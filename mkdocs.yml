@@ -23,8 +23,9 @@ plugins:
     - git-revision-date
     - mkdocs-jupyter:
           include_source: True
-          # execute: True
-          
+          ignore_h1_titles: True
+          execute: True
+
 markdown_extensions:
     - attr_list
     - pymdownx.superfences
@@ -45,6 +46,10 @@ nav:
     - FAQ: faq.md
     - Report Issues: https://github.com/giswqs/leafmap/issues
     - API Reference:
+          - basemaps module: basemaps.md
+          - common module: common.md
+          - foliummap module: foliumap.md
           - leafmap module: leafmap.md
+          - legends module: legends.md
     - Notebooks:
-          - notebooks/leafmap_intro.ipynb
+          - notebooks/01_leafmap_intro.ipynb
