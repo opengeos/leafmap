@@ -2,9 +2,14 @@
 
 import os
 import ipyleaflet
-from ipyleaflet import FullScreenControl, LayersControl, DrawControl, MeasureControl, ScaleControl, TileLayer
+
 
 class Map(ipyleaflet.Map):
+    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html. By default, the Map will add Google Maps as the basemap. Set add_google_map = False to use OpenStreetMap as the basemap.
+
+    Returns:
+        object: ipyleaflet map object.
+    """
 
     def __init__(self, **kwargs):
 
@@ -17,6 +22,9 @@ class Map(ipyleaflet.Map):
         if "scroll_wheel_zoom" not in kwargs:
             kwargs["scroll_wheel_zoom"] = True
 
+        if "attribution_control" not in kwargs:
+            kwargs["attribution_control"] = False
+
         super().__init__(**kwargs)
 
         if "height" not in kwargs:
@@ -24,35 +32,79 @@ class Map(ipyleaflet.Map):
         else:
             self.layout.height = kwargs["height"]
 
-        self.add_control(FullScreenControl())
-        self.add_control(LayersControl(position="topright"))
-        self.add_control(DrawControl(position="topleft"))
-        self.add_control(MeasureControl())
-        self.add_control(ScaleControl(position="bottomleft"))
+        if "layers_control" not in kwargs:
+            kwargs["layers_control"] = True
+        if kwargs["layers_control"]:
+            self.add_control(ipyleaflet.LayersControl(position="topright"))
+
+        if "fullscreen_control" not in kwargs:
+            kwargs["fullscreen_control"] = True
+        if kwargs["fullscreen_control"]:
+            self.add_control(ipyleaflet.FullScreenControl())
+
+        if "draw_control" not in kwargs:
+            kwargs["draw_control"] = True
+        if kwargs["draw_control"]:
+            draw_control = ipyleaflet.DrawControl(
+                marker={"shapeOptions": {"color": "#3388ff"}},
+                rectangle={"shapeOptions": {"color": "#3388ff"}},
+                circle={"shapeOptions": {"color": "#3388ff"}},
+                circlemarker={},
+                edit=True,
+                remove=True,
+                position="topleft",
+            )
+            self.add_control(draw_control)
+
+        if "measure_control" not in kwargs:
+            kwargs["measure_control"] = True
+        if kwargs["measure_control"]:
+            self.add_control(ipyleaflet.MeasureControl(position="topleft"))
+
+        if "scale_control" not in kwargs:
+            kwargs["scale_control"] = True
+        if kwargs["scale_control"]:
+            self.add_control(ipyleaflet.ScaleControl(position="bottomleft"))
 
         if "google_map" not in kwargs:
-            layer = TileLayer(
+            layer = ipyleaflet.TileLayer(
                 url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
                 attribution="Google",
                 name="Google Maps",
             )
             self.add_layer(layer)
         else:
-            if kwargs["google_map"] == "ROADMAP":
-                layer = TileLayer(
+            if kwargs["google_map"].upper() == "ROADMAP":
+                layer = ipyleaflet.TileLayer(
                     url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
                     attribution="Google",
                     name="Google Maps",
                 )
-                self.add_layer(layer)
-            elif kwargs["google_map"] == "HYBRID":
-                layer = TileLayer(
+            elif kwargs["google_map"].upper() == "HYBRID":
+                layer = ipyleaflet.TileLayer(
                     url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
                     attribution="Google",
-                    name="Google Satellite"
+                    name="Google Satellite",
                 )
-                self.add_layer(layer)
-
+            elif kwargs["google_map"].upper() == "TERRAIN":
+                layer = ipyleaflet.TileLayer(
+                    url="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+                    attribution="Google",
+                    name="Google Terrain",
+                )
+            elif kwargs["google_map"].upper() == "SATELLITE":
+                layer = ipyleaflet.TileLayer(
+                    url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+                    attribution="Google",
+                    name="Google Satellite",
+                )
+            else:
+                layer = ipyleaflet.TileLayer(
+                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+                    attribution="Google",
+                    name="Google Maps",
+                )
+            self.add_layer(layer)
 
     def add_geojson(self, in_geojson, style=None, layer_name="Untitled"):
 
@@ -65,10 +117,10 @@ class Map(ipyleaflet.Map):
 
             with open(in_geojson) as f:
                 data = json.load(f)
-        
+
         elif isinstance(in_geojson, dict):
             data = in_geojson
-        
+
         else:
             raise TypeError("The input geojson must be a type of str or dict.")
 
@@ -84,16 +136,16 @@ class Map(ipyleaflet.Map):
             }
 
         geo_json = ipyleaflet.GeoJSON(data=data, style=style, name=layer_name)
-        self.add_layer(geo_json)    
+        self.add_layer(geo_json)
 
-    def add_shapefile(self, in_shp, style=None, layer_name="Untitled"):     
+    def add_shapefile(self, in_shp, style=None, layer_name="Untitled"):
 
         geojson = shp_to_geojson(in_shp)
         self.add_geojson(geojson, style=style, layer_name=layer_name)
 
 
 def shp_to_geojson(in_shp, out_geojson=None):
-    
+
     import json
     import shapefile
 
