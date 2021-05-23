@@ -1,0 +1,3 @@
+# legends module
+
+::: leafmap.legends
