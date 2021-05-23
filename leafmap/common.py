@@ -8,7 +8,6 @@ import tarfile
 import urllib.request
 import zipfile
 import ipywidgets as widgets
-from ipytree import Tree, Node
 from IPython.display import display
 
 
@@ -1405,3 +1404,56 @@ def delete_shp(in_shp, verbose=True):
         os.remove(filepath)
         if verbose:
             print(f"Deleted {filepath}")
+
+
+def vector_to_geojson(
+    filename, out_geojson=None, bbox=None, mask=None, rows=None, epsg="4326", **kwargs
+):
+    """Converts any geopandas-supported vector dataset to GeoJSON.
+
+    Args:
+        filename (str): Either the absolute or relative path to the file or URL to be opened, or any object with a read() method (such as an open file or StringIO).
+        out_geojson (str, optional): The file path to the output GeoJSON. Defaults to None.
+        bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
+        mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
+        rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
+        epsg (str, optional): The EPSG number to convert to. Defaults to "4326".
+
+    Raises:
+        ValueError: When the output file path is invalid.
+
+    Returns:
+        dict: A dictionary containing the GeoJSON.
+    """
+    import warnings
+
+    warnings.filterwarnings("ignore")
+    check_package(name="geopandas", URL="https://geopandas.org")
+    import geopandas as gpd
+
+    if not filename.startswith("http"):
+        filename = os.path.abspath(filename)
+    ext = os.path.splitext(filename)[1].lower()
+    if ext == ".kml":
+        gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+        df = gpd.read_file(
+            filename, bbox=bbox, mask=mask, rows=rows, driver="KML", **kwargs
+        )
+    else:
+        df = gpd.read_file(filename, bbox=bbox, mask=mask, rows=rows, **kwargs)
+    gdf = df.to_crs(epsg=epsg)
+
+    if out_geojson is not None:
+
+        if not out_geojson.lower().endswith(".geojson"):
+            raise ValueError("The output file must have a geojson file extension.")
+
+        out_geojson = os.path.abspath(out_geojson)
+        out_dir = os.path.dirname(out_geojson)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+        gdf.to_file(out_geojson, driver="GeoJSON")
+
+    else:
+        return gdf.__geo_interface__
