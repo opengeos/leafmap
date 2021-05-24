@@ -3,6 +3,7 @@ import folium
 from folium import plugins
 from .common import *
 from .legends import builtin_legends
+from .basemaps import folium_basemaps
 
 
 class Map(folium.Map):
@@ -40,6 +41,12 @@ class Map(folium.Map):
 
         if "draw_export" not in kwargs:
             kwargs["draw_export"] = False
+
+        if "height" in kwargs and isinstance(kwargs["height"], str):
+            kwargs["height"] = float(kwargs["height"].replace("px", ""))
+
+        if "width" in kwargs and isinstance(kwargs["width"], str):
+            kwargs["width"] = float(kwargs["width"].replace("px", ""))
 
         super().__init__(**kwargs)
         self.baseclass = "folium"
@@ -152,6 +159,21 @@ class Map(folium.Map):
             zoom (int, optional): The zoom level, from 1 to 24. Defaults to 10.
         """
         self.fit_bounds([[lat, lon], [lat, lon]], max_zoom=zoom)
+
+    def add_basemap(self, basemap="HYBRID"):
+        """Adds a basemap to the map.
+
+        Args:
+            basemap (str, optional): Can be one of string from ee_basemaps. Defaults to 'HYBRID'.
+        """
+        try:
+            folium_basemaps[basemap].add_to(self)
+        except Exception:
+            raise Exception(
+                "Basemap can only be one of the following: {}".format(
+                    ", ".join(folium_basemaps.keys())
+                )
+            )
 
     def add_wms_layer(
         self,
