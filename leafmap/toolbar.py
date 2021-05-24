@@ -680,10 +680,10 @@ def change_basemap(m):
     Args:
         m (object): geemap.Map()
     """
-    from .basemaps import _basemaps
+    from .basemaps import leaf_basemaps
 
     dropdown = widgets.Dropdown(
-        options=list(_basemaps.keys()),
+        options=list(leaf_basemaps.keys()),
         value="ROADMAP",
         layout=widgets.Layout(width="200px")
         # description="Basemaps",
@@ -705,7 +705,7 @@ def change_basemap(m):
             old_basemap = m.layers[0]
         else:
             old_basemap = m.layers[1]
-        m.substitute_layer(old_basemap, _basemaps[basemap_name])
+        m.substitute_layer(old_basemap, leaf_basemaps[basemap_name])
 
     dropdown.observe(on_click, "value")
 

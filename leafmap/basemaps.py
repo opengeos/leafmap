@@ -11,13 +11,13 @@ More WMS basemaps can be found at the following websites:
 3. FWS NWI Wetlands data: https://www.fws.gov/wetlands/Data/Web-Map-Services.html
 
 """
-
+import folium
 from box import Box
 from ipyleaflet import TileLayer, WMSLayer, basemap_to_tiles
 import ipyleaflet.basemaps as ipybasemaps
 
 
-_basemaps = {
+leaf_basemaps = {
     "ROADMAP": TileLayer(
         url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         attribution="Google",
@@ -206,20 +206,146 @@ _basemaps = {
     ),
 }
 
+
+folium_basemaps = {
+    "ROADMAP": folium.TileLayer(
+        tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+        attr="Google",
+        name="Google Maps",
+        overlay=True,
+        control=True,
+    ),
+    "SATELLITE": folium.TileLayer(
+        tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+        attr="Google",
+        name="Google Satellite",
+        overlay=True,
+        control=True,
+    ),
+    "TERRAIN": folium.TileLayer(
+        tiles="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+        attr="Google",
+        name="Google Terrain",
+        overlay=True,
+        control=True,
+    ),
+    "HYBRID": folium.TileLayer(
+        tiles="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+        attr="Google",
+        name="Google Satellite",
+        overlay=True,
+        control=True,
+    ),
+    "ESRI": folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Satellite",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Ocean": folium.TileLayer(
+        tiles="https://services.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Ocean",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Satellite": folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Satellite",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Standard": folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Standard",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Terrain": folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Terrain",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Transportation": folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Transportation",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Topo World": folium.TileLayer(
+        tiles="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Topo World",
+        overlay=True,
+        control=True,
+    ),
+    "Esri National Geographic": folium.TileLayer(
+        tiles="http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri National Geographic",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Shaded Relief": folium.TileLayer(
+        tiles="https://services.arcgisonline.com/arcgis/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Shaded Relief",
+        overlay=True,
+        control=True,
+    ),
+    "Esri Physical Map": folium.TileLayer(
+        tiles="https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Esri Physical Map",
+        overlay=True,
+        control=True,
+    ),
+    "Bing VirtualEarth": folium.TileLayer(
+        tiles="http://ecn.t3.tiles.virtualearth.net/tiles/a{q}.jpeg?g=1",
+        attr="Microsoft",
+        name="Bing VirtualEarth",
+        overlay=True,
+        control=True,
+    ),
+    "3DEP Elevation": folium.WmsTileLayer(
+        url="https://elevation.nationalmap.gov/arcgis/services/3DEPElevation/ImageServer/WMSServer?",
+        layers="3DEPElevation:None",
+        attr="USGS",
+        name="3DEP Elevation",
+        overlay=True,
+        control=True,
+    ),
+    "NAIP Imagery": folium.WmsTileLayer(
+        url="https://services.nationalmap.gov/arcgis/services/USGSNAIPImagery/ImageServer/WMSServer?",
+        layers="0",
+        attr="USGS",
+        name="NAIP Imagery",
+        overlay=True,
+        control=True,
+    ),
+}
+
+
 # Adds ipyleaflet basemaps
 for item in ipybasemaps.values():
     try:
         name = item["name"]
         basemap = "ipybasemaps.{}".format(name)
-        _basemaps[name] = basemap_to_tiles(eval(basemap))
+        leaf_basemaps[name] = basemap_to_tiles(eval(basemap))
     except Exception:
         for sub_item in item:
             name = item[sub_item]["name"]
             basemap = "ipybasemaps.{}".format(name)
             basemap = basemap.replace("Mids", "Modis")
-            _basemaps[name] = basemap_to_tiles(eval(basemap))
+            leaf_basemaps[name] = basemap_to_tiles(eval(basemap))
 
-basemap_tiles = Box(_basemaps, frozen_box=True)
+basemap_tiles = Box(leaf_basemaps, frozen_box=True)
 basemaps = Box(
-    dict(zip(list(_basemaps.keys()), list(_basemaps.keys()))), frozen_box=True
+    dict(zip(list(leaf_basemaps.keys()), list(leaf_basemaps.keys()))), frozen_box=True
 )
