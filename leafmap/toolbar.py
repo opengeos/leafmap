@@ -430,7 +430,7 @@ def open_data_widget(m):
     """A widget for opening local vector/raster data.
 
     Args:
-        m (object): geemap.Map
+        m (object): leafmap.Map
     """
     tool_output = widgets.Output()
     tool_output_ctrl = WidgetControl(widget=tool_output, position="topright")
@@ -678,7 +678,7 @@ def change_basemap(m):
     """Widget for change basemaps.
 
     Args:
-        m (object): geemap.Map()
+        m (object): leafmap.Map()
     """
     from .basemaps import leaf_basemaps
 
