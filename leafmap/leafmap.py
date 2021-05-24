@@ -499,7 +499,7 @@ class Map(ipyleaflet.Map):
             raise ValueError(e)
 
     def basemap_demo(self):
-        """A demo for using geemap basemaps."""
+        """A demo for using leafmap basemaps."""
         dropdown = widgets.Dropdown(
             options=list(basemap_tiles.keys()),
             value="HYBRID",
