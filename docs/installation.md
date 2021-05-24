@@ -1,23 +1,42 @@
 # Installation
 
-## Stable release
+## Install from PyPI
 
-To install leafmap, run this command in your terminal:
+**leafmap** is available on [PyPI](https://pypi.org/project/leafmap/). To install **leafmap**, run this command in your terminal:
 
-```
-pip install leafmap
-```
+    pip install leafmap
 
-This is the preferred method to install leafmap, as it will always install the most recent stable release.
+## Install from conda-forge
 
-If you don't have [pip](https://pip.pypa.io) installed, this [Python installation guide](http://docs.python-guide.org/en/latest/starting/installation/) can guide you through the process.
+**leafmap** is also available on [conda-forge](https://anaconda.org/conda-forge/leafmap). If you have
+[Anaconda](https://www.anaconda.com/distribution/#download-section) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) installed on your computer, you can create a conda Python environment to install leafmap:
 
-## From sources
+    conda create -n geo python
+    conda activate geo
+    conda install mamba -c conda-forge
+    mamba install leafmap -c conda-forge
 
-The sources for leafmap can be downloaded from the Github repo.
+Optionally, you can install some [Jupyter notebook extensions](https://github.com/ipython-contrib/jupyter_contrib_nbextensions), which can improve your productivity in the notebook environment. Some useful extensions include Table of Contents, Gist-it, Autopep8, Variable Inspector, etc. See this [post](https://towardsdatascience.com/jupyter-notebook-extensions-517fa69d2231) for more information.
 
-You can clone the public repository:
+    conda install jupyter_contrib_nbextensions -c conda-forge
 
-```
-git clone git://github.com/giswqs/leafmap
-```
+## Install from GitHub
+
+To install the development version from GitHub using [Git](https://git-scm.com/), run the following command in your terminal:
+
+    pip install git+https://github.com/giswqs/leafmap
+
+## Upgrade leafmap
+
+If you have installed **leafmap** before and want to upgrade to the latest version, you can run the following command in your terminal:
+
+    pip install -U leafmap
+
+If you use conda, you can update leafmap to the latest version by running the following command in your terminal:
+
+    mamba update -c conda-forge leafmap
+
+To install the development version from GitHub directly within Jupyter notebook without using Git, run the following code:
+
+    import leafmap
+    leafmap.update_package()
