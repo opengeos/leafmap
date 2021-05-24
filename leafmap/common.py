@@ -34,6 +34,35 @@ def is_drive_mounted():
         return False
 
 
+def set_proxy(port=1080, ip="http://127.0.0.1"):
+    """Sets proxy if needed. This is only needed for countries where Google services are not available.
+
+    Args:
+        port (int, optional): The proxy port number. Defaults to 1080.
+        ip (str, optional): The IP address. Defaults to 'http://127.0.0.1'.
+    """
+    import requests
+
+    try:
+
+        if not ip.startswith("http"):
+            ip = "http://" + ip
+        proxy = "{}:{}".format(ip, port)
+
+        os.environ["HTTP_PROXY"] = proxy
+        os.environ["HTTPS_PROXY"] = proxy
+
+        a = requests.get("https://google.com")
+
+        if a.status_code != 200:
+            print(
+                "Failed to connect to Google services. Please double check the port number and ip address."
+            )
+
+    except Exception as e:
+        raise Exception(e)
+
+
 def check_install(package):
     """Checks whether a package is installed. If not, it will install the package.
 
