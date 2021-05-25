@@ -37,6 +37,9 @@ class Map(ipyleaflet.Map):
         self.tool_output_ctrl = None
         self.layer_control = None
         self.draw_control = None
+        self.user_roi = None
+        self.user_rois = None
+        self.draw_features = []
 
         if "height" not in kwargs:
             self.layout.height = "600px"
@@ -67,6 +70,19 @@ class Map(ipyleaflet.Map):
             )
             self.add_control(draw_control)
             self.draw_control = draw_control
+
+            def handle_draw(target, action, geo_json):
+                self.user_roi = geo_json
+                if action == "deleted" and len(self.draw_features) > 0:
+                    self.draw_features.remove(geo_json)
+                else:
+                    self.draw_features.append(geo_json)
+                self.user_rois = {
+                    "type": "FeatureCollection",
+                    "features": self.draw_features,
+                }
+
+            draw_control.on_draw(handle_draw)
 
         if "measure_control" not in kwargs:
             kwargs["measure_control"] = True
