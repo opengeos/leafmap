@@ -28,41 +28,6 @@ m = leafmap.Map(center=(40, -100), zoom=4)
 m
 ```
 
-## Customize map height
+## Demo
 
-```python
-m = leafmap.Map(height="450px")
-m
-```
-
-## Set control visibility
-
-```python
-m = leafmap.Map(draw_control=False, measure_control=False, fullscreen_control=False, attribution_control=True)
-m
-```
-
-## Change basemaps
-
-```python
-m = leafmap.Map(google_map="TERRAIN")
-m.add_basemap("HYBRID")
-m
-```
-
-## Add XYZ tile layer
-
-```python
-m = leafmap.Map()
-m.add_tile_layer(url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", name="Google Satellite")
-m
-```
-
-## Add WMS tile layer
-
-```python
-m = leafmap.Map()
-naip_url = 'https://services.nationalmap.gov/arcgis/services/USGSNAIPImagery/ImageServer/WMSServer?'
-m.add_wms_layer(url=naip_url, layers='0', name='NAIP Imagery', format='image/png', shown=True)
-m
-```
+![](https://wetlands.io/file/images/leafmap_demo.gif)

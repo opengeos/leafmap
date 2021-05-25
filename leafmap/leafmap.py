@@ -36,6 +36,7 @@ class Map(ipyleaflet.Map):
         self.tool_output = None
         self.tool_output_ctrl = None
         self.layer_control = None
+        self.draw_control = None
 
         if "height" not in kwargs:
             self.layout.height = "600px"
@@ -65,6 +66,7 @@ class Map(ipyleaflet.Map):
                 position="topleft",
             )
             self.add_control(draw_control)
+            self.draw_control = draw_control
 
         if "measure_control" not in kwargs:
             kwargs["measure_control"] = True
@@ -846,91 +848,91 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
-    # def to_html(
-    #     self,
-    #     outfile,
-    #     title="My Map",
-    #     width="100%",
-    #     height="880px",
-    #     add_layer_control=True,
-    # ):
-    #     """Saves the map as a HTML file.
+    def to_html(
+        self,
+        outfile,
+        title="My Map",
+        width="100%",
+        height="880px",
+        add_layer_control=True,
+    ):
+        """Saves the map as a HTML file.
 
-    #     Args:
-    #         outfile (str): The output file path to the HTML file.
-    #         title (str, optional): The title of the HTML file. Defaults to 'My Map'.
-    #         width (str, optional): The width of the map in pixels or percentage. Defaults to '100%'.
-    #         height (str, optional): The height of the map in pixels. Defaults to '880px'.
-    #         add_layer_control (bool, optional): Whether to add the LayersControl. Defaults to True.
+        Args:
+            outfile (str): The output file path to the HTML file.
+            title (str, optional): The title of the HTML file. Defaults to 'My Map'.
+            width (str, optional): The width of the map in pixels or percentage. Defaults to '100%'.
+            height (str, optional): The height of the map in pixels. Defaults to '880px'.
+            add_layer_control (bool, optional): Whether to add the LayersControl. Defaults to True.
 
-    #     """
-    #     try:
+        """
+        try:
 
-    #         if not outfile.endswith(".html"):
-    #             print("The output file must end with .html")
-    #             return
+            if not outfile.endswith(".html"):
+                print("The output file must end with .html")
+                return
 
-    #         out_dir = os.path.dirname(outfile)
-    #         if not os.path.exists(out_dir):
-    #             os.makedirs(out_dir)
+            out_dir = os.path.dirname(outfile)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
 
-    #         if add_layer_control and self.layer_control is None:
-    #             layer_control = ipyleaflet.LayersControl(position="topright")
-    #             self.layer_control = layer_control
-    #             self.add_control(layer_control)
+            if add_layer_control and self.layer_control is None:
+                layer_control = ipyleaflet.LayersControl(position="topright")
+                self.layer_control = layer_control
+                self.add_control(layer_control)
 
-    #         before_width = self.layout.width
-    #         before_height = self.layout.height
+            before_width = self.layout.width
+            before_height = self.layout.height
 
-    #         if not isinstance(width, str):
-    #             print("width must be a string.")
-    #             return
-    #         elif width.endswith("px") or width.endswith("%"):
-    #             pass
-    #         else:
-    #             print("width must end with px or %")
-    #             return
+            if not isinstance(width, str):
+                print("width must be a string.")
+                return
+            elif width.endswith("px") or width.endswith("%"):
+                pass
+            else:
+                print("width must end with px or %")
+                return
 
-    #         if not isinstance(height, str):
-    #             print("height must be a string.")
-    #             return
-    #         elif not height.endswith("px"):
-    #             print("height must end with px")
-    #             return
+            if not isinstance(height, str):
+                print("height must be a string.")
+                return
+            elif not height.endswith("px"):
+                print("height must end with px")
+                return
 
-    #         self.layout.width = width
-    #         self.layout.height = height
+            self.layout.width = width
+            self.layout.height = height
 
-    #         self.save(outfile, title=title)
+            self.save(outfile, title=title)
 
-    #         self.layout.width = before_width
-    #         self.layout.height = before_height
+            self.layout.width = before_width
+            self.layout.height = before_height
 
-    #     except Exception as e:
-    #         raise Exception(e)
+        except Exception as e:
+            raise Exception(e)
 
-    # def to_image(self, outfile=None, monitor=1):
-    #     """Saves the map as a PNG or JPG image.
+    def to_image(self, outfile=None, monitor=1):
+        """Saves the map as a PNG or JPG image.
 
-    #     Args:
-    #         outfile (str, optional): The output file path to the image. Defaults to None.
-    #         monitor (int, optional): The monitor to take the screenshot. Defaults to 1.
-    #     """
-    #     if outfile is None:
-    #         outfile = os.path.join(os.getcwd(), "my_map.png")
+        Args:
+            outfile (str, optional): The output file path to the image. Defaults to None.
+            monitor (int, optional): The monitor to take the screenshot. Defaults to 1.
+        """
+        if outfile is None:
+            outfile = os.path.join(os.getcwd(), "my_map.png")
 
-    #     if outfile.endswith(".png") or outfile.endswith(".jpg"):
-    #         pass
-    #     else:
-    #         print("The output file must be a PNG or JPG image.")
-    #         return
+        if outfile.endswith(".png") or outfile.endswith(".jpg"):
+            pass
+        else:
+            print("The output file must be a PNG or JPG image.")
+            return
 
-    #     work_dir = os.path.dirname(outfile)
-    #     if not os.path.exists(work_dir):
-    #         os.makedirs(work_dir)
+        work_dir = os.path.dirname(outfile)
+        if not os.path.exists(work_dir):
+            os.makedirs(work_dir)
 
-    #     screenshot = screen_capture(outfile, monitor)
-    #     self.screenshot = screenshot
+        screenshot = screen_capture(outfile, monitor)
+        self.screenshot = screenshot
 
     def toolbar_reset(self):
         """Reset the toolbar so that no tool is selected."""
