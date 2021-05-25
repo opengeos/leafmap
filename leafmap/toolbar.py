@@ -275,6 +275,9 @@ def main_toolbar(m):
             elif tool_name == "eraser":
                 if m.draw_control is not None:
                     m.draw_control.clear()
+                    m.user_roi = None
+                    m.user_rois = None
+                    m.draw_features = []
             elif tool_name == "whitebox":
                 import whiteboxgui.whiteboxgui as wbt
 
