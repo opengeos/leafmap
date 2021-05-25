@@ -11,7 +11,7 @@
 [![image](https://img.shields.io/badge/YouTube-Channel-red)](https://www.youtube.com/c/QiushengWu)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
 
-**A Python package for geospatial analysis and interactive mapping with minimal coding**
+**A Python package for geospatial analysis and interactive mapping in a Jupyter environment.**
 
 -   GitHub repo: <https://github.com/giswqs/leafmap>
 -   Documentation: <https://leafmap.gishub.org>
@@ -22,7 +22,7 @@
 
 ## Introduction
 
-**leafmap** is a Python package for geospatial analysis and interactive mapping with minimal coding. It is a spin-off the [geemap](https://geemap.org) Python package, which was designed specifically to work with [Google Earth Engine](https://earthengine.google.com) (GEE). However, not all users in the geospatial community have a GEE account. **leafmap** is designed to fill this gap for non-GEE users. It enables users to perform geospatial analysis and interactive mapping in a Jupyter-based environment with minimal coding. It is built upon a number of open-source packages, including [folium](https://github.com/python-visualization/folium) and [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) (for creating interactive maps), [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) and [whiteboxgui](https://github.com/giswqs/whiteboxgui) (for analyzing geospatial data), and [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) (for designing interactive graphical user interface).
+**leafmap** is a Python package for geospatial analysis and interactive mapping in a Jupyter environment. It is a spin-off project of the [geemap](https://geemap.org) Python package, which was designed specifically to work with [Google Earth Engine](https://earthengine.google.com) (GEE). However, not everyone in the geospatial community has a GEE account. **leafmap** is designed to fill this gap for non-GEE users. It enables users to perform advanced geospatial analysis and interactive mapping with minimal coding in a Jupyter environment (e.g., Google Colab, JupyterLab, Jupyter notebook). It is built upon a number of open-source packages, such as [folium](https://github.com/python-visualization/folium) and [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) (for creating interactive maps), [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) and [whiteboxgui](https://github.com/giswqs/whiteboxgui) (for analyzing geospatial data), and [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) (for designing interactive graphical user interface).
 
 The [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) library currently contains **447** tools, which are each grouped based on their main function into one of the following categories. For a list of available tools with comprehensive documentation and usage details, please see the [WhiteboxTools User Manual](https://jblindsay.github.io/wbt_book/available_tools/index.html).
 
@@ -48,15 +48,19 @@ Below is a partial list of features available for the leafmap package. Please ch
 -   Select from a variety of basemaps interactively without coding.
 -   Add XYZ and WMS tile services to the map.
 -   Convert CSV to points and display points as a marker cluster.
--   Add local vector data (e.g., shapfile, GeoJSON, KML) to the map without coding.
--   Add local raster data to the map without coding.
+-   Add local vector data (e.g., shapefile, GeoJSON, KML) to the map without coding.
+-   Add local raster data (e.g., GeoTIFF) to the map without coding.
 -   Add Cloud Optimized GeoTIFF (COG) and SpatialTemporal Asset Catalog (STAC) to the map.
 -   Add custom legends and colorbars to the map.
 -   Perform geospatial analysis using WhiteboxTools and whiteboxgui.
 -   Publish interactive maps with only one line of code.
 
+## Demo
+
+![](https://wetlands.io/file/images/leafmap_demo.gif)
+
 ## YouTube Channel
 
-I have created a [YouTube Channel](https://www.youtube.com/c/QiushengWu) for sharing geospaital tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
+I have created a [YouTube Channel](https://www.youtube.com/c/QiushengWu) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
 
 [![Earth Engine Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://www.youtube.com/c/QiushengWu)

@@ -1486,3 +1486,29 @@ def vector_to_geojson(
 
     else:
         return gdf.__geo_interface__
+
+
+def screen_capture(outfile, monitor=1):
+    """Takes a full screenshot of the selected monitor.
+
+    Args:
+        outfile (str): The output file path to the screenshot.
+        monitor (int, optional): The monitor to take the screenshot. Defaults to 1.
+    """
+    from mss import mss
+
+    out_dir = os.path.dirname(outfile)
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if not isinstance(monitor, int):
+        print("The monitor number must be an integer.")
+        return
+
+    try:
+        with mss() as sct:
+            sct.shot(output=outfile, mon=monitor)
+            return outfile
+
+    except Exception as e:
+        raise Exception(e)

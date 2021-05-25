@@ -12,7 +12,14 @@ from .common import *
 
 
 def tool_template(m=None):
+    """Generates a tool GUI template using ipywidgets.
 
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
     widget_width = "250px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
 
@@ -189,6 +196,11 @@ def tool_template(m=None):
 
 
 def main_toolbar(m):
+    """Creates the main toolbar and adds it to the map.
+
+    Args:
+        m (leafmap.Map): The leafmap Map object.
+    """
     tools = {
         "map": {
             "name": "basemap",
@@ -207,7 +219,7 @@ def main_toolbar(m):
             "tooltip": "WhiteboxTools for local geoprocessing",
         },
         "camera": {
-            "name": "to_image",
+            "name": "save_map",
             "tooltip": "Save map as HTML or image",
         },
         "question": {
@@ -260,7 +272,9 @@ def main_toolbar(m):
                 change_basemap(m)
             elif tool_name == "open_data":
                 open_data_widget(m)
-
+            elif tool_name == "eraser":
+                if m.draw_control is not None:
+                    m.draw_control.clear()
             elif tool_name == "whitebox":
                 import whiteboxgui.whiteboxgui as wbt
 
@@ -271,6 +285,8 @@ def main_toolbar(m):
                 wbt_control = WidgetControl(widget=wbt_toolbox, position="bottomright")
                 m.whitebox = wbt_control
                 m.add_control(wbt_control)
+            elif tool_name == "save_map":
+                save_map((m))
             elif tool_name == "help":
                 import webbrowser
 
@@ -279,7 +295,8 @@ def main_toolbar(m):
         else:
             tool = change["owner"]
             tool_name = tools[tool.icon]["name"]
-            m.toolbar_reset()
+
+        m.toolbar_reset()
 
     for tool in toolbar_grid.children:
         tool.observe(tool_callback, "value")
@@ -675,10 +692,10 @@ def open_data_widget(m):
 
 
 def change_basemap(m):
-    """Widget for change basemaps.
+    """Widget for changing basemaps.
 
     Args:
-        m (object): leafmap.Map()
+        m (object): leafmap.Map.
     """
     from .basemaps import leaf_basemaps
 
@@ -720,3 +737,94 @@ def change_basemap(m):
     basemap_control = WidgetControl(widget=basemap_widget, position="topright")
     m.add_control(basemap_control)
     m.basemap_ctrl = basemap_control
+
+
+def save_map(m):
+    """Saves the map as HTML, JPG, or PNG.
+
+    Args:
+        m (leafmap.Map): The leafmap Map object.
+    """
+    import time
+
+    tool_output = widgets.Output()
+    m.tool_output = tool_output
+    tool_output.clear_output(wait=True)
+    save_map_widget = widgets.VBox()
+
+    save_type = widgets.ToggleButtons(
+        options=["HTML", "PNG", "JPG"],
+        tooltips=[
+            "Save the map as an HTML file",
+            "Take a screenshot and save as a PNG file",
+            "Take a screenshot and save as a JPG file",
+        ],
+    )
+
+    file_chooser = FileChooser(os.getcwd())
+    file_chooser.default_filename = "my_map.html"
+    file_chooser.use_dir_icons = True
+
+    ok_cancel = widgets.ToggleButtons(
+        value=None,
+        options=["OK", "Cancel", "Close"],
+        tooltips=["OK", "Cancel", "Close"],
+        button_style="primary",
+    )
+
+    def save_type_changed(change):
+        ok_cancel.value = None
+        # file_chooser.reset()
+        file_chooser.default_path = os.getcwd()
+        if change["new"] == "HTML":
+            file_chooser.default_filename = "my_map.html"
+        elif change["new"] == "PNG":
+            file_chooser.default_filename = "my_map.png"
+        elif change["new"] == "JPG":
+            file_chooser.default_filename = "my_map.jpg"
+        save_map_widget.children = [save_type, file_chooser]
+
+    def chooser_callback(chooser):
+        save_map_widget.children = [save_type, file_chooser, ok_cancel]
+
+    def ok_cancel_clicked(change):
+        if change["new"] == "OK":
+            file_path = file_chooser.selected
+            ext = os.path.splitext(file_path)[1]
+            if save_type.value == "HTML" and ext.upper() == ".HTML":
+                tool_output.clear_output()
+                m.to_html(file_path)
+            elif save_type.value == "PNG" and ext.upper() == ".PNG":
+                tool_output.clear_output()
+                m.toolbar_button.value = False
+                time.sleep(1)
+                screen_capture(outfile=file_path)
+            elif save_type.value == "JPG" and ext.upper() == ".JPG":
+                tool_output.clear_output()
+                m.toolbar_button.value = False
+                time.sleep(1)
+                screen_capture(outfile=file_path)
+            else:
+                label = widgets.Label(
+                    value="The selected file extension does not match the selected exporting type."
+                )
+                save_map_widget.children = [save_type, file_chooser, label]
+        elif change["new"] == "Cancel":
+            tool_output.clear_output()
+            file_chooser.reset()
+        elif change["new"] == "Close":
+            if m.save_map_control is not None:
+                m.remove_control(m.save_map_control)
+                m.save_map_control = None
+        ok_cancel.value = None
+        m.toolbar_reset()
+
+    save_type.observe(save_type_changed, names="value")
+    ok_cancel.observe(ok_cancel_clicked, names="value")
+
+    file_chooser.register_callback(chooser_callback)
+
+    save_map_widget.children = [save_type, file_chooser]
+    save_map_control = WidgetControl(widget=save_map_widget, position="topright")
+    m.add_control(save_map_control)
+    m.save_map_control = save_map_control

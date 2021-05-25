@@ -39,7 +39,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
     ],
-    description="A Python package for geospatial analysis and interactive mapping with minimal coding",
+    description="A Python package for geospatial analysis and interactive mapping in a Jupyter environment.",
     install_requires=install_requires,
     dependency_links=dependency_links,
     license="MIT license",
