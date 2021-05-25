@@ -30,4 +30,4 @@ m
 
 ## Demo
 
-![](https://wetlands.io/file/images/leafmap_demo.gif)
+![](data/leafmap_demo.gif)

@@ -57,7 +57,7 @@ Below is a partial list of features available for the leafmap package. Please ch
 
 ## Demo
 
-![](https://wetlands.io/file/images/leafmap_demo.gif)
+![](data/leafmap_demo.gif)
 
 ## YouTube Channel
 
