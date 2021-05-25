@@ -11,6 +11,10 @@
 [![image](https://img.shields.io/badge/YouTube-Channel-red)](https://www.youtube.com/c/QiushengWu)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
 
+## Demo
+
+![](https://wetlands.io/file/images/leafmap_demo.gif)
+
 ## YouTube Channel
 
 I have created a [YouTube Channel](https://www.youtube.com/c/QiushengWu) for sharing geospaital tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
