@@ -119,6 +119,9 @@ class Map(folium.Map):
                     control=True,
                 )
             else:
+                print(
+                    f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
+                )
                 layer = folium.TileLayer(
                     tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
                     attr="Google",
@@ -167,7 +170,14 @@ class Map(folium.Map):
             basemap (str, optional): Can be one of string from ee_basemaps. Defaults to 'HYBRID'.
         """
         try:
-            folium_basemaps[basemap].add_to(self)
+            if basemap in folium_basemaps:
+                folium_basemaps[basemap].add_to(self)
+            else:
+                print(
+                    "Basemap can only be one of the following: {}".format(
+                        ", ".join(folium_basemaps.keys())
+                    )
+                )
         except Exception:
             raise Exception(
                 "Basemap can only be one of the following: {}".format(
