@@ -671,6 +671,74 @@ def csv_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude"):
         raise Exception(e)
 
 
+def csv_to_geojson(
+    in_csv, out_geojson=None, latitude="latitude", longitude="longitude"
+):
+    """Creates points for a CSV file and exports data as a GeoJSON.
+
+    Args:
+        in_csv (str): The file path to the input CSV file.
+        out_geojson (str): The file path to the exported GeoJSON. Default to None.
+        latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
+        longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+
+    """
+
+    import json
+    import shapefile
+
+    if out_geojson is not None:
+        out_dir = os.path.dirname(out_geojson)
+    else:
+        out_dir = os.path.expanduser("~/Downloads")
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    out_shp = os.path.join(out_dir, random_string() + ".shp")
+
+    csv_to_shp(in_csv, out_shp, latitude=latitude, longitude=longitude)
+    sf = shapefile.Reader(out_shp)
+    geojson = sf.__geo_interface__
+
+    delete_shp(out_shp, verbose=False)
+
+    if out_geojson is None:
+        return geojson
+    else:
+        with open(out_geojson, "w", encoding="utf-8") as f:
+            f.write(json.dumps(geojson))
+
+
+def csv_to_geopandas(in_csv, latitude="latitude", longitude="longitude"):
+    """Creates points for a CSV file and converts them to a GeoDataFrame.
+
+    Args:
+        in_csv (str): The file path to the input CSV file.
+        latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
+        longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+
+    Returns:
+        object: GeoDataFrame.
+    """
+
+    check_package(name="geopandas", URL="https://geopandas.org")
+
+    import geopandas as gpd
+
+    out_dir = os.path.expanduser("~/Downloads")
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    out_shp = os.path.join(out_dir, random_string() + ".shp")
+
+    csv_to_shp(in_csv, out_shp, latitude=latitude, longitude=longitude)
+
+    gdf = gpd.read_file(out_shp)
+    delete_shp(out_shp)
+    return gdf
+
+
 def create_code_cell(code="", where="below"):
     """Creates a code cell in the IPython Notebook.
 
@@ -776,7 +844,7 @@ def get_COG_mosaic(
         return r2["tiles"][0]
 
     except Exception as e:
-        print(e)
+        raise Exception(e)
 
 
 def get_COG_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
@@ -935,7 +1003,7 @@ def get_STAC_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
     import requests
 
     r = requests.get(
-        f"{titiler_endpoint}/stac/info",
+        f"{titiler_endpoint}/stac/assets",
         params={
             "url": url,
         },
