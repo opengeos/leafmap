@@ -127,6 +127,9 @@ class Map(ipyleaflet.Map):
                     name="Google Satellite",
                 )
             else:
+                print(
+                    f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
+                )
                 layer = ipyleaflet.TileLayer(
                     url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
                     attribution="Google",
@@ -169,18 +172,43 @@ class Map(ipyleaflet.Map):
         resolution = 156543.04 * math.cos(0) / math.pow(2, zoom_level)
         return resolution
 
+    def get_layer_names(self):
+        """Gets layer names as a list.
+
+        Returns:
+            list: A list of layer names.
+        """
+        layer_names = []
+
+        for layer in list(self.layers):
+            if len(layer.name) > 0:
+                layer_names.append(layer.name)
+
+        return layer_names
+
     def add_basemap(self, basemap="HYBRID"):
         """Adds a basemap to the map.
 
         Args:
-            basemap (str, optional): Can be one of string from ee_basemaps. Defaults to 'HYBRID'.
+            basemap (str, optional): Can be one of string from basemap_tiles. Defaults to 'HYBRID'.
         """
         try:
+            layer_names = self.get_layer_names()
             if (
-                basemap in basemap_tiles.keys()
-                and basemap_tiles[basemap] not in self.layers
+                basemap in basemap_tiles
+                and basemap_tiles[basemap].name not in layer_names
             ):
                 self.add_layer(basemap_tiles[basemap])
+            elif (
+                basemap in basemap_tiles and basemap_tiles[basemap].name in layer_names
+            ):
+                print(f"{basemap} has been already added before.")
+            else:
+                print(
+                    "Basemap can only be one of the following:\n  {}".format(
+                        "\n  ".join(basemap_tiles.keys())
+                    )
+                )
 
         except Exception:
             raise ValueError(
