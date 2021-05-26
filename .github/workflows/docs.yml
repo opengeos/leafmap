@@ -21,7 +21,7 @@ jobs:
               run: |
                   python -m unittest discover tests/
             - run: python -m pip install --upgrade pip
-            - run: pip install mkdocs-material mkdocstrings mkdocs-git-revision-date-plugin mkdocs-jupyter ipykernel xarray_leaflet
+            - run: pip install mkdocs-material mkdocstrings mkdocs-git-revision-date-plugin mkdocs-jupyter ipykernel xarray_leaflet geopandas
             - run: mkdocs gh-deploy --force
               env:
                   USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
