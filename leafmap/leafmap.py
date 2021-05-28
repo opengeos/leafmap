@@ -101,6 +101,8 @@ class Map(ipyleaflet.Map):
                 name="Google Maps",
             )
             self.add_layer(layer)
+        elif kwargs["google_map"] is None:
+            pass
         else:
             if kwargs["google_map"].upper() == "ROADMAP":
                 layer = ipyleaflet.TileLayer(
@@ -1439,3 +1441,94 @@ class Map(ipyleaflet.Map):
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
+
+
+def linked_maps(
+    rows=2,
+    cols=2,
+    height="400px",
+    layers=[],
+    labels=[],
+    label_position="topright",
+    **kwargs,
+):
+    """Create linked maps of Earth Engine data layers.
+
+    Args:
+        rows (int, optional): The number of rows of maps to create. Defaults to 2.
+        cols (int, optional): The number of columns of maps to ceate. Defaults to 2.
+        height (str, optional): The height of each map in pixels. Defaults to "400px".
+        layers (list, optional): The list of layers to use for each map. Defaults to [].
+        labels (list, optional): The list of labels to show on the map. Defaults to [].
+        label_position (str, optional): The position of the label, can be [topleft, topright, bottomleft, bottomright]. Defaults to "topright".
+
+    Raises:
+        ValueError: If the length of ee_objects is not equal to rows*cols.
+        ValueError: If the length of labels is not equal to rows*cols.
+
+    Returns:
+        ipywidget: A GridspecLayout widget.
+    """
+    grid = widgets.GridspecLayout(rows, cols, grid_gap="0px")
+    count = rows * cols
+
+    maps = []
+
+    if len(layers) > 0:
+        if len(layers) == 1:
+            layers = layers * count
+        elif len(layers) < count:
+            raise ValueError(f"The length of ee_objects must be equal to {count}.")
+
+    if len(labels) > 0:
+        if len(labels) == 1:
+            labels = labels * count
+        elif len(labels) < count:
+            raise ValueError(f"The length of labels must be equal to {count}.")
+
+    for i in range(rows):
+        for j in range(cols):
+            index = i * rows + j
+
+            if "draw_control" not in kwargs:
+                kwargs["draw_control"] = False
+            if "toolbar_control" not in kwargs:
+                kwargs["toolbar_control"] = False
+            if "measure_control" not in kwargs:
+                kwargs["measure_control"] = False
+            if "fullscreen_control" not in kwargs:
+                kwargs["fullscreen_control"] = False
+
+            m = Map(
+                height=height,
+                google_map=None,
+                layout=widgets.Layout(margin="0px", padding="0px"),
+                **kwargs,
+            )
+
+            if layers[index] in basemap_tiles:
+                m.add_layer(basemap_tiles[layers[index]])
+            else:
+                try:
+                    m.add_layer(layers[index])
+                except Exception as e:
+                    print("The layer is invalid.")
+                    raise Exception(e)
+
+            if len(labels) > 0:
+                label = widgets.Label(
+                    labels[index], layout=widgets.Layout(padding="0px 5px 0px 5px")
+                )
+                control = WidgetControl(widget=label, position=label_position)
+                m.add_control(control)
+
+            maps.append(m)
+            widgets.jslink((maps[0], "center"), (m, "center"))
+            widgets.jslink((maps[0], "zoom"), (m, "zoom"))
+
+            output = widgets.Output()
+            with output:
+                display(m)
+            grid[i, j] = output
+
+    return grid
