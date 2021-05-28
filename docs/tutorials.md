@@ -10,3 +10,8 @@
 8. Using WhiteboxTools with leafmap ([notebook](https://leafmap.gishub.org/notebooks/08_whitebox))
 9. Converting CSV to points ([notebook](https://leafmap.gishub.org/notebooks/09_csv_to_points))
 10. Adding local vector data (e.g., shp, geojson, kml) to the map ([notebook](https://leafmap.gishub.org/notebooks/10_add_vector))
+11. Creating linked maps for visualizing multiple maps simultaneous ([notebook](https://leafmap.gishub.org/notebooks/11_linked_maps))
+
+## Demo
+
+![](https://wetlands.io/file/images/leafmap_demo.gif)
