@@ -1532,3 +1532,79 @@ def linked_maps(
             grid[i, j] = output
 
     return grid
+
+
+def split_map(
+    left_layer="ROADMAP",
+    right_layer="HYBRID",
+    left_label=None,
+    right_label=None,
+    label_position="bottom",
+    **kwargs,
+):
+    """Creates a split-panel map.
+
+    Args:
+        left_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemap_tiles.keys()) or an ipyleaflet Layer instance. Defaults to "ROADMAP".
+        right_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemap_tiles.keys()) or an ipyleaflet Layer instance. . Defaults to "HYBRID".
+        left_label (str, optional): A label for the left layer to be shown on the map. Defaults to None.
+        right_label (str, optional): A label for the right layer to be shown on the map. . Defaults to None.
+        label_position (str, optional): Position of the labels, can be either "top" or "bottom". Defaults to "bottom".
+
+    Raises:
+        Exception: If the provided layer is invalid.
+
+    Returns:
+        leafmap.Map: The Map instance.
+    """
+    if "draw_control" not in kwargs:
+        kwargs["draw_control"] = False
+    if "toolbar_control" not in kwargs:
+        kwargs["toolbar_control"] = False
+    if "measure_control" not in kwargs:
+        kwargs["measure_control"] = False
+    if "fullscreen_control" not in kwargs:
+        kwargs["fullscreen_control"] = False
+    if "scale_control" not in kwargs:
+        kwargs["scale_control"] = False
+
+    if left_layer in basemap_tiles:
+        left_layer = basemap_tiles[left_layer]
+    if right_layer in basemap_tiles:
+        right_layer = basemap_tiles[right_layer]
+
+    m = Map(**kwargs)
+
+    try:
+        control = ipyleaflet.SplitMapControl(
+            left_layer=left_layer, right_layer=right_layer
+        )
+        m.add_control(control)
+
+        if left_label is not None:
+            label1 = widgets.Label(
+                str(left_label), layout=widgets.Layout(padding="0px 5px 0px 5px")
+            )
+            if label_position == "bottom":
+                position = "bottomleft"
+            else:
+                position = "topleft"
+            left_control = WidgetControl(widget=label1, position=position)
+            m.add_control(left_control)
+
+        if right_label is not None:
+            label2 = widgets.Label(
+                str(right_label), layout=widgets.Layout(padding="0px 5px 0px 5px")
+            )
+            if label_position == "bottom":
+                position = "bottomright"
+            else:
+                position = "topright"
+            right_control = WidgetControl(widget=label2, position=position)
+            m.add_control(right_control)
+
+    except Exception as e:
+        print("The provided layers are invalid.")
+        raise Exception(e)
+
+    return m
