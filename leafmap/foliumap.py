@@ -274,6 +274,36 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
+    def add_osm(
+        self,
+        query,
+        layer_name="Untitled",
+        which_result=None,
+        by_osmid=False,
+        buffer_dist=None,
+        **kwargs,
+    ):
+        """Adds OSM data to the map.
+
+        Args:
+            query (str | dict | list): Query string(s) or structured dict(s) to geocode.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            which_result (INT, optional): Which geocoding result to use. if None, auto-select the first (Multi)Polygon or raise an error if OSM doesn't return one. to get the top match regardless of geometry type, set which_result=1. Defaults to None.
+            by_osmid (bool, optional): If True, handle query as an OSM ID for lookup rather than text search. Defaults to False.
+            buffer_dist (float, optional): Distance to buffer around the place geometry, in meters. Defaults to None.
+
+        """
+
+        gdf = osm_to_geopandas(
+            query, which_result=which_result, by_osmid=by_osmid, buffer_dist=buffer_dist
+        )
+        geojson = gdf.__geo_interface__
+
+        self.add_geojson(geojson, layer_name=layer_name, **kwargs)
+        bounds = gdf.bounds.iloc[0]
+        self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+
     def add_COG_layer(
         self,
         url,
