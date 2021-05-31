@@ -452,11 +452,6 @@ def open_data_widget(m):
     Args:
         m (object): leafmap.Map
     """
-    tool_output = widgets.Output()
-    tool_output_ctrl = WidgetControl(widget=tool_output, position="topright")
-
-    if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
-        m.remove_control(m.tool_output_ctrl)
 
     file_type = widgets.ToggleButtons(
         options=["Shapefile", "GeoJSON", "Vector", "CSV", "GeoTIFF"],
@@ -551,6 +546,10 @@ def open_data_widget(m):
 
     raster_options = widgets.HBox()
 
+    tool_output = widgets.Output(
+        layout=widgets.Layout(max_height="150px", max_width="500px", overflow="auto")
+    )
+
     main_widget = widgets.VBox(
         [
             file_type,
@@ -559,16 +558,14 @@ def open_data_widget(m):
             layer_name,
             raster_options,
             ok_cancel,
+            tool_output,
         ]
     )
 
-    tool_output.clear_output()
-    with tool_output:
-        display(main_widget)
+    tool_output_ctrl = WidgetControl(widget=main_widget, position="topright")
 
-    # def chooser_callback(chooser):
-    #     if len(layer_name.value) == 0 and file_chooser.selected is not None:
-    #         layer_name.value = os.path.splitext(file_chooser.selected_filename)[0]
+    if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
+        m.remove_control(m.tool_output_ctrl)
 
     def bands_changed(change):
         if change["new"] and "," in change["owner"].value:
@@ -604,6 +601,7 @@ def open_data_widget(m):
         file_chooser.reset()
         layer_name.value = file_type.value
         csv_widget.children = []
+        tool_output.clear_output()
 
         if change["new"] == "Shapefile":
             file_chooser.filter_pattern = "*.shp"
@@ -631,9 +629,10 @@ def open_data_widget(m):
             m.default_style = {"cursor": "wait"}
             file_path = file_chooser.selected
 
-            if file_path is not None:
-                ext = os.path.splitext(file_path)[1]
-                with tool_output:
+            with tool_output:
+                tool_output.clear_output()
+                if file_path is not None:
+                    ext = os.path.splitext(file_path)[1]
                     if ext.lower() == ".shp":
                         m.add_shapefile(
                             file_path, style=None, layer_name=layer_name.value
@@ -666,8 +665,8 @@ def open_data_widget(m):
                         )
                     else:
                         m.add_vector(file_path, style=None, layer_name=layer_name.value)
-            else:
-                print("Please select a file to open.")
+                else:
+                    print("Please select a file to open.")
 
             m.toolbar_reset()
             m.default_style = {"cursor": "default"}
@@ -675,8 +674,6 @@ def open_data_widget(m):
         elif change["new"] == "Reset":
             file_chooser.reset()
             tool_output.clear_output()
-            with tool_output:
-                display(main_widget)
             m.toolbar_reset()
         elif change["new"] == "Close":
             if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
