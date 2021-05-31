@@ -293,7 +293,7 @@ def main_toolbar(m):
             elif tool_name == "help":
                 import webbrowser
 
-                webbrowser.open_new_tab("https://leafmap.gishub.org")
+                webbrowser.open_new_tab("https://leafmap.org")
                 current_tool.value = False
         else:
             tool = change["owner"]
