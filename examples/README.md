@@ -24,8 +24,10 @@
 9. Converting CSV to points ([notebook](https://leafmap.org/notebooks/09_csv_to_points))
 10. Adding local vector data (e.g., shp, geojson, kml) to the map ([notebook](https://leafmap.org/notebooks/10_add_vector))
 11. Creating linked maps for visualizing multiple maps simultaneously ([notebook](https://leafmap.org/notebooks/11_linked_maps))
-12. Creating a split-panel map with only one line of code ([notebook](https://leafmap.org/notebooks/12_split_map))
-13. Adding OpenStreetMap data to the map with only one line of code ([notebook](https://leafmap.org/notebooks/13_add_osm))
+12. Creating a split-panel map with a single line of code ([notebook](https://leafmap.org/notebooks/12_split_map))
+13. Adding a GeoPandas GeoDataFrame to the map with a single line of code ([notebook](https://leafmap.org/notebooks/13_geopandas))
+14. Adding data from a PostGIS database to the map ([notebook](https://leafmap.org/notebooks/14_postgis))
+15. Downloading OpenStreetMap data to the map with a single line of code ([notebook](https://leafmap.org/notebooks/15_add_osm))
 
 ## Demo
 
