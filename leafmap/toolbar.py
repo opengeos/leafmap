@@ -634,9 +634,7 @@ def open_data_widget(m):
                 if file_path is not None:
                     ext = os.path.splitext(file_path)[1]
                     if ext.lower() == ".shp":
-                        m.add_shapefile(
-                            file_path, style=None, layer_name=layer_name.value
-                        )
+                        m.add_shp(file_path, style=None, layer_name=layer_name.value)
                     elif ext.lower() == ".geojson":
 
                         m.add_geojson(
