@@ -710,7 +710,7 @@ def csv_to_geojson(
             f.write(json.dumps(geojson))
 
 
-def csv_to_geopandas(in_csv, latitude="latitude", longitude="longitude"):
+def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude"):
     """Creates points for a CSV file and converts them to a GeoDataFrame.
 
     Args:
@@ -1390,7 +1390,7 @@ def csv_to_pandas(in_csv, **kwargs):
         raise Exception(e)
 
 
-def shp_to_geopandas(in_shp):
+def shp_to_gdf(in_shp):
     """Converts a shapefile to Geopandas dataframe.
 
     Args:
@@ -1582,7 +1582,7 @@ def screen_capture(outfile, monitor=1):
         raise Exception(e)
 
 
-def osm_to_geopandas(
+def osm_to_gdf(
     query,
     which_result=None,
     by_osmid=False,
@@ -1625,5 +1625,44 @@ def osm_to_geojson(query, which_result=None, by_osmid=False, buffer_dist=None):
     Returns:
         ee.FeatureCollection: An Earth Engine FeatureCollection.
     """
-    gdf = osm_to_geopandas(query, which_result, by_osmid, buffer_dist)
+    gdf = osm_to_gdf(query, which_result, by_osmid, buffer_dist)
     return gdf.__geo_interface__
+
+
+def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
+    """Converts a GeoDataFame to GeoJSON.
+
+    Args:
+        gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
+        out_geojson (str, optional): File path to he output GeoJSON. Defaults to None.
+        epsg (str, optional): An EPSG string, e.g., "4326". Defaults to None.
+
+    Raises:
+        TypeError: When the output file extension is incorrect.
+        Exception: When the conversion fails.
+
+    Returns:
+        dict: When the out_json is None returns a dict.
+    """
+    check_package(name="geopandas", URL="https://geopandas.org")
+
+    try:
+        if epsg is not None:
+            gdf = gdf.to_crs(epsg=epsg)
+        geojson = gdf.__geo_interface__
+
+        if out_geojson is None:
+            return geojson
+        else:
+            ext = os.path.splitext(out_geojson)[1]
+            if ext.lower() not in [".json", ".geojson"]:
+                raise TypeError(
+                    "The output file extension must be either .json or .geojson"
+                )
+            out_dir = os.path.dirname(out_geojson)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+
+            gdf.to_file(out_geojson, driver="GeoJSON")
+    except Exception as e:
+        raise Exception(e)

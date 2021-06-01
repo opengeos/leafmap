@@ -295,7 +295,7 @@ class Map(folium.Map):
 
         """
 
-        gdf = osm_to_geopandas(
+        gdf = osm_to_gdf(
             query, which_result=which_result, by_osmid=by_osmid, buffer_dist=buffer_dist
         )
         geojson = gdf.__geo_interface__
@@ -602,7 +602,7 @@ class Map(folium.Map):
 
         self.add_child(colormap)
 
-    def add_shapefile(self, in_shp, layer_name="Untitled", **kwargs):
+    def add_shp(self, in_shp, layer_name="Untitled", **kwargs):
         """Adds a shapefile to the map. See https://python-visualization.github.io/folium/modules.html#folium.features.GeoJson for more info about setting style.
 
         Args:
@@ -656,8 +656,33 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-        geo_json = folium.GeoJson(data=data, name=layer_name, **kwargs)
-        geo_json.add_to(self)
+        geojson = folium.GeoJson(data=data, name=layer_name, **kwargs)
+        geojson.add_to(self)
+
+    def add_gdf(self, gdf, layer_name="Untitled", zoom_to_layer=True, **kwargs):
+        """Adds a GeoPandas GeoDataFrameto the map.
+
+        Args:
+            gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
+            layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer.
+
+        """
+
+        data = gdf_to_geojson(gdf, epsg="4326")
+
+        geojson = folium.GeoJson(data=data, name=layer_name, **kwargs)
+        geojson.add_to(self)
+
+        if zoom_to_layer:
+            import numpy as np
+
+            bounds = gdf.to_crs(epsg="4326").bounds
+            west = np.min(bounds["minx"])
+            south = np.min(bounds["miny"])
+            east = np.max(bounds["maxx"])
+            north = np.max(bounds["maxy"])
+            self.fit_bounds([[south, east], [north, west]])
 
     def add_kml(self, in_kml, layer_name="Untitled", **kwargs):
         """Adds a KML file to the map.
