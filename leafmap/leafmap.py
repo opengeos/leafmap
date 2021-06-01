@@ -1454,6 +1454,45 @@ class Map(ipyleaflet.Map):
             north = np.max(bounds["maxy"])
             self.fit_bounds([[south, east], [north, west]])
 
+    def add_gdf_from_postgis(
+        self,
+        sql,
+        con,
+        layer_name="Untitled",
+        style={},
+        hover_style={},
+        style_callback=None,
+        fill_colors=["black"],
+        info_mode="on_hover",
+        zoom_to_layer=True,
+        **kwargs,
+    ):
+        """Reads a PostGIS database and returns data as a GeoDataFrame to be added to the map.
+
+        Args:
+            sql (str): SQL query to execute in selecting entries from database, or name of the table to read from the database.
+            con (sqlalchemy.engine.Engine): Active connection to the database to query.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer.
+        """
+        gdf = read_postgis(sql, con, **kwargs)
+        gdf = gdf.to_crs("epsg:4326")
+        self.add_gdf(
+            gdf,
+            layer_name,
+            style,
+            hover_style,
+            style_callback,
+            fill_colors,
+            info_mode,
+            zoom_to_layer,
+        )
+
     def add_kml(
         self,
         in_kml,

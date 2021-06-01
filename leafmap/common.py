@@ -1666,3 +1666,72 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
             gdf.to_file(out_geojson, driver="GeoJSON")
     except Exception as e:
         raise Exception(e)
+
+
+def connect_postgis(
+    database, host="localhost", user=None, password=None, use_env_var=False
+):
+    """Connects to a PostGIS database.
+
+    Args:
+        database (str): Name of the database
+        host (str, optional): Hosting server for the database. Defaults to "localhost".
+        user (str, optional): User name to access the database. Defaults to None.
+        password (str, optional): Password to access the database. Defaults to None.
+        use_env_var (bool, optional): Whether to use environment variables. It set to True, user and password are treated as an environment variables with default values user="SQL_USER" and password="SQL_PASSWORD". Defaults to False.
+
+    Raises:
+        ValueError: If user is not specified.
+        ValueError: If password is not specified.
+
+    Returns:
+        [type]: [description]
+    """
+    check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(
+        name="sqlalchemy",
+        URL="https://docs.sqlalchemy.org/en/14/intro.html#installation",
+    )
+
+    from sqlalchemy import create_engine
+
+    if use_env_var:
+        if user is not None:
+            user = os.getenv(user)
+        else:
+            user = os.getenv("SQL_USER")
+
+        if password is not None:
+            password = os.getenv(password)
+        else:
+            password = os.getenv("SQL_PASSWORD")
+
+        if user is None:
+            raise ValueError("user is not specified.")
+        if password is None:
+            raise ValueError("password is not specified.")
+
+    connection_string = f"postgresql://{user}:{password}@{host}/{database}"
+    engine = create_engine(connection_string)
+
+    return engine
+
+
+def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
+    """Reads data from a PostGIS database and returns a GeoDataFrame.
+
+    Args:
+        sql (str): SQL query to execute in selecting entries from database, or name of the table to read from the database.
+        con (sqlalchemy.engine.Engine): Active connection to the database to query.
+        geom_col (str, optional): Column name to convert to shapely geometries. Defaults to "geom".
+        crs (str | dict, optional): CRS to use for the returned GeoDataFrame; if not set, tries to determine CRS from the SRID associated with the first geometry in the database, and assigns that to all geometries. Defaults to None.
+
+    Returns:
+        [type]: [description]
+    """
+    check_package(name="geopandas", URL="https://geopandas.org")
+
+    import geopandas as gpd
+
+    gdf = gpd.read_postgis(sql, con, geom_col, crs, **kwargs)
+    return gdf
