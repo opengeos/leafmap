@@ -763,7 +763,7 @@ def create_code_cell(code="", where="below"):
     )
 
 
-def get_COG_tile(url, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
+def get_cog_tile(url, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
         Source code adapted from https://developmentseed.org/titiler/examples/Working_with_CloudOptimizedGeoTIFF_simple/
 
@@ -797,7 +797,7 @@ def get_COG_tile(url, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
     return r["tiles"][0]
 
 
-def get_COG_mosaic(
+def get_cog_mosaic(
     links,
     titiler_endpoint="https://api.cogeo.xyz/",
     username="anonymous",
@@ -847,7 +847,7 @@ def get_COG_mosaic(
         raise Exception(e)
 
 
-def get_COG_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def get_cog_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
     """Get the bounding box of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -868,7 +868,7 @@ def get_COG_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return bounds
 
 
-def get_COG_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def get_cog_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
     """Get the centroid of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -878,12 +878,12 @@ def get_COG_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
     Returns:
         tuple: A tuple representing (longitude, latitude)
     """
-    bounds = get_COG_bounds(url, titiler_endpoint)
+    bounds = get_cog_bounds(url, titiler_endpoint)
     center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lat, lon)
     return center
 
 
-def get_COG_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def get_cog_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
     """Get band names of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -906,7 +906,7 @@ def get_COG_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return bands
 
 
-def get_STAC_tile(url, bands=None, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
+def get_stac_tile(url, bands=None, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
     """Get a tile layer from a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -934,7 +934,7 @@ def get_STAC_tile(url, bands=None, titiler_endpoint="https://api.cogeo.xyz/", **
     if "maxzoom" in kwargs.keys():
         params["maxzoom"] = kwargs["maxzoom"]
 
-    allowed_bands = get_STAC_bands(url, titiler_endpoint)
+    allowed_bands = get_stac_bands(url, titiler_endpoint)
 
     if bands is None:
         bands = [allowed_bands[0]]
@@ -957,7 +957,7 @@ def get_STAC_tile(url, bands=None, titiler_endpoint="https://api.cogeo.xyz/", **
     return r["tiles"][0]
 
 
-def get_STAC_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def get_stac_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
     """Get the bounding box of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -975,7 +975,7 @@ def get_STAC_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return bounds
 
 
-def get_STAC_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def get_stac_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
     """Get the centroid of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -985,12 +985,12 @@ def get_STAC_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
     Returns:
         tuple: A tuple representing (longitude, latitude)
     """
-    bounds = get_STAC_bounds(url, titiler_endpoint)
+    bounds = get_stac_bounds(url, titiler_endpoint)
     center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lat, lon)
     return center
 
 
-def get_STAC_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def get_stac_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
     """Get band names of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
