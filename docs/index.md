@@ -57,7 +57,7 @@ Below is a partial list of features available for the leafmap package. Please ch
 -   Add custom legends and colorbars to the map.
 -   Perform geospatial analysis using WhiteboxTools and whiteboxgui.
 -   Create split-panel map and linked maps.
--   Publish interactive maps with only one line of code.
+-   Publish interactive maps with a single line of code.
 
 ## Demo
 
