@@ -1,5 +1,9 @@
 # Tutorials
 
+[![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
+[![image](https://binder.pangeo.io/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
+[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
+
 1. Introducing the leafmap Python package for interactive mapping ([notebook](https://leafmap.org/notebooks/01_leafmap_intro))
 2. Using basemaps in leafmap ([notebook](https://leafmap.org/notebooks/02_using_basemaps))
 3. Using Cloud Optimized GeoTIFF (COG) and SpatioTemporal Asset Catalog (STAC) ([notebook](https://leafmap.org/notebooks/03_cog_stac))

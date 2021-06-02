@@ -1,7 +1,9 @@
 # leafmap
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
-[![image](https://binder.pangeo.io/badge_logo.svg)](https://binder.pangeo.io/v2/gh/giswqs/leafmap/master)
+[![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
+[![image](https://binder.pangeo.io/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
+[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
 [![image](https://pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
