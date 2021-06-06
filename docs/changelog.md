@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.2.0 - June 5, 2021
+
+**New Features**:
+
+-   Added handle-draw function [#2](https://github.com/giswqs/leafmap/issues/2)
+-   Added split-panel map [#7](https://github.com/giswqs/leafmap/issues/7)
+-   Added geopandas support [#16](https://github.com/giswqs/leafmap/issues/16)
+-   Added support for PostGIS [#15](https://github.com/giswqs/leafmap/issues/15)
+-   Added support for downloading OpenSteetMap data [#10](https://github.com/giswqs/leafmap/issues/10) [#12](https://github.com/giswqs/leafmap/issues/12)
+
+**Improvement**
+
+-   Fixed basemap bug [#5](https://github.com/giswqs/leafmap/discussions/5)
+-   Fixed output scroll bug [#11](https://github.com/giswqs/leafmap/issues/11)
+-   Changed COG and STAC functions to snake_case
+-   Added binder badge to notebooks
+-   Added binder env
+-   Added 15 turorials
+-   Added domain name leafmap.org
+
 ## v0.1.0 - May 25, 2021
 
 **New Features**:
