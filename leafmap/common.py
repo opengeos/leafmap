@@ -1582,53 +1582,6 @@ def screen_capture(outfile, monitor=1):
         raise Exception(e)
 
 
-def osm_to_gdf(
-    query,
-    which_result=None,
-    by_osmid=False,
-    buffer_dist=None,
-):
-    """Retrieves place(s) by name or ID from the Nominatim API as a GeoDataFrame.
-
-    Args:
-        query (str | dict | list): Query string(s) or structured dict(s) to geocode.
-        which_result (INT, optional): Which geocoding result to use. if None, auto-select the first (Multi)Polygon or raise an error if OSM doesn't return one. to get the top match regardless of geometry type, set which_result=1. Defaults to None.
-        by_osmid (bool, optional): If True, handle query as an OSM ID for lookup rather than text search. Defaults to False.
-        buffer_dist (float, optional): Distance to buffer around the place geometry, in meters. Defaults to None.
-
-    Returns:
-        GeoDataFrame: A GeoPandas GeoDataFrame.
-    """
-    check_package(
-        "geopandas", "https://geopandas.org/getting_started.html#installation"
-    )
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/")
-
-    try:
-        import osmnx as ox
-
-        gdf = ox.geocode_to_gdf(query, which_result, by_osmid, buffer_dist)
-        return gdf
-    except Exception as e:
-        raise Exception(e)
-
-
-def osm_to_geojson(query, which_result=None, by_osmid=False, buffer_dist=None):
-    """Retrieves place(s) by name or ID from the Nominatim API as an ee.FeatureCollection.
-
-    Args:
-        query (str | dict | list): Query string(s) or structured dict(s) to geocode.
-        which_result (INT, optional): Which geocoding result to use. if None, auto-select the first (Multi)Polygon or raise an error if OSM doesn't return one. to get the top match regardless of geometry type, set which_result=1. Defaults to None.
-        by_osmid (bool, optional): If True, handle query as an OSM ID for lookup rather than text search. Defaults to False.
-        buffer_dist (float, optional): Distance to buffer around the place geometry, in meters. Defaults to None.
-
-    Returns:
-        ee.FeatureCollection: An Earth Engine FeatureCollection.
-    """
-    gdf = osm_to_gdf(query, which_result, by_osmid, buffer_dist)
-    return gdf.__geo_interface__
-
-
 def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
     """Converts a GeoDataFame to GeoJSON.
 

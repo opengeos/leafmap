@@ -59,6 +59,7 @@ Below is a partial list of features available for the leafmap package. Please ch
 -   Perform geospatial analysis using WhiteboxTools and whiteboxgui.
 -   Create split-panel map and linked maps.
 -   Publish interactive maps with a single line of code.
+-   Download and display OpenStreetMap data with a single line of code.
 
 ## Demo
 
