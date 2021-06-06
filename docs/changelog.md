@@ -6,9 +6,9 @@
 
 -   Added handle-draw function [#2](https://github.com/giswqs/leafmap/issues/2)
 -   Added split-panel map [#7](https://github.com/giswqs/leafmap/issues/7)
--   Added geopandas support [#16](https://github.com/giswqs/leafmap/issues/16)
+-   Added GeoPandas support [#16](https://github.com/giswqs/leafmap/issues/16)
 -   Added support for PostGIS [#15](https://github.com/giswqs/leafmap/issues/15)
--   Added support for downloading OpenSteetMap data [#10](https://github.com/giswqs/leafmap/issues/10) [#12](https://github.com/giswqs/leafmap/issues/12)
+-   Added support for downloading OpenStreetMap data [#10](https://github.com/giswqs/leafmap/issues/10) [#12](https://github.com/giswqs/leafmap/issues/12)
 
 **Improvement**
 
