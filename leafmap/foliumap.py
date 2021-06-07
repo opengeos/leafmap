@@ -86,6 +86,8 @@ class Map(folium.Map):
                 control=True,
             )
             layer.add_to(self)
+        elif kwargs["google_map"] is None:
+            pass
         else:
             if kwargs["google_map"].upper() == "ROADMAP":
                 layer = folium.TileLayer(
