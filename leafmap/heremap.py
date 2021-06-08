@@ -1,10 +1,15 @@
+"""
+This module defines here-map-widget-for-jupyter as backend for leafmap library.
+For more details about Here Map Widget for Jupyter please check: https://github.com/heremaps/here-map-widget-for-jupyter
+"""
 import os
 import json
 import random
 import requests
 import here_map_widget
+import ipywidgets as widgets
 from .basemaps import here_basemaps
-from .common import kml_to_geojson
+from .common import vector_to_geojson
 
 from here_map_widget import (
     FullscreenControl,
@@ -13,7 +18,8 @@ from here_map_widget import (
     ZoomControl,
     ImageTileProvider,
     TileLayer,
-    GeoJSON
+    GeoJSON,
+    WidgetControl,
 )
 
 
@@ -25,15 +31,23 @@ class Map(here_map_widget.Map):
         object: here_map_widget map object.
     """
 
-    def __init__(self, apikey, **kwargs):
+    def __init__(self, api_key, **kwargs):
         if "center" not in kwargs:
             kwargs["center"] = [40, -100]
 
         if "zoom" not in kwargs:
             kwargs["zoom"] = 4
-        super().__init__(api_key=apikey, **kwargs)
+
+        if "basemap" in kwargs:
+            kwargs["basemap"] = here_basemaps[kwargs["basemap"]]
+
+        super().__init__(api_key=api_key, **kwargs)
         self.baseclass = "here_map_widget"
 
+        if "height" not in kwargs:
+            self.layout.height = "600px"
+        else:
+            self.layout.height = kwargs["height"]
         if "zoom_control" not in kwargs:
             kwargs["zoom_control"] = True
 
@@ -50,12 +64,6 @@ class Map(here_map_widget.Map):
             kwargs["scale_control"] = True
         if kwargs["scale_control"]:
             self.add_control(ScaleBar(alignment="LEFT_BOTTOM"))
-        if "toolbar_control" not in kwargs:
-            kwargs["toolbar_control"] = True
-        # if kwargs["toolbar_control"]:
-        #     from .toolbar import main_toolbar
-        #
-        #     main_toolbar(self)
 
         if "use_voila" not in kwargs:
             kwargs["use_voila"] = False
@@ -80,7 +88,7 @@ class Map(here_map_widget.Map):
         """
         try:
             if basemap in here_basemaps and here_basemaps[basemap] not in self.layers:
-                self.add_layer(here_basemaps[basemap])
+                self.basemap = here_basemaps[basemap]
         except Exception:
             raise ValueError(
                 "Basemap can only be one of the following:\n  {}".format(
@@ -118,37 +126,16 @@ class Map(here_map_widget.Map):
             print("Failed to add the specified TileLayer.")
             raise Exception(e)
 
-    def add_kml(self, in_kml=None, layer_name="Untitled", **kwargs):
-        """Adds a KML file to the map.
-
-        Args:
-            in_kml (str): The input file path to the KML.
-            url (str): The input KML data url.
-            layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
-
-        Raises:
-            FileNotFoundError: The provided KML file could not be found.
-        """
-        if in_kml:
-            in_kml = os.path.abspath(in_kml)
-            if not os.path.exists(in_kml):
-                raise FileNotFoundError("The provided KML file could not be found.")
-
-            data = kml_to_geojson(in_kml)
-            geo_json = GeoJSON(data=data, name=layer_name, **kwargs)
-            self.add_layer(geo_json)
-
-    def add_shape_file(self):
-        pass
-
-    def add_geojson(self,
+    def add_geojson(
+        self,
         in_geojson,
         layer_name="Untitled",
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",):
+        fill_colors=["rgba(0,0,0,0.5)"],
+        info_mode="on_hover",
+    ):
 
         try:
             if isinstance(in_geojson, str):
@@ -157,9 +144,7 @@ class Map(here_map_widget.Map):
                 else:
                     in_geojson = os.path.abspath(in_geojson)
                     if not os.path.exists(in_geojson):
-                        raise FileNotFoundError(
-                            "The provided GeoJSON file could not be found."
-                        )
+                        raise FileNotFoundError("The provided GeoJSON file could not be found.")
 
                     with open(in_geojson, encoding="utf-8") as f:
                         data = json.load(f)
@@ -172,29 +157,20 @@ class Map(here_map_widget.Map):
 
         if not style:
             style = {
-                "strokeColor": 'black',
-                "fillColor": 'rgba(255, 255, 255, 0.5)',
-                "lineWidth": 5,
-                "lineCap": 'square',
-                "lineJoin" : 'bevel'
+                "strokeColor": "black",
             }
 
         if not hover_style:
-            hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
-
-        def random_color(feature):
-            return {
-                "strokeColor": "black",
+            hover_style = {
                 "fillColor": random.choice(fill_colors),
+                "strokeColor": "black",
             }
 
         toolbar_button = widgets.ToggleButton(
             value=True,
             tooltip="Toolbar",
             icon="info",
-            layout=widgets.Layout(
-                width="28px", height="28px", padding="0px 0px 0px 4px"
-            ),
+            layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
         )
 
         close_button = widgets.ToggleButton(
@@ -202,9 +178,7 @@ class Map(here_map_widget.Map):
             tooltip="Close the tool",
             icon="times",
             # button_style="primary",
-            layout=widgets.Layout(
-                height="28px", width="28px", padding="0px 0px 0px 4px"
-            ),
+            layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
         )
 
         html = widgets.HTML()
@@ -212,9 +186,7 @@ class Map(here_map_widget.Map):
         html.layout.max_height = "250px"
         html.layout.max_width = "250px"
 
-        output_widget = widgets.VBox(
-            [widgets.HBox([toolbar_button, close_button]), html]
-        )
+        output_widget = widgets.VBox([widgets.HBox([toolbar_button, close_button]), html])
         info_control = WidgetControl(widget=output_widget, position="bottomright")
 
         if info_mode in ["on_hover", "on_click"]:
@@ -243,17 +215,14 @@ class Map(here_map_widget.Map):
         def update_html(feature, **kwargs):
 
             value = [
-                        "<h5><b>{}: </b>{}</h5>".format(prop, feature["properties"][prop])
-                        for prop in feature["properties"].keys()
-                    ][:-1]
+                "<h5><b>{}: </b>{}</h5>".format(prop, feature["properties"][prop])
+                for prop in feature["properties"].keys()
+            ][:-1]
 
             value = """{}""".format("".join(value))
             html.value = value
 
-        if style_callback is None:
-            style_callback = random_color
-
-        geojson = ipyleaflet.GeoJSON(
+        geojson = GeoJSON(
             data=data,
             style=style,
             hover_style=hover_style,
@@ -267,12 +236,3 @@ class Map(here_map_widget.Map):
             geojson.on_click(update_html)
 
         self.add_layer(geojson)
-
-    def add_COG_layer(self):
-        pass
-
-    def add_COG_mosaic(self):
-        pass
-
-    def add_STAC_layer(self):
-        pass
