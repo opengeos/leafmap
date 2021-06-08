@@ -16,7 +16,7 @@ from box import Box
 from ipyleaflet import TileLayer, WMSLayer, basemap_to_tiles
 import ipyleaflet.basemaps as ipybasemaps
 import here_map_widget
-from here_map_widget import ImageTileProvider
+from here_map_widget import ImageTileProvider, DefaultLayers, DefaultLayerNames
 
 
 leaf_basemaps = {
@@ -459,6 +459,40 @@ here_basemaps = {
             name="Google Satellite",
         )
     ),
+    "HERE_RASTER_NORMAL_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.map),
+    "HERE_RASTER_NORMAL_BASE": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.base),
+    "HERE_RASTER_NORMAL_BASE_NIGHT": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.basenight
+    ),
+    "HERE_RASTER_NORMAL_LABELS": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.labels),
+    "HERE_RASTER_NORMAL_TRAFFICINCIDENTS": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.trafficincidents
+    ),
+    "HERE_RASTER_NORMAL_TRANSIT": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.transit
+    ),
+    "HERE_RASTER_NORMAL_XBASE": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.xbase),
+    "HERE_RASTER_NORMAL_XBASE_NIGHT": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.xbasenight
+    ),
+    "HERE_RASTER_SATELLITE_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.satellite.map),
+    "HERE_RASTER_SATELLITE_LABELS": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.labels
+    ),
+    "HERE_RASTER_SATELLITE_BASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.base
+    ),
+    "HERE_RASTER_SATELLITE_XBASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.xbase
+    ),
+    "HERE_RASTER_TERRAIN_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.map),
+    "HERE_RASTER_TERRAIN_LABELS": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.terrain.labels
+    ),
+    "HERE_RASTER_TERRAIN_BASE": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.base),
+    "HERE_RASTER_TERRAIN_XBASE": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.xbase),
+    "HERE_VECTOR_NORMAL_MAP": DefaultLayers(layer_name=DefaultLayerNames.vector.normal.map),
+    "HERE_VECTOR_NORMAL_TRUCK": DefaultLayers(layer_name=DefaultLayerNames.vector.normal.truck),
 }
 
 
