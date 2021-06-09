@@ -9,7 +9,6 @@ import requests
 import here_map_widget
 import ipywidgets as widgets
 from .basemaps import here_basemaps
-from .common import vector_to_geojson
 
 from here_map_widget import (
     FullscreenControl,
@@ -20,12 +19,14 @@ from here_map_widget import (
     TileLayer,
     GeoJSON,
     WidgetControl,
+    LayersControl,
 )
 
 
 class Map(here_map_widget.Map):
     """
-    The Map class inherits here_map_widget.Map. The arguments you can pass to the Map can be found at https://here-map-widget-for-jupyter.readthedocs.io/en/latest/api_reference/map.html.
+    The Map class inherits here_map_widget.Map. The arguments you can pass to the Map can be found
+    at https://here-map-widget-for-jupyter.readthedocs.io/en/latest/api_reference/map.html.
 
     Returns:
         object: here_map_widget map object.
@@ -48,6 +49,10 @@ class Map(here_map_widget.Map):
             self.layout.height = "600px"
         else:
             self.layout.height = kwargs["height"]
+
+        if kwargs.get("layers_control"):
+            self.add_control(LayersControl(alignment="RIGHT_TOP"))
+
         if "zoom_control" not in kwargs:
             kwargs["zoom_control"] = True
 
@@ -64,9 +69,6 @@ class Map(here_map_widget.Map):
             kwargs["scale_control"] = True
         if kwargs["scale_control"]:
             self.add_control(ScaleBar(alignment="LEFT_BOTTOM"))
-
-        if "use_voila" not in kwargs:
-            kwargs["use_voila"] = False
 
     def set_center(self, lon, lat, zoom=None):
         """Centers the map view at a given coordinates with the given zoom level.
@@ -130,12 +132,25 @@ class Map(here_map_widget.Map):
         self,
         in_geojson,
         layer_name="Untitled",
-        style={},
-        hover_style={},
+        style=None,
+        hover_style=None,
         style_callback=None,
-        fill_colors=["rgba(0,0,0,0.5)"],
+        fill_colors=None,
         info_mode="on_hover",
     ):
+        """Adds a GeoJSON file to the map.
+
+        Args:
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+        Raises:
+            FileNotFoundError: The provided GeoJSON file could not be found.
+        """
 
         try:
             if isinstance(in_geojson, str):
@@ -158,12 +173,16 @@ class Map(here_map_widget.Map):
         if not style:
             style = {
                 "strokeColor": "black",
+                "lineWidth": 1,
             }
+        else:
+            style.setdefault("lineWidth", 1)
 
         if not hover_style:
             hover_style = {
-                "fillColor": random.choice(fill_colors),
+                "fillColor": random.choice(fill_colors) if fill_colors else ["rgba(0,0,0,0.5)"],
                 "strokeColor": "black",
+                "lineWidth": style["lineWidth"] + 1,
             }
 
         toolbar_button = widgets.ToggleButton(
@@ -192,7 +211,7 @@ class Map(here_map_widget.Map):
         if info_mode in ["on_hover", "on_click"]:
             self.add_control(info_control)
 
-        def toolbar_btn_click(change):
+        def _toolbar_btn_click(change):
             if change["new"]:
                 close_button.value = False
                 output_widget.children = [
@@ -201,18 +220,18 @@ class Map(here_map_widget.Map):
             else:
                 output_widget.children = [widgets.HBox([toolbar_button, close_button])]
 
-        toolbar_button.observe(toolbar_btn_click, "value")
+        toolbar_button.observe(_toolbar_btn_click, "value")
 
-        def close_btn_click(change):
+        def _close_btn_click(change):
             if change["new"]:
                 toolbar_button.value = False
                 if info_control in self.controls:
                     self.remove_control(info_control)
                 output_widget.close()
 
-        close_button.observe(close_btn_click, "value")
+        close_button.observe(_close_btn_click, "value")
 
-        def update_html(feature, **kwargs):
+        def _update_html(feature, **_):
 
             value = [
                 "<h5><b>{}: </b>{}</h5>".format(prop, feature["properties"][prop])
@@ -224,15 +243,15 @@ class Map(here_map_widget.Map):
 
         geojson = GeoJSON(
             data=data,
-            style=style,
-            hover_style=hover_style,
+            style=style if style else {},
+            hover_style=hover_style if hover_style else {},
             style_callback=style_callback,
             name=layer_name,
         )
 
         if info_mode == "on_hover":
-            geojson.on_hover(update_html)
+            geojson.on_hover(_update_html)
         elif info_mode == "on_click":
-            geojson.on_click(update_html)
+            geojson.on_click(_update_html)
 
         self.add_layer(geojson)

@@ -66,3 +66,18 @@ naip_url = 'https://services.nationalmap.gov/arcgis/services/USGSNAIPImagery/Ima
 m.add_wms_layer(url=naip_url, layers='0', name='NAIP Imagery', format='image/png', shown=True)
 m
 ```
+
+## Use HERE Map Widget for Jupyter plotting backend
+
+```python
+import leafmap.heremap as leafmap
+```
+
+## Create an interactive map
+
+```python
+import os
+api_key = os.environ.get("HEREMAPS_API_KEY") # read api_key from environment variable.
+m = leafmap.Map(api_key=api_key, center=(40, -100), zoom=4)
+m
+```

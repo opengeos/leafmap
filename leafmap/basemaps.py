@@ -465,9 +465,6 @@ here_basemaps = {
         layer_name=DefaultLayerNames.raster.normal.basenight
     ),
     "HERE_RASTER_NORMAL_LABELS": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.labels),
-    "HERE_RASTER_NORMAL_TRAFFICINCIDENTS": DefaultLayers(
-        layer_name=DefaultLayerNames.raster.normal.trafficincidents
-    ),
     "HERE_RASTER_NORMAL_TRANSIT": DefaultLayers(
         layer_name=DefaultLayerNames.raster.normal.transit
     ),
