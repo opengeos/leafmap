@@ -15,6 +15,8 @@ import folium
 from box import Box
 from ipyleaflet import TileLayer, WMSLayer, basemap_to_tiles
 import ipyleaflet.basemaps as ipybasemaps
+import here_map_widget
+from here_map_widget import ImageTileProvider, DefaultLayers, DefaultLayerNames
 
 
 leaf_basemaps = {
@@ -331,6 +333,165 @@ folium_basemaps = {
     ),
 }
 
+here_basemaps = {
+    "ROADMAP": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Maps",
+        )
+    ),
+    "SATELLITE": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Satellite",
+        )
+    ),
+    "TERRAIN": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Terrain",
+        )
+    ),
+    "HYBRID": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Satellite",
+        )
+    ),
+    "ESRI": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Satellite",
+        )
+    ),
+    "ESRI Ocean": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://services.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Ocean",
+        )
+    ),
+    "Esri Satellite": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            naem="Esri Satellite",
+        )
+    ),
+    "Esri Standard": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Standard",
+        )
+    ),
+    "Esri Terrain": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Terrain",
+        )
+    ),
+    "Esri Transportation": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Transportation",
+        )
+    ),
+    "Esri Topo World": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Topo World",
+        )
+    ),
+    "Esri National Geographic": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="http://services.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri National Geographic",
+        )
+    ),
+    "Esri Shaded Relief": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://services.arcgisonline.com/arcgis/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+            name="Esri Shaded Relief",
+        )
+    ),
+    "Esri Physical Map": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}",
+            attribution="Esri",
+        )
+    ),
+    "Google Maps": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Maps",
+        )
+    ),
+    "Google Satellite": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Satellite",
+        )
+    ),
+    "Google Terrain": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Terrain",
+        )
+    ),
+    "Google Satellite Hybrid": here_map_widget.TileLayer(
+        provider=ImageTileProvider(
+            url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
+            attribution="Google",
+            name="Google Satellite",
+        )
+    ),
+    "HERE_RASTER_NORMAL_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.map),
+    "HERE_RASTER_NORMAL_BASE": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.base),
+    "HERE_RASTER_NORMAL_BASE_NIGHT": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.basenight
+    ),
+    "HERE_RASTER_NORMAL_LABELS": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.labels),
+    "HERE_RASTER_NORMAL_TRANSIT": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.transit
+    ),
+    "HERE_RASTER_NORMAL_XBASE": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.xbase),
+    "HERE_RASTER_NORMAL_XBASE_NIGHT": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.xbasenight
+    ),
+    "HERE_RASTER_SATELLITE_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.satellite.map),
+    "HERE_RASTER_SATELLITE_LABELS": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.labels
+    ),
+    "HERE_RASTER_SATELLITE_BASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.base
+    ),
+    "HERE_RASTER_SATELLITE_XBASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.xbase
+    ),
+    "HERE_RASTER_TERRAIN_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.map),
+    "HERE_RASTER_TERRAIN_LABELS": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.terrain.labels
+    ),
+    "HERE_RASTER_TERRAIN_BASE": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.base),
+    "HERE_RASTER_TERRAIN_XBASE": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.xbase),
+    "HERE_VECTOR_NORMAL_MAP": DefaultLayers(layer_name=DefaultLayerNames.vector.normal.map),
+    "HERE_VECTOR_NORMAL_TRUCK": DefaultLayers(layer_name=DefaultLayerNames.vector.normal.truck),
+}
+
 
 # Adds ipyleaflet basemaps
 for item in ipybasemaps.values():
@@ -346,6 +507,4 @@ for item in ipybasemaps.values():
             leaf_basemaps[name] = basemap_to_tiles(eval(basemap))
 
 basemap_tiles = Box(leaf_basemaps, frozen_box=True)
-basemaps = Box(
-    dict(zip(list(leaf_basemaps.keys()), list(leaf_basemaps.keys()))), frozen_box=True
-)
+basemaps = Box(dict(zip(list(leaf_basemaps.keys()), list(leaf_basemaps.keys()))), frozen_box=True)
