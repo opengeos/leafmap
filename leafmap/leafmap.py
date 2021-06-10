@@ -2,7 +2,7 @@
 
 import os
 import ipyleaflet
-from ipyleaflet import Marker, MarkerCluster, TileLayer, WidgetControl
+from ipyleaflet import Marker, MarkerCluster, TileLayer, WidgetControl, VectorTileLayer
 from .basemaps import basemap_tiles
 from .common import *
 from .legends import builtin_legends
@@ -364,6 +364,31 @@ class Map(ipyleaflet.Map):
             print("Failed to add the specified TileLayer.")
             raise Exception(e)
 
+    def add_vector_tile_layer(
+        self,
+        url="https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt",
+        attribution="",
+        **kwargs,
+    ):
+        """Adds a VectorTileLayer to the map.
+
+        Args:
+            url (str, optional): The URL of the tile layer. Defaults to 'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt'.
+            name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+        """
+        try:
+            vector_tile_layer = VectorTileLayer(
+                url=url,
+                attribution=attribution,
+                **kwargs,
+            )
+            self.add_layer(vector_tile_layer)
+
+        except Exception as e:
+            print("Failed to add the specified VectorTileLayer.")
+            raise Exception(e)
+    
     def add_osm_from_geocode(
         self,
         query,
