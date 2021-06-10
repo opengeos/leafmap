@@ -3,6 +3,7 @@
 import os
 import ipyleaflet
 from ipyleaflet import Marker, MarkerCluster, TileLayer, WidgetControl, VectorTileLayer
+from traitlets import Unicode
 from .basemaps import basemap_tiles
 from .common import *
 from .legends import builtin_legends
@@ -366,21 +367,24 @@ class Map(ipyleaflet.Map):
 
     def add_vector_tile_layer(
         self,
-        url="https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt",
+        url="https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w",
         attribution="",
+        vector_tile_layer_styles=dict(),
         **kwargs,
     ):
         """Adds a VectorTileLayer to the map.
 
         Args:
-            url (str, optional): The URL of the tile layer. Defaults to 'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt'.
+            url (str, optional): The URL of the tile layer. Defaults to 'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
             name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
             attribution (str, optional): The attribution to use. Defaults to ''.
+            vector_tile_layer_styles(dict,optional): Style dict, specific to the vector tile source.
         """
         try:
             vector_tile_layer = VectorTileLayer(
                 url=url,
                 attribution=attribution,
+                vector_tile_layer_styles=vector_tile_layer_styles,
                 **kwargs,
             )
             self.add_layer(vector_tile_layer)
