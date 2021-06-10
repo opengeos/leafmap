@@ -49,8 +49,21 @@ class Map(folium.Map):
         if "width" in kwargs and isinstance(kwargs["width"], str):
             kwargs["width"] = float(kwargs["width"].replace("px", ""))
 
+        height = None
+        width = None
+
+        if "height" in kwargs:
+            height = kwargs.pop("height")
+
+        if "width" in kwargs:
+            width = kwargs.pop("width")
+
         super().__init__(**kwargs)
         self.baseclass = "folium"
+
+        if (height is not None) or (width is not None):
+            f = folium.Figure(width=width, height=height)
+            self.add_to(f)
 
         if "fullscreen_control" not in kwargs:
             kwargs["fullscreen_control"] = True
