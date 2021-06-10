@@ -1227,6 +1227,7 @@ class Map(ipyleaflet.Map):
         """
         try:
 
+            outfile = os.path.abspath(outfile)
             if not outfile.endswith(".html"):
                 print("The output file must end with .html")
                 return
