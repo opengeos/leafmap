@@ -607,7 +607,7 @@ def open_data_widget(m):
             file_chooser.filter_pattern = "*.shp"
             raster_options.children = []
         elif change["new"] == "GeoJSON":
-            file_chooser.filter_pattern = "*.geojson"
+            file_chooser.filter_pattern = ["*.geojson", "*.json"]
             raster_options.children = []
         elif change["new"] == "Vector":
             file_chooser.filter_pattern = "*.*"
