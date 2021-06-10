@@ -3,7 +3,6 @@
 import os
 import ipyleaflet
 from ipyleaflet import Marker, MarkerCluster, TileLayer, WidgetControl, VectorTileLayer
-from traitlets import Unicode
 from .basemaps import basemap_tiles
 from .common import *
 from .legends import builtin_legends
