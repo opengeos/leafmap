@@ -47,13 +47,14 @@ Below is a partial list of features available for the leafmap package. Please ch
 
 -   Create an interactive map with only one-line of code.
 -   Select from a variety of basemaps interactively without coding.
--   Add XYZ and WMS tile services to the map.
+-   Add XYZ, WMS, and vector tile services to the map.
 -   Convert CSV to points and display points as a marker cluster.
 -   Add local vector data (e.g., shapefile, GeoJSON, KML) to the map without coding.
 -   Add local raster data (e.g., GeoTIFF) to the map without coding.
 -   Add Cloud Optimized GeoTIFF (COG) and SpatialTemporal Asset Catalog (STAC) to the map.
 -   Add OpenStreetMap data to the map with a single line of code.
 -   Add a GeoPandas GeoDataFrame to the map with a single line of code.
+-   Add a point layer with popup attributes to the map.
 -   Add data from a PostGIS database to the map.
 -   Add custom legends and colorbars to the map.
 -   Perform geospatial analysis using WhiteboxTools and whiteboxgui.
