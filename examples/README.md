@@ -30,6 +30,10 @@
 13. Adding a GeoPandas GeoDataFrame to the map with a single line of code ([notebook](https://leafmap.org/notebooks/13_geopandas))
 14. Adding data from a PostGIS database to the map ([notebook](https://leafmap.org/notebooks/14_postgis))
 15. Downloading OpenStreetMap data to the map with a single line of code ([notebook](https://leafmap.org/notebooks/15_add_osm))
+16. Use [HERE Map Widget for Jupyter](https://github.com/heremaps/here-map-widget-for-jupyter) as plotting backend ([notebook](https://leafmap.org/notebooks/16_heremap))
+17. Adding vector tile layers to the map ([notebook](https://leafmap.org/notebooks/17_vector_tile_layer))
+18. Adding a point layer with popup attributes to the map ([notebook](https://leafmap.org/notebooks/18_point_layer))
+19. Saving maps as a html file ([notebook](https://leafmap.org/notebooks/19_map_to_html))
 
 ## Demo
 
