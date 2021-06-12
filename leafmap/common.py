@@ -1688,3 +1688,30 @@ def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
 
     gdf = gpd.read_postgis(sql, con, geom_col, crs, **kwargs)
     return gdf
+
+
+def vector_col_names(filename, **kwargs):
+    """Retrieves the column names of a vector atrribute table.
+
+    Args:
+        filename (str): The input file path.
+
+    Returns:
+        list: The list of column names.
+    """
+    import warnings
+
+    warnings.filterwarnings("ignore")
+    check_package(name="geopandas", URL="https://geopandas.org")
+    import geopandas as gpd
+
+    if not filename.startswith("http"):
+        filename = os.path.abspath(filename)
+    ext = os.path.splitext(filename)[1].lower()
+    if ext == ".kml":
+        gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+        gdf = gpd.read_file(filename, driver="KML", **kwargs)
+    else:
+        gdf = gpd.read_file(filename, **kwargs)
+    col_names = gdf.columns.values.tolist()
+    return col_names

@@ -22,6 +22,7 @@ def tool_template(m=None):
     """
     widget_width = "250px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
 
     toolbar_button = widgets.ToggleButton(
         value=False,
@@ -49,7 +50,7 @@ def tool_template(m=None):
         value=None,
         description="Dropdown:",
         layout=widgets.Layout(width=widget_width, padding=padding),
-        style={"description_width": "initial"},
+        style=style,
     )
 
     int_slider = widgets.IntSlider(
@@ -59,7 +60,7 @@ def tool_template(m=None):
         readout=False,
         continuous_update=True,
         layout=widgets.Layout(width="220px", padding=padding),
-        style={"description_width": "initial"},
+        style=style,
     )
 
     int_slider_label = widgets.Label()
@@ -72,7 +73,7 @@ def tool_template(m=None):
         readout=False,
         continuous_update=True,
         layout=widgets.Layout(width="220px", padding=padding),
-        style={"description_width": "initial"},
+        style=style,
     )
 
     float_slider_label = widgets.Label()
@@ -82,7 +83,7 @@ def tool_template(m=None):
         concise=False,
         description="Color:",
         value="white",
-        style={"description_width": "initial"},
+        style=style,
         layout=widgets.Layout(width=widget_width, padding=padding),
     )
 
@@ -90,7 +91,7 @@ def tool_template(m=None):
         value="",
         description="Textbox:",
         placeholder="Placeholder",
-        style={"description_width": "initial"},
+        style=style,
         layout=widgets.Layout(width=widget_width, padding=padding),
     )
 
@@ -453,6 +454,9 @@ def open_data_widget(m):
         m (object): leafmap.Map
     """
 
+    padding = "0px 0px 0px 5px"
+    style = {"description_width": "initial"}
+
     file_type = widgets.ToggleButtons(
         options=["Shapefile", "GeoJSON", "Vector", "CSV", "GeoTIFF"],
         tooltips=[
@@ -469,40 +473,70 @@ def open_data_widget(m):
     file_chooser.filter_pattern = "*.shp"
     file_chooser.use_dir_icons = True
 
-    style = {"description_width": "initial"}
     layer_name = widgets.Text(
         value="Shapefile",
         description="Enter a layer name:",
         tooltip="Enter a layer name for the selected file",
         style=style,
-        layout=widgets.Layout(width="454px", padding="0px 0px 0px 5px"),
+        layout=widgets.Layout(width="454px", padding=padding),
     )
 
     longitude = widgets.Dropdown(
         options=[],
         value=None,
         description="Longitude:",
-        layout=widgets.Layout(width="149px", padding="0px 0px 0px 5px"),
-        style={"description_width": "initial"},
+        layout=widgets.Layout(width="149px", padding=padding),
+        style=style,
     )
 
     latitude = widgets.Dropdown(
         options=[],
         value=None,
         description="Latitude:",
-        layout=widgets.Layout(width="149px", padding="0px 0px 0px 5px"),
-        style={"description_width": "initial"},
+        layout=widgets.Layout(width="149px", padding=padding),
+        style=style,
     )
 
     label = widgets.Dropdown(
         options=[],
         value=None,
         description="Label:",
-        layout=widgets.Layout(width="149px", padding="0px 0px 0px 5px"),
-        style={"description_width": "initial"},
+        layout=widgets.Layout(width="149px", padding=padding),
+        style=style,
+    )
+
+    point_check = widgets.Checkbox(
+        description="Is it a point layer?",
+        indent=False,
+        layout=widgets.Layout(padding=padding, width="150px"),
+        style=style,
+    )
+
+    point_popup = widgets.SelectMultiple(
+        options=[
+            "None",
+        ],
+        value=["None"],
+        description="Popup attributes:",
+        disabled=False,
+        style=style,
     )
 
     csv_widget = widgets.HBox()
+    point_widget = widgets.HBox()
+
+    def point_layer_check(change):
+        if point_check.value:
+            if file_chooser.selected is not None:
+                m.default_style = {"cursor": "wait"}
+                point_popup.options = vector_col_names(file_chooser.selected)
+                point_popup.value = [point_popup.options[0]]
+
+            point_widget.children = [point_check, point_popup]
+        else:
+            point_widget.children = [point_check]
+
+    point_check.observe(point_layer_check)
 
     ok_cancel = widgets.ToggleButtons(
         value=None,
@@ -556,6 +590,7 @@ def open_data_widget(m):
             file_chooser,
             csv_widget,
             layer_name,
+            point_widget,
             raster_options,
             ok_cancel,
             tool_output,
@@ -606,16 +641,24 @@ def open_data_widget(m):
         if change["new"] == "Shapefile":
             file_chooser.filter_pattern = "*.shp"
             raster_options.children = []
+            point_widget.children = []
+            point_check.value = False
         elif change["new"] == "GeoJSON":
             file_chooser.filter_pattern = ["*.geojson", "*.json"]
             raster_options.children = []
+            point_widget.children = []
+            point_check.value = False
         elif change["new"] == "Vector":
             file_chooser.filter_pattern = "*.*"
             raster_options.children = []
+            point_widget.children = [point_check]
+            point_check.value = False
         elif change["new"] == "CSV":
             file_chooser.filter_pattern = ["*.csv", "*.CSV"]
             csv_widget.children = [longitude, latitude, label]
             raster_options.children = []
+            point_widget.children = []
+            point_check.value = False
         elif change["new"] == "GeoTIFF":
             import matplotlib.pyplot as plt
 
@@ -623,6 +666,8 @@ def open_data_widget(m):
             colormap.options = plt.colormaps()
             colormap.value = "terrain"
             raster_options.children = [bands, colormap, x_dim, y_dim]
+            point_widget.children = []
+            point_check.value = False
 
     def ok_cancel_clicked(change):
         if change["new"] == "Apply":
@@ -633,7 +678,16 @@ def open_data_widget(m):
                 tool_output.clear_output()
                 if file_path is not None:
                     ext = os.path.splitext(file_path)[1]
-                    if ext.lower() == ".shp":
+                    if point_check.value:
+                        popup=list(point_popup.value)
+                        if len(popup) == 1:
+                            popup = popup[0]
+                        m.add_point_layer(
+                            file_path,
+                            popup=popup,
+                            layer_name=layer_name.value,
+                        )
+                    elif ext.lower() == ".shp":
                         m.add_shp(file_path, style=None, layer_name=layer_name.value)
                     elif ext.lower() == ".geojson":
 
