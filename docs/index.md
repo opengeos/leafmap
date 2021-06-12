@@ -25,7 +25,7 @@
 
 **leafmap** is a Python package for geospatial analysis and interactive mapping in a Jupyter environment. It is a spin-off project of the [geemap](https://geemap.org) Python package, which was designed specifically to work with [Google Earth Engine](https://earthengine.google.com) (GEE). However, not everyone in the geospatial community has a GEE account. **leafmap** is designed to fill this gap for non-GEE users. It enables users to perform advanced geospatial analysis and interactive mapping with minimal coding in a Jupyter environment (e.g., Google Colab, JupyterLab, Jupyter notebook). It is built upon a number of open-source packages, such as [folium](https://github.com/python-visualization/folium) and [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) (for creating interactive maps), [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) and [whiteboxgui](https://github.com/giswqs/whiteboxgui) (for analyzing geospatial data), and [ipywidgets](https://github.com/jupyter-widgets/ipywidgets) (for designing interactive graphical user interface).
 
-The [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) library currently contains **447** tools, which are each grouped based on their main function into one of the following categories. For a list of available tools with comprehensive documentation and usage details, please see the [WhiteboxTools User Manual](https://jblindsay.github.io/wbt_book/available_tools/index.html).
+The [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) library currently contains **468** tools, which are each grouped based on their main function into one of the following categories. For a list of available tools with comprehensive documentation and usage details, please see the [WhiteboxTools User Manual](https://jblindsay.github.io/wbt_book/available_tools/index.html).
 
 -   [Data Tools](https://jblindsay.github.io/wbt_book/available_tools/data_tools.html)
 -   [Geomorphometric Analysis](https://jblindsay.github.io/wbt_book/available_tools/geomorphometric_analysis.html)
@@ -40,6 +40,8 @@ Launch the interactive notebook tutorial for the **leafmap** Python package with
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://binder.pangeo.io/badge_logo.svg)](https://binder.pangeo.io/v2/gh/giswqs/leafmap/master)
+
+Check out this excellent article on Medium - [Leafmap a new Python Package for Geospatial data science](https://link.medium.com/HRRKDcynYgb)
 
 ## Key Features
 
