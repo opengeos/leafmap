@@ -154,6 +154,14 @@ class Map(folium.Map):
 
         self.fit_bounds([latlon, latlon], max_zoom=zoom)
 
+    def add_layer(self, layer):
+        """Adds a layer to the map.
+
+        Args:
+            layer (TileLayer): A TileLayer instance.
+        """        
+        layer.add_to(self)
+
     def add_layer_control(self):
         """Adds layer control to the map."""
         layer_ctrl = False

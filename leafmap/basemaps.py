@@ -11,6 +11,7 @@ More WMS basemaps can be found at the following websites:
 3. FWS NWI Wetlands data: https://www.fws.gov/wetlands/Data/Web-Map-Services.html
 
 """
+import os
 import folium
 from box import Box
 from ipyleaflet import TileLayer, WMSLayer, basemap_to_tiles
@@ -459,20 +460,30 @@ here_basemaps = {
             name="Google Satellite",
         )
     ),
-    "HERE_RASTER_NORMAL_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.map),
-    "HERE_RASTER_NORMAL_BASE": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.base),
+    "HERE_RASTER_NORMAL_MAP": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.map
+    ),
+    "HERE_RASTER_NORMAL_BASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.base
+    ),
     "HERE_RASTER_NORMAL_BASE_NIGHT": DefaultLayers(
         layer_name=DefaultLayerNames.raster.normal.basenight
     ),
-    "HERE_RASTER_NORMAL_LABELS": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.labels),
+    "HERE_RASTER_NORMAL_LABELS": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.labels
+    ),
     "HERE_RASTER_NORMAL_TRANSIT": DefaultLayers(
         layer_name=DefaultLayerNames.raster.normal.transit
     ),
-    "HERE_RASTER_NORMAL_XBASE": DefaultLayers(layer_name=DefaultLayerNames.raster.normal.xbase),
+    "HERE_RASTER_NORMAL_XBASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.normal.xbase
+    ),
     "HERE_RASTER_NORMAL_XBASE_NIGHT": DefaultLayers(
         layer_name=DefaultLayerNames.raster.normal.xbasenight
     ),
-    "HERE_RASTER_SATELLITE_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.satellite.map),
+    "HERE_RASTER_SATELLITE_MAP": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.satellite.map
+    ),
     "HERE_RASTER_SATELLITE_LABELS": DefaultLayers(
         layer_name=DefaultLayerNames.raster.satellite.labels
     ),
@@ -482,14 +493,24 @@ here_basemaps = {
     "HERE_RASTER_SATELLITE_XBASE": DefaultLayers(
         layer_name=DefaultLayerNames.raster.satellite.xbase
     ),
-    "HERE_RASTER_TERRAIN_MAP": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.map),
+    "HERE_RASTER_TERRAIN_MAP": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.terrain.map
+    ),
     "HERE_RASTER_TERRAIN_LABELS": DefaultLayers(
         layer_name=DefaultLayerNames.raster.terrain.labels
     ),
-    "HERE_RASTER_TERRAIN_BASE": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.base),
-    "HERE_RASTER_TERRAIN_XBASE": DefaultLayers(layer_name=DefaultLayerNames.raster.terrain.xbase),
-    "HERE_VECTOR_NORMAL_MAP": DefaultLayers(layer_name=DefaultLayerNames.vector.normal.map),
-    "HERE_VECTOR_NORMAL_TRUCK": DefaultLayers(layer_name=DefaultLayerNames.vector.normal.truck),
+    "HERE_RASTER_TERRAIN_BASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.terrain.base
+    ),
+    "HERE_RASTER_TERRAIN_XBASE": DefaultLayers(
+        layer_name=DefaultLayerNames.raster.terrain.xbase
+    ),
+    "HERE_VECTOR_NORMAL_MAP": DefaultLayers(
+        layer_name=DefaultLayerNames.vector.normal.map
+    ),
+    "HERE_VECTOR_NORMAL_TRUCK": DefaultLayers(
+        layer_name=DefaultLayerNames.vector.normal.truck
+    ),
 }
 
 
@@ -506,5 +527,14 @@ for item in ipybasemaps.values():
             basemap = basemap.replace("Mids", "Modis")
             leaf_basemaps[name] = basemap_to_tiles(eval(basemap))
 
+if os.environ.get("PLANET_API_KEY") is not None:
+    from .common import planet_tiles
+
+    planet_dict = planet_tiles()
+    for key in planet_dict:
+        leaf_basemaps[key] = planet_dict[key]
+
 basemap_tiles = Box(leaf_basemaps, frozen_box=True)
-basemaps = Box(dict(zip(list(leaf_basemaps.keys()), list(leaf_basemaps.keys()))), frozen_box=True)
+basemaps = Box(
+    dict(zip(list(leaf_basemaps.keys()), list(leaf_basemaps.keys()))), frozen_box=True
+)
