@@ -469,6 +469,15 @@ def open_data_widget(m):
     )
     file_type.style.button_width = "88px"
 
+    filepath = widgets.Text(
+        value="",
+        description="File path or HTTP URL:",
+        tooltip="Enter a file path or HTTP URL to vector data",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+    http_widget = widgets.HBox()
+
     file_chooser = FileChooser(os.getcwd())
     file_chooser.filter_pattern = "*.shp"
     file_chooser.use_dir_icons = True
@@ -527,9 +536,9 @@ def open_data_widget(m):
 
     def point_layer_check(change):
         if point_check.value:
-            if file_chooser.selected is not None:
+            if filepath.value.strip() != "":
                 m.default_style = {"cursor": "wait"}
-                point_popup.options = vector_col_names(file_chooser.selected)
+                point_popup.options = vector_col_names(filepath.value)
                 point_popup.value = [point_popup.options[0]]
 
             point_widget.children = [point_check, point_popup]
@@ -588,6 +597,7 @@ def open_data_widget(m):
         [
             file_type,
             file_chooser,
+            http_widget,
             csv_widget,
             layer_name,
             point_widget,
@@ -612,10 +622,13 @@ def open_data_widget(m):
     bands.observe(bands_changed, "value")
 
     def chooser_callback(chooser):
+
+        filepath.value = file_chooser.selected
+
         if file_type.value == "CSV":
             import pandas as pd
 
-            df = pd.read_csv(file_chooser.selected)
+            df = pd.read_csv(filepath.value)
             col_names = df.columns.values.tolist()
             longitude.options = col_names
             latitude.options = col_names
@@ -636,6 +649,7 @@ def open_data_widget(m):
         file_chooser.reset()
         layer_name.value = file_type.value
         csv_widget.children = []
+        filepath.value = ""
         tool_output.clear_output()
 
         if change["new"] == "Shapefile":
@@ -643,22 +657,26 @@ def open_data_widget(m):
             raster_options.children = []
             point_widget.children = []
             point_check.value = False
+            http_widget.children = []
         elif change["new"] == "GeoJSON":
             file_chooser.filter_pattern = ["*.geojson", "*.json"]
             raster_options.children = []
             point_widget.children = []
             point_check.value = False
+            http_widget.children = [filepath]
         elif change["new"] == "Vector":
             file_chooser.filter_pattern = "*.*"
             raster_options.children = []
             point_widget.children = [point_check]
             point_check.value = False
+            http_widget.children = [filepath]
         elif change["new"] == "CSV":
             file_chooser.filter_pattern = ["*.csv", "*.CSV"]
             csv_widget.children = [longitude, latitude, label]
             raster_options.children = []
             point_widget.children = []
             point_check.value = False
+            http_widget.children = [filepath]
         elif change["new"] == "GeoTIFF":
             import matplotlib.pyplot as plt
 
@@ -668,18 +686,19 @@ def open_data_widget(m):
             raster_options.children = [bands, colormap, x_dim, y_dim]
             point_widget.children = []
             point_check.value = False
+            http_widget.children = []
 
     def ok_cancel_clicked(change):
         if change["new"] == "Apply":
             m.default_style = {"cursor": "wait"}
-            file_path = file_chooser.selected
+            file_path = filepath.value
 
             with tool_output:
                 tool_output.clear_output()
-                if file_path is not None:
+                if file_path.strip() != "":
                     ext = os.path.splitext(file_path)[1]
                     if point_check.value:
-                        popup=list(point_popup.value)
+                        popup = list(point_popup.value)
                         if len(popup) == 1:
                             popup = popup[0]
                         m.add_point_layer(
@@ -726,6 +745,7 @@ def open_data_widget(m):
         elif change["new"] == "Reset":
             file_chooser.reset()
             tool_output.clear_output()
+            filepath.value = ""
             m.toolbar_reset()
         elif change["new"] == "Close":
             if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
