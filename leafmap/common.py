@@ -1715,3 +1715,219 @@ def vector_col_names(filename, **kwargs):
         gdf = gpd.read_file(filename, **kwargs)
     col_names = gdf.columns.values.tolist()
     return col_names
+
+
+def planet_monthly_catalog(api_key=None, token_name="PLANET_API_KEY"):
+    """Generates Planet monthly imagery URLs based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
+
+    Args:
+        api_key (str, optional): The Planet API key. Defaults to None.
+        token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+
+    Raises:
+        ValueError: If the API key could not be found.
+
+    Returns:
+        list: A list of tile URLs.
+    """
+    from datetime import date
+
+    if api_key is None:
+        api_key = os.environ.get(token_name)
+        if api_key is None:
+            raise ValueError("The Planet API Key must be provided.")
+
+    today = date.today()
+    year_now = int(today.strftime("%Y"))
+    month_now = int(today.strftime("%m"))
+
+    url_list = []
+    for year in range(2020, year_now + 1):
+
+        for month in range(1, 13):
+            m_str = str(year) + "-" + str(month).zfill(2)
+
+            if year == 2020 and month < 9:
+                continue
+            if year == year_now and month >= month_now:
+                break
+
+            prefix = "https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_"
+            subfix = "_mosaic/gmap/{z}/{x}/{y}.png?api_key="
+            url = f"{prefix}{m_str}{subfix}{api_key}"
+            url_list.append(url)
+
+    return url_list
+
+
+def planet_biannual_catalog(api_key=None, token_name="PLANET_API_KEY"):
+    """Generates Planet bi-annual imagery URLs based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
+
+    Args:
+        api_key (str, optional): The Planet API key. Defaults to None.
+        token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+
+    Raises:
+        ValueError: If the API key could not be found.
+
+    Returns:
+        list: A list of tile URLs.
+    """
+
+    if api_key is None:
+        api_key = os.environ.get(token_name)
+        if api_key is None:
+            raise ValueError("The Planet API Key must be provided.")
+
+    dates = [
+        "2015-12_2016-05",
+        "2016-06_2016-11",
+        "2016-12_2017-05",
+        "2017-06_2017-11",
+        "2017-12_2018-05",
+        "2018-06_2018-11",
+        "2018-12_2019-05",
+        "2019-06_2019-11",
+        "2019-12_2020-05",
+        "2020-06_2020-08",
+    ]
+
+    url_list = []
+
+    for d in dates:
+        prefix = "https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_"
+        subfix = "_mosaic/gmap/{z}/{x}/{y}.png?api_key="
+        url = f"{prefix}{d}{subfix}{api_key}"
+        url_list.append(url)
+
+    return url_list
+
+
+def planet_catalog(api_key=None, token_name="PLANET_API_KEY"):
+    """Generates Planet bi-annual and monthly imagery URLs based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
+
+    Args:
+        api_key (str, optional): The Planet API key. Defaults to None.
+        token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+
+    Returns:
+        list: A list of tile URLs.
+    """
+    biannual = planet_biannual_catalog(api_key, token_name)
+    monthly = planet_monthly_catalog(api_key, token_name)
+    return biannual + monthly
+
+
+def planet_monthly_tiles(
+    api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"
+):
+    """Generates Planet  monthly imagery TileLayer based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
+
+    Args:
+        api_key (str, optional): The Planet API key. Defaults to None.
+        token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+        tile_format (str, optional): The TileLayer format, can be either ipyleaflet or folium. Defaults to "ipyleaflet".
+
+    Raises:
+        ValueError: If the tile layer format is invalid.
+
+    Returns:
+        dict: A dictionary of TileLayer.
+    """
+    import ipyleaflet
+    import folium
+
+    if tile_format not in ["ipyleaflet", "folium"]:
+        raise ValueError("The tile format must be either ipyleaflet or folium.")
+
+    tiles = {}
+    url_list = planet_monthly_catalog(api_key, token_name)
+    for url in url_list:
+        index = url.find("20")
+        name = "Planet_" + url[index : index + 7]
+
+        if tile_format == "ipyleaflet":
+            tile = ipyleaflet.TileLayer(url=url, attribution="Planet", name=name)
+        else:
+            tile = folium.TileLayer(
+                tiles=url,
+                attr="Planet",
+                name=name,
+                overlay=True,
+                control=True,
+            )
+
+        tiles[name] = tile
+
+    return tiles
+
+
+def planet_biannual_tiles(
+    api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"
+):
+    """Generates Planet  bi-annual imagery TileLayer based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
+
+    Args:
+        api_key (str, optional): The Planet API key. Defaults to None.
+        token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+        tile_format (str, optional): The TileLayer format, can be either ipyleaflet or folium. Defaults to "ipyleaflet".
+
+    Raises:
+        ValueError: If the tile layer format is invalid.
+
+    Returns:
+        dict: A dictionary of TileLayer.
+    """
+
+    import ipyleaflet
+    import folium
+
+    if tile_format not in ["ipyleaflet", "folium"]:
+        raise ValueError("The tile format must be either ipyleaflet or folium.")
+
+    tiles = {}
+    url_list = planet_biannual_catalog(api_key, token_name)
+    for url in url_list:
+        index = url.find("20")
+        name = "Planet_" + url[index : index + 15]
+        if tile_format == "ipyleaflet":
+            tile = ipyleaflet.TileLayer(url=url, attribution="Planet", name=name)
+        else:
+            tile = folium.TileLayer(
+                tiles=url,
+                attr="Planet",
+                name=name,
+                overlay=True,
+                control=True,
+            )
+        tiles[name] = tile
+
+    return tiles
+
+
+def planet_tiles(api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"):
+    """Generates Planet  monthly imagery TileLayer based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
+
+    Args:
+        api_key (str, optional): The Planet API key. Defaults to None.
+        token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+        tile_format (str, optional): The TileLayer format, can be either ipyleaflet or folium. Defaults to "ipyleaflet".
+
+    Raises:
+        ValueError: If the tile layer format is invalid.
+
+    Returns:
+        dict: A dictionary of TileLayer.
+    """
+
+    catalog = {}
+    biannul = planet_biannual_tiles(api_key, token_name, tile_format)
+    monthly = planet_monthly_tiles(api_key, token_name, tile_format)
+
+    for key in biannul:
+        catalog[key] = biannul[key]
+
+    for key in monthly:
+        catalog[key] = monthly[key]
+
+    return catalog
