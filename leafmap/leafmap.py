@@ -46,6 +46,8 @@ class Map(ipyleaflet.Map):
             self.layout.height = "600px"
         else:
             self.layout.height = kwargs["height"]
+        if "width" in kwargs:
+            self.layout.width = kwargs["width"]
 
         if "layers_control" not in kwargs:
             kwargs["layers_control"] = False
