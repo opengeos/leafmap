@@ -1717,7 +1717,7 @@ def vector_col_names(filename, **kwargs):
     return col_names
 
 
-def planet_monthly_catalog(api_key=None, token_name="PLANET_API_KEY"):
+def planet_monthly_tropical(api_key=None, token_name="PLANET_API_KEY"):
     """Generates Planet monthly imagery URLs based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
 
     Args:
@@ -1760,7 +1760,7 @@ def planet_monthly_catalog(api_key=None, token_name="PLANET_API_KEY"):
     return url_list
 
 
-def planet_biannual_catalog(api_key=None, token_name="PLANET_API_KEY"):
+def planet_biannual_tropical(api_key=None, token_name="PLANET_API_KEY"):
     """Generates Planet bi-annual imagery URLs based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
 
     Args:
@@ -1803,7 +1803,7 @@ def planet_biannual_catalog(api_key=None, token_name="PLANET_API_KEY"):
     return url_list
 
 
-def planet_catalog(api_key=None, token_name="PLANET_API_KEY"):
+def planet_catalog_tropical(api_key=None, token_name="PLANET_API_KEY"):
     """Generates Planet bi-annual and monthly imagery URLs based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
 
     Args:
@@ -1813,12 +1813,12 @@ def planet_catalog(api_key=None, token_name="PLANET_API_KEY"):
     Returns:
         list: A list of tile URLs.
     """
-    biannual = planet_biannual_catalog(api_key, token_name)
-    monthly = planet_monthly_catalog(api_key, token_name)
+    biannual = planet_biannual_tropical(api_key, token_name)
+    monthly = planet_monthly_tropical(api_key, token_name)
     return biannual + monthly
 
 
-def planet_monthly_tiles(
+def planet_monthly_tiles_tropical(
     api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"
 ):
     """Generates Planet  monthly imagery TileLayer based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
@@ -1841,7 +1841,7 @@ def planet_monthly_tiles(
         raise ValueError("The tile format must be either ipyleaflet or folium.")
 
     tiles = {}
-    url_list = planet_monthly_catalog(api_key, token_name)
+    url_list = planet_monthly_tropical(api_key, token_name)
     for url in url_list:
         index = url.find("20")
         name = "Planet_" + url[index : index + 7]
@@ -1862,7 +1862,7 @@ def planet_monthly_tiles(
     return tiles
 
 
-def planet_biannual_tiles(
+def planet_biannual_tiles_tropical(
     api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"
 ):
     """Generates Planet  bi-annual imagery TileLayer based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
@@ -1886,7 +1886,7 @@ def planet_biannual_tiles(
         raise ValueError("The tile format must be either ipyleaflet or folium.")
 
     tiles = {}
-    url_list = planet_biannual_catalog(api_key, token_name)
+    url_list = planet_biannual_tropical(api_key, token_name)
     for url in url_list:
         index = url.find("20")
         name = "Planet_" + url[index : index + 15]
@@ -1905,7 +1905,9 @@ def planet_biannual_tiles(
     return tiles
 
 
-def planet_tiles(api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"):
+def planet_tiles_tropical(
+    api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"
+):
     """Generates Planet  monthly imagery TileLayer based on API key. See https://assets.planet.com/docs/NICFI_UserGuidesFAQ.pdf
 
     Args:
@@ -1921,8 +1923,8 @@ def planet_tiles(api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaf
     """
 
     catalog = {}
-    biannul = planet_biannual_tiles(api_key, token_name, tile_format)
-    monthly = planet_monthly_tiles(api_key, token_name, tile_format)
+    biannul = planet_biannual_tiles_tropical(api_key, token_name, tile_format)
+    monthly = planet_monthly_tiles_tropical(api_key, token_name, tile_format)
 
     for key in biannul:
         catalog[key] = biannul[key]

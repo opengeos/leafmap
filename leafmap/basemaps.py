@@ -528,9 +528,9 @@ for item in ipybasemaps.values():
             leaf_basemaps[name] = basemap_to_tiles(eval(basemap))
 
 if os.environ.get("PLANET_API_KEY") is not None:
-    from .common import planet_tiles
+    from .common import planet_tiles_tropical
 
-    planet_dict = planet_tiles()
+    planet_dict = planet_tiles_tropical()
     for key in planet_dict:
         leaf_basemaps[key] = planet_dict[key]
 

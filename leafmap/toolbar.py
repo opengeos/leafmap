@@ -207,21 +207,37 @@ def main_toolbar(m):
             "name": "basemap",
             "tooltip": "Change basemap",
         },
+        "adjust": {
+            "name": "split_map",
+            "tooltip": "Split-panel map",
+        },
+        "globe": {
+            "name": "planet",
+            "tooltip": "Planet imagery",
+        },
         "folder-open": {
             "name": "open_data",
             "tooltip": "Open local vector/raster data",
-        },
-        "eraser": {
-            "name": "eraser",
-            "tooltip": "Remove all drawn features",
         },
         "gears": {
             "name": "whitebox",
             "tooltip": "WhiteboxTools for local geoprocessing",
         },
+        "eraser": {
+            "name": "eraser",
+            "tooltip": "Remove all drawn features",
+        },
         "camera": {
             "name": "save_map",
             "tooltip": "Save map as HTML or image",
+        },
+        # "smile-o": {
+        #     "name": "placeholder",
+        #     "tooltip": "This is a placehold",
+        # },
+        "spinner": {
+            "name": "placeholder2",
+            "tooltip": "This is a placehold",
         },
         "question": {
             "name": "help",
@@ -271,6 +287,10 @@ def main_toolbar(m):
 
             if tool_name == "basemap":
                 change_basemap(m)
+            if tool_name == "split_map":
+                split_basemaps(m)
+            if tool_name == "planet":
+                split_basemaps(m, layers_dict=planet_tiles_tropical())
             elif tool_name == "open_data":
                 open_data_widget(m)
             elif tool_name == "eraser":
@@ -900,3 +920,75 @@ def save_map(m):
     save_map_control = WidgetControl(widget=save_map_widget, position="topright")
     m.add_control(save_map_control)
     m.save_map_control = save_map_control
+
+
+def split_basemaps(m, layers_dict=None, left_name=None, right_name=None, width="120px"):
+
+    from .basemaps import basemap_tiles
+
+    m.layers = [m.layers[0]]
+    m.clear_controls()
+
+    # layers_dict = None
+    # left_name = None
+    # right_name = None
+    # width = "120px"
+    add_zoom = True
+    add_fullscreen = True
+
+    if layers_dict is None:
+        layers_dict = {}
+        keys = dict(basemap_tiles).keys()
+        for key in keys:
+            if isinstance(basemap_tiles[key], ipyleaflet.WMSLayer):
+                pass
+            else:
+                layers_dict[key] = basemap_tiles[key]
+
+    keys = list(layers_dict.keys())
+    if left_name is None:
+        left_name = keys[0]
+    if right_name is None:
+        right_name = keys[-1]
+
+    left_layer = layers_dict[left_name]
+    right_layer = layers_dict[right_name]
+
+    control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
+    m.add_control(control)
+
+    left_dropdown = widgets.Dropdown(
+        options=keys, value=left_name, layout=widgets.Layout(width=width)
+    )
+
+    left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
+    m.add_control(left_control)
+
+    right_dropdown = widgets.Dropdown(
+        options=keys, value=right_name, layout=widgets.Layout(width=width)
+    )
+
+    right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
+    m.add_control(right_control)
+
+    if add_zoom:
+        m.add_control(ipyleaflet.ZoomControl())
+    if add_fullscreen:
+        m.add_control(ipyleaflet.FullScreenControl())
+    m.add_control(ipyleaflet.ScaleControl(position="bottomleft"))
+
+    split_control = None
+    for ctrl in m.controls:
+        if isinstance(ctrl, ipyleaflet.SplitMapControl):
+            split_control = ctrl
+            break
+
+    def left_change(change):
+        split_control.left_layer.url = layers_dict[left_dropdown.value].url
+
+    left_dropdown.observe(left_change, "value")
+
+    def right_change(change):
+        split_control.right_layer.url = layers_dict[right_dropdown.value].url
+
+    right_dropdown.observe(right_change, "value")
