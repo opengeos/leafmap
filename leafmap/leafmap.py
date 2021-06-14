@@ -2228,3 +2228,93 @@ def split_map(
         raise Exception(e)
 
     return m
+
+
+def ts_inspector(
+    layers_dict=None,
+    left_name=None,
+    right_name=None,
+    width="120px",
+    center=[40, -100],
+    zoom=4,
+    **kwargs,
+):
+
+    import ipywidgets as widgets
+
+    add_zoom = True
+    add_fullscreen = True
+
+    if "toolbar_control" not in kwargs:
+        kwargs["toolbar_control"] = False
+    if "draw_control" not in kwargs:
+        kwargs["draw_control"] = False
+    if "measure_control" not in kwargs:
+        kwargs["measure_control"] = False
+    if "zoom_control" not in kwargs:
+        kwargs["zoom_control"] = False
+    else:
+        add_zoom = kwargs["zoom_control"]
+    if "fullscreen_control" not in kwargs:
+        kwargs["fullscreen_control"] = False
+    else:
+        add_fullscreen = kwargs["fullscreen_control"]
+
+    if layers_dict is None:
+        layers_dict = {}
+        keys = dict(basemap_tiles).keys()
+        for key in keys:
+            if isinstance(basemap_tiles[key], ipyleaflet.WMSLayer):
+                pass
+            else:
+                layers_dict[key] = basemap_tiles[key]
+
+    keys = list(layers_dict.keys())
+    if left_name is None:
+        left_name = keys[0]
+    if right_name is None:
+        right_name = keys[-1]
+
+    left_layer = layers_dict[left_name]
+    right_layer = layers_dict[right_name]
+
+    m = Map(center=center, zoom=zoom, google_map=None, **kwargs)
+    control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
+    m.add_control(control)
+
+    left_dropdown = widgets.Dropdown(
+        options=keys, value=left_name, layout=widgets.Layout(width=width)
+    )
+
+    left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
+    m.add_control(left_control)
+
+    right_dropdown = widgets.Dropdown(
+        options=keys, value=right_name, layout=widgets.Layout(width=width)
+    )
+
+    right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
+    m.add_control(right_control)
+
+    if add_zoom:
+        m.add_control(ipyleaflet.ZoomControl())
+    if add_fullscreen:
+        m.add_control(ipyleaflet.FullScreenControl())
+
+    split_control = None
+    for ctrl in m.controls:
+        if isinstance(ctrl, ipyleaflet.SplitMapControl):
+            split_control = ctrl
+            break
+
+    def left_change(change):
+        split_control.left_layer.url = layers_dict[left_dropdown.value].url
+
+    left_dropdown.observe(left_change, "value")
+
+    def right_change(change):
+        split_control.right_layer.url = layers_dict[right_dropdown.value].url
+
+    right_dropdown.observe(right_change, "value")
+
+    return m
