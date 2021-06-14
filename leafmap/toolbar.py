@@ -889,12 +889,18 @@ def save_map(m):
             elif save_type.value == "PNG" and ext.upper() == ".PNG":
                 tool_output.clear_output()
                 m.toolbar_button.value = False
-                time.sleep(1)
+                if m.save_map_control is not None:
+                    m.remove_control(m.save_map_control)
+                    m.save_map_control = None
+                time.sleep(2)
                 screen_capture(outfile=file_path)
             elif save_type.value == "JPG" and ext.upper() == ".JPG":
                 tool_output.clear_output()
                 m.toolbar_button.value = False
-                time.sleep(1)
+                if m.save_map_control is not None:
+                    m.remove_control(m.save_map_control)
+                    m.save_map_control = None
+                time.sleep(2)
                 screen_capture(outfile=file_path)
             else:
                 label = widgets.Label(
