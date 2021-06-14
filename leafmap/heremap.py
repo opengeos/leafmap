@@ -1,6 +1,7 @@
 """
 This module defines here-map-widget-for-jupyter as backend for leafmap library.
-For more details about Here Map Widget for Jupyter please check: https://github.com/heremaps/here-map-widget-for-jupyter
+For more details about Here Map Widget for Jupyter
+please check: https://github.com/heremaps/here-map-widget-for-jupyter
 """
 import os
 import json
@@ -9,6 +10,7 @@ import requests
 import here_map_widget
 import ipywidgets as widgets
 from .basemaps import here_basemaps
+from .common import shp_to_geojson, gdf_to_geojson
 
 from here_map_widget import (
     FullscreenControl,
@@ -49,6 +51,9 @@ class Map(here_map_widget.Map):
             self.layout.height = "600px"
         else:
             self.layout.height = kwargs["height"]
+
+        if "width" in kwargs:
+            self.layout.width = kwargs["width"]
 
         if kwargs.get("layers_control"):
             self.add_control(LayersControl(alignment="RIGHT_TOP"))
@@ -109,7 +114,8 @@ class Map(here_map_widget.Map):
         """Adds a TileLayer to the map.
 
         Args:
-            url (str, optional): The URL of the tile layer. Defaults to 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'.
+            url (str, optional): The URL of the tile layer.
+            Defaults to 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'.
             name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
@@ -141,13 +147,19 @@ class Map(here_map_widget.Map):
         """Adds a GeoJSON file to the map.
 
         Args:
-            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a
+            dictionary containing the geojson.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes the feature
+            as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
@@ -255,3 +267,86 @@ class Map(here_map_widget.Map):
             geojson.on_click(_update_html)
 
         self.add_layer(geojson)
+
+    def add_shp(
+        self,
+        in_shp,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        fill_colors=None,
+        info_mode="on_hover",
+    ):
+        """Adds a shapefile to the map.
+
+        Args:
+            in_shp (str): The input file path to the shapefile.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes the feature as
+            argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+
+        Raises:
+            FileNotFoundError: The provided shapefile could not be found.
+        """
+        in_shp = os.path.abspath(in_shp)
+        if not os.path.exists(in_shp):
+            raise FileNotFoundError("The provided shapefile could not be found.")
+
+        geojson = shp_to_geojson(in_shp)
+        self.add_geojson(
+            geojson,
+            layer_name,
+            style,
+            hover_style,
+            style_callback,
+            fill_colors,
+            info_mode,
+        )
+
+    def add_gdf(
+        self,
+        gdf,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        fill_colors=None,
+        info_mode="on_hover",
+        zoom_to_layer=True,
+    ):
+        """Adds a GeoJSON file to the map.
+
+        Args:
+            gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes
+            the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer.
+        """
+        data = gdf_to_geojson(gdf, epsg="4326")
+        self.add_geojson(
+            data,
+            layer_name,
+            style,
+            hover_style,
+            style_callback,
+            fill_colors,
+            info_mode,
+        )
