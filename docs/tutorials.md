@@ -23,7 +23,8 @@
 17. Adding vector tile layers to the map ([notebook](https://leafmap.org/notebooks/17_vector_tile_layer))
 18. Adding a point layer with popup attributes to the map ([notebook](https://leafmap.org/notebooks/18_point_layer))
 19. Saving maps as a html file ([notebook](https://leafmap.org/notebooks/19_map_to_html))
-20. Adding Planet basemaps ([notebook](https://leafmap.org/notebooks/20_planet_imagery))
+20. Adding Planet global monthly and quarterly mosaic ([notebook](https://leafmap.org/notebooks/20_planet_imagery))
+21. Using timeseries inspector with one click ([notebook](https://leafmap.org/notebooks/21_ts_inspector))
 
 ## Demo
 

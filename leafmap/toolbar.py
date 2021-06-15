@@ -290,7 +290,7 @@ def main_toolbar(m):
             if tool_name == "split_map":
                 split_basemaps(m)
             if tool_name == "planet":
-                split_basemaps(m, layers_dict=planet_tiles_tropical())
+                split_basemaps(m, layers_dict=planet_tiles())
             elif tool_name == "open_data":
                 open_data_widget(m)
             elif tool_name == "eraser":
@@ -928,17 +928,17 @@ def save_map(m):
     m.save_map_control = save_map_control
 
 
-def split_basemaps(m, layers_dict=None, left_name=None, right_name=None, width="120px"):
+def split_basemaps(
+    m, layers_dict=None, left_name=None, right_name=None, width="120px", **kwargs
+):
 
     from .basemaps import basemap_tiles
 
+    controls = m.controls
+    layers = m.layers
     m.layers = [m.layers[0]]
     m.clear_controls()
 
-    # layers_dict = None
-    # left_name = None
-    # right_name = None
-    # width = "120px"
     add_zoom = True
     add_fullscreen = True
 
@@ -976,6 +976,25 @@ def split_basemaps(m, layers_dict=None, left_name=None, right_name=None, width="
 
     right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
     m.add_control(right_control)
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        # button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    def close_btn_click(change):
+        if change["new"]:
+            m.controls = controls
+            m.layers = layers
+
+    close_button.observe(close_btn_click, "value")
+    close_control = ipyleaflet.WidgetControl(
+        widget=close_button, position="bottomright"
+    )
+    m.add_control(close_control)
 
     if add_zoom:
         m.add_control(ipyleaflet.ZoomControl())
