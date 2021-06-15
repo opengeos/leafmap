@@ -41,6 +41,7 @@ class Map(ipyleaflet.Map):
         self.user_roi = None
         self.user_rois = None
         self.draw_features = []
+        self.api_keys = {}
 
         if "height" not in kwargs:
             self.layout.height = "600px"
@@ -2061,6 +2062,36 @@ class Map(ipyleaflet.Map):
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
+
+    def add_planet_by_month(
+        self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
+    ):
+        """Adds a Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
+
+        Args:
+            year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
+            month (int, optional): The month of Planet global mosaic, must be 1-12. Defaults to 1.
+            name (str, optional): The layer name to use. Defaults to None.
+            api_key (str, optional): The Planet API key. Defaults to None.
+            token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+        """
+        layer = planet_tile_by_month(year, month, name, api_key, token_name)
+        self.add_layer(layer)
+
+    def add_planet_by_quarter(
+        self, year=2016, quarter=1, name=None, api_key=None, token_name="PLANET_API_KEY"
+    ):
+        """Adds a Planet global mosaic by quarter to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
+
+        Args:
+            year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
+            quarter (int, optional): The quarter of Planet global mosaic, must be 1-12. Defaults to 1.
+            name (str, optional): The layer name to use. Defaults to None.
+            api_key (str, optional): The Planet API key. Defaults to None.
+            token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+        """
+        layer = planet_tile_by_quarter(year, quarter, name, api_key, token_name)
+        self.add_layer(layer)
 
 
 def linked_maps(
