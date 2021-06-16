@@ -1,6 +1,7 @@
 """
 This module defines here-map-widget-for-jupyter as backend for leafmap library.
-For more details about Here Map Widget for Jupyter please check: https://github.com/heremaps/here-map-widget-for-jupyter
+For more details about Here Map Widget for Jupyter
+please check: https://github.com/heremaps/here-map-widget-for-jupyter
 """
 import os
 import json
@@ -9,6 +10,7 @@ import requests
 import here_map_widget
 import ipywidgets as widgets
 from .basemaps import here_basemaps
+from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson
 
 from here_map_widget import (
     FullscreenControl,
@@ -50,6 +52,9 @@ class Map(here_map_widget.Map):
         else:
             self.layout.height = kwargs["height"]
 
+        if "width" in kwargs:
+            self.layout.width = kwargs["width"]
+
         if kwargs.get("layers_control"):
             self.add_control(LayersControl(alignment="RIGHT_TOP"))
 
@@ -82,6 +87,24 @@ class Map(here_map_widget.Map):
         if zoom is not None:
             self.zoom = zoom
 
+    def zoom_to_bounds(self, bounds):
+        """Zooms to a bounding box in the form of [south, west, north, east].
+
+        Args:
+            bounds (list | tuple): A list/tuple containing south, west, north, east values for the
+            bounds.
+        """
+        self.bounds = tuple(bounds)
+
+    def zoom_to_gdf(self, gdf):
+        """Zooms to the bounding box of a GeoPandas GeoDataFrame.
+
+        Args:
+            gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
+        """
+        bounds = gdf.total_bounds
+        self.zoom_to_bounds(bounds)
+
     def add_basemap(self, basemap="HYBRID"):
         """Adds a basemap to the map.
 
@@ -104,12 +127,13 @@ class Map(here_map_widget.Map):
         name="Untitled",
         attribution="",
         opacity=1.0,
-        **kwargs
+        **kwargs,
     ):
         """Adds a TileLayer to the map.
 
         Args:
-            url (str, optional): The URL of the tile layer. Defaults to 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'.
+            url (str, optional): The URL of the tile layer.
+            Defaults to 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'.
             name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
@@ -137,17 +161,29 @@ class Map(here_map_widget.Map):
         style_callback=None,
         fill_colors=None,
         info_mode="on_hover",
+        point_style=None,
+        default_popup=False,
     ):
         """Adds a GeoJSON file to the map.
 
         Args:
-            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a
+            dictionary containing the geojson.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes the feature
+            as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
+            default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be
+            shown on clicking the feature.
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
@@ -208,7 +244,7 @@ class Map(here_map_widget.Map):
         output_widget = widgets.VBox([widgets.HBox([toolbar_button, close_button]), html])
         info_control = WidgetControl(widget=output_widget, position="bottomright")
 
-        if info_mode in ["on_hover", "on_click"]:
+        if not default_popup and info_mode in ["on_hover", "on_click"]:
             self.add_control(info_control)
 
         def _toolbar_btn_click(change):
@@ -247,11 +283,272 @@ class Map(here_map_widget.Map):
             hover_style=hover_style if hover_style else {},
             style_callback=style_callback,
             name=layer_name,
+            point_style=point_style if point_style else {},
+            show_bubble=default_popup,
         )
 
-        if info_mode == "on_hover":
-            geojson.on_hover(_update_html)
-        elif info_mode == "on_click":
-            geojson.on_click(_update_html)
+        if not default_popup:
+            if info_mode == "on_hover":
+                geojson.on_hover(_update_html)
+            elif info_mode == "on_click":
+                geojson.on_click(_update_html)
 
         self.add_layer(geojson)
+
+    def add_shp(
+        self,
+        in_shp,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        fill_colors=None,
+        info_mode="on_hover",
+        point_style=None,
+        default_popup=False,
+    ):
+        """Adds a shapefile to the map.
+
+        Args:
+            in_shp (str): The input file path to the shapefile.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes the feature as
+            argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
+            default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be
+            shown on clicking the feature.
+
+        Raises:
+            FileNotFoundError: The provided shapefile could not be found.
+        """
+        in_shp = os.path.abspath(in_shp)
+        if not os.path.exists(in_shp):
+            raise FileNotFoundError("The provided shapefile could not be found.")
+
+        geojson = shp_to_geojson(in_shp)
+        self.add_geojson(
+            in_geojson=geojson,
+            layer_name=layer_name,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            fill_colors=fill_colors,
+            info_mode=info_mode,
+            point_style=point_style,
+            default_popup=default_popup,
+        )
+
+    def add_gdf(
+        self,
+        gdf,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        fill_colors=None,
+        info_mode="on_hover",
+        zoom_to_layer=True,
+        point_style=None,
+        default_popup=False,
+    ):
+        """Adds a GeoJSON file to the map.
+
+        Args:
+            gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes
+            the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
+            default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be
+            shown on clicking the feature.
+        """
+        data = gdf_to_geojson(gdf, epsg="4326")
+        self.add_geojson(
+            in_geojson=data,
+            layer_name=layer_name,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            fill_colors=fill_colors,
+            info_mode=info_mode,
+            point_style=point_style,
+            default_popup=default_popup,
+        )
+        if zoom_to_layer:
+            import numpy as np
+
+            bounds = gdf.to_crs(epsg="4326").bounds
+            west = np.min(bounds["minx"])
+            south = np.min(bounds["miny"])
+            east = np.max(bounds["maxx"])
+            north = np.max(bounds["maxy"])
+            print((south, west, north, east))
+            self.bounds = (south, west, north, east)
+
+    def add_kml(
+        self,
+        in_kml,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        fill_colors=None,
+        info_mode="on_hover",
+        point_style=None,
+        default_popup=False,
+    ):
+        """Adds a GeoJSON file to the map.
+
+        Args:
+            in_kml (str): The input file path to the KML.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes the feature
+            as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
+            default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be
+            shown on clicking the feature.
+
+        Raises:
+            FileNotFoundError: The provided KML file could not be found.
+        """
+
+        in_kml = os.path.abspath(in_kml)
+        if not os.path.exists(in_kml):
+            raise FileNotFoundError("The provided KML file could not be found.")
+        self.add_vector(
+            in_kml,
+            layer_name,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            fill_colors=fill_colors,
+            info_mode=info_mode,
+            point_style=point_style,
+            default_popup=default_popup,
+        )
+
+    def add_vector(
+        self,
+        filename,
+        layer_name="Untitled",
+        bbox=None,
+        mask=None,
+        rows=None,
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        fill_colors=None,
+        info_mode="on_hover",
+        point_style=None,
+        default_popup=False,
+        **kwargs,
+    ):
+        """Adds any geopandas-supported vector dataset to the map.
+
+        Args:
+            filename (str): Either the absolute or relative path to the file or URL to be opened,
+            or any object with a read() method (such as an open file or StringIO).
+            layer_name (str, optional): The layer name to use. Defaults to "Untitled".
+            bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features
+            by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry.
+            CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame.
+            Cannot be used with mask. Defaults to None.
+            mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for
+            features that intersect with the given dict-like geojson geometry, GeoSeries,
+            GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or
+            GeoDataFrame. Cannot be used with bbox. Defaults to None.
+            rows (int or slice, optional): Load in specific rows by passing an integer
+            (first n rows) or a slice() object.. Defaults to None.
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called for each feature,
+            and should return the feature style. This styling function takes the feature as
+            argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+            Any value other than "on_hover" or "on_click" will be treated as None.
+            Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
+            default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be
+            shown on clicking the feature.
+
+        """
+        if not filename.startswith("http"):
+            filename = os.path.abspath(filename)
+
+        ext = os.path.splitext(filename)[1].lower()
+        if ext == ".shp":
+            self.add_shp(
+                filename,
+                layer_name,
+                style,
+                hover_style,
+                style_callback,
+                fill_colors,
+                info_mode,
+                point_style,
+                default_popup,
+            )
+        elif ext in [".json", ".geojson"]:
+            self.add_geojson(
+                in_geojson=filename,
+                layer_name=layer_name,
+                style=style,
+                hover_style=hover_style,
+                style_callback=style_callback,
+                fill_colors=fill_colors,
+                info_mode=info_mode,
+                point_style=point_style,
+                default_popup=default_popup,
+            )
+        else:
+            geojson = vector_to_geojson(
+                filename,
+                bbox=bbox,
+                mask=mask,
+                rows=rows,
+                epsg="4326",
+                **kwargs,
+            )
+
+            self.add_geojson(
+                in_geojson=geojson,
+                layer_name=layer_name,
+                style=style,
+                hover_style=hover_style,
+                style_callback=style_callback,
+                fill_colors=fill_colors,
+                info_mode=info_mode,
+                point_style=point_style,
+                default_popup=default_popup,
+            )
