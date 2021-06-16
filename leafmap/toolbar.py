@@ -207,11 +207,11 @@ def main_toolbar(m):
             "name": "basemap",
             "tooltip": "Change basemap",
         },
-        "adjust": {
+        "globe": {
             "name": "split_map",
             "tooltip": "Split-panel map",
         },
-        "globe": {
+        "adjust": {
             "name": "planet",
             "tooltip": "Planet imagery",
         },
