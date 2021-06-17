@@ -8,7 +8,6 @@ import tarfile
 import urllib.request
 import zipfile
 import ipywidgets as widgets
-from IPython.display import display
 
 
 def in_colab_shell():
@@ -234,9 +233,7 @@ def clone_github_repo(url, out_dir):
 def is_tool(name):
     """Check whether `name` is on PATH and marked as executable."""
 
-    from shutil import which
-
-    return which(name) is not None
+    return shutil.which(name) is not None
 
 
 def random_string(string_length=3):
