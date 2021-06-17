@@ -44,6 +44,10 @@ Launch the interactive notebook tutorial for the **leafmap** Python package with
 
 Check out this excellent article on Medium - [Leafmap a new Python Package for Geospatial data science](https://link.medium.com/HRRKDcynYgb)
 
+To learn more about leafmap, check out the leafmap documentation website - <https://leafmap.org>
+
+![](https://i.imgur.com/abd8pTH.gif)
+
 ## Key Features
 
 Below is a partial list of features available for the leafmap package. Please check the [examples](https://github.com/giswqs/leafmap/tree/master/examples) page for notebook examples, GIF animations, and video tutorials.
