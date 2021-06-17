@@ -6,7 +6,6 @@ import ipyevents
 import ipyleaflet
 import ipywidgets as widgets
 from ipyleaflet import TileLayer, WidgetControl
-from IPython.core.display import display
 from ipyfilechooser import FileChooser
 from .common import *
 
@@ -318,7 +317,7 @@ def main_toolbar(m):
                 current_tool.value = False
         else:
             tool = change["owner"]
-            tool_name = tools[tool.icon]["name"]
+            # tool_name = tools[tool.icon]["name"]
 
         m.toolbar_reset()
 
@@ -435,17 +434,17 @@ def main_toolbar(m):
                     ),
                 )
 
-                def layer_vis_on_click(change):
-                    if change["new"]:
-                        layer_name = change["owner"].tooltip
-                        change["owner"].value = False
+                # def layer_vis_on_click(change):
+                #     if change["new"]:
+                #         layer_name = change["owner"].tooltip
+                #         change["owner"].value = False
 
-                layer_settings.observe(layer_vis_on_click, "value")
+                # layer_settings.observe(layer_vis_on_click, "value")
 
-                def layer_chk_changed(change):
-                    layer_name = change["owner"].description
+                # def layer_chk_changed(change):
+                #     layer_name = change["owner"].description
 
-                layer_chk.observe(layer_chk_changed, "value")
+                # layer_chk.observe(layer_chk_changed, "value")
 
                 widgets.jslink((layer_chk, "value"), (layer, "visible"))
                 widgets.jsdlink((layer_opacity, "value"), (layer, "opacity"))
@@ -484,7 +483,8 @@ def open_data_widget(m):
             "Open a GeoJSON file",
             "Open a vector dataset",
             "Create points from CSV",
-            "Open a vector dataset" "Open a GeoTIFF",
+            "Open a vector dataset",
+            "Open a GeoTIFF",
         ],
     )
     file_type.style.button_width = "88px"
