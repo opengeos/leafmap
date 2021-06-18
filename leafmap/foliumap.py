@@ -159,7 +159,7 @@ class Map(folium.Map):
 
         Args:
             layer (TileLayer): A TileLayer instance.
-        """        
+        """
         layer.add_to(self)
 
     def add_layer_control(self):
@@ -925,8 +925,7 @@ class Map(folium.Map):
 
         data = shp_to_geojson(in_shp)
 
-        geo_json = folium.GeoJson(data=data, name=layer_name, **kwargs)
-        geo_json.add_to(self)
+        self.add_geojson(data, layer_name=layer_name, **kwargs)
 
     def add_geojson(self, in_geojson, layer_name="Untitled", **kwargs):
         """Adds a GeoJSON file to the map.
@@ -940,6 +939,7 @@ class Map(folium.Map):
         """
         import json
         import requests
+        import random
 
         try:
 
@@ -965,7 +965,24 @@ class Map(folium.Map):
 
         # interchangable parameters between ipyleaflet and folium.
         if "style" in kwargs:
+            style_dict = kwargs["style"]
+            if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:
+                kwargs["style_function"] = lambda x: style_dict
             kwargs.pop("style")
+        else:
+            style_dict = {
+                # "stroke": True,
+                "color": "#000000",
+                "weight": 1,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 0.1,
+                # "dashArray": "9"
+                # "clickable": True,
+            }
+            kwargs["style_function"] = lambda x: style_dict
+
         if "style_callback" in kwargs:
             if kwargs["style_callback"] is not None:
                 kwargs["style_function"] = kwargs["style_callback"]
@@ -973,9 +990,22 @@ class Map(folium.Map):
 
         if "hover_style" in kwargs:
             if len(kwargs["hover_style"]) > 0:
-                kwargs["highlight_function"] = kwargs["hover_style"]
+                hover_dict = kwargs["hover_style"]
+                kwargs["highlight_function"] = lambda x: hover_dict
             kwargs.pop("hover_style")
+        else:
+            hover_dict = {"weight": style_dict["weight"] + 1, "fillOpacity": 0.5}
+            kwargs["highlight_function"] = lambda x: hover_dict
+
         if "fill_colors" in kwargs:
+            fill_colors = kwargs["fill_colors"]
+
+            def random_color(feature):
+                style_dict["fillColor"] = random.choice(fill_colors)
+                return style_dict
+
+            kwargs["style_function"] = random_color
+
             kwargs.pop("fill_colors")
         if "info_mode" in kwargs:
             kwargs.pop("info_mode")
@@ -995,8 +1025,7 @@ class Map(folium.Map):
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        geojson = folium.GeoJson(data=data, name=layer_name, **kwargs)
-        geojson.add_to(self)
+        self.add_geojson(data, layer_name=layer_name, **kwargs)
 
         if zoom_to_layer:
             import numpy as np
@@ -1025,8 +1054,7 @@ class Map(folium.Map):
         gdf = read_postgis(sql, con, **kwargs)
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        geojson = folium.GeoJson(data=data, name=layer_name, **kwargs)
-        geojson.add_to(self)
+        self.add_geojson(data, layer_name=layer_name, **kwargs)
 
         if zoom_to_layer:
             import numpy as np
@@ -1055,8 +1083,46 @@ class Map(folium.Map):
 
         data = kml_to_geojson(in_kml)
 
-        geo_json = folium.GeoJson(data=data, name=layer_name, **kwargs)
-        geo_json.add_to(self)
+        self.add_geojson(data, layer_name=layer_name, **kwargs)
+
+    def add_vector(
+        self,
+        filename,
+        layer_name="Untitled",
+        bbox=None,
+        mask=None,
+        rows=None,
+        **kwargs,
+    ):
+        """Adds any geopandas-supported vector dataset to the map.
+
+        Args:
+            filename (str): Either the absolute or relative path to the file or URL to be opened, or any object with a read() method (such as an open file or StringIO).
+            layer_name (str, optional): The layer name to use. Defaults to "Untitled".
+            bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
+            mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
+            rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
+
+        """
+        if not filename.startswith("http"):
+            filename = os.path.abspath(filename)
+
+        ext = os.path.splitext(filename)[1].lower()
+        if ext == ".shp":
+            self.add_shp(filename, layer_name, **kwargs)
+        elif ext in [".json", ".geojson"]:
+            self.add_geojson(filename, layer_name, **kwargs)
+        else:
+            geojson = vector_to_geojson(
+                filename,
+                bbox=bbox,
+                mask=mask,
+                rows=rows,
+                epsg="4326",
+                **kwargs,
+            )
+
+            self.add_geojson(geojson, layer_name, **kwargs)
 
     def add_planet_by_month(
         self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
@@ -1070,7 +1136,9 @@ class Map(folium.Map):
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
-        layer = planet_tile_by_month(year, month, name, api_key, token_name,tile_format="folium")
+        layer = planet_tile_by_month(
+            year, month, name, api_key, token_name, tile_format="folium"
+        )
         self.add_layer(layer)
 
     def add_planet_by_quarter(
@@ -1085,7 +1153,9 @@ class Map(folium.Map):
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
-        layer = planet_tile_by_quarter(year, quarter, name, api_key, token_name, tile_format="folium")
+        layer = planet_tile_by_quarter(
+            year, quarter, name, api_key, token_name, tile_format="folium"
+        )
         self.add_layer(layer)
 
     def publish(
