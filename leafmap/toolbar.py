@@ -609,6 +609,21 @@ def open_data_widget(m):
 
     raster_options = widgets.HBox()
 
+    def filepath_change(change):
+        if file_type.value == "GeoTIFF":
+            if filepath.value.startswith("http"):
+                bands.disabled = True
+                colormap.disabled = True
+                x_dim.disabled = True
+                y_dim.disabled = True
+            else:
+                bands.disabled = False
+                colormap.disabled = False
+                x_dim.disabled = False
+                y_dim.disabled = False
+
+    filepath.observe(filepath_change, "value")
+
     tool_output = widgets.Output(
         layout=widgets.Layout(max_height="150px", max_width="500px", overflow="auto")
     )
@@ -706,7 +721,7 @@ def open_data_widget(m):
             raster_options.children = [bands, colormap, x_dim, y_dim]
             point_widget.children = []
             point_check.value = False
-            http_widget.children = []
+            http_widget.children = [filepath]
 
     def ok_cancel_clicked(change):
         if change["new"] == "Apply":
@@ -745,15 +760,18 @@ def open_data_widget(m):
                         )
 
                     elif ext.lower() == ".tif":
-                        sel_bands = [int(b.strip()) for b in bands.value.split(",")]
-                        m.add_raster(
-                            image=file_path,
-                            bands=sel_bands,
-                            layer_name=layer_name.value,
-                            colormap=colormap.value,
-                            x_dim=x_dim.value,
-                            y_dim=y_dim.value,
-                        )
+                        if file_path.startswith("http"):
+                            m.add_cog_layer(file_path, layer_name.value)
+                        else:
+                            sel_bands = [int(b.strip()) for b in bands.value.split(",")]
+                            m.add_raster(
+                                image=file_path,
+                                bands=sel_bands,
+                                layer_name=layer_name.value,
+                                colormap=colormap.value,
+                                x_dim=x_dim.value,
+                                y_dim=y_dim.value,
+                            )
                     else:
                         m.add_vector(file_path, style=None, layer_name=layer_name.value)
                 else:
