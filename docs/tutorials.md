@@ -4,8 +4,8 @@
 [![image](https://binder.pangeo.io/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 
-1. Introducing the leafmap Python package for interactive mapping ([notebook](https://leafmap.org/notebooks/01_leafmap_intro))
-2. Using basemaps in leafmap ([notebook](https://leafmap.org/notebooks/02_using_basemaps))
+1. Introducing the leafmap Python package for interactive mapping ([video](https://youtu.be/-UPt7x3Gn60) | [gif](https://i.imgur.com/2pRxunR.gif) | [notebook](https://leafmap.org/notebooks/01_leafmap_intro))
+2. Using basemaps in leafmap ([video](https://youtu.be/uylpjbDZesY) | [gif](https://youtu.be/-lOo-vxjrDM) | [notebook](https://leafmap.org/notebooks/02_using_basemaps))
 3. Using Cloud Optimized GeoTIFF (COG) and SpatioTemporal Asset Catalog (STAC) ([notebook](https://leafmap.org/notebooks/03_cog_stac))
 4. Creating a virtual mosaic of Cloud Optimized GeoTIFFs (COG) ([notebook](https://leafmap.org/notebooks/04_cog_mosaic))
 5. Loading local raster datasets with leafmap ([notebook](https://leafmap.org/notebooks/05_load_raster))
