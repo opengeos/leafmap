@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.3.1 - June 20, 2021
+
+**New Features**:
+
+-   Added GUI for loading COG [#50](https://github.com/giswqs/leafmap/issues/50)
+-   Added methods to add vector data on heremap [#43 ](https://github.com/giswqs/leafmap/pull/43)
+-   Added Planet imagery GUI [#9](https://github.com/giswqs/leafmap/commit/2bea287e08886b8d20b96a80364d898237b425bd)
+
+**Improvement**
+
+-   Improved support for folium styles [#47](https://github.com/giswqs/leafmap/discussions/47)
+-   Improved save map to image [#37](https://github.com/giswqs/leafmap/issues/37)
+-   Updated toolbar icons [#9](https://github.com/giswqs/leafmap/issues/9)
+-   Added LGTM
+-   Updated installation docs
+
 ## v0.3.0 - June 14, 2021
 
 **New Features**:
