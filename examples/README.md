@@ -36,6 +36,7 @@
 19. Saving maps as a html file ([notebook](https://leafmap.org/notebooks/19_map_to_html))
 20. Adding Planet global monthly and quarterly mosaic ([notebook](https://leafmap.org/notebooks/20_planet_imagery))
 21. Using timeseries inspector with one click ([notebook](https://leafmap.org/notebooks/21_ts_inspector))
+22. Using time slider for visualizing timeseries images ([notebook](https://leafmap.org/notebooks/22_time_slider))
 
 ## Demo
 
