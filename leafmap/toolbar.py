@@ -6,6 +6,7 @@ import ipyevents
 import ipyleaflet
 import ipywidgets as widgets
 from ipyleaflet import TileLayer, WidgetControl
+from IPython.display import display
 from ipyfilechooser import FileChooser
 from .common import *
 
@@ -222,6 +223,10 @@ def main_toolbar(m):
             "name": "whitebox",
             "tooltip": "WhiteboxTools for local geoprocessing",
         },
+        "fast-forward": {
+            "name": "timeslider",
+            "tooltip": "Activate the time slider",
+        },
         "eraser": {
             "name": "eraser",
             "tooltip": "Remove all drawn features",
@@ -234,10 +239,10 @@ def main_toolbar(m):
         #     "name": "placeholder",
         #     "tooltip": "This is a placehold",
         # },
-        "spinner": {
-            "name": "placeholder2",
-            "tooltip": "This is a placehold",
-        },
+        # "spinner": {
+        #     "name": "placeholder2",
+        #     "tooltip": "This is a placehold",
+        # },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -308,6 +313,8 @@ def main_toolbar(m):
                 wbt_control = WidgetControl(widget=wbt_toolbox, position="bottomright")
                 m.whitebox = wbt_control
                 m.add_control(wbt_control)
+            elif tool_name == "timeslider":
+                m.add_time_slider()
             elif tool_name == "save_map":
                 save_map((m))
             elif tool_name == "help":
@@ -1035,3 +1042,121 @@ def split_basemaps(
         split_control.right_layer.url = layers_dict[right_dropdown.value].url
 
     right_dropdown.observe(right_change, "value")
+
+
+def time_slider(
+    m,
+    layers_dict={},
+    labels=None,
+    time_interval=1,
+    position="bottomright",
+    slider_length="150px",
+):
+    """Adds a time slider to the map.
+
+    Args:
+        layers_dict (dict, optional): The dictionary containing a set of XYZ tile layers.
+        labels (list, optional): The list of labels to be used for the time series. Defaults to None.
+        time_interval (int, optional): Time interval in seconds. Defaults to 1.
+        position (str, optional): Position to place the time slider, can be any of ['topleft', 'topright', 'bottomleft', 'bottomright']. Defaults to "bottomright".
+        slider_length (str, optional): Length of the time slider. Defaults to "150px".
+
+    """
+    import time
+    import threading
+
+    if not isinstance(layers_dict, dict):
+        raise TypeError("The layers_dict must be a dictionary.")
+
+    if len(layers_dict) == 0:
+        layers_dict = planet_monthly_tiles()
+
+    if labels is None:
+        labels = list(layers_dict.keys())
+    if len(labels) != len(layers_dict):
+        raise ValueError("The length of labels is not equal to that of layers_dict.")
+
+    slider = widgets.IntSlider(
+        min=1,
+        max=len(labels),
+        readout=False,
+        continuous_update=False,
+        layout=widgets.Layout(width=slider_length),
+    )
+    label = widgets.Label(
+        value=labels[0], layout=widgets.Layout(padding="0px 5px 0px 5px")
+    )
+
+    play_btn = widgets.Button(
+        icon="play",
+        tooltip="Play the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    pause_btn = widgets.Button(
+        icon="pause",
+        tooltip="Pause the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    close_btn = widgets.Button(
+        icon="times",
+        tooltip="Close the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    play_chk = widgets.Checkbox(value=False)
+
+    slider_widget = widgets.HBox([label, slider, play_btn, pause_btn, close_btn])
+
+    def play_click(b):
+
+        play_chk.value = True
+
+        def work(slider):
+            while play_chk.value:
+                if slider.value < len(labels):
+                    slider.value += 1
+                else:
+                    slider.value = 1
+                time.sleep(time_interval)
+
+        thread = threading.Thread(target=work, args=(slider,))
+        thread.start()
+
+    def pause_click(b):
+        play_chk.value = False
+
+    play_btn.on_click(play_click)
+    pause_btn.on_click(pause_click)
+
+    keys = list(layers_dict.keys())
+    layer = layers_dict[keys[0]]
+    m.add_layer(layer)
+
+    def slider_changed(change):
+        m.default_style = {"cursor": "wait"}
+        index = slider.value - 1
+        label.value = labels[index]
+        layer.url = layers_dict[label.value].url
+        layer.name = layers_dict[label.value].name
+        m.default_style = {"cursor": "default"}
+
+    slider.observe(slider_changed, "value")
+
+    def close_click(b):
+        play_chk.value = False
+        m.toolbar_reset()
+
+        if m.slider_ctrl is not None and m.slider_ctrl in m.controls:
+            m.remove_control(m.slider_ctrl)
+        slider_widget.close()
+
+    close_btn.on_click(close_click)
+
+    slider_ctrl = WidgetControl(widget=slider_widget, position=position)
+    m.add_control(slider_ctrl)
+    m.slider_ctrl = slider_ctrl

@@ -3,6 +3,7 @@
 import os
 import ipyleaflet
 from ipyleaflet import Marker, MarkerCluster, TileLayer, WidgetControl, VectorTileLayer
+from IPython.display import display
 from .basemaps import basemap_tiles
 from .common import *
 from .legends import builtin_legends
@@ -2094,6 +2095,31 @@ class Map(ipyleaflet.Map):
         """
         layer = planet_tile_by_quarter(year, quarter, name, api_key, token_name)
         self.add_layer(layer)
+
+    def add_time_slider(
+        self,
+        layers_dict={},
+        labels=None,
+        time_interval=1,
+        position="bottomright",
+        slider_length="150px",
+    ):
+        """Adds a time slider to the map.
+
+        Args:
+            layers_dict (dict, optional): The dictionary containing a set of XYZ tile layers.
+            labels (list, optional): The list of labels to be used for the time series. Defaults to None.
+            time_interval (int, optional): Time interval in seconds. Defaults to 1.
+            position (str, optional): Position to place the time slider, can be any of ['topleft', 'topright', 'bottomleft', 'bottomright']. Defaults to "bottomright".
+            slider_length (str, optional): Length of the time slider. Defaults to "150px".
+
+        """
+        from .toolbar import time_slider
+
+        time_slider(self, layers_dict, labels, time_interval, position, slider_length)
+
+
+# The functions below are outside the Map class.
 
 
 def linked_maps(
