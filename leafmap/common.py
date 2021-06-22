@@ -7,6 +7,7 @@ import shutil
 import tarfile
 import urllib.request
 import zipfile
+import ipyleaflet
 import ipywidgets as widgets
 
 
@@ -2382,3 +2383,21 @@ def planet_tile_by_month(
         )
 
     return tile
+
+
+def basemap_xyz_tiles():
+    """Returns a dictionary containing a set of basemaps that are XYZ tile layers.
+
+    Returns:
+        dict: A dictionary of XYZ tile layers.
+    """
+    from .basemaps import basemap_tiles
+
+    layers_dict = {}
+    keys = dict(basemap_tiles).keys()
+    for key in keys:
+        if isinstance(basemap_tiles[key], ipyleaflet.WMSLayer):
+            pass
+        else:
+            layers_dict[key] = basemap_tiles[key]
+    return layers_dict
