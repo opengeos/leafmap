@@ -2,9 +2,7 @@
 
 """Tests for `leafmap` package."""
 
-
 import unittest
-
 from leafmap import leafmap
 
 
@@ -17,5 +15,13 @@ class TestLeafmap(unittest.TestCase):
     def tearDown(self):
         """Tear down test fixtures, if any."""
 
-    def test_000_something(self):
-        """Test something."""
+    def test_basemap_tiles(self):
+
+        self.assertIsInstance(leafmap.basemap_tiles.to_dict(), dict)
+
+    def test_linked_maps(self):
+        self.assertIsInstance(leafmap.split_map(), leafmap.Map)
+
+
+if __name__ == "__main__":
+    unittest.main()
