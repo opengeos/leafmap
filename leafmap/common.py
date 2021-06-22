@@ -1479,7 +1479,7 @@ def shp_to_geojson(in_shp, out_json=None, **kwargs):
         raise Exception(e)
 
 
-def delete_shp(in_shp, verbose=True):
+def delete_shp(in_shp, verbose=False):
     """Deletes a shapefile.
 
     Args:
