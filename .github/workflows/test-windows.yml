@@ -1,0 +1,87 @@
+# derived from Fiona: https://github.com/geopandas/pyogrio/blob/master/.github/workflows/test-windows.yml
+name: Windows Test
+
+on: workflow_dispatch
+
+jobs:
+    test:
+        name: Python ${{ matrix.python }} / GDAL ${{ matrix.GDAL_VERSION }}
+        runs-on: windows-2019
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - python: 3.9
+                      GDAL_VERSION: 3.2.1
+                      GIS_INTERNALS: release-1911-x64-gdal-3-2-1-mapserver-7-6-2.zip
+                      GIS_INTERNALS_LIBS: release-1911-x64-gdal-3-2-1-mapserver-7-6-2-libs.zip
+                      allow_failure: false
+
+        env:
+            # NOTE: GDAL_VERSION is obtained automatically by setup.py using gdalinfo.exe
+            GIS_INTERNALS: ${{ matrix.GIS_INTERNALS }}
+            GIS_INTERNALS_LIBS: ${{ matrix.GIS_INTERNALS_LIBS }}
+            GDAL_DATA: "C:\\gdal\\bin\\gdal-data"
+            PROJ_LIB: "C:\\gdal\\bin\\proj6\\share"
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Cache GDAL binaries
+              uses: actions/cache@v2
+              with:
+                  path: C:\gdal
+                  key: ${{ runner.os }}-gdal-${{ matrix.GDAL_VERSION }}
+
+            - name: Add msbuild to PATH
+              uses: microsoft/setup-msbuild@v1.0.2
+
+            - name: Download GDAL
+              run: |
+                  # Only download if not already cached
+                  if (!(test-path C:\gdal)) {
+                    curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS --output gdalbin.zip
+                    Expand-Archive -LiteralPath gdalbin.zip -DestinationPath C:\gdal
+                    curl http://download.gisinternals.com/sdk/downloads/$env:GIS_INTERNALS_LIBS --output gdallibs.zip
+                    Expand-Archive -LiteralPath gdallibs.zip -DestinationPath C:\gdal
+                  }
+
+            - name: Set env variables
+              run: |
+                  echo "Print env from GH"
+                  echo "C:\gdal\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+                  echo "GITHUB_PATH"
+                  Get-Content -Path $env:GITHUB_PATH
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Install Python dependencies
+              run: |
+                  python -m pip install -U pip wheel
+                  echo "Install Cython and numpy (build deps)"
+                  python -m pip install cython~=0.29 numpy~=1.19
+                  echo ""
+                  echo "Install pandas"
+                  python -m pip install pandas
+                  echo "Install test dependencies"
+                  python -m pip install pytest~=5.0 pytest-cov
+
+            - name: CHECKOUT CODE
+              uses: actions/checkout@v2
+            - name: SETUP PYTHON
+              uses: actions/setup-python@v1
+              with:
+                  python-version: ${{ matrix.config.py }}
+            - name: Install dependencies
+              run: |
+                  python -m pip install --upgrade pip
+                  pip install --user --no-cache-dir Cython
+                  pip install --user -r requirements.txt
+                  pip install --user -r requirements_dev.txt
+            - name: PKG-TEST
+              run: |
+                  pip install geopandas osmnx
+                  python -m unittest discover tests/
