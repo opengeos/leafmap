@@ -32,9 +32,10 @@ The [WhiteboxTools](https://github.com/jblindsay/whitebox-tools) library current
 -   [Geomorphometric Analysis](https://jblindsay.github.io/wbt_book/available_tools/geomorphometric_analysis.html)
 -   [GIS Analysis](https://jblindsay.github.io/wbt_book/available_tools/gis_analysis.html)
 -   [Hydrological Analysis](https://jblindsay.github.io/wbt_book/available_tools/hydrological_analysis.html)
--   [Image Analysis](https://jblindsay.github.io/wbt_book/available_tools/image_processing_tools.html)
--   [LiDAR Analysis](https://jblindsay.github.io/wbt_book/available_tools/lidar_tools.html)
+-   [Image Processing Tools](https://jblindsay.github.io/wbt_book/available_tools/image_processing_tools.html)
+-   [LiDAR Tools](https://jblindsay.github.io/wbt_book/available_tools/lidar_tools.html)
 -   [Mathematical and Statistical Analysis](https://jblindsay.github.io/wbt_book/available_tools/mathand_stats_tools.html)
+-   [Precision Agriculture](https://jblindsay.github.io/wbt_book/available_tools/precision_agriculture.html)
 -   [Stream Network Analysis](https://jblindsay.github.io/wbt_book/available_tools/stream_network_analysis.html)
 
 Launch the interactive notebook tutorial for the **leafmap** Python package with Google Colab or Binder now:
