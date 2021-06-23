@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.3.2 - June 22, 2021
+
+**New Features**:
+
+-   Added time slider [#42](https://github.com/giswqs/leafmap/issues/42)
+-   Added JOSS manuscript
+-   Added unittests
+
 ## v0.3.1 - June 20, 2021
 
 **New Features**:
