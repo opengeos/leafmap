@@ -1112,7 +1112,6 @@ class Map(ipyleaflet.Map):
         height="45px",
         transparent_bg=False,
         position="bottomright",
-        layer_name=None,
         **kwargs,
     ):
         """Add a branca colorbar to the map.
@@ -1128,7 +1127,6 @@ class Map(ipyleaflet.Map):
             height (str, optional): The height of the colormap widget. Defaults to "45px".
             transparent_bg (bool, optional): Whether to use transparent background for the colormap widget. Defaults to True.
             position (str, optional): The position for the colormap widget. Defaults to "bottomright".
-            layer_name (str, optional): Layer name of the colorbar to be associated with. Defaults to None.
 
         """
         from box import Box
@@ -1171,6 +1169,63 @@ class Map(ipyleaflet.Map):
         with output:
             output.clear_output()
             display(colormap)
+
+        self.colorbar = colormap_ctrl
+        self.add_control(colormap_ctrl)
+
+    def add_colormap(
+        self,
+        cmap,
+        width=8.0,
+        height=0.4,
+        orientation="horizontal",
+        vmin=0,
+        vmax=1.0,
+        axis_off=True,
+        show_name=False,
+        font_size=12,
+        transparent_bg=False,
+        position="bottomright",
+        **kwargs,
+    ):
+        """Adds a matplotlib colormap to the map.
+
+        Args:
+            cmap (str): The name of the colormap.
+            width (float, optional): The width of the colormap. Defaults to 8.0.
+            height (float, optional): The height of the colormap. Defaults to 0.4.
+            orientation (str, optional): The orientation of the colormap. Defaults to "horizontal".
+            vmin (float, optional): The minimum value range. Defaults to 0.
+            vmax (float, optional): The maximum value range. Defaults to 1.0.
+            axis_off (bool, optional): Whether to turn axis off. Defaults to True.
+            show_name (bool, optional): Whether to show the colormap name. Defaults to False.
+            font_size (int, optional): Font size of the text. Defaults to 12.
+            transparent_bg (bool, optional): Whether to use transparent background for the colormap widget. Defaults to True.
+            position (str, optional): The position for the colormap widget. Defaults to "bottomright".
+        """
+        from .colormaps import plot_colormap
+
+        output = widgets.Output()
+
+        colormap_ctrl = WidgetControl(
+            widget=output,
+            position=position,
+            transparent_bg=transparent_bg,
+            **kwargs,
+        )
+        with output:
+            output.clear_output()
+            plot_colormap(
+                cmap,
+                width,
+                height,
+                orientation,
+                vmin,
+                vmax,
+                axis_off,
+                show_name,
+                font_size,
+            )
 
         self.colorbar = colormap_ctrl
         self.add_control(colormap_ctrl)
