@@ -2401,3 +2401,19 @@ def basemap_xyz_tiles():
         else:
             layers_dict[key] = basemap_tiles[key]
     return layers_dict
+
+
+def to_hex_colors(colors):
+    """Adds # to a list of hex color codes.
+
+    Args:
+        colors (list): A list of hex color codes.
+
+    Returns:
+        list: A list of hex color codes prefixed with #.
+    """
+    result = all([len(color.strip()) == 6 for color in colors])
+    if result:
+        return ["#" + color.strip() for color in colors]
+    else:
+        return colors
