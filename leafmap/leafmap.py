@@ -1175,13 +1175,16 @@ class Map(ipyleaflet.Map):
 
     def add_colormap(
         self,
-        cmap,
+        cmap="gray",
+        colors=None,
+        discrete=False,
+        label=None,
         width=8.0,
         height=0.4,
         orientation="horizontal",
         vmin=0,
         vmax=1.0,
-        axis_off=True,
+        axis_off=False,
         show_name=False,
         font_size=12,
         transparent_bg=False,
@@ -1191,13 +1194,16 @@ class Map(ipyleaflet.Map):
         """Adds a matplotlib colormap to the map.
 
         Args:
-            cmap (str): The name of the colormap.
+            cmap (str, optional): Matplotlib colormap. Defaults to "gray". See https://matplotlib.org/3.3.4/tutorials/colors/colormaps.html#sphx-glr-tutorials-colors-colormaps-py for options.
+            colors (list, optional): A list of custom colors to create a colormap. Defaults to None.
+            discrete (bool, optional): Whether to create a discrete colorbar. Defaults to False.
+            label (str, optional): Label for the colorbar. Defaults to None.
             width (float, optional): The width of the colormap. Defaults to 8.0.
             height (float, optional): The height of the colormap. Defaults to 0.4.
             orientation (str, optional): The orientation of the colormap. Defaults to "horizontal".
             vmin (float, optional): The minimum value range. Defaults to 0.
             vmax (float, optional): The maximum value range. Defaults to 1.0.
-            axis_off (bool, optional): Whether to turn axis off. Defaults to True.
+            axis_off (bool, optional): Whether to turn axis off. Defaults to False.
             show_name (bool, optional): Whether to show the colormap name. Defaults to False.
             font_size (int, optional): Font size of the text. Defaults to 12.
             transparent_bg (bool, optional): Whether to use transparent background for the colormap widget. Defaults to True.
@@ -1211,12 +1217,14 @@ class Map(ipyleaflet.Map):
             widget=output,
             position=position,
             transparent_bg=transparent_bg,
-            **kwargs,
         )
         with output:
             output.clear_output()
             plot_colormap(
                 cmap,
+                colors,
+                discrete,
+                label,
                 width,
                 height,
                 orientation,
@@ -1225,6 +1233,7 @@ class Map(ipyleaflet.Map):
                 axis_off,
                 show_name,
                 font_size,
+                **kwargs,
             )
 
         self.colorbar = colormap_ctrl
