@@ -804,7 +804,22 @@ def get_cog_mosaic(
     verbose=True,
     **kwargs,
 ):
+    """Creates a COG mosaic from a list of COG URLs.
 
+    Args:
+        links (list): A list containing COG HTTP URLs.
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
+        layername ([type], optional): Layer name to use. Defaults to None.
+        overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
+        verbose (bool, optional): Whether to print out descriptive information. Defaults to True.
+
+    Raises:
+        Exception: If the COG mosaic fails to create.
+
+    Returns:
+        str: The tile URL for the COG mosaic.
+    """
     import requests
 
     if layername is None:
@@ -843,6 +858,50 @@ def get_cog_mosaic(
 
     except Exception as e:
         raise Exception(e)
+
+
+def get_cog_mosaic_from_file(
+    filepath,
+    skip_rows=0,
+    titiler_endpoint="https://api.cogeo.xyz/",
+    username="anonymous",
+    layername=None,
+    overwrite=False,
+    verbose=True,
+    **kwargs,
+):
+    """Creates a COG mosaic from a csv/txt file stored locally for through HTTP URL.
+
+    Args:
+        filepath (str): Local path or HTTP URL to the csv/txt file containing COG URLs.
+        skip_rows (int, optional): The number of rows to skip in the file. Defaults to 0.
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
+        layername ([type], optional): Layer name to use. Defaults to None.
+        overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
+        verbose (bool, optional): Whether to print out descriptive information. Defaults to True.
+
+    Returns:
+        str: The tile URL for the COG mosaic.
+    """
+    import urllib
+
+    links = []
+    if filepath.startswith("http"):
+        data = urllib.request.urlopen(filepath)
+        for line in data:
+            links.append(line.decode("utf-8").strip())
+
+    else:
+        with open(filepath) as f:
+            links = [line.strip() for line in f.readlines()]
+
+    links = links[skip_rows:]
+    # print(links)
+    mosaic = get_cog_mosaic(
+        links, titiler_endpoint, username, layername, overwrite, verbose, **kwargs
+    )
+    return mosaic
 
 
 def get_cog_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
