@@ -61,15 +61,15 @@ class TestCommon(unittest.TestCase):
 
         self.assertIsInstance(vector_to_geojson(self.in_shp), dict)
 
-    def test_get_cog_bounds(self):
+    def test_cog_bounds(self):
 
-        self.assertIsInstance(get_cog_bounds(self.in_cog), list)
-        self.assertEqual(len(get_cog_bounds(self.in_cog)), 4)
+        self.assertIsInstance(cog_bounds(self.in_cog), list)
+        self.assertEqual(len(cog_bounds(self.in_cog)), 4)
 
-    def test_get_cog_center(self):
+    def test_cog_center(self):
 
-        self.assertIsInstance(get_cog_center(self.in_cog), tuple)
-        self.assertEqual(len(get_cog_center(self.in_cog)), 2)
+        self.assertIsInstance(cog_center(self.in_cog), tuple)
+        self.assertEqual(len(cog_center(self.in_cog)), 2)
 
 
 if __name__ == "__main__":
