@@ -618,7 +618,11 @@ def open_data_widget(m):
 
     def filepath_change(change):
         if file_type.value == "GeoTIFF":
-            if filepath.value.startswith("http"):
+            if (
+                filepath.value.startswith("http")
+                or filepath.value.endswith(".txt")
+                or filepath.value.endswith(".csv")
+            ):
                 bands.disabled = True
                 colormap.disabled = True
                 x_dim.disabled = True
@@ -722,7 +726,7 @@ def open_data_widget(m):
         elif change["new"] == "GeoTIFF":
             import matplotlib.pyplot as plt
 
-            file_chooser.filter_pattern = "*.tif"
+            file_chooser.filter_pattern = ["*.tif", "*.csv", "*.txt"]
             colormap.options = plt.colormaps()
             colormap.value = "terrain"
             raster_options.children = [bands, colormap, x_dim, y_dim]
@@ -756,7 +760,7 @@ def open_data_widget(m):
                             file_path, style=None, layer_name=layer_name.value
                         )
 
-                    elif ext.lower() == ".csv":
+                    elif ext.lower() == ".csv" and file_type.value == "CSV":
 
                         m.add_xy_data(
                             file_path,
@@ -766,7 +770,7 @@ def open_data_widget(m):
                             layer_name=layer_name.value,
                         )
 
-                    elif ext.lower() == ".tif":
+                    elif ext.lower() == ".tif" and file_type.value == "GeoTIFF":
                         if file_path.startswith("http"):
                             m.add_cog_layer(file_path, layer_name.value)
                         else:
@@ -779,6 +783,13 @@ def open_data_widget(m):
                                 x_dim=x_dim.value,
                                 y_dim=y_dim.value,
                             )
+                    elif file_type.value == "GeoTIFF" and ext.lower() in [
+                        ".csv",
+                        ".txt",
+                    ]:
+                        m.add_cog_mosaic_from_file(
+                            file_path, name=layer_name.value, show_footprints=True
+                        )
                     else:
                         m.add_vector(file_path, style=None, layer_name=layer_name.value)
                 else:
