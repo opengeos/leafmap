@@ -2219,6 +2219,47 @@ class Map(ipyleaflet.Map):
 
         self.default_style = {"cursor": "default"}
 
+    def add_heatmap(
+        self,
+        filepath=None,
+        latitude="latitude",
+        longitude="longitude",
+        value="value",
+        data=None,
+        name="Heat map",
+        radius=25,
+        **kwargs,
+    ):
+        """Adds a heat map to the map. Reference: https://ipyleaflet.readthedocs.io/en/latest/api_reference/heatmap.html
+
+        Args:
+            filepath (str, optional): File path or HTTP URL to the input file. Defaults to None.
+            latitude (str, optional): The column name of latitude. Defaults to "latitude".
+            longitude (str, optional): The column name of longitude. Defaults to "longitude".
+            value (str, optional): The column name of values. Defaults to "value".
+            data (list, optional): A list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. Defaults to None.
+            name (str, optional): Layer name to use. Defaults to "Heat map".
+            radius (int, optional): Radius of each “point” of the heatmap. Defaults to 25.
+
+        Raises:
+            ValueError: If data is not a list.
+        """
+        import pandas as pd
+        from ipyleaflet import Heatmap
+
+        if data is None:
+            if filepath is None:
+                filepath = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_cities.csv"
+                value = "pop_max"
+
+            df = pd.read_csv(filepath)
+            data = df[[latitude, longitude, value]].values.tolist()
+        elif not isinstance(data, list):
+            raise ValueError("data must be a list in the format of ")
+
+        heatmap = Heatmap(locations=data, radius=radius, name=name, **kwargs)
+        self.add_layer(heatmap)
+
     def add_planet_by_month(
         self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
     ):
