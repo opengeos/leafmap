@@ -61,3 +61,33 @@ To install the development version from GitHub directly within Jupyter notebook 
     import leafmap
     leafmap.update_package()
 ```
+
+## Troubleshooting
+
+If the interactive map does not show up on Jupyter Notebook and JupyterLab, it is probably because the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) extentsion is not installed properly.
+For example, you might receive an error message saying `Error displaying widget: model not found`. This a well-known issue related to ipyleaflet. See some relevant issues below.
+
+-   [How to display map object using ipyleaflet in jupyter notebook or jupyter Lab](https://github.com/jupyter-widgets/ipyleaflet/issues/739)
+-   [ipyleaflet does not work in jupyter lab - "Error displaying widget: model not found"](https://github.com/jupyter-widgets/ipyleaflet/issues/418)
+-   [Error displaying widget: model not found](https://github.com/jupyter-widgets/ipyleaflet/issues/504)
+
+Try some of the options below to resolve the issue. If the issue persists after trying these steps, you can open an issue on the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet/issues) repository.
+
+For Jupyter notebook, try running the following two commands within your leafmap conda environment:
+
+```
+jupyter nbextension install --py --symlink --sys-prefix ipyleaflet
+jupyter nbextension enable --py --sys-prefix ipyleaflet
+```
+
+For JupyterLab, try running the following command within your leafmap conda environment:
+
+```
+jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
+
+```
+
+Alternatively, you can run leafmap directly using binder:
+
+-   <https://gishub.org/leafmap-pangeo>
+-   <https://gishub.org/leafmap-binder>
