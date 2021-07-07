@@ -669,8 +669,55 @@ def csv_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude"):
         raise Exception(e)
 
 
+def pandas_to_geojson(
+    df,
+    out_geojson=None,
+    latitude="latitude",
+    longitude="longitude",
+    encoding="utf-8",
+):
+    """Creates points for a Pandas DataFrame and exports data as a GeoJSON.
+
+    Args:
+        df (pandas.DataFrame): The input Pandas DataFrame.
+        out_geojson (str): The file path to the exported GeoJSON. Default to None.
+        latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
+        longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+        encoding (str, optional): The encoding of characters. Defaults to "utf-8".
+
+    """
+
+    import json
+    from geojson import Feature, FeatureCollection, Point
+
+    if out_geojson is not None:
+        out_dir = os.path.dirname(os.path.abspath(out_geojson))
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
+    features = df.apply(
+        lambda row: Feature(
+            geometry=Point((float(row[longitude]), float(row[latitude]))),
+            properties=dict(row),
+        ),
+        axis=1,
+    ).tolist()
+
+    geojson = FeatureCollection(features=features)
+
+    if out_geojson is None:
+        return geojson
+    else:
+        with open(out_geojson, "w", encoding=encoding) as f:
+            f.write(json.dumps(geojson))
+
+
 def csv_to_geojson(
-    in_csv, out_geojson=None, latitude="latitude", longitude="longitude"
+    in_csv,
+    out_geojson=None,
+    latitude="latitude",
+    longitude="longitude",
+    encoding="utf-8",
 ):
     """Creates points for a CSV file and exports data as a GeoJSON.
 
@@ -679,42 +726,38 @@ def csv_to_geojson(
         out_geojson (str): The file path to the exported GeoJSON. Default to None.
         latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
         longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+        encoding (str, optional): The encoding of characters. Defaults to "utf-8".
 
     """
 
     import json
-    import shapefile
+    import pandas as pd
 
     if out_geojson is not None:
-        out_dir = os.path.dirname(out_geojson)
-    else:
-        out_dir = os.path.expanduser("~/Downloads")
+        out_dir = os.path.dirname(os.path.abspath(out_geojson))
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
 
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    out_shp = os.path.join(out_dir, random_string() + ".shp")
-
-    csv_to_shp(in_csv, out_shp, latitude=latitude, longitude=longitude)
-    sf = shapefile.Reader(out_shp)
-    geojson = sf.__geo_interface__
-
-    delete_shp(out_shp, verbose=False)
+    df = pd.read_csv(in_csv)
+    geojson = pandas_to_geojson(
+        df, latitude=latitude, longitude=longitude, encoding=encoding
+    )
 
     if out_geojson is None:
         return geojson
     else:
-        with open(out_geojson, "w", encoding="utf-8") as f:
+        with open(out_geojson, "w", encoding=encoding) as f:
             f.write(json.dumps(geojson))
 
 
-def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude"):
+def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude", encoding="utf-8"):
     """Creates points for a CSV file and converts them to a GeoDataFrame.
 
     Args:
         in_csv (str): The file path to the input CSV file.
         latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
         longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+        encoding (str, optional): The encoding of characters. Defaults to "utf-8".
 
     Returns:
         object: GeoDataFrame.
@@ -724,16 +767,13 @@ def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude"):
 
     import geopandas as gpd
 
-    out_dir = os.path.expanduser("~/Downloads")
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    out_dir = os.getcwd()
 
-    out_shp = os.path.join(out_dir, random_string() + ".shp")
+    out_geojson = os.path.join(out_dir, random_string() + ".geojson")
+    csv_to_geojson(in_csv, out_geojson, latitude, longitude, encoding)
 
-    csv_to_shp(in_csv, out_shp, latitude=latitude, longitude=longitude)
-
-    gdf = gpd.read_file(out_shp)
-    delete_shp(out_shp)
+    gdf = gpd.read_file(out_geojson)
+    os.remove(out_geojson)
     return gdf
 
 
