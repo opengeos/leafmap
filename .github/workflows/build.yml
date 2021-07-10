@@ -16,10 +16,11 @@ jobs:
             matrix:
                 config:
                     # - { os: windows-latest, py: "3.7" }
-                    - { os: macOS-latest, py: "3.7" }
+                    - { os: macOS-latest, py: "3.8" }
                     - { os: ubuntu-latest, py: "3.6" }
                     - { os: ubuntu-latest, py: "3.7" }
                     - { os: ubuntu-latest, py: "3.8" }
+                    - { os: ubuntu-latest, py: "3.9" }
 
         env:
             SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
@@ -27,15 +28,14 @@ jobs:
             - name: CHECKOUT CODE
               uses: actions/checkout@v2
             - name: SETUP PYTHON
-              uses: actions/setup-python@v1
+              uses: actions/setup-python@v2
               with:
                   python-version: ${{ matrix.config.py }}
             - name: Install dependencies
               run: |
                   python -m pip install --upgrade pip
-                  pip install --user --no-cache-dir Cython
-                  pip install --user -r requirements.txt
-                  pip install --user -r requirements_dev.txt
+                  pip install --no-cache-dir Cython
+                  pip install -r requirements.txt -r requirements_dev.txt
             - name: PKG-TEST
               run: |
                   pip install geopandas osmnx
