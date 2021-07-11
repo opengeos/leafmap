@@ -237,17 +237,24 @@ def main_toolbar(m):
         },
         # "smile-o": {
         #     "name": "placeholder",
-        #     "tooltip": "This is a placehold",
+        #     "tooltip": "This is a placeholder",
         # },
         # "spinner": {
         #     "name": "placeholder2",
-        #     "tooltip": "This is a placehold",
+        #     "tooltip": "This is a placeholder",
         # },
         "question": {
             "name": "help",
             "tooltip": "Get help",
         },
     }
+
+    if os.environ.get("USE_VOILA") is not None:
+        voila_tools = ["camera", "folder-open", "gears"]
+
+        for item in voila_tools:
+            if item in tools.keys():
+                del tools[item]
 
     icons = list(tools.keys())
     tooltips = [item["tooltip"] for item in list(tools.values())]
