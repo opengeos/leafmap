@@ -123,19 +123,18 @@ class Map(here_map_widget.Map):
 
     def add_tile_layer(
         self,
-        url="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        name="Untitled",
-        attribution="",
+        url,
+        name,
+        attribution,
         opacity=1.0,
         **kwargs,
     ):
         """Adds a TileLayer to the map.
 
         Args:
-            url (str, optional): The URL of the tile layer.
-            Defaults to 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'.
-            name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
-            attribution (str, optional): The attribution to use. Defaults to ''.
+            url (str): The URL of the tile layer.
+            name (str): The layer name to use for the layer.
+            attribution (str): The attribution to use.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
         """
         try:
@@ -195,7 +194,9 @@ class Map(here_map_widget.Map):
                 else:
                     in_geojson = os.path.abspath(in_geojson)
                     if not os.path.exists(in_geojson):
-                        raise FileNotFoundError("The provided GeoJSON file could not be found.")
+                        raise FileNotFoundError(
+                            "The provided GeoJSON file could not be found."
+                        )
 
                     with open(in_geojson, encoding="utf-8") as f:
                         data = json.load(f)
@@ -216,7 +217,9 @@ class Map(here_map_widget.Map):
 
         if not hover_style:
             hover_style = {
-                "fillColor": random.choice(fill_colors) if fill_colors else ["rgba(0,0,0,0.5)"],
+                "fillColor": random.choice(fill_colors)
+                if fill_colors
+                else ["rgba(0,0,0,0.5)"],
                 "strokeColor": "black",
                 "lineWidth": style["lineWidth"] + 1,
             }
@@ -225,7 +228,9 @@ class Map(here_map_widget.Map):
             value=True,
             tooltip="Toolbar",
             icon="info",
-            layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+            layout=widgets.Layout(
+                width="28px", height="28px", padding="0px 0px 0px 4px"
+            ),
         )
 
         close_button = widgets.ToggleButton(
@@ -233,7 +238,9 @@ class Map(here_map_widget.Map):
             tooltip="Close the tool",
             icon="times",
             # button_style="primary",
-            layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+            layout=widgets.Layout(
+                height="28px", width="28px", padding="0px 0px 0px 4px"
+            ),
         )
 
         html = widgets.HTML()
@@ -241,7 +248,9 @@ class Map(here_map_widget.Map):
         html.layout.max_height = "250px"
         html.layout.max_width = "250px"
 
-        output_widget = widgets.VBox([widgets.HBox([toolbar_button, close_button]), html])
+        output_widget = widgets.VBox(
+            [widgets.HBox([toolbar_button, close_button]), html]
+        )
         info_control = WidgetControl(widget=output_widget, position="bottomright")
 
         if not default_popup and info_mode in ["on_hover", "on_click"]:

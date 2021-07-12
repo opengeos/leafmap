@@ -279,8 +279,8 @@ class Map(folium.Map):
     def add_tile_layer(
         self,
         url,
-        name="Untitled",
-        attribution=".",
+        name,
+        attribution,
         overlay=True,
         control=True,
         shown=True,
@@ -292,8 +292,8 @@ class Map(folium.Map):
 
         Args:
             url (str): The URL of the XYZ tile service.
-            name (str, optional): The layer name to use on the layer control. Defaults to 'Untitled'.
-            attribution (str, optional): The attribution of the data layer. Defaults to '.'.
+            name (str): The layer name to use on the layer control.
+            attribution (str): The attribution of the data layer.
             overlay (str, optional): Allows overlay. Defaults to True.
             control (str, optional): Adds the layer to the layer control. Defaults to True.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
