@@ -54,7 +54,7 @@ m
 
 ```python
 m = leafmap.Map()
-m.add_tile_layer(url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", name="Google Satellite")
+m.add_tile_layer(url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}", name="Google Satellite", attribution="Google")
 m
 ```
 
@@ -70,12 +70,15 @@ m
 ## Use HERE Map Widget for Jupyter plotting backend
 
 ### Prerequisites
-- A HERE developer account, free and available under [HERE Developer Portal](https://developer.here.com)
-- An [API key](https://developer.here.com/documentation/identity-access-management/dev_guide/topics/dev-apikey.html) from the [HERE Developer Portal](https://developer.here.com)
-- Export API key into environment variable `HEREMAPS_API_KEY`
+
+-   A HERE developer account, free and available under [HERE Developer Portal](https://developer.here.com)
+-   An [API key](https://developer.here.com/documentation/identity-access-management/dev_guide/topics/dev-apikey.html) from the [HERE Developer Portal](https://developer.here.com)
+-   Export API key into environment variable `HEREMAPS_API_KEY`
+
 ```bash
 export HEREMAPS_API_KEY=YOUR-ACTUAL-API-KEY
 ```
+
 ```python
 import leafmap.heremap as leafmap
 ```

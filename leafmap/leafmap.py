@@ -29,7 +29,7 @@ class Map(ipyleaflet.Map):
             kwargs["scroll_wheel_zoom"] = True
 
         if "attribution_control" not in kwargs:
-            kwargs["attribution_control"] = False
+            kwargs["attribution_control"] = True
 
         super().__init__(**kwargs)
         self.baseclass = "ipyleaflet"
@@ -337,9 +337,9 @@ class Map(ipyleaflet.Map):
 
     def add_tile_layer(
         self,
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        name="Untitled",
-        attribution="",
+        url,
+        name,
+        attribution,
         opacity=1.0,
         shown=True,
         **kwargs,
@@ -347,9 +347,9 @@ class Map(ipyleaflet.Map):
         """Adds a TileLayer to the map.
 
         Args:
-            url (str, optional): The URL of the tile layer. Defaults to 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'.
-            name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
-            attribution (str, optional): The attribution to use. Defaults to ''.
+            url (str): The URL of the tile layer.
+            name (str): The layer name to use for the layer.
+            attribution (str): The attribution to use.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
         """
