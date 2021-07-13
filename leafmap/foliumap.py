@@ -1369,6 +1369,29 @@ class Map(folium.Map):
             os.remove(outfile)
             return out_html
 
+    def add_title(self, title, align="center", font_size="16px", style=None):
+        """Adds a title to the map.
+
+        Args:
+            title (str): The title to use.
+            align (str, optional): The alignment of the title, can be ["center", "left", "right"]. Defaults to "center".
+            font_size (str, optional): The font size in the unit of px. Defaults to "16px".
+            style ([type], optional): The style to use. Defaults to None.
+        """
+        if style is None:
+            title_html = """
+                    <h3 align={} style="font-size:{}"><b>{}</b></h3>
+                    """.format(
+                align, font_size, title
+            )
+        else:
+            title_html = """
+                <h3 align={} style={}><b>{}</b></h3>
+                """.format(
+                align, style, title
+            )
+        self.get_root().html.add_child(folium.Element(title_html))
+
 
 def delete_dp_report(name):
     """Deletes a datapane report.
