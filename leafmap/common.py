@@ -116,7 +116,7 @@ def update_package():
         raise Exception(e)
 
 
-def __check_package(name, URL=""):
+def check_package(name, URL=""):
 
     try:
         __import__(name.lower())
@@ -763,7 +763,7 @@ def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude", encoding="utf
         object: GeoDataFrame.
     """
 
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1415,7 +1415,7 @@ def kml_to_shp(in_kml, out_shp):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1455,7 +1455,7 @@ def kml_to_geojson(in_kml, out_geojson=None):
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1507,7 +1507,7 @@ def shp_to_gdf(in_shp):
     if not os.path.exists(in_shp):
         raise FileNotFoundError("The provided shp could not be found.")
 
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1622,7 +1622,7 @@ def vector_to_geojson(
     import warnings
 
     warnings.filterwarnings("ignore")
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
     import geopandas as gpd
 
     if not filename.startswith("http"):
@@ -1694,7 +1694,7 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
     Returns:
         dict: When the out_json is None returns a dict.
     """
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
 
     try:
         if epsg is not None:
@@ -1737,8 +1737,8 @@ def connect_postgis(
     Returns:
         [type]: [description]
     """
-    __check_package(name="geopandas", URL="https://geopandas.org")
-    __check_package(
+    check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(
         name="sqlalchemy",
         URL="https://docs.sqlalchemy.org/en/14/intro.html#installation",
     )
@@ -1779,7 +1779,7 @@ def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
     Returns:
         [type]: [description]
     """
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1799,7 +1799,7 @@ def vector_col_names(filename, **kwargs):
     import warnings
 
     warnings.filterwarnings("ignore")
-    __check_package(name="geopandas", URL="https://geopandas.org")
+    check_package(name="geopandas", URL="https://geopandas.org")
     import geopandas as gpd
 
     if not filename.startswith("http"):

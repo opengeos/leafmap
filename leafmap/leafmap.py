@@ -2150,7 +2150,7 @@ class Map(ipyleaflet.Map):
         import warnings
 
         warnings.filterwarnings("ignore")
-        __check_package(name="geopandas", URL="https://geopandas.org")
+        check_package(name="geopandas", URL="https://geopandas.org")
         import geopandas as gpd
 
         self.default_style = {"cursor": "wait"}
