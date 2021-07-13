@@ -11,7 +11,7 @@ import ipyleaflet
 import ipywidgets as widgets
 
 
-def in_colab_shell():
+def __in_colab_shell():
     """Tests if the code is being executed within Google Colab."""
     import sys
 
@@ -21,7 +21,7 @@ def in_colab_shell():
         return False
 
 
-def is_drive_mounted():
+def __is_drive_mounted():
     """Checks whether Google Drive is mounted in Google Colab.
 
     Returns:
@@ -63,7 +63,7 @@ def set_proxy(port=1080, ip="http://127.0.0.1"):
         raise Exception(e)
 
 
-def check_install(package):
+def __check_install(package):
     """Checks whether a package is installed. If not, it will install the package.
 
     Args:
@@ -94,7 +94,7 @@ def update_package():
         download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
         if not os.path.exists(download_dir):
             os.makedirs(download_dir)
-        clone_repo(out_dir=download_dir)
+        __clone_repo(out_dir=download_dir)
 
         pkg_dir = os.path.join(download_dir, "leafmap-master")
         work_dir = os.getcwd()
@@ -116,7 +116,7 @@ def update_package():
         raise Exception(e)
 
 
-def check_package(name, URL=""):
+def __check_package(name, URL=""):
 
     try:
         __import__(name.lower())
@@ -126,7 +126,7 @@ def check_package(name, URL=""):
         )
 
 
-def clone_repo(out_dir=".", unzip=True):
+def __clone_repo(out_dir=".", unzip=True):
     """Clones the leafmap GitHub repository.
 
     Args:
@@ -138,7 +138,7 @@ def clone_repo(out_dir=".", unzip=True):
     download_from_url(url, out_file_name=filename, out_dir=out_dir, unzip=unzip)
 
 
-def install_from_github(url):
+def __install_from_github(url):
     """Install a package from a GitHub repository.
 
     Args:
@@ -172,7 +172,7 @@ def install_from_github(url):
         raise Exception(e)
 
 
-def check_git_install():
+def __check_git_install():
     """Checks if Git is installed.
 
     Returns:
@@ -196,7 +196,7 @@ def check_git_install():
         return False
 
 
-def clone_github_repo(url, out_dir):
+def __clone_github_repo(url, out_dir):
     """Clones a GitHub repository.
 
     Args:
@@ -231,7 +231,7 @@ def clone_github_repo(url, out_dir):
     os.remove(out_file_path)
 
 
-def is_tool(name):
+def __is_tool(name):
     """Check whether `name` is on PATH and marked as executable."""
 
     return shutil.which(name) is not None
@@ -340,8 +340,8 @@ def upload_to_imgur(in_gif):
     import subprocess
 
     pkg_name = "imgur-uploader"
-    if not is_tool(pkg_name):
-        check_install(pkg_name)
+    if not __is_tool(pkg_name):
+        __check_install(pkg_name)
 
     try:
         IMGUR_API_ID = os.environ.get("IMGUR_API_ID", None)
@@ -763,7 +763,7 @@ def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude", encoding="utf
         object: GeoDataFrame.
     """
 
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1415,7 +1415,7 @@ def kml_to_shp(in_kml, out_shp):
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1455,7 +1455,7 @@ def kml_to_geojson(in_kml, out_geojson=None):
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1507,7 +1507,7 @@ def shp_to_gdf(in_shp):
     if not os.path.exists(in_shp):
         raise FileNotFoundError("The provided shp could not be found.")
 
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1622,7 +1622,7 @@ def vector_to_geojson(
     import warnings
 
     warnings.filterwarnings("ignore")
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
     import geopandas as gpd
 
     if not filename.startswith("http"):
@@ -1694,7 +1694,7 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
     Returns:
         dict: When the out_json is None returns a dict.
     """
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
 
     try:
         if epsg is not None:
@@ -1737,8 +1737,8 @@ def connect_postgis(
     Returns:
         [type]: [description]
     """
-    check_package(name="geopandas", URL="https://geopandas.org")
-    check_package(
+    __check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(
         name="sqlalchemy",
         URL="https://docs.sqlalchemy.org/en/14/intro.html#installation",
     )
@@ -1779,7 +1779,7 @@ def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
     Returns:
         [type]: [description]
     """
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
 
@@ -1799,7 +1799,7 @@ def vector_col_names(filename, **kwargs):
     import warnings
 
     warnings.filterwarnings("ignore")
-    check_package(name="geopandas", URL="https://geopandas.org")
+    __check_package(name="geopandas", URL="https://geopandas.org")
     import geopandas as gpd
 
     if not filename.startswith("http"):

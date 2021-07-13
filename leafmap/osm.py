@@ -3,7 +3,7 @@
 Most functions for downloading OpenStreetMap data require tags of map features. The list of commonly used tags can be found at 
 https://wiki.openstreetmap.org/wiki/Map_features 
 """
-from .common import check_package
+from .common import __check_package
 
 
 def osm_gdf_from_address(address, tags, dist=1000):
@@ -17,7 +17,7 @@ def osm_gdf_from_address(address, tags, dist=1000):
     Returns:
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
     gdf = ox.geometries_from_address(address, tags, dist)
@@ -69,7 +69,7 @@ def osm_gdf_from_place(query, tags, which_result=None, buffer_dist=None):
     Returns:
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
     ox.config(use_cache=True, log_console=True)
@@ -126,7 +126,7 @@ def osm_gdf_from_point(center_point, tags, dist=1000):
     Returns:
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
     gdf = ox.geometries_from_point(center_point, tags, dist)
@@ -175,7 +175,7 @@ def osm_gdf_from_polygon(polygon, tags):
     Returns:
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
     gdf = ox.geometries_from_polygon(polygon, tags)
@@ -225,7 +225,7 @@ def osm_gdf_from_bbox(north, south, east, west, tags):
     Returns:
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
     gdf = ox.geometries_from_bbox(north, south, east, west, tags)
@@ -279,7 +279,7 @@ def osm_gdf_from_xml(filepath, polygon=None, tags=None):
     Returns:
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
     gdf = ox.geometries_from_xml(filepath, polygon, tags)
@@ -304,7 +304,7 @@ def osm_gdf_from_geocode(
         GeoDataFrame: A GeoPandas GeoDataFrame.
     """
 
-    check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/")
+    __check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/")
 
     import osmnx as ox
 
