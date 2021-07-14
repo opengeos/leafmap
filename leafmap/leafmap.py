@@ -2325,7 +2325,7 @@ def linked_maps(
     label_position="topright",
     **kwargs,
 ):
-    """Create linked maps of Earth Engine data layers.
+    """Create linked maps of XYZ tile layers.
 
     Args:
         rows (int, optional): The number of rows of maps to create. Defaults to 2.
