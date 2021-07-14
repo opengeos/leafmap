@@ -1392,6 +1392,102 @@ class Map(folium.Map):
             )
         self.get_root().html.add_child(folium.Element(title_html))
 
+    def add_colormap(self, **kwargs):
+        """Adds a matplotlib colormap to the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_maker_cluster(self, **kwargs):
+        """Captures user inputs and add markers to the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_minimap(self, **kwargs):
+        """Adds a minimap (overview) to the ipyleaflet map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_point_layer(self, **kwargs):
+        """Adds a point layer to the map with a popup attribute."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_raster(self, **kwargs):
+        """Adds a local raster dataset to the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_time_slider(self, **kwargs):
+        """Adds a time slider to the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_vector_tile_layer(
+        self,
+        **kwargs,
+    ):
+        """Adds a VectorTileLayer to the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def add_xy_data(
+        self,
+        **kwargs,
+    ):
+        """Adds points from a CSV file containing lat/lon information and display data on the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def basemap_demo(self, **kwargs):
+        """A demo for using leafmap basemaps."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def find_layer(self, **kwargs):
+        """Finds layer by name."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def find_layer_index(self, **kwargs):
+        """Finds layer index by name."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def layer_opacity(self, **kwargs):
+        """Changes layer opacity."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def split_map(self, **kwargs):
+        """Adds split map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def toolbar_reset(self, **kwargs):
+        """Reset the toolbar so that no tool is selected."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
+    def video_overlay(self, **kwargs):
+        """Overlays a video from the Internet on the map."""
+        raise NotImplementedError(
+            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+        )
+
 
 def delete_dp_report(name):
     """Deletes a datapane report.
@@ -1428,3 +1524,21 @@ def delete_dp_reports():
             dp.Report.delete(dp.Report.by_id(url))
     except Exception as e:
         raise Exception(e)
+
+
+def linked_maps(
+    **kwargs,
+):
+    """Create linked maps of XYZ tile layers."""
+    raise NotImplementedError(
+        "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+    )
+
+
+def split_map(
+    **kwargs,
+):
+    """Creates a split-panel map."""
+    raise NotImplementedError(
+        "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
+    )
