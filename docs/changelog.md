@@ -74,7 +74,7 @@
 -   Changed COG and STAC functions to snake_case
 -   Added binder badge to notebooks
 -   Added binder env
--   Added 15 turorials
+-   Added 15 tutorials
 -   Added domain name leafmap.org
 
 ## v0.1.0 - May 25, 2021
