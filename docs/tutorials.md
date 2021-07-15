@@ -28,6 +28,7 @@
 22. Using time slider for visualizing timeseries images ([notebook](https://leafmap.org/notebooks/22_time_slider))
 23. Creating colormaps with a single line of code ([notebook](https://leafmap.org/notebooks/23_colormaps))
 24. Creating heat map from csv ([notebook](https://leafmap.org/notebooks/24_heatmap))
+25. Creating a population heat map with a colorbar and map title ([notebook](https://leafmap.org/notebooks/25_map_title))
 
 ## Demo
 
