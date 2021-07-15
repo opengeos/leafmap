@@ -19,7 +19,7 @@ with Google Colab, `import leafmap` will automatically use the `folium` plotting
 
 ## Why the interactive map does not show up
 
-If the interactive map does not show up on Jupyter Notebook and JupyterLab, it is probably because the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) extentsion is not installed properly.
+If the interactive map does not show up on Jupyter Notebook and JupyterLab, it is probably because the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) extension is not installed properly.
 For example, you might receive an error message saying `Error displaying widget: model not found`. This a well-known issue related to ipyleaflet. See some relevant issues below.
 
 -   [How to display map object using ipyleaflet in jupyter notebook or jupyter Lab](https://github.com/jupyter-widgets/ipyleaflet/issues/739)
@@ -49,7 +49,7 @@ Alternatively, you can run leafmap directly using binder:
 
 ## How to use leafmap in countries where Google Services are blocked
 
-If you are trying to use leafmap in coutries where Gooogle Services are blocked (e.g., China), you will need a VPN. Use `leafmap.set_proxy(port=your-port-number)` to connect to Google servers. Otherwise, you might encounter a connection timeout issue.
+If you are trying to use leafmap in countries where Google Services are blocked (e.g., China), you will need a VPN. Use `leafmap.set_proxy(port=your-port-number)` to connect to Google servers. Otherwise, you might encounter a connection timeout issue.
 
 ```python
 import leafmap
