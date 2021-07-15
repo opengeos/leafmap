@@ -1788,7 +1788,7 @@ def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
 
 
 def vector_col_names(filename, **kwargs):
-    """Retrieves the column names of a vector atrribute table.
+    """Retrieves the column names of a vector attribute table.
 
     Args:
         filename (str): The input file path.
@@ -2299,7 +2299,7 @@ def planet_by_quarter(
         ValueError: The Planet API key is not provided.
         ValueError: The year is invalid.
         ValueError: The quarter is invalid.
-        ValueError: The quater is invalid.
+        ValueError: The quarter is invalid.
 
     Returns:
         str: A Planet global mosaic tile url.
