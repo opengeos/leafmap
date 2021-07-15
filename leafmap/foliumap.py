@@ -173,7 +173,7 @@ class Map(folium.Map):
             folium.LayerControl().add_to(self)
 
     def _repr_mimebundle_(self, **kwargs):
-        """Adds Layer control to the map. Referece: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_"""
+        """Adds Layer control to the map. Reference: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_"""
         if self.options["layersControl"]:
             self.add_layer_control()
 
@@ -903,7 +903,7 @@ class Map(folium.Map):
             if not isinstance(labels, list):
                 raise ValueError("The legend labels must be a list.")
         else:
-            labels = ["One", "Two", "Three", "Four", "ect"]
+            labels = ["One", "Two", "Three", "Four", "etc"]
 
         if colors is not None:
             if not isinstance(colors, list):
@@ -1088,7 +1088,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-        # interchangable parameters between ipyleaflet and folium.
+        # interchangeable parameters between ipyleaflet and folium.
         if "style" in kwargs:
             style_dict = kwargs["style"]
             if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:

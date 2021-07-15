@@ -1065,7 +1065,7 @@ class Map(ipyleaflet.Map):
                 print("The legend keys must be a list.")
                 return
         else:
-            legend_keys = ["One", "Two", "Three", "Four", "ect"]
+            legend_keys = ["One", "Two", "Three", "Four", "etc"]
 
         if legend_colors is not None:
             if not isinstance(legend_colors, list):
@@ -1510,7 +1510,7 @@ class Map(ipyleaflet.Map):
 
         Args:
             image (str): The image file path.
-            bands (int or list, optional): The image bands to use. It can be either a nubmer (e.g., 1) or a list (e.g., [3, 2, 1]). Defaults to None.
+            bands (int or list, optional): The image bands to use. It can be either a number (e.g., 1) or a list (e.g., [3, 2, 1]). Defaults to None.
             layer_name (str, optional): The layer name to use for the raster. Defaults to None.
             colormap (str, optional): The name of the colormap to use for the raster, such as 'gray' and 'terrain'. More can be found at https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html. Defaults to None.
             x_dim (str, optional): The x dimension. Defaults to 'x'.
@@ -2329,7 +2329,7 @@ def linked_maps(
 
     Args:
         rows (int, optional): The number of rows of maps to create. Defaults to 2.
-        cols (int, optional): The number of columns of maps to ceate. Defaults to 2.
+        cols (int, optional): The number of columns of maps to create. Defaults to 2.
         height (str, optional): The height of each map in pixels. Defaults to "400px".
         layers (list, optional): The list of layers to use for each map. Defaults to [].
         labels (list, optional): The list of labels to show on the map. Defaults to [].
