@@ -5,7 +5,6 @@ import os
 import ipyevents
 import ipyleaflet
 import ipywidgets as widgets
-from ipyleaflet import TileLayer, WidgetControl
 from IPython.display import display
 from ipyfilechooser import FileChooser
 from .common import *
@@ -187,7 +186,9 @@ def tool_template(m=None):
 
     toolbar_button.value = True
     if m is not None:
-        toolbar_control = WidgetControl(widget=toolbar_widget, position="topright")
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
 
         if toolbar_control not in m.controls:
             m.add_control(toolbar_control)
@@ -317,7 +318,9 @@ def main_toolbar(m):
                 wbt_toolbox = wbt.build_toolbox(
                     tools_dict, max_width="800px", max_height="500px"
                 )
-                wbt_control = WidgetControl(widget=wbt_toolbox, position="bottomright")
+                wbt_control = ipyleaflet.WidgetControl(
+                    widget=wbt_toolbox, position="bottomright"
+                )
                 m.whitebox = wbt_control
                 m.add_control(wbt_control)
             elif tool_name == "timeslider":
@@ -330,8 +333,9 @@ def main_toolbar(m):
                 webbrowser.open_new_tab("https://leafmap.org")
                 current_tool.value = False
         else:
-            tool = change["owner"]
+            # tool = change["owner"]
             # tool_name = tools[tool.icon]["name"]
+            pass
 
         m.toolbar_reset()
 
@@ -412,7 +416,10 @@ def main_toolbar(m):
             layers = [
                 lyr
                 for lyr in m.layers[1:]
-                if (isinstance(lyr, TileLayer) or isinstance(lyr, ipyleaflet.WMSLayer))
+                if (
+                    isinstance(lyr, ipyleaflet.TileLayer)
+                    or isinstance(lyr, ipyleaflet.WMSLayer)
+                )
             ]
 
             # if the layers contain unsupported layers (e.g., GeoJSON, GeoData), adds the ipyleaflet built-in LayerControl
@@ -475,7 +482,9 @@ def main_toolbar(m):
 
     layers_button.observe(layers_btn_click, "value")
 
-    toolbar_control = WidgetControl(widget=toolbar_widget, position="topright")
+    toolbar_control = ipyleaflet.WidgetControl(
+        widget=toolbar_widget, position="topright"
+    )
 
     m.add_control(toolbar_control)
 
@@ -660,7 +669,7 @@ def open_data_widget(m):
         ]
     )
 
-    tool_output_ctrl = WidgetControl(widget=main_widget, position="topright")
+    tool_output_ctrl = ipyleaflet.WidgetControl(widget=main_widget, position="topright")
 
     if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
         m.remove_control(m.tool_output_ctrl)
@@ -869,7 +878,9 @@ def change_basemap(m):
 
     close_btn.on_click(close_click)
 
-    basemap_control = WidgetControl(widget=basemap_widget, position="topright")
+    basemap_control = ipyleaflet.WidgetControl(
+        widget=basemap_widget, position="topright"
+    )
     m.add_control(basemap_control)
     m.basemap_ctrl = basemap_control
 
@@ -966,7 +977,9 @@ def save_map(m):
     file_chooser.register_callback(chooser_callback)
 
     save_map_widget.children = [save_type, file_chooser]
-    save_map_control = WidgetControl(widget=save_map_widget, position="topright")
+    save_map_control = ipyleaflet.WidgetControl(
+        widget=save_map_widget, position="topright"
+    )
     m.add_control(save_map_control)
     m.save_map_control = save_map_control
 
@@ -1010,14 +1023,18 @@ def split_basemaps(
         options=keys, value=left_name, layout=widgets.Layout(width=width)
     )
 
-    left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
+    left_control = ipyleaflet.ipyleaflet.WidgetControl(
+        widget=left_dropdown, position="topleft"
+    )
     m.add_control(left_control)
 
     right_dropdown = widgets.Dropdown(
         options=keys, value=right_name, layout=widgets.Layout(width=width)
     )
 
-    right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
+    right_control = ipyleaflet.ipyleaflet.WidgetControl(
+        widget=right_dropdown, position="topright"
+    )
     m.add_control(right_control)
 
     close_button = widgets.ToggleButton(
@@ -1034,7 +1051,7 @@ def split_basemaps(
             m.layers = layers
 
     close_button.observe(close_btn_click, "value")
-    close_control = ipyleaflet.WidgetControl(
+    close_control = ipyleaflet.ipyleaflet.WidgetControl(
         widget=close_button, position="bottomright"
     )
     m.add_control(close_control)
@@ -1175,6 +1192,6 @@ def time_slider(
 
     close_btn.on_click(close_click)
 
-    slider_ctrl = WidgetControl(widget=slider_widget, position=position)
+    slider_ctrl = ipyleaflet.WidgetControl(widget=slider_widget, position=position)
     m.add_control(slider_ctrl)
     m.slider_ctrl = slider_ctrl
