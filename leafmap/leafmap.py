@@ -2,7 +2,6 @@
 
 import os
 import ipyleaflet
-from ipyleaflet import Marker, MarkerCluster, TileLayer, WidgetControl, VectorTileLayer
 from IPython.display import display
 from .basemaps import basemap_tiles
 from .common import *
@@ -354,7 +353,7 @@ class Map(ipyleaflet.Map):
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
         """
         try:
-            tile_layer = TileLayer(
+            tile_layer = ipyleaflet.TileLayer(
                 url=url,
                 name=name,
                 attribution=attribution,
@@ -384,7 +383,7 @@ class Map(ipyleaflet.Map):
             vector_tile_layer_styles(dict,optional): Style dict, specific to the vector tile source.
         """
         try:
-            vector_tile_layer = VectorTileLayer(
+            vector_tile_layer = ipyleaflet.VectorTileLayer(
                 url=url,
                 attribution=attribution,
                 vector_tile_layer_styles=vector_tile_layer_styles,
@@ -919,7 +918,7 @@ class Map(ipyleaflet.Map):
         minimap.layout.width = "150px"
         minimap.layout.height = "150px"
         ipyleaflet.link((minimap, "center"), (self, "center"))
-        minimap_control = WidgetControl(widget=minimap, position=position)
+        minimap_control = ipyleaflet.WidgetControl(widget=minimap, position=position)
         self.add_control(minimap_control)
 
     def add_maker_cluster(self, event="click", add_marker=True):
@@ -934,7 +933,7 @@ class Map(ipyleaflet.Map):
         """
         coordinates = []
         markers = []
-        marker_cluster = MarkerCluster(name="Marker Cluster")
+        marker_cluster = ipyleaflet.MarkerCluster(name="Marker Cluster")
         self.last_click = []
         self.all_clicks = []
         if add_marker:
@@ -948,7 +947,7 @@ class Map(ipyleaflet.Map):
                 self.last_click = latlon
                 self.all_clicks = coordinates
                 if add_marker:
-                    markers.append(Marker(location=latlon))
+                    markers.append(ipyleaflet.Marker(location=latlon))
                     marker_cluster.markers = markers
             elif kwargs.get("type") == "mousemove":
                 pass
@@ -994,7 +993,7 @@ class Map(ipyleaflet.Map):
             self.substitute_layer(old_basemap, basemap_tiles[basemap_name])
 
         dropdown.observe(on_click, "value")
-        basemap_control = WidgetControl(widget=dropdown, position="topright")
+        basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
         self.add_control(basemap_control)
 
     def add_legend(
@@ -1175,7 +1174,7 @@ class Map(ipyleaflet.Map):
                     "overflow": "scroll",
                 }
             )
-            legend_control = WidgetControl(
+            legend_control = ipyleaflet.WidgetControl(
                 widget=legend_output_widget, position=position
             )
             legend_widget = widgets.HTML(value=legend_text)
@@ -1249,7 +1248,7 @@ class Map(ipyleaflet.Map):
             else:
                 colormap = colormap.to_step(3)
 
-        colormap_ctrl = WidgetControl(
+        colormap_ctrl = ipyleaflet.WidgetControl(
             widget=output,
             position=position,
             transparent_bg=transparent_bg,
@@ -1302,7 +1301,7 @@ class Map(ipyleaflet.Map):
 
         output = widgets.Output()
 
-        colormap_ctrl = WidgetControl(
+        colormap_ctrl = ipyleaflet.WidgetControl(
             widget=output,
             position=position,
             transparent_bg=transparent_bg,
@@ -1725,7 +1724,9 @@ class Map(ipyleaflet.Map):
         output_widget = widgets.VBox(
             [widgets.HBox([toolbar_button, close_button]), html]
         )
-        info_control = WidgetControl(widget=output_widget, position="bottomright")
+        info_control = ipyleaflet.WidgetControl(
+            widget=output_widget, position="bottomright"
+        )
 
         if info_mode in ["on_hover", "on_click"]:
             self.add_control(info_control)
@@ -1856,7 +1857,9 @@ class Map(ipyleaflet.Map):
         output_widget = widgets.VBox(
             [widgets.HBox([toolbar_button, close_button]), html]
         )
-        info_control = WidgetControl(widget=output_widget, position="bottomright")
+        info_control = ipyleaflet.WidgetControl(
+            widget=output_widget, position="bottomright"
+        )
 
         if info_mode in ["on_hover", "on_click"]:
             self.add_control(info_control)
@@ -2118,7 +2121,7 @@ class Map(ipyleaflet.Map):
         if label is not None:
             labels = df[label]
             markers = [
-                Marker(
+                ipyleaflet.Marker(
                     location=point,
                     draggable=False,
                     popup=widgets.HTML(str(labels[index])),
@@ -2126,9 +2129,11 @@ class Map(ipyleaflet.Map):
                 for index, point in enumerate(points)
             ]
         else:
-            markers = [Marker(location=point, draggable=False) for point in points]
+            markers = [
+                ipyleaflet.Marker(location=point, draggable=False) for point in points
+            ]
 
-        marker_cluster = MarkerCluster(markers=markers, name=layer_name)
+        marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
@@ -2186,7 +2191,7 @@ class Map(ipyleaflet.Map):
             if isinstance(popup, str):
                 labels = df[popup]
                 markers = [
-                    Marker(
+                    ipyleaflet.Marker(
                         location=point,
                         draggable=False,
                         popup=widgets.HTML(str(labels[index])),
@@ -2203,7 +2208,7 @@ class Map(ipyleaflet.Map):
                 df["popup"] = labels
 
                 markers = [
-                    Marker(
+                    ipyleaflet.Marker(
                         location=point,
                         draggable=False,
                         popup=widgets.HTML(labels[index]),
@@ -2212,9 +2217,11 @@ class Map(ipyleaflet.Map):
                 ]
 
         else:
-            markers = [Marker(location=point, draggable=False) for point in points]
+            markers = [
+                ipyleaflet.Marker(location=point, draggable=False) for point in points
+            ]
 
-        marker_cluster = MarkerCluster(markers=markers, name=layer_name)
+        marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
@@ -2392,7 +2399,9 @@ def linked_maps(
                 label = widgets.Label(
                     labels[index], layout=widgets.Layout(padding="0px 5px 0px 5px")
                 )
-                control = WidgetControl(widget=label, position=label_position)
+                control = ipyleaflet.WidgetControl(
+                    widget=label, position=label_position
+                )
                 m.add_control(control)
 
             maps.append(m)
@@ -2462,7 +2471,7 @@ def split_map(
                 position = "bottomleft"
             else:
                 position = "topleft"
-            left_control = WidgetControl(widget=label1, position=position)
+            left_control = ipyleaflet.WidgetControl(widget=label1, position=position)
             m.add_control(left_control)
 
         if right_label is not None:
@@ -2473,7 +2482,7 @@ def split_map(
                 position = "bottomright"
             else:
                 position = "topright"
-            right_control = WidgetControl(widget=label2, position=position)
+            right_control = ipyleaflet.WidgetControl(widget=label2, position=position)
             m.add_control(right_control)
 
     except Exception as e:
