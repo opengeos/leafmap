@@ -1,6 +1,6 @@
 import os
 import folium
-from folium import plugins
+import folium.plugins as plugins
 from .common import *
 from .legends import builtin_legends
 from .basemaps import folium_basemaps

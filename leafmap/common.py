@@ -7,6 +7,7 @@ import shutil
 import tarfile
 import urllib.request
 import zipfile
+import folium
 import ipyleaflet
 import ipywidgets as widgets
 
@@ -1567,10 +1568,10 @@ def shp_to_geojson(in_shp, out_json=None, **kwargs):
         out_dict = reader.__geo_interface__
 
         if out_json is not None:
-            from json import dumps
+            import json
 
             with open(out_json, "w") as geojson:
-                geojson.write(dumps(out_dict, indent=2) + "\n")
+                geojson.write(json.dumps(out_dict, indent=2) + "\n")
         else:
             return out_dict
 
@@ -1962,8 +1963,6 @@ def planet_monthly_tiles_tropical(
     Returns:
         dict: A dictionary of TileLayer.
     """
-    import ipyleaflet
-    import folium
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
@@ -2006,9 +2005,6 @@ def planet_biannual_tiles_tropical(
     Returns:
         dict: A dictionary of TileLayer.
     """
-
-    import ipyleaflet
-    import folium
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
@@ -2166,7 +2162,7 @@ def planet_catalog(api_key=None, token_name="PLANET_API_KEY"):
 def planet_monthly_tiles(
     api_key=None, token_name="PLANET_API_KEY", tile_format="ipyleaflet"
 ):
-    """Generates Planet  monthly imagery TileLayer based on an API key. To get a Planet API key, see https://developers.planet.com/quickstart/apis/
+    """Generates Planet monthly imagery TileLayer based on an API key. To get a Planet API key, see https://developers.planet.com/quickstart/apis/
 
     Args:
         api_key (str, optional): The Planet API key. Defaults to None.
@@ -2179,8 +2175,6 @@ def planet_monthly_tiles(
     Returns:
         dict: A dictionary of TileLayer.
     """
-    import ipyleaflet
-    import folium
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
@@ -2224,8 +2218,6 @@ def planet_quarterly_tiles(
     Returns:
         dict: A dictionary of TileLayer.
     """
-    import ipyleaflet
-    import folium
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
@@ -2410,9 +2402,6 @@ def planet_tile_by_quarter(
         dict: A dictionary of TileLayer.
     """
 
-    import ipyleaflet
-    import folium
-
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
 
@@ -2459,8 +2448,6 @@ def planet_tile_by_month(
     Returns:
         dict: A dictionary of TileLayer.
     """
-    import ipyleaflet
-    import folium
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
