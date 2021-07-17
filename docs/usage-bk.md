@@ -83,7 +83,7 @@ export HEREMAPS_API_KEY=YOUR-ACTUAL-API-KEY
 import leafmap.heremap as leafmap
 ```
 
-## Create an interactive map
+### Create an interactive map
 
 ```python
 import os
