@@ -1044,9 +1044,24 @@ class Map(folium.Map):
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
         """
-        in_shp = os.path.abspath(in_shp)
-        if not os.path.exists(in_shp):
-            raise FileNotFoundError("The provided shapefile could not be found.")
+        import glob
+
+        if in_shp.startswith("http") and in_shp.endswith(".zip"):
+            out_dir = os.path.abspath("./cache/shp")
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            files = list(glob.glob(os.path.join(out_dir, "*.shp")))
+            if len(files) > 0:
+                in_shp = files[0]
+            else:
+                raise FileNotFoundError(
+                    "The downloaded zip file does not contain any shapefile in the root directory."
+                )
+        else:
+            in_shp = os.path.abspath(in_shp)
+            if not os.path.exists(in_shp):
+                raise FileNotFoundError("The provided shapefile could not be found.")
 
         data = shp_to_geojson(in_shp)
 
@@ -1202,9 +1217,18 @@ class Map(folium.Map):
             FileNotFoundError: The provided KML file could not be found.
         """
 
-        in_kml = os.path.abspath(in_kml)
-        if not os.path.exists(in_kml):
-            raise FileNotFoundError("The provided KML file could not be found.")
+        if in_kml.startswith("http") and in_kml.endswith(".kml"):
+            out_dir = os.path.abspath("./cache")
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            download_from_url(in_kml, out_dir=out_dir, unzip=False, verbose=False)
+            in_kml = os.path.join(out_dir, os.path.basename(in_kml))
+            if not os.path.exists(in_kml):
+                raise FileNotFoundError("The downloaded kml file could not be found.")
+        else:
+            in_kml = os.path.abspath(in_kml)
+            if not os.path.exists(in_kml):
+                raise FileNotFoundError("The provided KML could not be found.")
 
         data = kml_to_geojson(in_kml)
 
