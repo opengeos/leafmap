@@ -17,26 +17,27 @@ conda activate geo
 jupyter notebook
 ```
 
-## Use the ipyleaflet plotting backend
+## Use ipyleaflet plotting backend
 
 ```python
 import leafmap
-```
-
-## Use the folium plotting backend
-
-```python
-import leafmap.foliumap as leafmap
-```
-
-## Create an interactive map
-
-```python
 m = leafmap.Map(center=(40, -100), zoom=4)
 m
 ```
 
-## Use the heremap plotting backend
+![](https://i.imgur.com/CUtzD19.png)
+
+## Use folium plotting backend
+
+```python
+import leafmap.foliumap as leafmap
+m = leafmap.Map(center=(40, -100), zoom=4)
+m
+```
+
+![](https://i.imgur.com/cwdskMb.png)
+
+## Use heremap plotting backend
 
 ### Prerequisites
 
@@ -48,19 +49,18 @@ m
 export HEREMAPS_API_KEY=YOUR-ACTUAL-API-KEY
 ```
 
-```python
-import leafmap.heremap as leafmap
-```
-
 ### Create an interactive map
 
 ```python
 import os
+import leafmap.heremap as leafmap
 api_key = os.environ.get("HEREMAPS_API_KEY") # read api_key from environment variable.
 m = leafmap.Map(api_key=api_key, center=(40, -100), zoom=4)
 m
 ```
 
-## Demo
+![](https://i.imgur.com/TWfgHsV.png)
+
+## Leafmap demo with ipyleaflet backend
 
 ![](data/leafmap_demo.gif)

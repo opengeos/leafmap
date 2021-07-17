@@ -201,7 +201,7 @@ leaf_basemaps = {
     ),
     "USGS 3DEP Elevation": WMSLayer(
         url="https://elevation.nationalmap.gov/arcgis/services/3DEPElevation/ImageServer/WMSServer?",
-        layers="3DEPElevation:None",
+        layers="33DEPElevation:Hillshade Elevation Tinted",
         name="USGS 3DEP Elevation",
         attribution="USGS",
         format="image/png",
@@ -316,13 +316,15 @@ folium_basemaps = {
         overlay=True,
         control=True,
     ),
-    "3DEP Elevation": folium.WmsTileLayer(
+    "USGS 3DEP Elevation": folium.WmsTileLayer(
         url="https://elevation.nationalmap.gov/arcgis/services/3DEPElevation/ImageServer/WMSServer?",
-        layers="3DEPElevation:None",
+        layers="3DEPElevation:Hillshade Elevation Tinted",
         attr="USGS",
-        name="3DEP Elevation",
+        name="USGS 3DEP Elevation",
         overlay=True,
         control=True,
+        fmt="image/png",
+        transparent=True,
     ),
     "NAIP Imagery": folium.WmsTileLayer(
         url="https://services.nationalmap.gov/arcgis/services/USGSNAIPImagery/ImageServer/WMSServer?",
