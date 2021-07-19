@@ -10,6 +10,31 @@ import zipfile
 import folium
 import ipyleaflet
 import ipywidgets as widgets
+import whitebox
+
+
+class WhiteboxTools(whitebox.WhiteboxTools):
+    """This class inherits the whitebox WhiteboxTools class."""
+
+    def __init__(self, **kwargs):
+
+        super().__init__(**kwargs)
+
+
+def whiteboxgui(verbose=True, tree=False, reset=False):
+    """Shows the WhiteboxTools GUI.
+
+    Args:
+        verbose (bool, optional): Whether to show progress info when the tool is running. Defaults to True.
+        tree (bool, optional): Whether to use the tree mode toolbox built using ipytree rather than ipywidgets. Defaults to False.
+        reset (bool, optional): Whether to regenerate the json file with the dictionary containing the information for all tools. Defaults to False.
+
+    Returns:
+        object: A toolbox GUI.
+    """
+    import whiteboxgui
+
+    return whiteboxgui.show(verbose, tree, reset)
 
 
 def __in_colab_shell():
