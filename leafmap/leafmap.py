@@ -668,6 +668,11 @@ class Map(ipyleaflet.Map):
 
         """
         bounds = self.bounds
+        if len(bounds) == 0:
+            bounds = (
+                (40.74824858675827, -73.98933637940563),
+                (40.75068694343106, -73.98364473187601),
+            )
         north, south, east, west = (
             bounds[1][0],
             bounds[0][0],
@@ -921,7 +926,7 @@ class Map(ipyleaflet.Map):
         minimap_control = ipyleaflet.WidgetControl(widget=minimap, position=position)
         self.add_control(minimap_control)
 
-    def add_maker_cluster(self, event="click", add_marker=True):
+    def add_marker_cluster(self, event="click", add_marker=True):
         """Captures user inputs and add markers to the map.
 
         Args:
