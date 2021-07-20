@@ -1023,18 +1023,14 @@ def split_basemaps(
         options=keys, value=left_name, layout=widgets.Layout(width=width)
     )
 
-    left_control = ipyleaflet.ipyleaflet.WidgetControl(
-        widget=left_dropdown, position="topleft"
-    )
+    left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
     m.add_control(left_control)
 
     right_dropdown = widgets.Dropdown(
         options=keys, value=right_name, layout=widgets.Layout(width=width)
     )
 
-    right_control = ipyleaflet.ipyleaflet.WidgetControl(
-        widget=right_dropdown, position="topright"
-    )
+    right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
     m.add_control(right_control)
 
     close_button = widgets.ToggleButton(
@@ -1051,7 +1047,7 @@ def split_basemaps(
             m.layers = layers
 
     close_button.observe(close_btn_click, "value")
-    close_control = ipyleaflet.ipyleaflet.WidgetControl(
+    close_control = ipyleaflet.WidgetControl(
         widget=close_button, position="bottomright"
     )
     m.add_control(close_control)
