@@ -37,7 +37,7 @@ def whiteboxgui(verbose=True, tree=False, reset=False):
     return whiteboxgui.show(verbose, tree, reset)
 
 
-def __in_colab_shell():
+def _in_colab_shell():
     """Tests if the code is being executed within Google Colab."""
     import sys
 
@@ -47,7 +47,7 @@ def __in_colab_shell():
         return False
 
 
-def __is_drive_mounted():
+def _is_drive_mounted():
     """Checks whether Google Drive is mounted in Google Colab.
 
     Returns:
@@ -89,7 +89,7 @@ def set_proxy(port=1080, ip="http://127.0.0.1"):
         raise Exception(e)
 
 
-def __check_install(package):
+def _check_install(package):
     """Checks whether a package is installed. If not, it will install the package.
 
     Args:
@@ -120,7 +120,7 @@ def update_package():
         download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
         if not os.path.exists(download_dir):
             os.makedirs(download_dir)
-        __clone_repo(out_dir=download_dir)
+        _clone_repo(out_dir=download_dir)
 
         pkg_dir = os.path.join(download_dir, "leafmap-master")
         work_dir = os.getcwd()
@@ -152,7 +152,7 @@ def check_package(name, URL=""):
         )
 
 
-def __clone_repo(out_dir=".", unzip=True):
+def _clone_repo(out_dir=".", unzip=True):
     """Clones the leafmap GitHub repository.
 
     Args:
@@ -198,7 +198,7 @@ def __install_from_github(url):
         raise Exception(e)
 
 
-def __check_git_install():
+def _check_git_install():
     """Checks if Git is installed.
 
     Returns:
@@ -222,7 +222,7 @@ def __check_git_install():
         return False
 
 
-def __clone_github_repo(url, out_dir):
+def _clone_github_repo(url, out_dir):
     """Clones a GitHub repository.
 
     Args:
@@ -257,7 +257,7 @@ def __clone_github_repo(url, out_dir):
     os.remove(out_file_path)
 
 
-def __is_tool(name):
+def _is_tool(name):
     """Check whether `name` is on PATH and marked as executable."""
 
     return shutil.which(name) is not None
@@ -366,8 +366,8 @@ def upload_to_imgur(in_gif):
     import subprocess
 
     pkg_name = "imgur-uploader"
-    if not __is_tool(pkg_name):
-        __check_install(pkg_name)
+    if not _is_tool(pkg_name):
+        _check_install(pkg_name)
 
     try:
         IMGUR_API_ID = os.environ.get("IMGUR_API_ID", None)
