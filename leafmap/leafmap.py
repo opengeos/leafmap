@@ -378,7 +378,6 @@ class Map(ipyleaflet.Map):
 
         Args:
             url (str, optional): The URL of the tile layer. Defaults to 'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
-            name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
             attribution (str, optional): The attribution to use. Defaults to ''.
             vector_tile_layer_styles(dict,optional): Style dict, specific to the vector tile source.
         """

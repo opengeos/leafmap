@@ -9,7 +9,7 @@ import geopandas as gpd
 from unittest.mock import patch
 
 
-class TestLeafmap(unittest.TestCase):
+class TestFoliumap(unittest.TestCase):
     """Tests for `foliumap` module."""
 
     def setUp(self):
@@ -242,19 +242,19 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "NYC buildings" not in out_str
 
-    def test_add_planet_by_month(self):
-        """Check Planet monthly imagery"""
-        m = leafmap.Map()
-        m.add_planet_by_month(year=2020, month=8)
-        out_str = m.to_html()
-        assert "Planet_2020_08" in out_str
+    # def test_add_planet_by_month(self):
+    #     """Check Planet monthly imagery"""
+    #     m = leafmap.Map()
+    #     m.add_planet_by_month(year=2020, month=8)
+    #     out_str = m.to_html()
+    #     assert "Planet_2020_08" in out_str
 
-    def test_add_planet_by_quarter(self):
-        """Check Planet quarterly imagery"""
-        m = leafmap.Map()
-        m.add_planet_by_quarter(year=2019, quarter=2)
-        out_str = m.to_html()
-        assert "Planet_2019_q2" in out_str
+    # def test_add_planet_by_quarter(self):
+    #     """Check Planet quarterly imagery"""
+    #     m = leafmap.Map()
+    #     m.add_planet_by_quarter(year=2019, quarter=2)
+    #     out_str = m.to_html()
+    #     assert "Planet_2019_q2" in out_str
 
     def test_add_point_layer(self):
         """Check adding point layer"""
@@ -304,14 +304,14 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "Google Satellite" in out_str
 
-    def test_add_time_slider(self):
-        """Check adding time slider"""
-        with self.assertRaises(NotImplementedError):
-            m = leafmap.Map()
-            layers_dict = leafmap.planet_quarterly_tiles()
-            m.add_time_slider(layers_dict, time_interval=1)
-            out_str = m.to_html()
-            assert "Planet_2019_q2" in out_str
+    # def test_add_time_slider(self):
+    #     """Check adding time slider"""
+    #     with self.assertRaises(NotImplementedError):
+    #         m = leafmap.Map()
+    #         layers_dict = leafmap.planet_quarterly_tiles()
+    #         m.add_time_slider(layers_dict, time_interval=1)
+    #         out_str = m.to_html()
+    #         assert "Planet_2019_q2" in out_str
 
     def test_add_vector(self):
         """Check adding vector"""
