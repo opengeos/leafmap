@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.3.4 - July 21, 2021
+
+**New Features**:
+
+-   Added map title function [#84](https://github.com/giswqs/leafmap/issues/84)
+
+**Improvement**
+
+-   Improved add_ahp and add_kml for http
+-   Added codespell to docs.yml
+-   Made XYZ tiles attribution required [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Changed some functions to be private [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added more info about plotting backends [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added text description to notebooks [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added NotImplementedError for foliumap [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Fixed typos using codespell [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added Code of Conduct [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Made usage page interactive [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added key features notebook [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added plotting backend comparison [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Added leafmap and foliumap unittest [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Improved JOSS paper [#83](https://github.com/giswqs/leafmap/issues/83)
+
 ## v0.3.3 - July 8, 2021
 
 **New Features**:
