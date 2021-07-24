@@ -10,7 +10,7 @@ import requests
 import here_map_widget
 import ipywidgets as widgets
 from .basemaps import here_basemaps
-from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson
+from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
 
 from here_map_widget import (
     FullscreenControl,
@@ -34,7 +34,15 @@ class Map(here_map_widget.Map):
         object: here_map_widget map object.
     """
 
-    def __init__(self, api_key, **kwargs):
+    def __init__(self, api_key=None, **kwargs):
+
+        if api_key is None:
+            api_key = os.environ.get("HEREMAPS_API_KEY")
+            if api_key is None:
+                raise ValueError(
+                    "Please provide an api_key or set the HEREMAPS_API_KEY environment variable."
+                )
+
         if "center" not in kwargs:
             kwargs["center"] = [40, -100]
 
