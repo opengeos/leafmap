@@ -23,6 +23,8 @@ jobs:
               run: |
                   pip install xarray_leaflet geopandas osmnx sqlalchemy psycopg2
                   python -m unittest discover tests/
+              env:
+                  PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
             - run: python -m pip install --upgrade pip
             - run: pip install mkdocs mkdocs-material mkdocstrings mkdocs-git-revision-date-plugin mkdocs-jupyter ipykernel livereload
             - run: mkdocs gh-deploy --force
