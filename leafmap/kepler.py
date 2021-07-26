@@ -17,6 +17,12 @@ class Map(keplergl.KeplerGl):
 
     def __init__(self, **kwargs):
 
+        if "center" not in kwargs:
+            kwargs["center"] = [40, -100]
+
+        if "zoom" not in kwargs:
+            kwargs["zoom"] = 2.97
+
         if "height" not in kwargs:
             kwargs["height"] = 600
 
@@ -25,9 +31,23 @@ class Map(keplergl.KeplerGl):
 
         if kwargs["widescreen"]:
             display(HTML("<style>.container { width:100% !important; }</style>"))
-        kwargs.pop("widescreen")
 
+        config = {
+            "version": "v1",
+            "config": {
+                "mapState": {
+                    "latitude": kwargs["center"][0],
+                    "longitude": kwargs["center"][1],
+                    "zoom": kwargs["zoom"],
+                }
+            },
+        }
+
+        kwargs.pop("widescreen")
+        kwargs.pop("center")
+        kwargs.pop("zoom")
         # if "show_docs" not in kwargs:
         #     kwargs["show_docs"] = False
 
         super().__init__(**kwargs)
+        self.config = config
