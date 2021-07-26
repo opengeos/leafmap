@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.3.5 - July 26, 2021
+
+**New Features**:
+
+-   Added kepler.gl plotting backend [#88](https://github.com/giswqs/leafmap/issues/88)
+
+**Improvement**
+
+-   Added unittest for toolbar module [#83](https://github.com/giswqs/leafmap/issues/83)
+-   Updated paper.md
+
 ## v0.3.4 - July 21, 2021
 
 **New Features**:
