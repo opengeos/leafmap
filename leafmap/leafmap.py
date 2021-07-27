@@ -1810,7 +1810,7 @@ class Map(ipyleaflet.Map):
         info_mode="on_hover",
         zoom_to_layer=True,
     ):
-        """Adds a GeoJSON file to the map.
+        """Adds a GeoDataFrame to the map.
 
         Args:
             gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
@@ -1991,7 +1991,7 @@ class Map(ipyleaflet.Map):
         fill_colors=["black"],
         info_mode="on_hover",
     ):
-        """Adds a GeoJSON file to the map.
+        """Adds a KML file to the map.
 
         Args:
             in_kml (str): The input file path to the KML.

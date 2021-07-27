@@ -12,7 +12,7 @@
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![image](https://img.shields.io/badge/YouTube-Channel-red)](https://www.youtube.com/c/QiushengWu)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
-[![status](https://joss.theoj.org/papers/b081afbd9bdaa4386475c787db8e370c/status.svg)](https://joss.theoj.org/papers/b081afbd9bdaa4386475c787db8e370c)
+[![status](https://joss.theoj.org/papers/10.21105/joss.03414/status.svg)](https://doi.org/10.21105/joss.03414)
 
 **A Python package for geospatial analysis and interactive mapping in a Jupyter environment.**
 

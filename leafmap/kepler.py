@@ -1,4 +1,7 @@
+import os
 from IPython.core.display import display, HTML
+from .common import *
+from .osm import *
 
 try:
     import keplergl
@@ -25,6 +28,8 @@ class Map(keplergl.KeplerGl):
 
         if "height" not in kwargs:
             kwargs["height"] = 600
+        elif "px" in str(kwargs["height"]):
+            kwargs["height"] = kwargs["height"].replace("px", "")
 
         if "widescreen" not in kwargs:
             kwargs["widescreen"] = False
@@ -51,3 +56,198 @@ class Map(keplergl.KeplerGl):
 
         super().__init__(**kwargs)
         self.config = config
+
+    def add_geojson(self, in_geojson, layer_name="Untitled", **kwargs):
+        """Adds a GeoJSON file to the map.
+
+        Args:
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+
+        Raises:
+            FileNotFoundError: The provided GeoJSON file could not be found.
+            TypeError: The input geojson must be a type of str or dict.
+        """
+        import json
+        import requests
+
+        if "encoding" in kwargs:
+            encoding = kwargs["encoding"]
+        else:
+            encoding = "utf-8"
+
+        try:
+
+            if isinstance(in_geojson, str):
+
+                if in_geojson.startswith("http"):
+                    data = requests.get(in_geojson).json()
+                else:
+                    in_geojson = os.path.abspath(in_geojson)
+                    if not os.path.exists(in_geojson):
+                        raise FileNotFoundError(
+                            "The provided GeoJSON file could not be found."
+                        )
+
+                    with open(in_geojson, encoding=encoding) as f:
+                        data = json.load(f)
+            elif isinstance(in_geojson, dict):
+                data = in_geojson
+            else:
+                raise TypeError("The input geojson must be a type of str or dict.")
+        except Exception as e:
+            raise Exception(e)
+
+        self.add_data(data, name=layer_name)
+
+    def add_shp(self, in_shp, layer_name="Untitled", **kwargs):
+        """Adds a shapefile to the map.
+
+        Args:
+            in_shp (str): The input file path to the shapefile.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+
+        Raises:
+            FileNotFoundError: The provided shapefile could not be found.
+        """
+
+        import glob
+
+        if in_shp.startswith("http") and in_shp.endswith(".zip"):
+            out_dir = os.path.abspath("./cache/shp")
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            files = list(glob.glob(os.path.join(out_dir, "*.shp")))
+            if len(files) > 0:
+                in_shp = files[0]
+            else:
+                raise FileNotFoundError(
+                    "The downloaded zip file does not contain any shapefile in the root directory."
+                )
+        else:
+            in_shp = os.path.abspath(in_shp)
+            if not os.path.exists(in_shp):
+                raise FileNotFoundError("The provided shapefile could not be found.")
+
+        geojson = shp_to_geojson(in_shp)
+        self.add_geojson(
+            geojson,
+            layer_name,
+            **kwargs,
+        )
+
+    def add_gdf(
+        self,
+        gdf,
+        layer_name="Untitled",
+        **kwargs,
+    ):
+        """Adds a GeoDataFrame to the map.
+
+        Args:
+            gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+        """
+
+        data = gdf_to_geojson(gdf, epsg="4326")
+        self.add_geojson(data, layer_name, **kwargs)
+
+    def add_vector(
+        self,
+        filename,
+        layer_name="Untitled",
+        **kwargs,
+    ):
+        """Adds any geopandas-supported vector dataset to the map.
+
+        Args:
+            filename (str): Either the absolute or relative path to the file or URL to be opened, or any object with a read() method (such as an open file or StringIO).
+            layer_name (str, optional): The layer name to use. Defaults to "Untitled".
+
+        """
+        if not filename.startswith("http"):
+            filename = os.path.abspath(filename)
+
+        ext = os.path.splitext(filename)[1].lower()
+        if ext == ".shp":
+            self.add_shp(
+                filename,
+                layer_name,
+                **kwargs,
+            )
+        elif ext in [".json", ".geojson"]:
+            self.add_geojson(
+                filename,
+                layer_name,
+                **kwargs,
+            )
+        else:
+            geojson = vector_to_geojson(
+                filename,
+                epsg="4326",
+                **kwargs,
+            )
+
+            self.add_geojson(
+                geojson,
+                layer_name,
+                **kwargs,
+            )
+
+    def add_kml(
+        self,
+        in_kml,
+        layer_name="Untitled",
+        **kwargs,
+    ):
+        """Adds a KML file to the map.
+
+        Args:
+            in_kml (str): The input file path to the KML.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+
+        Raises:
+            FileNotFoundError: The provided KML file could not be found.
+        """
+
+        if in_kml.startswith("http") and in_kml.endswith(".kml"):
+            out_dir = os.path.abspath("./cache")
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            download_from_url(in_kml, out_dir=out_dir, unzip=False, verbose=False)
+            in_kml = os.path.join(out_dir, os.path.basename(in_kml))
+            if not os.path.exists(in_kml):
+                raise FileNotFoundError("The downloaded kml file could not be found.")
+        else:
+            in_kml = os.path.abspath(in_kml)
+            if not os.path.exists(in_kml):
+                raise FileNotFoundError("The provided KML could not be found.")
+
+        self.add_vector(
+            in_kml,
+            layer_name,
+            **kwargs,
+        )
+
+    def add_gdf_from_postgis(
+        self,
+        sql,
+        con,
+        layer_name="Untitled",
+        **kwargs,
+    ):
+        """Reads a PostGIS database and returns data as a GeoDataFrame to be added to the map.
+
+        Args:
+            sql (str): SQL query to execute in selecting entries from database, or name of the table to read from the database.
+            con (sqlalchemy.engine.Engine): Active connection to the database to query.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+        """
+        gdf = read_postgis(sql, con, **kwargs)
+        gdf = gdf.to_crs("epsg:4326")
+        self.add_gdf(
+            gdf,
+            layer_name,
+            **kwargs,
+        )
