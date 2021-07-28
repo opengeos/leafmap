@@ -10,7 +10,7 @@ m = leafmap.Map(center=[40, -100], zoom=2, height=600, widescreen=False)
 m
 ```
 
-<iframe width=1000, height=600 frameBorder=0 src="notebooks/cache/kepler.html"></iframe>
+<iframe width=1000, height=600 frameBorder=0 src="../maps/kepler.html"></iframe>
 
 Add a GeoJSON to the map.
 
@@ -21,7 +21,7 @@ m.add_geojson(lines, layer_name="Cable lines")
 m
 ```
 
-<iframe width=1000, height=600 frameBorder=0 src="notebooks/cache/kepler_lines.html"></iframe>
+<iframe width=1000, height=600 frameBorder=0 src="../maps/kepler_lines.html"></iframe>
 
 Add a GeoJSON with US state boundaries to the map.
 
@@ -32,7 +32,7 @@ m.add_geojson(polygons, layer_name="Countries")
 m
 ```
 
-<iframe width=1000, height=600 frameBorder=0 src="notebooks/cache/kepler_states.html"></iframe>
+<iframe width=1000, height=600 frameBorder=0 src="../maps/kepler_states.html"></iframe>
 
 Add a shapefile to the map.
 
@@ -43,7 +43,7 @@ m.add_shp(in_shp, "Countries")
 m
 ```
 
-<iframe width=1000, height=600 frameBorder=0 src="notebooks/cache/kepler_states.html"></iframe>
+<iframe width=1000, height=600 frameBorder=0 src="../maps/kepler_countries.html"></iframe>
 
 Add a GeoPandas GeoDataFrame to the map.
 
@@ -55,4 +55,4 @@ m.add_gdf(gdf, "World cities")
 m
 ```
 
-<iframe width=1000, height=600 frameBorder=0 src="notebooks/cache/kepler_cities.html"></iframe>
+<iframe width=1000, height=600 frameBorder=0 src="../maps/kepler_cities.html"></iframe>
