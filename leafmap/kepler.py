@@ -1,5 +1,6 @@
 import os
-from IPython.core.display import display, HTML
+import ipywidgets as widgets
+from IPython.display import display, HTML
 from .common import *
 from .osm import *
 
@@ -56,6 +57,24 @@ class Map(keplergl.KeplerGl):
 
         super().__init__(**kwargs)
         self.config = config
+
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        """Display the map in a notebook.
+
+        Args:
+            include (list, optional): A list of MIME types to include.
+            exclude (list, optional): A list of MIME types to exclude.
+
+        Returns:
+            dict: A dictionary of MIME type keyed dict of MIME type data.
+        """
+        print("hello")
+        # import base64
+
+        # bundle = super()._repr_mimebundle_(include=include, exclude=exclude)
+        # if bundle["text/html"]:
+        #     bundle["text/html"] = self.display_html()
+        # return bundle
 
     def add_geojson(self, in_geojson, layer_name="Untitled", **kwargs):
         """Adds a GeoJSON file to the map.
@@ -251,3 +270,29 @@ class Map(keplergl.KeplerGl):
             layer_name,
             **kwargs,
         )
+
+    def static_map(
+        self, width=950, height=600, read_only=False, out_file=None, **kwargs
+    ):
+        """Display a kepler.gl static map in a Jupyter Notebook.
+
+        Args
+            m (keplergl.KeplerGl): A kepler.gl map.
+            width (int, optional): Width of the map. Defaults to 950.
+            height (int, optional): Height of the map. Defaults to 600.
+            read_only (bool, optional): Whether to hide the side panel to disable map customization. Defaults to False.
+            out_file (str, optional): Output html file path. Defaults to None.
+        """
+        if isinstance(self, keplergl.KeplerGl):
+            if out_file is None:
+                out_file = "./cache/" + "kepler_" + random_string(3) + ".html"
+            out_dir = os.path.abspath(os.path.dirname(out_file))
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+
+            output = widgets.Output()
+            with output:
+                self.save_to_html(file_name=out_file, read_only=read_only)
+            display_html(src=out_file, width=width, height=height)
+        else:
+            raise TypeError("The provided map is not a kepler.gl map.")
