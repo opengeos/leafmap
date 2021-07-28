@@ -11,6 +11,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
+from IPython.display import display, IFrame
 
 
 class WhiteboxTools(whitebox.WhiteboxTools):
@@ -2528,3 +2529,16 @@ def to_hex_colors(colors):
         return ["#" + color.strip() for color in colors]
     else:
         return colors
+
+
+def display_html(src, width=950, height=600):
+    """Display an HTML file in a Jupyter Notebook.
+
+    Args
+        src (str): File path to HTML file.
+        width (int, optional): Width of the map. Defaults to 950.
+        height (int, optional): Height of the map. Defaults to 600.
+    """
+    if not os.path.isfile(src):
+        raise ValueError(f"{src} is not a valid file path.")
+    display(IFrame(src=src, width=width, height=height))

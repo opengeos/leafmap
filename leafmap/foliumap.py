@@ -1420,6 +1420,28 @@ class Map(folium.Map):
             )
         self.get_root().html.add_child(folium.Element(title_html))
 
+    def static_map(self, width=950, height=600, out_file=None, **kwargs):
+        """Display a folium static map in a Jupyter Notebook.
+
+        Args
+            m (folium.Map): A folium map.
+            width (int, optional): Width of the map. Defaults to 950.
+            height (int, optional): Height of the map. Defaults to 600.
+            read_only (bool, optional): Whether to hide the side panel to disable map customization. Defaults to False.
+            out_file (str, optional): Output html file path. Defaults to None.
+        """
+        if isinstance(self, folium.Map):
+            if out_file is None:
+                out_file = "./cache/" + "folium_" + random_string(3) + ".html"
+            out_dir = os.path.abspath(os.path.dirname(out_file))
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+
+            self.to_html(out_file)
+            display_html(src=out_file, width=width, height=height)
+        else:
+            raise TypeError("The provided map is not a folium map.")
+
     def add_colormap(
         self,
         cmap="gray",
