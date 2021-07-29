@@ -29,6 +29,7 @@
 23. Creating colormaps with a single line of code ([notebook](https://leafmap.org/notebooks/23_colormaps))
 24. Creating heat map from csv ([notebook](https://leafmap.org/notebooks/24_heatmap))
 25. Creating a population heat map with a colorbar and map title ([notebook](https://leafmap.org/notebooks/25_map_title))
+26. Creating an interactive map using the kepler.gl plotting backend ([notebook](https://leafmap.org/notebooks/26_kepler_gl))
 
 ## Demo
 
