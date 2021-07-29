@@ -25,26 +25,26 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "Google Terrain" in out_str
 
-    def test_add_cog_layer(self):
-        """Check COG layer"""
-        m = leafmap.Map()
-        url = "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif"
-        m.add_cog_layer(url, name="Fire (pre-event)")
-        out_str = m.to_html()
-        assert "Fire (pre-event)" in out_str
+    # def test_add_cog_layer(self):
+    #     """Check COG layer"""
+    #     m = leafmap.Map()
+    #     url = "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif"
+    #     m.add_cog_layer(url, name="Fire (pre-event)")
+    #     out_str = m.to_html()
+    #     assert "Fire (pre-event)" in out_str
 
-    def test_add_cog_mosaic(self):
-        """Check COG mosaic"""
-        m = leafmap.Map()
-        links = [
-            "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif",
-            "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-08-18/pine-gulch-fire20/1040010041D3B300.tif",
-        ]
+    # def test_add_cog_mosaic(self):
+    #     """Check COG mosaic"""
+    #     m = leafmap.Map()
+    #     links = [
+    #         "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif",
+    #         "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-08-18/pine-gulch-fire20/1040010041D3B300.tif",
+    #     ]
 
-        m.add_cog_mosaic(links, name="COG mosaic", attribution="MAXAR")
-        out_str = m.to_html()
-        assert "COG mosaic" in out_str
-        assert "MAXAR" in out_str
+    #     m.add_cog_mosaic(links, name="COG mosaic", attribution="MAXAR")
+    #     out_str = m.to_html()
+    #     assert "COG mosaic" in out_str
+    #     assert "MAXAR" in out_str
 
     def test_add_colorbar(self):
         """Check colorbar"""
