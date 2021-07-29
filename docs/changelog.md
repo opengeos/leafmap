@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.0 - July 28, 2021
+
+**New Features**:
+
+-   Added kepler.gl plotting backend [#88](https://github.com/giswqs/leafmap/issues/88)
+-   Added keplergl sample data [#88](https://github.com/giswqs/leafmap/issues/88)
+-   Added keplergl sample html [#88](https://github.com/giswqs/leafmap/issues/88)
+
+**Improvement**
+
+-   Added CITATIONS.cff
+
 ## v0.3.5 - July 26, 2021
 
 **New Features**:
