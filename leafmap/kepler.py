@@ -1,5 +1,8 @@
+import json
 import os
+import requests
 import ipywidgets as widgets
+import pandas as pd
 from IPython.display import display, HTML
 from .common import *
 from .osm import *
@@ -8,7 +11,7 @@ try:
     import keplergl
 except ImportError:
     raise ImportError(
-        "Kepler needs to be installed to use this module. See https://docs.kepler.gl/docs/keplergl-jupyter"
+        "Kepler needs to be installed to use this module. Use 'pip install keplergl' to install the package. See https://docs.kepler.gl/docs/keplergl-jupyter for more details."
     )
 
 
@@ -78,12 +81,13 @@ class Map(keplergl.KeplerGl):
         #     bundle["text/html"] = self.display_html()
         # return bundle
 
-    def add_geojson(self, in_geojson, layer_name="Untitled", **kwargs):
+    def add_geojson(self, in_geojson, layer_name="Untitled", config=None, **kwargs):
         """Adds a GeoJSON file to the map.
 
         Args:
             in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
@@ -120,13 +124,15 @@ class Map(keplergl.KeplerGl):
             raise Exception(e)
 
         self.add_data(data, name=layer_name)
+        self.load_config(config)
 
-    def add_shp(self, in_shp, layer_name="Untitled", **kwargs):
+    def add_shp(self, in_shp, layer_name="Untitled", config=None, **kwargs):
         """Adds a shapefile to the map.
 
         Args:
             in_shp (str): The input file path to the shapefile.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
@@ -157,11 +163,13 @@ class Map(keplergl.KeplerGl):
             layer_name,
             **kwargs,
         )
+        self.load_config(config)
 
     def add_gdf(
         self,
         gdf,
         layer_name="Untitled",
+        config=None,
         **kwargs,
     ):
         """Adds a GeoDataFrame to the map.
@@ -169,15 +177,57 @@ class Map(keplergl.KeplerGl):
         Args:
             gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
+
         """
 
         data = gdf_to_geojson(gdf, epsg="4326")
         self.add_geojson(data, layer_name, **kwargs)
+        self.load_config(config)
+
+    def add_df(
+        self,
+        df,
+        layer_name="Untitled",
+        config=None,
+        **kwargs,
+    ):
+        """Adds a DataFrame to the map.
+
+        Args:
+            df (DataFrame): A Pandas DataFrame.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
+
+        """
+
+        self.add_data(data=df, name=layer_name)
+        self.load_config(config)
+
+    def add_csv(
+        self,
+        in_csv,
+        layer_name="Untitled",
+        config=None,
+        **kwargs,
+    ):
+        """Adds a CSV to the map.
+
+        Args:
+            csv (DataFrame): File path to the CSV.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
+
+        """
+
+        df = pd.read_csv(in_csv)
+        self.add_df(df, layer_name, config, **kwargs)
 
     def add_vector(
         self,
         filename,
         layer_name="Untitled",
+        config=None,
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -185,6 +235,7 @@ class Map(keplergl.KeplerGl):
         Args:
             filename (str): Either the absolute or relative path to the file or URL to be opened, or any object with a read() method (such as an open file or StringIO).
             layer_name (str, optional): The layer name to use. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
         """
         if not filename.startswith("http"):
@@ -197,12 +248,14 @@ class Map(keplergl.KeplerGl):
                 layer_name,
                 **kwargs,
             )
+            self.load_config(config)
         elif ext in [".json", ".geojson"]:
             self.add_geojson(
                 filename,
                 layer_name,
                 **kwargs,
             )
+            self.load_config(config)
         else:
             geojson = vector_to_geojson(
                 filename,
@@ -215,11 +268,13 @@ class Map(keplergl.KeplerGl):
                 layer_name,
                 **kwargs,
             )
+            self.add_config(config)
 
     def add_kml(
         self,
         in_kml,
         layer_name="Untitled",
+        config=None,
         **kwargs,
     ):
         """Adds a KML file to the map.
@@ -227,6 +282,7 @@ class Map(keplergl.KeplerGl):
         Args:
             in_kml (str): The input file path to the KML.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
         Raises:
             FileNotFoundError: The provided KML file could not be found.
@@ -250,12 +306,14 @@ class Map(keplergl.KeplerGl):
             layer_name,
             **kwargs,
         )
+        self.load_config(config)
 
     def add_gdf_from_postgis(
         self,
         sql,
         con,
         layer_name="Untitled",
+        config=None,
         **kwargs,
     ):
         """Reads a PostGIS database and returns data as a GeoDataFrame to be added to the map.
@@ -264,6 +322,8 @@ class Map(keplergl.KeplerGl):
             sql (str): SQL query to execute in selecting entries from database, or name of the table to read from the database.
             con (sqlalchemy.engine.Engine): Active connection to the database to query.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
+
         """
         gdf = read_postgis(sql, con, **kwargs)
         gdf = gdf.to_crs("epsg:4326")
@@ -272,6 +332,7 @@ class Map(keplergl.KeplerGl):
             layer_name,
             **kwargs,
         )
+        self.load_config(config)
 
     def static_map(
         self, width=950, height=600, read_only=False, out_file=None, **kwargs
@@ -342,3 +403,53 @@ class Map(keplergl.KeplerGl):
 
         except Exception as e:
             raise Exception(e)
+
+    def load_config(self, config=None):
+        """Loads a kepler.gl config file.
+
+        Args:
+            config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
+
+        Raises:
+            FileNotFoundError: The provided config file could not be found.
+            TypeError: The provided config file is not a kepler.gl config file.
+        """
+        if config is None:
+            pass
+        elif isinstance(config, dict):
+            self.config = config
+        elif isinstance(config, str):
+            if config.startswith("http"):
+                r = requests.get(config)
+                self.config = r.json()
+            elif os.path.isfile(config):
+                with open(config) as f:
+                    self.config = json.load(f)
+            else:
+                raise FileNotFoundError("The provided config file could not be found.")
+        else:
+            raise TypeError("The provided config is not a dictionary or filepath.")
+
+    def save_config(self, out_json):
+        """Saves a kepler.gl config file.
+
+        Args:
+            out_json (str): Output file path to the config file.
+
+        Raises:
+            ValueError: The output file extension must be json.
+            TypeError: The provided filepath is invalid.
+        """
+        if isinstance(out_json, str):
+            if not out_json.endswith(".json"):
+                raise ValueError("The output file extension must be json.")
+            out_json = os.path.abspath(out_json)
+            out_dir = os.path.dirname(out_json)
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+
+            json_str = json.dumps(self.config, indent=2)
+            with open(out_json, "w") as f:
+                f.write(json_str)
+        else:
+            raise TypeError("The provided filepath is invalid.")
