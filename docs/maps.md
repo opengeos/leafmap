@@ -1,6 +1,6 @@
 # Interactive maps
 
-This page demonstrates some interactive maps created using the kepler.gl plotting backend.
+This page demonstrates some interactive maps created using the [kepler.gl](https://kepler.gl/) plotting backend.
 
 ## Create an interactive map
 
