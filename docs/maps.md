@@ -14,6 +14,18 @@ m
 
 <iframe width=760 height=500 frameBorder=0 src="../html/kepler.html"></iframe>
 
+## Add a CSV
+
+```python
+m = leafmap.Map(center=[37.7621, -122.4143], zoom=12)
+in_csv = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/hex_data.csv'
+config = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/hex_config.json'
+m.add_csv(in_csv, layer_name="hex_data", config=config)
+m
+```
+
+<iframe width=760 height=500 frameBorder=0 src="../html/kepler_hex.html"></iframe>
+
 ## Add a GeoJSON
 
 ```python
