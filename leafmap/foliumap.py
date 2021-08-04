@@ -8,7 +8,7 @@ from .osm import *
 
 
 class Map(folium.Map):
-    """The Map class inherits folium.Map. By default, the Map will add Google Maps as the basemap.
+    """The Map class inherits folium.Map. By default, the Map will add OpenStreetMap as the basemap.
 
     Returns:
         object: folium map object.
@@ -91,60 +91,21 @@ class Map(folium.Map):
             plugins.MiniMap().add_to(self)
 
         if "google_map" not in kwargs:
-            layer = folium.TileLayer(
-                tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                attr="Google",
-                name="Google Maps",
-                overlay=True,
-                control=True,
-            )
-            layer.add_to(self)
-        elif kwargs["google_map"] is None:
             pass
-        else:
+        elif kwargs["google_map"] is not None:
             if kwargs["google_map"].upper() == "ROADMAP":
-                layer = folium.TileLayer(
-                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                    attr="Google",
-                    name="Google Maps",
-                    overlay=True,
-                    control=True,
-                )
+                layer = folium_basemaps["ROADMAP"]
             elif kwargs["google_map"].upper() == "HYBRID":
-                layer = folium.TileLayer(
-                    tiles="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-                    attr="Google",
-                    name="Google Satellite",
-                    overlay=True,
-                    control=True,
-                )
+                layer = folium_basemaps["HYBRID"]
             elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = folium.TileLayer(
-                    tiles="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-                    attr="Google",
-                    name="Google Terrain",
-                    overlay=True,
-                    control=True,
-                )
+                layer = folium_basemaps["TERRAIN"]
             elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = folium.TileLayer(
-                    tiles="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-                    attr="Google",
-                    name="Google Satellite",
-                    overlay=True,
-                    control=True,
-                )
+                layer = folium_basemaps["SATELLITE"]
             else:
                 print(
                     f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
                 )
-                layer = folium.TileLayer(
-                    tiles="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                    attr="Google",
-                    name="Google Maps",
-                    overlay=True,
-                    control=True,
-                )
+                layer = folium_basemaps["ROADMAP"]
             layer.add_to(self)
 
         if "layers_control" not in kwargs:

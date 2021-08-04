@@ -21,6 +21,11 @@ from here_map_widget import ImageTileProvider, DefaultLayers, DefaultLayerNames
 
 
 leaf_basemaps = {
+    "OpenStreetMap": TileLayer(
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        attribution="OpenStreetMap",
+        name="OpenStreetMap",
+    ),
     "ROADMAP": TileLayer(
         url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
         attribution="Google",

@@ -363,17 +363,17 @@ class TestLeafmap(unittest.TestCase):
         """Check finding layer"""
         m = leafmap.Map()
         self.assertIsNone(m.find_layer("HYBRID"))
-        self.assertIsNotNone(m.find_layer("Google Maps"))
+        self.assertIsNotNone(m.find_layer("OpenStreetMap"))
 
     def test_find_layer_index(self):
         """Check finding layer index"""
         m = leafmap.Map()
-        self.assertEqual(m.find_layer_index("Google Maps"), 1)
+        self.assertEqual(m.find_layer_index("OpenStreetMap"), 0)
 
     def test_get_layer_names(self):
         """Check getting layer names"""
         m = leafmap.Map()
-        assert "Google Maps" in m.get_layer_names()
+        assert "OpenStreetMap" in m.get_layer_names()
 
     def test_get_scale(self):
         """Check getting scale"""
@@ -392,8 +392,8 @@ class TestLeafmap(unittest.TestCase):
     def test_layer_opacity(self):
         """Check layer opacity"""
         m = leafmap.Map()
-        m.layer_opacity("Google Maps", 0.5)
-        layer = m.find_layer("Google Maps")
+        m.layer_opacity("OpenStreetMap", 0.5)
+        layer = m.find_layer("OpenStreetMap")
         self.assertEqual(layer.opacity, 0.5)
 
     def test_set_center(self):
@@ -413,7 +413,7 @@ class TestLeafmap(unittest.TestCase):
         """Check map to html"""
         m = leafmap.Map()
         out_str = m.to_html()
-        assert "Google Maps" in out_str
+        assert "OpenStreetMap" in out_str
 
     # def test_to_image(self):
     #     """Check map to image"""
@@ -445,7 +445,7 @@ class TestLeafmap(unittest.TestCase):
         bounds = [13, -130, 32, -100]
         m.zoom_to_bounds(bounds)
         out_str = m.to_html()
-        assert "Google Maps" in out_str
+        assert "OpenStreetMap" in out_str
 
     def test_zoom_to_gdf(self):
         """Check zoom to GeoDataFrame"""
@@ -455,13 +455,13 @@ class TestLeafmap(unittest.TestCase):
         )
         m.zoom_to_gdf(gdf)
         out_str = m.to_html()
-        assert "Google Maps" in out_str
+        assert "OpenStreetMap" in out_str
 
     def test_leafmap_split_map(self):
         """Check split-panel map"""
         m = leafmap.split_map(left_layer="ROADMAP", right_layer="HYBRID")
         out_str = m.to_html()
-        assert "Google Maps" in out_str
+        assert "OpenStreetMap" in out_str
 
     def test_linked_maps(self):
         """Check linked maps"""
