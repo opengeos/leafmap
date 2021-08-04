@@ -415,7 +415,7 @@ def main_toolbar(m):
 
             layers = [
                 lyr
-                for lyr in m.layers[1:]
+                for lyr in m.layers
                 if (
                     isinstance(lyr, ipyleaflet.TileLayer)
                     or isinstance(lyr, ipyleaflet.WMSLayer)
@@ -843,11 +843,15 @@ def change_basemap(m):
     """
     from .basemaps import leaf_basemaps
 
+    value = "OpenStreetMap.Mapnik"
+    if len(m.layers) > 0:
+        if m.layers[0].name in list(leaf_basemaps.keys()):
+            value = m.layers[0].name
+
     dropdown = widgets.Dropdown(
         options=list(leaf_basemaps.keys()),
-        value="ROADMAP",
-        layout=widgets.Layout(width="200px")
-        # description="Basemaps",
+        value=value,
+        layout=widgets.Layout(width="200px"),
     )
 
     close_btn = widgets.Button(

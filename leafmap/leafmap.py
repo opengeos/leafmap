@@ -10,7 +10,7 @@ from .osm import *
 
 
 class Map(ipyleaflet.Map):
-    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html. By default, the Map will add Google Maps as the basemap. Set add_google_map = False to use OpenStreetMap as the basemap.
+    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html. By default, the Map will add OpenStreetMap as the basemap.
 
     Returns:
         object: ipyleaflet map object.
@@ -98,49 +98,25 @@ class Map(ipyleaflet.Map):
         if kwargs["scale_control"]:
             self.add_control(ipyleaflet.ScaleControl(position="bottomleft"))
 
+        self.clear_layers()
+        self.add_layer(basemap_tiles["OpenStreetMap"])
+
         if "google_map" not in kwargs:
-            layer = ipyleaflet.TileLayer(
-                url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                attribution="Google",
-                name="Google Maps",
-            )
-            self.add_layer(layer)
-        elif kwargs["google_map"] is None:
             pass
-        else:
+        elif kwargs["google_map"] is not None:
             if kwargs["google_map"].upper() == "ROADMAP":
-                layer = ipyleaflet.TileLayer(
-                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                    attribution="Google",
-                    name="Google Maps",
-                )
+                layer = basemap_tiles["ROADMAP"]
             elif kwargs["google_map"].upper() == "HYBRID":
-                layer = ipyleaflet.TileLayer(
-                    url="https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
-                    attribution="Google",
-                    name="Google Satellite",
-                )
+                layer = basemap_tiles["HYBRID"]
             elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = ipyleaflet.TileLayer(
-                    url="https://mt1.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-                    attribution="Google",
-                    name="Google Terrain",
-                )
+                layer = basemap_tiles["TERRAIN"]
             elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = ipyleaflet.TileLayer(
-                    url="https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-                    attribution="Google",
-                    name="Google Satellite",
-                )
+                layer = basemap_tiles["SATELLITE"]
             else:
                 print(
                     f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
                 )
-                layer = ipyleaflet.TileLayer(
-                    url="https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-                    attribution="Google",
-                    name="Google Maps",
-                )
+                layer = basemap_tiles["ROADMAP"]
             self.add_layer(layer)
 
         if "toolbar_control" not in kwargs:
@@ -2433,7 +2409,6 @@ def linked_maps(
 
             m = Map(
                 height=height,
-                google_map=None,
                 layout=widgets.Layout(margin="0px", padding="0px"),
                 **kwargs,
             )
@@ -2592,7 +2567,7 @@ def ts_inspector(
     left_layer = layers_dict[left_name]
     right_layer = layers_dict[right_name]
 
-    m = Map(center=center, zoom=zoom, google_map=None, **kwargs)
+    m = Map(center=center, zoom=zoom, **kwargs)
     control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
     m.add_control(control)
 
