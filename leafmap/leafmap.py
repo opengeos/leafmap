@@ -191,9 +191,23 @@ class Map(ipyleaflet.Map):
         Args:
             basemap (str, optional): Can be one of string from leafmap_basemaps. Defaults to 'HYBRID'.
         """
+        import xyzservices
+
         try:
             layer_names = self.get_layer_names()
-            if (
+            if isinstance(basemap, xyzservices.TileProvider):
+                name = basemap.name
+                url = basemap.build_url()
+                attribution = basemap.attribution
+                if "max_zoom" in basemap.keys():
+                    max_zoom = basemap["max_zoom"]
+                else:
+                    max_zoom = 22
+                layer = ipyleaflet.TileLayer(
+                    url=url, name=name, max_zoom=max_zoom, attribution=attribution
+                )
+                self.add_layer(layer)
+            elif (
                 basemap in leafmap_basemaps
                 and leafmap_basemaps[basemap].name not in layer_names
             ):

@@ -172,8 +172,28 @@ class Map(folium.Map):
         Args:
             basemap (str, optional): Can be one of string from ee_basemaps. Defaults to 'HYBRID'.
         """
+        import xyzservices
+
         try:
-            if basemap in folium_basemaps:
+            if isinstance(basemap, xyzservices.TileProvider):
+                name = basemap.name
+                url = basemap.build_url()
+                attribution = basemap.attribution
+                if "max_zoom" in basemap.keys():
+                    max_zoom = basemap["max_zoom"]
+                else:
+                    max_zoom = 22
+                layer = folium.TileLayer(
+                    tiles=url,
+                    attr=attribution,
+                    name=name,
+                    max_zoom=max_zoom,
+                    overlay=True,
+                    control=True,
+                )
+
+                self.add_layer(layer)
+            elif basemap in folium_basemaps:
                 folium_basemaps[basemap].add_to(self)
             else:
                 print(
