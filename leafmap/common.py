@@ -2503,15 +2503,15 @@ def basemap_xyz_tiles():
     Returns:
         dict: A dictionary of XYZ tile layers.
     """
-    from .basemaps import basemap_tiles
+    from .basemaps import leafmap_basemaps
 
     layers_dict = {}
-    keys = dict(basemap_tiles).keys()
+    keys = dict(leafmap_basemaps).keys()
     for key in keys:
-        if isinstance(basemap_tiles[key], ipyleaflet.WMSLayer):
+        if isinstance(leafmap_basemaps[key], ipyleaflet.WMSLayer):
             pass
         else:
-            layers_dict[key] = basemap_tiles[key]
+            layers_dict[key] = leafmap_basemaps[key]
     return layers_dict
 
 
