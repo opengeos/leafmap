@@ -119,8 +119,24 @@ class Map(here_map_widget.Map):
         Args:
             basemap (str, optional): Can be one of string from ee_basemaps. Defaults to 'HYBRID'.
         """
+        import xyzservices
+
         try:
-            if basemap in here_basemaps and here_basemaps[basemap] not in self.layers:
+            if isinstance(basemap, xyzservices.TileProvider):
+                name = basemap.name
+                url = basemap.build_url()
+                attribution = basemap.attribution
+                if "max_zoom" in basemap.keys():
+                    max_zoom = basemap["max_zoom"]
+                else:
+                    max_zoom = 22
+                layer = here_map_widget.TileLayer(
+                    provider=here_map_widget.ImageTileProvider(
+                        url=url, attribution=attribution, name=name, max_zoom=max_zoom
+                    )
+                )
+                self.basemap = layer
+            elif basemap in here_basemaps and here_basemaps[basemap] not in self.layers:
                 self.basemap = here_basemaps[basemap]
         except Exception:
             raise ValueError(
