@@ -2386,7 +2386,7 @@ def linked_maps(
         if len(layers) == 1:
             layers = layers * count
         elif len(layers) < count:
-            raise ValueError(f"The length of ee_objects must be equal to {count}.")
+            raise ValueError(f"The length of layers must be equal to {count}.")
 
     if len(labels) > 0:
         if len(labels) == 1:
@@ -2396,7 +2396,7 @@ def linked_maps(
 
     for i in range(rows):
         for j in range(cols):
-            index = i * rows + j
+            index = i * cols + j
 
             if "draw_control" not in kwargs:
                 kwargs["draw_control"] = False
@@ -2414,7 +2414,8 @@ def linked_maps(
             )
 
             if layers[index] in leafmap_basemaps:
-                m.add_layer(leafmap_basemaps[layers[index]])
+                # m.add_layer(leafmap_basemaps[layers[index]])
+                m.add_basemap(layers[index])
             else:
                 try:
                     m.add_layer(layers[index])
