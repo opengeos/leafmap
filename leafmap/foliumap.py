@@ -1546,7 +1546,7 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def split_map(self, left_layer="HYBRID", right_layer="ESRI"):
+    def split_map(self, left_layer="HYBRID", right_layer="OpenStreetMap"):
         """Adds split map."""
         raise NotImplementedError(
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."

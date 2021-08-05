@@ -189,7 +189,7 @@ class Map(ipyleaflet.Map):
         """Adds a basemap to the map.
 
         Args:
-            basemap (str, optional): Can be one of string from basemap_tiles. Defaults to 'HYBRID'.
+            basemap (str, optional): Can be one of string from leafmap_basemaps. Defaults to 'HYBRID'.
         """
         try:
             layer_names = self.get_layer_names()
@@ -936,12 +936,12 @@ class Map(ipyleaflet.Map):
         self.default_style = {"cursor": "crosshair"}
         self.on_interaction(handle_interaction)
 
-    def split_map(self, left_layer="HYBRID", right_layer="ESRI"):
+    def split_map(self, left_layer="HYBRID", right_layer="OpenStreetMap"):
         """Adds split map.
 
         Args:
             left_layer (str, optional): The layer tile layer. Defaults to 'HYBRID'.
-            right_layer (str, optional): The right tile layer. Defaults to 'ESRI'.
+            right_layer (str, optional): The right tile layer. Defaults to 'OpenStreetMap'.
         """
         try:
             if left_layer in leafmap_basemaps.keys():
@@ -2454,8 +2454,8 @@ def split_map(
     """Creates a split-panel map.
 
     Args:
-        left_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemap_tiles.keys()) or an ipyleaflet Layer instance. Defaults to "ROADMAP".
-        right_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemap_tiles.keys()) or an ipyleaflet Layer instance. . Defaults to "HYBRID".
+        left_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.leafmap_basemaps.keys()) or an ipyleaflet Layer instance. Defaults to "ROADMAP".
+        right_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.leafmap_basemaps.keys()) or an ipyleaflet Layer instance. . Defaults to "HYBRID".
         left_label (str, optional): A label for the left layer to be shown on the map. Defaults to None.
         right_label (str, optional): A label for the right layer to be shown on the map. . Defaults to None.
         label_position (str, optional): Position of the labels, can be either "top" or "bottom". Defaults to "bottom".

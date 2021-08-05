@@ -405,9 +405,9 @@ class TestLeafmap(unittest.TestCase):
     def test_split_map(self):
         """Check split-panel map"""
         m = leafmap.Map()
-        m.split_map(left_layer="HYBRID", right_layer="ESRI")
+        m.split_map(left_layer="HYBRID", right_layer="OpenStreetMap")
         out_str = m.to_html()
-        assert "ESRI" in out_str
+        assert "OpenStreetMap" in out_str
 
     def test_to_html(self):
         """Check map to html"""
@@ -470,10 +470,6 @@ class TestLeafmap(unittest.TestCase):
 
         self.assertEqual(m.n_rows, 1)
         self.assertEqual(m.n_columns, 2)
-
-    # def test_basemap_tiles(self):
-
-    #     self.assertIsInstance(leafmap.basemap_tiles.to_dict(), dict)
 
 
 if __name__ == "__main__":
