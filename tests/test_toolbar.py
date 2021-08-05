@@ -22,7 +22,7 @@ class TestToolbar(unittest.TestCase):
         change_basemap(m)
         out_str = m.to_html()
         assert "Google Terrain" in out_str
-        assert "ESRI" in out_str
+        assert "OpenStreetMap" in out_str
         assert "FWS NWI Wetlands" in out_str
         assert "NLCD 2016 CONUS Land Cover" in out_str
 

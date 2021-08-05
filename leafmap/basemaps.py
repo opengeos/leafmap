@@ -383,4 +383,4 @@ def xyz_to_heremap():
 
 leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
-heremap_basemaps = Box(xyz_to_heremap(), frozen_box=True)
+here_basemaps = Box(xyz_to_heremap(), frozen_box=True)
