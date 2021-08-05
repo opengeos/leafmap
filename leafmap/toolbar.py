@@ -841,15 +841,21 @@ def change_basemap(m):
     Args:
         m (object): leafmap.Map.
     """
-    from .basemaps import leaf_basemaps
+    from .basemaps import leafmap_basemaps, get_xyz_dict
 
-    value = "OpenStreetMap.Mapnik"
-    if len(m.layers) > 0:
-        if m.layers[0].name in list(leaf_basemaps.keys()):
-            value = m.layers[0].name
+    xyz_dict = get_xyz_dict()
+
+    layers = list(m.layers)
+    if len(layers) == 1:
+        layers = [layers[0]] + [leafmap_basemaps["OpenStreetMap"]]
+    elif len(layers) > 1 and (layers[1].name != "OpenStreetMap"):
+        layers = [layers[0]] + [leafmap_basemaps["OpenStreetMap"]] + layers[1:]
+    m.layers = layers
+
+    value = "OpenStreetMap"
 
     dropdown = widgets.Dropdown(
-        options=list(leaf_basemaps.keys()),
+        options=list(leafmap_basemaps.keys()),
         value=value,
         layout=widgets.Layout(width="200px"),
     )
@@ -865,12 +871,13 @@ def change_basemap(m):
 
     def on_click(change):
         basemap_name = change["new"]
-
-        if len(m.layers) == 1:
-            old_basemap = m.layers[0]
-        else:
-            old_basemap = m.layers[1]
-        m.substitute_layer(old_basemap, leaf_basemaps[basemap_name])
+        old_basemap = m.layers[1]
+        m.substitute_layer(old_basemap, leafmap_basemaps[basemap_name])
+        if basemap_name in xyz_dict:
+            if "bounds" in xyz_dict[basemap_name]:
+                bounds = xyz_dict[basemap_name]["bounds"]
+                bounds = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
+                m.zoom_to_bounds(bounds)
 
     dropdown.observe(on_click, "value")
 
@@ -992,11 +999,11 @@ def split_basemaps(
     m, layers_dict=None, left_name=None, right_name=None, width="120px", **kwargs
 ):
 
-    from .basemaps import basemap_tiles
+    from .basemaps import leafmap_basemaps
 
     controls = m.controls
     layers = m.layers
-    m.layers = [m.layers[0]]
+    # m.layers = [m.layers[0]]
     m.clear_controls()
 
     add_zoom = True
@@ -1004,12 +1011,12 @@ def split_basemaps(
 
     if layers_dict is None:
         layers_dict = {}
-        keys = dict(basemap_tiles).keys()
+        keys = dict(leafmap_basemaps).keys()
         for key in keys:
-            if isinstance(basemap_tiles[key], ipyleaflet.WMSLayer):
+            if isinstance(leafmap_basemaps[key], ipyleaflet.WMSLayer):
                 pass
             else:
-                layers_dict[key] = basemap_tiles[key]
+                layers_dict[key] = leafmap_basemaps[key]
 
     keys = list(layers_dict.keys())
     if left_name is None:
@@ -1048,6 +1055,7 @@ def split_basemaps(
     def close_btn_click(change):
         if change["new"]:
             m.controls = controls
+            m.clear_layers()
             m.layers = layers
 
     close_button.observe(close_btn_click, "value")
