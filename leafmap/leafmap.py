@@ -3,7 +3,7 @@
 import os
 import ipyleaflet
 from IPython.display import display
-from .basemaps import basemap_tiles
+from .basemaps import leafmap_basemaps
 from .common import *
 from .legends import builtin_legends
 from .osm import *
@@ -98,25 +98,24 @@ class Map(ipyleaflet.Map):
         if kwargs["scale_control"]:
             self.add_control(ipyleaflet.ScaleControl(position="bottomleft"))
 
-        self.clear_layers()
-        self.add_layer(basemap_tiles["OpenStreetMap"])
+        self.layers[0].name = "OpenStreetMap"
 
         if "google_map" not in kwargs:
             pass
         elif kwargs["google_map"] is not None:
             if kwargs["google_map"].upper() == "ROADMAP":
-                layer = basemap_tiles["ROADMAP"]
+                layer = leafmap_basemaps["ROADMAP"]
             elif kwargs["google_map"].upper() == "HYBRID":
-                layer = basemap_tiles["HYBRID"]
+                layer = leafmap_basemaps["HYBRID"]
             elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = basemap_tiles["TERRAIN"]
+                layer = leafmap_basemaps["TERRAIN"]
             elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = basemap_tiles["SATELLITE"]
+                layer = leafmap_basemaps["SATELLITE"]
             else:
                 print(
                     f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
                 )
-                layer = basemap_tiles["ROADMAP"]
+                layer = leafmap_basemaps["ROADMAP"]
             self.add_layer(layer)
 
         if "toolbar_control" not in kwargs:
@@ -195,25 +194,26 @@ class Map(ipyleaflet.Map):
         try:
             layer_names = self.get_layer_names()
             if (
-                basemap in basemap_tiles
-                and basemap_tiles[basemap].name not in layer_names
+                basemap in leafmap_basemaps
+                and leafmap_basemaps[basemap].name not in layer_names
             ):
-                self.add_layer(basemap_tiles[basemap])
+                self.add_layer(leafmap_basemaps[basemap])
             elif (
-                basemap in basemap_tiles and basemap_tiles[basemap].name in layer_names
+                basemap in leafmap_basemaps
+                and leafmap_basemaps[basemap].name in layer_names
             ):
                 print(f"{basemap} has been already added before.")
             else:
                 print(
                     "Basemap can only be one of the following:\n  {}".format(
-                        "\n  ".join(basemap_tiles.keys())
+                        "\n  ".join(leafmap_basemaps.keys())
                     )
                 )
 
         except Exception:
             raise ValueError(
                 "Basemap can only be one of the following:\n  {}".format(
-                    "\n  ".join(basemap_tiles.keys())
+                    "\n  ".join(leafmap_basemaps.keys())
                 )
             )
 
@@ -893,7 +893,7 @@ class Map(ipyleaflet.Map):
             attribution_control=False,
             zoom=zoom,
             center=self.center,
-            layers=[basemap_tiles["ROADMAP"]],
+            layers=[leafmap_basemaps["ROADMAP"]],
         )
         minimap.layout.width = "150px"
         minimap.layout.height = "150px"
@@ -944,11 +944,11 @@ class Map(ipyleaflet.Map):
             right_layer (str, optional): The right tile layer. Defaults to 'ESRI'.
         """
         try:
-            if left_layer in basemap_tiles.keys():
-                left_layer = basemap_tiles[left_layer]
+            if left_layer in leafmap_basemaps.keys():
+                left_layer = leafmap_basemaps[left_layer]
 
-            if right_layer in basemap_tiles.keys():
-                right_layer = basemap_tiles[right_layer]
+            if right_layer in leafmap_basemaps.keys():
+                right_layer = leafmap_basemaps[right_layer]
 
             control = ipyleaflet.SplitMapControl(
                 left_layer=left_layer, right_layer=right_layer
@@ -962,7 +962,7 @@ class Map(ipyleaflet.Map):
     def basemap_demo(self):
         """A demo for using leafmap basemaps."""
         dropdown = widgets.Dropdown(
-            options=list(basemap_tiles.keys()),
+            options=list(leafmap_basemaps.keys()),
             value="HYBRID",
             description="Basemaps",
         )
@@ -970,7 +970,7 @@ class Map(ipyleaflet.Map):
         def on_click(change):
             basemap_name = change["new"]
             old_basemap = self.layers[-1]
-            self.substitute_layer(old_basemap, basemap_tiles[basemap_name])
+            self.substitute_layer(old_basemap, leafmap_basemaps[basemap_name])
 
         dropdown.observe(on_click, "value")
         basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
@@ -2413,8 +2413,8 @@ def linked_maps(
                 **kwargs,
             )
 
-            if layers[index] in basemap_tiles:
-                m.add_layer(basemap_tiles[layers[index]])
+            if layers[index] in leafmap_basemaps:
+                m.add_layer(leafmap_basemaps[layers[index]])
             else:
                 try:
                     m.add_layer(layers[index])
@@ -2477,10 +2477,10 @@ def split_map(
     if "scale_control" not in kwargs:
         kwargs["scale_control"] = False
 
-    if left_layer in basemap_tiles:
-        left_layer = basemap_tiles[left_layer]
-    if right_layer in basemap_tiles:
-        right_layer = basemap_tiles[right_layer]
+    if left_layer in leafmap_basemaps:
+        left_layer = leafmap_basemaps[left_layer]
+    if right_layer in leafmap_basemaps:
+        right_layer = leafmap_basemaps[right_layer]
 
     m = Map(**kwargs)
 
@@ -2551,12 +2551,12 @@ def ts_inspector(
 
     if layers_dict is None:
         layers_dict = {}
-        keys = dict(basemap_tiles).keys()
+        keys = dict(leafmap_basemaps).keys()
         for key in keys:
-            if isinstance(basemap_tiles[key], ipyleaflet.WMSLayer):
+            if isinstance(leafmap_basemaps[key], ipyleaflet.WMSLayer):
                 pass
             else:
-                layers_dict[key] = basemap_tiles[key]
+                layers_dict[key] = leafmap_basemaps[key]
 
     keys = list(layers_dict.keys())
     if left_name is None:
