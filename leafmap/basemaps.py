@@ -264,7 +264,7 @@ def xyz_to_leaflet():
         name = wms_tiles[key]["name"]
         url = wms_tiles[key]["url"]
         layers = wms_tiles[key]["layers"]
-        fnt = wms_tiles[key]["format"]
+        fmt = wms_tiles[key]["format"]
         transparent = wms_tiles[key]["transparent"]
         attribution = wms_tiles[key]["attribution"]
         leaflet_dict[key] = ipyleaflet.WMSLayer(
@@ -272,7 +272,7 @@ def xyz_to_leaflet():
             layers=layers,
             name=name,
             attribution=attribution,
-            format=fnt,
+            format=fmt,
             transparent=transparent,
         )
 
@@ -313,6 +313,24 @@ def xyz_to_folium():
             tiles=url,
             attr=attribution,
             name=name,
+            overlay=True,
+            control=True,
+        )
+
+    for key in wms_tiles:
+        name = wms_tiles[key]["name"]
+        url = wms_tiles[key]["url"]
+        layers = wms_tiles[key]["layers"]
+        fmt = wms_tiles[key]["format"]
+        transparent = wms_tiles[key]["transparent"]
+        attribution = wms_tiles[key]["attribution"]
+        folium_dict[key] = folium.WmsTileLayer(
+            url=url,
+            layers=layers,
+            name=name,
+            attr=attribution,
+            fmt=fmt,
+            transparent=transparent,
             overlay=True,
             control=True,
         )
