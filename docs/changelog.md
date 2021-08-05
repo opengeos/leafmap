@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.4.1 - August 4, 2021
+
+**New Features**:
+
+-   Added 200+ basemaps from xyzservices [#91](https://github.com/giswqs/leafmap/issues/91)
+
+**Improvement**
+
+-   Fixed typo [#90](https://github.com/giswqs/leafmap/pull/90)
+-   Added kepler module to mkdocs
+-   Removed support for Python 3.6 due to xyzservices
+
 ## v0.4.0 - July 28, 2021
 
 **New Features**:
