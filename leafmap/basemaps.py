@@ -11,6 +11,7 @@ More WMS basemaps can be found at the following websites:
 """
 import collections
 import os
+import requests
 import folium
 import here_map_widget
 import ipyleaflet
@@ -397,6 +398,45 @@ def xyz_to_heremap():
     heremap_dict.update(here_tiles)
 
     return heremap_dict
+
+
+def search_qms(keywords, limit=10):
+    """Search qms files for keywords. Reference: https://github.com/geopandas/xyzservices/issues/65
+
+    Args:
+        keywords (str): Keywords to search for.
+        limit (int): Number of results to return.
+    """
+    QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
+
+    services = requests.get(
+        f"{QMS_API}/?search={keywords}&type=tms&epsg=3857&limit={str(limit)}"
+    )
+    services = services.json()
+    if services["count"] == 0:
+        return None
+    elif services["count"] <= limit:
+        return services["results"]
+    else:
+        return services["results"][:limit]
+
+
+def get_qms(service_id):
+
+    QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
+    service_details = requests.get(f"{QMS_API}/{service_id}")
+    return service_details.json()
+
+
+def qms_to_leafmap(service_id):
+
+    service_details = get_qms(service_id)
+    name = service_details["name"]
+    url = service_details["url"]
+    attribution = service_details["copyright_text"]
+
+    layer = ipyleaflet.TileLayer(url=url, name=name, attribution=attribution)
+    return layer
 
 
 leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
