@@ -1,9 +1,6 @@
 """Module of sample legends for some commonly used geospatial datasets.
 """
 
-import os
-
-
 # Land Cover datasets in Earth Engine https://developers.google.com/earth-engine/datasets/tags/landcover
 builtin_legends = {
     # National Land Cover Database 2016 (NLCD2016) Legend https://www.mrlc.gov/data/legends/national-land-cover-database-2016-nlcd2016-legend
