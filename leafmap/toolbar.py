@@ -5,7 +5,6 @@ import os
 import ipyevents
 import ipyleaflet
 import ipywidgets as widgets
-from IPython.display import display
 from ipyfilechooser import FileChooser
 from .common import *
 

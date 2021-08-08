@@ -626,7 +626,6 @@ def csv_points_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude
         longitude (str, optional): Column name for the longitude column. Defaults to 'longitude'.
 
     """
-    import whitebox
 
     if in_csv.startswith("http") and in_csv.endswith(".csv"):
         out_dir = os.path.join(os.path.expanduser("~"), "Downloads")

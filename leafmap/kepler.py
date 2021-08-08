@@ -93,8 +93,6 @@ class Map(keplergl.KeplerGl):
             FileNotFoundError: The provided GeoJSON file could not be found.
             TypeError: The input geojson must be a type of str or dict.
         """
-        import json
-        import requests
 
         if "encoding" in kwargs:
             encoding = kwargs["encoding"]
