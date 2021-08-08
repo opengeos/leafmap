@@ -404,6 +404,32 @@ class Map(keplergl.KeplerGl):
         except Exception as e:
             raise Exception(e)
 
+    def to_streamlit(self, width=700, height=500, scrolling=False, **kwargs):
+        """Renders `keplergl.KeplerGl` map figure in a Streamlit app.
+
+        Args:
+            width (int, optional): Width of the map. Defaults to 800.
+            height (int, optional): Height of the map. Defaults to 600.
+            scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
+
+        Raises:
+            ImportError: If streamlit-folium is not installed.
+
+        Returns:
+            streamlit.components: components.html object.
+        """
+
+        try:
+            from streamlit_keplergl import keplergl_static
+
+            return keplergl_static(
+                self, width=width, height=height, scrolling=scrolling
+            )
+        except ImportError:
+            raise ImportError(
+                "streamlit-keplergl is not installed. You need to install streamlit-keplergl first using 'pip install streamlit_keplergl'. See https://github.com/chrieke/streamlit-keplergl"
+            )
+
     def load_config(self, config=None):
         """Loads a kepler.gl config file.
 

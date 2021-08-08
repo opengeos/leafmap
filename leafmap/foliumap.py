@@ -1384,6 +1384,32 @@ class Map(folium.Map):
             os.remove(outfile)
             return out_html
 
+    def to_streamlit(self, width=700, height=500, add_layer_control=True, **kwargs):
+        """Renders `folium.Figure` or `folium.Map` in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
+
+        Args:
+            width (int, optional): Width of the map. Defaults to 800.
+            height (int, optional): Height of the map. Defaults to 600.
+            add_layer_control (bool, optional): Whether to add the layer control. Defaults to True.
+
+        Raises:
+            ImportError: If streamlit-folium is not installed.
+
+        Returns:
+            streamlit.components: components.html object.
+        """
+
+        try:
+            from streamlit_folium import folium_static
+
+            if add_layer_control:
+                self.add_layer_control()
+            return folium_static(self, width=width, height=height)
+        except ImportError:
+            raise ImportError(
+                "streamlit-folium is not installed. You need to install streamlit-folium first using 'pip install streamlit-folium'. See https://github.com/randyzwitch/streamlit-folium"
+            )
+
     def add_title(self, title, align="center", font_size="16px", style=None):
         """Adds a title to the map.
 
