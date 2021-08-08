@@ -10,7 +10,7 @@ import requests
 import here_map_widget
 import ipywidgets as widgets
 from .basemaps import here_basemaps
-from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
+from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson
 
 from here_map_widget import (
     FullscreenControl,
