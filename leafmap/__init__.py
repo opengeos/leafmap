@@ -7,7 +7,7 @@ __version__ = "0.4.1"
 import os
 
 
-def __in_colab_shell():
+def _in_colab_shell():
     """Tests if the code is being executed within Google Colab."""
     import sys
 
@@ -17,7 +17,7 @@ def __in_colab_shell():
         return False
 
 
-def __use_folium():
+def _use_folium():
     """Whether to use the folium or ipyleaflet plotting backend."""
     if os.environ.get("USE_FOLIUM") is not None:
         return True
@@ -25,7 +25,7 @@ def __use_folium():
         return False
 
 
-if __in_colab_shell() or __use_folium():
+if _use_folium():
     from .foliumap import *
 else:
     from .leafmap import *
