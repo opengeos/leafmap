@@ -1,8 +1,9 @@
 """Main module."""
 
 import os
+import sys
 import ipyleaflet
-from IPython.display import display
+from IPython.display import display, Javascript
 from .basemaps import leafmap_basemaps
 from .common import *
 from .legends import builtin_legends
@@ -46,8 +47,12 @@ class Map(ipyleaflet.Map):
         if "height" not in kwargs:
             self.layout.height = "600px"
         else:
+            if isinstance(kwargs["height"], int):
+                kwargs["height"] = str(kwargs["height"]) + "px"
             self.layout.height = kwargs["height"]
         if "width" in kwargs:
+            if isinstance(kwargs["width"], int):
+                kwargs["width"] = str(kwargs["width"]) + "px"
             self.layout.width = kwargs["width"]
 
         if "layers_control" not in kwargs:
@@ -127,6 +132,19 @@ class Map(ipyleaflet.Map):
 
         if "use_voila" not in kwargs:
             kwargs["use_voila"] = False
+
+    def _repr_mimebundle_(self, **kwargs):
+        """Check if run on Colab. Reference: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_
+        https://github.com/googlecolab/colabtools/issues/498#issuecomment-910755873
+        """
+        if "google.colab" in sys.modules:
+            display(
+                Javascript(
+                    """
+            google.colab.widgets.installCustomManager('https://ssl.gstatic.com/colaboratory-static/widgets/colab-cdn-widget-manager/6a14374f468a145a/manager.min.js');
+            """
+                )
+            )
 
     def set_center(self, lon, lat, zoom=None):
         """Centers the map view at a given coordinates with the given zoom level.
@@ -1483,6 +1501,24 @@ class Map(ipyleaflet.Map):
 
         screenshot = screen_capture(outfile, monitor)
         self.screenshot = screenshot
+
+    def to_streamlit(self, width=700, height=500, scrolling=False, **kwargs):
+        """Renders map figure in a Streamlit app.
+
+        Args:
+            width (int, optional): Width of the map. Defaults to 800.
+            height (int, optional): Height of the map. Defaults to 600.
+            scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
+
+        Returns:
+            streamlit.components: components.html object.
+        """
+
+        import streamlit.components.v1 as components
+
+        return components.html(
+            self.to_html(), width=width, height=height, scrolling=scrolling
+        )
 
     def toolbar_reset(self):
         """Reset the toolbar so that no tool is selected."""
