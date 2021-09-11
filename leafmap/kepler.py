@@ -204,9 +204,11 @@ class Map(keplergl.KeplerGl):
             config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
         """
-
-        self.add_data(data=df, name=layer_name)
-        self.load_config(config)
+        try:
+            self.add_data(data=df, name=layer_name)
+            self.load_config(config)
+        except Exception as e:
+            print(e)
 
     def add_csv(
         self,
