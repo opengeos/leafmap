@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.4.2 - September 10, 2021
+
+**New Features**:
+
+-   Changed default plotting backend on Colab from folium to ipyleaflet [#112](https://github.com/giswqs/leafmap/issues/112)
+-   Added streamlit support [#96](https://github.com/giswqs/leafmap/issues/96)
+-   Added support for xyzservices provider [#92](https://github.com/giswqs/leafmap/issues/92)
+-   Added a basemap gallery [#91](https://github.com/giswqs/leafmap/issues/91)
+
+**Improvement**
+
+-   Fixed linked maps bug
+-   Improved folium basemaps [#91](https://github.com/giswqs/leafmap/issues/91)
+
 ## v0.4.1 - August 4, 2021
 
 **New Features**:
