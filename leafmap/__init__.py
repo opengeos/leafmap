@@ -29,3 +29,8 @@ if _use_folium():
     from .foliumap import *
 else:
     from .leafmap import *
+
+    if _in_colab_shell():
+        from google.colab import output
+
+        output.enable_custom_widget_manager()
