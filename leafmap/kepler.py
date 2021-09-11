@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import requests
 import ipywidgets as widgets
 import pandas as pd
@@ -9,6 +10,11 @@ from .osm import *
 
 try:
     import keplergl
+
+    if "google.colab" in sys.modules:
+        from google.colab import output
+
+        output.enable_custom_widget_manager()
 except ImportError:
     raise ImportError(
         "Kepler needs to be installed to use this module. Use 'pip install keplergl' to install the package. See https://docs.kepler.gl/docs/keplergl-jupyter for more details."
@@ -63,23 +69,23 @@ class Map(keplergl.KeplerGl):
             super().__init__(**kwargs)
         self.config = config
 
-    def _repr_mimebundle_(self, include=None, exclude=None):
-        """Display the map in a notebook.
+    # def _repr_mimebundle_(self, include=None, exclude=None):
+    #     """Display the map in a notebook.
 
-        Args:
-            include (list, optional): A list of MIME types to include.
-            exclude (list, optional): A list of MIME types to exclude.
+    #     Args:
+    #         include (list, optional): A list of MIME types to include.
+    #         exclude (list, optional): A list of MIME types to exclude.
 
-        Returns:
-            dict: A dictionary of MIME type keyed dict of MIME type data.
-        """
-        print("hello")
-        # import base64
+    #     Returns:
+    #         dict: A dictionary of MIME type keyed dict of MIME type data.
+    #     """
+    #     print("hello")
+    #     # import base64
 
-        # bundle = super()._repr_mimebundle_(include=include, exclude=exclude)
-        # if bundle["text/html"]:
-        #     bundle["text/html"] = self.display_html()
-        # return bundle
+    #     # bundle = super()._repr_mimebundle_(include=include, exclude=exclude)
+    #     # if bundle["text/html"]:
+    #     #     bundle["text/html"] = self.display_html()
+    #     # return bundle
 
     def add_geojson(self, in_geojson, layer_name="Untitled", config=None, **kwargs):
         """Adds a GeoJSON file to the map.
