@@ -44,6 +44,13 @@ class Map(ipyleaflet.Map):
         self.draw_features = []
         self.api_keys = {}
 
+        if "sandbox_path" not in kwargs: # sandbox path for Voila app to restrict access to system directories.
+            self.sandbox_path = None
+        else:
+            if os.path.exists(os.path.abspath(kwargs["sandbox_path"])):
+                self.sandbox_path = kwargs["sandbox_path"]
+            else:
+                print('The sandbox path is invalid.')
         if "height" not in kwargs:
             self.layout.height = "600px"
         else:
