@@ -249,7 +249,7 @@ def main_toolbar(m):
         },
     }
 
-    if os.environ.get("USE_VOILA") is not None:
+    if m.sandbox_path is None and (os.environ.get("USE_VOILA") is not None):
         voila_tools = ["camera", "folder-open", "gears"]
 
         for item in voila_tools:
@@ -277,7 +277,7 @@ def main_toolbar(m):
             for i in range(len(icons))
         ],
         layout=widgets.Layout(
-            width="107px",
+            width="109px",
             grid_template_columns=(icon_width + " ") * n_cols,
             grid_template_rows=(icon_height + " ") * n_rows,
             grid_gap="1px 1px",
@@ -523,6 +523,8 @@ def open_data_widget(m):
     file_chooser = FileChooser(os.getcwd())
     file_chooser.filter_pattern = "*.shp"
     file_chooser.use_dir_icons = True
+    if m.sandbox_path is not None:
+        file_chooser.sandbox_path = m.sandbox_path
 
     layer_name = widgets.Text(
         value="Shapefile",
@@ -918,6 +920,10 @@ def save_map(m):
     )
 
     file_chooser = FileChooser(os.getcwd())
+
+    if m.sandbox_path is not None:
+        file_chooser.sandbox_path = m.sandbox_path
+
     file_chooser.default_filename = "my_map.html"
     file_chooser.use_dir_icons = True
 
