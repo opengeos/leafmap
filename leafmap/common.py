@@ -22,20 +22,21 @@ class WhiteboxTools(whitebox.WhiteboxTools):
         super().__init__(**kwargs)
 
 
-def whiteboxgui(verbose=True, tree=False, reset=False):
+def whiteboxgui(verbose=True, tree=False, reset=False, sandbox_path=None):
     """Shows the WhiteboxTools GUI.
 
     Args:
         verbose (bool, optional): Whether to show progress info when the tool is running. Defaults to True.
         tree (bool, optional): Whether to use the tree mode toolbox built using ipytree rather than ipywidgets. Defaults to False.
         reset (bool, optional): Whether to regenerate the json file with the dictionary containing the information for all tools. Defaults to False.
+        sandbox_path (str, optional): The path to the sandbox folder. Defaults to None.
 
     Returns:
         object: A toolbox GUI.
     """
     import whiteboxgui
 
-    return whiteboxgui.show(verbose, tree, reset)
+    return whiteboxgui.show(verbose, tree, reset, sandbox_path)
 
 
 def _in_colab_shell():
