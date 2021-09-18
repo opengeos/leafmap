@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.3 - September 17, 2021
+
+**New Features**:
+
+-   Added `sandbox_path` option allowing users to restrict Voila app access to system directories [#113](https://github.com/giswqs/leafmap/issues/113)
+
 ## v0.4.2 - September 10, 2021
 
 **New Features**:
