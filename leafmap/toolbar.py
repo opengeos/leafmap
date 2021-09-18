@@ -249,12 +249,12 @@ def main_toolbar(m):
         },
     }
 
-    if m.sandbox_path is None and (os.environ.get("USE_VOILA") is not None):
-        voila_tools = ["camera", "folder-open", "gears"]
+    # if m.sandbox_path is None and (os.environ.get("USE_VOILA") is not None):
+    #     voila_tools = ["camera", "folder-open", "gears"]
 
-        for item in voila_tools:
-            if item in tools.keys():
-                del tools[item]
+    #     for item in voila_tools:
+    #         if item in tools.keys():
+    #             del tools[item]
 
     icons = list(tools.keys())
     tooltips = [item["tooltip"] for item in list(tools.values())]
@@ -315,7 +315,10 @@ def main_toolbar(m):
 
                 tools_dict = wbt.get_wbt_dict()
                 wbt_toolbox = wbt.build_toolbox(
-                    tools_dict, max_width="800px", max_height="500px"
+                    tools_dict,
+                    max_width="800px",
+                    max_height="500px",
+                    sandbox_path=m.sandbox_path,
                 )
                 wbt_control = ipyleaflet.WidgetControl(
                     widget=wbt_toolbox, position="bottomright"
@@ -520,11 +523,9 @@ def open_data_widget(m):
     )
     http_widget = widgets.HBox()
 
-    file_chooser = FileChooser(os.getcwd())
+    file_chooser = FileChooser(os.getcwd(), sandbox_path=m.sandbox_path)
     file_chooser.filter_pattern = "*.shp"
     file_chooser.use_dir_icons = True
-    if m.sandbox_path is not None:
-        file_chooser.sandbox_path = m.sandbox_path
 
     layer_name = widgets.Text(
         value="Shapefile",
@@ -919,11 +920,7 @@ def save_map(m):
         ],
     )
 
-    file_chooser = FileChooser(os.getcwd())
-
-    if m.sandbox_path is not None:
-        file_chooser.sandbox_path = m.sandbox_path
-
+    file_chooser = FileChooser(os.getcwd(), sandbox_path=m.sandbox_path)
     file_chooser.default_filename = "my_map.html"
     file_chooser.use_dir_icons = True
 

@@ -44,13 +44,19 @@ class Map(ipyleaflet.Map):
         self.draw_features = []
         self.api_keys = {}
 
-        if "sandbox_path" not in kwargs: # sandbox path for Voila app to restrict access to system directories.
-            self.sandbox_path = None
+        # sandbox path for Voila app to restrict access to system directories.
+        if "sandbox_path" not in kwargs:
+            if os.environ.get("USE_VOILA") is not None:
+                self.sandbox_path = os.getcwd()
+            else:
+                self.sandbox_path = None
         else:
             if os.path.exists(os.path.abspath(kwargs["sandbox_path"])):
                 self.sandbox_path = kwargs["sandbox_path"]
             else:
-                print('The sandbox path is invalid.')
+                print("The sandbox path is invalid.")
+                self.sandbox_path = None
+
         if "height" not in kwargs:
             self.layout.height = "600px"
         else:
@@ -139,19 +145,6 @@ class Map(ipyleaflet.Map):
 
         if "use_voila" not in kwargs:
             kwargs["use_voila"] = False
-
-    def _repr_mimebundle_(self, **kwargs):
-        """Check if run on Colab. Reference: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_
-        https://github.com/googlecolab/colabtools/issues/498#issuecomment-910755873
-        """
-        if "google.colab" in sys.modules:
-            display(
-                Javascript(
-                    """
-            google.colab.widgets.installCustomManager('https://ssl.gstatic.com/colaboratory-static/widgets/colab-cdn-widget-manager/6a14374f468a145a/manager.min.js');
-            """
-                )
-            )
 
     def set_center(self, lon, lat, zoom=None):
         """Centers the map view at a given coordinates with the given zoom level.
