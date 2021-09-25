@@ -220,7 +220,7 @@ class Map(keplergl.KeplerGl):
         """Adds a CSV to the map.
 
         Args:
-            csv (DataFrame): File path to the CSV.
+            csv (str): File path to the CSV.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
