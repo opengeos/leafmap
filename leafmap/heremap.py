@@ -99,8 +99,7 @@ class Map(here_map_widget.Map):
         """Zooms to a bounding box in the form of [south, west, north, east].
 
         Args:
-            bounds (list | tuple): A list/tuple containing south, west, north, east values for the
-            bounds.
+            bounds (list | tuple): A list/tuple containing south, west, north, east values for the bounds.
         """
         self.bounds = tuple(bounds)
 
@@ -190,23 +189,15 @@ class Map(here_map_widget.Map):
         """Adds a GeoJSON file to the map.
 
         Args:
-            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a
-            dictionary containing the geojson.
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature,
-            and should return the feature style. This styling function takes the feature
-            as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons.
-            Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
-            Any value other than "on_hover" or "on_click" will be treated as None.
-            Defaults to "on_hover".
-            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
-            default Markers will be shown.
-            default_popup: If set to True this will disable info_mode and default popup will be
-            shown on clicking the feature.
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be shown on clicking the feature.
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
@@ -347,18 +338,11 @@ class Map(here_map_widget.Map):
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature,
-            and should return the feature style. This styling function takes the feature as
-            argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons.
-            Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
-            Any value other than "on_hover" or "on_click" will be treated as None.
-            Defaults to "on_hover".
-            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
-            default Markers will be shown.
-            default_popup: If set to True this will disable info_mode and default popup will be
-            shown on clicking the feature.
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be shown on clicking the feature.
 
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
@@ -400,19 +384,12 @@ class Map(here_map_widget.Map):
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature,
-            and should return the feature style. This styling function takes
-            the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons.
-            Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
-            Any value other than "on_hover" or "on_click" will be treated as None.
-            Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
-            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
-            default Markers will be shown.
-            default_popup: If set to True this will disable info_mode and default popup will be
-            shown on clicking the feature.
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be shown on clicking the feature.
         """
         data = gdf_to_geojson(gdf, epsg="4326")
         self.add_geojson(
@@ -456,18 +433,11 @@ class Map(here_map_widget.Map):
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature,
-            and should return the feature style. This styling function takes the feature
-            as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons.
-            Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
-            Any value other than "on_hover" or "on_click" will be treated as None.
-            Defaults to "on_hover".
-            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
-            default Markers will be shown.
-            default_popup: If set to True this will disable info_mode and default popup will be
-            shown on clicking the feature.
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be shown on clicking the feature.
 
         Raises:
             FileNotFoundError: The provided KML file could not be found.
@@ -507,33 +477,18 @@ class Map(here_map_widget.Map):
         """Adds any geopandas-supported vector dataset to the map.
 
         Args:
-            filename (str): Either the absolute or relative path to the file or URL to be opened,
-            or any object with a read() method (such as an open file or StringIO).
+            filename (str): Either the absolute or relative path to the file or URL to be opened, or any object with a read() method (such as an open file or StringIO).
             layer_name (str, optional): The layer name to use. Defaults to "Untitled".
-            bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features
-            by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry.
-            CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame.
-            Cannot be used with mask. Defaults to None.
-            mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for
-            features that intersect with the given dict-like geojson geometry, GeoSeries,
-            GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or
-            GeoDataFrame. Cannot be used with bbox. Defaults to None.
-            rows (int or slice, optional): Load in specific rows by passing an integer
-            (first n rows) or a slice() object.. Defaults to None.
+            bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
+            mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
+            rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature,
-            and should return the feature style. This styling function takes the feature as
-            argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons.
-            Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
-            Any value other than "on_hover" or "on_click" will be treated as None.
-            Defaults to "on_hover".
-            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided
-            default Markers will be shown.
-            default_popup: If set to True this will disable info_mode and default popup will be
-            shown on clicking the feature.
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            point_style (dict, optional): style dictionary for Points in GeoJSON. If not provided default Markers will be shown.
+            default_popup: If set to True this will disable info_mode and default popup will be shown on clicking the feature.
 
         """
         if not filename.startswith("http"):
