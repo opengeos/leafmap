@@ -2,9 +2,9 @@
 
 More WMS basemaps can be found at the following websites:
 
-1. USGS National Map: https://viewer.nationalmap.gov/services/
+1. USGS National Map: https://viewer.nationalmap.gov/services
 
-2. MRLC NLCD Land Cover data: https://viewer.nationalmap.gov/services/
+2. MRLC NLCD Land Cover data: https://www.mrlc.gov/data-services-page
 
 3. FWS NWI Wetlands data: https://www.fws.gov/wetlands/Data/Web-Map-Services.html
 
@@ -17,7 +17,7 @@ import here_map_widget
 import ipyleaflet
 import xyzservices.providers as xyz
 from box import Box
-from .common import planet_tiles
+from .common import planet_tiles_tropical
 
 # Custom XYZ tile services.
 xyz_tiles = {
@@ -292,7 +292,7 @@ def xyz_to_leaflet():
 
     if os.environ.get("PLANET_API_KEY") is not None:
 
-        planet_dict = planet_tiles(tile_format="ipyleaflet")
+        planet_dict = planet_tiles_tropical(tile_format="ipyleaflet")
         leaflet_dict.update(planet_dict)
 
     return leaflet_dict
@@ -356,7 +356,7 @@ def xyz_to_folium():
 
     if os.environ.get("PLANET_API_KEY") is not None:
 
-        planet_dict = planet_tiles(tile_format="folium")
+        planet_dict = planet_tiles_tropical(tile_format="folium")
         folium_dict.update(planet_dict)
 
     return folium_dict
