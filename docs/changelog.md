@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.5.0 - September 26, 2021
+
+**New Features**:
+
+-   Added FOSS4G workshop notebook
+
+**Improvement**
+
+-   Updated binder env
+-   Updated Google Analytics
+-   Added nbconvert to docs build
+
 ## v0.4.3 - September 17, 2021
 
 **New Features**:
