@@ -83,6 +83,7 @@ class TestLeafmap(unittest.TestCase):
                 host="localhost",
                 user=None,
                 password=None,
+                port=5432,
                 use_env_var=True,
             )
             sql = "SELECT * FROM nyc_neighborhoods"
