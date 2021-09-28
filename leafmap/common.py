@@ -1746,7 +1746,7 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
 
 
 def connect_postgis(
-    database, host="localhost", user=None, password=None, use_env_var=False
+    database, host="localhost", user=None, password=None, port=5432, use_env_var=False
 ):
     """Connects to a PostGIS database.
 
@@ -1755,6 +1755,7 @@ def connect_postgis(
         host (str, optional): Hosting server for the database. Defaults to "localhost".
         user (str, optional): User name to access the database. Defaults to None.
         password (str, optional): Password to access the database. Defaults to None.
+        port (int, optional): Port number to connect to at the server host. Defaults to 5432.
         use_env_var (bool, optional): Whether to use environment variables. It set to True, user and password are treated as an environment variables with default values user="SQL_USER" and password="SQL_PASSWORD". Defaults to False.
 
     Raises:
@@ -1788,7 +1789,7 @@ def connect_postgis(
         if password is None:
             raise ValueError("password is not specified.")
 
-    connection_string = f"postgresql://{user}:{password}@{host}/{database}"
+    connection_string = f"postgresql://{user}:{password}@{host}:{port}/{database}"
     engine = create_engine(connection_string)
 
     return engine
