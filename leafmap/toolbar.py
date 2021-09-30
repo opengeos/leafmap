@@ -1000,7 +1000,15 @@ def save_map(m):
 def split_basemaps(
     m, layers_dict=None, left_name=None, right_name=None, width="120px", **kwargs
 ):
+    """Create a split-panel map for visualizing two maps.
 
+    Args:
+        m (ipyleaflet.Map): An ipyleaflet map object.
+        layers_dict (dict, optional): A dictionary of TileLayers. Defaults to None.
+        left_name (str, optional): The default value of the left dropdown list. Defaults to None.
+        right_name (str, optional): The default value of the right dropdown list. Defaults to None.
+        width (str, optional): The width of the dropdown list. Defaults to "120px".
+    """
     from .basemaps import leafmap_basemaps
 
     controls = m.controls
