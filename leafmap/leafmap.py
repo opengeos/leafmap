@@ -1412,7 +1412,7 @@ class Map(ipyleaflet.Map):
         add_layer_control=True,
         **kwargs,
     ):
-        """Saves the map as a HTML file.
+        """Saves the map as an HTML file.
 
         Args:
             outfile (str, optional): The output file path to the HTML file.
@@ -1506,8 +1506,8 @@ class Map(ipyleaflet.Map):
         """Renders map figure in a Streamlit app.
 
         Args:
-            width (int, optional): Width of the map. Defaults to 800.
-            height (int, optional): Height of the map. Defaults to 600.
+            width (int, optional): Width of the map. Defaults to 700.
+            height (int, optional): Height of the map. Defaults to 500.
             scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
 
         Returns:

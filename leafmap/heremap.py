@@ -10,7 +10,7 @@ import requests
 import here_map_widget
 import ipywidgets as widgets
 from .basemaps import here_basemaps
-from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson
+from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
 
 from here_map_widget import (
     FullscreenControl,
@@ -540,3 +540,91 @@ class Map(here_map_widget.Map):
                 point_style=point_style,
                 default_popup=default_popup,
             )
+
+    def to_html(
+        self,
+        outfile=None,
+        title="My Map",
+        width="100%",
+        height="880px",
+        **kwargs,
+    ):
+        """Saves the map as an HTML file.
+
+        Args:
+            outfile (str, optional): The output file path to the HTML file.
+            title (str, optional): The title of the HTML file. Defaults to 'My Map'.
+            width (str, optional): The width of the map in pixels or percentage. Defaults to '100%'.
+            height (str, optional): The height of the map in pixels. Defaults to '880px'.
+
+        """
+        try:
+            from ipywidgets.embed import embed_minimal_html
+
+            save = True
+            if outfile is not None:
+                if not outfile.endswith(".html"):
+                    raise ValueError("The output file extension must be html.")
+                outfile = os.path.abspath(outfile)
+                out_dir = os.path.dirname(outfile)
+                if not os.path.exists(out_dir):
+                    os.makedirs(out_dir)
+            else:
+                outfile = os.path.abspath(random_string() + ".html")
+                save = False
+
+            before_width = self.layout.width
+            before_height = self.layout.height
+
+            if not isinstance(width, str):
+                print("width must be a string.")
+                return
+            elif width.endswith("px") or width.endswith("%"):
+                pass
+            else:
+                print("width must end with px or %")
+                return
+
+            if not isinstance(height, str):
+                print("height must be a string.")
+                return
+            elif not height.endswith("px"):
+                print("height must end with px")
+                return
+
+            self.layout.width = width
+            self.layout.height = height
+
+            embed_minimal_html(outfile, views=[self], title=title, **kwargs)
+
+            self.layout.width = before_width
+            self.layout.height = before_height
+
+            if not save:
+                out_html = ""
+                with open(outfile) as f:
+                    lines = f.readlines()
+                    out_html = "".join(lines)
+                os.remove(outfile)
+                return out_html
+
+        except Exception as e:
+            raise Exception(e)
+
+    def to_streamlit(self, width=700, height=500, scrolling=False, **kwargs):
+        """Renders map figure in a Streamlit app.
+
+        Args:
+            width (int, optional): Width of the map. Defaults to 700.
+            height (int, optional): Height of the map. Defaults to 500.
+            scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
+
+        Returns:
+            streamlit.components: components.html object.
+        """
+
+        import streamlit.components.v1 as components
+
+        return components.html(
+            self.to_html(), width=width, height=height, scrolling=scrolling
+        )
