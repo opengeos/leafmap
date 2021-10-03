@@ -61,12 +61,10 @@ class Map(keplergl.KeplerGl):
         kwargs.pop("widescreen")
         kwargs.pop("center")
         kwargs.pop("zoom")
-        # if "show_docs" not in kwargs:
-        #     kwargs["show_docs"] = False
+        if "show_docs" not in kwargs:
+            kwargs["show_docs"] = False
 
-        output = widgets.Output()
-        with output:
-            super().__init__(**kwargs)
+        super().__init__(**kwargs)
         self.config = config
 
     # def _repr_mimebundle_(self, include=None, exclude=None):
