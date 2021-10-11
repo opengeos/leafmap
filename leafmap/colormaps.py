@@ -64,6 +64,76 @@ def list_colormaps():
     return plt.colormaps()
 
 
+def create_colormap(
+    cmap="gray",
+    colors=None,
+    discrete=False,
+    label=None,
+    width=8.0,
+    height=0.4,
+    orientation="horizontal",
+    vmin=0,
+    vmax=1.0,
+    axis_off=False,
+    show_name=False,
+    font_size=12,
+    **kwargs
+):
+    """Plot a matplotlib colormap.
+
+    Args:
+        cmap (str, optional): Matplotlib colormap. Defaults to "gray". See https://matplotlib.org/3.3.4/tutorials/colors/colormaps.html#sphx-glr-tutorials-colors-colormaps-py for options.
+        colors (list, optional): A list of custom colors to create a colormap. Defaults to None.
+        discrete (bool, optional): Whether to create a discrete colorbar. Defaults to False.
+        label (str, optional): Label for the colorbar. Defaults to None.
+        width (float, optional): The width of the colormap. Defaults to 8.0.
+        height (float, optional): The height of the colormap. Defaults to 0.4.
+        orientation (str, optional): The orientation of the colormap. Defaults to "horizontal".
+        vmin (float, optional): The minimum value range. Defaults to 0.
+        vmax (float, optional): The maximum value range. Defaults to 1.0.
+        axis_off (bool, optional): Whether to turn axis off. Defaults to False.
+        show_name (bool, optional): Whether to show the colormap name. Defaults to False.
+        font_size (int, optional): Font size of the text. Defaults to 12.
+    """
+    fig, ax = plt.subplots(figsize=(width, height))
+
+    if colors is not None and (isinstance(colors, list) or isinstance(colors, tuple)):
+        hexcodes = to_hex_colors(list(colors))
+        if discrete:
+            col_map = mpl.colors.ListedColormap(hexcodes)
+            vals = np.linspace(vmin, vmax, col_map.N + 1)
+            norm = mpl.colors.BoundaryNorm(vals, col_map.N)
+
+        else:
+            col_map = mpl.colors.LinearSegmentedColormap.from_list(
+                "custom", hexcodes, N=256
+            )
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+    else:
+
+        col_map = plt.get_cmap(cmap)
+        norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+
+    cb = mpl.colorbar.ColorbarBase(
+        ax, norm=norm, cmap=col_map, orientation=orientation, **kwargs
+    )
+
+    if label is not None and isinstance(label, str):
+        cb.set_label(label, fontsize=font_size)
+
+    if axis_off:
+        ax.set_axis_off()
+    ax.tick_params(labelsize=font_size)
+
+    if show_name:
+        pos = list(ax.get_position().bounds)
+        x_text = pos[0] - 0.01
+        y_text = pos[1] + pos[3] / 2.0
+        fig.text(x_text, y_text, cmap, va="center", ha="right", fontsize=font_size)
+
+    return fig
+
+
 def plot_colormap(
     cmap="gray",
     colors=None,
