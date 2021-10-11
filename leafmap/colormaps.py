@@ -204,12 +204,13 @@ def plot_colormap(
     plt.show()
 
 
-def plot_colormaps(width=8.0, height=0.4):
+def plot_colormaps(width=8.0, height=0.4, return_fig=False, **kwargs):
     """Plot all available colormaps.
 
     Args:
         width (float, optional): Width of the colormap. Defaults to 8.0.
         height (float, optional): Height of the colormap. Defaults to 0.4.
+        return_fig (bool, optional): Whether to return the figure. Defaults to False.
     """
     cmap_list = list_colormaps()
     nrows = len(cmap_list)
@@ -231,7 +232,10 @@ def plot_colormaps(width=8.0, height=0.4):
     for ax in axes:
         ax.set_axis_off()
 
-    plt.show()
+    if return_fig:
+        return fig
+    else:
+        plt.show()
 
 
 _palette_dict = {
