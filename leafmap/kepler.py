@@ -272,7 +272,7 @@ class Map(keplergl.KeplerGl):
                 layer_name,
                 **kwargs,
             )
-            self.add_config(config)
+            self.load_config(config)
 
     def add_kml(
         self,
