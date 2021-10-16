@@ -1654,6 +1654,8 @@ def vector_to_geojson(
 
     if not filename.startswith("http"):
         filename = os.path.abspath(filename)
+        if filename.endswith(".zip"):
+            filename = "zip://" + filename
     ext = os.path.splitext(filename)[1].lower()
     if ext == ".kml":
         gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
@@ -1661,6 +1663,7 @@ def vector_to_geojson(
             filename, bbox=bbox, mask=mask, rows=rows, driver="KML", **kwargs
         )
     else:
+
         df = gpd.read_file(filename, bbox=bbox, mask=mask, rows=rows, **kwargs)
     gdf = df.to_crs(epsg=epsg)
 
