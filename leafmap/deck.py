@@ -111,31 +111,23 @@ class Map(pdk.Deck):
                 )
             )
 
-    def add_vector(self, filename, layer_name=None, random_color_column=None, **kwargs):
-        """Adds a vector file to the map.
+    def add_gdf(self, gdf, layer_name=None, random_color_column=None, **kwargs):
+        """Adds a GeoPandas GeoDataFrame to the map.
 
         Args:
-            filename (str): The input file path to the vector dataset.
+            gdf (GeoPandas.GeoDataFrame): The GeoPandas GeoDataFrame to add to the map.
             layer_name (str, optional): The layer name to be used. Defaults to None.
             random_color_column (str, optional): The column name to use for random color. Defaults to None.
 
         Raises:
-            FileNotFoundError: The provided vector file could not be found.
+            TypeError: gdf must be a GeoPandas GeoDataFrame.
         """
-        import geopandas as gpd
 
         try:
+            import geopandas as gpd
 
-            if not filename.startswith("http"):
-                filename = os.path.abspath(filename)
-                if filename.endswith(".zip"):
-                    filename = "zip://" + filename
-
-            if filename.endswith(".kml"):
-                gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
-                gdf = gpd.read_file(filename, driver="KML")
-            else:
-                gdf = gpd.read_file(filename)
+            if not isinstance(gdf, gpd.GeoDataFrame):
+                raise TypeError("gdf must be a GeoPandas GeoDataFrame.")
 
             if layer_name is None:
                 layer_name = "layer_" + random_string(3)
@@ -179,6 +171,38 @@ class Map(pdk.Deck):
                 **kwargs,
             )
             self.add_layer(layer)
+
+        except Exception as e:
+            raise Exception(e)
+
+    def add_vector(self, filename, layer_name=None, random_color_column=None, **kwargs):
+        """Adds a vector file to the map.
+
+        Args:
+            filename (str): The input file path to the vector dataset.
+            layer_name (str, optional): The layer name to be used. Defaults to None.
+            random_color_column (str, optional): The column name to use for random color. Defaults to None.
+
+        Raises:
+            FileNotFoundError: The provided vector file could not be found.
+        """
+
+        try:
+
+            import geopandas as gpd
+
+            if not filename.startswith("http"):
+                filename = os.path.abspath(filename)
+                if filename.endswith(".zip"):
+                    filename = "zip://" + filename
+
+            if filename.endswith(".kml"):
+                gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+                gdf = gpd.read_file(filename, driver="KML")
+            else:
+                gdf = gpd.read_file(filename)
+
+            self.add_gdf(gdf, layer_name, random_color_column, **kwargs)
 
         except Exception as e:
             raise Exception(e)
