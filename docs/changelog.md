@@ -1,16 +1,22 @@
 # Changelog
 
-## v0.5.0 - September 26, 2021
+## v0.5.1 - October 17, 2021
 
 **New Features**:
 
--   Added FOSS4G workshop notebook
+-   Added support for pydeck [#122](https://github.com/giswqs/leafmap/issues/122)
+-   Added streamlit support for heremap [#118](https://github.com/giswqs/leafmap/issues/118)
+-   Added create_colormap function
 
 **Improvement**
 
--   Updated binder env
--   Updated Google Analytics
--   Added nbconvert to docs build
+-   Added optional postgis port param [#144](https://github.com/giswqs/leafmap/pull/114)
+-   Added STAC time slider example to notebook [#177](https://github.com/giswqs/leafmap/pull/117)
+-   Fixed geojson style callback bug [#119](https://github.com/giswqs/leafmap/issues/119)
+-   Updated foss4g notebook
+-   Fixed planet imagery bug
+-   Improved vector to geojson
+-   Added streamlit app link to docs
 
 ## v0.4.3 - September 17, 2021
 
