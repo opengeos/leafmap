@@ -1,7 +1,7 @@
 import os
 from .common import *
 from .osm import *
-from .basemaps import pydeck_basemaps
+from .basemaps import leafmap_basemaps
 
 try:
     import pydeck as pdk
@@ -94,20 +94,30 @@ class Map(pdk.Deck):
                 url = basemap.build_url()
                 self.add_layer(url, name)
 
-            elif basemap in pydeck_basemaps:
-                self.add_layer(pydeck_basemaps[basemap])
+            elif basemap in leafmap_basemaps:
+
+                pdk.settings.custom_libraries = [
+                    {
+                        "libraryName": "MyTileLayerLibrary",
+                        "resourceUri": "https://cdn.jsdelivr.net/gh/giswqs/pydeck_myTileLayer@master/dist/bundle.js",
+                    }
+                ]
+
+                layer = pdk.Layer("MyTileLayer", leafmap_basemaps[basemap].url, basemap)
+
+                self.add_layer(layer)
 
             else:
                 print(
                     "Basemap can only be one of the following:\n  {}".format(
-                        "\n  ".join(pydeck_basemaps.keys())
+                        "\n  ".join(leafmap_basemaps.keys())
                     )
                 )
 
         except Exception:
             raise ValueError(
                 "Basemap can only be one of the following:\n  {}".format(
-                    "\n  ".join(pydeck_basemaps.keys())
+                    "\n  ".join(leafmap_basemaps.keys())
                 )
             )
 
