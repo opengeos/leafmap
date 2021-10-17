@@ -2546,3 +2546,79 @@ def display_html(src, width=950, height=600):
     if not os.path.isfile(src):
         raise ValueError(f"{src} is not a valid file path.")
     display(IFrame(src=src, width=width, height=height))
+
+
+def get_census_dict(reset=False):
+    """Returns a dictionary of Census data.
+
+    Args:
+        reset (bool, optional): Reset the dictionary. Defaults to False.
+
+    Returns:
+        dict: A dictionary of Census data.
+    """
+    import json
+    import pkg_resources
+
+    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+    census_data = os.path.join(pkg_dir, "data/census_data.json")
+
+    if reset:
+
+        from owslib.wms import WebMapService
+
+        census_dict = {}
+
+        names = [
+            "Current",
+            "ACS 2021",
+            "ACS 2019",
+            "ACS 2018",
+            "ACS 2017",
+            "ACS 2016",
+            "ACS 2015",
+            "ACS 2014",
+            "ACS 2013",
+            "ACS 2012",
+            "ECON 2012",
+            "Census 2020",
+            "Census 2010",
+            "Physical Features",
+            "Decennial Census 2020",
+            "Decennial Census 2010",
+            "Decennial Census 2000",
+            "Decennial Physical Features",
+        ]
+
+        links = {}
+
+        print("Retrieving data. Please wait ...")
+        for name in names:
+            if "Decennial" not in name:
+                links[
+                    name
+                ] = f"https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_{name.replace(' ', '')}/MapServer/WMSServer"
+            else:
+                links[
+                    name
+                ] = f"https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_{name.replace('Decennial', '').replace(' ', '')}/MapServer/WMSServer"
+
+            wms = WebMapService(links[name], timeout=300)
+            layers = list(wms.contents)
+            layers.sort()
+            census_dict[name] = {
+                "url": links[name],
+                "layers": layers,
+                # "title": wms.identification.title,
+                # "abstract": wms.identification.abstract,
+            }
+
+        with open(census_data, "w") as f:
+            json.dump(census_dict, f, indent=4)
+
+    else:
+
+        with open(census_data, "r") as f:
+            census_dict = json.load(f)
+
+    return census_dict
