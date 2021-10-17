@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.2 - October 17, 2021
+
+**Improvement**
+
+-   Fixed pydeck import error
+
 ## v0.5.1 - October 17, 2021
 
 **New Features**:
