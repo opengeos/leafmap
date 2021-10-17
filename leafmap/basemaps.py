@@ -327,11 +327,11 @@ def xyz_to_pydeck():
         url = xyz_dict[item].build_url()
         pydeck_dict[item] = url
 
-        # if os.environ.get("PLANET_API_KEY") is not None:
+        if os.environ.get("PLANET_API_KEY") is not None:
 
-        planet_dict = planet_tiles_tropical(tile_format="ipyleaflet")
-        for tile in planet_dict:
-            pydeck_dict[tile] = planet_dict[tile].url
+            planet_dict = planet_tiles_tropical(tile_format="ipyleaflet")
+            for tile in planet_dict:
+                pydeck_dict[tile] = planet_dict[tile].url
 
     pdk.settings.custom_libraries = [
         {
