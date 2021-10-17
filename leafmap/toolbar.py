@@ -235,14 +235,18 @@ def main_toolbar(m):
             "name": "save_map",
             "tooltip": "Save map as HTML or image",
         },
-        # "smile-o": {
-        #     "name": "placeholder",
-        #     "tooltip": "This is a placeholder",
-        # },
-        # "spinner": {
-        #     "name": "placeholder2",
-        #     "tooltip": "This is a placeholder",
-        # },
+        "address-book": {
+            "name": "census",
+            "tooltip": "Get US Census data",
+        },
+        "smile-o": {
+            "name": "placeholder",
+            "tooltip": "This is a placeholder",
+        },
+        "spinner": {
+            "name": "placeholder2",
+            "tooltip": "This is a placeholder",
+        },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -329,6 +333,8 @@ def main_toolbar(m):
                 m.add_time_slider()
             elif tool_name == "save_map":
                 save_map((m))
+            elif tool_name == "census":
+                census_widget(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -1213,3 +1219,143 @@ def time_slider(
     slider_ctrl = ipyleaflet.WidgetControl(widget=slider_widget, position=position)
     m.add_control(slider_ctrl)
     m.slider_ctrl = slider_ctrl
+
+
+def census_widget(m=None):
+    """Widget for adding US Census data.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    from owslib.wms import WebMapService
+
+    census_dict = get_census_dict()
+    m.add_census_data("Census 2020", "States")
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="address-book",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    wms = widgets.Dropdown(
+        options=census_dict.keys(),
+        value="Census 2020",
+        description="WMS:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    layer = widgets.Dropdown(
+        options=census_dict["Census 2020"]["layers"],
+        value="States",
+        description="Layer:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    checkbox = widgets.Checkbox(
+        description="Replace existing census data layer",
+        value=True,
+        indent=False,
+        layout=widgets.Layout(padding=padding, width=widget_width),
+    )
+
+    # output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        wms,
+        layer,
+        checkbox,
+        # output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def wms_change(change):
+        layer.options = census_dict[change["new"]]["layers"]
+        layer.value = layer.options[0]
+
+    wms.observe(wms_change, "value")
+
+    def layer_change(change):
+        if change["new"] != "":
+            if checkbox.value:
+                m.layers = m.layers[:-1]
+            m.add_census_data(wms.value, layer.value)
+
+            # with output:
+            #     w = WebMapService(census_dict[wms.value]["url"])
+            #     output.clear_output()
+            #     print(w[layer.value].abstract)
+
+    layer.observe(layer_change, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
