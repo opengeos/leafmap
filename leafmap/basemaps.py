@@ -17,7 +17,7 @@ import here_map_widget
 import ipyleaflet
 import xyzservices.providers as xyz
 from box import Box
-from .common import planet_tiles_tropical
+from .common import check_package, planet_tiles_tropical
 
 # Custom XYZ tile services.
 xyz_tiles = {
@@ -306,6 +306,46 @@ def xyz_to_leaflet():
     return leaflet_dict
 
 
+def xyz_to_pydeck():
+    """Convert xyz tile services to pydeck custom tile layers.
+
+    Returns:
+        dict: A dictionary of pydeck tile layers.
+    """
+
+    check_package("pydeck", "https://deckgl.readthedocs.io/en/latest/installation.html")
+    import pydeck as pdk
+
+    pydeck_dict = {}
+
+    for key in xyz_tiles:
+        url = xyz_tiles[key]["url"]
+        pydeck_dict[key] = url
+
+    xyz_dict = get_xyz_dict()
+    for item in xyz_dict:
+        url = xyz_dict[item].build_url()
+        pydeck_dict[item] = url
+
+        # if os.environ.get("PLANET_API_KEY") is not None:
+
+        planet_dict = planet_tiles_tropical(tile_format="ipyleaflet")
+        for tile in planet_dict:
+            pydeck_dict[tile] = planet_dict[tile].url
+
+    pdk.settings.custom_libraries = [
+        {
+            "libraryName": "MyTileLayerLibrary",
+            "resourceUri": "https://cdn.jsdelivr.net/gh/giswqs/pydeck_myTileLayer@master/dist/bundle.js",
+        }
+    ]
+
+    for key in pydeck_dict:
+        pydeck_dict[key] = pdk.Layer("MyTileLayer", pydeck_dict[key], key)
+
+    return pydeck_dict
+
+
 def xyz_to_folium():
     """Convert xyz tile services to folium tile layers.
 
@@ -450,3 +490,4 @@ def qms_to_leafmap(service_id):
 leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
 here_basemaps = Box(xyz_to_heremap(), frozen_box=True)
+pydeck_basemaps = Box(xyz_to_pydeck(), frozen_box=True)

@@ -37,7 +37,7 @@ jobs:
                   pip install -r requirements.txt -r requirements_dev.txt
             - name: PKG-TEST
               run: |
-                  pip install geopandas osmnx xarray_leaflet keplergl
+                  pip install geopandas osmnx xarray_leaflet keplergl pydeck
                   python -m unittest discover tests/
               env:
                   HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
