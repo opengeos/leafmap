@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.3 - October 17, 2021
+
+**New Features**:
+
+-   Added support for US Census data with hundreds of WMS layers [#123](https://github.com/giswqs/leafmap/issues/123)
+
 ## v0.5.2 - October 17, 2021
 
 **Improvement**
