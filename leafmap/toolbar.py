@@ -239,14 +239,18 @@ def main_toolbar(m):
             "name": "census",
             "tooltip": "Get US Census data",
         },
+        "search": {
+            "name": "search_xyz",
+            "tooltip": "Search XYZ tile services",
+        },
         "smile-o": {
             "name": "placeholder",
             "tooltip": "This is a placeholder",
         },
-        "spinner": {
-            "name": "placeholder2",
-            "tooltip": "This is a placeholder",
-        },
+        # "spinner": {
+        #     "name": "placeholder2",
+        #     "tooltip": "This is a placeholder",
+        # },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -335,6 +339,8 @@ def main_toolbar(m):
                 save_map((m))
             elif tool_name == "census":
                 census_widget(m)
+            elif tool_name == "search_xyz":
+                search_basemaps(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -1347,6 +1353,203 @@ def census_widget(m=None):
             #     print(w[layer.value].abstract)
 
     layer.observe(layer_change, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def search_basemaps(m=None):
+    """The widget for search XYZ tile services.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    import xyzservices.providers as xyz
+    from xyzservices import TileProvider
+
+    layers = m.layers
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="search",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    checkbox = widgets.Checkbox(
+        description="Search Quick Map Services (QMS)",
+        indent=False,
+        layout=widgets.Layout(padding=padding, width=widget_width),
+    )
+
+    providers = widgets.Dropdown(
+        options=[],
+        value=None,
+        description="XYZ Tile:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    keyword = widgets.Text(
+        value="",
+        description="Search keyword:",
+        placeholder="OpenStreetMap",
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
+    def search_callback(change):
+        providers.options = []
+        if keyword.value != "":
+            tiles = search_xyz_services(keyword=keyword.value)
+            if checkbox.value:
+                tiles = tiles + search_qms(keyword=keyword.value)
+            providers.options = tiles
+
+    keyword.on_submit(search_callback)
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Search", "Reset", "Close"],
+        tooltips=["Search", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "80px"
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    def providers_change(change):
+        # with output:
+        #     print(change["new"])
+        if change["new"] != "":
+            provider = change["new"]
+            if provider is not None:
+                if provider.startswith("qms"):
+                    with output:
+                        output.clear_output()
+                        print("Adding data. Please wait...")
+                    name = provider[4:]
+                    qms_provider = TileProvider.from_qms(name)
+                    url = qms_provider.build_url()
+                    attribution = qms_provider.attribution
+                    m.layers = layers
+                    m.add_tile_layer(url, name, attribution)
+                    output.clear_output()
+                elif provider.startswith("xyz"):
+                    name = provider[4:]
+                    xyz_provider = xyz.flatten()[name]
+                    url = xyz_provider.build_url()
+                    attribution = xyz_provider.attribution
+                    m.layers = layers
+                    if xyz_provider.requires_token():
+                        with output:
+                            output.clear_output()
+                            print(f"{provider} requires an API Key.")
+                    m.add_tile_layer(url, name, attribution)
+
+    providers.observe(providers_change, "value")
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        checkbox,
+        keyword,
+        providers,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Search":
+            providers.options = []
+            if keyword.value != "":
+                tiles = search_xyz_services(keyword=keyword.value)
+                if checkbox.value:
+                    tiles = tiles + search_qms(keyword=keyword.value)
+                providers.options = tiles
+            with output:
+                output.clear_output()
+                # print("Running ...")
+        elif change["new"] == "Reset":
+            keyword.value = ""
+            providers.options = []
+            output.clear_output()
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
 
     toolbar_button.value = True
     if m is not None:

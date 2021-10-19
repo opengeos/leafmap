@@ -2449,6 +2449,35 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
+    def add_xyz_service(self, provider, **kwargs):
+        """Add a XYZ tile layer to the map.
+
+        Args:
+            provider (str): A tile layer name starts with xyz or qms. For example, xyz.OpenTopoMap, 
+
+        Raises:
+            ValueError: The provider is not valid. It must start with xyz or qms.
+        """
+        import xyzservices.providers as xyz
+        from xyzservices import TileProvider
+
+        if provider.startswith("xyz"):
+            name = provider[4:]
+            xyz_provider = xyz.flatten()[name]
+            url = xyz_provider.build_url()
+            attribution = xyz_provider.attribution
+            self.add_tile_layer(url, name, attribution)
+        elif provider.startswith("qms"):
+            name = provider[4:]
+            qms_provider = TileProvider.from_qms(name)
+            url = qms_provider.build_url()
+            attribution = qms_provider.attribution
+            self.add_tile_layer(url, name, attribution)
+        else:
+            raise ValueError(
+                f"The provider {provider} is not valid. It must start with xyz or qms."
+            )
+
 
 # The functions below are outside the Map class.
 

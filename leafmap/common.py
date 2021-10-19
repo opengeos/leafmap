@@ -2622,3 +2622,65 @@ def get_census_dict(reset=False):
             census_dict = json.load(f)
 
     return census_dict
+
+
+def search_xyz_services(keyword, name=None, list_only=True, add_prefix=True):
+    """Search for XYZ tile providers from xyzservices.
+
+    Args:
+        keyword (str): The keyword to search for.
+        name (str, optional): The name of the xyz tile. Defaults to None.
+        list_only (bool, optional): If True, only the list of services will be returned. Defaults to True.
+        add_prefix (bool, optional): If True, the prefix "xyz." will be added to the service name. Defaults to True.
+
+    Returns:
+        list: A list of XYZ tile providers.
+    """
+
+    import xyzservices.providers as xyz
+
+    if name is None:
+        providers = xyz.filter(keyword=keyword).flatten()
+    else:
+        providers = xyz.filter(name=name).flatten()
+
+    if list_only:
+        if add_prefix:
+            return ["xyz." + provider for provider in providers]
+        else:
+            return [provider for provider in providers]
+    else:
+        return providers
+
+
+def search_qms(keyword, limit=10, list_only=True, add_prefix=True):
+    """Search for QMS tile providers from Quick Map Services.
+
+    Args:
+        keyword (str): The keyword to search for.
+        limit (int, optional): The maximum number of results to return. Defaults to 10.
+        list_only (bool, optional): If True, only the list of services will be returned. Defaults to True.
+        add_prefix (bool, optional): If True, the prefix "qms." will be added to the service name. Defaults to True.
+
+    Returns:
+        list: A list of QMS tile providers.
+    """
+
+    import requests
+
+    QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
+    services = requests.get(
+        f"{QMS_API}/?search={keyword}&type=tms&epsg=3857&limit={limit}"
+    )
+    services = services.json()
+    if services["results"]:
+        providers = services["results"]
+        if list_only:
+            if add_prefix:
+                return ["qms." + provider["name"] for provider in providers]
+            else:
+                return [provider["name"] for provider in providers]
+        else:
+            return providers
+    else:
+        return None
