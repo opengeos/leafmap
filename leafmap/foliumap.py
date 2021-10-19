@@ -1511,13 +1511,17 @@ class Map(folium.Map):
             xyz_provider = xyz.flatten()[name]
             url = xyz_provider.build_url()
             attribution = xyz_provider.attribution
+            if attribution.strip() == "":
+                attribution = " "
             self.add_tile_layer(url, name, attribution)
         elif provider.startswith("qms"):
             name = provider[4:]
             qms_provider = TileProvider.from_qms(name)
             url = qms_provider.build_url()
             attribution = qms_provider.attribution
-            self.add_tile_layer(url, name, attribution)
+            if attribution.strip() == "":
+                attribution = " "
+            self.add_tile_layer(url=url, name=name, attribution=attribution)
         else:
             raise ValueError(
                 f"The provider {provider} is not valid. It must start with xyz or qms."
