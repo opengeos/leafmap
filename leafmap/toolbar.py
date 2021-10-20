@@ -783,12 +783,10 @@ def open_data_widget(m):
                             layer_name=layer_name.value,
                         )
                     elif ext.lower() == ".shp":
-                        m.add_shp(file_path, style=None, layer_name=layer_name.value)
+                        m.add_shp(file_path, style={}, layer_name=layer_name.value)
                     elif ext.lower() == ".geojson":
 
-                        m.add_geojson(
-                            file_path, style=None, layer_name=layer_name.value
-                        )
+                        m.add_geojson(file_path, style={}, layer_name=layer_name.value)
 
                     elif ext.lower() == ".csv" and file_type.value == "CSV":
 
@@ -821,7 +819,7 @@ def open_data_widget(m):
                             file_path, name=layer_name.value, show_footprints=True
                         )
                     else:
-                        m.add_vector(file_path, style=None, layer_name=layer_name.value)
+                        m.add_vector(file_path, style={}, layer_name=layer_name.value)
                 else:
                     print("Please select a file to open.")
 
