@@ -1514,11 +1514,14 @@ class Map(ipyleaflet.Map):
             streamlit.components: components.html object.
         """
 
-        import streamlit.components.v1 as components
+        try:
+            import streamlit.components.v1 as components
 
-        return components.html(
-            self.to_html(), width=width, height=height, scrolling=scrolling
-        )
+            return components.html(
+                self.to_html(), width=width, height=height, scrolling=scrolling
+            )
+        except Exception as e:
+            raise Exception(e)
 
     def toolbar_reset(self):
         """Reset the toolbar so that no tool is selected."""
