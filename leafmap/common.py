@@ -2684,3 +2684,20 @@ def search_qms(keyword, limit=10, list_only=True, add_prefix=True):
             return providers
     else:
         return None
+
+
+def get_wms_layers(url):
+    """Returns a list of WMS layers from a WMS service.
+
+    Args:
+        url (str): The URL of the WMS service.
+
+    Returns:
+        list: A list of WMS layers.
+    """
+    from owslib.wms import WebMapService
+
+    wms = WebMapService(url)
+    layers = list(wms.contents)
+    layers.sort()
+    return layers
