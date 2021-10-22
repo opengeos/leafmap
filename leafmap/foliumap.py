@@ -1399,16 +1399,25 @@ class Map(folium.Map):
             streamlit.components: components.html object.
         """
 
+        # try:
+        #     from streamlit_folium import folium_static
+
+        #     if add_layer_control:
+        #         self.add_layer_control()
+        #     return folium_static(self, width=width, height=height)
+        # except ImportError:
+        #     raise ImportError(
+        #         "streamlit-folium is not installed. You need to install streamlit-folium first using 'pip install streamlit-folium'. See https://github.com/randyzwitch/streamlit-folium"
+        #     )
+
         try:
-            from streamlit_folium import folium_static
+            import streamlit.components.v1 as components
 
             if add_layer_control:
                 self.add_layer_control()
-            return folium_static(self, width=width, height=height)
-        except ImportError:
-            raise ImportError(
-                "streamlit-folium is not installed. You need to install streamlit-folium first using 'pip install streamlit-folium'. See https://github.com/randyzwitch/streamlit-folium"
-            )
+            return components.html(self.to_html(), width=width, height=height)
+        except Exception as e:
+            raise Exception(e)
 
     def add_title(self, title, align="center", font_size="16px", style=None):
         """Adds a title to the map.

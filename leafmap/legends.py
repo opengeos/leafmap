@@ -408,4 +408,17 @@ builtin_legends = {
         "250 Cranberries": "ff6666",
         "254 Dbl Crop Barley/Soybeans": "267000",
     },
+    "ESA_WorldCover": {
+        "10 Trees": "006400",
+        "20 Shrubland": "ffbb22",
+        "30 Grassland": "ffff4c",
+        "40 Cropland": "f096ff",
+        "50 Built-up": "fa0000",
+        "60 Barren / sparse vegetation": "b4b4b4",
+        "70 Snow and ice": "f0f0f0",
+        "80 Open water": "0064c8",
+        "90 Herbaceous wetland": "0096a0",
+        "95 Mangroves": "00cf75",
+        "100 Moss and lichen": "fae6a0",
+    },
 }
