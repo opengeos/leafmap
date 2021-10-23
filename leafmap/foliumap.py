@@ -1384,38 +1384,49 @@ class Map(folium.Map):
             os.remove(outfile)
             return out_html
 
-    def to_streamlit(self, width=700, height=500, add_layer_control=True, **kwargs):
+    def to_streamlit(
+        self,
+        width=700,
+        height=500,
+        responsive=True,
+        scrolling=False,
+        add_layer_control=True,
+        **kwargs,
+    ):
         """Renders `folium.Figure` or `folium.Map` in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
 
         Args:
             width (int, optional): Width of the map. Defaults to 800.
             height (int, optional): Height of the map. Defaults to 600.
+            responsive (bool, optional): Whether to make the map responsive. Defaults to True.
+            scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
             add_layer_control (bool, optional): Whether to add the layer control. Defaults to True.
 
         Raises:
-            ImportError: If streamlit-folium is not installed.
+            ImportError: If streamlit is not installed.
 
         Returns:
             streamlit.components: components.html object.
         """
 
-        # try:
-        #     from streamlit_folium import folium_static
-
-        #     if add_layer_control:
-        #         self.add_layer_control()
-        #     return folium_static(self, width=width, height=height)
-        # except ImportError:
-        #     raise ImportError(
-        #         "streamlit-folium is not installed. You need to install streamlit-folium first using 'pip install streamlit-folium'. See https://github.com/randyzwitch/streamlit-folium"
-        #     )
-
         try:
+            import streamlit as st
             import streamlit.components.v1 as components
 
             if add_layer_control:
                 self.add_layer_control()
-            return components.html(self.to_html(), width=width, height=height)
+
+            if responsive:
+                make_map_responsive = """
+                <style>
+                [title~="st.iframe"] { width: 100%}
+                </style>
+                """
+                st.markdown(make_map_responsive, unsafe_allow_html=True)
+            return components.html(
+                self.to_html(), width=width, height=height, scrolling=scrolling
+            )
+
         except Exception as e:
             raise Exception(e)
 
