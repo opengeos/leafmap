@@ -14,12 +14,8 @@ except ImportError:
 
 class Layer(pdk.Layer):
     """Configures a deck.gl layer for rendering on a map. Parameters passed here will be specific to the particular deck.gl layer that you are choosing to use.
-       Please see the deck.gl Layer catalog (https://deck.gl/docs/api-reference/layers) to determine the particular parameters of your layer.
-       You are highly encouraged to look at the examples in the pydeck documentation.
-
-
-    Args:
-        pdk ([type]): [description]
+    Please see the deck.gl Layer catalog (https://deck.gl/docs/api-reference/layers) to determine the particular parameters of your layer.
+    You are highly encouraged to look at the examples in the pydeck documentation.
     """
 
     def __init__(self, type, data=None, id=None, use_binary_transport=None, **kwargs):

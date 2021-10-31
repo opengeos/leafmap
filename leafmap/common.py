@@ -2970,3 +2970,25 @@ def create_download_button(
         return
     except Exception as e:
         raise Exception(e)
+
+
+def temp_file_path(extension):
+    """Returns a temporary file path.
+
+    Args:
+        extension (str): The file extension.
+
+    Returns:
+        str: The temporary file path.
+    """
+
+    import tempfile
+    import os
+    import uuid
+
+    if not extension.startswith("."):
+        extension = "." + extension
+    file_id = str(uuid.uuid4())
+    file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{extension}")
+
+    return file_path
