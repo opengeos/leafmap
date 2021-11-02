@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.5.4 - November 2, 2021
+
+**New Features**:
+
+-   Added search basemaps GUI [#93](https://github.com/giswqs/leafmap/issues/93)
+-   Added get wms layers function
+-   Made streamlit map width reponsive [#126](https://github.com/giswqs/leafmap/issues/126)
+-   Added function read file from url
+-   Added streamlit download button
+-   Added SIGSPATIAL workshop notebook
+
+**Improvement**
+
+-   Fixed layer attribution error [#93](https://github.com/giswqs/leafmap/issues/93)
+-   Fixed open vector bug [#124](https://github.com/giswqs/leafmap/discussions/124)
+-   Improved streamlit support
 ## v0.5.3 - October 17, 2021
 
 **New Features**:
