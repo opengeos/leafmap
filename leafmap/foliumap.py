@@ -36,6 +36,8 @@ class Map(folium.Map):
             zoom = kwargs["zoom_start"]
         else:
             kwargs["zoom_start"] = zoom
+        if "max_zoom" not in kwargs:
+            kwargs["max_zoom"] = 22
 
         if "control_scale" not in kwargs:
             kwargs["control_scale"] = True
