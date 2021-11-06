@@ -17,7 +17,7 @@ import here_map_widget
 import ipyleaflet
 import xyzservices.providers as xyz
 from box import Box
-from .common import check_package, planet_tiles_tropical
+from .common import check_package, planet_tiles
 
 # Custom XYZ tile services.
 xyz_tiles = {
@@ -264,9 +264,7 @@ def xyz_to_leaflet():
         url = xyz_tiles[key]["url"]
         attribution = xyz_tiles[key]["attribution"]
         leaflet_dict[key] = ipyleaflet.TileLayer(
-            url=url,
-            name=name,
-            attribution=attribution,
+            url=url, name=name, attribution=attribution, max_zoom=22
         )
 
     for key in wms_tiles:
@@ -300,7 +298,7 @@ def xyz_to_leaflet():
 
     if os.environ.get("PLANET_API_KEY") is not None:
 
-        planet_dict = planet_tiles_tropical(tile_format="ipyleaflet")
+        planet_dict = planet_tiles(tile_format="ipyleaflet")
         leaflet_dict.update(planet_dict)
 
     return leaflet_dict
@@ -329,7 +327,7 @@ def xyz_to_pydeck():
 
         if os.environ.get("PLANET_API_KEY") is not None:
 
-            planet_dict = planet_tiles_tropical(tile_format="ipyleaflet")
+            planet_dict = planet_tiles(tile_format="ipyleaflet")
             for tile in planet_dict:
                 pydeck_dict[tile] = planet_dict[tile].url
 
@@ -364,6 +362,7 @@ def xyz_to_folium():
             name=name,
             overlay=True,
             control=True,
+            max_zoom=22,
         )
 
     for key in wms_tiles:
@@ -404,7 +403,7 @@ def xyz_to_folium():
 
     if os.environ.get("PLANET_API_KEY") is not None:
 
-        planet_dict = planet_tiles_tropical(tile_format="folium")
+        planet_dict = planet_tiles(tile_format="folium")
         folium_dict.update(planet_dict)
 
     return folium_dict
