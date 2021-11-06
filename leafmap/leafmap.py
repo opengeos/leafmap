@@ -25,6 +25,9 @@ class Map(ipyleaflet.Map):
         if "zoom" not in kwargs:
             kwargs["zoom"] = 4
 
+        if "max_zoom" not in kwargs:
+            kwargs["max_zoom"] = 22
+
         if "scroll_wheel_zoom" not in kwargs:
             kwargs["scroll_wheel_zoom"] = True
 
@@ -1010,10 +1013,10 @@ class Map(ipyleaflet.Map):
 
     def add_legend(
         self,
-        legend_title="Legend",
+        title="Legend",
         legend_dict=None,
-        legend_keys=None,
-        legend_colors=None,
+        labels=None,
+        colors=None,
         position="bottomright",
         builtin_legend=None,
         layer_name=None,
@@ -1022,10 +1025,10 @@ class Map(ipyleaflet.Map):
         """Adds a customized basemap to the map.
 
         Args:
-            legend_title (str, optional): Title of the legend. Defaults to 'Legend'.
+            title (str, optional): Title of the legend. Defaults to 'Legend'.
             legend_dict (dict, optional): A dictionary containing legend items as keys and color as values. If provided, legend_keys and legend_colors will be ignored. Defaults to None.
-            legend_keys (list, optional): A list of legend keys. Defaults to None.
-            legend_colors (list, optional): A list of legend colors. Defaults to None.
+            labels (list, optional): A list of legend keys. Defaults to None.
+            colors (list, optional): A list of legend colors. Defaults to None.
             position (str, optional): Position of the legend. Defaults to 'bottomright'.
             builtin_legend (str, optional): Name of the builtin legend to add to the map. Defaults to None.
             layer_name (str, optional): Layer name of the legend to be associated with. Defaults to None.
@@ -1071,33 +1074,31 @@ class Map(ipyleaflet.Map):
             print("The legend template does not exist.")
             return
 
-        if legend_keys is not None:
-            if not isinstance(legend_keys, list):
+        if labels is not None:
+            if not isinstance(labels, list):
                 print("The legend keys must be a list.")
                 return
         else:
-            legend_keys = ["One", "Two", "Three", "Four", "etc"]
+            labels = ["One", "Two", "Three", "Four", "etc"]
 
-        if legend_colors is not None:
-            if not isinstance(legend_colors, list):
+        if colors is not None:
+            if not isinstance(colors, list):
                 print("The legend colors must be a list.")
                 return
-            elif all(isinstance(item, tuple) for item in legend_colors):
+            elif all(isinstance(item, tuple) for item in colors):
                 try:
-                    legend_colors = [rgb_to_hex(x) for x in legend_colors]
+                    colors = [rgb_to_hex(x) for x in colors]
                 except Exception as e:
                     print(e)
-            elif all(
-                (item.startswith("#") and len(item) == 7) for item in legend_colors
-            ):
+            elif all((item.startswith("#") and len(item) == 7) for item in colors):
                 pass
-            elif all((len(item) == 6) for item in legend_colors):
+            elif all((len(item) == 6) for item in colors):
                 pass
             else:
                 print("The legend colors must be a list of tuples.")
                 return
         else:
-            legend_colors = [
+            colors = [
                 "#8DD3C7",
                 "#FFFFB3",
                 "#BEBADA",
@@ -1105,7 +1106,7 @@ class Map(ipyleaflet.Map):
                 "#80B1D3",
             ]
 
-        if len(legend_keys) != len(legend_colors):
+        if len(labels) != len(colors):
             print("The legend keys and values must be the same length.")
             return
 
@@ -1120,19 +1121,19 @@ class Map(ipyleaflet.Map):
                 return
             else:
                 legend_dict = builtin_legends[builtin_legend]
-                legend_keys = list(legend_dict.keys())
-                legend_colors = list(legend_dict.values())
+                labels = list(legend_dict.keys())
+                colors = list(legend_dict.values())
 
         if legend_dict is not None:
             if not isinstance(legend_dict, dict):
                 print("The legend dict must be a dictionary.")
                 return
             else:
-                legend_keys = list(legend_dict.keys())
-                legend_colors = list(legend_dict.values())
-                if all(isinstance(item, tuple) for item in legend_colors):
+                labels = list(legend_dict.keys())
+                colors = list(legend_dict.values())
+                if all(isinstance(item, tuple) for item in colors):
                     try:
-                        legend_colors = [rgb_to_hex(x) for x in legend_colors]
+                        colors = [rgb_to_hex(x) for x in colors]
                     except Exception as e:
                         print(e)
 
@@ -1156,12 +1157,12 @@ class Map(ipyleaflet.Map):
 
         with open(legend_template) as f:
             lines = f.readlines()
-            lines[3] = lines[3].replace("Legend", legend_title)
+            lines[3] = lines[3].replace("Legend", title)
             header = lines[:6]
             footer = lines[11:]
 
-        for index, key in enumerate(legend_keys):
-            color = legend_colors[index]
+        for index, key in enumerate(labels):
+            color = colors[index]
             if not color.startswith("#"):
                 color = "#" + color
             item = "      <li><span style='background:{};'></span>{}</li>\n".format(
