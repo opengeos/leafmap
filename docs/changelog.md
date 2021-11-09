@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.5 - November 9, 2021
+
+**New Features**:
+
+-   Added YouthMappers workshop [notebook](https://leafmap.org/workshops/YouthMappers_2021/)
+
+**Improvement**
+
+-   Fixed `add_legend` bug
+-   Changed default `max_zoom` to 24
+
 ## v0.5.4 - November 2, 2021
 
 **New Features**:
@@ -16,6 +27,7 @@
 -   Fixed layer attribution error [#93](https://github.com/giswqs/leafmap/issues/93)
 -   Fixed open vector bug [#124](https://github.com/giswqs/leafmap/discussions/124)
 -   Improved streamlit support
+
 ## v0.5.3 - October 17, 2021
 
 **New Features**:
