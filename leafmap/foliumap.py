@@ -1389,7 +1389,7 @@ class Map(folium.Map):
     def to_streamlit(
         self,
         width=700,
-        height=500,
+        height=600,
         responsive=True,
         scrolling=False,
         add_layer_control=True,
@@ -1548,6 +1548,33 @@ class Map(folium.Map):
             raise ValueError(
                 f"The provider {provider} is not valid. It must start with xyz or qms."
             )
+
+    def add_marker(
+        self, location, popup=None, tooltip=None, icon=None, draggable=False, **kwargs
+    ):
+        """Adds a marker to the map. More info about marker options at https://python-visualization.github.io/folium/modules.html#folium.map.Marker.
+
+        Args:
+            location (list | tuple): The location of the marker in the format of [lat, lng].
+            popup (str, optional): The popup text. Defaults to None.
+            tooltip (str, optional): The tooltip text. Defaults to None.
+            icon (str, optional): The icon to use. Defaults to None.
+            draggable (bool, optional): Whether the marker is draggable. Defaults to False.
+        """
+        if isinstance(location, list):
+            location = tuple(location)
+        if isinstance(location, tuple):
+            folium.Marker(
+                location=location,
+                popup=popup,
+                tooltip=tooltip,
+                icon=icon,
+                draggable=draggable,
+                **kwargs,
+            ).add_to(self)
+
+        else:
+            raise TypeError("The location must be a list or a tuple.")
 
     def add_colormap(
         self,
