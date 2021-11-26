@@ -1,9 +1,8 @@
 """Main module."""
 
 import os
-import sys
 import ipyleaflet
-from IPython.display import display, Javascript
+from IPython.display import display
 from .basemaps import leafmap_basemaps
 from .common import *
 from .legends import builtin_legends
@@ -205,6 +204,22 @@ class Map(ipyleaflet.Map):
                 layer_names.append(layer.name)
 
         return layer_names
+
+    def add_marker(self, location, **kwargs):
+        """Adds a marker to the map. More info about marker at https://ipyleaflet.readthedocs.io/en/latest/api_reference/marker.html.
+
+        Args:
+            location (list | tuple): The location of the marker in the format of [lat, lng].
+
+            **kwargs: Keyword arguments for the marker.
+        """
+        if isinstance(location, list):
+            location = tuple(location)
+        if isinstance(location, tuple):
+            marker = ipyleaflet.Marker(location=location, **kwargs)
+            self.add_layer(marker)
+        else:
+            raise TypeError("The location must be a list or a tuple.")
 
     def add_basemap(self, basemap="HYBRID"):
         """Adds a basemap to the map.
@@ -1504,13 +1519,13 @@ class Map(ipyleaflet.Map):
         self.screenshot = screenshot
 
     def to_streamlit(
-        self, width=700, height=500, responsive=True, scrolling=False, **kwargs
+        self, width=700, height=600, responsive=True, scrolling=False, **kwargs
     ):
         """Renders map figure in a Streamlit app.
 
         Args:
             width (int, optional): Width of the map. Defaults to 700.
-            height (int, optional): Height of the map. Defaults to 500.
+            height (int, optional): Height of the map. Defaults to 600.
             responsive (bool, optional): Whether to make the map responsive. Defaults to True.
             scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
 
