@@ -25,7 +25,7 @@ The leafmap package has an optional dependency - [geopandas](https://geopandas.o
     conda install geopandas
     conda install mamba -c conda-forge
     mamba install leafmap xarray_leaflet -c conda-forge
-    pip install keplergl
+    pip install keplergl localtileserver
 ```
 
 Optionally, you can install some [Jupyter notebook extensions](https://github.com/ipython-contrib/jupyter_contrib_nbextensions), which can improve your productivity in the notebook environment. Some useful extensions include Table of Contents, Gist-it, Autopep8, Variable Inspector, etc. See this [post](https://towardsdatascience.com/jupyter-notebook-extensions-517fa69d2231) for more information.
