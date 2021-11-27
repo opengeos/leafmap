@@ -3047,6 +3047,7 @@ def get_local_tile_layer(
     tile_format="ipyleaflet",
     layer_name=None,
     get_center=False,
+    get_bounds=False,
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
@@ -3065,7 +3066,7 @@ def get_local_tile_layer(
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to None.
         get_center (bool, optional): If True, the center of the layer will be returned. Defaults to False.
-
+        get_bounds (bool, optional): If True, the bounds [minx, miny, maxx, maxy] of the layer will be returned. Defaults to False.
 
     Returns:
         ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
@@ -3132,7 +3133,15 @@ def get_local_tile_layer(
             **kwargs,
         )
 
-    if get_center:
-        return tile_layer, tile_client.center()
+    center = tile_client.center()
+    bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
+    bounds = (bounds[2], bounds[0], bounds[3], bounds[1])  # [minx, miny, maxx, maxy]
+
+    if get_center and get_bounds:
+        return tile_layer, center, bounds
+    elif get_center:
+        return tile_layer, center
+    elif get_bounds:
+        return tile_layer, bounds
     else:
         return tile_layer
