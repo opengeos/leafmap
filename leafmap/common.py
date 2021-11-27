@@ -2972,6 +2972,45 @@ def create_download_button(
         raise Exception(e)
 
 
+def save_data(data, file_ext=None, file_name=None):
+    """Save data in the memory to a file.
+
+    Args:
+        data (object): The data to be saved.
+        file_ext (str): The file extension of the file.
+        file_name (str, optional): The name of the file to be saved. Defaults to None.
+
+    Returns:
+        str: The path of the file.
+    """
+    import tempfile
+    import uuid
+
+    try:
+
+        if file_ext is None:
+            if hasattr(data, "name"):
+                _, file_ext = os.path.splitext(data.name)
+        else:
+            if not file_ext.startswith("."):
+                file_ext = "." + file_ext
+
+        if file_name is not None:
+            file_path = os.path.abspath(file_name)
+            if not file_path.endswith(file_ext):
+                file_path = file_path + file_ext
+        else:
+            file_id = str(uuid.uuid4())
+            file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{file_ext}")
+
+        with open(file_path, "wb") as file:
+            file.write(data.getbuffer())
+        return file_path
+    except Exception as e:
+        print(e)
+        return None
+
+
 def temp_file_path(extension):
     """Returns a temporary file path.
 
