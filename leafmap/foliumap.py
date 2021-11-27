@@ -324,7 +324,7 @@ class Map(folium.Map):
             layer_name (str, optional): The layer name to use. Defaults to None.
         """
 
-        tile, center = get_local_tile_layer(
+        tile, bounds = get_local_tile_layer(
             source,
             band=band,
             palette=palette,
@@ -334,11 +334,11 @@ class Map(folium.Map):
             attribution=attribution,
             tile_format="folium",
             layer_name=layer_name,
-            get_center=True,
+            get_bounds=True,
             **kwargs,
         )
         self.add_layer(tile)
-        self.set_center(center[1], center[0], 10)
+        self.zoom_to_bounds(bounds)
 
     def add_remote_tile(
         self,
