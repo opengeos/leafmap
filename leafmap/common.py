@@ -2992,3 +2992,108 @@ def temp_file_path(extension):
     file_path = os.path.join(tempfile.gettempdir(), f"{file_id}{extension}")
 
     return file_path
+
+
+def get_local_tile_layer(
+    source,
+    port="default",
+    debug=False,
+    projection="EPSG:3857",
+    band=None,
+    palette=None,
+    vmin=None,
+    vmax=None,
+    nodata=None,
+    attribution=None,
+    tile_format="ipyleaflet",
+    layer_name=None,
+    get_center=False,
+    **kwargs,
+):
+    """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
+
+    Args:
+        source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
+        port (str, optional): The port to use for the server. Defaults to "default".
+        debug (bool, optional): If True, the server will be started in debug mode. Defaults to False.
+        projection (str, optional): The projection of the GeoTIFF. Defaults to "EPSG:3857".
+        band (int, optional): The band to use. Band indexing starts at 1. Defaults to None.
+        palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
+        vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
+        vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+        nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
+        attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
+        tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
+        layer_name (str, optional): The layer name to use. Defaults to None.
+        get_center (bool, optional): If True, the center of the layer will be returned. Defaults to False.
+
+
+    Returns:
+        ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
+    """
+
+    check_package(
+        "localtileserver", URL="https://github.com/banesullivan/localtileserver"
+    )
+
+    from localtileserver import (
+        get_leaflet_tile_layer,
+        get_folium_tile_layer,
+        TileClient,
+    )
+
+    if isinstance(source, str):
+        if not source.startswith("http"):
+            source = os.path.abspath(source)
+            if not os.path.exists(source):
+                raise ValueError("The source path does not exist.")
+    else:
+        raise ValueError("The source must either be a string or TileClient")
+
+    if tile_format not in ["ipyleaflet", "folium"]:
+        raise ValueError("The tile format must be either ipyleaflet or folium.")
+
+    if layer_name is None:
+        if source.startswith("http"):
+            layer_name = "RemoteTile_" + random_string(3)
+        else:
+            layer_name = "LocalTile_" + random_string(3)
+
+    tile_client = TileClient(source, port=port, debug=debug)
+
+    if tile_format == "ipyleaflet":
+        tile_layer = get_leaflet_tile_layer(
+            tile_client,
+            port=port,
+            debug=debug,
+            projection=projection,
+            band=band,
+            palette=palette,
+            vmin=vmin,
+            vmax=vmax,
+            nodata=nodata,
+            attribution=attribution,
+            name=layer_name,
+            **kwargs,
+        )
+    else:
+        tile_layer = get_folium_tile_layer(
+            tile_client,
+            port=port,
+            debug=debug,
+            projection=projection,
+            band=band,
+            palette=palette,
+            vmin=vmin,
+            vmax=vmax,
+            nodata=nodata,
+            attr=attribution,
+            overlay=True,
+            name=layer_name,
+            **kwargs,
+        )
+
+    if get_center:
+        return tile_layer, tile_client.center()
+    else:
+        return tile_layer
