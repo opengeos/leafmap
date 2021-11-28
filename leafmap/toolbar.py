@@ -520,28 +520,30 @@ def open_data_widget(m):
     style = {"description_width": "initial"}
 
     file_type = widgets.ToggleButtons(
-        options=["Shapefile", "GeoJSON", "Vector", "CSV", "GeoTIFF"],
+        options=["Shapefile", "GeoJSON", "CSV", "Vector", "Raster"],
         tooltips=[
             "Open a shapefile",
             "Open a GeoJSON file",
             "Open a vector dataset",
             "Create points from CSV",
             "Open a vector dataset",
-            "Open a GeoTIFF",
+            "Open a raster dataset",
         ],
     )
     file_type.style.button_width = "88px"
 
     filepath = widgets.Text(
         value="",
-        description="File path or HTTP URL:",
-        tooltip="Enter a file path or HTTP URL to vector data",
+        description="File path or http URL:",
+        tooltip="Enter a file path or http URL to vector data",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
     )
     http_widget = widgets.HBox()
 
-    file_chooser = FileChooser(os.getcwd(), sandbox_path=m.sandbox_path)
+    file_chooser = FileChooser(
+        os.getcwd(), sandbox_path=m.sandbox_path, layout=widgets.Layout(width="454px")
+    )
     file_chooser.filter_pattern = "*.shp"
     file_chooser.use_dir_icons = True
 
@@ -619,55 +621,64 @@ def open_data_widget(m):
     # ok_cancel.style.button_width = "50px"
 
     bands = widgets.Text(
-        value="1",
-        description="Bands:",
+        value=None,
+        description="Band:",
         tooltip="Enter a list of band indices",
         style=style,
-        layout=widgets.Layout(width="110px"),
+        layout=widgets.Layout(width="150px", padding=padding),
     )
 
-    colormap = widgets.Dropdown(
+    vmin = widgets.Text(
+        value=None,
+        description="vmin:",
+        tooltip="Minimum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="148px"),
+    )
+
+    vmax = widgets.Text(
+        value=None,
+        description="vmax:",
+        tooltip="Maximum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="148px"),
+    )
+
+    nodata = widgets.Text(
+        value=None,
+        description="Nodata:",
+        tooltip="Nodata the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="150px", padding=padding),
+    )
+
+    palette = widgets.Dropdown(
         options=[],
         value=None,
-        description="colormap:",
-        layout=widgets.Layout(width="172px"),
+        description="palette:",
+        layout=widgets.Layout(width="300px"),
         style=style,
     )
 
-    x_dim = widgets.Text(
-        value="x",
-        description="x_dim:",
-        tooltip="The x dimension",
-        style=style,
-        layout=widgets.Layout(width="80px"),
-    )
-
-    y_dim = widgets.Text(
-        value="y",
-        description="y_dim:",
-        tooltip="The xydimension",
-        style=style,
-        layout=widgets.Layout(width="80px"),
-    )
-
-    raster_options = widgets.HBox()
+    raster_options = widgets.VBox()
 
     def filepath_change(change):
-        if file_type.value == "GeoTIFF":
-            if (
-                filepath.value.startswith("http")
-                or filepath.value.endswith(".txt")
-                or filepath.value.endswith(".csv")
-            ):
-                bands.disabled = True
-                colormap.disabled = True
-                x_dim.disabled = True
-                y_dim.disabled = True
-            else:
-                bands.disabled = False
-                colormap.disabled = False
-                x_dim.disabled = False
-                y_dim.disabled = False
+        if file_type.value == "Raster":
+            pass
+            # if (
+            #     filepath.value.startswith("http")
+            #     or filepath.value.endswith(".txt")
+            #     or filepath.value.endswith(".csv")
+            # ):
+            #     bands.disabled = True
+            #     palette.disabled = False
+            #     # x_dim.disabled = True
+            #     # y_dim.disabled = True
+            # else:
+            #     bands.disabled = False
+            #     palette.disabled = False
+            #     # x_dim.disabled = True
+            #     # y_dim.disabled = True
 
     filepath.observe(filepath_change, "value")
 
@@ -696,10 +707,10 @@ def open_data_widget(m):
 
     def bands_changed(change):
         if change["new"] and "," in change["owner"].value:
-            colormap.value = None
-            colormap.disabled = True
+            palette.value = None
+            palette.disabled = True
         else:
-            colormap.disabled = False
+            palette.disabled = False
 
     bands.observe(bands_changed, "value")
 
@@ -759,13 +770,14 @@ def open_data_widget(m):
             point_widget.children = []
             point_check.value = False
             http_widget.children = [filepath]
-        elif change["new"] == "GeoTIFF":
-            import matplotlib.pyplot as plt
-
-            file_chooser.filter_pattern = ["*.tif", "*.csv", "*.txt"]
-            colormap.options = plt.colormaps()
-            colormap.value = "terrain"
-            raster_options.children = [bands, colormap, x_dim, y_dim]
+        elif change["new"] == "Raster":
+            file_chooser.filter_pattern = ["*.tif", "*.img"]
+            palette.options = get_palettable(types=["matplotlib", "cartocolors"])
+            palette.value = None
+            raster_options.children = [
+                widgets.HBox([bands, vmin, vmax]),
+                widgets.HBox([nodata, palette]),
+            ]
             point_widget.children = []
             point_check.value = False
             http_widget.children = [filepath]
@@ -804,28 +816,37 @@ def open_data_widget(m):
                             layer_name=layer_name.value,
                         )
 
-                    elif ext.lower() == ".tif" and file_type.value == "GeoTIFF":
-                        if file_path.startswith("http"):
-                            m.add_cog_layer(file_path, layer_name.value)
-                        else:
-                            sel_bands = [int(b.strip()) for b in bands.value.split(",")]
-                            m.add_raster(
-                                image=file_path,
-                                bands=sel_bands,
-                                layer_name=layer_name.value,
-                                colormap=colormap.value,
-                                x_dim=x_dim.value,
-                                y_dim=y_dim.value,
-                            )
-                    elif file_type.value == "GeoTIFF" and ext.lower() in [
-                        ".csv",
-                        ".txt",
-                    ]:
-                        m.add_cog_mosaic_from_file(
-                            file_path, name=layer_name.value, show_footprints=True
+                    elif (
+                        ext.lower() in [".tif", "img"]
+                    ) and file_type.value == "Raster":
+
+                        band = None
+                        vis_min = None
+                        vis_max = None
+                        vis_nodata = None
+
+                        try:
+                            if len(bands.value) > 0:
+                                band = int(bands.value)
+                            if len(vmin.value) > 0:
+                                vis_min = float(vmin.value)
+                            if len(vmax.value) > 0:
+                                vis_max = float(vmax.value)
+                            if len(nodata.value) > 0:
+                                vis_nodata = float(nodata.value)
+                        except:
+                            pass
+
+                        m.add_local_tile(
+                            file_path,
+                            layer_name=layer_name.value,
+                            band=band,
+                            palette=palette.value,
+                            vmin=vis_min,
+                            vmax=vis_max,
+                            nodata=vis_nodata,
                         )
-                    else:
-                        m.add_vector(file_path, style={}, layer_name=layer_name.value)
+
                 else:
                     print("Please select a file to open.")
 
@@ -936,7 +957,9 @@ def save_map(m):
         ],
     )
 
-    file_chooser = FileChooser(os.getcwd(), sandbox_path=m.sandbox_path)
+    file_chooser = FileChooser(
+        os.getcwd(), sandbox_path=m.sandbox_path, layout=widgets.Layout(width="454px")
+    )
     file_chooser.default_filename = "my_map.html"
     file_chooser.use_dir_icons = True
 
