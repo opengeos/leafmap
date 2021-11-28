@@ -32,6 +32,10 @@
 26. Creating an interactive map using the kepler.gl plotting backend ([notebook](https://leafmap.org/notebooks/26_kepler_gl))
 27. Creating a basemap gallery ([notebook](https://leafmap.org/notebooks/27_basemap_gallery))
 28. Publishing maps with a single line of code ([notebook](https://leafmap.org/notebooks/28_publish_map))
+29. Using the pydeck plotting backend ([notebook](https://leafmap.org/notebooks/29_pydeck))
+30. Using U.S. Census data ([notebook](https://leafmap.org/notebooks/30_census_data))
+31. Searching basemaps with xyzservices ([notebook](https://leafmap.org/notebooks/31_search_basemaps))
+32. Loading local raster datasets and Cloud Optimized GeoTIFF (COG) ([notebook](https://leafmap.org/notebooks/32_local_tile))
 
 ## Demo
 
