@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.6.0 - November 27, 2021
+
+**New Features**:
+
+-   Added add_marker function
+-   Added save_data function
+-   Added support for local tile [#129](https://github.com/giswqs/leafmap/issues/129)
+-   Added open raster GUI [#129](https://github.com/giswqs/leafmap/issues/129)
+-   Added zoom to tile [#129](https://github.com/giswqs/leafmap/issues/129)
+
 ## v0.5.5 - November 9, 2021
 
 **New Features**:
