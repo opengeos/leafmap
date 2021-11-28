@@ -3145,3 +3145,152 @@ def get_local_tile_layer(
         return tile_layer, bounds
     else:
         return tile_layer
+
+
+def get_palettable(types=None):
+    """Get a list of palettable color palettes.
+
+    Args:
+        types (list, optional): A list of palettable types to return, e.g., types=['matplotlib', 'cartocolors']. Defaults to None.
+
+    Returns:
+        list: A list of palettable color palettes.
+    """
+    import palettable
+
+    if types is not None and (not isinstance(types, list)):
+        raise ValueError("The types must be a list.")
+
+    allowed_palettes = [
+        "cartocolors",
+        "cmocean",
+        "colorbrewer",
+        "cubehelix",
+        "lightbartlein",
+        "matplotlib",
+        "mycarta",
+        "scientific",
+        "tableau",
+        "wesanderson",
+    ]
+
+    if types is None:
+        types = allowed_palettes[:]
+
+    if all(x in allowed_palettes for x in types):
+        pass
+    else:
+        raise ValueError(
+            "The types must be one of the following: " + ", ".join(allowed_palettes)
+        )
+
+    palettes = []
+
+    if "cartocolors" in types:
+
+        cartocolors_diverging = [
+            f"cartocolors.diverging.{c}"
+            for c in dir(palettable.cartocolors.diverging)[:-19]
+        ]
+        cartocolors_qualitative = [
+            f"cartocolors.qualitative.{c}"
+            for c in dir(palettable.cartocolors.qualitative)[:-19]
+        ]
+        cartocolors_sequential = [
+            f"cartocolors.sequential.{c}"
+            for c in dir(palettable.cartocolors.sequential)[:-41]
+        ]
+
+        palettes = (
+            palettes
+            + cartocolors_diverging
+            + cartocolors_qualitative
+            + cartocolors_sequential
+        )
+
+    if "cmocean" in types:
+
+        cmocean_diverging = [
+            f"cmocean.diverging.{c}" for c in dir(palettable.cmocean.diverging)[:-19]
+        ]
+        cmocean_sequential = [
+            f"cmocean.sequential.{c}" for c in dir(palettable.cmocean.sequential)[:-19]
+        ]
+
+        palettes = palettes + cmocean_diverging + cmocean_sequential
+
+    if "colorbrewer" in types:
+
+        colorbrewer_diverging = [
+            f"colorbrewer.diverging.{c}"
+            for c in dir(palettable.colorbrewer.diverging)[:-19]
+        ]
+        colorbrewer_qualitative = [
+            f"colorbrewer.qualitative.{c}"
+            for c in dir(palettable.colorbrewer.qualitative)[:-19]
+        ]
+        colorbrewer_sequential = [
+            f"colorbrewer.sequential.{c}"
+            for c in dir(palettable.colorbrewer.sequential)[:-41]
+        ]
+
+        palettes = (
+            palettes
+            + colorbrewer_diverging
+            + colorbrewer_qualitative
+            + colorbrewer_sequential
+        )
+
+    if "cubehelix" in types:
+        cubehelix = [
+            "classic_16",
+            "cubehelix1_16",
+            "cubehelix2_16",
+            "cubehelix3_16",
+            "jim_special_16",
+            "perceptual_rainbow_16",
+            "purple_16",
+            "red_16",
+        ]
+        cubehelix = [f"cubehelix.{c}" for c in cubehelix]
+        palettes = palettes + cubehelix
+
+    if "lightbartlein" in types:
+        lightbartlein_diverging = [
+            f"lightbartlein.diverging.{c}"
+            for c in dir(palettable.lightbartlein.diverging)[:-19]
+        ]
+        lightbartlein_sequential = [
+            f"lightbartlein.sequential.{c}"
+            for c in dir(palettable.lightbartlein.sequential)[:-19]
+        ]
+
+        palettes = palettes + lightbartlein_diverging + lightbartlein_sequential
+
+    if "matplotlib" in types:
+        matplotlib_colors = [
+            f"matplotlib.{c}" for c in dir(palettable.matplotlib)[:-16]
+        ]
+        palettes = palettes + matplotlib_colors
+
+    if "mycarta" in types:
+        mycarta = [f"mycarta.{c}" for c in dir(palettable.mycarta)[:-16]]
+        palettes = palettes + mycarta
+
+    if "scientific" in types:
+        scientific_diverging = [
+            f"scientific.diverging.{c}"
+            for c in dir(palettable.scientific.diverging)[:-19]
+        ]
+        scientific_sequential = [
+            f"scientific.sequential.{c}"
+            for c in dir(palettable.scientific.sequential)[:-19]
+        ]
+
+        palettes = palettes + scientific_diverging + scientific_sequential
+
+    if "tableau" in types:
+        tableau = [f"tableau.{c}" for c in dir(palettable.tableau)[:-14]]
+        palettes = palettes + tableau
+
+    return palettes
