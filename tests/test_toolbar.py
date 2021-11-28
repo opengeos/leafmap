@@ -47,7 +47,7 @@ class TestToolbar(unittest.TestCase):
         assert "GeoJSON" in out_str
         assert "CSV" in out_str
         assert "Vector" in out_str
-        assert "GeoTIFF" in out_str
+        assert "Raster" in out_str
 
     def test_save_map(self):
         """Check save map widget"""
