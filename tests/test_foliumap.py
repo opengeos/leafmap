@@ -151,13 +151,13 @@ class TestFoliumap(unittest.TestCase):
         out_str = m.to_html()
         assert "NLCD" in out_str
 
-    def test_add_marker_cluster(self):
-        """Check marker cluster"""
-        with self.assertRaises(NotImplementedError):
-            m = leafmap.Map()
-            m.add_marker_cluster()
-            out_str = m.to_html()
-            assert "Marker Cluster" in out_str
+    # def test_add_marker_cluster(self):
+    #     """Check marker cluster"""
+    #     with self.assertRaises(NotImplementedError):
+    #         m = leafmap.Map()
+    #         m.add_marker_cluster()
+    #         out_str = m.to_html()
+    #         assert "Marker Cluster" in out_str
 
     def test_add_minimap(self):
         """Check minimap"""
