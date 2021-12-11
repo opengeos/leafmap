@@ -2276,10 +2276,13 @@ class Map(ipyleaflet.Map):
         """
         import pandas as pd
 
-        if not in_csv.startswith("http") and (not os.path.exists(in_csv)):
+        if isinstance(in_csv, pd.DataFrame):
+            df = in_csv
+        elif not in_csv.startswith("http") and (not os.path.exists(in_csv)):
             raise FileNotFoundError("The specified input csv does not exist.")
+        else:
+            df = pd.read_csv(in_csv)
 
-        df = pd.read_csv(in_csv)
         col_names = df.columns.values.tolist()
 
         if x not in col_names:
@@ -2339,14 +2342,17 @@ class Map(ipyleaflet.Map):
 
         self.default_style = {"cursor": "wait"}
 
-        if not filename.startswith("http"):
-            filename = os.path.abspath(filename)
-        ext = os.path.splitext(filename)[1].lower()
-        if ext == ".kml":
-            gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
-            gdf = gpd.read_file(filename, driver="KML", **kwargs)
+        if isinstance(filename, gpd.GeoDataFrame):
+            gdf = filename
         else:
-            gdf = gpd.read_file(filename, **kwargs)
+            if not filename.startswith("http"):
+                filename = os.path.abspath(filename)
+            ext = os.path.splitext(filename)[1].lower()
+            if ext == ".kml":
+                gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+                gdf = gpd.read_file(filename, driver="KML", **kwargs)
+            else:
+                gdf = gpd.read_file(filename, **kwargs)
         df = gdf.to_crs(epsg="4326")
         col_names = df.columns.values.tolist()
         if popup is not None:
