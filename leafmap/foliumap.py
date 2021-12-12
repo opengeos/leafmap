@@ -87,6 +87,11 @@ class Map(folium.Map):
         if kwargs["latlon_control"]:
             folium.LatLngPopup().add_to(self)
 
+        if "locate_control" not in kwargs:
+            kwargs["locate_control"] = False
+        if kwargs["locate_control"]:
+            plugins.LocateControl().add_to(self)
+
         if "minimap_control" not in kwargs:
             kwargs["minimap_control"] = False
         if kwargs["minimap_control"]:
