@@ -1684,7 +1684,7 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def add_marker_cluster(
+    def add_points_from_xy(
         self,
         data,
         x="longitude",
