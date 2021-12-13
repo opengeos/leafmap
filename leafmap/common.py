@@ -3329,3 +3329,106 @@ def points_from_xy(data, x="longitude", y="latitude", z=None, crs=None, **kwargs
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df[x], df[y], z=z, crs=crs))
 
     return gdf
+
+
+def html_to_streamlit(
+    html,
+    width=800,
+    height=600,
+    responsive=True,
+    scrolling=False,
+    token_name=None,
+    token_value=None,
+    **kwargs,
+):
+    """Renders an HTML file in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
+
+    Args:
+        html (str): The HTML file to render. It can a local file path or a URL.
+        width (int, optional): Width of the map. Defaults to 800.
+        height (int, optional): Height of the map. Defaults to 600.
+        responsive (bool, optional): Whether to make the map responsive. Defaults to True.
+        scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
+        token_name (str, optional): The name of the token in the HTML file to be replaced. Defaults to None.
+        token_value (str, optional): The value of the token to pass to the HTML file. Defaults to None.
+
+    Returns:
+        streamlit.components: components.html object.
+    """
+
+    try:
+        import streamlit as st
+        import streamlit.components.v1 as components
+
+        if isinstance(html, str):
+
+            temp_path = None
+            if html.startswith("http") and html.endswith(".html"):
+                temp_path = temp_file_path(".html")
+                out_file = os.path.basename(temp_path)
+                out_dir = os.path.dirname(temp_path)
+                download_from_url(html, out_file, out_dir)
+                html = temp_path
+
+            elif not os.path.exists(html):
+                raise FileNotFoundError("The specified input html does not exist.")
+
+            with open(html) as f:
+                lines = f.readlines()
+                if (token_name is not None) and (token_value is not None):
+                    lines = [line.replace(token_name, token_value) for line in lines]
+                html_str = "".join(lines)
+
+            if temp_path is not None:
+                os.remove(temp_path)
+
+            if responsive:
+                make_map_responsive = """
+                <style>
+                [title~="st.iframe"] { width: 100%}
+                </style>
+                """
+                st.markdown(make_map_responsive, unsafe_allow_html=True)
+            return components.html(
+                html_str, width=width, height=height, scrolling=scrolling
+            )
+        else:
+            raise TypeError("The html must be a string.")
+
+    except Exception as e:
+        raise Exception(e)
+
+
+def cesium_to_streamlit(
+    html,
+    width=800,
+    height=600,
+    responsive=True,
+    scrolling=False,
+    token_name=None,
+    token_value=None,
+    **kwargs,
+):
+    """Renders an cesium HTML file in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
+
+    Args:
+        html (str): The HTML file to render. It can a local file path or a URL.
+        width (int, optional): Width of the map. Defaults to 800.
+        height (int, optional): Height of the map. Defaults to 600.
+        responsive (bool, optional): Whether to make the map responsive. Defaults to True.
+        scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
+        token_name (str, optional): The name of the token in the HTML file to be replaced. Defaults to None.
+        token_value (str, optional): The value of the token to pass to the HTML file. Defaults to None.
+
+    Returns:
+        streamlit.components: components.html object.
+    """
+    if token_name is None:
+        token_name = "your_access_token"
+
+    if token_value is None:
+        token_value = os.environ.get("CESIUM_TOKEN")
+
+    html_to_streamlit(
+        html, width, height, responsive, scrolling, token_name, token_value
+    )
