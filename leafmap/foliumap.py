@@ -37,7 +37,7 @@ class Map(folium.Map):
         else:
             kwargs["zoom_start"] = zoom
         if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 22
+            kwargs["max_zoom"] = 24
 
         if "control_scale" not in kwargs:
             kwargs["control_scale"] = True
@@ -386,11 +386,10 @@ class Map(folium.Map):
 
     def add_heatmap(
         self,
-        filepath=None,
+        data,
         latitude="latitude",
         longitude="longitude",
         value="value",
-        data=None,
         name="Heat map",
         radius=25,
         **kwargs,
@@ -398,11 +397,10 @@ class Map(folium.Map):
         """Adds a heat map to the map. Reference: https://stackoverflow.com/a/54756617
 
         Args:
-            filepath (str, optional): File path or HTTP URL to the input file. Defaults to None.
+            data (str | list | pd.DataFrame): File path or HTTP URL to the input file or a list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. For example, https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/world_cities.csv
             latitude (str, optional): The column name of latitude. Defaults to "latitude".
             longitude (str, optional): The column name of longitude. Defaults to "longitude".
             value (str, optional): The column name of values. Defaults to "value".
-            data (list, optional): A list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. Defaults to None.
             name (str, optional): Layer name to use. Defaults to "Heat map".
             radius (int, optional): Radius of each “point” of the heatmap. Defaults to 25.
 
@@ -411,19 +409,23 @@ class Map(folium.Map):
         """
         import pandas as pd
 
-        if data is None:
-            if filepath is None:
-                filepath = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_cities.csv"
-                value = "pop_max"
+        try:
 
-            df = pd.read_csv(filepath)
-            data = df[[latitude, longitude, value]].values.tolist()
-        elif not isinstance(data, list):
-            raise ValueError("data must be a list in the format of ")
+            if isinstance(data, str):
+                df = pd.read_csv(data)
+                data = df[[latitude, longitude, value]].values.tolist()
+            elif isinstance(data, pd.DataFrame):
+                data = data[[latitude, longitude, value]].values.tolist()
+            elif isinstance(data, list):
+                pass
+            else:
+                raise ValueError("data must be a list, a DataFrame, or a file path.")
 
-        plugins.HeatMap(data, name=name, radius=radius, **kwargs).add_to(
-            folium.FeatureGroup(name=name).add_to(self)
-        )
+            plugins.HeatMap(data, name=name, radius=radius, **kwargs).add_to(
+                folium.FeatureGroup(name=name).add_to(self)
+            )
+        except Exception as e:
+            raise Exception(e)
 
     def add_osm_from_geocode(
         self,
@@ -1689,7 +1691,7 @@ class Map(folium.Map):
         data,
         x="longitude",
         y="latitude",
-        popups=None,
+        popup=None,
         min_width=100,
         max_width=200,
         layer_name="Marker Cluster",
@@ -1701,7 +1703,7 @@ class Map(folium.Map):
             data (str | pd.DataFrame): A csv or Pandas DataFrame containing x, y, z values.
             x (str, optional): The column name for the x values. Defaults to "longitude".
             y (str, optional): The column name for the y values. Defaults to "latitude".
-            popups (list, optional): A list of column names to be used as the popup. Defaults to None.
+            popup (list, optional): A list of column names to be used as the popup. Defaults to None.
             min_width (int, optional): The minimum width of the popup. Defaults to 100.
             max_width (int, optional): The maximum width of the popup. Defaults to 200.
             layer_name (str, optional): The name of the layer. Defaults to "Marker Cluster".
@@ -1718,8 +1720,8 @@ class Map(folium.Map):
 
         col_names = df.columns.values.tolist()
 
-        if popups is None:
-            popups = col_names
+        if popup is None:
+            popup = col_names
 
         if x not in col_names:
             raise ValueError(f"x must be one of the following: {', '.join(col_names)}")
@@ -1731,7 +1733,7 @@ class Map(folium.Map):
 
         for row in df.itertuples():
             html = ""
-            for p in popups:
+            for p in popup:
                 html = (
                     html
                     + "<b>"
@@ -1741,10 +1743,110 @@ class Map(folium.Map):
                     + str(eval(str("row." + p)))
                     + "<br>"
                 )
-            popup = folium.Popup(html, min_width=min_width, max_width=max_width)
+            popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
             folium.Marker(
-                location=[eval(f"row.{y}"), eval(f"row.{x}")], popup=popup
+                location=[eval(f"row.{y}"), eval(f"row.{x}")], popup=popup_html
             ).add_to(marker_cluster)
+
+    def add_circle_markers_from_xy(
+        self,
+        data,
+        x="longitude",
+        y="latitude",
+        radius=10,
+        popup=None,
+        tooltip=None,
+        min_width=100,
+        max_width=200,
+        **kwargs,
+    ):
+        """Adds a marker cluster to the map.
+
+        Args:
+            data (str | pd.DataFrame): A csv or Pandas DataFrame containing x, y, z values.
+            x (str, optional): The column name for the x values. Defaults to "longitude".
+            y (str, optional): The column name for the y values. Defaults to "latitude".
+            radius (int, optional): The radius of the circle. Defaults to 10.
+            popup (list, optional): A list of column names to be used as the popup. Defaults to None.
+            tooltip (list, optional): A list of column names to be used as the tooltip. Defaults to None.
+            min_width (int, optional): The minimum width of the popup. Defaults to 100.
+            max_width (int, optional): The maximum width of the popup. Defaults to 200.
+
+        """
+        import pandas as pd
+
+        if isinstance(data, pd.DataFrame):
+            df = data
+        elif not data.startswith("http") and (not os.path.exists(data)):
+            raise FileNotFoundError("The specified input csv does not exist.")
+        else:
+            df = pd.read_csv(data)
+
+        col_names = df.columns.values.tolist()
+
+        if "color" not in kwargs:
+            kwargs["color"] = None
+        if "fill" not in kwargs:
+            fill = True
+        if "fill_color" not in kwargs:
+            kwargs["fill_color"] = "blue"
+        if "fill_opacity" not in kwargs:
+            kwargs["fill_opacity"] = 0.7
+
+        if popup is None:
+            popup = col_names
+
+        if not isinstance(popup, list):
+            popup = [popup]
+
+        if tooltip is not None:
+            if not isinstance(tooltip, list):
+                tooltip = [tooltip]
+
+        if x not in col_names:
+            raise ValueError(f"x must be one of the following: {', '.join(col_names)}")
+
+        if y not in col_names:
+            raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
+
+        for row in df.itertuples():
+            html = ""
+            for p in popup:
+                html = (
+                    html
+                    + "<b>"
+                    + p
+                    + "</b>"
+                    + ": "
+                    + str(eval(str("row." + p)))
+                    + "<br>"
+                )
+            popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
+
+            if tooltip is not None:
+                html = ""
+                for p in tooltip:
+                    html = (
+                        html
+                        + "<b>"
+                        + p
+                        + "</b>"
+                        + ": "
+                        + str(eval(str("row." + p)))
+                        + "<br>"
+                    )
+
+                tooltip_str = folium.Tooltip(html)
+            else:
+                tooltip_str = None
+
+            folium.CircleMarker(
+                location=[eval(f"row.{y}"), eval(f"row.{x}")],
+                radius=radius,
+                popup=popup_html,
+                tooltip=tooltip_str,
+                **kwargs,
+            ).add_to(self)
 
     def add_minimap(self, zoom=5, position="bottomright"):
         """Adds a minimap (overview) to the ipyleaflet map."""
