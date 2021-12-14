@@ -25,7 +25,7 @@ class Map(ipyleaflet.Map):
             kwargs["zoom"] = 4
 
         if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 22
+            kwargs["max_zoom"] = 24
 
         if "scroll_wheel_zoom" not in kwargs:
             kwargs["scroll_wheel_zoom"] = True
@@ -2314,7 +2314,7 @@ class Map(ipyleaflet.Map):
         data,
         x="longitude",
         y="latitude",
-        popups=None,
+        popup=None,
         layer_name="Marker Cluster",
         **kwargs,
     ):
@@ -2324,7 +2324,7 @@ class Map(ipyleaflet.Map):
             data (str | pd.DataFrame): A csv or Pandas DataFrame containing x, y, z values.
             x (str, optional): The column name for the x values. Defaults to "longitude".
             y (str, optional): The column name for the y values. Defaults to "latitude".
-            popups (list, optional): A list of column names to be used as the popup. Defaults to None.
+            popup (list, optional): A list of column names to be used as the popup. Defaults to None.
             layer_name (str, optional): The name of the layer. Defaults to "Marker Cluster".
 
         """
@@ -2343,28 +2343,28 @@ class Map(ipyleaflet.Map):
         if "geometry" in col_names:
             col_names.remove("geometry")
 
-        if popups is not None:
-            if isinstance(popups, str) and (popups not in col_names):
+        if popup is not None:
+            if isinstance(popup, str) and (popup not in col_names):
                 raise ValueError(
                     f"popup must be one of the following: {', '.join(col_names)}"
                 )
-            elif isinstance(popups, list) and (
-                not all(item in col_names for item in popups)
+            elif isinstance(popup, list) and (
+                not all(item in col_names for item in popup)
             ):
                 raise ValueError(
                     f"All popup items must be select from: {', '.join(col_names)}"
                 )
         else:
-            popups = col_names
+            popup = col_names
 
         df["x"] = df.geometry.x
         df["y"] = df.geometry.y
 
         points = list(zip(df["y"], df["x"]))
 
-        if popups is not None:
-            if isinstance(popups, str):
-                labels = df[popups]
+        if popup is not None:
+            if isinstance(popup, str):
+                labels = df[popup]
                 markers = [
                     ipyleaflet.Marker(
                         location=point,
@@ -2373,11 +2373,11 @@ class Map(ipyleaflet.Map):
                     )
                     for index, point in enumerate(points)
                 ]
-            elif isinstance(popups, list):
+            elif isinstance(popup, list):
                 labels = []
                 for i in range(len(points)):
                     label = ""
-                    for item in popups:
+                    for item in popup:
                         label = (
                             label
                             + "<b>"
@@ -2411,11 +2411,10 @@ class Map(ipyleaflet.Map):
 
     def add_heatmap(
         self,
-        filepath=None,
+        data,
         latitude="latitude",
         longitude="longitude",
         value="value",
-        data=None,
         name="Heat map",
         radius=25,
         **kwargs,
@@ -2423,11 +2422,10 @@ class Map(ipyleaflet.Map):
         """Adds a heat map to the map. Reference: https://ipyleaflet.readthedocs.io/en/latest/api_reference/heatmap.html
 
         Args:
-            filepath (str, optional): File path or HTTP URL to the input file. Defaults to None.
+            data (str | list | pd.DataFrame): File path or HTTP URL to the input file or a list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. For example, https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/world_cities.csv
             latitude (str, optional): The column name of latitude. Defaults to "latitude".
             longitude (str, optional): The column name of longitude. Defaults to "longitude".
             value (str, optional): The column name of values. Defaults to "value".
-            data (list, optional): A list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. Defaults to None.
             name (str, optional): Layer name to use. Defaults to "Heat map".
             radius (int, optional): Radius of each “point” of the heatmap. Defaults to 25.
 
@@ -2437,18 +2435,23 @@ class Map(ipyleaflet.Map):
         import pandas as pd
         from ipyleaflet import Heatmap
 
-        if data is None:
-            if filepath is None:
-                filepath = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_cities.csv"
-                value = "pop_max"
+        try:
 
-            df = pd.read_csv(filepath)
-            data = df[[latitude, longitude, value]].values.tolist()
-        elif not isinstance(data, list):
-            raise ValueError("data must be a list in the format of ")
+            if isinstance(data, str):
+                df = pd.read_csv(data)
+                data = df[[latitude, longitude, value]].values.tolist()
+            elif isinstance(data, pd.DataFrame):
+                data = data[[latitude, longitude, value]].values.tolist()
+            elif isinstance(data, list):
+                pass
+            else:
+                raise ValueError("data must be a list, a DataFrame, or a file path.")
 
-        heatmap = Heatmap(locations=data, radius=radius, name=name, **kwargs)
-        self.add_layer(heatmap)
+            heatmap = Heatmap(locations=data, radius=radius, name=name, **kwargs)
+            self.add_layer(heatmap)
+
+        except Exception as e:
+            raise Exception(e)
 
     def add_planet_by_month(
         self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
