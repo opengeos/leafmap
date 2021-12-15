@@ -37,12 +37,12 @@ class Map(pdk.Deck):
         object: pydeck.Deck object.
     """
 
-    def __init__(self, center=(40, -100), zoom=3, **kwargs):
+    def __init__(self, center=(20, 0), zoom=1.2, **kwargs):
         """Initialize a Map object.
 
         Args:
-            center (tuple, optional): Center of the map in the format of (lat, lon). Defaults to (40, -100).
-            zoom (int, optional): The map zoom level. Defaults to 3.
+            center (tuple, optional): Center of the map in the format of (lat, lon). Defaults to (20, 0).
+            zoom (int, optional): The map zoom level. Defaults to 1.2.
         """
         if "initial_view_state" not in kwargs:
             kwargs["initial_view_state"] = pdk.ViewState(

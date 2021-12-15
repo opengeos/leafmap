@@ -17,8 +17,8 @@ class Map(folium.Map):
     def __init__(self, **kwargs):
 
         # Default map center location and zoom level
-        latlon = [40, -100]
-        zoom = 4
+        latlon = [20, 0]
+        zoom = 2
 
         # Interchangeable parameters between ipyleaflet and folium
         if "center" in kwargs:
