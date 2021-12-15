@@ -19,10 +19,10 @@ class Map(ipyleaflet.Map):
     def __init__(self, **kwargs):
 
         if "center" not in kwargs:
-            kwargs["center"] = [40, -100]
+            kwargs["center"] = [20, 0]
 
         if "zoom" not in kwargs:
-            kwargs["zoom"] = 4
+            kwargs["zoom"] = 2
 
         if "max_zoom" not in kwargs:
             kwargs["max_zoom"] = 24

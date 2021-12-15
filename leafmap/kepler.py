@@ -31,10 +31,10 @@ class Map(keplergl.KeplerGl):
     def __init__(self, **kwargs):
 
         if "center" not in kwargs:
-            kwargs["center"] = [40, -100]
+            kwargs["center"] = [20, 0]
 
         if "zoom" not in kwargs:
-            kwargs["zoom"] = 2.97
+            kwargs["zoom"] = 1.3
 
         if "height" not in kwargs:
             kwargs["height"] = 600
