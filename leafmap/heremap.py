@@ -44,10 +44,10 @@ class Map(here_map_widget.Map):
                 )
 
         if "center" not in kwargs:
-            kwargs["center"] = [40, -100]
+            kwargs["center"] = [20, 0]
 
         if "zoom" not in kwargs:
-            kwargs["zoom"] = 4
+            kwargs["zoom"] = 2
 
         if "basemap" in kwargs:
             kwargs["basemap"] = here_basemaps[kwargs["basemap"]]
