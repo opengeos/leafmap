@@ -392,7 +392,7 @@ class TestFoliumap(unittest.TestCase):
         """Check getting scale"""
         with self.assertRaises(NotImplementedError):
             m = leafmap.Map()
-            self.assertEqual(m.get_scale(), 9783.94)
+            self.assertEqual(m.get_scale(), 39135.76)
 
     def test_image_overlay(self):
         """Check image overlay"""

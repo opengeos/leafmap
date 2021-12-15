@@ -379,7 +379,7 @@ class TestLeafmap(unittest.TestCase):
     def test_get_scale(self):
         """Check getting scale"""
         m = leafmap.Map()
-        self.assertEqual(m.get_scale(), 9783.94)
+        self.assertEqual(m.get_scale(), 39135.76)
 
     def test_image_overlay(self):
         """Check image overlay"""
