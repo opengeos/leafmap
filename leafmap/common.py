@@ -2891,7 +2891,7 @@ def read_file_from_url(url, return_type="list", encoding="utf-8"):
         raise ValueError("The return type must be either list or string.")
 
 
-def create_download_button(
+def st_download_button(
     label,
     data,
     file_name=None,
@@ -2900,6 +2900,7 @@ def create_download_button(
     help=None,
     on_click=None,
     args=None,
+    csv_sep=",",
     **kwargs,
 ):
     """Streamlit function to create a download button.
@@ -2926,7 +2927,7 @@ def create_download_button(
                 file_name = data.split("/")[-1]
 
             if data.endswith(".csv"):
-                data = pd.read_csv(data).to_csv()
+                data = pd.read_csv(data).to_csv(sep=csv_sep, index=False)
                 if mime is None:
                     mime = "text/csv"
                 return st.download_button(
@@ -2950,20 +2951,31 @@ def create_download_button(
                         args,
                         **kwargs,
                     )
+        elif isinstance(data, pd.DataFrame):
+            if file_name is None:
+                file_name = "data.csv"
 
-            else:
-                return st.download_button(
-                    label,
-                    label,
-                    data,
-                    file_name,
-                    mime,
-                    key,
-                    help,
-                    on_click,
-                    args,
-                    **kwargs,
-                )
+            data = data.to_csv(sep=csv_sep, index=False)
+            if mime is None:
+                mime = "text/csv"
+            return st.download_button(
+                label, data, file_name, mime, key, help, on_click, args, **kwargs
+            )
+
+        else:
+            # if mime is None:
+            #     mime = "application/pdf"
+            return st.download_button(
+                label,
+                data,
+                file_name,
+                mime,
+                key,
+                help,
+                on_click,
+                args,
+                **kwargs,
+            )
 
     except ImportError:
         print("Streamlit is not installed. Please run 'pip install streamlit'.")
