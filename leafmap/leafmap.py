@@ -2901,7 +2901,19 @@ def ts_inspector(
     zoom=4,
     **kwargs,
 ):
+    """Creates a time series inspector.
 
+    Args:
+        layers_dict (dict, optional): A dictionary of layers to be shown on the map. Defaults to None.
+        left_name (str, optional): A name for the left layer. Defaults to None.
+        right_name (str, optional): A name for the right layer. Defaults to None.
+        width (str, optional): Width of the dropdown list. Defaults to "120px".
+        center (list, optional): Center of the map. Defaults to [40, -100].
+        zoom (int, optional): Zoom level of the map. Defaults to 4.
+
+    Returns:
+        leafmap.Map: The Map instance.
+    """
     import ipywidgets as widgets
 
     add_zoom = True
