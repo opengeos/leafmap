@@ -7,7 +7,7 @@
 -   Added image overlay functionality [#136](https://github.com/giswqs/leafmap/issues/136)
 -   Added marker cluster function [#138](https://github.com/giswqs/leafmap/issues/138)
 -   Added locate control to folium
--   Added cesium \_to_streamlit function [#139](https://github.com/giswqs/leafmap/issues/139)
+-   Added cesium_to_streamlit function [#139](https://github.com/giswqs/leafmap/issues/139)
 -   Added add_points_from_xy function [#138](https://github.com/giswqs/leafmap/issues/138)
 -   Added circle markers function [#140](https://github.com/giswqs/leafmap/issues/143)
 
