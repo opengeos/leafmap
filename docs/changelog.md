@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.6.1 - December 23, 2021
+
+**New Features**:
+
+-   Added image overlay functionality [#136](https://github.com/giswqs/leafmap/issues/136)
+-   Added marker cluster function [#138](https://github.com/giswqs/leafmap/issues/138)
+-   Added locate control to folium
+-   Added cesium \_to_streamlit function [#139](https://github.com/giswqs/leafmap/issues/139)
+-   Added add_points_from_xy function [#138](https://github.com/giswqs/leafmap/issues/138)
+-   Added circle markers function [#140](https://github.com/giswqs/leafmap/issues/143)
+
+**Improvement**
+
+-   Added localtileserver to env.yml
+-   Fixed gdf style callback bug [#119](https://github.com/giswqs/leafmap/issues/119)
+-   Added ts_inspector docstring [#147](https://github.com/giswqs/leafmap/discussions/147)
+-   Improved streamlit download button
+
 ## v0.6.0 - November 27, 2021
 
 **New Features**:
