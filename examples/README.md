@@ -50,6 +50,7 @@
 33. Adding image overlay to the map ([notebook](https://geemap.org/notebooks/33_image_overlay))
 34. Adding points from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/34_add_points_from_xy))
 35. Adding circle markers from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/35_circle_markers))
+36. Adding labels to the map ([notebook](https://geemap.org/notebooks/36_add_labels))
 
 ## Demo
 
