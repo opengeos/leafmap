@@ -47,6 +47,9 @@
 30. Using U.S. Census data ([notebook](https://leafmap.org/notebooks/30_census_data))
 31. Searching basemaps with xyzservices ([notebook](https://leafmap.org/notebooks/31_search_basemaps))
 32. Loading local raster datasets and Cloud Optimized GeoTIFF (COG) ([notebook](https://leafmap.org/notebooks/32_local_tile))
+33. Adding image overlay to the map ([notebook](https://geemap.org/notebooks/33_image_overlay))
+34. Adding points from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/34_add_points_from_xy))
+35. Adding circle markers from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/35_circle_markers))
 
 ## Demo
 
