@@ -1930,6 +1930,10 @@ class Map(folium.Map):
 
         layer_group.add_to(self)
 
+    def remove_labels(self, **kwargs):
+        """Removes a layer from the map."""
+        print("The folium plotting backend does not support removing labels.")
+
     def add_minimap(self, zoom=5, position="bottomright"):
         """Adds a minimap (overview) to the ipyleaflet map."""
         raise NotImplementedError(
