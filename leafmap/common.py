@@ -828,13 +828,13 @@ def create_code_cell(code="", where="below"):
     )
 
 
-def cog_tile(url, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
+def cog_tile(url, titiler_endpoint="https://titiler.xyz", **kwargs):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
         Source code adapted from https://developmentseed.org/titiler/examples/Working_with_CloudOptimizedGeoTIFF_simple/
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         tuple: Returns the COG Tile layer URL and bounds.
@@ -864,7 +864,7 @@ def cog_tile(url, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
 
 def cog_mosaic(
     links,
-    titiler_endpoint="https://api.cogeo.xyz/",
+    titiler_endpoint="https://titiler.xyz",
     username="anonymous",
     layername=None,
     overwrite=False,
@@ -875,7 +875,7 @@ def cog_mosaic(
 
     Args:
         links (list): A list containing COG HTTP URLs.
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
         username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
         layername ([type], optional): Layer name to use. Defaults to None.
         overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
@@ -930,7 +930,7 @@ def cog_mosaic(
 def cog_mosaic_from_file(
     filepath,
     skip_rows=0,
-    titiler_endpoint="https://api.cogeo.xyz/",
+    titiler_endpoint="https://titiler.xyz",
     username="anonymous",
     layername=None,
     overwrite=False,
@@ -942,7 +942,7 @@ def cog_mosaic_from_file(
     Args:
         filepath (str): Local path or HTTP URL to the csv/txt file containing COG URLs.
         skip_rows (int, optional): The number of rows to skip in the file. Defaults to 0.
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
         username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
         layername ([type], optional): Layer name to use. Defaults to None.
         overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
@@ -971,12 +971,12 @@ def cog_mosaic_from_file(
     return mosaic
 
 
-def cog_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def cog_bounds(url, titiler_endpoint="https://titiler.xyz"):
     """Get the bounding box of a Cloud Optimized GeoTIFF (COG).
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         list: A list of values representing [left, bottom, right, top]
@@ -992,12 +992,12 @@ def cog_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return bounds
 
 
-def cog_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def cog_center(url, titiler_endpoint="https://titiler.xyz"):
     """Get the centroid of a Cloud Optimized GeoTIFF (COG).
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         tuple: A tuple representing (longitude, latitude)
@@ -1007,12 +1007,12 @@ def cog_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return center
 
 
-def cog_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def cog_bands(url, titiler_endpoint="https://titiler.xyz"):
     """Get band names of a Cloud Optimized GeoTIFF (COG).
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         list: A list of band names
@@ -1030,12 +1030,12 @@ def cog_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return bands
 
 
-def stac_tile(url, bands=None, titiler_endpoint="https://api.cogeo.xyz/", **kwargs):
+def stac_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
     """Get a tile layer from a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         tuple: Returns the COG Tile layer URL and bounds.
@@ -1081,12 +1081,12 @@ def stac_tile(url, bands=None, titiler_endpoint="https://api.cogeo.xyz/", **kwar
     return r["tiles"][0]
 
 
-def stac_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def stac_bounds(url, titiler_endpoint="https://titiler.xyz"):
     """Get the bounding box of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         list: A list of values representing [left, bottom, right, top]
@@ -1099,12 +1099,12 @@ def stac_bounds(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return bounds
 
 
-def stac_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def stac_center(url, titiler_endpoint="https://titiler.xyz"):
     """Get the centroid of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         tuple: A tuple representing (longitude, latitude)
@@ -1114,12 +1114,12 @@ def stac_center(url, titiler_endpoint="https://api.cogeo.xyz/"):
     return center
 
 
-def stac_bands(url, titiler_endpoint="https://api.cogeo.xyz/"):
+def stac_bands(url, titiler_endpoint="https://titiler.xyz"):
     """Get band names of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://api.cogeo.xyz/".
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
         list: A list of band names
