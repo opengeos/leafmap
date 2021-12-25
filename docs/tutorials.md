@@ -1,7 +1,7 @@
 # Tutorials
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
-[![image](https://binder.pangeo.io/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
+[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 
 1. Introducing the leafmap Python package for interactive mapping ([video](https://youtu.be/-UPt7x3Gn60) | [gif](https://i.imgur.com/2pRxunR.gif) | [notebook](https://leafmap.org/notebooks/01_leafmap_intro))
@@ -40,6 +40,7 @@
 34. Adding points from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/34_add_points_from_xy))
 35. Adding circle markers from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/35_circle_markers))
 36. Adding labels to the map ([notebook](https://geemap.org/notebooks/36_add_labels))
+37. Adding Planetary Computer STAC item to the map ([notebook](https://geemap.org/notebooks/37_planetary_computer))
 
 ## Demo
 

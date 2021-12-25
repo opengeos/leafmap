@@ -2,7 +2,7 @@
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
-[![image](https://binder.pangeo.io/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
+[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
@@ -51,6 +51,7 @@
 34. Adding points from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/34_add_points_from_xy))
 35. Adding circle markers from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://geemap.org/notebooks/35_circle_markers))
 36. Adding labels to the map ([notebook](https://geemap.org/notebooks/36_add_labels))
+37. Adding Planetary Computer STAC item to the map ([notebook](https://geemap.org/notebooks/37_planetary_computer))
 
 ## Demo
 
