@@ -1,6 +1,6 @@
 # Usage
 
-You can try out leafmap by using Goolge Colab ([![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)) or Binder ([![image](https://binder.pangeo.io/badge_logo.svg)](https://gishub.org/leafmap-pangeo)) without having to install anything on your computer.
+You can try out leafmap by using Goolge Colab ([![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)) or Binder ([![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)) without having to install anything on your computer.
 
 ## Launch Jupyter notebook
 

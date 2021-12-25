@@ -2764,6 +2764,9 @@ class Map(ipyleaflet.Map):
                 f"The provider {provider} is not valid. It must start with xyz or qms."
             )
 
+    def add_title(self, title, align="center", font_size="16px", style=None, **kwargs):
+        print("The ipyleaflet map does not support titles.")
+
 
 # The functions below are outside the Map class.
 
