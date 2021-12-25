@@ -2,7 +2,7 @@
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 
-<!-- [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-pangeo) -->
+<!-- [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder) -->
 
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
@@ -36,7 +36,7 @@ There are a plethora of Python packages for geospatial analysis, such as [geopan
 Launch the interactive notebook tutorial for the **leafmap** Python package with Google Colab or Binder now:
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
-[![image](https://mybinder.org/badge_logo.svg)](https://binder.pangeo.io/v2/gh/giswqs/leafmap/master)
+[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 
 Check out this excellent article on Medium - [Leafmap a new Python Package for Geospatial data science](https://link.medium.com/HRRKDcynYgb)
 

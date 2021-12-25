@@ -1,7 +1,7 @@
 # Tutorials
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
-[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-pangeo)
+[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 
 1. Introducing the leafmap Python package for interactive mapping ([video](https://youtu.be/-UPt7x3Gn60) | [gif](https://i.imgur.com/2pRxunR.gif) | [notebook](https://leafmap.org/notebooks/01_leafmap_intro))

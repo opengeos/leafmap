@@ -5,7 +5,6 @@ import csv
 import os
 import requests
 import shutil
-import sys
 import tarfile
 import urllib.request
 import zipfile
