@@ -44,6 +44,18 @@ class Map(keplergl.KeplerGl):
         if "widescreen" not in kwargs:
             kwargs["widescreen"] = False
 
+        if "pitch" not in kwargs:
+            kwargs["pitch"] = 0
+
+        if "bearing" not in kwargs:
+            kwargs["bearing"] = 0
+
+        if "dragRotate" not in kwargs:
+            kwargs["dragRotate"] = False
+
+        if "isSplit" not in kwargs:
+            kwargs["isSplit"] = False
+
         if kwargs["widescreen"]:
             display(HTML("<style>.container { width:100% !important; }</style>"))
 
@@ -54,6 +66,12 @@ class Map(keplergl.KeplerGl):
                     "latitude": kwargs["center"][0],
                     "longitude": kwargs["center"][1],
                     "zoom": kwargs["zoom"],
+                    "bearing": kwargs["bearing"],
+                    "pitch": kwargs["pitch"],
+                    "isSplit": kwargs["isSplit"],
+                    "dragRotate": kwargs["dragRotate"],
+                    "width": kwargs["width"],
+                    "height": kwargs["height"],
                 }
             },
         }
