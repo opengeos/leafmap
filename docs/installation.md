@@ -90,5 +90,5 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
 
 Alternatively, you can run leafmap directly using binder:
 
--   <https://gishub.org/leafmap-pangeo>
+-   <https://gishub.org/leafmap-binder>
 -   <https://gishub.org/leafmap-binder>
