@@ -2,11 +2,14 @@
 
 import os
 import ipyleaflet
+from box import Box
 from IPython.display import display
-from .basemaps import leafmap_basemaps
+from .basemaps import xyz_to_leaflet
 from .common import *
 from .legends import builtin_legends
 from .osm import *
+
+leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 
 class Map(ipyleaflet.Map):

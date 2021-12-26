@@ -70,7 +70,6 @@ class Map(keplergl.KeplerGl):
                     "pitch": kwargs["pitch"],
                     "isSplit": kwargs["isSplit"],
                     "dragRotate": kwargs["dragRotate"],
-                    "width": kwargs["width"],
                     "height": kwargs["height"],
                 }
             },

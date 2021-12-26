@@ -880,7 +880,8 @@ def change_basemap(m):
     Args:
         m (object): leafmap.Map.
     """
-    from .basemaps import leafmap_basemaps, get_xyz_dict
+    from .basemaps import get_xyz_dict
+    from .leafmap import leafmap_basemaps
 
     xyz_dict = get_xyz_dict()
 
@@ -1048,7 +1049,7 @@ def split_basemaps(
         right_name (str, optional): The default value of the right dropdown list. Defaults to None.
         width (str, optional): The width of the dropdown list. Defaults to "120px".
     """
-    from .basemaps import leafmap_basemaps
+    from .leafmap import leafmap_basemaps
 
     controls = m.controls
     layers = m.layers

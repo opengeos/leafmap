@@ -2860,7 +2860,7 @@ def basemap_xyz_tiles():
     Returns:
         dict: A dictionary of XYZ tile layers.
     """
-    from .basemaps import leafmap_basemaps
+    from .leafmap import leafmap_basemaps
 
     layers_dict = {}
     keys = dict(leafmap_basemaps).keys()
