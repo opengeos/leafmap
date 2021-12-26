@@ -1,10 +1,13 @@
 import os
 import folium
 import folium.plugins as plugins
+from box import Box
 from .common import *
 from .legends import builtin_legends
-from .basemaps import folium_basemaps
+from .basemaps import xyz_to_folium
 from .osm import *
+
+folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
 
 
 class Map(folium.Map):

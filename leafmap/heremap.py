@@ -9,7 +9,8 @@ import random
 import requests
 import here_map_widget
 import ipywidgets as widgets
-from .basemaps import here_basemaps
+from box import Box
+from .basemaps import xyz_to_heremap
 from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
 
 from here_map_widget import (
@@ -23,6 +24,9 @@ from here_map_widget import (
     WidgetControl,
     LayersControl,
 )
+
+
+here_basemaps = Box(xyz_to_heremap(), frozen_box=True)
 
 
 class Map(here_map_widget.Map):

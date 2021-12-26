@@ -16,8 +16,9 @@ import folium
 import here_map_widget
 import ipyleaflet
 import xyzservices.providers as xyz
-from box import Box
 from .common import check_package, planet_tiles
+
+# from box import Box
 
 # Custom XYZ tile services.
 xyz_tiles = {
@@ -447,6 +448,40 @@ def xyz_to_heremap():
     return heremap_dict
 
 
+def xyz_to_plotly():
+    """Convert xyz tile services to plotly tile layers.
+
+    Returns:
+        dict: A dictionary of plotly tile layers.
+    """
+    plotly_dict = {}
+
+    for key in xyz_tiles:
+        url = xyz_tiles[key]["url"]
+        attribution = xyz_tiles[key]["attribution"]
+        plotly_dict[key] = {
+            "below": "traces",
+            "sourcetype": "raster",
+            "sourceattribution": attribution,
+            "source": [url],
+        }
+
+    xyz_dict = get_xyz_dict()
+    for item in xyz_dict:
+        name = xyz_dict[item].name
+        url = xyz_dict[item].build_url()
+        attribution = xyz_dict[item].attribution
+
+        plotly_dict[name] = {
+            "below": "traces",
+            "sourcetype": "raster",
+            "sourceattribution": attribution,
+            "source": [url],
+        }
+
+    return plotly_dict
+
+
 def search_qms(keywords, limit=10):
     """Search qms files for keywords. Reference: https://github.com/geopandas/xyzservices/issues/65
 
@@ -486,9 +521,9 @@ def qms_to_leafmap(service_id):
     return layer
 
 
-leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
-folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
-here_basemaps = Box(xyz_to_heremap(), frozen_box=True)
+# leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
+# folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
+# here_basemaps = Box(xyz_to_heremap(), frozen_box=True)
 # try:
 #     import pydeck
 
