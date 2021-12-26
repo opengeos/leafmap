@@ -52,6 +52,18 @@ class Map(go.FigureWidget):
 
         self.update_layout(mapbox_layers=[plotly_basemaps[basemap]])
 
+    def add_mapbox_layer(self, style, access_token=None):
+        """Adds a mapbox layer to the map.
+
+        Args:
+            layer (str | dict): Layer to add. Can be "basic", "streets", "outdoors", "light", "dark", "satellite", or "satellite-streets". See https://plotly.com/python/mapbox-layers/ and https://docs.mapbox.com/mapbox-gl-js/style-spec/
+        """
+
+        if access_token is None:
+            access_token = os.environ.get("MAPBOX_TOKEN")
+
+        self.update_layout(mapbox_style=style, mapbox_accesstoken=access_token)
+
 
 def fix_widget_error():
     """
