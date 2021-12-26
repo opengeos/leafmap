@@ -66,6 +66,33 @@ class Map(go.FigureWidget):
 
         self.update_layout(mapbox_style=style, mapbox_accesstoken=access_token)
 
+    def add_choropleth_map(
+        self, data, name=None, z=None, colorscale="Viridis", **kwargs
+    ):
+        """Adds a choropleth map to the map.
+
+        Args:
+            data (str): File path to vector data, e.g., https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/countries.geojson
+            name (str, optional): Name of the layer. Defaults to None.
+            z (str, optional): Z value of the data. Defaults to None.
+            colorscale (str, optional): Color scale of the data. Defaults to "Viridis".
+        """
+        check_package("geopandas")
+        import json
+        import geopandas as gpd
+
+        gdf = gpd.read_file(data).to_crs(epsg=4326)
+        geojson = json.loads(gdf.to_json())
+
+        self.add_choroplethmapbox(
+            geojson=geojson,
+            locations=gdf.index,
+            z=gdf[z],
+            name=name,
+            colorscale=colorscale,
+            **kwargs,
+        )
+
 
 def fix_widget_error():
     """
