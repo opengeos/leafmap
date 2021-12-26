@@ -2,6 +2,8 @@ import os
 import numpy as np
 import plotly.graph_objects as go
 from .basemaps import xyz_to_plotly
+from .common import *
+from .osm import *
 
 plotly_basemaps = xyz_to_plotly()
 

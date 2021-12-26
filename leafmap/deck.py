@@ -1,7 +1,7 @@
 import os
 from .common import *
 from .osm import *
-from .basemaps import leafmap_basemaps
+from .leafmap import leafmap_basemaps
 
 try:
     import pydeck as pdk
