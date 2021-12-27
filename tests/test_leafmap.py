@@ -271,15 +271,15 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "DEM" in out_str
 
-    def test_add_shp(self):
-        """Check adding shapefile"""
-        m = leafmap.Map()
-        in_shp = (
-            "https://github.com/giswqs/leafmap/raw/master/examples/data/countries.zip"
-        )
-        m.add_shp(in_shp, layer_name="Countries")
-        out_str = m.to_html()
-        assert "Countries" in out_str
+    # def test_add_shp(self):
+    #     """Check adding shapefile"""
+    #     m = leafmap.Map()
+    #     in_shp = (
+    #         "https://github.com/giswqs/leafmap/raw/master/examples/data/countries.zip"
+    #     )
+    #     m.add_shp(in_shp, layer_name="Countries")
+    #     out_str = m.to_html()
+    #     assert "Countries" in out_str
 
     # def test_add_stac_layer(self):
     #     """Check adding STAC layer"""
