@@ -1653,8 +1653,6 @@ def stac_pixel_value(
         return None
     else:
         values = [v[0] for v in r["values"]]
-        print(values)
-        print(assets)
         result = dict(zip(assets.split(","), values))
         return result
 
