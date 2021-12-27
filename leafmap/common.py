@@ -3795,3 +3795,80 @@ def cesium_to_streamlit(
     html_to_streamlit(
         html, width, height, responsive, scrolling, token_name, token_value
     )
+
+
+def geom_type(in_geojson, encoding="utf-8"):
+    """Returns the geometry type of a GeoJSON object.
+
+    Args:
+        in_geojson (dict): A GeoJSON object.
+        encoding (str, optional): The encoding of the GeoJSON object. Defaults to "utf-8".
+
+    Returns:
+        str: The geometry type of the GeoJSON object.
+    """
+    import json
+
+    try:
+
+        if isinstance(in_geojson, str):
+
+            if in_geojson.startswith("http"):
+                data = requests.get(in_geojson).json()
+            else:
+                in_geojson = os.path.abspath(in_geojson)
+                if not os.path.exists(in_geojson):
+                    raise FileNotFoundError(
+                        "The provided GeoJSON file could not be found."
+                    )
+
+                with open(in_geojson, encoding=encoding) as f:
+                    data = json.load(f)
+        elif isinstance(in_geojson, dict):
+            data = in_geojson
+        else:
+            raise TypeError("The input geojson must be a type of str or dict.")
+
+        return data["features"][0]["geometry"]["type"]
+
+    except Exception as e:
+        raise Exception(e)
+
+
+def geojson_to_df(in_geojson, encoding="utf-8"):
+    """Converts a GeoJSON object to a pandas DataFrame.
+
+    Args:
+        in_geojson (str | dict): The input GeoJSON file or dict.
+        encoding (str, optional): The encoding of the GeoJSON object. Defaults to "utf-8".
+
+    Raises:
+        FileNotFoundError: If the input GeoJSON file could not be found.
+
+    Returns:
+        pd.DataFrame: A pandas DataFrame containing the GeoJSON object.
+    """
+
+    import json
+    import pandas as pd
+    from urllib.request import urlopen
+
+    if isinstance(in_geojson, str):
+
+        if in_geojson.startswith("http"):
+            with urlopen(in_geojson) as f:
+                data = json.load(f)
+        else:
+            in_geojson = os.path.abspath(in_geojson)
+            if not os.path.exists(in_geojson):
+                raise FileNotFoundError("The provided GeoJSON file could not be found.")
+
+            with open(in_geojson, encoding=encoding) as f:
+                data = json.load(f)
+
+    elif isinstance(in_geojson, dict):
+        data = in_geojson
+
+    df = pd.json_normalize(data["features"])
+    df.columns = [col.replace("properties.", "") for col in df.columns]
+    return df
