@@ -1202,7 +1202,7 @@ def stac_tile(
         items (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
         bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         str: Returns the STAC Tile layer URL.
@@ -1210,6 +1210,9 @@ def stac_tile(
 
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
+
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
 
     if url is not None:
         kwargs["url"] = url
@@ -1231,6 +1234,44 @@ def stac_tile(
             kwargs["bidx"] = bands
 
         kwargs["assets"] = assets
+
+        if ("expression" in kwargs) and ("rescale" not in kwargs):
+            stats = stac_stats(
+                collection=collection,
+                items=items,
+                expression=kwargs["expression"],
+                titiler_endpoint=titiler_endpoint,
+            )
+            kwargs[
+                "rescale"
+            ] = f"{stats[0]['percentile_2']},{stats[0]['percentile_98']}"
+
+        if ("asset_expression" in kwargs) and ("rescale" not in kwargs):
+            stats = stac_stats(
+                collection=collection,
+                items=items,
+                expression=kwargs["asset_expression"],
+                titiler_endpoint=titiler_endpoint,
+            )
+            kwargs[
+                "rescale"
+            ] = f"{stats[0]['percentile_2']},{stats[0]['percentile_98']}"
+
+        if (
+            (assets is not None)
+            and ("asset_expression" not in kwargs)
+            and ("expression" not in kwargs)
+            and ("rescale" not in kwargs)
+        ):
+            stats = stac_stats(
+                collection=collection,
+                items=items,
+                assets=assets,
+                titiler_endpoint=titiler_endpoint,
+            )
+            percentile_2 = min([s["percentile_2"] for s in stats])
+            percentile_98 = max([s["percentile_98"] for s in stats])
+            kwargs["rescale"] = f"{percentile_2},{percentile_98}"
 
     else:
         if isinstance(bands, str):
@@ -1275,6 +1316,9 @@ def stac_bounds(url=None, collection=None, items=None, titiler_endpoint=None, **
 
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
+
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
 
     if url is not None:
         kwargs["url"] = url
@@ -1326,6 +1370,9 @@ def stac_bands(url=None, collection=None, items=None, titiler_endpoint=None, **k
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
 
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
+
     if url is not None:
         kwargs["url"] = url
     if collection is not None:
@@ -1360,6 +1407,9 @@ def stac_stats(
 
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
+
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
 
     if url is not None:
         kwargs["url"] = url
@@ -1400,6 +1450,9 @@ def stac_info(
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
 
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
+
     if url is not None:
         kwargs["url"] = url
     if collection is not None:
@@ -1437,6 +1490,9 @@ def stac_info_geojson(
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
 
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
+
     if url is not None:
         kwargs["url"] = url
     if collection is not None:
@@ -1472,6 +1528,9 @@ def stac_assets(url=None, collection=None, items=None, titiler_endpoint=None, **
 
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
+
+    if collection is not None and titiler_endpoint is None:
+        titiler_endpoint = "planetary-computer"
 
     if url is not None:
         kwargs["url"] = url
