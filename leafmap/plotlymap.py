@@ -10,6 +10,8 @@ plotly_basemaps = xyz_to_plotly()
 
 
 class Map(go.FigureWidget):
+    """The Map class inherits the Plotly FigureWidget class. More info at https://plotly.com/python/figurewidget."""
+
     def __init__(
         self, center=(20, 0), zoom=1, basemap="open-street-map", height=600, **kwargs
     ):
@@ -110,6 +112,7 @@ class Map(go.FigureWidget):
 
         Args:
             layer (str | dict): Layer to add. Can be "basic", "streets", "outdoors", "light", "dark", "satellite", or "satellite-streets". See https://plotly.com/python/mapbox-layers/ and https://docs.mapbox.com/mapbox-gl-js/style-spec/
+            access_token (str, optional): The Mapbox Access token. It can be set as an environment variable "MAPBOX_TOKEN". Defaults to None.
         """
 
         if access_token is None:
@@ -162,9 +165,9 @@ class Map(go.FigureWidget):
 
         Args:
             url (str): The URL of the tile layer.
+            name (str, optional): Name of the layer. Defaults to 'TileLayer'.
             attribution (str): The attribution to use. Defaults to "".
             opacity (float, optional): The opacity of the layer. Defaults to 1.
-            shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
         """
 
         layer = {
@@ -234,6 +237,62 @@ class Map(go.FigureWidget):
         center = stac_center(url, collection, items, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
+
+    def add_planet_by_month(
+        self,
+        year=2016,
+        month=1,
+        api_key=None,
+        token_name="PLANET_API_KEY",
+        name=None,
+        attribution="",
+        opacity=1.0,
+    ):
+        """Adds Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis/
+
+        Args:
+            year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
+            month (int, optional): The month of Planet global mosaic, must be 1-12. Defaults to 1.
+            api_key (str, optional): The Planet API key. Defaults to None.
+            token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+            name (str, optional): Name of the layer. Defaults to 'TileLayer'.
+            attribution (str): The attribution to use. Defaults to "".
+            opacity (float, optional): The opacity of the layer. Defaults to 1.
+        """
+        if name is None:
+            name = str(year) + "-" + str(month).zfill(2)
+        tile_url = planet_by_month(year, month, api_key, token_name)
+        self.add_tile_layer(
+            tile_url, name=name, attribution=attribution, opacity=opacity
+        )
+
+    def add_planet_by_quarter(
+        self,
+        year=2016,
+        quarter=1,
+        api_key=None,
+        token_name="PLANET_API_KEY",
+        name=None,
+        attribution="",
+        opacity=1.0,
+    ):
+        """Adds Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis/
+
+        Args:
+            year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
+            quarter (int, optional): The quarter of Planet global mosaic, must be 1-4. Defaults to 1.
+            api_key (str, optional): The Planet API key. Defaults to None.
+            token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
+            name (str, optional): Name of the layer. Defaults to 'TileLayer'.
+            attribution (str): The attribution to use. Defaults to "".
+            opacity (float, optional): The opacity of the layer. Defaults to 1.
+        """
+        if name is None:
+            name = str(year) + "-" + "q" + str(quarter)
+        tile_url = planet_by_quarter(year, quarter, api_key, token_name)
+        self.add_tile_layer(
+            tile_url, name=name, attribution=attribution, opacity=opacity
+        )
 
     def save(self, file, format=None, width=None, height=None, scale=None, **kwargs):
         """Convert a map to a static image and write it to a file or writeable object
