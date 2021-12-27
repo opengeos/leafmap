@@ -41,6 +41,7 @@
 35. Adding circle markers from xy data (e.g., CSV, Pandas DataFrame) ([notebook](https://leafmap.org/notebooks/35_circle_markers))
 36. Adding labels to the map ([notebook](https://leafmap.org/notebooks/36_add_labels))
 37. Adding Planetary Computer STAC item to the map ([notebook](https://leafmap.org/notebooks/37_planetary_computer))
+38. Using the plotly plotting backend ([notebook](https://leafmap.org/notebooks/38_plotly))
 
 ## Demo
 
