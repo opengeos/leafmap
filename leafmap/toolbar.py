@@ -1795,9 +1795,78 @@ def inspector_gui(m=None):
     Returns:
         ipywidgets: The tool GUI widget.
     """
+    import pandas as pd
+
     widget_width = "250px"
     padding = "0px 5px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
+
+    if m is not None:
+
+        marker_cluster = ipyleaflet.MarkerCluster(name="Inspector Markers")
+        setattr(m, "pixel_values", [])
+        setattr(m, "marker_cluster", marker_cluster)
+
+        if not hasattr(m, "interact_mode"):
+            setattr(m, "interact_mode", False)
+
+        if not hasattr(m, "inspector_output"):
+            inspector_output = widgets.Output(
+                layout=widgets.Layout(width=widget_width, padding="0px 5px 5px 5px")
+            )
+            setattr(m, "inspector_output", inspector_output)
+
+        output = m.inspector_output
+        output.clear_output()
+
+        if not hasattr(m, "inspector_add_marker"):
+            inspector_add_marker = widgets.Checkbox(
+                description="Add Marker at clicked location",
+                value=True,
+                indent=False,
+                layout=widgets.Layout(padding=padding, width=widget_width),
+            )
+            setattr(m, "inspector_add_marker", inspector_add_marker)
+        add_marker = m.inspector_add_marker
+
+        if not hasattr(m, "inspector_bands_chk"):
+            inspector_bands_chk = widgets.Checkbox(
+                description="Get pixel value for visible bands only",
+                indent=False,
+                layout=widgets.Layout(padding=padding, width=widget_width),
+            )
+            setattr(m, "inspector_bands_chk", inspector_bands_chk)
+        bands_chk = m.inspector_bands_chk
+
+        if not hasattr(m, "inspector_class_label"):
+            inspector_label = widgets.Text(
+                value="",
+                description="Class label:",
+                placeholder="Add a label to the marker",
+                style=style,
+                layout=widgets.Layout(width=widget_width, padding=padding),
+            )
+            setattr(m, "inspector_class_label", inspector_label)
+        label = m.inspector_class_label
+
+        options = []
+        if hasattr(m, "cog_layer_dict"):
+            options = list(m.cog_layer_dict.keys())
+
+        if len(options) == 0:
+            default_option = None
+        else:
+            default_option = options[0]
+        if not hasattr(m, "inspector_dropdown"):
+            inspector_dropdown = widgets.Dropdown(
+                options=options,
+                value=default_option,
+                description="Select a layer:",
+                layout=widgets.Layout(width=widget_width, padding=padding),
+                style=style,
+            )
+            setattr(m, "inspector_dropdown", inspector_dropdown)
+        dropdown = m.inspector_dropdown
 
     toolbar_button = widgets.ToggleButton(
         value=False,
@@ -1814,38 +1883,13 @@ def inspector_gui(m=None):
         layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
     )
 
-    add_marker = widgets.Checkbox(
-        description="Add Marker at clicked location",
-        indent=False,
-        layout=widgets.Layout(padding=padding, width=widget_width),
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Download", "Reset", "Close"],
+        tooltips=["Download", "Reset", "Close"],
+        button_style="primary",
     )
-
-    checkbox = widgets.Checkbox(
-        description="Get pixel value for visible bands only",
-        indent=False,
-        layout=widgets.Layout(padding=padding, width=widget_width),
-    )
-
-    options = []
-    if m is not None and hasattr(m, "cog_layer_dict"):
-        options = list(m.cog_layer_dict.keys())
-
-    if len(options) == 0:
-        default_option = None
-    else:
-        default_option = options[0]
-
-    dropdown = widgets.Dropdown(
-        options=options,
-        value=default_option,
-        description="Select a layer:",
-        layout=widgets.Layout(width=widget_width, padding=padding),
-        style=style,
-    )
-
-    output = widgets.Output(
-        layout=widgets.Layout(width=widget_width, padding="5px 5px 5px 5px")
-    )
+    buttons.style.button_width = "80px"
 
     if len(options) == 0:
         with output:
@@ -1858,14 +1902,25 @@ def inspector_gui(m=None):
     toolbar_footer = widgets.VBox()
     toolbar_footer.children = [
         add_marker,
-        checkbox,
+        label,
         dropdown,
+        bands_chk,
+        buttons,
         output,
     ]
 
     toolbar_event = ipyevents.Event(
         source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
     )
+
+    def chk_change(change):
+        if hasattr(m, "pixel_values"):
+            m.pixel_values = []
+        if hasattr(m, "marker_cluster"):
+            m.marker_cluster.markers = []
+        output.clear_output()
+
+    bands_chk.observe(chk_change, "value")
 
     def handle_toolbar_event(event):
 
@@ -1901,35 +1956,86 @@ def inspector_gui(m=None):
                     m.tool_control = None
                 m.default_style = {"cursor": "default"}
 
+                m.marker_cluster.markers = []
+                m.pixel_values = []
                 marker_cluster_layer = m.find_layer("Inspector Markers")
                 if marker_cluster_layer is not None:
                     m.remove_layer(marker_cluster_layer)
+
+                if hasattr(m, "pixel_values"):
+                    delattr(m, "pixel_values")
+
+                if hasattr(m, "marker_cluster"):
+                    delattr(m, "marker_cluster")
+
             toolbar_widget.close()
 
     close_button.observe(close_btn_click, "value")
 
-    toolbar_button.value = True
+    def button_clicked(change):
+        if change["new"] == "Download":
+            with output:
+                output.clear_output()
+                if len(m.pixel_values) == 0:
+                    print(
+                        "No pixel values available. Click on the map to start collection data."
+                    )
+                else:
+                    print("Downloading pixel values...")
+                    df = pd.DataFrame(m.pixel_values)
+                    temp_csv = temp_file_path("csv")
+                    df.to_csv(temp_csv, index=False)
+                    link = create_download_link(temp_csv)
+                    with output:
+                        output.clear_output()
+                        display(link)
+        elif change["new"] == "Reset":
+            label.value = ""
+            output.clear_output()
+            if hasattr(m, "pixel_values"):
+                m.pixel_values = []
+            if hasattr(m, "marker_cluster"):
+                m.marker_cluster.markers = []
+        elif change["new"] == "Close":
+            if m is not None:
+                if hasattr(m, "inspector_mode"):
+                    delattr(m, "inspector_mode")
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+                m.default_style = {"cursor": "default"}
+                m.marker_cluster.markers = []
+                marker_cluster_layer = m.find_layer("Inspector Markers")
+                if marker_cluster_layer is not None:
+                    m.remove_layer(marker_cluster_layer)
+                m.pixel_values = []
 
-    markers = []
-    marker_cluster = ipyleaflet.MarkerCluster(name="Inspector Markers")
-    if m is not None:
-        m.add_layer(marker_cluster)
+                if hasattr(m, "pixel_values"):
+                    delattr(m, "pixel_values")
+
+                if hasattr(m, "marker_cluster"):
+                    delattr(m, "marker_cluster")
+
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
 
     def handle_interaction(**kwargs):
         latlon = kwargs.get("coordinates")
-        lat = latlon[0]
-        lon = latlon[1]
+        lat = round(latlon[0], 4)
+        lon = round(latlon[1], 4)
         if (
             kwargs.get("type") == "click"
             and hasattr(m, "inspector_mode")
             and m.inspector_mode
         ):
             m.default_style = {"cursor": "wait"}
-            if add_marker.value:
-                markers.append(ipyleaflet.Marker(location=latlon))
-                marker_cluster.markers = markers
-                with output:
-                    print(latlon)
+
             with output:
                 output.clear_output()
                 print("Getting pixel value ...")
@@ -1937,7 +2043,7 @@ def inspector_gui(m=None):
                 layer_dict = m.cog_layer_dict[dropdown.value]
 
             if layer_dict["type"] == "STAC":
-                if checkbox.value:
+                if bands_chk.value:
                     assets = layer_dict["assets"]
                 else:
                     assets = None
@@ -1958,6 +2064,16 @@ def inspector_gui(m=None):
                         print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
+
+                        result["latitude"] = lat
+                        result["longitude"] = lon
+                        result["label"] = label.value
+                        m.pixel_values.append(result)
+                    if add_marker.value:
+                        markers = list(m.marker_cluster.markers)
+                        markers.append(ipyleaflet.Marker(location=latlon))
+                        m.marker_cluster.markers = markers
+
                 else:
                     with output:
                         output.clear_output()
@@ -1970,12 +2086,31 @@ def inspector_gui(m=None):
                         print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
+
+                        result["latitude"] = lat
+                        result["longitude"] = lon
+                        result["label"] = label.value
+                        m.pixel_values.append(result)
+                    if add_marker.value:
+                        markers = list(m.marker_cluster.markers)
+                        markers.append(ipyleaflet.Marker(location=latlon))
+                        m.marker_cluster.markers = markers
                 else:
                     with output:
                         output.clear_output()
                         print("No pixel value available")
 
             m.default_style = {"cursor": "crosshair"}
+
+    if m is not None:
+        if not hasattr(m, "marker_cluster"):
+            setattr(m, "marker_cluster", marker_cluster)
+        m.add_layer(marker_cluster)
+
+        if not m.interact_mode:
+
+            m.on_interaction(handle_interaction)
+            m.interact_mode = True
 
     if m is not None:
         toolbar_control = ipyleaflet.WidgetControl(
@@ -1991,7 +2126,6 @@ def inspector_gui(m=None):
                 setattr(m, "inspector_mode", True)
             else:
                 setattr(m, "inspector_mode", False)
-        m.on_interaction(handle_interaction)
 
     else:
         return toolbar_widget
