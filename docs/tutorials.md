@@ -42,6 +42,7 @@
 36. Adding labels to the map ([notebook](https://leafmap.org/notebooks/36_add_labels))
 37. Adding Planetary Computer STAC item to the map ([notebook](https://leafmap.org/notebooks/37_planetary_computer))
 38. Using the plotly plotting backend ([notebook](https://leafmap.org/notebooks/38_plotly))
+39. Getting pixel values using the Inspector tool ([notebook](https://leafmap.org/notebooks/39_inspector_tool))
 
 ## Demo
 
