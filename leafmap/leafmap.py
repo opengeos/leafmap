@@ -748,6 +748,12 @@ class Map(ipyleaflet.Map):
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
+        if not hasattr(self, "cog_layer_dict"):
+            self.cog_layer_dict = {}
+
+        params = {"url": url, "titizer_endpoint": titiler_endpoint, "type": "COG"}
+        self.cog_layer_dict[name] = params
+
     def add_cog_mosaic(
         self,
         links,
@@ -942,6 +948,23 @@ class Map(ipyleaflet.Map):
         bounds = stac_bounds(url, collection, items, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+
+        if not hasattr(self, "cog_layer_dict"):
+            self.cog_layer_dict = {}
+
+        if assets is None and bands is not None:
+            assets = bands
+
+        params = {
+            "url": url,
+            "collection": collection,
+            "items": items,
+            "assets": assets,
+            "titiler_endpoint": titiler_endpoint,
+            "type": "STAC",
+        }
+
+        self.cog_layer_dict[name] = params
 
     def add_minimap(self, zoom=5, position="bottomright"):
         """Adds a minimap (overview) to the ipyleaflet map.
