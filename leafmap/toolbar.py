@@ -2129,3 +2129,168 @@ def inspector_gui(m=None):
 
     else:
         return toolbar_widget
+
+
+def plotly_toolbar(
+    m=None, output=None, map_min_width="91%", map_max_width="98%", refresh=False
+):
+    """Creates the main toolbar and adds it to the map.
+
+    Args:
+        m (leafmap.Map): The leafmap Map object.
+    """
+
+    if not refresh:
+        width = int(map_min_width.replace("%", ""))
+        if width > 85:
+            map_min_width = "85%"
+
+    tools = {
+        "map": {
+            "name": "basemap",
+            "tooltip": "Change basemap",
+        },
+        "globe": {
+            "name": "split_map",
+            "tooltip": "Split-panel map",
+        },
+        # "adjust": {
+        #     "name": "planet",
+        #     "tooltip": "Planet imagery",
+        # },
+        # "folder-open": {
+        #     "name": "open_data",
+        #     "tooltip": "Open local vector/raster data",
+        # },
+        # "gears": {
+        #     "name": "whitebox",
+        #     "tooltip": "WhiteboxTools for local geoprocessing",
+        # },
+        # "fast-forward": {
+        #     "name": "timeslider",
+        #     "tooltip": "Activate the time slider",
+        # },
+        # "eraser": {
+        #     "name": "eraser",
+        #     "tooltip": "Remove all drawn features",
+        # },
+        # "camera": {
+        #     "name": "save_map",
+        #     "tooltip": "Save map as HTML or image",
+        # },
+        # "address-book": {
+        #     "name": "census",
+        #     "tooltip": "Get US Census data",
+        # },
+        # "info": {
+        #     "name": "inspector",
+        #     "tooltip": "Get COG/STAC pixel value",
+        # },
+        # "search": {
+        #     "name": "search_xyz",
+        #     "tooltip": "Search XYZ tile services",
+        # },
+        # "download": {
+        #     "name": "download_osm",
+        #     "tooltip": "Download OSM data",
+        # },
+        # "smile-o": {
+        #     "name": "placeholder",
+        #     "tooltip": "This is a placeholder",
+        # },
+        # "spinner": {
+        #     "name": "placeholder2",
+        #     "tooltip": "This is a placeholder",
+        # },
+        "question": {
+            "name": "help",
+            "tooltip": "Get help",
+        },
+    }
+
+    icons = list(tools.keys())
+    tooltips = [item["tooltip"] for item in list(tools.values())]
+
+    icon_width = "32px"
+    icon_height = "32px"
+    n_cols = 3
+    n_rows = math.ceil(len(icons) / n_cols)
+
+    toolbar_grid = widgets.GridBox(
+        children=[
+            widgets.ToggleButton(
+                layout=widgets.Layout(
+                    width="auto", height="auto", padding="0px 0px 0px 4px"
+                ),
+                button_style="primary",
+                icon=icons[i],
+                tooltip=tooltips[i],
+            )
+            for i in range(len(icons))
+        ],
+        layout=widgets.Layout(
+            width="115px",
+            grid_template_columns=(icon_width + " ") * n_cols,
+            grid_template_rows=(icon_height + " ") * n_rows,
+            grid_gap="1px 1px",
+            padding="5px",
+        ),
+    )
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="wrench",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    layers_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Layers",
+        icon="server",
+        layout=widgets.Layout(height="28px", width="72px"),
+    )
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [layers_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [toolbar_grid]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                layers_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            output.layout.width = map_min_width
+            if refresh:
+                with output:
+                    output.clear_output()
+                    display(m)
+            layers_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            output.layout.width = map_max_width
+            if not layers_button.value:
+                toolbar_widget.children = [toolbar_button]
+            if refresh:
+                with output:
+                    output.clear_output()
+                    display(m)
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+    return toolbar_widget

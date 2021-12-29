@@ -1,7 +1,9 @@
 import os
 import numpy as np
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objects as go
+import ipywidgets as widgets
 from .basemaps import xyz_to_plotly
 from .common import *
 from .osm import *
@@ -37,6 +39,28 @@ class Map(go.FigureWidget):
             }
         )
 
+    def show(
+        self,
+        toolbar=True,
+        map_min_width="91%",
+        map_max_width="98%",
+        refresh=False,
+        **kwargs,
+    ):
+        from .toolbar import plotly_toolbar
+
+        if not toolbar:
+            super().show(**kwargs)
+        else:
+            output = widgets.Output(layout=widgets.Layout(width=map_max_width))
+            with output:
+                display(self)
+            toolbar = plotly_toolbar(
+                self, output, map_min_width, map_max_width, refresh
+            )
+            canvas = widgets.HBox([output, toolbar])
+            display(canvas)
+
     def clear_controls(self):
         """Removes all controls from the map."""
         config = {
@@ -46,7 +70,7 @@ class Map(go.FigureWidget):
             "showLink": False,
             "displaylogo": False,
         }
-        self.show(config=config)
+        self.show(toolbar=False, config=config)
 
     def add_controls(self, controls):
         """Adds controls to the map.
@@ -399,6 +423,43 @@ class Map(go.FigureWidget):
 
         self.add_basemap("Stamen.Terrain")
         self.add_trace(heatmap)
+
+    def add_gdf(self, gdf, name=None, locations=None, color=None, **kwargs):
+        """Adds a GeoDataFrame to the map.
+
+        Args:
+            gdf (GeoDataFrame): A GeoDataFrame.
+            locations (str, optional): The column name of locations. Defaults to None.
+            color (str, optional): The column name of color. Defaults to None.
+        """
+
+        check_package("geopandas")
+        import geopandas as gpd
+
+        gdf.to_crs(epsg=4326, inplace=True)
+        if isinstance(locations, str):
+            gdf.set_index(locations, inplace=True)
+            locations = gdf.index
+        elif locations is None:
+            locations = gdf.index
+
+        if isinstance(color, str):
+            if color not in gdf.columns:
+                raise ValueError(
+                    f"color must be a column name in the GeoDataFrame. Can be one of {','.join(gdf.columns)} "
+                )
+
+        fig = px.choropleth_mapbox(
+            gdf,
+            geojson=gdf.geometry,
+            locations=locations,
+            color=color,
+            # center={"lat": 45.5517, "lon": -73.7073},
+            # zoom=10,
+            # mapbox_style="open-street-map",
+            zoom=1,
+        )
+        self.add_traces(fig.data)
 
 
 def fix_widget_error():
