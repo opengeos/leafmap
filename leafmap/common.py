@@ -4068,3 +4068,23 @@ def bbox_to_gdf(bbox, crs="EPSG:4326"):
     gdf = GeoDataFrame(d, crs="EPSG:4326")
     gdf.to_crs(crs=crs, inplace=True)
     return gdf
+
+
+def gdf_to_df(gdf, drop_geom=True):
+    """Converts a GeoDataFrame to a pandas DataFrame.
+
+    Args:
+        gdf (gpd.GeoDataFrame): A GeoDataFrame.
+        drop_geom (bool, optional): Whether to drop the geometry column. Defaults to True.
+
+    Returns:
+        pd.DataFrame: A pandas DataFrame containing the GeoDataFrame.
+    """
+    import pandas as pd
+
+    if drop_geom:
+        df = pd.DataFrame(gdf.drop(columns=["geometry"]))
+    else:
+        df = pd.DataFrame(gdf)
+
+    return df
