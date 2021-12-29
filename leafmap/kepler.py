@@ -41,6 +41,11 @@ class Map(keplergl.KeplerGl):
         elif "px" in str(kwargs["height"]):
             kwargs["height"] = kwargs["height"].replace("px", "")
 
+        if "width" not in kwargs:
+            kwargs["width"] = 600
+        elif "px" in str(kwargs["width"]):
+            kwargs["width"] = kwargs["width"].replace("px", "")
+
         if "widescreen" not in kwargs:
             kwargs["widescreen"] = False
 
@@ -71,6 +76,7 @@ class Map(keplergl.KeplerGl):
                     "isSplit": kwargs["isSplit"],
                     "dragRotate": kwargs["dragRotate"],
                     "height": kwargs["height"],
+                    "width": kwargs["width"],
                 }
             },
         }
