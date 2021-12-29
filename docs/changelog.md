@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.7.0 - December 29, 2021
+
+**New Features**:
+
+-   Added Planetary Computer STAC support [#137](https://github.com/giswqs/leafmap/issues/137)
+-   Added plotly backend [#109](https://github.com/giswqs/leafmap/issues/109)
+-   Added Inspector tool [#158](https://github.com/giswqs/leafmap/pull/158)
+-   Added plotly COG STAC support [#109](https://github.com/giswqs/leafmap/issues/109)
+-   Added plotly planet imagery support [#109](https://github.com/giswqs/leafmap/issues/109)
+-   Added plotly toolbar [#160](https://github.com/giswqs/leafmap/issues/160)
+-   Added geojson_to_df and geom_type functions
+
+**Improvement**
+
+-   Removed pangeo broken binder links
+-   Improved kepler config options [#150](https://github.com/giswqs/leafmap/discussions/150)
+-   Improved stac tile function [#137](https://github.com/giswqs/leafmap/issues/156)
+-   Updated STAC notebook example [#156](https://github.com/giswqs/leafmap/issues/156)
+
 ## v0.6.1 - December 23, 2021
 
 **New Features**:
