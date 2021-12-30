@@ -211,6 +211,7 @@ class Map(go.FigureWidget):
         name="Untitled",
         attribution="",
         opacity=1.0,
+        bands=None,
         titiler_endpoint="https://titiler.xyz",
         **kwargs,
     ):
@@ -221,10 +222,11 @@ class Map(go.FigureWidget):
             name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
+            bands (list, optional): The bands to use. Defaults to None.
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
             **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale, color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/ and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3]
         """
-        tile_url = cog_tile(url, titiler_endpoint, **kwargs)
+        tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
         center = cog_center(url, titiler_endpoint)  # (lon, lat)
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
@@ -424,42 +426,61 @@ class Map(go.FigureWidget):
         self.add_basemap("Stamen.Terrain")
         self.add_trace(heatmap)
 
-    def add_gdf(self, gdf, name=None, locations=None, color=None, **kwargs):
+    def add_gdf(
+        self,
+        gdf,
+        label_col=None,
+        color_col=None,
+        labels=None,
+        opacity=1.0,
+        zoom=None,
+        color_continuous_scale="Viridis",
+        **kwargs,
+    ):
         """Adds a GeoDataFrame to the map.
 
         Args:
             gdf (GeoDataFrame): A GeoDataFrame.
-            locations (str, optional): The column name of locations. Defaults to None.
-            color (str, optional): The column name of color. Defaults to None.
+            label_col (str, optional): The column name of locations. Defaults to None.
+            color_col (str, optional): The column name of color. Defaults to None.
         """
 
-        check_package("geopandas")
+        check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 
-        gdf.to_crs(epsg=4326, inplace=True)
-        if isinstance(locations, str):
-            gdf.set_index(locations, inplace=True)
-            locations = gdf.index
-        elif locations is None:
-            locations = gdf.index
+        if not isinstance(gdf, gpd.GeoDataFrame):
+            raise ValueError("gdf must be a GeoDataFrame.")
 
-        if isinstance(color, str):
-            if color not in gdf.columns:
+        gdf = gdf.to_crs(epsg=4326)
+        geom_type = gdf_geom_type(gdf)
+        center_lon, center_lat = gdf_centroid(gdf)
+
+        if isinstance(label_col, str):
+            gdf = gdf.set_index(label_col)
+            label_col = gdf.index
+        elif label_col is None:
+            label_col = gdf.index
+
+        if isinstance(color_col, str):
+            if color_col not in gdf.columns:
                 raise ValueError(
                     f"color must be a column name in the GeoDataFrame. Can be one of {','.join(gdf.columns)} "
                 )
-
         fig = px.choropleth_mapbox(
             gdf,
             geojson=gdf.geometry,
-            locations=locations,
-            color=color,
-            # center={"lat": 45.5517, "lon": -73.7073},
-            # zoom=10,
-            # mapbox_style="open-street-map",
-            zoom=1,
+            locations=label_col,
+            color=color_col,
+            color_continuous_scale=color_continuous_scale,
+            opacity=opacity,
+            labels=labels,
+            mapbox_style="carto-positron",
+            **kwargs,
         )
+
         self.add_traces(fig.data)
+        self.set_center(center_lat, center_lon, zoom)
+        return fig.data
 
 
 def fix_widget_error():
