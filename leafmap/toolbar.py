@@ -1852,7 +1852,7 @@ def inspector_gui(m=None):
         options = []
         if hasattr(m, "cog_layer_dict"):
             options = list(m.cog_layer_dict.keys())
-
+            options.sort()
         if len(options) == 0:
             default_option = None
         else:
@@ -1866,6 +1866,7 @@ def inspector_gui(m=None):
                 style=style,
             )
             setattr(m, "inspector_dropdown", inspector_dropdown)
+
         dropdown = m.inspector_dropdown
 
     toolbar_button = widgets.ToggleButton(
@@ -2078,6 +2079,8 @@ def inspector_gui(m=None):
                     with output:
                         output.clear_output()
                         print("No pixel value available")
+                        bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
+                        m.zoom_to_bounds(bounds)
             elif layer_dict["type"] == "COG":
                 result = cog_pixel_value(lon, lat, layer_dict["url"], verbose=False)
                 if result is not None:
@@ -2099,12 +2102,22 @@ def inspector_gui(m=None):
                     with output:
                         output.clear_output()
                         print("No pixel value available")
+                        bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
+                        m.zoom_to_bounds(bounds)
 
             elif layer_dict["type"] == "LOCAL":
                 result = local_tile_pixel_value(
                     lon, lat, layer_dict["tile_client"], verbose=False
                 )
                 if result is not None:
+                    if m.inspector_bands_chk.value:
+                        band = m.cog_layer_dict[m.inspector_dropdown.value]["band"]
+                        band_names = m.cog_layer_dict[m.inspector_dropdown.value][
+                            "band_names"
+                        ]
+                        if band is not None:
+                            sel_bands = [band_names[b - 1] for b in band]
+                            result = {k: v for k, v in result.items() if k in sel_bands}
                     with output:
                         output.clear_output()
                         print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
@@ -2123,7 +2136,8 @@ def inspector_gui(m=None):
                     with output:
                         output.clear_output()
                         print("No pixel value available")
-
+                        bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
+                        m.zoom_to_bounds(bounds)
             m.default_style = {"cursor": "crosshair"}
 
     if m is not None:

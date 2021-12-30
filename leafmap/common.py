@@ -623,10 +623,11 @@ def download_from_url(url, out_file_name=None, out_dir=".", unzip=True, verbose=
         verbose (bool, optional): Whether to display or not the output of the function
     """
     in_file_name = os.path.basename(url)
+    out_dir = check_dir(out_dir)
 
     if out_file_name is None:
         out_file_name = in_file_name
-    out_file_path = os.path.join(os.path.abspath(out_dir), out_file_name)
+    out_file_path = os.path.join(out_dir, out_file_name)
 
     if verbose:
         print("Downloading {} ...".format(url))
@@ -680,6 +681,7 @@ def download_from_gdrive(gfile_url, file_name, out_dir=".", unzip=True, verbose=
     if verbose:
         print("Google Drive file id: {}".format(file_id))
 
+    out_dir = check_dir(out_dir)
     dest_path = os.path.join(out_dir, file_name)
     gdd.download_file_from_google_drive(file_id, dest_path, True, unzip)
 
@@ -3631,7 +3633,7 @@ def get_local_tile_layer(
     nodata=None,
     attribution=None,
     tile_format="ipyleaflet",
-    layer_name=None,
+    layer_name="Local COG",
     return_client=False,
     **kwargs,
 ):
@@ -3668,7 +3670,10 @@ def get_local_tile_layer(
 
     if isinstance(source, str):
         if not source.startswith("http"):
-            source = os.path.abspath(source)
+            if source.startswith("~"):
+                source = os.path.expanduser(source)
+            else:
+                source = os.path.abspath(source)
             if not os.path.exists(source):
                 raise ValueError("The source path does not exist.")
     else:
@@ -4196,3 +4201,35 @@ def gdf_geom_type(gdf, first_only=True):
         return gdf.geometry.type[0]
     else:
         return gdf.geometry.type
+
+
+def check_dir(dir_path, make_dirs=True):
+    """Checks if a directory exists and creates it if it does not.
+
+    Args:
+        dir_path ([str): The path to the directory.
+        make_dirs (bool, optional): Whether to create the directory if it does not exist. Defaults to True.
+
+    Raises:
+        FileNotFoundError: If the directory could not be found.
+        TypeError: If the input directory path is not a string.
+
+    Returns:
+        str: The path to the directory.
+    """
+
+    if isinstance(dir_path, str):
+        if dir_path.startswith("~"):
+            dir_path = os.path.expanduser(dir_path)
+        else:
+            dir_path = os.path.abspath(dir_path)
+
+        if not os.path.exists(dir_path) and make_dirs:
+            os.makedirs(dir_path)
+
+        if os.path.exists(dir_path):
+            return dir_path
+        else:
+            raise FileNotFoundError("The provided directory could not be found.")
+    else:
+        raise TypeError("The provided directory path must be a string.")
