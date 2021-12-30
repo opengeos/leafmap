@@ -1682,6 +1682,36 @@ def stac_pixel_value(
         return result
 
 
+def local_tile_pixel_value(
+    lon,
+    lat,
+    tile_client,
+    verbose=True,
+    **kwargs,
+):
+    """Get pixel value from COG.
+
+    Args:
+        lon (float): Longitude of the pixel.
+        lat (float): Latitude of the pixel.
+        url (str): HTTP URL to a COG, e.g., 'https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif'
+        bidx (str, optional): Dataset band indexes (e.g bidx=1, bidx=1&bidx=2&bidx=3). Defaults to None.
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
+        verbose (bool, optional): Print status messages. Defaults to True.
+
+    Returns:
+        list: A dictionary of band info.
+    """
+
+    r = tile_client.pixel(lat, lon, units="EPSG:4326", **kwargs)
+    if "bands" in r:
+        return r["bands"]
+    else:
+        if verbose:
+            print("No pixel value found.")
+        return None
+
+
 def bbox_to_geojson(bounds):
     """Convert coordinates of a bounding box to a geojson.
 
@@ -3602,8 +3632,7 @@ def get_local_tile_layer(
     attribution=None,
     tile_format="ipyleaflet",
     layer_name=None,
-    get_center=False,
-    get_bounds=False,
+    return_client=False,
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
@@ -3621,8 +3650,7 @@ def get_local_tile_layer(
         attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to None.
-        get_center (bool, optional): If True, the center of the layer will be returned. Defaults to False.
-        get_bounds (bool, optional): If True, the bounds [minx, miny, maxx, maxy] of the layer will be returned. Defaults to False.
+        return_client (bool, optional): If True, the tile client will be returned. Defaults to False.
 
     Returns:
         ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
@@ -3689,18 +3717,23 @@ def get_local_tile_layer(
             **kwargs,
         )
 
-    center = tile_client.center()
-    bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
-    bounds = (bounds[2], bounds[0], bounds[3], bounds[1])  # [minx, miny, maxx, maxy]
-
-    if get_center and get_bounds:
-        return tile_layer, center, bounds
-    elif get_center:
-        return tile_layer, center
-    elif get_bounds:
-        return tile_layer, bounds
+    if return_client:
+        return tile_layer, tile_client
     else:
         return tile_layer
+
+    # center = tile_client.center()
+    # bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
+    # bounds = (bounds[2], bounds[0], bounds[3], bounds[1])  # [minx, miny, maxx, maxy]
+
+    # if get_center and get_bounds:
+    #     return tile_layer, center, bounds
+    # elif get_center:
+    #     return tile_layer, center
+    # elif get_bounds:
+    #     return tile_layer, bounds
+    # else:
+    #     return tile_layer
 
 
 def get_palettable(types=None):
