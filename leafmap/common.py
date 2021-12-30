@@ -947,7 +947,7 @@ def create_code_cell(code="", where="below"):
     )
 
 
-def cog_tile(url, titiler_endpoint="https://titiler.xyz", **kwargs):
+def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
         Source code adapted from https://developmentseed.org/titiler/examples/notebooks/Working_with_CloudOptimizedGeoTIFF_simple/
 
@@ -960,6 +960,25 @@ def cog_tile(url, titiler_endpoint="https://titiler.xyz", **kwargs):
     """
 
     kwargs["url"] = url
+
+    band_names = cog_bands(url, titiler_endpoint)
+
+    if bands is None and "bidx" not in kwargs:
+        if len(band_names) >= 3:
+            kwargs["bidx"] = [1, 2, 3]
+    elif bands is not None and "bidx" not in kwargs:
+        if all(isinstance(x, int) for x in bands):
+            kwargs["bidx"] = bands
+        elif all(isinstance(x, str) for x in bands):
+            kwargs["bidx"] = [band_names.index(x) + 1 for x in bands]
+        else:
+            raise ValueError("Bands must be a list of integers or strings.")
+
+    if "rescale" not in kwargs:
+        stats = cog_stats(url, titiler_endpoint)
+        percentile_2 = min([stats[s]["percentile_2"] for s in stats])
+        percentile_98 = max([stats[s]["percentile_98"] for s in stats])
+        kwargs["rescale"] = f"{percentile_2},{percentile_98}"
 
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
@@ -4088,3 +4107,59 @@ def gdf_to_df(gdf, drop_geom=True):
         df = pd.DataFrame(gdf)
 
     return df
+
+
+def gdf_bounds(gdf, return_geom=False):
+    """Returns the bounding box of a GeoDataFrame.
+
+    Args:
+        gdf (gpd.GeoDataFrame): A GeoDataFrame.
+        return_geom (bool, optional): Whether to return the bounding box as a GeoDataFrame. Defaults to False.
+
+    Returns:
+        list | gpd.GeoDataFrame: A bounding box in the form of a list (minx, miny, maxx, maxy) or GeoDataFrame.
+    """
+    bounds = gdf.total_bounds
+    if return_geom:
+        return bbox_to_gdf(bbox=bounds)
+    else:
+        return bounds
+
+
+def gdf_centroid(gdf, return_geom=False):
+    """Returns the centroid of a GeoDataFrame.
+
+    Args:
+        gdf (gpd.GeoDataFrame): A GeoDataFrame.
+        return_geom (bool, optional): Whether to return the bounding box as a GeoDataFrame. Defaults to False.
+
+    Returns:
+        list | gpd.GeoDataFrame: A bounding box in the form of a list (lon, lat) or GeoDataFrame.
+    """
+    import warnings
+
+    warnings.filterwarnings("ignore")
+
+    centroid = gdf_bounds(gdf, return_geom=True).centroid
+    if return_geom:
+        return centroid
+    else:
+        return centroid.x[0], centroid.y[0]
+
+
+def gdf_geom_type(gdf, first_only=True):
+    """Returns the geometry type of a GeoDataFrame.
+
+    Args:
+        gdf (gpd.GeoDataFrame): A GeoDataFrame.
+        first_only (bool, optional): Whether to return the geometry type of the first feature in the GeoDataFrame. Defaults to True.
+
+    Returns:
+        str: The geometry type of the GeoDataFrame.
+    """
+    import geopandas as gpd
+
+    if first_only:
+        return gdf.geometry.type[0]
+    else:
+        return gdf.geometry.type
