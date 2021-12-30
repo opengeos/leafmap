@@ -316,7 +316,7 @@ class Map(folium.Map):
         vmax=None,
         nodata=None,
         attribution=None,
-        layer_name=None,
+        layer_name="Local COG",
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -329,7 +329,7 @@ class Map(folium.Map):
             vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
-            layer_name (str, optional): The layer name to use. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
         """
 
         tile_layer, tile_client = get_local_tile_layer(
