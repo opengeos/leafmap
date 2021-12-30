@@ -2100,6 +2100,30 @@ def inspector_gui(m=None):
                         output.clear_output()
                         print("No pixel value available")
 
+            elif layer_dict["type"] == "LOCAL":
+                result = local_tile_pixel_value(
+                    lon, lat, layer_dict["tile_client"], verbose=False
+                )
+                if result is not None:
+                    with output:
+                        output.clear_output()
+                        print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
+                        for key in result:
+                            print(f"{key}: {result[key]}")
+
+                        result["latitude"] = lat
+                        result["longitude"] = lon
+                        result["label"] = label.value
+                        m.pixel_values.append(result)
+                    if add_marker.value:
+                        markers = list(m.marker_cluster.markers)
+                        markers.append(ipyleaflet.Marker(location=latlon))
+                        m.marker_cluster.markers = markers
+                else:
+                    with output:
+                        output.clear_output()
+                        print("No pixel value available")
+
             m.default_style = {"cursor": "crosshair"}
 
     if m is not None:
