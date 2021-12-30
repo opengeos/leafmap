@@ -1685,7 +1685,7 @@ class Map(ipyleaflet.Map):
             layer_name (str, optional): The layer name to use. Defaults to None.
         """
 
-        tile, bounds = get_local_tile_layer(
+        tile_layer, tile_client = get_local_tile_layer(
             source,
             band=band,
             palette=palette,
@@ -1694,11 +1694,25 @@ class Map(ipyleaflet.Map):
             nodata=nodata,
             attribution=attribution,
             layer_name=layer_name,
-            get_bounds=True,
+            return_client=True,
             **kwargs,
         )
-        self.add_layer(tile)
+        self.add_layer(tile_layer)
+
+        bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
+        bounds = (
+            bounds[2],
+            bounds[0],
+            bounds[3],
+            bounds[1],
+        )  # [minx, miny, maxx, maxy]
         self.zoom_to_bounds(bounds)
+
+        if not hasattr(self, "cog_layer_dict"):
+            self.cog_layer_dict = {}
+
+        params = {"tile_layer": tile_layer, "tile_client": tile_client, "band": band, "type": "LOCAL"}
+        self.cog_layer_dict[layer_name] = params
 
     def add_remote_tile(
         self,
