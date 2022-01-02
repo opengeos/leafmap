@@ -2361,6 +2361,99 @@ def plotly_toolbar(
                     display(m)
 
     toolbar_button.observe(toolbar_btn_click, "value")
+
+    def layers_btn_click(change):
+        if change["new"]:
+
+            layer_names = list(m.get_layers().keys())
+            layers_hbox = []
+            all_layers_chk = widgets.Checkbox(
+                value=True,
+                description="All layers on/off",
+                indent=False,
+                layout=widgets.Layout(height="18px", padding="0px 8px 25px 8px"),
+            )
+            all_layers_chk.layout.width = "30ex"
+            layers_hbox.append(all_layers_chk)
+
+            layer_chk_dict = {}
+
+            for name in layer_names:
+                if name in m.get_tile_layers():
+                    index = m.find_layer_index(name)
+                    layer = m.layout.mapbox.layers[index]
+                elif name in m.get_data_layers():
+                    index = m.find_layer_index(name)
+                    layer = m.data[index]
+
+                layer_chk = widgets.Checkbox(
+                    value=layer.visible,
+                    description=name,
+                    indent=False,
+                    layout=widgets.Layout(height="18px"),
+                )
+                layer_chk.layout.width = "25ex"
+                layer_chk_dict[name] = layer_chk
+
+                layer_opacity = widgets.FloatSlider(
+                    value=layer.opacity,
+                    description_tooltip=name,
+                    min=0,
+                    max=1,
+                    step=0.01,
+                    readout=False,
+                    layout=widgets.Layout(width="80px"),
+                )
+
+                layer_settings = widgets.ToggleButton(
+                    icon="gear",
+                    tooltip=name,
+                    layout=widgets.Layout(
+                        width="25px", height="25px", padding="0px 0px 0px 5px"
+                    ),
+                )
+
+                def layer_chk_change(change):
+                    if change["new"]:
+                        m.set_layer_visibility(change["owner"].description, True)
+                    else:
+                        m.set_layer_visibility(change["owner"].description, False)
+
+                layer_chk.observe(layer_chk_change, "value")
+
+                def layer_opacity_change(change):
+                    if change["new"]:
+                        m.set_layer_opacity(
+                            change["owner"].description_tooltip, change["new"]
+                        )
+
+                layer_opacity.observe(layer_opacity_change, "value")
+
+                hbox = widgets.HBox(
+                    [layer_chk, layer_settings, layer_opacity],
+                    layout=widgets.Layout(padding="0px 8px 0px 8px"),
+                )
+                layers_hbox.append(hbox)
+
+            def all_layers_chk_changed(change):
+                if change["new"]:
+                    for name in layer_names:
+                        m.set_layer_visibility(name, True)
+                        layer_chk_dict[name].value = True
+                else:
+                    for name in layer_names:
+                        m.set_layer_visibility(name, False)
+                        layer_chk_dict[name].value = False
+
+            all_layers_chk.observe(all_layers_chk_changed, "value")
+
+            toolbar_footer.children = layers_hbox
+            toolbar_button.value = False
+        else:
+            toolbar_footer.children = [toolbar_grid]
+
+    layers_button.observe(layers_btn_click, "value")
+
     return toolbar_widget
 
 
