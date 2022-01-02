@@ -8,7 +8,57 @@ from .basemaps import xyz_to_plotly
 from .common import *
 from .osm import *
 
+
 plotly_basemaps = xyz_to_plotly()
+
+
+class Canvas:
+    """The widgets.HBox containing the map and a toolbar."""
+
+    def __init__(
+        self,
+        map,
+        map_min_width="91%",
+        map_max_width="98%",
+        map_refresh=False,
+        **kwargs,
+    ):
+        """Initialize the Canvas.
+
+        Args:
+            map (go.FigureWidget, optional): The map to display.
+            map_min_width (str, optional): The minimum width of the map. Defaults to '91%'.
+            map_max_width (str, optional): The maximum width of the map. Defaults to '98%'.
+            map_refresh (bool, optional): Whether to refresh the map when the map is resized. Defaults to False.
+        """
+        from .toolbar import plotly_toolbar
+
+        map_widget = widgets.Output(layout=widgets.Layout(width=map_max_width))
+        with map_widget:
+            display(map)
+        output_widget = widgets.VBox()
+        canvas = widgets.HBox()
+
+        self.map = map
+        self.map_min_width = map_min_width
+        self.map_max_width = map_max_width
+        self.map_refresh = map_refresh
+        self.canvas = canvas
+        self.map_widget = map_widget
+        self.output_widget = output_widget
+        self.toolbar = None
+
+        toolbar_widget = plotly_toolbar(self)
+        canvas.children = [map_widget, widgets.VBox([toolbar_widget, output_widget])]
+
+        self.toolbar_widget = toolbar_widget
+
+    def toolbar_reset(self):
+        """Reset the toolbar so that no tool is selected."""
+        if hasattr(self, "toolbar"):
+            toolbar_grid = self.toolbar
+            for tool in toolbar_grid.children:
+                tool.value = False
 
 
 class Map(go.FigureWidget):
@@ -47,19 +97,27 @@ class Map(go.FigureWidget):
         refresh=False,
         **kwargs,
     ):
-        from .toolbar import plotly_toolbar
+        """Shows the map.
 
+        Args:
+            toolbar (bool, optional): Whether to show the toolbar. Defaults to True.
+            map_min_width (str, optional): The minimum width of the map. Defaults to '91%'.
+            map_max_width (str, optional): The maximum width of the map. Defaults to '98%'.
+            refresh (bool, optional): Whether to refresh the map when the map is resized. Defaults to False.
+
+        Returns:
+            Canvas: [description]
+        """
         if not toolbar:
             super().show(**kwargs)
         else:
-            output = widgets.Output(layout=widgets.Layout(width=map_max_width))
-            with output:
-                display(self)
-            toolbar = plotly_toolbar(
-                self, output, map_min_width, map_max_width, refresh
+            canvas = Canvas(
+                self,
+                min_width=map_min_width,
+                max_width=map_max_width,
+                map_refresh=refresh,
             )
-            canvas = widgets.HBox([output, toolbar])
-            display(canvas)
+            return canvas.canvas
 
     def clear_controls(self):
         """Removes all controls from the map."""
@@ -131,6 +189,16 @@ class Map(go.FigureWidget):
         layers = list(self.layout.mapbox.layers) + [plotly_basemaps[basemap]]
         self.update_layout(mapbox_layers=layers)
 
+    def remove_basemap(self, name):
+        """Removes a basemap from the map.
+
+        Args:
+            name (str): Name of the basemap to remove.
+        """
+        layers = list(self.layout.mapbox.layers)
+        layers = [layer for layer in layers if layer["name"] != name]
+        self.layout.mapbox.layers = layers
+
     def add_mapbox_layer(self, style, access_token=None):
         """Adds a mapbox layer to the map.
 
@@ -163,7 +231,12 @@ class Map(go.FigureWidget):
         Args:
             name (str): Name of the layer to remove.
         """
-        self.data = [layer for layer in self.data if layer.name != name]
+        if name in self.get_data_layers():
+            self.data = [layer for layer in self.data if layer.name != name]
+        elif name in self.get_tile_layers():
+            self.layout.mapbox.layers = [
+                layer for layer in self.layout.mapbox.layers if layer["name"] != name
+            ]
 
     def clear_layers(self, clear_basemap=False):
         """Clears all layers from the map.
@@ -176,6 +249,72 @@ class Map(go.FigureWidget):
         else:
             if len(self.data) > 1:
                 self.data = self.data[:1]
+
+    def get_layers(self):
+        """Returns a dictionary of all layers in the map.
+        Returns:
+            dict: A dictionary of all layers in the map.
+        """
+        layers = {}
+
+        for layer in self.layout.mapbox.layers:
+            if layer["name"] is not None:
+                layers[layer["name"]] = layer
+
+        for layer in self.data:
+            if layer.name is not None and layer.name != "trace 0":
+                layers[layer.name] = layer
+
+        return layers
+
+    def get_tile_layers(self):
+        """Returns a dictionary of tile layers in the map.
+
+        Returns:
+            dict: A dictionary of tile layers in the map.
+        """
+
+        layers = {}
+
+        for layer in self.layout.mapbox.layers:
+            if layer["name"] is not None:
+                layers[layer["name"]] = layer
+
+        return layers
+
+    def get_data_layers(self):
+        """Returns a dictionary of data layers in the map.
+
+        Returns:
+            dict: A dictionary of data layers in the map.
+        """
+
+        layers = {}
+
+        for layer in self.data:
+            if layer.name is not None and layer.name != "trace 0":
+                layers[layer.name] = layer
+
+        return layers
+
+    def find_layer_index(self, name):
+        """Finds the index of a layer.
+
+        Args:
+            name (str): Name of the layer to find.
+
+        Returns:
+            int: Index of the layer.
+        """
+        for i, layer in enumerate(self.data):
+            if layer.name == name:
+                return i
+
+        for i, layer in enumerate(self.layout.mapbox.layers):
+            if layer["name"] == name:
+                return i
+
+        return None
 
     def add_tile_layer(
         self,
