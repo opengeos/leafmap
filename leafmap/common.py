@@ -4233,3 +4233,33 @@ def check_dir(dir_path, make_dirs=True):
             raise FileNotFoundError("The provided directory could not be found.")
     else:
         raise TypeError("The provided directory path must be a string.")
+
+
+def check_file_path(file_path, make_dirs=True):
+    """Gets the absolute file path.
+
+    Args:
+        file_path ([str): The path to the file.
+        make_dirs (bool, optional): Whether to create the directory if it does not exist. Defaults to True.
+
+    Raises:
+        FileNotFoundError: If the directory could not be found.
+        TypeError: If the input directory path is not a string.
+
+    Returns:
+        str: The absolute path to the file.
+    """
+    if isinstance(file_path, str):
+        if file_path.startswith("~"):
+            file_path = os.path.expanduser(file_path)
+        else:
+            file_path = os.path.abspath(file_path)
+
+        file_dir = os.path.dirname(file_path)
+        if not os.path.exists(file_dir) and make_dirs:
+            os.makedirs(file_dir)
+
+        return file_path
+
+    else:
+        raise TypeError("The provided file path must be a string.")

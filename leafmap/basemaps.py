@@ -464,6 +464,7 @@ def xyz_to_plotly():
             "sourcetype": "raster",
             "sourceattribution": attribution,
             "source": [url],
+            "name": key,
         }
 
     xyz_dict = get_xyz_dict()
@@ -477,6 +478,7 @@ def xyz_to_plotly():
             "sourcetype": "raster",
             "sourceattribution": attribution,
             "source": [url],
+            "name": name,
         }
 
     return plotly_dict
