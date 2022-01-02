@@ -2170,15 +2170,27 @@ def inspector_gui(m=None):
 
 
 def plotly_toolbar(
-    m=None, output=None, map_min_width="91%", map_max_width="98%", refresh=False
+    canvas,
+    # m=None,
+    # output=None,
+    # map_min_width="91%",
+    # map_max_width="98%",
+    # refresh=False,
+    # output_widget=None,
 ):
     """Creates the main toolbar and adds it to the map.
 
     Args:
         m (leafmap.Map): The leafmap Map object.
     """
+    m = canvas.map
+    map_min_width = canvas.map_min_width
+    map_max_width = canvas.map_max_width
+    map_refresh = canvas.map_refresh
+    output_widget = canvas.output_widget
+    map_widget = canvas.map_widget
 
-    if not refresh:
+    if not map_refresh:
         width = int(map_min_width.replace("%", ""))
         if width > 85:
             map_min_width = "85%"
@@ -2274,6 +2286,24 @@ def plotly_toolbar(
             padding="5px",
         ),
     )
+    canvas.toolbar = toolbar_grid
+
+    def tool_callback(change):
+
+        if change["new"]:
+            current_tool = change["owner"]
+            for tool in toolbar_grid.children:
+                if tool is not current_tool:
+                    tool.value = False
+            tool = change["owner"]
+            tool_name = tools[tool.icon]["name"]
+            canvas.output_widget.children = []
+
+            if tool_name == "basemap":
+                plotly_basemap_gui(canvas)
+
+    for tool in toolbar_grid.children:
+        tool.observe(tool_callback, "value")
 
     toolbar_button = widgets.ToggleButton(
         value=False,
@@ -2314,21 +2344,71 @@ def plotly_toolbar(
 
     def toolbar_btn_click(change):
         if change["new"]:
-            output.layout.width = map_min_width
-            if refresh:
-                with output:
-                    output.clear_output()
+            map_widget.layout.width = map_min_width
+            if map_refresh:
+                with map_widget:
+                    map_widget.clear_output()
                     display(m)
             layers_button.value = False
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         else:
-            output.layout.width = map_max_width
+            map_widget.layout.width = map_max_width
             if not layers_button.value:
                 toolbar_widget.children = [toolbar_button]
-            if refresh:
-                with output:
-                    output.clear_output()
+            if map_refresh:
+                with map_widget:
+                    map_widget.clear_output()
                     display(m)
 
     toolbar_button.observe(toolbar_btn_click, "value")
     return toolbar_widget
+
+
+def plotly_basemap_gui(canvas, map_min_width="68%", map_max_width="85%"):
+    """Widget for changing basemaps.
+
+    Args:
+        m (object): leafmap.Map.
+    """
+    from .plotlymap import plotly_basemaps
+
+    m = canvas.map
+    layer_count = len(m.layout.mapbox.layers)
+    toolbar_widget = canvas.output_widget
+    map_widget = canvas.map_widget
+
+    map_widget.layout.width = map_min_width
+
+    value = "Stamen.Terrain"
+    m.add_basemap(value)
+
+    dropdown = widgets.Dropdown(
+        options=list(plotly_basemaps.keys()),
+        value=value,
+        layout=widgets.Layout(width="200px"),
+    )
+
+    close_btn = widgets.Button(
+        icon="times",
+        tooltip="Close the basemap widget",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    basemap_widget = widgets.HBox([dropdown, close_btn])
+    toolbar_widget.children = [basemap_widget]
+
+    def on_click(change):
+        basemap_name = change["new"]
+        m.layout.mapbox.layers = m.layout.mapbox.layers[:layer_count]
+        m.add_basemap(basemap_name)
+
+    dropdown.observe(on_click, "value")
+
+    def close_click(change):
+        toolbar_widget.children = []
+        basemap_widget.close()
+        map_widget.layout.width = map_max_width
+        canvas.toolbar_reset()
+
+    close_btn.on_click(close_click)
