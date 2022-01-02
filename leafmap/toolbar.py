@@ -2192,66 +2192,30 @@ def plotly_toolbar(
 
     if not map_refresh:
         width = int(map_min_width.replace("%", ""))
-        if width > 85:
-            map_min_width = "85%"
+        if width > 90:
+            map_min_width = "90%"
 
     tools = {
         "map": {
             "name": "basemap",
             "tooltip": "Change basemap",
         },
-        "globe": {
-            "name": "split_map",
-            "tooltip": "Split-panel map",
+        "search": {
+            "name": "search_xyz",
+            "tooltip": "Search XYZ tile services",
         },
-        # "adjust": {
-        #     "name": "planet",
-        #     "tooltip": "Planet imagery",
-        # },
-        # "folder-open": {
-        #     "name": "open_data",
-        #     "tooltip": "Open local vector/raster data",
-        # },
-        # "gears": {
-        #     "name": "whitebox",
-        #     "tooltip": "WhiteboxTools for local geoprocessing",
-        # },
-        # "fast-forward": {
-        #     "name": "timeslider",
-        #     "tooltip": "Activate the time slider",
-        # },
-        # "eraser": {
-        #     "name": "eraser",
-        #     "tooltip": "Remove all drawn features",
-        # },
-        # "camera": {
-        #     "name": "save_map",
-        #     "tooltip": "Save map as HTML or image",
-        # },
-        # "address-book": {
-        #     "name": "census",
-        #     "tooltip": "Get US Census data",
-        # },
-        # "info": {
-        #     "name": "inspector",
-        #     "tooltip": "Get COG/STAC pixel value",
-        # },
-        # "search": {
-        #     "name": "search_xyz",
-        #     "tooltip": "Search XYZ tile services",
-        # },
-        # "download": {
-        #     "name": "download_osm",
-        #     "tooltip": "Download OSM data",
-        # },
-        # "smile-o": {
-        #     "name": "placeholder",
-        #     "tooltip": "This is a placeholder",
-        # },
-        # "spinner": {
-        #     "name": "placeholder2",
-        #     "tooltip": "This is a placeholder",
-        # },
+        "gears": {
+            "name": "whitebox",
+            "tooltip": "WhiteboxTools for local geoprocessing",
+        },
+        "folder-open": {
+            "name": "open_data",
+            "tooltip": "Open local vector/raster data",
+        },
+        "picture-o": {
+            "name": "cog",
+            "tooltip": "Open COG/STAC dataset",
+        },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -2301,6 +2265,14 @@ def plotly_toolbar(
 
             if tool_name == "basemap":
                 plotly_basemap_gui(canvas)
+            elif tool_name == "help":
+                import webbrowser
+
+                webbrowser.open_new_tab("https://leafmap.org")
+                tool.value = False
+        else:
+            canvas.output_widget.children = []
+            map_widget.layout.width = map_max_width
 
     for tool in toolbar_grid.children:
         tool.observe(tool_callback, "value")
@@ -2319,11 +2291,11 @@ def plotly_toolbar(
         layout=widgets.Layout(height="28px", width="72px"),
     )
 
-    toolbar_widget = widgets.VBox()
+    toolbar_widget = widgets.VBox(layout=widgets.Layout(overflow="hidden"))
     toolbar_widget.children = [toolbar_button]
-    toolbar_header = widgets.HBox()
+    toolbar_header = widgets.HBox(layout=widgets.Layout(overflow="hidden"))
     toolbar_header.children = [layers_button, toolbar_button]
-    toolbar_footer = widgets.VBox()
+    toolbar_footer = widgets.VBox(layout=widgets.Layout(overflow="hidden"))
     toolbar_footer.children = [toolbar_grid]
 
     toolbar_event = ipyevents.Event(
@@ -2339,6 +2311,7 @@ def plotly_toolbar(
                 toolbar_widget.children = [toolbar_button]
                 toolbar_button.value = False
                 layers_button.value = False
+                # map_widget.layout.width = map_max_width
 
     toolbar_event.on_dom_event(handle_toolbar_event)
 
@@ -2352,6 +2325,7 @@ def plotly_toolbar(
             layers_button.value = False
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         else:
+            canvas.toolbar_reset()
             map_widget.layout.width = map_max_width
             if not layers_button.value:
                 toolbar_widget.children = [toolbar_button]
@@ -2457,7 +2431,7 @@ def plotly_toolbar(
     return toolbar_widget
 
 
-def plotly_basemap_gui(canvas, map_min_width="68%", map_max_width="85%"):
+def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
     """Widget for changing basemaps.
 
     Args:
