@@ -186,6 +186,8 @@ class Map(go.FigureWidget):
                 f"Basemap {basemap} not found. Choose from {','.join(plotly_basemaps.keys())}"
             )
 
+        if basemap in self.get_tile_layers():
+            self.remove_basemap(basemap)
         layers = list(self.layout.mapbox.layers) + [plotly_basemaps[basemap]]
         self.update_layout(mapbox_layers=layers)
 
@@ -315,6 +317,40 @@ class Map(go.FigureWidget):
                 return i
 
         return None
+
+    def set_layer_visibility(self, name, show=True):
+        """Sets the visibility of a layer.
+
+        Args:
+            name (str): Name of the layer to set.
+            show (bool, optional): If True, shows the layer. Defaults to True.
+        """
+
+        if name in self.get_tile_layers():
+            index = self.find_layer_index(name)
+            self.layout.mapbox.layers[index].visible = show
+        elif name in self.get_data_layers():
+            index = self.find_layer_index(name)
+            self.data[index].visible = show
+        else:
+            print(f"Layer {name} not found.")
+
+    def set_layer_opacity(self, name, opacity=1):
+        """Sets the visibility of a layer.
+
+        Args:
+            name (str): Name of the layer to set.
+            opacity (float, optional): Opacity of the layer. Defaults to 1.
+        """
+
+        if name in self.get_tile_layers():
+            index = self.find_layer_index(name)
+            self.layout.mapbox.layers[index].opacity = opacity
+        elif name in self.get_data_layers():
+            index = self.find_layer_index(name)
+            self.data[index].opacity = opacity
+        else:
+            print(f"Layer {name} not found.")
 
     def add_tile_layer(
         self,
