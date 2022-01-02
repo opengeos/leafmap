@@ -18,7 +18,7 @@ class Canvas:
     def __init__(
         self,
         map,
-        map_min_width="91%",
+        map_min_width="90%",
         map_max_width="98%",
         map_refresh=False,
         **kwargs,
