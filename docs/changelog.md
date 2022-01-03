@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.7.1 - January 3, 2022
+
+**New Features**:
+
+-   Added plotly toolbar GUI [#160](https://github.com/giswqs/leafmap/issues/160)
+-   Added layer control [#160](https://github.com/giswqs/leafmap/issues/160)
+-   Added Inspector support for local tile [#162](https://github.com/giswqs/leafmap/issues/162)
+-   Added add_gdf for plotly [#163](https://github.com/giswqs/leafmap/issues/163)
+
+
+**Improvement**
+
+-   Improved COG visualization [#161](https://github.com/giswqs/leafmap/issues/161)
+-   Fixed citation bug [#165](https://github.com/giswqs/leafmap/pull/165)
+
 ## v0.7.0 - December 29, 2021
 
 **New Features**:
