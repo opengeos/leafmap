@@ -1477,8 +1477,6 @@ def search_basemaps(m=None):
     output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
 
     def providers_change(change):
-        # with output:
-        #     print(change["new"])
         if change["new"] != "":
             provider = change["new"]
             if provider is not None:
@@ -2175,13 +2173,12 @@ def plotly_toolbar(
     """Creates the main toolbar and adds it to the map.
 
     Args:
-        m (leafmap.Map): The leafmap Map object.
+        m (plotlymap.Map): The plotly Map object.
     """
     m = canvas.map
     map_min_width = canvas.map_min_width
     map_max_width = canvas.map_max_width
     map_refresh = canvas.map_refresh
-    output_widget = canvas.output_widget
     map_widget = canvas.map_widget
 
     if not map_refresh:
@@ -2255,17 +2252,21 @@ def plotly_toolbar(
                     tool.value = False
             tool = change["owner"]
             tool_name = tools[tool.icon]["name"]
-            canvas.output_widget.children = []
+            canvas.container_widget.children = []
 
             if tool_name == "basemap":
                 plotly_basemap_gui(canvas)
+            elif tool_name == "search_xyz":
+                plotly_search_basemaps(canvas)
+            elif tool_name == "whitebox":
+                plotly_whitebox_gui(canvas)
             elif tool_name == "help":
                 import webbrowser
 
                 webbrowser.open_new_tab("https://leafmap.org")
                 tool.value = False
         else:
-            canvas.output_widget.children = []
+            canvas.container_widget.children = []
             map_widget.layout.width = map_max_width
 
     for tool in toolbar_grid.children:
@@ -2438,7 +2439,7 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
 
     m = canvas.map
     layer_count = len(m.layout.mapbox.layers)
-    toolbar_widget = canvas.output_widget
+    container_widget = canvas.container_widget
     map_widget = canvas.map_widget
 
     map_widget.layout.width = map_min_width
@@ -2460,7 +2461,7 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
     )
 
     basemap_widget = widgets.HBox([dropdown, close_btn])
-    toolbar_widget.children = [basemap_widget]
+    container_widget.children = [basemap_widget]
 
     def on_click(change):
         basemap_name = change["new"]
@@ -2470,10 +2471,281 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
     dropdown.observe(on_click, "value")
 
     def close_click(change):
-        toolbar_widget.children = []
+        container_widget.children = []
         basemap_widget.close()
         map_widget.layout.width = map_max_width
         canvas.toolbar_reset()
         canvas.toolbar_button.value = False
 
     close_btn.on_click(close_click)
+
+
+def plotly_search_basemaps(canvas):
+    """The widget for search XYZ tile services.
+
+    Args:
+        m (plotlymap.Map, optional): The Plotly Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    import xyzservices.providers as xyz
+    from xyzservices import TileProvider
+
+    m = canvas.map
+    container_widget = canvas.container_widget
+    map_widget = canvas.map_widget
+    map_widget.layout.width = "75%"
+
+    # map_widget.layout.width = map_min_width
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="search",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    checkbox = widgets.Checkbox(
+        description="Search Quick Map Services (QMS)",
+        indent=False,
+        layout=widgets.Layout(padding=padding, width=widget_width),
+    )
+
+    providers = widgets.Dropdown(
+        options=[],
+        value=None,
+        description="XYZ Tile:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    keyword = widgets.Text(
+        value="",
+        description="Search keyword:",
+        placeholder="OpenStreetMap",
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
+    def search_callback(change):
+        providers.options = []
+        if keyword.value != "":
+            tiles = search_xyz_services(keyword=keyword.value)
+            if checkbox.value:
+                tiles = tiles + search_qms(keyword=keyword.value)
+            providers.options = tiles
+
+    keyword.on_submit(search_callback)
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Search", "Reset", "Close"],
+        tooltips=["Search", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "80px"
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    def providers_change(change):
+        if change["new"] != "":
+            provider = change["new"]
+            if provider is not None:
+                if provider.startswith("qms"):
+                    with output:
+                        output.clear_output()
+                        print("Adding data. Please wait...")
+                    name = provider[4:]
+                    qms_provider = TileProvider.from_qms(name)
+                    url = qms_provider.build_url()
+                    attribution = qms_provider.attribution
+                    m.add_tile_layer(url, name, attribution)
+                    output.clear_output()
+                elif provider.startswith("xyz"):
+                    name = provider[4:]
+                    xyz_provider = xyz.flatten()[name]
+                    url = xyz_provider.build_url()
+                    attribution = xyz_provider.attribution
+                    if xyz_provider.requires_token():
+                        with output:
+                            output.clear_output()
+                            print(f"{provider} requires an API Key.")
+                    m.add_tile_layer(url, name, attribution)
+
+    providers.observe(providers_change, "value")
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        checkbox,
+        keyword,
+        providers,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            canvas.toolbar_reset()
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Search":
+            providers.options = []
+            output.clear_output()
+            if keyword.value != "":
+                tiles = search_xyz_services(keyword=keyword.value)
+                if checkbox.value:
+                    tiles = tiles + search_qms(keyword=keyword.value)
+                providers.options = tiles
+            else:
+                with output:
+                    print("Please enter a search keyword.")
+        elif change["new"] == "Reset":
+            keyword.value = ""
+            providers.options = []
+            output.clear_output()
+        elif change["new"] == "Close":
+            canvas.toolbar_reset()
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
+    container_widget.children = [toolbar_widget]
+
+
+def plotly_whitebox_gui(canvas):
+
+    import whiteboxgui.whiteboxgui as wbt
+
+    container_widget = canvas.container_widget
+    map_widget = canvas.map_widget
+    map_width = "25%"
+    map_widget.layout.width = map_width
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="gears",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    tools_dict = wbt.get_wbt_dict()
+    wbt_toolbox = wbt.build_toolbox(
+        tools_dict,
+        max_width="800px",
+        max_height="500px",
+        sandbox_path=os.getcwd(),
+    )
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        wbt_toolbox,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+            map_widget.layout.width = map_width
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+                map_widget.layout.width = canvas.map_max_width
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+            map_widget.layout.width = map_width
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+            map_widget.layout.width = canvas.map_max_width
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            canvas.toolbar_reset()
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    toolbar_button.value = True
+    container_widget.children = [toolbar_widget]

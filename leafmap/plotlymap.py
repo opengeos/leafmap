@@ -26,8 +26,8 @@ class Canvas:
         """Initialize the Canvas.
 
         Args:
-            map (go.FigureWidget, optional): The map to display.
-            map_min_width (str, optional): The minimum width of the map. Defaults to '91%'.
+            map (go.FigureWidget): The map to display.
+            map_min_width (str, optional): The minimum width of the map. Defaults to '90%'.
             map_max_width (str, optional): The maximum width of the map. Defaults to '98%'.
             map_refresh (bool, optional): Whether to refresh the map when the map is resized. Defaults to False.
         """
@@ -36,21 +36,21 @@ class Canvas:
         map_widget = widgets.Output(layout=widgets.Layout(width=map_max_width))
         with map_widget:
             display(map)
-        output_widget = widgets.VBox()
-        canvas = widgets.HBox()
 
         self.map = map
         self.map_min_width = map_min_width
         self.map_max_width = map_max_width
         self.map_refresh = map_refresh
-        self.canvas = canvas
         self.map_widget = map_widget
-        self.output_widget = output_widget
-        self.toolbar = None
+
+        container_widget = widgets.VBox()
+        self.container_widget = container_widget
 
         toolbar_widget = plotly_toolbar(self)
-        canvas.children = [map_widget, widgets.VBox([toolbar_widget, output_widget])]
+        sidebar_widget = widgets.VBox([toolbar_widget, container_widget])
+        canvas = widgets.HBox([map_widget, sidebar_widget])
 
+        self.canvas = canvas
         self.toolbar_widget = toolbar_widget
 
     def toolbar_reset(self):
@@ -664,6 +664,7 @@ def fix_widget_error():
     Adopted from: https://github.com/plotly/plotly.py/issues/2570#issuecomment-738735816
     """
     import shutil
+
     basedatatypesPath = os.path.join(
         os.path.dirname(os.__file__), "site-packages", "plotly", "basedatatypes.py"
     )
