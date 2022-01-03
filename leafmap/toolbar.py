@@ -2200,11 +2200,11 @@ def plotly_toolbar(
             "tooltip": "WhiteboxTools for local geoprocessing",
         },
         "folder-open": {
-            "name": "open_data",
+            "name": "vector",
             "tooltip": "Open local vector/raster data",
         },
         "picture-o": {
-            "name": "cog",
+            "name": "raster",
             "tooltip": "Open COG/STAC dataset",
         },
         "question": {
@@ -2260,6 +2260,10 @@ def plotly_toolbar(
                 plotly_search_basemaps(canvas)
             elif tool_name == "whitebox":
                 plotly_whitebox_gui(canvas)
+            elif tool_name == "vector":
+                plotly_tool_template(canvas)
+            elif tool_name == "raster":
+                plotly_tool_template(canvas)
             elif tool_name == "help":
                 import webbrowser
 
@@ -2367,8 +2371,15 @@ def plotly_toolbar(
                 layer_chk.layout.width = "25ex"
                 layer_chk_dict[name] = layer_chk
 
+                if hasattr(layer, "opacity"):
+                    opacity = layer.opacity
+                elif hasattr(layer, "marker"):
+                    opacity = layer.marker.opacity
+                else:
+                    opacity = 1.0
+
                 layer_opacity = widgets.FloatSlider(
-                    value=layer.opacity,
+                    value=opacity,
                     description_tooltip=name,
                     min=0,
                     max=1,
@@ -2386,6 +2397,7 @@ def plotly_toolbar(
                 )
 
                 def layer_chk_change(change):
+
                     if change["new"]:
                         m.set_layer_visibility(change["owner"].description, True)
                     else:
@@ -2427,6 +2439,86 @@ def plotly_toolbar(
     layers_button.observe(layers_btn_click, "value")
 
     return toolbar_widget
+
+
+def plotly_tool_template(canvas):
+
+    container_widget = canvas.container_widget
+    map_widget = canvas.map_widget
+    map_width = "70%"
+    map_widget.layout.width = map_width
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="gears",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+    with output:
+        print("To be implemented")
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+            map_widget.layout.width = map_width
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+                map_widget.layout.width = canvas.map_max_width
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+            map_widget.layout.width = map_width
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+            map_widget.layout.width = canvas.map_max_width
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            canvas.toolbar_reset()
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    toolbar_button.value = True
+    container_widget.children = [toolbar_widget]
 
 
 def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
