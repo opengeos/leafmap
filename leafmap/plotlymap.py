@@ -348,7 +348,11 @@ class Map(go.FigureWidget):
             self.layout.mapbox.layers[index].opacity = opacity
         elif name in self.get_data_layers():
             index = self.find_layer_index(name)
-            self.data[index].opacity = opacity
+            layer = self.data[index]
+            if hasattr(layer, "opacity"):
+                layer.opacity = opacity
+            elif hasattr(layer, "marker"):
+                layer.marker.opacity = opacity
         else:
             print(f"Layer {name} not found.")
 
@@ -623,6 +627,9 @@ class Map(go.FigureWidget):
         check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 
+        if isinstance(gdf, str):
+            gdf = gpd.read_file(gdf)
+
         if not isinstance(gdf, gpd.GeoDataFrame):
             raise ValueError("gdf must be a GeoDataFrame.")
 
@@ -632,6 +639,8 @@ class Map(go.FigureWidget):
 
         if isinstance(label_col, str):
             gdf = gdf.set_index(label_col)
+            if label_col == color_col:
+                gdf[label_col] = gdf.index
             label_col = gdf.index
         elif label_col is None:
             label_col = gdf.index
@@ -649,13 +658,13 @@ class Map(go.FigureWidget):
             color_continuous_scale=color_continuous_scale,
             opacity=opacity,
             labels=labels,
-            mapbox_style="carto-positron",
+            # mapbox_style="carto-positron",
             **kwargs,
         )
 
         self.add_traces(fig.data)
         self.set_center(center_lat, center_lon, zoom)
-        return fig.data
+        del fig
 
 
 def fix_widget_error():
