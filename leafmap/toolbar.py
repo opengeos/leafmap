@@ -2171,12 +2171,6 @@ def inspector_gui(m=None):
 
 def plotly_toolbar(
     canvas,
-    # m=None,
-    # output=None,
-    # map_min_width="91%",
-    # map_max_width="98%",
-    # refresh=False,
-    # output_widget=None,
 ):
     """Creates the main toolbar and adds it to the map.
 
@@ -2283,6 +2277,7 @@ def plotly_toolbar(
         icon="wrench",
         layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
     )
+    canvas.toolbar_button = toolbar_button
 
     layers_button = widgets.ToggleButton(
         value=False,
@@ -2290,6 +2285,7 @@ def plotly_toolbar(
         icon="server",
         layout=widgets.Layout(height="28px", width="72px"),
     )
+    canvas.layers_button = layers_button
 
     toolbar_widget = widgets.VBox(layout=widgets.Layout(overflow="hidden"))
     toolbar_widget.children = [toolbar_button]
@@ -2306,6 +2302,7 @@ def plotly_toolbar(
 
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
+            # map_widget.layout.width = "85%"
         elif event["type"] == "mouseleave":
             if not toolbar_button.value:
                 toolbar_widget.children = [toolbar_button]
@@ -2477,5 +2474,6 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
         basemap_widget.close()
         map_widget.layout.width = map_max_width
         canvas.toolbar_reset()
+        canvas.toolbar_button.value = False
 
     close_btn.on_click(close_click)
