@@ -113,8 +113,8 @@ class Map(go.FigureWidget):
         else:
             canvas = Canvas(
                 self,
-                min_width=map_min_width,
-                max_width=map_max_width,
+                map_min_width=map_min_width,
+                map_max_width=map_max_width,
                 map_refresh=refresh,
             )
             return canvas.canvas
@@ -663,9 +663,13 @@ def fix_widget_error():
     Fix FigureWidget - 'mapbox._derived' Value Error.
     Adopted from: https://github.com/plotly/plotly.py/issues/2570#issuecomment-738735816
     """
+    import shutil
     basedatatypesPath = os.path.join(
         os.path.dirname(os.__file__), "site-packages", "plotly", "basedatatypes.py"
     )
+
+    backup_file = basedatatypesPath.replace(".py", "_bk.py")
+    shutil.copyfile(basedatatypesPath, backup_file)
 
     # read basedatatypes.py
     with open(basedatatypesPath, "r") as f:
@@ -674,8 +678,8 @@ def fix_widget_error():
     find = "if not BaseFigure._is_key_path_compatible(key_path_str, self.layout):"
 
     replace = """if not BaseFigure._is_key_path_compatible(key_path_str, self.layout):
-                    if key_path_str == "mapbox._derived":
-                        return"""
+                if key_path_str == "mapbox._derived":
+                    return"""
 
     # add new text
     lines = lines.replace(find, replace)
