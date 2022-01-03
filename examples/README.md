@@ -54,6 +54,7 @@
 37. Adding Planetary Computer STAC item to the map ([notebook](https://leafmap.org/notebooks/37_planetary_computer))
 38. Using the plotly plotting backend ([notebook](https://leafmap.org/notebooks/38_plotly))
 39. Getting pixel values using the Inspector tool ([notebook](https://leafmap.org/notebooks/39_inspector_tool))
+40. Using the interactive plotly toolbar GUI ([notebook](https://leafmap.org/notebooks/40_plotly_gui))
 
 ## Demo
 

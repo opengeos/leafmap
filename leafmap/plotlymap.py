@@ -545,7 +545,9 @@ class Map(go.FigureWidget):
         lons = np.random.random(1000) * 360.0
         lats = np.random.random(1000) * 180.0 - 90.0
         z = np.random.random(1000) * 50.0
-        self.add_scattermapbox(lon=lons, lat=lats, marker={"color": z})
+        self.add_scattermapbox(
+            lon=lons, lat=lats, marker={"color": z}, name="Random points", **kwargs
+        )
 
     def add_heatmap(
         self,
@@ -600,6 +602,7 @@ class Map(go.FigureWidget):
             z=quakes.Magnitude,
             radius=10,
             name="Earthquake",
+            **kwargs,
         )
 
         self.add_basemap("Stamen.Terrain")
