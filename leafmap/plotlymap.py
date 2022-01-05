@@ -668,6 +668,75 @@ class Map(go.FigureWidget):
         self.add_traces(fig.data)
         self.set_center(center_lat, center_lon, zoom)
         del fig
+        
+    def add_geojson_layer(self, geojson_in, name, color='blue', opacity=1):
+        """Prepare proper and give style for different type of Geometry
+
+        Args:
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            name (str): Name for the Layer 
+            color (str, optional): Plain name for color (e.g: blue) or color code (e.g: #FF0000)
+            opacity(float, optional): opacity of the layer in Map
+        """
+
+        import json
+        import requests
+
+        if isinstance(geojson_in, dict):
+            data = geojson_in
+        elif geojson_in.startswith("http"):
+            data = requests.get(geojson_in).json()
+        elif geojson_in.lower().endswith(('.json', '.geojson')):
+            with open(geojson_in) as fp:
+                data = json.load(fp)
+        else:
+            data = geojson_in
+
+        """ Only Checking Geometry of first feature( todo : handle multiple type of Geometry in same geojson ) """
+        first_feature = data['features'][0]
+        geometry_type = first_feature['geometry']['type']
+
+        if(geometry_type.lower() in ["polygon", 'multipolygon']):
+            type = 'fill'
+        elif(geometry_type.lower() in ["linstring",'multilinestring']):
+            type = 'line'
+        elif(geometry_type.lower() in ["point","multipoint"]):
+            type = 'circle'
+        else:
+            type = 'fill'
+
+        self.add_geojson(data, name, type, color, opacity)
+
+    def add_geojson(self, data, name, type, color, opacity):
+        """Add layers to the Map
+
+        Args:
+            data (dict): Geojson in Dict form
+            name (str): Name for the Layer 
+            color (str, optional): Plain name for color (e.g: blue) or color code (e.g: #FF0000)
+            opacity(float, optional): opacity of the layer in Map
+        """
+
+        new_layer = {
+            'source': data,
+            'name': name,
+            'type': type,
+            'opacity': opacity,
+            'color': color,
+
+        }
+        if(type == 'circle'):
+            new_layer['circle'] = {
+                'radius': 5
+            }
+        existing_layers = list(self.layout.mapbox.layers)
+
+        existing_layers.append(new_layer)
+
+        self.update_layout(
+            mapbox={
+                'layers': tuple(existing_layers)
+            })
 
 
 def fix_widget_error():
