@@ -76,7 +76,7 @@ class Map(go.FigureWidget):
             height (int, optional): Height of the map. Defaults to 600.
         """
         super().__init__(**kwargs)
-        # self.add_scattermapbox()
+        self.add_scattermapbox()
         self.update_layout(
             {
                 "mapbox": {
@@ -537,7 +537,6 @@ class Map(go.FigureWidget):
             z=gdf[z],
             name=name,
             colorscale=colorscale,
-            autocolorscale=False,
             **kwargs,
         )
 
