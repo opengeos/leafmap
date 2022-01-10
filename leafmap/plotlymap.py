@@ -608,6 +608,44 @@ class Map(go.FigureWidget):
         self.add_basemap("Stamen.Terrain")
         self.add_trace(heatmap)
 
+    def add_gdf_demo(
+        self,
+        gdf,
+        label_col,
+        color_col,
+        color_continuous_scale="Viridis",
+        **kwargs,
+    ):
+
+        check_package("geopandas", "https://geopandas.org")
+        import geopandas as gpd
+
+        geojson_url = str(gdf)
+
+        if isinstance(gdf, str):
+            gdf = gpd.read_file(gdf).to_crs(epsg=4326)
+
+        fig = go.Choroplethmapbox(
+            geojson=geojson_url,
+            featureidkey='properties.{}'.format(label_col),
+            locations=gdf[label_col],
+            z=gdf[color_col],
+            autocolorscale=False,
+            colorscale=color_continuous_scale,
+            marker_line_color='peachpuff',
+            colorbar=dict(
+                title={'text': "Legend"},
+                thickness=15,
+                len=0.35,
+                bgcolor='rgba(255,255,255,0.6)',
+                xanchor='left',
+                x=0.02,
+                yanchor='bottom',
+                y=0.05
+            )
+        )
+        self.add_trace(fig)
+
     def add_gdf(
         self,
         gdf,
@@ -620,7 +658,6 @@ class Map(go.FigureWidget):
         **kwargs,
     ):
         """Adds a GeoDataFrame to the map.
-
         Args:
             gdf (GeoDataFrame): A GeoDataFrame.
             label_col (str, optional): The column name of locations. Defaults to None.
@@ -669,6 +706,75 @@ class Map(go.FigureWidget):
         self.set_center(center_lat, center_lon, zoom)
         del fig
 
+    def add_geojson_layer(self, geojson_in, name, color='blue', opacity=1):
+        """Prepare proper and give style for different type of Geometry
+
+        Args:
+            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            name (str): Name for the Layer 
+            color (str, optional): Plain name for color (e.g: blue) or color code (e.g: #FF0000)
+            opacity(float, optional): opacity of the layer in Map
+        """
+
+        import json
+        import requests
+
+        if isinstance(geojson_in, dict):
+            data = geojson_in
+        elif geojson_in.startswith("http"):
+            data = requests.get(geojson_in).json()
+        elif geojson_in.lower().endswith(('.json', '.geojson')):
+            with open(geojson_in) as fp:
+                data = json.load(fp)
+        else:
+            data = geojson_in
+
+        """ Only Checking Geometry of first feature( todo : handle multiple type of Geometry in same geojson ) """
+        first_feature = data['features'][0]
+        geometry_type = first_feature['geometry']['type']
+
+        if(geometry_type.lower() in ["polygon", 'multipolygon']):
+            type = 'fill'
+        elif(geometry_type.lower() in ["linstring", 'multilinestring']):
+            type = 'line'
+        elif(geometry_type.lower() in ["point", "multipoint"]):
+            type = 'circle'
+        else:
+            type = 'fill'
+
+        self.add_geojson(data, name, type, color, opacity)
+
+    def add_geojson(self, data, name, type, color, opacity):
+        """Add layers to the Map
+
+        Args:
+            data (dict): Geojson in Dict form
+            name (str): Name for the Layer 
+            color (str, optional): Plain name for color (e.g: blue) or color code (e.g: #FF0000)
+            opacity(float, optional): opacity of the layer in Map
+        """
+
+        new_layer = {
+            'source': data,
+            'name': name,
+            'type': type,
+            'opacity': opacity,
+            'color': color,
+
+        }
+        if(type == 'circle'):
+            new_layer['circle'] = {
+                'radius': 5
+            }
+        existing_layers = list(self.layout.mapbox.layers)
+
+        existing_layers.append(new_layer)
+
+        self.update_layout(
+            mapbox={
+                'layers': tuple(existing_layers)
+            })
+
 
 def fix_widget_error():
     """
@@ -678,7 +784,8 @@ def fix_widget_error():
     import shutil
 
     basedatatypesPath = os.path.join(
-        os.path.dirname(os.__file__), "site-packages", "plotly", "basedatatypes.py"
+        os.path.dirname(
+            os.__file__), "site-packages", "plotly", "basedatatypes.py"
     )
 
     backup_file = basedatatypesPath.replace(".py", "_bk.py")
