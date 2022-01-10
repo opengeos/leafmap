@@ -955,6 +955,7 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
+        bands (list, optional): List of bands to use. Defaults to None.
         titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
 
     Returns:
@@ -965,13 +966,20 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
 
     band_names = cog_bands(url, titiler_endpoint)
 
+    if isinstance(bands, str):
+        bands = [bands]
+
     if bands is None and "bidx" not in kwargs:
         if len(band_names) >= 3:
             kwargs["bidx"] = [1, 2, 3]
-    elif bands is not None and "bidx" not in kwargs:
+    elif isinstance(bands, list) and "bidx" not in kwargs:
         if all(isinstance(x, int) for x in bands):
+            if len(set(bands)) == 1:
+                bands = bands[0]
             kwargs["bidx"] = bands
         elif all(isinstance(x, str) for x in bands):
+            if len(set(bands)) == 1:
+                bands = bands[0]
             kwargs["bidx"] = [band_names.index(x) + 1 for x in bands]
         else:
             raise ValueError("Bands must be a list of integers or strings.")
@@ -990,8 +998,38 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
     r = requests.get(
         f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json", params=kwargs
     ).json()
-
     return r["tiles"][0]
+
+
+def cog_tile_vmin_vmax(
+    url, bands=None, titiler_endpoint="https://titiler.xyz", percentile=True, **kwargs
+):
+    """Get a tile layer from a Cloud Optimized GeoTIFF (COG) and return the minimum and maximum values.
+
+    Args:
+        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
+        bands (list, optional): List of bands to use. Defaults to None.
+        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
+        percentile (bool, optional): Whether to use percentiles or not. Defaults to True.
+    Returns:
+        tuple: Returns the minimum and maximum values.
+    """
+    stats = cog_stats(url, titiler_endpoint)
+
+    if isinstance(bands, str):
+        bands = [bands]
+
+    if bands is not None:
+        stats = {s: stats[s] for s in stats if s in bands}
+
+    if percentile:
+        vmin = min([stats[s]["percentile_2"] for s in stats])
+        vmax = max([stats[s]["percentile_98"] for s in stats])
+    else:
+        vmin = min([stats[s]["min"] for s in stats])
+        vmax = max([stats[s]["max"] for s in stats])
+
+    return vmin, vmax
 
 
 def cog_mosaic(
@@ -1288,6 +1326,12 @@ def stac_tile(
         kwargs["collection"] = collection
     if items is not None:
         kwargs["items"] = items
+
+    if isinstance(bands, list) and len(set(bands)) == 1:
+        bands = bands[0]
+
+    if isinstance(assets, list) and len(set(assets)) == 1:
+        assets = assets[0]
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
@@ -1712,6 +1756,75 @@ def local_tile_pixel_value(
         if verbose:
             print("No pixel value found.")
         return None
+
+
+def local_tile_vmin_vmax(
+    source,
+    bands=None,
+    **kwargs,
+):
+    """Get vmin and vmax from COG.
+
+    Args:
+        source (str | TileClient): A local COG file path or TileClient object.
+        bands (str | list, optional): A list of band names. Defaults to None.
+
+    Raises:
+        ValueError: If source is not a TileClient object or a local COG file path.
+
+    Returns:
+        tuple: A tuple of vmin and vmax.
+    """
+    check_package("localtileserver", "https://github.com/banesullivan/localtileserver")
+    from localtileserver import TileClient
+
+    if isinstance(source, str):
+        tile_client = TileClient(source)
+    elif isinstance(source, TileClient):
+        tile_client = source
+    else:
+        raise ValueError("source must be a string or TileClient object.")
+
+    stats = tile_client.metadata()["bands"]
+    bandnames = list(stats.keys())
+
+    if isinstance(bands, str):
+        bands = [bands]
+    elif isinstance(bands, list):
+        pass
+    elif bands is None:
+        bands = bandnames
+
+    if all(b in bandnames for b in bands):
+        vmin = min([stats[b]["min"] for b in bands])
+        vmax = max([stats[b]["max"] for b in bands])
+    else:
+        vmin = min([stats[b]["min"] for b in bandnames])
+        vmax = max([stats[b]["max"] for b in bandnames])
+    return vmin, vmax
+
+
+def local_tile_bands(source):
+    """Get band names from COG.
+
+    Args:
+        source (str | TileClient): A local COG file path or TileClient
+
+    Returns:
+        list: A list of band names.
+    """
+    check_package("localtileserver", "https://github.com/banesullivan/localtileserver")
+    from localtileserver import TileClient
+
+    if isinstance(source, str):
+        tile_client = TileClient(source)
+    elif isinstance(source, TileClient):
+        tile_client = source
+    else:
+        raise ValueError("source must be a string or TileClient object.")
+
+    bandnames = list(tile_client.metadata()["bands"].keys())
+    return bandnames
 
 
 def bbox_to_geojson(bounds):

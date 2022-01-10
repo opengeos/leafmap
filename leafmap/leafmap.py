@@ -8,6 +8,7 @@ from .basemaps import xyz_to_leaflet
 from .common import *
 from .legends import builtin_legends
 from .osm import *
+from .pc import *
 
 leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -303,6 +304,17 @@ class Map(ipyleaflet.Map):
                 return index
 
         return -1
+
+    def add_layer(self, layer):
+        """Adds a layer to the map.
+
+        Args:
+            layer (ipyleaflet layer): The layer to be added.
+        """
+        existing_layer = self.find_layer(layer.name)
+        if existing_layer is not None:
+            self.remove_layer(existing_layer)
+        super().add_layer(layer)
 
     def layer_opacity(self, name, value=1.0):
         """Changes layer opacity.
@@ -1703,6 +1715,7 @@ class Map(ipyleaflet.Map):
             return_client=True,
             **kwargs,
         )
+
         self.add_layer(tile_layer)
 
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
@@ -1721,7 +1734,7 @@ class Map(ipyleaflet.Map):
             "tile_layer": tile_layer,
             "tile_client": tile_client,
             "band": band,
-            "band_names": band_names, 
+            "band_names": band_names,
             "bounds": bounds,
             "type": "LOCAL",
         }
@@ -2821,6 +2834,11 @@ class Map(ipyleaflet.Map):
 
     def add_title(self, title, align="center", font_size="16px", style=None, **kwargs):
         print("The ipyleaflet map does not support titles.")
+
+    def get_pc_collections(self):
+        """Get the list of Microsoft Planetary Computer collections."""
+        if not hasattr(self, "pc_collections"):
+            setattr(self, "pc_collections", get_pc_collections())
 
 
 # The functions below are outside the Map class.
