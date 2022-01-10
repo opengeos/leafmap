@@ -7,18 +7,25 @@ from box import Box
 from .common import to_hex_colors
 
 
-def get_palette(cmap_name=None, n_class=None):
+def get_palette(cmap_name=None, n_class=None, hashtag=False):
     """Get a palette from a matplotlib colormap. See the list of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
     Args:
         cmap_name (str, optional): The name of the matplotlib colormap. Defaults to None.
         n_class (int, optional): The number of colors. Defaults to None.
+        hashtag (bool, optional): Whether to return a list of hex colors. Defaults to False.
 
     Returns:
         list: A list of hex colors.
     """
-    cmap = plt.cm.get_cmap(cmap_name, n_class)
-    colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
+
+    if cmap_name in ["dem", "ndvi", "ndwi"]:
+        colors = _palette_dict[cmap_name]
+    else:
+        cmap = plt.cm.get_cmap(cmap_name, n_class)
+        colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
+    if hashtag:
+        colors = ["#" + i for i in colors]
     return colors
 
 
@@ -55,13 +62,19 @@ def get_colorbar(
     plt.show()
 
 
-def list_colormaps():
+def list_colormaps(add_extra=False, lowercase=False):
     """List all available colormaps. See a complete lost of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
     Returns:
         list: The list of colormap names.
     """
-    return plt.colormaps()
+    result = plt.colormaps()
+    if add_extra:
+        result += ["dem", "ndvi", "ndwi"]
+    if lowercase:
+        result = [i.lower() for i in result]
+    result.sort()
+    return result
 
 
 def create_colormap(
@@ -259,14 +272,14 @@ _palette_dict = {
         "011301",
     ],
     "ndwi": [
-        "#ece7f2",
-        "#d0d1e6",
-        "#a6bddb",
-        "#74a9cf",
-        "#3690c0",
-        "#0570b0",
-        "#045a8d",
-        "#023858",
+        "ece7f2",
+        "d0d1e6",
+        "a6bddb",
+        "74a9cf",
+        "3690c0",
+        "0570b0",
+        "045a8d",
+        "023858",
     ],
     "dem": ["006633", "E5FFCC", "662A00", "D8D8D8", "F5F5F5"],
 }
