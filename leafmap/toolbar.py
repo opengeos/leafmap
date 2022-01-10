@@ -7,6 +7,7 @@ import ipyleaflet
 import ipywidgets as widgets
 from ipyfilechooser import FileChooser
 from .common import *
+from .pc import *
 
 
 def tool_template(m=None):
@@ -251,9 +252,9 @@ def main_toolbar(m):
             "name": "download_osm",
             "tooltip": "Download OSM data",
         },
-        "smile-o": {
-            "name": "placeholder",
-            "tooltip": "This is a placeholder",
+        "picture-o": {
+            "name": "raster",
+            "tooltip": "Open COG/STAC dataset",
         },
         "spinner": {
             "name": "placeholder2",
@@ -353,6 +354,8 @@ def main_toolbar(m):
                 search_basemaps(m)
             elif tool_name == "download_osm":
                 download_osm(m)
+            elif tool_name == "raster":
+                open_raster_gui(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -521,6 +524,9 @@ def open_data_widget(m):
     Args:
         m (object): leafmap.Map
     """
+    import warnings
+
+    warnings.filterwarnings("ignore")
 
     padding = "0px 0px 0px 5px"
     style = {"description_width": "initial"}
@@ -863,6 +869,558 @@ def open_data_widget(m):
             file_chooser.reset()
             tool_output.clear_output()
             filepath.value = ""
+            m.toolbar_reset()
+        elif change["new"] == "Close":
+            if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
+                m.remove_control(m.tool_output_ctrl)
+                m.tool_output_ctrl = None
+                m.toolbar_reset()
+
+        ok_cancel.value = None
+
+    file_type.observe(file_type_changed, names="value")
+    ok_cancel.observe(ok_cancel_clicked, names="value")
+    # file_chooser.register_callback(chooser_callback)
+
+    m.add_control(tool_output_ctrl)
+    m.tool_output_ctrl = tool_output_ctrl
+
+
+def open_raster_gui(m):
+    """A widget for opening local/remote COG/STAC data.
+
+    Args:
+        m (object): leafmap.Map
+    """
+    import json
+    from .colormaps import list_colormaps, get_palette
+
+    padding = "0px 0px 0px 5px"
+    style = {"description_width": "initial"}
+
+    tool_output = widgets.Output(
+        layout=widgets.Layout(max_height="150px", max_width="500px", overflow="auto")
+    )
+
+    file_type = widgets.ToggleButtons(
+        options=["GeoTIFF", "COG", "STAC", "Microsoft"],
+        tooltips=[
+            "Open a local GeoTIFF file",
+            "Open a remote COG file",
+            "Open a remote STAC item",
+            "Create COG from Microsoft Planetary Computer",
+        ],
+    )
+    file_type.style.button_width = "110px"
+
+    # file_chooser = FileChooser(
+    #     os.getcwd(), sandbox_path=m.sandbox_path, layout=widgets.Layout(width="454px")
+    # )
+    file_chooser = FileChooser(os.getcwd(), layout=widgets.Layout(width="454px"))
+    file_chooser.filter_pattern = ["*.tif", "*.tiff"]
+    file_chooser.use_dir_icons = True
+
+    source_widget = widgets.VBox([file_chooser])
+
+    http_url = widgets.Text(
+        value="",
+        description="HTTP URL:",
+        tooltip="Enter an http URL to COG file",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    collection = widgets.Dropdown(
+        options=["landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2"],
+        value="landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2",
+        description="PC Collection:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    items = widgets.Text(
+        value="LC08_L2SP_047027_20201204_02_T1",
+        description="STAC Items:",
+        tooltip="STAC Item ID",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    assets = widgets.Text(
+        value="SR_B7,SR_B5,SR_B4",
+        description="STAC Assets:",
+        tooltip="STAC Asset ID",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    layer_name = widgets.Text(
+        value="GeoTIFF",
+        description="Enter a layer name:",
+        tooltip="Enter a layer name for the selected file",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    ok_cancel = widgets.ToggleButtons(
+        value=None,
+        options=["Apply", "Reset", "Close"],
+        tooltips=["Apply", "Reset", "Close"],
+        button_style="primary",
+    )
+    # ok_cancel.style.button_width = "50px"
+
+    bands = widgets.Text(
+        value=None,
+        description="Band:",
+        tooltip="Enter a list of band indices",
+        style=style,
+        layout=widgets.Layout(width="150px", padding=padding),
+    )
+
+    band_width = width = "149px"
+    red = widgets.Dropdown(
+        value=None,
+        options=[],
+        description="Red:",
+        tooltip="Select a band for the red channel",
+        style=style,
+        layout=widgets.Layout(width=band_width, padding=padding),
+    )
+
+    green = widgets.Dropdown(
+        value=None,
+        options=[],
+        description="Green:",
+        tooltip="Select a band for the green channel",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    blue = widgets.Dropdown(
+        value=None,
+        options=[],
+        description="Blue:",
+        tooltip="Select a band for the blue channel",
+        style=style,
+        layout=widgets.Layout(width=band_width, padding=padding),
+    )
+
+    vmin = widgets.Text(
+        value=None,
+        description="vmin:",
+        tooltip="Minimum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    vmax = widgets.Text(
+        value=None,
+        description="vmax:",
+        tooltip="Maximum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    nodata = widgets.Text(
+        value=None,
+        description="Nodata:",
+        tooltip="Nodata the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="150px", padding=padding),
+    )
+
+    local_tile_palettes = list_colormaps(add_extra=True)
+    cog_stac_palettes = list_colormaps(lowercase=True)
+    palette_options = local_tile_palettes
+    palette = widgets.Dropdown(
+        options=palette_options,
+        value=None,
+        description="palette:",
+        layout=widgets.Layout(width="300px", padding=padding),
+        style=style,
+    )
+
+    checkbox = widgets.Checkbox(
+        value=False,
+        description="Additional params",
+        indent=False,
+        layout=widgets.Layout(width="154px", padding=padding),
+        style=style,
+    )
+
+    add_params = widgets.Textarea(
+        value="",
+        placeholder="Additional parameters in the format of a dictionary, for example, \n {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5']}",
+        layout=widgets.Layout(width="454px", padding=padding),
+        style=style,
+    )
+
+    params_widget = widgets.HBox()
+
+    raster_options = widgets.VBox()
+    raster_options.children = [
+        widgets.HBox([red, green, blue]),
+        widgets.HBox([vmin, vmax, nodata]),
+        widgets.HBox([palette, checkbox]),
+        params_widget,
+    ]
+
+    def collection_changed(change):
+        if change["new"] == "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2":
+            items.value = "LC08_L2SP_047027_20201204_02_T1"
+            assets.value = "SR_B7,SR_B5,SR_B4"
+        else:
+            with tool_output:
+                items.value = ""
+                assets.value = ""
+
+    collection.observe(collection_changed, names="value")
+
+    def band_changed(change):
+        if change["name"]:
+            if not checkbox.value:
+                if file_type.value == "GeoTIFF":
+                    if hasattr(m, "tile_client"):
+                        min_max = local_tile_vmin_vmax(
+                            m.tile_client, bands=[red.value, green.value, blue.value]
+                        )
+                        vmin.value = str(min_max[0])
+                        vmax.value = str(min_max[1])
+                elif file_type.value == "Microsoft":
+                    if len(set([red.value, green.value, blue.value])) == 1:
+                        assets.value = f"{red.value}"
+                    else:
+                        assets.value = f"{red.value},{green.value},{blue.value}"
+
+    red.observe(band_changed, names="value")
+    green.observe(band_changed, names="value")
+    blue.observe(band_changed, names="value")
+
+    def checkbox_changed(change):
+        if change["new"]:
+            params_widget.children = [add_params]
+        else:
+            params_widget.children = []
+
+    checkbox.observe(checkbox_changed, names="value")
+
+    def url_change(change):
+        if change["new"] and change["new"].startswith("http"):
+            with tool_output:
+                try:
+                    print("Retrieving band names...")
+                    if file_type.value == "COG":
+                        bandnames = cog_bands(change["new"])
+                    elif file_type.value == "STAC":
+                        bandnames = stac_bands(change["new"])
+                    red.options = bandnames
+                    green.options = bandnames
+                    blue.options = bandnames
+                    if len(bandnames) > 2:
+                        red.value = bandnames[0]
+                        green.value = bandnames[1]
+                        blue.value = bandnames[2]
+                    else:
+                        red.value = bandnames[0]
+                        green.value = bandnames[0]
+                        blue.value = bandnames[0]
+                    tool_output.clear_output()
+
+                except Exception as e:
+                    print(e)
+                    print("Error loading URL.")
+                    return
+        else:
+            red.options = []
+            green.options = []
+            blue.options = []
+            vmin.value = ""
+            vmax.value = ""
+            nodata.value = ""
+            palette.value = None
+
+    http_url.observe(url_change, names="value")
+
+    # def filepath_change(change):
+    #     if file_type.value == "Raster":
+    #         pass
+    #         # if (
+    #         #     filepath.value.startswith("http")
+    #         #     or filepath.value.endswith(".txt")
+    #         #     or filepath.value.endswith(".csv")
+    #         # ):
+    #         #     bands.disabled = True
+    #         #     palette.disabled = False
+    #         #     # x_dim.disabled = True
+    #         #     # y_dim.disabled = True
+    #         # else:
+    #         #     bands.disabled = False
+    #         #     palette.disabled = False
+    #         #     # x_dim.disabled = True
+    #         #     # y_dim.disabled = True
+
+    # http_url.observe(filepath_change, "value")
+
+    main_widget = widgets.VBox(
+        [
+            file_type,
+            source_widget,
+            layer_name,
+            raster_options,
+            ok_cancel,
+            tool_output,
+        ]
+    )
+
+    tool_output_ctrl = ipyleaflet.WidgetControl(widget=main_widget, position="topright")
+
+    if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
+        m.remove_control(m.tool_output_ctrl)
+
+    def bands_changed(change):
+        if change["new"] and "," in change["owner"].value:
+            palette.value = None
+            palette.disabled = True
+        else:
+            palette.disabled = False
+
+    bands.observe(bands_changed, "value")
+
+    def chooser_callback(chooser):
+
+        # http_url.value = file_chooser.selected
+        try:
+            source = file_chooser.selected
+            tile_layer, tile_client = get_local_tile_layer(source, return_client=True)
+            if not hasattr(m, "tile_client"):
+                setattr(m, "tile_client", tile_client)
+            bandnames = local_tile_bands(tile_client)
+            red.options = bandnames
+            green.options = bandnames
+            blue.options = bandnames
+            if len(bandnames) > 2:
+                red.value = bandnames[0]
+                green.value = bandnames[1]
+                blue.value = bandnames[2]
+                min_max = local_tile_vmin_vmax(
+                    tile_client, bands=[red.value, green.value, blue.value]
+                )
+                vmin.value = str(min_max[0])
+                vmax.value = str(min_max[1])
+            else:
+                red.value = bandnames[0]
+                green.value = bandnames[0]
+                blue.value = bandnames[0]
+                min_max = local_tile_vmin_vmax(tile_client)
+                vmin.value = str(min_max[0])
+                vmax.value = str(min_max[1])
+        except Exception as e:
+            with tool_output:
+                print(e)
+
+    file_chooser.register_callback(chooser_callback)
+
+    def file_type_changed(change):
+        ok_cancel.value = None
+        file_chooser.default_path = os.getcwd()
+        file_chooser.reset()
+        layer_name.value = file_type.value
+        http_url.value = ""
+        tool_output.clear_output()
+        red.value = None
+        green.value = None
+        blue.value = None
+        vmin.value = ""
+        vmax.value = ""
+        nodata.value = ""
+        palette.value = None
+
+        if change["new"] == "GeoTIFF":
+            source_widget.children = [file_chooser]
+            file_chooser.filter_pattern = ["*.tif", "*.tiff"]
+            palette.options = local_tile_palettes
+            palette.value = None
+            raster_options.children = [
+                widgets.HBox([red, green, blue]),
+                widgets.HBox([vmin, vmax, nodata]),
+                widgets.HBox([palette, checkbox]),
+                params_widget,
+            ]
+        elif change["new"] == "COG":
+            http_url.value = "https://opendata.digitalglobe.com/events/california-fire-2020/post-event/2020-08-14/pine-gulch-fire20/10300100AAC8DD00.tif"
+            source_widget.children = [http_url]
+            palette.options = cog_stac_palettes
+            palette.value = None
+        elif change["new"] == "STAC":
+            http_url.value = "https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"
+            source_widget.children = [http_url]
+            palette.options = cog_stac_palettes
+            palette.value = None
+            red.value = "B3"
+            green.value = "B2"
+            blue.value = "B1"
+        elif change["new"] == "Microsoft":
+            source_widget.children = [collection, items, assets]
+            palette.options = cog_stac_palettes
+            palette.value = None
+            with tool_output:
+                tool_output.clear_output()
+                print("Retrieving Planetary Computer collections. Please wait...")
+                m.get_pc_collections()
+                collections = m.pc_collections
+                collection.options = [
+                    f"{key} - {value}" for key, value in collections.items()
+                ]
+                collection.value = "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2"
+
+                tool_output.clear_output()
+
+    def ok_cancel_clicked(change):
+        if change["new"] == "Apply":
+            m.default_style = {"cursor": "wait"}
+            # file_path = http_url.value
+
+            with tool_output:
+                tool_output.clear_output()
+                print("Loading data...")
+                if file_type.value == "GeoTIFF" and file_chooser.selected:
+
+                    band = None
+                    vis_min = None
+                    vis_max = None
+                    vis_nodata = None
+                    vis_palette = None
+
+                    try:
+                        if len(red.options) > 2:
+                            band = [red.value, green.value, blue.value]
+                            if len(set(band)) > 1:
+                                palette.value = None
+                            else:
+                                band = [red.value]
+                        else:
+                            band = [red.value]
+                        if len(vmin.value) > 0:
+                            vis_min = float(vmin.value)
+                        if len(vmax.value) > 0:
+                            vis_max = float(vmax.value)
+                        if len(nodata.value) > 0:
+                            vis_nodata = float(nodata.value)
+                        if (
+                            checkbox.value
+                            and add_params.value.strip().startswith("{")
+                            and add_params.value.strip().endswith("}")
+                        ):
+                            vis_params = eval(add_params.value)
+                            if "palette" in vis_params:
+                                vis_palette = vis_params["palette"]
+                            else:
+                                vis_palette = get_palette(palette.value, hashtag=True)
+                        elif palette.value is not None:
+                            vis_palette = get_palette(palette.value, hashtag=True)
+                    except:
+                        pass
+
+                    m.add_local_tile(
+                        file_chooser.selected,
+                        layer_name=layer_name.value,
+                        band=band,
+                        palette=vis_palette,
+                        vmin=vis_min,
+                        vmax=vis_max,
+                        nodata=vis_nodata,
+                    )
+                    tool_output.clear_output()
+                elif file_type.value in ["COG", "STAC"] and http_url.value:
+                    try:
+                        tool_output.clear_output()
+                        print("Loading data...")
+
+                        if (
+                            checkbox.value
+                            and add_params.value.strip().startswith("{")
+                            and add_params.value.strip().endswith("}")
+                        ):
+                            vis_params = eval(add_params.value)
+                        else:
+                            vis_params = {}
+
+                        if (
+                            palette.value
+                            and len(set([red.value, green.value, blue.value])) == 1
+                        ):
+                            vis_params["colormap_name"] = palette.value
+                        elif (
+                            palette.value
+                            and len(set([red.value, green.value, blue.value])) > 1
+                        ):
+                            palette.value = None
+                            print("Palette can only be set for single band images.")
+
+                        if vmin.value and vmax.value:
+                            vis_params["rescale"] = f"{vmin.value},{vmax.value}"
+
+                        if nodata.value:
+                            vis_params["nodata"] = nodata.value
+
+                        if file_type.value == "COG":
+                            m.add_cog_layer(
+                                http_url.value,
+                                name=layer_name.value,
+                                bands=[red.value, green.value, blue.value],
+                                **vis_params,
+                            )
+                        elif file_type.value == "STAC":
+                            m.add_stac_layer(
+                                http_url.value,
+                                bands=[red.value, green.value, blue.value],
+                                name=layer_name.value,
+                                **vis_params,
+                            )
+                        tool_output.clear_output()
+                    except Exception as e:
+                        print(e)
+                        print("Error loading data.")
+                        return
+
+                elif file_type.value == "Microsoft":
+                    try:
+                        tool_output.clear_output()
+                        print("Loading data...")
+                        col = collection.value.split(" - ")[0]
+                        m.add_stac_layer(
+                            collection=col,
+                            items=items.value,
+                            assets=assets.value,
+                            name=layer_name.value,
+                        )
+                        tool_output.clear_output()
+                    except Exception as e:
+                        print(e)
+                        print("Error loading data.")
+                        return
+
+                else:
+                    tool_output.clear_output()
+                    print("Please select a file and enter an http URL.")
+
+            m.toolbar_reset()
+            m.default_style = {"cursor": "default"}
+
+        elif change["new"] == "Reset":
+            file_chooser.reset()
+            tool_output.clear_output()
+            http_url.value = ""
+            add_params.value = ""
+            checkbox.value = False
+            palette.value = None
+            red.value = None
+            green.value = None
+            blue.value = None
+            vmin.value = ""
+            vmax.value = ""
+            nodata.value = ""
             m.toolbar_reset()
         elif change["new"] == "Close":
             if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
@@ -1870,7 +2428,7 @@ def inspector_gui(m=None):
     toolbar_button = widgets.ToggleButton(
         value=False,
         tooltip="Toolbar",
-        icon="gear",
+        icon="info",
         layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
     )
 
