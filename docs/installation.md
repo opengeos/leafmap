@@ -17,15 +17,14 @@
     conda install leafmap -c conda-forge
 ```
 
-The leafmap package has an optional dependency - [geopandas](https://geopandas.org/), which can be challenging to install on some computers, especially Windows. It is highly recommended that you create a fresh conda environment to install geopandas and leafmap. Follow the commands below to set up a conda env and isntall geopandas, xarray_leaflet, and leafmap.
+The leafmap package has some optional dependencies (e.g., [geopandas](https://geopandas.org/) and [localtileserver](https://github.com/banesullivan/localtileserver)), which can be challenging to install on some computers, especially Windows. It is highly recommended that you create a fresh conda environment to install geopandas and leafmap. Follow the commands below to set up a conda env and isntall [geopandas](https://geopandas.org), [localtileserver](https://github.com/banesullivan/localtileserver), [keplergl](https://docs.kepler.gl/docs/keplergl-jupyter), [pydeck](https://deckgl.readthedocs.io/), and leafmap.
 
 ```bash
-    conda create -n geo python=3.8
+    conda create -n geo python=3.9
     conda activate geo
     conda install geopandas
     conda install mamba -c conda-forge
-    mamba install leafmap xarray_leaflet -c conda-forge
-    pip install keplergl localtileserver
+    mamba install localtileserver keplergl pydeck leafmap -c conda-forge
 ```
 
 Optionally, you can install some [Jupyter notebook extensions](https://github.com/ipython-contrib/jupyter_contrib_nbextensions), which can improve your productivity in the notebook environment. Some useful extensions include Table of Contents, Gist-it, Autopep8, Variable Inspector, etc. See this [post](https://towardsdatascience.com/jupyter-notebook-extensions-517fa69d2231) for more information.
