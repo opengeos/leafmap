@@ -913,10 +913,9 @@ def open_raster_gui(m):
     )
     file_type.style.button_width = "110px"
 
-    # file_chooser = FileChooser(
-    #     os.getcwd(), sandbox_path=m.sandbox_path, layout=widgets.Layout(width="454px")
-    # )
-    file_chooser = FileChooser(os.getcwd(), layout=widgets.Layout(width="454px"))
+    file_chooser = FileChooser(
+        os.getcwd(), sandbox_path=m.sandbox_path, layout=widgets.Layout(width="454px")
+    )
     file_chooser.filter_pattern = ["*.tif", "*.tiff"]
     file_chooser.use_dir_icons = True
 
@@ -1049,9 +1048,11 @@ def open_raster_gui(m):
         style=style,
     )
 
+    add_params_text1 = "Additional parameters in the format of a dictionary, for example, \n {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5']}"
+    add_params_text2 = "Additional parameters in the format of a dictionary, for example, \n {'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
     add_params = widgets.Textarea(
         value="",
-        placeholder="Additional parameters in the format of a dictionary, for example, \n {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5']}",
+        placeholder=add_params_text1,
         layout=widgets.Layout(width="454px", padding=padding),
         style=style,
     )
@@ -1067,13 +1068,40 @@ def open_raster_gui(m):
     ]
 
     def collection_changed(change):
-        if change["new"] == "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2":
-            items.value = "LC08_L2SP_047027_20201204_02_T1"
-            assets.value = "SR_B7,SR_B5,SR_B4"
-        else:
-            with tool_output:
-                items.value = ""
-                assets.value = ""
+
+        if change["new"]:
+            if not hasattr(m, "pc_inventory"):
+                setattr(m, "pc_inventory", get_pc_inventory())
+            col_name = change["new"].split(" - ")[0]
+            items.value = m.pc_inventory[col_name]["first_item"]
+            band_names = m.pc_inventory[col_name]["bands"]
+            red.options = band_names
+            green.options = band_names
+            blue.options = band_names
+
+            if change["new"] == "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2":
+                items.value = "LC08_L2SP_047027_20201204_02_T1"
+                assets.value = "SR_B7,SR_B5,SR_B4"
+                red.value = "SR_B7"
+                green.value = "SR_B5"
+                blue.value = "SR_B4"
+            elif change["new"] == "sentinel-2-l2a - Sentinel-2 Level-2A":
+                items.value = "S2B_MSIL2A_20190629T212529_R043_T06VVN_20201006T080531"
+                assets.value = "B08,B04,B03"
+                red.value = "B08"
+                green.value = "B04"
+                blue.value = "B03"
+            else:
+                if len(band_names) > 2:
+                    assets.value = ",".join(band_names[:3])
+                    red.value = band_names[0]
+                    green.value = band_names[1]
+                    blue.value = band_names[2]
+                else:
+                    assets.value = band_names[0]
+                    red.value = band_names[0]
+                    green.value = band_names[0]
+                    blue.value = band_names[0]
 
     collection.observe(collection_changed, names="value")
 
@@ -1142,26 +1170,6 @@ def open_raster_gui(m):
 
     http_url.observe(url_change, names="value")
 
-    # def filepath_change(change):
-    #     if file_type.value == "Raster":
-    #         pass
-    #         # if (
-    #         #     filepath.value.startswith("http")
-    #         #     or filepath.value.endswith(".txt")
-    #         #     or filepath.value.endswith(".csv")
-    #         # ):
-    #         #     bands.disabled = True
-    #         #     palette.disabled = False
-    #         #     # x_dim.disabled = True
-    #         #     # y_dim.disabled = True
-    #         # else:
-    #         #     bands.disabled = False
-    #         #     palette.disabled = False
-    #         #     # x_dim.disabled = True
-    #         #     # y_dim.disabled = True
-
-    # http_url.observe(filepath_change, "value")
-
     main_widget = widgets.VBox(
         [
             file_type,
@@ -1189,7 +1197,6 @@ def open_raster_gui(m):
 
     def chooser_callback(chooser):
 
-        # http_url.value = file_chooser.selected
         try:
             source = file_chooser.selected
             tile_layer, tile_client = get_local_tile_layer(source, return_client=True)
@@ -1241,6 +1248,7 @@ def open_raster_gui(m):
             file_chooser.filter_pattern = ["*.tif", "*.tiff"]
             palette.options = local_tile_palettes
             palette.value = None
+            add_params.placeholder = add_params_text1
             raster_options.children = [
                 widgets.HBox([red, green, blue]),
                 widgets.HBox([vmin, vmax, nodata]),
@@ -1252,6 +1260,7 @@ def open_raster_gui(m):
             source_widget.children = [http_url]
             palette.options = cog_stac_palettes
             palette.value = None
+            add_params.placeholder = add_params_text2
         elif change["new"] == "STAC":
             http_url.value = "https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"
             source_widget.children = [http_url]
@@ -1260,21 +1269,18 @@ def open_raster_gui(m):
             red.value = "B3"
             green.value = "B2"
             blue.value = "B1"
+            add_params.placeholder = add_params_text2
         elif change["new"] == "Microsoft":
             source_widget.children = [collection, items, assets]
             palette.options = cog_stac_palettes
             palette.value = None
-            with tool_output:
-                tool_output.clear_output()
-                print("Retrieving Planetary Computer collections. Please wait...")
-                m.get_pc_collections()
-                collections = m.pc_collections
-                collection.options = [
-                    f"{key} - {value}" for key, value in collections.items()
-                ]
-                collection.value = "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2"
-
-                tool_output.clear_output()
+            add_params.placeholder = add_params_text2
+            collection.options = get_collection_list()
+            collection.value = "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2"
+            if not hasattr(m, "pc_inventory"):
+                setattr(m, "pc_inventory", get_pc_inventory())
+            items.value = "LC08_L2SP_047027_20201204_02_T1"
+            assets.value = "SR_B7,SR_B5,SR_B4"
 
     def ok_cancel_clicked(change):
         if change["new"] == "Apply":
@@ -1388,12 +1394,42 @@ def open_raster_gui(m):
                     try:
                         tool_output.clear_output()
                         print("Loading data...")
+
+                        if (
+                            checkbox.value
+                            and add_params.value.strip().startswith("{")
+                            and add_params.value.strip().endswith("}")
+                        ):
+                            vis_params = eval(add_params.value)
+                        else:
+                            vis_params = {}
+
+                        if (
+                            palette.value
+                            and len(set([red.value, green.value, blue.value])) == 1
+                        ) or (palette.value and "expression" in vis_params):
+                            vis_params["colormap_name"] = palette.value
+                        elif (
+                            palette.value
+                            and len(set([red.value, green.value, blue.value])) > 1
+                            and "expression" not in vis_params
+                        ):
+                            palette.value = None
+                            print("Palette can only be set for single band images.")
+
+                        if vmin.value and vmax.value:
+                            vis_params["rescale"] = f"{vmin.value},{vmax.value}"
+
+                        if nodata.value:
+                            vis_params["nodata"] = nodata.value
+
                         col = collection.value.split(" - ")[0]
                         m.add_stac_layer(
                             collection=col,
                             items=items.value,
                             assets=assets.value,
                             name=layer_name.value,
+                            **vis_params,
                         )
                         tool_output.clear_output()
                     except Exception as e:
@@ -1421,6 +1457,9 @@ def open_raster_gui(m):
             vmin.value = ""
             vmax.value = ""
             nodata.value = ""
+            collection.value = None
+            items.value = ""
+            assets.value = ""
             m.toolbar_reset()
         elif change["new"] == "Close":
             if m.tool_output_ctrl is not None and m.tool_output_ctrl in m.controls:
@@ -1432,7 +1471,6 @@ def open_raster_gui(m):
 
     file_type.observe(file_type_changed, names="value")
     ok_cancel.observe(ok_cancel_clicked, names="value")
-    # file_chooser.register_callback(chooser_callback)
 
     m.add_control(tool_output_ctrl)
     m.tool_output_ctrl = tool_output_ctrl
