@@ -4376,3 +4376,25 @@ def check_file_path(file_path, make_dirs=True):
 
     else:
         raise TypeError("The provided file path must be a string.")
+
+
+def dict_to_json(data, file_path, indent=4):
+    """Writes a dictionary to a JSON file.
+
+    Args:
+        data (dict): A dictionary.
+        file_path (str): The path to the JSON file.
+        indent (int, optional): The indentation of the JSON file. Defaults to 4.
+
+    Raises:
+        TypeError: If the input data is not a dictionary.
+    """
+    import json
+
+    file_path = check_file_path(file_path)
+
+    if isinstance(data, dict):
+        with open(file_path, "w") as f:
+            json.dump(data, f, indent=indent)
+    else:
+        raise TypeError("The provided data must be a dictionary.")
