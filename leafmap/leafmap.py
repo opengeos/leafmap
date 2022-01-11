@@ -2840,6 +2840,19 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "pc_collections"):
             setattr(self, "pc_collections", get_pc_collections())
 
+    def save_draw_features(self, out_file):
+        """Save the draw features to a file.
+
+        Args:
+            out_file (str): The output file path.
+        """
+        import json
+
+        out_file = check_file_path(out_file)
+
+        with open(out_file, "w") as f:
+            json.dump(self.user_rois, f)
+
 
 # The functions below are outside the Map class.
 
