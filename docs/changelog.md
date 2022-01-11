@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7.2 - January 11, 2022
+
+**New Features**:
+
+-   Added GUI for loading COG/STAC [#164](https://github.com/giswqs/leafmap/issues/164)
+-   Added ROI to GeoJSON function [#170](https://github.com/giswqs/leafmap/issues/170)
+-   Added add_geojson for plotly [#163](https://github.com/giswqs/leafmap/issues/163) [#167](https://github.com/giswqs/leafmap/pull/167)
+
 ## v0.7.1 - January 3, 2022
 
 **New Features**:
@@ -8,7 +16,6 @@
 -   Added layer control [#160](https://github.com/giswqs/leafmap/issues/160)
 -   Added Inspector support for local tile [#162](https://github.com/giswqs/leafmap/issues/162)
 -   Added add_gdf for plotly [#163](https://github.com/giswqs/leafmap/issues/163)
-
 
 **Improvement**
 
