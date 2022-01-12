@@ -28,7 +28,7 @@ jobs:
               run: codespell --skip="*.csv,*.geojson,*.json,*.js,*.html,*cff" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
             - name: PKG-TEST
               run: |
-                  pip install xarray_leaflet geopandas osmnx sqlalchemy psycopg2 keplergl datapane pydeck localtileserver
+                  pip install xarray_leaflet geopandas osmnx sqlalchemy psycopg2 keplergl datapane pydeck localtileserver rio-cogeo
                   python -m unittest discover tests/
               env:
                   PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
