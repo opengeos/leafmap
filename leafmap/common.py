@@ -984,6 +984,10 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
         else:
             raise ValueError("Bands must be a list of integers or strings.")
 
+    if "palette" in kwargs:
+        kwargs["colormap_name"] = kwargs["palette"]
+        del kwargs["palette"]
+
     if "rescale" not in kwargs:
         stats = cog_stats(url, titiler_endpoint)
         percentile_2 = min([stats[s]["percentile_2"] for s in stats])
@@ -1326,6 +1330,10 @@ def stac_tile(
         kwargs["collection"] = collection
     if items is not None:
         kwargs["items"] = items
+
+    if "palette" in kwargs:
+        kwargs["colormap_name"] = kwargs["palette"]
+        del kwargs["palette"]
 
     if isinstance(bands, list) and len(set(bands)) == 1:
         bands = bands[0]
@@ -3792,6 +3800,11 @@ def get_local_tile_layer(
     else:
         raise ValueError("The source must either be a string or TileClient")
 
+    if isinstance(palette, str):
+        from .colormaps import get_palette
+
+        palette = get_palette(palette, hashtag=True)
+
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
 
@@ -4398,3 +4411,75 @@ def dict_to_json(data, file_path, indent=4):
             json.dump(data, f, indent=indent)
     else:
         raise TypeError("The provided data must be a dictionary.")
+
+
+def image_to_cog(source, dst_path=None, profile="deflate", **kwargs):
+    """Converts an image to a COG file.
+
+    Args:
+        source (str): A dataset path, URL or rasterio.io.DatasetReader object.
+        dst_path (str, optional): An output dataset path or or PathLike object. Defaults to None.
+        profile (str, optional): COG profile. More at https://cogeotiff.github.io/rio-cogeo/profile. Defaults to "deflate".
+
+    Raises:
+        ImportError: If rio-cogeo is not installed.
+        FileNotFoundError: If the source file could not be found.
+    """
+    try:
+        from rio_cogeo.cogeo import cog_translate
+        from rio_cogeo.profiles import cog_profiles
+
+    except ImportError:
+        raise ImportError(
+            "The rio-cogeo package is not installed. Please install it with `pip install rio-cogeo` or `conda install rio-cogeo -c conda-forge`."
+        )
+
+    if not source.startswith("http"):
+        source = check_file_path(source)
+
+        if not os.path.exists(source):
+            raise FileNotFoundError("The provided input file could not be found.")
+
+    if dst_path is None:
+        if not source.startswith("http"):
+            dst_path = os.path.splitext(source)[0] + "_cog.tif"
+        else:
+            dst_path = temp_file_path(extension=".tif")
+
+    dst_path = check_file_path(dst_path)
+
+    dst_profile = cog_profiles.get(profile)
+    cog_translate(source, dst_path, dst_profile, **kwargs)
+
+
+def cog_validate(source, verbose=False):
+    """Validate Cloud Optimized Geotiff.
+
+    Args:
+        source (str): A dataset path or URL. Will be opened in "r" mode.
+        verbose (bool, optional): Whether to print the output of the validation. Defaults to False.
+
+    Raises:
+        ImportError: If the rio-cogeo package is not installed.
+        FileNotFoundError: If the provided file could not be found.
+
+    Returns:
+        tuple: A tuple containing the validation results (True is src_path is a valid COG, List of validation errors, and a list of validation warnings).
+    """
+    try:
+        from rio_cogeo.cogeo import cog_validate, cog_info
+    except ImportError:
+        raise ImportError(
+            "The rio-cogeo package is not installed. Please install it with `pip install rio-cogeo` or `conda install rio-cogeo -c conda-forge`."
+        )
+
+    if not source.startswith("http"):
+        source = check_file_path(source)
+
+        if not os.path.exists(source):
+            raise FileNotFoundError("The provided input file could not be found.")
+
+    if verbose:
+        return cog_info(source)
+    else:
+        return cog_validate(source)
