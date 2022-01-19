@@ -51,18 +51,18 @@ class Map(ipyleaflet.Map):
         self.user_rois = None
         self.draw_features = []
         self.api_keys = {}
-        self.searchable_geojson = ipyleaflet.LayerGroup()
+        self.searchable_geojsons = ipyleaflet.LayerGroup()
         self.search_control = ipyleaflet.SearchControl(
             url='https://nominatim.openstreetmap.org/search?format=json&q={s}',
-            position="topright",
-            # layer=self.searchable_geojson,
+            position="bottomleft",
+            layer=self.searchable_geojsons,
             zoom=4,
             # property_name='name',
             marker=marker,
         )
         self.add_control(self.search_control)
 
-        self.add_layer(self.searchable_geojson)
+        self.add_layer(self.searchable_geojsons)
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -1965,10 +1965,13 @@ class Map(ipyleaflet.Map):
         elif info_mode == "on_click":
             geojson.on_click(update_html)
 
-        self.searchable_geojson.add_layer(geojson)
-
+        self.searchable_geojsons.add_layer(geojson)
 
         # self.add_layer(geojson)
+
+    def update_search_control(self, property_name):
+        self.search_control.layer = self.searchable_geojsons
+        self.search_control.property_name = property_name
 
     def add_gdf(
         self,
