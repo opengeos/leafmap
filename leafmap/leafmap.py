@@ -53,11 +53,10 @@ class Map(ipyleaflet.Map):
         self.api_keys = {}
         self.searchable_geojsons = ipyleaflet.LayerGroup()
         self.search_control = ipyleaflet.SearchControl(
-            url='https://nominatim.openstreetmap.org/search?format=json&q={s}',
-            position="bottomleft",
+            position="topleft",
             layer=self.searchable_geojsons,
             zoom=4,
-            # property_name='name',
+            property_name='name',
             marker=marker,
         )
         self.add_control(self.search_control)
@@ -1972,6 +1971,14 @@ class Map(ipyleaflet.Map):
     def update_search_control(self, property_name):
         self.search_control.layer = self.searchable_geojsons
         self.search_control.property_name = property_name
+
+    def add_location_search_control(self):
+        self.add_control(ipyleaflet.SearchControl(
+            position="bottomleft",
+            url='https://nominatim.openstreetmap.org/search?format=json&q={s}',
+            zoom=5,
+            marker=marker
+        ))
 
     def add_gdf(
         self,
