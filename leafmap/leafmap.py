@@ -11,6 +11,8 @@ from .osm import *
 from .pc import *
 
 leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
+marker = ipyleaflet.Marker(icon=ipyleaflet.AwesomeIcon(
+    name="check", marker_color='green', icon_color='darkred'))
 
 
 class Map(ipyleaflet.Map):
@@ -49,6 +51,18 @@ class Map(ipyleaflet.Map):
         self.user_rois = None
         self.draw_features = []
         self.api_keys = {}
+        self.searchable_geojson = ipyleaflet.LayerGroup()
+        self.search_control = ipyleaflet.SearchControl(
+            url='https://nominatim.openstreetmap.org/search?format=json&q={s}',
+            position="topright",
+            # layer=self.searchable_geojson,
+            zoom=4,
+            # property_name='name',
+            marker=marker,
+        )
+        self.add_control(self.search_control)
+
+        self.add_layer(self.searchable_geojson)
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -854,7 +868,8 @@ class Map(ipyleaflet.Map):
         minimap.layout.width = "150px"
         minimap.layout.height = "150px"
         ipyleaflet.link((minimap, "center"), (self, "center"))
-        minimap_control = ipyleaflet.WidgetControl(widget=minimap, position=position)
+        minimap_control = ipyleaflet.WidgetControl(
+            widget=minimap, position=position)
         self.add_control(minimap_control)
 
     def add_marker_cluster(self, event="click", add_marker=True):
@@ -929,10 +944,12 @@ class Map(ipyleaflet.Map):
             popup = [popup]
 
         if x not in col_names:
-            raise ValueError(f"x must be one of the following: {', '.join(col_names)}")
+            raise ValueError(
+                f"x must be one of the following: {', '.join(col_names)}")
 
         if y not in col_names:
-            raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
+            raise ValueError(
+                f"y must be one of the following: {', '.join(col_names)}")
 
         for row in df.itertuples():
             html = ""
@@ -994,7 +1011,8 @@ class Map(ipyleaflet.Map):
             self.substitute_layer(old_basemap, leafmap_basemaps[basemap_name])
 
         dropdown.observe(on_click, "value")
-        basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
+        basemap_control = ipyleaflet.WidgetControl(
+            widget=dropdown, position="topright")
         self.add_control(basemap_control)
 
     def add_legend(
@@ -1712,9 +1730,11 @@ class Map(ipyleaflet.Map):
         # da = da.rio.write_crs(crs)
 
         if multi_band and type(bands) == list:
-            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band")
+            layer = da.leaflet.plot(
+                self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band")
         else:
-            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, colormap=colormap)
+            layer = da.leaflet.plot(
+                self, x_dim=x_dim, y_dim=y_dim, colormap=colormap)
 
         layer.name = layer_name
 
@@ -1760,7 +1780,8 @@ class Map(ipyleaflet.Map):
         else:
             in_shp = os.path.abspath(in_shp)
             if not os.path.exists(in_shp):
-                raise FileNotFoundError("The provided shapefile could not be found.")
+                raise FileNotFoundError(
+                    "The provided shapefile could not be found.")
 
         geojson = shp_to_geojson(in_shp)
         self.add_geojson(
@@ -1793,6 +1814,7 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            search_field: (str, optional): attritbute to search feature from search controll
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
@@ -1823,7 +1845,8 @@ class Map(ipyleaflet.Map):
             elif isinstance(in_geojson, dict):
                 data = in_geojson
             else:
-                raise TypeError("The input geojson must be a type of str or dict.")
+                raise TypeError(
+                    "The input geojson must be a type of str or dict.")
         except Exception as e:
             raise Exception(e)
 
@@ -1889,10 +1912,12 @@ class Map(ipyleaflet.Map):
             if change["new"]:
                 close_button.value = False
                 output_widget.children = [
-                    widgets.VBox([widgets.HBox([toolbar_button, close_button]), html])
+                    widgets.VBox(
+                        [widgets.HBox([toolbar_button, close_button]), html])
                 ]
             else:
-                output_widget.children = [widgets.HBox([toolbar_button, close_button])]
+                output_widget.children = [
+                    widgets.HBox([toolbar_button, close_button])]
 
         toolbar_button.observe(toolbar_btn_click, "value")
 
@@ -1908,7 +1933,8 @@ class Map(ipyleaflet.Map):
         def update_html(feature, **kwargs):
 
             value = [
-                "<h5><b>{}: </b>{}</h5>".format(prop, feature["properties"][prop])
+                "<h5><b>{}: </b>{}</h5>".format(prop,
+                                                feature["properties"][prop])
                 for prop in feature["properties"].keys()
             ][:-1]
 
@@ -1939,7 +1965,10 @@ class Map(ipyleaflet.Map):
         elif info_mode == "on_click":
             geojson.on_click(update_html)
 
-        self.add_layer(geojson)
+        self.searchable_geojson.add_layer(geojson)
+
+
+        # self.add_layer(geojson)
 
     def add_gdf(
         self,
@@ -2050,10 +2079,12 @@ class Map(ipyleaflet.Map):
             out_dir = os.path.abspath("./cache")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_kml, out_dir=out_dir, unzip=False, verbose=False)
+            download_from_url(in_kml, out_dir=out_dir,
+                              unzip=False, verbose=False)
             in_kml = os.path.join(out_dir, os.path.basename(in_kml))
             if not os.path.exists(in_kml):
-                raise FileNotFoundError("The downloaded kml file could not be found.")
+                raise FileNotFoundError(
+                    "The downloaded kml file could not be found.")
         else:
             in_kml = os.path.abspath(in_kml)
             if not os.path.exists(in_kml):
@@ -2177,10 +2208,12 @@ class Map(ipyleaflet.Map):
         col_names = df.columns.values.tolist()
 
         if x not in col_names:
-            raise ValueError(f"x must be one of the following: {', '.join(col_names)}")
+            raise ValueError(
+                f"x must be one of the following: {', '.join(col_names)}")
 
         if y not in col_names:
-            raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
+            raise ValueError(
+                f"y must be one of the following: {', '.join(col_names)}")
 
         if label is not None and (label not in col_names):
             raise ValueError(
@@ -2206,7 +2239,8 @@ class Map(ipyleaflet.Map):
                 ipyleaflet.Marker(location=point, draggable=False) for point in points
             ]
 
-        marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
+        marker_cluster = ipyleaflet.MarkerCluster(
+            markers=markers, name=layer_name)
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
@@ -2279,7 +2313,8 @@ class Map(ipyleaflet.Map):
                 for i in range(len(points)):
                     label = ""
                     for item in popup:
-                        label = label + str(item) + ": " + str(df[item][i]) + "<br>"
+                        label = label + str(item) + ": " + \
+                            str(df[item][i]) + "<br>"
                     labels.append(label)
                 df["popup"] = labels
 
@@ -2297,7 +2332,8 @@ class Map(ipyleaflet.Map):
                 ipyleaflet.Marker(location=point, draggable=False) for point in points
             ]
 
-        marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
+        marker_cluster = ipyleaflet.MarkerCluster(
+            markers=markers, name=layer_name)
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
@@ -2397,7 +2433,8 @@ class Map(ipyleaflet.Map):
                 ipyleaflet.Marker(location=point, draggable=False) for point in points
             ]
 
-        marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
+        marker_cluster = ipyleaflet.MarkerCluster(
+            markers=markers, name=layer_name)
         self.add_layer(marker_cluster)
 
         self.default_style = {"cursor": "default"}
@@ -2438,9 +2475,11 @@ class Map(ipyleaflet.Map):
             elif isinstance(data, list):
                 pass
             else:
-                raise ValueError("data must be a list, a DataFrame, or a file path.")
+                raise ValueError(
+                    "data must be a list, a DataFrame, or a file path.")
 
-            heatmap = Heatmap(locations=data, radius=radius, name=name, **kwargs)
+            heatmap = Heatmap(locations=data, radius=radius,
+                              name=name, **kwargs)
             self.add_layer(heatmap)
 
         except Exception as e:
@@ -2498,7 +2537,8 @@ class Map(ipyleaflet.Map):
                     return
 
         else:
-            raise ValueError("data must be a DataFrame or an ee.FeatureCollection.")
+            raise ValueError(
+                "data must be a DataFrame or an ee.FeatureCollection.")
 
         if column not in df.columns:
             raise ValueError(f"column must be one of {', '.join(df.columns)}.")
@@ -2563,7 +2603,8 @@ class Map(ipyleaflet.Map):
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
-        layer = planet_tile_by_quarter(year, quarter, name, api_key, token_name)
+        layer = planet_tile_by_quarter(
+            year, quarter, name, api_key, token_name)
         self.add_layer(layer)
 
     def add_time_slider(
@@ -2586,7 +2627,8 @@ class Map(ipyleaflet.Map):
         """
         from .toolbar import time_slider
 
-        time_slider(self, layers_dict, labels, time_interval, position, slider_length)
+        time_slider(self, layers_dict, labels,
+                    time_interval, position, slider_length)
 
     def static_map(self, width=950, height=600, out_file=None, **kwargs):
         """Display an ipyleaflet static map in a Jupyter Notebook.
@@ -2728,7 +2770,8 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
 
                 url = os.path.abspath(url)
                 if not os.path.exists(url):
-                    raise FileNotFoundError("The provided file does not exist.")
+                    raise FileNotFoundError(
+                        "The provided file does not exist.")
 
                 ext = os.path.splitext(url)[1][1:]  # file extension
                 image = Image.open(url)
@@ -2837,7 +2880,8 @@ def linked_maps(
 
             if len(labels) > 0:
                 label = widgets.Label(
-                    labels[index], layout=widgets.Layout(padding="0px 5px 0px 5px")
+                    labels[index], layout=widgets.Layout(
+                        padding="0px 5px 0px 5px")
                 )
                 control = ipyleaflet.WidgetControl(
                     widget=label, position=label_position
@@ -2911,7 +2955,8 @@ def split_map(
                 position = "bottomleft"
             else:
                 position = "topleft"
-            left_control = ipyleaflet.WidgetControl(widget=label1, position=position)
+            left_control = ipyleaflet.WidgetControl(
+                widget=label1, position=position)
             m.add_control(left_control)
 
         if right_label is not None:
@@ -2922,7 +2967,8 @@ def split_map(
                 position = "bottomright"
             else:
                 position = "topright"
-            right_control = ipyleaflet.WidgetControl(widget=label2, position=position)
+            right_control = ipyleaflet.WidgetControl(
+                widget=label2, position=position)
             m.add_control(right_control)
 
     except Exception as e:
@@ -2993,21 +3039,24 @@ def ts_inspector(
     right_layer = layers_dict[right_name]
 
     m = Map(center=center, zoom=zoom, **kwargs)
-    control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
+    control = ipyleaflet.SplitMapControl(
+        left_layer=left_layer, right_layer=right_layer)
     m.add_control(control)
 
     left_dropdown = widgets.Dropdown(
         options=keys, value=left_name, layout=widgets.Layout(width=width)
     )
 
-    left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
+    left_control = ipyleaflet.WidgetControl(
+        widget=left_dropdown, position="topleft")
     m.add_control(left_control)
 
     right_dropdown = widgets.Dropdown(
         options=keys, value=right_name, layout=widgets.Layout(width=width)
     )
 
-    right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
+    right_control = ipyleaflet.WidgetControl(
+        widget=right_dropdown, position="topright")
     m.add_control(right_control)
 
     if add_zoom:
