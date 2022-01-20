@@ -60,8 +60,8 @@ class Map(ipyleaflet.Map):
             marker=marker,
         )
         self.add_control(self.search_control)
+        super().add_layer(self.searchable_geojsons)
 
-        self.add_layer(self.searchable_geojsons)
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -298,7 +298,6 @@ class Map(ipyleaflet.Map):
         for layer in layers:
             if layer.name == name:
                 return layer
-
         return None
 
     def find_layer_index(self, name):
