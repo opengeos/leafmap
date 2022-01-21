@@ -4192,12 +4192,13 @@ def geom_type(in_geojson, encoding="utf-8"):
         raise Exception(e)
 
 
-def geojson_to_df(in_geojson, encoding="utf-8"):
+def geojson_to_df(in_geojson, encoding="utf-8", drop_geometry=True):
     """Converts a GeoJSON object to a pandas DataFrame.
 
     Args:
         in_geojson (str | dict): The input GeoJSON file or dict.
         encoding (str, optional): The encoding of the GeoJSON object. Defaults to "utf-8".
+        drop_geometry (bool, optional): Whether to drop the geometry column. Defaults to True.
 
     Raises:
         FileNotFoundError: If the input GeoJSON file could not be found.
@@ -4228,6 +4229,8 @@ def geojson_to_df(in_geojson, encoding="utf-8"):
 
     df = pd.json_normalize(data["features"])
     df.columns = [col.replace("properties.", "") for col in df.columns]
+    if drop_geometry:
+        df = df[df.columns.drop(list(df.filter(regex="geometry")))]
     return df
 
 
