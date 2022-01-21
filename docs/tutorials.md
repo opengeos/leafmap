@@ -46,6 +46,7 @@
 40. Using the interactive plotly toolbar GUI ([notebook](https://leafmap.org/notebooks/40_plotly_gui))
 41. Loading COG/STAC items using the raster GUI ([notebook](https://leafmap.org/notebooks/41_raster_gui))
 42. Creating Cloud Optimized GeoTIFF (COG) ([notebook](https://leafmap.org/notebooks/42_create_cog))
+43. Searching for locations and features in vector data ([notebook](https://leafmap.org/notebooks/43_search_control))
 
 ## Demo
 
