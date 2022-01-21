@@ -3458,6 +3458,16 @@ def search_geojson_gui(m=None):
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
 
+    search_control = m.search_control
+    if len(m.geojson_layers) > 0:
+        geojson_layer_group = ipyleaflet.LayerGroup()
+        for geojson_layer in m.geojson_layers:
+            geojson_layer_group.add_layer(geojson_layer)
+        if not hasattr(m, "geojson_layer_group"):
+            setattr(m, "geojson_layer_group", geojson_layer_group)
+        else:
+            m.geojson_layer_group = geojson_layer_group
+
     toolbar_button = widgets.ToggleButton(
         value=False,
         tooltip="Toolbar",
@@ -3558,15 +3568,34 @@ def search_geojson_gui(m=None):
                 if m.tool_control is not None and m.tool_control in m.controls:
                     m.remove_control(m.tool_control)
                     m.tool_control = None
+                m.search_control.marker.visible = False
+                m.remove_control(m.search_control)
+                m.add_control(search_control)
+                m.search_control = search_control
+                m.geojson_layer_group.clear_layers()
+                delattr(m, "geojson_layer_group")
+
             toolbar_widget.close()
 
     close_button.observe(close_btn_click, "value")
 
     def button_clicked(change):
         if change["new"] == "Apply":
+            if len(m.geojson_layers) > 0 and attributes.value is not None:
+                if m.search_control.layer is None:
+                    m.remove_control(m.search_control)
+                    geojson_control = ipyleaflet.SearchControl(
+                        position="topleft",
+                        layer=m.geojson_layer_group,
+                        property_name=attributes.value,
+                        marker=m.location_marker,
+                    )
+                    m.add_control(geojson_control)
+                    m.search_control = geojson_control
+                else:
+                    m.search_control.property_name = attributes.value
             with output:
                 output.clear_output()
-                print("Running ...")
         elif change["new"] == "Reset":
             output.clear_output()
             layers.value = None
@@ -3578,6 +3607,13 @@ def search_geojson_gui(m=None):
                 if m.tool_control is not None and m.tool_control in m.controls:
                     m.remove_control(m.tool_control)
                     m.tool_control = None
+                m.search_control.marker.visible = False
+                m.remove_control(m.search_control)
+                m.add_control(search_control)
+                m.search_control = search_control
+                m.geojson_layer_group.clear_layers()
+                delattr(m, "geojson_layer_group")
+
             toolbar_widget.close()
 
         buttons.value = None

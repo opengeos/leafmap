@@ -55,16 +55,6 @@ class Map(ipyleaflet.Map):
                 name="check", marker_color="green", icon_color="darkred"
             )
         )
-        # self.searchable_geojsons = ipyleaflet.LayerGroup()
-        # self.search_control = ipyleaflet.SearchControl(
-        #     position="topleft",
-        #     layer=self.searchable_geojsons,
-        #     zoom=4,
-        #     property_name="name",
-        #     marker=marker,
-        # )
-        # self.add_control(self.search_control)
-        # super().add_layer(self.searchable_geojsons)
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -1961,10 +1951,6 @@ class Map(ipyleaflet.Map):
 
         self.add_layer(geojson)
         self.geojson_layers.append(geojson)
-
-    def update_search_control(self, property_name):
-        self.search_control.layer = self.searchable_geojsons
-        self.search_control.property_name = property_name
 
     def add_search_control(self):
         search_control = ipyleaflet.SearchControl(
