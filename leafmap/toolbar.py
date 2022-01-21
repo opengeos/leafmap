@@ -256,10 +256,14 @@ def main_toolbar(m):
             "name": "raster",
             "tooltip": "Open COG/STAC dataset",
         },
-        "spinner": {
-            "name": "placeholder2",
-            "tooltip": "This is a placeholder",
+        "search-plus": {
+            "name": "search_geojson",
+            "tooltip": "Search features in GeoJSON layer",
         },
+        # "spinner": {
+        #     "name": "placeholder2",
+        #     "tooltip": "This is a placeholder",
+        # },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -356,6 +360,8 @@ def main_toolbar(m):
                 download_osm(m)
             elif tool_name == "raster":
                 open_raster_gui(m)
+            elif tool_name == "search_geojson":
+                search_geojson_gui(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -3437,3 +3443,155 @@ def plotly_whitebox_gui(canvas):
 
     toolbar_button.value = True
     container_widget.children = [toolbar_widget]
+
+
+def search_geojson_gui(m=None):
+    """Generates a tool GUI template using ipywidgets.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="search-plus",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    layer_options = []
+    if len(m.geojson_layers) > 0:
+        layer_options = [layer.name for layer in m.geojson_layers]
+
+    layers = widgets.Dropdown(
+        options=layer_options,
+        value=None,
+        description="Layer:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    attributes = widgets.Dropdown(
+        options=[],
+        value=None,
+        description="Attribute:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Apply", "Reset", "Close"],
+        tooltips=["Apply", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "80px"
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        layers,
+        attributes,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def layer_change(change):
+        if change["new"]:
+            for layer in m.geojson_layers:
+                if layer.name == change["new"]:
+                    df = geojson_to_df(layer.data)
+                    attributes.options = list(df.columns)
+
+    layers.observe(layer_change, names="value")
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Apply":
+            with output:
+                output.clear_output()
+                print("Running ...")
+        elif change["new"] == "Reset":
+            output.clear_output()
+            layers.value = None
+            attributes.value = None
+
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
