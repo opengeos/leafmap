@@ -49,6 +49,7 @@ class Map(ipyleaflet.Map):
         self.user_rois = None
         self.draw_features = []
         self.api_keys = {}
+        self.geojson_layers = []
         self.location_marker = ipyleaflet.Marker(
             icon=ipyleaflet.AwesomeIcon(
                 name="check", marker_color="green", icon_color="darkred"
@@ -1958,9 +1959,8 @@ class Map(ipyleaflet.Map):
         elif info_mode == "on_click":
             geojson.on_click(update_html)
 
-        # self.searchable_geojsons.add_layer(geojson)
-
         self.add_layer(geojson)
+        self.geojson_layers.append(geojson)
 
     def update_search_control(self, property_name):
         self.search_control.layer = self.searchable_geojsons
