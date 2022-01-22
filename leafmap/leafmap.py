@@ -45,16 +45,12 @@ class Map(ipyleaflet.Map):
         self.tool_output_ctrl = None
         self.layer_control = None
         self.draw_control = None
+        self.search_control = None
         self.user_roi = None
         self.user_rois = None
         self.draw_features = []
         self.api_keys = {}
         self.geojson_layers = []
-        self.location_marker = ipyleaflet.Marker(
-            icon=ipyleaflet.AwesomeIcon(
-                name="check", marker_color="green", icon_color="darkred"
-            )
-        )
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -89,11 +85,6 @@ class Map(ipyleaflet.Map):
             kwargs["fullscreen_control"] = True
         if kwargs["fullscreen_control"]:
             self.add_control(ipyleaflet.FullScreenControl())
-
-        if "search_control" not in kwargs:
-            kwargs["search_control"] = True
-        if kwargs["search_control"]:
-            self.add_search_control()
 
         if "draw_control" not in kwargs:
             kwargs["draw_control"] = True
@@ -1952,12 +1943,29 @@ class Map(ipyleaflet.Map):
         self.add_layer(geojson)
         self.geojson_layers.append(geojson)
 
-    def add_search_control(self):
+    def add_search_control(
+        self, url, marker=None, zoom=None, position="topleft", **kwargs
+    ):
+        """Adds a search control to the map.
+
+        Args:
+            url (str): The url to the search API. For example, "https://nominatim.openstreetmap.org/search?format=json&q={s}".
+            marker (ipyleaflet.Marker, optional): The marker to be used for the search result. Defaults to None.
+            zoom (int, optional): The zoom level to be used for the search result. Defaults to None.
+            position (str, optional): The position of the search control. Defaults to "topleft".
+            kwargs (dict, optional): Additional keyword arguments to be passed to the search control. See https://ipyleaflet.readthedocs.io/en/latest/api_reference/search_control.html
+        """
+        if marker is None:
+            marker = ipyleaflet.Marker(
+                icon=ipyleaflet.AwesomeIcon(
+                    name="check", marker_color="green", icon_color="darkred"
+                )
+            )
         search_control = ipyleaflet.SearchControl(
-            position="topleft",
-            url="https://nominatim.openstreetmap.org/search?format=json&q={s}",
-            zoom=5,
-            marker=self.location_marker,
+            position=position,
+            url=url,
+            zoom=zoom,
+            marker=marker,
         )
         self.add_control(search_control)
         self.search_control = search_control
