@@ -3568,12 +3568,13 @@ def search_geojson_gui(m=None):
                 if m.tool_control is not None and m.tool_control in m.controls:
                     m.remove_control(m.tool_control)
                     m.tool_control = None
-                m.search_control.marker.visible = False
-                m.remove_control(m.search_control)
-                m.add_control(search_control)
-                m.search_control = search_control
-                m.geojson_layer_group.clear_layers()
-                delattr(m, "geojson_layer_group")
+                if len(m.geojson_layers) > 0:
+                    m.search_control.marker.visible = False
+                    m.remove_control(m.search_control)
+                    m.add_control(search_control)
+                    m.search_control = search_control
+                    m.geojson_layer_group.clear_layers()
+                    delattr(m, "geojson_layer_group")
 
             toolbar_widget.close()
 
@@ -3607,12 +3608,14 @@ def search_geojson_gui(m=None):
                 if m.tool_control is not None and m.tool_control in m.controls:
                     m.remove_control(m.tool_control)
                     m.tool_control = None
-                m.search_control.marker.visible = False
-                m.remove_control(m.search_control)
-                m.add_control(search_control)
-                m.search_control = search_control
-                m.geojson_layer_group.clear_layers()
-                delattr(m, "geojson_layer_group")
+                if len(m.geojson_layers) > 0:
+                    m.search_control.marker.visible = False
+                    m.remove_control(m.search_control)
+                    m.add_control(search_control)
+                    m.search_control = search_control
+                    if hasattr(m, "geojson_layer_group"):
+                        m.geojson_layer_group.clear_layers()
+                        delattr(m, "geojson_layer_group")
 
             toolbar_widget.close()
 
