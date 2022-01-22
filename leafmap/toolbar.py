@@ -3458,7 +3458,6 @@ def search_geojson_gui(m=None):
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
 
-    search_control = m.search_control
     if len(m.geojson_layers) > 0:
         geojson_layer_group = ipyleaflet.LayerGroup()
         for geojson_layer in m.geojson_layers:
@@ -3512,6 +3511,10 @@ def search_geojson_gui(m=None):
     buttons.style.button_width = "80px"
 
     output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    if len(m.geojson_layers) == 0:
+        with output:
+            print("Please add vector data layers to the map before using this tool.")
 
     toolbar_widget = widgets.VBox()
     toolbar_widget.children = [toolbar_button]
@@ -3568,11 +3571,10 @@ def search_geojson_gui(m=None):
                 if m.tool_control is not None and m.tool_control in m.controls:
                     m.remove_control(m.tool_control)
                     m.tool_control = None
-                if len(m.geojson_layers) > 0:
+                if len(m.geojson_layers) > 0 and m.search_control is not None:
                     m.search_control.marker.visible = False
                     m.remove_control(m.search_control)
-                    m.add_control(search_control)
-                    m.search_control = search_control
+                    m.search_control = None
                     m.geojson_layer_group.clear_layers()
                     delattr(m, "geojson_layer_group")
 
@@ -3583,13 +3585,16 @@ def search_geojson_gui(m=None):
     def button_clicked(change):
         if change["new"] == "Apply":
             if len(m.geojson_layers) > 0 and attributes.value is not None:
-                if m.search_control.layer is None:
-                    m.remove_control(m.search_control)
+                if m.search_control is None:
                     geojson_control = ipyleaflet.SearchControl(
                         position="topleft",
                         layer=m.geojson_layer_group,
                         property_name=attributes.value,
-                        marker=m.location_marker,
+                        marker=ipyleaflet.Marker(
+                            icon=ipyleaflet.AwesomeIcon(
+                                name="check", marker_color="green", icon_color="darkred"
+                            )
+                        ),
                     )
                     m.add_control(geojson_control)
                     m.search_control = geojson_control
@@ -3608,11 +3613,10 @@ def search_geojson_gui(m=None):
                 if m.tool_control is not None and m.tool_control in m.controls:
                     m.remove_control(m.tool_control)
                     m.tool_control = None
-                if len(m.geojson_layers) > 0:
+                if len(m.geojson_layers) > 0 and m.search_control is not None:
                     m.search_control.marker.visible = False
                     m.remove_control(m.search_control)
-                    m.add_control(search_control)
-                    m.search_control = search_control
+                    m.search_control = None
                     if hasattr(m, "geojson_layer_group"):
                         m.geojson_layer_group.clear_layers()
                         delattr(m, "geojson_layer_group")
