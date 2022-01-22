@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.7.3 - January 21, 2022
+
+**New Features**:
+
+-   Added search control GUI [#182](https://github.com/giswqs/leafmap/issues/182) [#183](https://github.com/giswqs/leafmap/pull/183)
+-   Added COG creation [#176](https://github.com/giswqs/leafmap/issues/176)
+
+**Improvement**
+
+-   Removed COG mosaic function #180
+-   Updated binder env
+
 ## v0.7.2 - January 11, 2022
 
 **New Features**:
