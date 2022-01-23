@@ -260,10 +260,18 @@ def main_toolbar(m):
             "name": "search_geojson",
             "tooltip": "Search features in GeoJSON layer",
         },
-        # "spinner": {
-        #     "name": "placeholder2",
-        #     "tooltip": "This is a placeholder",
-        # },
+        "table": {
+            "name": "attribute_table",
+            "tooltip": "Open attribute table",
+        },
+        "smile-o": {
+            "name": "placeholder2",
+            "tooltip": "This is a placeholder",
+        },
+        "spinner": {
+            "name": "placeholder2",
+            "tooltip": "This is a placeholder",
+        },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -362,6 +370,8 @@ def main_toolbar(m):
                 open_raster_gui(m)
             elif tool_name == "search_geojson":
                 search_geojson_gui(m)
+            elif tool_name == "attribute_table":
+                select_table_gui(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -3357,7 +3367,11 @@ def plotly_search_basemaps(canvas):
 
 
 def plotly_whitebox_gui(canvas):
+    """Display a GUI for the whitebox tool.
 
+    Args:
+        canvas (plotlymap.Canvas): Map canvas.
+    """
     import whiteboxgui.whiteboxgui as wbt
 
     container_widget = canvas.container_widget
@@ -3636,5 +3650,406 @@ def search_geojson_gui(m=None):
         if toolbar_control not in m.controls:
             m.add_control(toolbar_control)
             m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def select_table_gui(m=None):
+    """GUI for selecting layers to display attribute table.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    import ipysheet
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="table",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    layer_options = []
+    if len(m.geojson_layers) > 0:
+        layer_options = [layer.name for layer in m.geojson_layers]
+
+    layers = widgets.Dropdown(
+        options=layer_options,
+        value=None,
+        description="Layer:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Apply", "Reset", "Close"],
+        tooltips=["Apply", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "80px"
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    if len(m.geojson_layers) == 0:
+        with output:
+            print("Please add vector data layers to the map before using this tool.")
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        layers,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Apply":
+            if len(m.geojson_layers) > 0 and layers.value is not None:
+                if hasattr(m, "table_control"):
+                    m.remove_control(m.table_control)
+                lyr_index = layers.options.index(layers.value)
+                data = m.geojson_layers[lyr_index].data
+                df = geojson_to_df(data)
+                show_table_gui(m, df)
+        elif change["new"] == "Reset":
+            output.clear_output()
+            layers.value = None
+
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def show_table_gui(m, df):
+    """Open the attribute table GUI.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    import ipysheet
+
+    widget_width = "560px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    sheet = ipysheet.from_dataframe(df.head(10))
+
+    output = widgets.Output(
+        layout=widgets.Layout(
+            width=widget_width,
+            padding=padding,
+        )
+    )
+
+    checkbox = widgets.Checkbox(
+        description="Show all rows",
+        indent=False,
+        layout=widgets.Layout(padding=padding, width="115px"),
+    )
+
+    sheet.layout.width = output.layout.width
+
+    def checkbox_clicked(change):
+
+        output.clear_output()
+
+        if change["new"]:
+            sheet = ipysheet.from_dataframe(df)
+        else:
+            sheet = ipysheet.from_dataframe(df.head(10))
+
+        sheet.layout.max_width = output.layout.width
+        output.layout.max_height = str(int(m.layout.height[:-2]) - 220) + "px"
+        sheet.layout.max_height = output.layout.height
+        if sheet.layout.height > output.layout.max_height:
+            sheet.layout.height = output.layout.max_height
+        with output:
+            display(sheet)
+
+    checkbox.observe(checkbox_clicked, "value")
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Minimize window",
+        icon="window-minimize",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    toolbar_widget = widgets.VBox()
+    m.table_widget = toolbar_widget
+    m.table_output = output
+
+    reset_btn = widgets.Button(
+        tooltip="Reset the plot",
+        icon="home",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 0px"),
+    )
+
+    def reset_btn_clicked(b):
+
+        output.layout.width = widget_width
+        output.layout.max_height = str(int(m.layout.height[:-2]) - 220) + "px"
+
+    reset_btn.on_click(reset_btn_clicked)
+
+    fullscreen_btn = widgets.Button(
+        tooltip="Fullscreen the attribute table",
+        icon="arrows-alt",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 0px"),
+    )
+
+    def fullscreen_btn_clicked(b):
+
+        output.layout.width = "1000px"
+        output.layout.max_height = str(int(m.layout.height[:-2]) - 220) + "px"
+
+        sheet.layout.width = output.layout.width
+        with output:
+            output.clear_output()
+            display(sheet)
+
+    fullscreen_btn.on_click(fullscreen_btn_clicked)
+
+    width_btn = widgets.Button(
+        tooltip="Change table width",
+        icon="arrows-h",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 0px"),
+    )
+
+    height_btn = widgets.Button(
+        tooltip="Change table height",
+        icon="arrows-v",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 0px"),
+    )
+
+    width_slider = widgets.IntSlider(
+        value=560,
+        min=550,
+        max=1500,
+        step=10,
+        description="",
+        readout=False,
+        continuous_update=False,
+        layout=widgets.Layout(width="100px", padding=padding),
+        style={"description_width": "initial"},
+    )
+
+    width_slider_label = widgets.Label(
+        layout=widgets.Layout(padding="0px 10px 0px 0px")
+    )
+    widgets.jslink((width_slider, "value"), (width_slider_label, "value"))
+
+    def width_changed(change):
+        if change["new"]:
+            output.layout.width = str(width_slider.value) + "px"
+
+            if checkbox.value:
+                sheet = ipysheet.from_dataframe(df)
+            else:
+                sheet = ipysheet.from_dataframe(df.head(10))
+            sheet.layout.width = output.layout.width
+            with output:
+                output.clear_output()
+                display(sheet)
+
+    width_slider.observe(width_changed, "value")
+
+    height_slider = widgets.IntSlider(
+        value=250,
+        min=200,
+        max=1000,
+        step=10,
+        description="",
+        readout=False,
+        continuous_update=False,
+        layout=widgets.Layout(width="100px", padding=padding),
+        style={"description_width": "initial"},
+    )
+
+    height_slider_label = widgets.Label()
+    widgets.jslink((height_slider, "value"), (height_slider_label, "value"))
+
+    def height_changed(change):
+        if change["new"]:
+            output.layout.max_height = str(height_slider.value) + "px"
+            if checkbox.value:
+                sheet = ipysheet.from_dataframe(df)
+            else:
+                sheet = ipysheet.from_dataframe(df.head(10))
+
+            sheet.layout.height = output.layout.max_height
+            with output:
+                output.clear_output()
+                display(sheet)
+
+    height_slider.observe(height_changed, "value")
+
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [
+        close_button,
+        toolbar_button,
+        reset_btn,
+        fullscreen_btn,
+        width_btn,
+        width_slider,
+        width_slider_label,
+        height_btn,
+        height_slider,
+        height_slider_label,
+        checkbox,
+    ]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+            toolbar_button.icon = "window-minimize"
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+                toolbar_button.icon = "window-maximize"
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+            toolbar_button.icon = "window-minimize"
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.icon = "window-maximize"
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.table_control is not None and m.table_control in m.controls:
+                    m.remove_control(m.table_control)
+                    m.table_control = None
+                    delattr(m, "table_control")
+
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    with output:
+
+        display(sheet)
+
+    toolbar_button.value = True
+    if m is not None:
+        table_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if table_control not in m.controls:
+            m.add_control(table_control)
+            m.table_control = table_control
     else:
         return toolbar_widget
