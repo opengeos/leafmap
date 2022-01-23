@@ -1647,6 +1647,7 @@ class Map(ipyleaflet.Map):
         colormap=None,
         x_dim="x",
         y_dim="y",
+        fit_bounds=True,
     ):
         """Adds a local raster dataset to the map.
 
@@ -1657,6 +1658,7 @@ class Map(ipyleaflet.Map):
             colormap (str, optional): The name of the colormap to use for the raster, such as 'gray' and 'terrain'. More can be found at https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html. Defaults to None.
             x_dim (str, optional): The x dimension. Defaults to 'x'.
             y_dim (str, optional): The y dimension. Defaults to 'y'.
+            fit_bounds (bool, optional): Whether to fit map bounds to raster bounds.  Defaults to True.
         """
         try:
             import xarray_leaflet
@@ -1722,9 +1724,9 @@ class Map(ipyleaflet.Map):
         # da = da.rio.write_crs(crs)
 
         if multi_band and type(bands) == list:
-            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band")
+            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band", fit_bounds=fit_bounds)
         else:
-            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, colormap=colormap)
+            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, colormap=colormap, fit_bounds=fit_bounds)
 
         layer.name = layer_name
 
