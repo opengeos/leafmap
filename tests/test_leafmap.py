@@ -271,6 +271,17 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "DEM" in out_str
 
+        # ensure fit_bounds keyword argument doesn't interfere with rendering
+        m = leafmap.Map()
+        m.add_raster("dem.tif", colormap="terrain", layer_name="DEM", fit_bounds=False)
+        out_str = m.to_html()
+        assert "DEM" in out_str
+        m = leafmap.Map()
+        m.add_raster("dem.tif", colormap="terrain", layer_name="DEM", fit_bounds=True)
+        out_str = m.to_html()
+        assert "DEM" in out_str
+
+
     # def test_add_shp(self):
     #     """Check adding shapefile"""
     #     m = leafmap.Map()
