@@ -2511,6 +2511,10 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, pd.DataFrame):
             df = data
+            if "geometry" in data.columns:
+                df[x] = df.centroid.x
+                df[y] = df.centroid.y
+
         elif isinstance(data, str):
             ext = os.path.splitext(data)[1]
             if ext == ".csv":
@@ -2527,7 +2531,9 @@ class Map(ipyleaflet.Map):
                     return
 
         else:
-            raise ValueError("data must be a DataFrame or an ee.FeatureCollection.")
+            raise ValueError(
+                "data must be a pd.DataFrame, gpd.GeoDataFrame, or an ee.FeatureCollection."
+            )
 
         if column not in df.columns:
             raise ValueError(f"column must be one of {', '.join(df.columns)}.")

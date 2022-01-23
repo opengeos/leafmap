@@ -1766,6 +1766,9 @@ class Map(folium.Map):
 
         if isinstance(data, pd.DataFrame):
             df = data
+            if "geometry" in data.columns:
+                df[x] = df.centroid.x
+                df[y] = df.centroid.y
         elif isinstance(data, str):
             ext = os.path.splitext(data)[1]
             if ext == ".csv":
