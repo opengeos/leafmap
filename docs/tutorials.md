@@ -47,6 +47,7 @@
 41. Loading COG/STAC items using the raster GUI ([notebook](https://leafmap.org/notebooks/41_raster_gui))
 42. Creating Cloud Optimized GeoTIFF (COG) ([notebook](https://leafmap.org/notebooks/42_create_cog))
 43. Searching for locations and features in vector data ([notebook](https://leafmap.org/notebooks/43_search_control))
+44. Opening vector data attribute table without coding ([notebook](https://leafmap.org/notebooks/44_attribute_table))
 
 ## Demo
 
