@@ -1953,6 +1953,12 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
+    def add_search_control(
+        self, url, marker=None, zoom=None, position="topleft", **kwargs
+    ):
+        """Adds a search control to the map."""
+        print("The folium plotting backend does not support this function.")
+
 
 def delete_dp_report(name):
     """Deletes a datapane report.
