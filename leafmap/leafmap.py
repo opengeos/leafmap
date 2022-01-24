@@ -1715,9 +1715,13 @@ class Map(ipyleaflet.Map):
         # da = da.rio.write_crs(crs)
 
         if multi_band and type(bands) == list:
-            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band", fit_bounds=fit_bounds)
+            layer = da.leaflet.plot(
+                self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band", fit_bounds=fit_bounds
+            )
         else:
-            layer = da.leaflet.plot(self, x_dim=x_dim, y_dim=y_dim, colormap=colormap, fit_bounds=fit_bounds)
+            layer = da.leaflet.plot(
+                self, x_dim=x_dim, y_dim=y_dim, colormap=colormap, fit_bounds=fit_bounds
+            )
 
         layer.name = layer_name
 
@@ -2513,7 +2517,7 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, pd.DataFrame):
             df = data
-            if "geometry" in data.columns:
+            if "geometry" in data.columns or ("geom" in data.columns):
                 df[x] = df.centroid.x
                 df[y] = df.centroid.y
 
