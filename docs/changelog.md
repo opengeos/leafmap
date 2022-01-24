@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.7.4 - January 24, 2022
+
+**New Features**:
+
+-   Added attribute table GUI [#179](https://github.com/giswqs/leafmap/issues/179)
+
+**Improvement**
+
+-   Improved add_labels function [#188](https://github.com/giswqs/leafmap/discussions/188)
+-   Improved GitHub workflows [#192](https://github.com/giswqs/leafmap/pull/192)
+-   Improved add_raster function [#191](https://github.com/giswqs/leafmap/pull/191)
+-   Removed nominatim URL from Search Control [#182](https://github.com/giswqs/leafmap/issues/182)
+-   Fixed search control bug [#183](https://github.com/giswqs/leafmap/pull/183)
+
 ## v0.7.3 - January 21, 2022
 
 **New Features**:
