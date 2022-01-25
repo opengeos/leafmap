@@ -51,6 +51,7 @@ class Map(ipyleaflet.Map):
         self.draw_features = []
         self.api_keys = {}
         self.geojson_layers = []
+        self.edit_mode = False
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -101,12 +102,33 @@ class Map(ipyleaflet.Map):
             self.add_control(draw_control)
             self.draw_control = draw_control
 
+            draw_output = widgets.Output()
+            control = ipyleaflet.WidgetControl(
+                widget=draw_output, position="bottomright"
+            )
+            self.add_control(control)
+
             def handle_draw(target, action, geo_json):
+                if "style" in geo_json["properties"]:
+                    del geo_json["properties"]["style"]
                 self.user_roi = geo_json
-                if action == "deleted" and len(self.draw_features) > 0:
-                    self.draw_features.remove(geo_json)
-                else:
+
+                if action in ["created", "edited"]:
+                    feature = {
+                        "type": "Feature",
+                        "geometry": geo_json["geometry"],
+                    }
                     self.draw_features.append(geo_json)
+                elif action == "deleted":
+                    geometries = [
+                        feature["geometry"] for feature in self.draw_control.data
+                    ]
+                    for geom in geometries:
+                        if geom == geo_json["geometry"]:
+                            geometries.remove(geom)
+                    for feature in self.draw_features:
+                        if feature["geometry"] not in geometries:
+                            self.draw_features.remove(feature)
                 self.user_rois = {
                     "type": "FeatureCollection",
                     "features": self.draw_features,
@@ -2731,7 +2753,7 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "pc_collections"):
             setattr(self, "pc_collections", get_pc_collections())
 
-    def save_draw_features(self, out_file, indent=4):
+    def save_draw_features(self, out_file, indent=4, **kwargs):
         """Save the draw features to a file.
 
         Args:
@@ -2740,10 +2762,101 @@ class Map(ipyleaflet.Map):
         """
         import json
 
+        self.update_draw_features()
         out_file = check_file_path(out_file)
-
+        geojson = {
+            "type": "FeatureCollection",
+            "features": self.draw_features,
+        }
         with open(out_file, "w") as f:
-            json.dump(self.user_rois, f, indent=indent)
+            if indent is None:
+                json.dump(geojson, f, **kwargs)
+            else:
+                json.dump(geojson, f, indent=indent, **kwargs)
+
+    def last_edit_data(self):
+
+        import pandas as pd
+
+        df = pd.DataFrame(
+            {
+                "Key": [""],
+                "Value": [""],
+            }
+        )
+        if self.draw_control.last_action == "edited":
+            properties = self.draw_control.last_draw["properties"]
+            if "style" in properties:
+                properties.pop("style")
+            print(properties)
+            df = pd.DataFrame(
+                {"Key": list(properties.keys()), "Value": list(properties.values())}
+            )
+        elif (
+            self.draw_control.last_action == "created"
+            and len(self.draw_control.data) > 1
+        ):
+            print(len(self.draw_control.data))
+            print(self.draw_control.data)
+            properties = self.draw_control.data[-2]["properties"]
+            if "style" in properties:
+                properties.pop("style")
+            print(properties)
+            df = pd.DataFrame(
+                {"Key": list(properties.keys()), "Value": [""] * len(properties)}
+            )
+        return df
+
+    def update_draw_features(self):
+        """Update the draw features by removing features that have been edited and no longer exist."""
+
+        geometries = [feature["geometry"] for feature in self.draw_control.data]
+
+        for feature in self.draw_features:
+            if feature["geometry"] not in geometries:
+                self.draw_features.remove(feature)
+
+    def get_draw_props(self, n=None, return_df=False):
+        """Get the properties of the draw features.
+
+        Args:
+            n (int, optional): The maximum number of attributes to return. Defaults to None.
+            return_df (bool, optional): If True, return a pandas dataframe. Defaults to False.
+
+        Returns:
+            pd.DataFrame: A pandas dataframe containing the properties of the draw features.
+        """
+
+        import pandas as pd
+
+        props = None
+        if self.draw_control.last_action == "edited":
+            self.update_draw_features()
+        if len(self.draw_features) > 0:
+            keys = self.draw_features[-1]["properties"].keys()
+            if len(keys) > 0:
+                props = list(keys)
+
+        if props is not None:
+            if n is not None and n <= len(props):
+                n = len(props)
+            elif n is not None and n > len(props):
+                props = props + [""] * (n - len(props))
+
+            if not return_df:
+                return props
+            else:
+
+                df = pd.DataFrame({"Key": props, "Value": [""] * len(props)})
+                df.index += 1
+                return df
+        else:
+            if not return_df:
+                return []
+            else:
+                df = pd.DataFrame({"Key": [""] * n, "Value": [""] * n})
+                df.index += 1
+                return df
 
 
 # The functions below are outside the Map class.
