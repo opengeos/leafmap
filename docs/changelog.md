@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.5 - January 27, 2022
+
+**New Features**:
+
+-   Added vector creation GUI [#179](https://github.com/giswqs/leafmap/issues/179) [#194](https://github.com/giswqs/leafmap/pull/194)
+
 ## v0.7.4 - January 24, 2022
 
 **New Features**:
