@@ -4082,6 +4082,12 @@ def edit_draw_gui(m):
     if n_props == 0:
         n_props = 1
 
+    sheet = ipysheet.from_dataframe(m.get_draw_props(n_props, return_df=True))
+    m.edit_sheet = sheet
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+    m.edit_output = output
+
     toolbar_button = widgets.ToggleButton(
         value=False,
         tooltip="Edit attribute table",
@@ -4101,7 +4107,6 @@ def edit_draw_gui(m):
         value=False,
         tooltip="Save to file",
         icon="floppy-o",
-        # button_style="primary",
         layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
     )
 
@@ -4118,17 +4123,6 @@ def edit_draw_gui(m):
     int_slider_label = widgets.Label()
     widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
 
-    def int_slider_changed(change):
-        if change["new"]:
-            with output:
-                output.clear_output()
-                sheet = ipysheet.from_dataframe(
-                    m.get_draw_props(n=int_slider.value, return_df=True)
-                )
-                display(sheet)
-
-    int_slider.observe(int_slider_changed, "value")
-
     buttons = widgets.ToggleButtons(
         value=None,
         options=["Apply", "Reset", "Close"],
@@ -4137,15 +4131,23 @@ def edit_draw_gui(m):
     )
     buttons.style.button_width = "60px"
 
-    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
-    m.edit_output = output
-
     with output:
-        sheet = ipysheet.from_dataframe(
-            m.get_draw_props(n=int_slider.value, return_df=True)
-        )
         output.clear_output()
-        display(sheet)
+        display(m.edit_sheet)
+
+    def int_slider_changed(change):
+        if change["new"]:
+            m.edit_sheet.rows = int_slider.value
+            m.num_attributes = int_slider.value
+            with output:
+                output.clear_output()
+                m.edit_sheet = ipysheet.from_dataframe(
+                    m.get_draw_props(n=int_slider.value, return_df=True)
+                )
+                display(m.edit_sheet)
+
+    int_slider.observe(int_slider_changed, "value")
+    m.num_attributes = int_slider.value
 
     toolbar_widget = widgets.VBox()
     toolbar_widget.children = [toolbar_button]
@@ -4202,13 +4204,32 @@ def edit_draw_gui(m):
 
     close_button.observe(close_btn_click, "value")
 
+    def chooser_callback(chooser):
+        m.save_draw_features(chooser.selected, indent=None)
+        if m.file_control in m.controls:
+            m.remove_control(m.file_control)
+        with output:
+            print(f"Saved to {chooser.selected}")
+
     def save_btn_click(change):
         if change["new"]:
             save_button.value = False
-            m.save_draw_features("roi.geojson", indent=None)
-            with output:
-                output.clear_output()
-                print("Saved to 'roi.geojson'")
+
+            file_chooser = FileChooser(
+                os.getcwd(),
+                sandbox_path=m.sandbox_path,
+                layout=widgets.Layout(width="454px"),
+            )
+            file_chooser.filter_pattern = ["*.shp", "*.geojson", "*.gpkg"]
+            file_chooser.default_filename = "data.geojson"
+            file_chooser.use_dir_icons = True
+            file_chooser.register_callback(chooser_callback)
+
+            file_control = ipyleaflet.WidgetControl(
+                widget=file_chooser, position="topright"
+            )
+            m.add_control(file_control)
+            m.file_control = file_control
 
     save_button.observe(save_btn_click, "value")
 
@@ -4216,12 +4237,19 @@ def edit_draw_gui(m):
         if change["new"] == "Apply":
             with output:
                 output.clear_output()
-                sheet = ipysheet.sheet(
-                    rows=m.num_attributes, columns=2, column_headers=["Key", "Value"]
-                )
-                display(sheet)
+                display(m.edit_sheet)
+                if len(m.draw_control.data) == 0:
+                    print("Please draw a feature first.")
+                else:
+                    m.update_draw_props(ipysheet.to_dataframe(m.edit_sheet))
         elif change["new"] == "Reset":
-            output.clear_output()
+
+            m.edit_sheet = ipysheet.from_dataframe(
+                m.get_draw_props(int_slider.value, return_df=True)
+            )
+            with output:
+                output.clear_output()
+                display(m.edit_sheet)
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()
