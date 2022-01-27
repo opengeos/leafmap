@@ -1962,6 +1962,15 @@ class Map(folium.Map):
         """Adds a search control to the map."""
         print("The folium plotting backend does not support this function.")
 
+    def save_draw_features(self, out_file, indent=4, **kwargs):
+        """Save the draw features to a file.
+
+        Args:
+            out_file (str): The output file path.
+            indent (int, optional): The indentation level when saving data as a GeoJSON. Defaults to 4.
+        """
+        print("The folium plotting backend does not support this function.")
+
 
 def delete_dp_report(name):
     """Deletes a datapane report.
