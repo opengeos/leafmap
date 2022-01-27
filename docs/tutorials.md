@@ -48,6 +48,7 @@
 42. Creating Cloud Optimized GeoTIFF (COG) ([notebook](https://leafmap.org/notebooks/42_create_cog))
 43. Searching for locations and features in vector data ([notebook](https://leafmap.org/notebooks/43_search_control))
 44. Opening vector data attribute table without coding ([notebook](https://leafmap.org/notebooks/44_attribute_table))
+45. Creating vector data interactively ([notebook](https://leafmap.org/notebooks/45_create_vector))
 
 ## Demo
 
