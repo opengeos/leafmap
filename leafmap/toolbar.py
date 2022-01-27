@@ -266,7 +266,7 @@ def main_toolbar(m):
         },
         "pencil-square-o": {
             "name": "edit_vector",
-            "tooltip": "Edit vector data attribute table",
+            "tooltip": "Create vector data",
         },
         # "smile-o": {
         #     "name": "placeholder2",
