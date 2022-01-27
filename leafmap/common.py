@@ -4234,6 +4234,57 @@ def geojson_to_df(in_geojson, encoding="utf-8", drop_geometry=True):
     return df
 
 
+def geojson_to_shp(in_geojson, out_shp, **kwargs):
+    """Converts a GeoJSON object to GeoPandas GeoDataFrame.
+
+    Args:
+        in_geojson (str | dict): The input GeoJSON file or dict.
+        out_shp (str): The output shapefile path.
+    """
+    import geopandas as gpd
+    import json
+
+    ext = os.path.splitext(out_shp)[1]
+    if ext != ".shp":
+        out_shp = out_shp + ".shp"
+    out_shp = check_file_path(out_shp)
+
+    if isinstance(in_geojson, dict):
+        out_file = temp_file_path(extension="geojson")
+        with open(out_file, "w") as f:
+            json.dump(in_geojson, f)
+            in_geojson = out_file
+
+    gdf = gpd.read_file(in_geojson, **kwargs)
+    gdf.to_file(out_shp)
+
+
+def geojson_to_gpkg(in_geojson, out_gpkg, **kwargs):
+    """Converts a GeoJSON object to GeoPackage.
+
+    Args:
+        in_geojson (str | dict): The input GeoJSON file or dict.
+        out_gpkg (str): The output GeoPackage path.
+    """
+    import geopandas as gpd
+    import json
+
+    ext = os.path.splitext(out_gpkg)[1]
+    if ext.lower() != ".gpkg":
+        out_gpkg = out_gpkg + ".gpkg"
+    out_gpkg = check_file_path(out_gpkg)
+
+    if isinstance(in_geojson, dict):
+        out_file = temp_file_path(extension="geojson")
+        with open(out_file, "w") as f:
+            json.dump(in_geojson, f)
+            in_geojson = out_file
+
+    gdf = gpd.read_file(in_geojson, **kwargs)
+    name = os.path.splitext(os.path.basename(out_gpkg))[0]
+    gdf.to_file(out_gpkg, layer=name, driver="GPKG")
+
+
 def bbox_to_gdf(bbox, crs="EPSG:4326"):
     """Converts a bounding box to a GeoDataFrame.
 
