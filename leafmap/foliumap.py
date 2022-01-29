@@ -1971,6 +1971,14 @@ class Map(folium.Map):
         """
         print("The folium plotting backend does not support this function.")
 
+    def edit_vector(self, data, **kwargs):
+        """Edit a vector layer.
+
+        Args:
+            data (dict | str): The data to edit. It can be a GeoJSON dictionary or a file path.
+        """
+        print("The folium plotting backend does not support this function.")
+
 
 def delete_dp_report(name):
     """Deletes a datapane report.

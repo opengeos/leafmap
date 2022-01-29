@@ -134,19 +134,19 @@ class Map(ipyleaflet.Map):
                     for feature in self.draw_features:
                         if feature["geometry"] not in geometries:
                             self.draw_features.remove(feature)
-                self.user_rois = {
-                    "type": "FeatureCollection",
-                    "features": self.draw_features,
-                }
 
                 if self.edit_mode:
                     with self.edit_output:
                         self.edit_output.clear_output()
-                        # ipysheet.column(1, [""] * self.num_attributes)
                         self.edit_sheet = ipysheet.from_dataframe(
                             self.get_draw_props(n=self.num_attributes, return_df=True)
                         )
                         display(self.edit_sheet)
+
+                self.user_rois = {
+                    "type": "FeatureCollection",
+                    "features": self.draw_features,
+                }
 
             draw_control.on_draw(handle_draw)
 
@@ -2862,14 +2862,35 @@ class Map(ipyleaflet.Map):
                     self.draw_features[-1]["properties"] = props
                 elif self.draw_control.last_action == "edited":
                     for feature in self.draw_features:
-                        if self.draw_control.last_draw:
-                            self.draw_control.last_draw["geometry"] == feature[
-                                "geometry"
-                            ]
+                        if (
+                            self.draw_control.last_draw["geometry"]
+                            == feature["geometry"]
+                        ):
                             feature["properties"] = props
             for prop in list(props.keys()):
                 if prop not in self.edit_props:
                     self.edit_props.append(prop)
+
+    def edit_vector(self, data, **kwargs):
+        """Edit a vector layer.
+
+        Args:
+            data (dict | str): The data to edit. It can be a GeoJSON dictionary or a file path.
+        """
+        if isinstance(data, str):
+            check_package("geopandas", "https://geopandas.org")
+            import geopandas as gpd
+
+            gdf = gpd.read_file(data, **kwargs)
+            geojson = gdf_to_geojson(gdf, epsg=4326, tuple_to_list=True)
+        elif isinstance(data, dict):
+            geojson = data
+        else:
+            raise ValueError(
+                "The data must be a GeoJSON dictionary or a file path to a vector dataset."
+            )
+        self.draw_control.data = self.draw_control.data + (geojson["features"])
+        self.draw_features = self.draw_features + (geojson["features"])
 
 
 # The functions below are outside the Map class.
