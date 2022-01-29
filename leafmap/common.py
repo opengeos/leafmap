@@ -2408,13 +2408,15 @@ def screen_capture(outfile, monitor=1):
         raise Exception(e)
 
 
-def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
+def gdf_to_geojson(gdf, out_geojson=None, epsg=None, tuple_to_list=False):
     """Converts a GeoDataFame to GeoJSON.
 
     Args:
         gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
         out_geojson (str, optional): File path to he output GeoJSON. Defaults to None.
         epsg (str, optional): An EPSG string, e.g., "4326". Defaults to None.
+        tuple_to_list (bool, optional): Whether to convert tuples to lists. Defaults to False.
+
 
     Raises:
         TypeError: When the output file extension is incorrect.
@@ -2425,10 +2427,19 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None):
     """
     check_package(name="geopandas", URL="https://geopandas.org")
 
+    def listit(t):
+        return list(map(listit, t)) if isinstance(t, (list, tuple)) else t
+
     try:
         if epsg is not None:
             gdf = gdf.to_crs(epsg=epsg)
         geojson = gdf.__geo_interface__
+
+        if tuple_to_list:
+            for feature in geojson["features"]:
+                feature["geometry"]["coordinates"] = listit(
+                    feature["geometry"]["coordinates"]
+                )
 
         if out_geojson is None:
             return geojson

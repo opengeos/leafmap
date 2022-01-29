@@ -4103,6 +4103,13 @@ def edit_draw_gui(m):
         layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
     )
 
+    open_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Open vector data",
+        icon="folder-open",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
     save_button = widgets.ToggleButton(
         value=False,
         tooltip="Save to file",
@@ -4110,13 +4117,21 @@ def edit_draw_gui(m):
         layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
     )
 
+    refresh_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Get attribute",
+        icon="refresh",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+    m.edit_refresh = refresh_button
+
     int_slider = widgets.IntSlider(
         min=n_props,
         max=n_props + 10,
-        description="Attributes:",
+        description="Rows:",
         readout=False,
         continuous_update=True,
-        layout=widgets.Layout(width="135px", padding=padding),
+        layout=widgets.Layout(width="85px", padding=padding),
         style=style,
     )
 
@@ -4129,7 +4144,7 @@ def edit_draw_gui(m):
         tooltips=["Apply", "Reset", "Close"],
         button_style="primary",
     )
-    buttons.style.button_width = "60px"
+    buttons.style.button_width = "64px"
 
     with output:
         output.clear_output()
@@ -4155,7 +4170,9 @@ def edit_draw_gui(m):
     toolbar_header.children = [
         close_button,
         toolbar_button,
+        open_button,
         save_button,
+        refresh_button,
         int_slider,
         int_slider_label,
     ]
@@ -4204,10 +4221,46 @@ def edit_draw_gui(m):
 
     close_button.observe(close_btn_click, "value")
 
+    def open_chooser_callback(chooser):
+        with output:
+            import geopandas as gpd
+
+            gdf = gpd.read_file(chooser.selected)
+            geojson = gdf_to_geojson(gdf, epsg=4326, tuple_to_list=True)
+            m.draw_control.data = m.draw_control.data + (geojson["features"])
+            m.draw_features = m.draw_features + (geojson["features"])
+            open_button.value = False
+
+        if m.open_control in m.controls:
+            m.remove_control(m.open_control)
+            delattr(m, "open_control")
+
+    def open_btn_click(change):
+        if change["new"]:
+            save_button.value = False
+
+            open_chooser = FileChooser(
+                os.getcwd(),
+                sandbox_path=m.sandbox_path,
+                layout=widgets.Layout(width="454px"),
+            )
+            open_chooser.filter_pattern = ["*.shp", "*.geojson", "*.gpkg"]
+            open_chooser.use_dir_icons = True
+            open_chooser.register_callback(open_chooser_callback)
+
+            open_control = ipyleaflet.WidgetControl(
+                widget=open_chooser, position="topright"
+            )
+            m.add_control(open_control)
+            m.open_control = open_control
+
+    open_button.observe(open_btn_click, "value")
+
     def chooser_callback(chooser):
         m.save_draw_features(chooser.selected, indent=None)
         if m.file_control in m.controls:
             m.remove_control(m.file_control)
+            delattr(m, "file_control")
         with output:
             print(f"Saved to {chooser.selected}")
 
@@ -4233,6 +4286,38 @@ def edit_draw_gui(m):
 
     save_button.observe(save_btn_click, "value")
 
+    def refresh_btn_click(change):
+        if change["new"]:
+            refresh_button.value = False
+            if m.draw_control.last_action == "edited":
+                with output:
+                    geometries = [
+                        feature["geometry"] for feature in m.draw_control.data
+                    ]
+                    if len(m.draw_features) > 0:
+                        if (
+                            m.draw_features[-1]["geometry"]
+                            == m.draw_control.last_draw["geometry"]
+                        ):
+                            m.draw_features.pop()
+                    for feature in m.draw_features:
+                        if feature["geometry"] not in geometries:
+                            feature["geometry"] = m.draw_control.last_draw["geometry"]
+                            values = []
+                            props = ipysheet.to_dataframe(m.edit_sheet)["Key"].tolist()
+                            for prop in props:
+                                if prop in feature["properties"]:
+                                    values.append(feature["properties"][prop])
+                                else:
+                                    values.append("")
+                            df = pd.DataFrame({"Key": props, "Value": values})
+                            df.index += 1
+                            m.edit_sheet = ipysheet.from_dataframe(df)
+                            output.clear_output()
+                            display(m.edit_sheet)
+
+    refresh_button.observe(refresh_btn_click, "value")
+
     def button_clicked(change):
         if change["new"] == "Apply":
             with output:
@@ -4241,6 +4326,8 @@ def edit_draw_gui(m):
                 if len(m.draw_control.data) == 0:
                     print("Please draw a feature first.")
                 else:
+                    if m.draw_control.last_action == "edited":
+                        m.update_draw_features()
                     m.update_draw_props(ipysheet.to_dataframe(m.edit_sheet))
         elif change["new"] == "Reset":
 
