@@ -134,19 +134,19 @@ class Map(ipyleaflet.Map):
                     for feature in self.draw_features:
                         if feature["geometry"] not in geometries:
                             self.draw_features.remove(feature)
-                self.user_rois = {
-                    "type": "FeatureCollection",
-                    "features": self.draw_features,
-                }
 
                 if self.edit_mode:
                     with self.edit_output:
                         self.edit_output.clear_output()
-                        # ipysheet.column(1, [""] * self.num_attributes)
                         self.edit_sheet = ipysheet.from_dataframe(
                             self.get_draw_props(n=self.num_attributes, return_df=True)
                         )
                         display(self.edit_sheet)
+
+                self.user_rois = {
+                    "type": "FeatureCollection",
+                    "features": self.draw_features,
+                }
 
             draw_control.on_draw(handle_draw)
 
@@ -2862,10 +2862,10 @@ class Map(ipyleaflet.Map):
                     self.draw_features[-1]["properties"] = props
                 elif self.draw_control.last_action == "edited":
                     for feature in self.draw_features:
-                        if self.draw_control.last_draw:
-                            self.draw_control.last_draw["geometry"] == feature[
-                                "geometry"
-                            ]
+                        if (
+                            self.draw_control.last_draw["geometry"]
+                            == feature["geometry"]
+                        ):
                             feature["properties"] = props
             for prop in list(props.keys()):
                 if prop not in self.edit_props:
