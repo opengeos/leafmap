@@ -3,7 +3,10 @@
 Most functions for downloading OpenStreetMap data require tags of map features. The list of commonly used tags can be found at 
 https://wiki.openstreetmap.org/wiki/Map_features 
 """
+import warnings
 from .common import check_package
+
+warnings.filterwarnings("ignore")
 
 
 def osm_gdf_from_address(address, tags, dist=1000):
@@ -72,7 +75,7 @@ def osm_gdf_from_place(query, tags, which_result=None, buffer_dist=None):
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    ox.config(use_cache=True, log_console=True)
+    ox.config(use_cache=True, log_console=False)
 
     gdf = ox.geometries_from_place(query, tags, which_result, buffer_dist)
     return gdf
