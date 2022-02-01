@@ -7,12 +7,14 @@ import os
 import json
 import random
 import requests
+import warnings
 import here_map_widget
 import ipywidgets as widgets
 from box import Box
 from .basemaps import xyz_to_heremap
 from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
 
+warnings.filterwarnings("ignore")
 from here_map_widget import (
     FullscreenControl,
     MeasurementControl,
