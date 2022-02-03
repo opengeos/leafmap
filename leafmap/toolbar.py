@@ -63,7 +63,13 @@ def tool_template(m=None):
     )
 
     int_slider_label = widgets.Label()
-    widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
+    # widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
+
+    def int_slider_changed(change):
+        if change["new"]:
+            int_slider_label.value = str(int_slider.value)
+
+    int_slider.observe(int_slider_changed, "value")
 
     float_slider = widgets.FloatSlider(
         min=1,
@@ -76,7 +82,13 @@ def tool_template(m=None):
     )
 
     float_slider_label = widgets.Label()
-    widgets.jslink((float_slider, "value"), (float_slider_label, "value"))
+    # widgets.jslink((float_slider, "value"), (float_slider_label, "value"))
+
+    def float_slider_changed(change):
+        if change["new"]:
+            float_slider_label.value = str(float_slider.value)
+
+    int_slider.observe(int_slider_changed, "value")
 
     color = widgets.ColorPicker(
         concise=False,
@@ -2267,7 +2279,12 @@ def download_osm(m=None):
     )
 
     int_slider_label = widgets.Label()
-    widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
+    # widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
+    def int_slider_changed(change):
+        if change["new"]:
+            int_slider_label.value = str(int_slider.value)
+
+    int_slider.observe(int_slider_changed, "value")
 
     float_slider = widgets.FloatSlider(
         min=1,
@@ -2280,7 +2297,12 @@ def download_osm(m=None):
     )
 
     float_slider_label = widgets.Label()
-    widgets.jslink((float_slider, "value"), (float_slider_label, "value"))
+    # widgets.jslink((float_slider, "value"), (float_slider_label, "value"))
+    def float_slider_changed(change):
+        if change["new"]:
+            float_slider_label.value = str(float_slider.value)
+
+    int_slider.observe(int_slider_changed, "value")
 
     color = widgets.ColorPicker(
         concise=False,
@@ -3931,12 +3953,13 @@ def show_table_gui(m, df):
     )
 
     width_slider_label = widgets.Label(
-        layout=widgets.Layout(padding="0px 10px 0px 0px")
+        value="560", layout=widgets.Layout(padding="0px 10px 0px 0px")
     )
-    widgets.jslink((width_slider, "value"), (width_slider_label, "value"))
+    # widgets.jslink((width_slider, "value"), (width_slider_label, "value"))
 
     def width_changed(change):
         if change["new"]:
+            width_slider_label.value = str(width_slider.value)
             output.layout.width = str(width_slider.value) + "px"
 
             if checkbox.value:
@@ -3962,11 +3985,12 @@ def show_table_gui(m, df):
         style={"description_width": "initial"},
     )
 
-    height_slider_label = widgets.Label()
-    widgets.jslink((height_slider, "value"), (height_slider_label, "value"))
+    height_slider_label = widgets.Label(value="250")
+    # widgets.jslink((height_slider, "value"), (height_slider_label, "value"))
 
     def height_changed(change):
         if change["new"]:
+            height_slider_label.value = str(height_slider.value)
             output.layout.max_height = str(height_slider.value) + "px"
             if checkbox.value:
                 sheet = ipysheet.from_dataframe(df)
@@ -4136,7 +4160,14 @@ def edit_draw_gui(m):
     )
 
     int_slider_label = widgets.Label()
-    widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
+
+    def int_slider_changed(change):
+        if change["new"]:
+            int_slider_label.value = str(int_slider.value)
+
+    int_slider.observe(int_slider_changed, "value")
+
+    # widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
 
     buttons = widgets.ToggleButtons(
         value=None,
