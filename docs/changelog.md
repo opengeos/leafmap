@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.7.6 - February 4, 2022
+
+**New Features**:
+
+-   Added support for editing vector data [#178](https://github.com/giswqs/leafmap/discussions/178) [#179](https://github.com/giswqs/leafmap/issues/179)
+
+**Improvement**
+
+-   Fixed Colab widgets.jslink bug
+-   Updated STAC notebooks
+-   Changed STAC items to item
+-   Added sample vector data
+
 ## v0.7.5 - January 27, 2022
 
 **New Features**:
