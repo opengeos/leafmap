@@ -776,10 +776,11 @@ def fix_widget_error():
     Adopted from: https://github.com/plotly/plotly.py/issues/2570#issuecomment-738735816
     """
     import shutil
+    import pkg_resources
 
-    basedatatypesPath = os.path.join(
-        os.path.dirname(os.__file__), "site-packages", "plotly", "basedatatypes.py"
-    )
+    pkg_dir = os.path.dirname(pkg_resources.resource_filename("plotly", "plotly.py"))
+
+    basedatatypesPath = os.path.join(pkg_dir, "basedatatypes.py")
 
     backup_file = basedatatypesPath.replace(".py", "_bk.py")
     shutil.copyfile(basedatatypesPath, backup_file)
