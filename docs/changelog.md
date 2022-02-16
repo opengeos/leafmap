@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.7.7 - February 15, 2022
+
+**New Features**:
+
+-   Added raster support for JupyterHub
+-   Added new function add_geotiff
+
+**Improvement**
+
+-   Fixed Colab plotly bug [#199](https://github.com/giswqs/leafmap/issues/199)
+
 ## v0.7.6 - February 4, 2022
 
 **New Features**:
