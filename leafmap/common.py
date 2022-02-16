@@ -3774,6 +3774,11 @@ def get_local_tile_layer(
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
+        If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer),
+        try adding to following two lines to the beginning of the notebook if the raster does not render properly.
+
+        import os
+        os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = f'{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}'
 
     Args:
         source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
