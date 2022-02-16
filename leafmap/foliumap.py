@@ -321,6 +321,12 @@ class Map(folium.Map):
     ):
         """Add a local raster dataset to the map.
 
+            If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer),
+            try adding to following two lines to the beginning of the notebook if the raster does not render properly.
+
+            import os
+            os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = f'{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}'
+
         Args:
             source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
             band (int, optional): The band to use. Band indexing starts at 1. Defaults to None.
