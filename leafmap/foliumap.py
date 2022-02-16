@@ -356,6 +356,8 @@ class Map(folium.Map):
         )  # [minx, miny, maxx, maxy]
         self.zoom_to_bounds(bounds)
 
+    add_geotiff = add_local_tile
+
     def add_remote_tile(
         self,
         source,

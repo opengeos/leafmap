@@ -1627,6 +1627,8 @@ class Map(ipyleaflet.Map):
         }
         self.cog_layer_dict[layer_name] = params
 
+    add_geotiff = add_local_tile
+
     def add_remote_tile(
         self,
         source,
