@@ -3798,6 +3798,12 @@ def get_local_tile_layer(
         "localtileserver", URL="https://github.com/banesullivan/localtileserver"
     )
 
+    # Make it compatible with binder and JupyterHub
+    if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
+        os.environ[
+            "LOCALTILESERVER_CLIENT_PREFIX"
+        ] = f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
+
     from localtileserver import (
         get_leaflet_tile_layer,
         get_folium_tile_layer,
