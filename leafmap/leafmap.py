@@ -118,10 +118,10 @@ class Map(ipyleaflet.Map):
 
                 if action in ["created", "edited"]:
 
-                    feature = {
-                        "type": "Feature",
-                        "geometry": geo_json["geometry"],
-                    }
+                    # feature = {
+                    #     "type": "Feature",
+                    #     "geometry": geo_json["geometry"],
+                    # }
                     self.draw_features.append(geo_json)
 
                 elif action == "deleted":
@@ -971,7 +971,7 @@ class Map(ipyleaflet.Map):
         if y not in col_names:
             raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
 
-        for row in df.itertuples():
+        for _ in df.itertuples():
             html = ""
             for p in popup:
                 html = (
@@ -2575,7 +2575,7 @@ class Map(ipyleaflet.Map):
                     df = gpd.read_file(data)
                     df[x] = df.centroid.x
                     df[y] = df.centroid.y
-                except:
+                except Exception as _:
                     print("geopandas is required to read geojson.")
                     return
 

@@ -674,7 +674,7 @@ class Map(go.FigureWidget):
             raise ValueError("gdf must be a GeoDataFrame.")
 
         gdf = gdf.to_crs(epsg=4326)
-        geom_type = gdf_geom_type(gdf)
+        # geom_type = gdf_geom_type(gdf)
         center_lon, center_lat = gdf_centroid(gdf)
 
         if isinstance(label_col, str):
@@ -704,7 +704,6 @@ class Map(go.FigureWidget):
 
         self.add_traces(fig.data)
         self.set_center(center_lat, center_lon, zoom)
-        del fig
 
     def add_geojson_layer(self, geojson_in, name, color="blue", opacity=1):
         """Prepare proper and give style for different type of Geometry
