@@ -3453,14 +3453,14 @@ def create_legend(
     #     max_height = None
     # else:
     #     max_height = kwargs["max_height"]
-    if "height" not in kwargs.keys():
-        height = None
-    else:
-        height = kwargs["height"]
-    if "width" not in kwargs.keys():
-        width = None
-    else:
-        width = kwargs["width"]
+    # if "height" not in kwargs.keys():
+    #     height = None
+    # else:
+    #     height = kwargs["height"]
+    # if "width" not in kwargs.keys():
+    #     width = None
+    # else:
+    #     width = kwargs["width"]
 
     # if width is None:
     #     max_width = "300px"
