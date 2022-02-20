@@ -3439,20 +3439,20 @@ def create_legend(
     pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
     legend_template = os.path.join(pkg_dir, "data/template/legend.html")
 
-    if "min_width" not in kwargs.keys():
-        min_width = None
-    if "max_width" not in kwargs.keys():
-        max_width = None
-    else:
-        max_width = kwargs["max_width"]
-    if "min_height" not in kwargs.keys():
-        min_height = None
-    else:
-        min_height = kwargs["min_height"]
-    if "max_height" not in kwargs.keys():
-        max_height = None
-    else:
-        max_height = kwargs["max_height"]
+    # if "min_width" not in kwargs.keys():
+    #     min_width = None
+    # if "max_width" not in kwargs.keys():
+    #     max_width = None
+    # else:
+    #     max_width = kwargs["max_width"]
+    # if "min_height" not in kwargs.keys():
+    #     min_height = None
+    # else:
+    #     min_height = kwargs["min_height"]
+    # if "max_height" not in kwargs.keys():
+    #     max_height = None
+    # else:
+    #     max_height = kwargs["max_height"]
     if "height" not in kwargs.keys():
         height = None
     else:
@@ -3462,10 +3462,10 @@ def create_legend(
     else:
         width = kwargs["width"]
 
-    if width is None:
-        max_width = "300px"
-    if height is None:
-        max_height = "400px"
+    # if width is None:
+    #     max_width = "300px"
+    # if height is None:
+    #     max_height = "400px"
 
     if not os.path.exists(legend_template):
         print("The legend template does not exist.")
@@ -3746,7 +3746,6 @@ def temp_file_path(extension):
     """
 
     import tempfile
-    import os
     import uuid
 
     if not extension.startswith("."):
