@@ -88,7 +88,7 @@ def tool_template(m=None):
         if change["new"]:
             float_slider_label.value = str(float_slider.value)
 
-    int_slider.observe(int_slider_changed, "value")
+    float_slider.observe(float_slider_changed, "value")
 
     color = widgets.ColorPicker(
         concise=False,
@@ -880,7 +880,7 @@ def open_data_widget(m):
                                 vis_max = float(vmax.value)
                             if len(nodata.value) > 0:
                                 vis_nodata = float(nodata.value)
-                        except:
+                        except Exception as _:
                             pass
 
                         m.add_local_tile(
@@ -1011,7 +1011,7 @@ def open_raster_gui(m):
         layout=widgets.Layout(width="150px", padding=padding),
     )
 
-    band_width = width = "149px"
+    band_width = "149px"
     red = widgets.Dropdown(
         value=None,
         options=[],
@@ -1359,7 +1359,7 @@ def open_raster_gui(m):
                                 vis_palette = get_palette(palette.value, hashtag=True)
                         elif palette.value is not None:
                             vis_palette = get_palette(palette.value, hashtag=True)
-                    except:
+                    except Exception as e:
                         pass
 
                     m.add_local_tile(
@@ -2302,7 +2302,7 @@ def download_osm(m=None):
         if change["new"]:
             float_slider_label.value = str(float_slider.value)
 
-    int_slider.observe(int_slider_changed, "value")
+    float_slider.observe(float_slider_changed, "value")
 
     color = widgets.ColorPicker(
         concise=False,
@@ -3090,7 +3090,7 @@ def plotly_tool_template(canvas):
 
     widget_width = "250px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
-    style = {"description_width": "initial"}
+    # style = {"description_width": "initial"}
 
     toolbar_button = widgets.ToggleButton(
         value=False,
@@ -3409,7 +3409,7 @@ def plotly_whitebox_gui(canvas):
 
     widget_width = "250px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
-    style = {"description_width": "initial"}
+    # style = {"description_width": "initial"}
 
     toolbar_button = widgets.ToggleButton(
         value=False,
@@ -3840,7 +3840,7 @@ def show_table_gui(m, df):
 
     widget_width = "560px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
-    style = {"description_width": "initial"}
+    # style = {"description_width": "initial"}
 
     sheet = ipysheet.from_dataframe(df.head(10))
 
