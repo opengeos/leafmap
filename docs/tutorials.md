@@ -50,6 +50,7 @@
 44. Opening vector data attribute table without coding ([notebook](https://leafmap.org/notebooks/44_attribute_table))
 45. Creating vector data interactively without coding ([notebook](https://leafmap.org/notebooks/45_create_vector))
 46. Editing existing vector data interactively without coding ([notebook](https://leafmap.org/notebooks/46_edit_vector))
+47. Converting numpy array to COG ([notebook](https://leafmap.org/notebooks/47_numpy_to_cog))
 
 ## Demo
 
