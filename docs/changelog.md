@@ -1,6 +1,16 @@
 # Changelog
 
-## v0.7.7 - February 15, 2022
+## v0.7.8 - Feb 22, 2022
+
+**New Features**:
+
+-   Added numpy to cog [#200](https://github.com/giswqs/leafmap/issues/200)
+
+**Improvement**
+
+-   Fixed LGTM alerts
+
+## v0.7.7 - Feb 15, 2022
 
 **New Features**:
 
@@ -11,7 +21,7 @@
 
 -   Fixed Colab plotly bug [#199](https://github.com/giswqs/leafmap/issues/199)
 
-## v0.7.6 - February 4, 2022
+## v0.7.6 - Feb 4, 2022
 
 **New Features**:
 
@@ -24,13 +34,13 @@
 -   Changed STAC items to item
 -   Added sample vector data
 
-## v0.7.5 - January 27, 2022
+## v0.7.5 - Jan 27, 2022
 
 **New Features**:
 
 -   Added vector creation GUI [#179](https://github.com/giswqs/leafmap/issues/179) [#194](https://github.com/giswqs/leafmap/pull/194)
 
-## v0.7.4 - January 24, 2022
+## v0.7.4 - Jan 24, 2022
 
 **New Features**:
 
@@ -44,7 +54,7 @@
 -   Removed nominatim URL from Search Control [#182](https://github.com/giswqs/leafmap/issues/182)
 -   Fixed search control bug [#183](https://github.com/giswqs/leafmap/pull/183)
 
-## v0.7.3 - January 21, 2022
+## v0.7.3 - Jan 21, 2022
 
 **New Features**:
 
@@ -56,7 +66,7 @@
 -   Removed COG mosaic function #180
 -   Updated binder env
 
-## v0.7.2 - January 11, 2022
+## v0.7.2 - Jan 11, 2022
 
 **New Features**:
 
@@ -64,7 +74,7 @@
 -   Added ROI to GeoJSON function [#170](https://github.com/giswqs/leafmap/issues/170)
 -   Added add_geojson for plotly [#163](https://github.com/giswqs/leafmap/issues/163) [#167](https://github.com/giswqs/leafmap/pull/167)
 
-## v0.7.1 - January 3, 2022
+## v0.7.1 - Jan 3, 2022
 
 **New Features**:
 
@@ -78,7 +88,7 @@
 -   Improved COG visualization [#161](https://github.com/giswqs/leafmap/issues/161)
 -   Fixed citation bug [#165](https://github.com/giswqs/leafmap/pull/165)
 
-## v0.7.0 - December 29, 2021
+## v0.7.0 - Dec 29, 2021
 
 **New Features**:
 
@@ -97,7 +107,7 @@
 -   Improved stac tile function [#137](https://github.com/giswqs/leafmap/issues/156)
 -   Updated STAC notebook example [#156](https://github.com/giswqs/leafmap/issues/156)
 
-## v0.6.1 - December 23, 2021
+## v0.6.1 - Dec 23, 2021
 
 **New Features**:
 
@@ -115,7 +125,7 @@
 -   Added ts_inspector docstring [#147](https://github.com/giswqs/leafmap/discussions/147)
 -   Improved streamlit download button
 
-## v0.6.0 - November 27, 2021
+## v0.6.0 - Nov 27, 2021
 
 **New Features**:
 
@@ -125,7 +135,7 @@
 -   Added open raster GUI [#129](https://github.com/giswqs/leafmap/issues/129)
 -   Added zoom to tile [#129](https://github.com/giswqs/leafmap/issues/129)
 
-## v0.5.5 - November 9, 2021
+## v0.5.5 - Nov 9, 2021
 
 **New Features**:
 
@@ -136,7 +146,7 @@
 -   Fixed `add_legend` bug
 -   Changed default `max_zoom` to 24
 
-## v0.5.4 - November 2, 2021
+## v0.5.4 - Nov 2, 2021
 
 **New Features**:
 
@@ -153,19 +163,19 @@
 -   Fixed open vector bug [#124](https://github.com/giswqs/leafmap/discussions/124)
 -   Improved streamlit support
 
-## v0.5.3 - October 17, 2021
+## v0.5.3 - Oct 17, 2021
 
 **New Features**:
 
 -   Added support for US Census data with hundreds of WMS layers [#123](https://github.com/giswqs/leafmap/issues/123)
 
-## v0.5.2 - October 17, 2021
+## v0.5.2 - Oct 17, 2021
 
 **Improvement**
 
 -   Fixed pydeck import error
 
-## v0.5.1 - October 17, 2021
+## v0.5.1 - Oct 17, 2021
 
 **New Features**:
 
@@ -183,13 +193,13 @@
 -   Improved vector to geojson
 -   Added streamlit app link to docs
 
-## v0.4.3 - September 17, 2021
+## v0.4.3 - Sep 17, 2021
 
 **New Features**:
 
 -   Added `sandbox_path` option allowing users to restrict Voila app access to system directories [#113](https://github.com/giswqs/leafmap/issues/113)
 
-## v0.4.2 - September 10, 2021
+## v0.4.2 - Sep 10, 2021
 
 **New Features**:
 
@@ -203,7 +213,7 @@
 -   Fixed linked maps bug
 -   Improved folium basemaps [#91](https://github.com/giswqs/leafmap/issues/91)
 
-## v0.4.1 - August 4, 2021
+## v0.4.1 - Aug 4, 2021
 
 **New Features**:
 
@@ -215,7 +225,7 @@
 -   Added kepler module to mkdocs
 -   Removed support for Python 3.6 due to xyzservices
 
-## v0.4.0 - July 28, 2021
+## v0.4.0 - Jul 28, 2021
 
 **New Features**:
 
@@ -227,7 +237,7 @@
 
 -   Added CITATIONS.cff
 
-## v0.3.5 - July 26, 2021
+## v0.3.5 - Jul 26, 2021
 
 **New Features**:
 
@@ -238,7 +248,7 @@
 -   Added unittest for toolbar module [#83](https://github.com/giswqs/leafmap/issues/83)
 -   Updated paper.md
 
-## v0.3.4 - July 21, 2021
+## v0.3.4 - Jul 21, 2021
 
 **New Features**:
 
@@ -261,7 +271,7 @@
 -   Added leafmap and foliumap unittest [#83](https://github.com/giswqs/leafmap/issues/83)
 -   Improved JOSS paper [#83](https://github.com/giswqs/leafmap/issues/83)
 
-## v0.3.3 - July 8, 2021
+## v0.3.3 - Jul 8, 2021
 
 **New Features**:
 
@@ -276,7 +286,7 @@
 -   Changed COG and STAC function names [#61](https://github.com/giswqs/leafmap/issues/61)
 -   Updated colormap example [#60](https://github.com/giswqs/leafmap/issues/60)
 
-## v0.3.2 - June 22, 2021
+## v0.3.2 - Jun 22, 2021
 
 **New Features**:
 
@@ -284,7 +294,7 @@
 -   Added JOSS manuscript
 -   Added unittests
 
-## v0.3.1 - June 20, 2021
+## v0.3.1 - Jun 20, 2021
 
 **New Features**:
 
@@ -300,7 +310,7 @@
 -   Added LGTM
 -   Updated installation docs
 
-## v0.3.0 - June 14, 2021
+## v0.3.0 - Jun 14, 2021
 
 **New Features**:
 
@@ -318,7 +328,7 @@
 -   Added five notebook tutorials
 -   Fixed folium map custom size bug [#21](https://github.com/giswqs/leafmap/issues/21)
 
-## v0.2.0 - June 5, 2021
+## v0.2.0 - Jun 5, 2021
 
 **New Features**:
 
