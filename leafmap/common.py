@@ -4601,6 +4601,7 @@ def numpy_to_cog(
         crs (str, optional): The coordinate reference system of the output COG file. Defaults to "epsg:4326".
 
     """
+    import warnings
     import numpy as np
     import rasterio
     from rasterio.io import MemoryFile
@@ -4609,6 +4610,7 @@ def numpy_to_cog(
     from rio_cogeo.cogeo import cog_translate
     from rio_cogeo.profiles import cog_profiles
 
+    warnings.filterwarnings("ignore")
     if not isinstance(np_array, np.ndarray):
         raise TypeError("The input array must be a numpy array.")
 
