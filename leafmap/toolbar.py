@@ -4592,14 +4592,8 @@ def stac_gui(m=None):
         output.clear_output()
 
     with output:
-        #     if not hasattr(m, "pc_inventory"):
-        #         setattr(m, "pc_inventory", get_pc_inventory())
         col_name = collection.value.split(' - ')[0].strip()
-        # print(col_name)
-        # item.value = m.pc_inventory[col_name]["first_item"]
-        # print(item.value)
         band_names = get_pc_inventory()[col_name]["bands"]
-        # print(band_names)
         red.options = band_names
         green.options = band_names
         blue.options = band_names
@@ -4737,7 +4731,9 @@ def stac_gui(m=None):
                         collection.options = get_pc_collection_list()
                     else:
                         print("Retrieving collections...")
-                        collection.options = [x[0] for x in get_stac_collections(http_url.value)]
+                        collection.options = [
+                            x[0] for x in get_stac_collections(http_url.value)
+                        ]
                         output.clear_output()
                 else:
                     print("Please enter a valid URL.")
