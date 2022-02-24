@@ -971,7 +971,7 @@ class Map(ipyleaflet.Map):
         if y not in col_names:
             raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
 
-        for _ in df.itertuples():
+        for row in df.itertuples():
             html = ""
             for p in popup:
                 html = (
@@ -2042,7 +2042,6 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
         """
-        import random
 
         data = gdf_to_geojson(gdf, epsg="4326")
 

@@ -1389,13 +1389,17 @@ def stac_tile(
                 assets=assets,
                 titiler_endpoint=titiler_endpoint,
             )
-            percentile_2 = min(
-                [stats[s][list(stats[s].keys())[0]]["percentile_2"] for s in stats]
-            )
-            percentile_98 = max(
-                [stats[s][list(stats[s].keys())[0]]["percentile_98"] for s in stats]
-            )
-            kwargs["rescale"] = f"{percentile_2},{percentile_98}"
+            if 'detail' not in stats:
+
+                percentile_2 = min(
+                    [stats[s][list(stats[s].keys())[0]]["percentile_2"] for s in stats]
+                )
+                percentile_98 = max(
+                    [stats[s][list(stats[s].keys())[0]]["percentile_98"] for s in stats]
+                )
+                kwargs["rescale"] = f"{percentile_2},{percentile_98}"
+            else:
+                print(stats['detail'])  # When operation times out.
 
     else:
         if isinstance(bands, str):
@@ -2430,13 +2434,15 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None, tuple_to_list=False):
         dict: When the out_json is None returns a dict.
     """
     check_package(name="geopandas", URL="https://geopandas.org")
+    import pyproj
 
     def listit(t):
         return list(map(listit, t)) if isinstance(t, (list, tuple)) else t
 
     try:
         if epsg is not None:
-            gdf = gdf.to_crs(epsg=epsg)
+            if gdf.crs is not None and gdf.crs.to_epsg() != epsg:
+                gdf = gdf.to_crs(epsg=epsg)
         geojson = gdf.__geo_interface__
 
         if tuple_to_list:
@@ -3826,9 +3832,8 @@ def get_local_tile_layer(
         raise ValueError("The source must either be a string or TileClient")
 
     if isinstance(palette, str):
-        from .colormaps import get_palette
 
-        palette = get_palette(palette, hashtag=True)
+        palette = get_palette_colors(palette, hashtag=True)
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
@@ -4679,3 +4684,178 @@ def numpy_to_cog(
                 in_memory=True,
                 quiet=True,
             )
+
+
+def get_stac_collections(url):
+    """Retrieve a list of STAC collections from a URL.
+    This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L31.
+    Credits to Mykola Kozyr.
+
+    Args:
+        url (str): A URL to a STAC catalog.
+
+    Returns:
+        list: A list of STAC collections.
+    """
+    from pystac_client import Client
+
+    # Expensive function. Added cache for it.
+
+    # Empty list that would be used for a dataframe to collect and visualize info about collections
+    root_catalog = Client.open(url)
+    collections_list = []
+    # Reading collections in the Catalog
+    collections = list(root_catalog.get_collections())
+    print(collections)
+    for collection in collections:
+        id = collection.id
+        title = collection.title
+        # bbox = collection.extent.spatial.bboxes # not in use for the first release
+        # interval = collection.extent.temporal.intervals # not in use for the first release
+        description = collection.description
+
+        # creating a list of lists of values
+        collections_list.append([id, title, description])
+    return collections_list
+
+
+def get_stac_items(
+    url,
+    collection,
+    limit=None,
+    bbox=None,
+    datetime=None,
+    intersects=None,
+    ids=None,
+    **kwargs,
+):
+    """Retrieve a list of STAC items from a URL and a collection.
+    This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L49.
+    Credits to Mykola Kozyr.
+    Available parameters can be found at https://github.com/radiantearth/stac-api-spec/tree/master/item-search
+
+    Args:
+        url (str): A URL to a STAC catalog.
+        collection (str): A STAC collection ID.
+        limit (int, optional): The maximum number of results to return (page size). Defaults to None.
+        bbox (tuple, optional): Requested bounding box in the format of (minx, miny, maxx, maxy). Defaults to None.
+        datetime (str, optional): Single date+time, or a range ('/' separator), formatted to RFC 3339, section 5.6. Use double dots .. for open date ranges.
+        intersects (dict, optional): A dictionary representing a GeoJSON Geometry. Searches items by performing intersection between their geometry and provided GeoJSON geometry. All GeoJSON geometry types must be supported.
+        ids (list, optional): A list of item ids to return.
+
+    Returns:
+        GeoPandas.GeoDataFraem: A GeoDataFrame with the STAC items.
+    """
+
+    import itertools
+    import geopandas as gpd
+    from shapely.geometry import shape
+    from pystac_client import Client
+
+    # Empty list that would be used for a dataframe to collect and visualize info about collections
+    items_list = []
+    root_catalog = Client.open(url)
+
+    if limit:
+        kwargs["limit"] = limit
+    if bbox:
+        kwargs["bbox"] = bbox
+    if datetime:
+        kwargs["datetime"] = datetime
+    if intersects:
+        kwargs["intersects"] = intersects
+    if ids:
+        kwargs["ids"] = ids
+
+    if kwargs:
+        try:
+            catalog = root_catalog.search(collections=collection, **kwargs)
+        except NotImplementedError:
+            catalog = root_catalog
+    else:
+        catalog = root_catalog
+
+    iterable = catalog.get_all_items()
+    items = list(
+        itertools.islice(iterable, limit)
+    )  # getting first 25000 items. To Do some smarter logic
+    if len(items) == 0:
+        try:
+            catalog = root_catalog.get_child(collection)
+            iterable = catalog.get_all_items()
+            items = list(itertools.islice(iterable, limit))
+        except Exception as _:
+            print('Ooops, it looks like this collection does not have items.')
+            return None
+    # Iterating over items to collect main information
+    for item in items:
+        id = item.id
+        geometry = shape(item.geometry)
+        datetime = (
+            item.datetime
+            or item.properties['datetime']
+            or item.properties['end_datetime']
+            or item.properties['start_datetime']
+        )
+        links = item.links
+        for link in links:
+            if link.rel == 'self':
+                self_url = link.target
+        assets_list = []
+        assets = item.assets
+        for asset in assets:
+            assets_list.append(asset)
+
+        # creating a list of lists of values
+        items_list.append([id, geometry, datetime, self_url, assets_list])
+
+    if limit is not None:
+        items_list = items_list[:limit]
+    items_df = gpd.GeoDataFrame(items_list)
+    items_df.columns = ['id', 'geometry', 'datetime', 'self_url', 'assets_list']
+
+    items_gdf = items_df.set_geometry('geometry')
+    items_gdf["datetime"] = items_gdf["datetime"].astype(
+        str
+    )  # specifically for KeplerGL. See https://github.com/keplergl/kepler.gl/issues/602
+    # items_gdf["assets_list"] = items_gdf["assets_list"].astype(str) #specifically for KeplerGL. See https://github.com/keplergl/kepler.gl/issues/602
+    items_gdf.set_crs(epsg=4326, inplace=True)
+    return items_gdf
+
+
+def list_palettes(add_extra=False, lowercase=False):
+    """List all available colormaps. See a complete lost of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
+
+    Returns:
+        list: The list of colormap names.
+    """
+    import matplotlib.pyplot as plt
+
+    result = plt.colormaps()
+    if add_extra:
+        result += ["dem", "ndvi", "ndwi"]
+    if lowercase:
+        result = [i.lower() for i in result]
+    result.sort()
+    return result
+
+
+def get_palette_colors(cmap_name=None, n_class=None, hashtag=False):
+    """Get a palette from a matplotlib colormap. See the list of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
+
+    Args:
+        cmap_name (str, optional): The name of the matplotlib colormap. Defaults to None.
+        n_class (int, optional): The number of colors. Defaults to None.
+        hashtag (bool, optional): Whether to return a list of hex colors. Defaults to False.
+
+    Returns:
+        list: A list of hex colors.
+    """
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+
+    cmap = plt.cm.get_cmap(cmap_name, n_class)
+    colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
+    if hashtag:
+        colors = ["#" + i for i in colors]
+    return colors
