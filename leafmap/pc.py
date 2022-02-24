@@ -4,7 +4,7 @@
 import json
 import os
 from pystac_client import Client
-from .common import stac_bands
+from .common import stac_assets, stac_bands
 
 
 PC_ENDPOINT = "https://planetarycomputer.microsoft.com/api/stac/v1"
@@ -85,7 +85,7 @@ def get_pc_inventory(refresh=False, verbose=False):
                 if verbose:
                     print(f"{collection.id} - {collection.title}")
                 first_item = get_first_item(collection.id, return_id=True)
-                bands = stac_bands(collection=collection.id, items=first_item)
+                bands = stac_assets(collection=collection.id, item=first_item)
                 if isinstance(bands, list):
                     data[collection.id] = {}
                     data[collection.id]["title"] = collection.title
@@ -105,7 +105,7 @@ def get_pc_inventory(refresh=False, verbose=False):
     return data
 
 
-def get_collection_list():
+def get_pc_collection_list():
     """Get a list of collections in the Microsoft Planetary Computer catalog.
 
     Returns:
