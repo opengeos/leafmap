@@ -1620,7 +1620,7 @@ class Map(folium.Map):
 
         marker_cluster = plugins.MarkerCluster(name=layer_name).add_to(self)
 
-        for _ in df.itertuples():
+        for row in df.itertuples():
             html = ""
             for p in popup:
                 html = (
@@ -1698,7 +1698,7 @@ class Map(folium.Map):
         if y not in col_names:
             raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
 
-        for _ in df.itertuples():
+        for row in df.itertuples():
             html = ""
             for p in popup:
                 html = (
