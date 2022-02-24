@@ -4687,7 +4687,16 @@ def numpy_to_cog(
 
 
 def get_stac_collections(url):
+    """Retrieve a list of STAC collections from a URL.
+    This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L31.
+    Credits to Mykola Kozyr.
 
+    Args:
+        url (str): A URL to a STAC catalog.
+
+    Returns:
+        list: A list of STAC collections.
+    """
     from pystac_client import Client
 
     # Expensive function. Added cache for it.
@@ -4720,9 +4729,24 @@ def get_stac_items(
     ids=None,
     **kwargs,
 ):
+    """Retrieve a list of STAC items from a URL and a collection.
+    This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L49.
+    Credits to Mykola Kozyr.
+    Available parameters can be found at https://github.com/radiantearth/stac-api-spec/tree/master/item-search
 
-    # https://github.com/radiantearth/stac-api-spec/tree/master/item-search
-    # https://github.com/radiantearth/stac-api-spec/blob/master/item-search/examples.md
+    Args:
+        url (str): A URL to a STAC catalog.
+        collection (str): A STAC collection ID.
+        limit (int, optional): The maximum number of results to return (page size). Defaults to None.
+        bbox (tuple, optional): Requested bounding box in the format of (minx, miny, maxx, maxy). Defaults to None.
+        datetime (str, optional): Single date+time, or a range ('/' separator), formatted to RFC 3339, section 5.6. Use double dots .. for open date ranges.
+        intersects (dict, optional): A dictionary representing a GeoJSON Geometry. Searches items by performing intersection between their geometry and provided GeoJSON geometry. All GeoJSON geometry types must be supported.
+        ids (list, optional): A list of item ids to return.
+
+    Returns:
+        GeoPandas.GeoDataFraem: A GeoDataFrame with the STAC items.
+    """
+
     import itertools
     import geopandas as gpd
     from shapely.geometry import shape
