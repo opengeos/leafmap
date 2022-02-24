@@ -11,7 +11,7 @@ from .pc import *
 
 
 def tool_template(m=None):
-    """Generates a tool GUI template using ipywidgets.
+    """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
         m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
@@ -280,14 +280,14 @@ def main_toolbar(m):
             "name": "edit_vector",
             "tooltip": "Create vector data",
         },
-        # "smile-o": {
+        "stack-exchange": {
+            "name": "stac",
+            "tooltip": "Discover STAC Catalog",
+        },
+        # "spinner": {
         #     "name": "placeholder2",
         #     "tooltip": "This is a placeholder",
         # },
-        "spinner": {
-            "name": "placeholder2",
-            "tooltip": "This is a placeholder",
-        },
         "question": {
             "name": "help",
             "tooltip": "Get help",
@@ -390,6 +390,8 @@ def main_toolbar(m):
                 select_table_gui(m)
             elif tool_name == "edit_vector":
                 edit_draw_gui(m)
+            elif tool_name == "stac":
+                stac_gui(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -926,8 +928,6 @@ def open_raster_gui(m):
     Args:
         m (object): leafmap.Map
     """
-    import json
-    from .colormaps import list_colormaps, get_palette
 
     padding = "0px 0px 0px 5px"
     style = {"description_width": "initial"}
@@ -1063,8 +1063,8 @@ def open_raster_gui(m):
         layout=widgets.Layout(width="150px", padding=padding),
     )
 
-    local_tile_palettes = list_colormaps(add_extra=True)
-    cog_stac_palettes = list_colormaps(lowercase=True)
+    local_tile_palettes = list_palettes(add_extra=True)
+    cog_stac_palettes = list_palettes(lowercase=True)
     palette_options = local_tile_palettes
     palette = widgets.Dropdown(
         options=palette_options,
@@ -1309,7 +1309,7 @@ def open_raster_gui(m):
             palette.options = cog_stac_palettes
             palette.value = None
             add_params.placeholder = add_params_text2
-            collection.options = get_collection_list()
+            collection.options = get_pc_collection_list()
             collection.value = "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2"
             if not hasattr(m, "pc_inventory"):
                 setattr(m, "pc_inventory", get_pc_inventory())
@@ -1356,9 +1356,13 @@ def open_raster_gui(m):
                             if "palette" in vis_params:
                                 vis_palette = vis_params["palette"]
                             else:
-                                vis_palette = get_palette(palette.value, hashtag=True)
+                                vis_palette = get_palette_colors(
+                                    palette.value, hashtag=True
+                                )
                         elif palette.value is not None:
-                            vis_palette = get_palette(palette.value, hashtag=True)
+                            vis_palette = get_palette_colors(
+                                palette.value, hashtag=True
+                            )
                     except Exception as e:
                         pass
 
@@ -1460,7 +1464,7 @@ def open_raster_gui(m):
                         col = collection.value.split(" - ")[0]
                         m.add_stac_layer(
                             collection=col,
-                            items=items.value,
+                            item=items.value,
                             assets=assets.value,
                             name=layer_name.value,
                             **vis_params,
@@ -4375,6 +4379,485 @@ def edit_draw_gui(m):
                     m.remove_control(m.tool_control)
                     m.tool_control = None
                 m.edit_mode = False
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def stac_gui(m=None):
+    """Generates a tool GUI template using ipywidgets.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    from .pc import get_pc_collection_list
+
+    widget_width = "450px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Discver STAC Catalog",
+        icon="stack-exchange",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    http_url = widgets.Text(
+        value="https://planetarycomputer.microsoft.com/api/stac/v1",
+        description="Catalog URL:",
+        tooltip="Enter an http URL to the STAC Catalog",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    start_date = widgets.DatePicker(
+        description='Start date:',
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width="225px", padding=padding),
+    )
+    end_date = widgets.DatePicker(
+        description='End date:',
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width="225px", padding=padding),
+    )
+
+    collection = widgets.Dropdown(
+        options=get_pc_collection_list(),
+        value='landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2',
+        description="Collection:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    col_name = collection.value.split(' - ')[0].strip()
+    band_names = get_pc_inventory()[col_name]["bands"]
+    # red.options = band_names
+    # green.options = band_names
+    # blue.options = band_names
+
+    item = widgets.Dropdown(
+        options=['LC08_L2SP_047027_20201204_02_T1'],
+        description="Item:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    # assets = widgets.Text(
+    #     value=None,
+    #     description="Bands:",
+    #     tooltip="STAC Asset ID",
+    #     style=style,
+    #     layout=widgets.Layout(width="454px", padding=padding),
+    # )
+
+    layer_name = widgets.Text(
+        value="STAC Layer",
+        description="Layer name:",
+        tooltip="Enter a layer name for the selected file",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    band_width = "149px"
+    red = widgets.Dropdown(
+        value='SR_B5',
+        options=band_names,
+        description="Red:",
+        tooltip="Select a band for the red channel",
+        style=style,
+        layout=widgets.Layout(width=band_width, padding=padding),
+    )
+
+    green = widgets.Dropdown(
+        value='SR_B4',
+        options=band_names,
+        description="Green:",
+        tooltip="Select a band for the green channel",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    blue = widgets.Dropdown(
+        value='SR_B3',
+        options=band_names,
+        description="Blue:",
+        tooltip="Select a band for the blue channel",
+        style=style,
+        layout=widgets.Layout(width=band_width, padding=padding),
+    )
+
+    vmin = widgets.Text(
+        value=None,
+        description="vmin:",
+        tooltip="Minimum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    vmax = widgets.Text(
+        value=None,
+        description="vmax:",
+        tooltip="Maximum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    nodata = widgets.Text(
+        value=None,
+        description="Nodata:",
+        tooltip="Nodata the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="150px", padding=padding),
+    )
+
+    # local_tile_palettes = list_palettes(add_extra=True)
+    palette_options = list_palettes(lowercase=True)
+    # palette_options = local_tile_palettes
+    palette = widgets.Dropdown(
+        options=palette_options,
+        value=None,
+        description="palette:",
+        layout=widgets.Layout(width="300px", padding=padding),
+        style=style,
+    )
+
+    checkbox = widgets.Checkbox(
+        value=False,
+        description="Additional params",
+        indent=False,
+        layout=widgets.Layout(width="154px", padding=padding),
+        style=style,
+    )
+
+    add_params_text = "Additional parameters in the format of a dictionary, for example, \n {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5'], 'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
+    add_params = widgets.Textarea(
+        value="",
+        placeholder=add_params_text,
+        layout=widgets.Layout(width="454px", padding=padding),
+        style=style,
+    )
+
+    def reset_options(reset_url=True):
+        """Reset the options to their default values."""
+        if reset_url:
+            http_url.value = "https://planetarycomputer.microsoft.com/api/stac/v1"
+        start_date.value = None
+        end_date.value = None
+        collection.options = []
+        collection.value = None
+        item.options = []
+        item.value = None
+        layer_name.value = ""
+        red.options = []
+        green.options = []
+        blue.options = []
+        red.value = None
+        green.value = None
+        blue.value = None
+        vmin.value = ""
+        vmax.value = ""
+        nodata.value = ""
+        palette.value = None
+        add_params.value = ""
+        output.clear_output()
+
+    with output:
+        #     if not hasattr(m, "pc_inventory"):
+        #         setattr(m, "pc_inventory", get_pc_inventory())
+        col_name = collection.value.split(' - ')[0].strip()
+        # print(col_name)
+        # item.value = m.pc_inventory[col_name]["first_item"]
+        # print(item.value)
+        band_names = get_pc_inventory()[col_name]["bands"]
+        # print(band_names)
+        red.options = band_names
+        green.options = band_names
+        blue.options = band_names
+
+    params_widget = widgets.HBox()
+
+    raster_options = widgets.VBox()
+    raster_options.children = [
+        widgets.HBox([red, green, blue]),
+        widgets.HBox([vmin, vmax, nodata]),
+        widgets.HBox([palette, checkbox]),
+        params_widget,
+    ]
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Collections", "Items", "Display", "Reset", "Close"],
+        tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "65px"
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        http_url,
+        widgets.HBox([start_date, end_date]),
+        collection,
+        item,
+        layer_name,
+        raster_options,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def checkbox_changed(change):
+        if change["new"]:
+            params_widget.children = [add_params]
+        else:
+            params_widget.children = []
+
+    checkbox.observe(checkbox_changed, names="value")
+
+    def url_changed(change):
+        if change["new"] or http_url.value == "":
+            reset_options(reset_url=False)
+
+    http_url.observe(url_changed, names="value")
+
+    def collection_changed(change):
+
+        if change["new"]:
+            with output:
+                if not hasattr(m, "pc_inventory"):
+                    setattr(m, "pc_inventory", get_pc_inventory())
+                col_name = change["new"].split(" - ")[0]
+                first_item = m.pc_inventory[col_name]["first_item"]
+                item.options = [first_item]
+                band_names = m.pc_inventory[col_name]["bands"]
+                red.options = band_names
+                green.options = band_names
+                blue.options = band_names
+
+                if change["new"] == "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2":
+                    red.value = "SR_B7"
+                    green.value = "SR_B5"
+                    blue.value = "SR_B4"
+                elif change["new"] == "sentinel-2-l2a - Sentinel-2 Level-2A":
+                    red.value = "B08"
+                    green.value = "B04"
+                    blue.value = "B03"
+                else:
+                    if len(band_names) > 2:
+                        red.value = band_names[0]
+                        green.value = band_names[1]
+                        blue.value = band_names[2]
+                    else:
+                        red.value = band_names[0]
+                        green.value = band_names[0]
+                        blue.value = band_names[0]
+
+    collection.observe(collection_changed, names="value")
+
+    def handle_toolbar_event(event):
+
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+
+        if change["new"] == "Collections":
+            with output:
+                output.clear_output()
+                if http_url.value.startswith("http"):
+                    if (
+                        http_url.value
+                        == "https://planetarycomputer.microsoft.com/api/stac/v1"
+                    ):
+                        collection.options = get_pc_collection_list()
+                    else:
+                        print("Retrieving collections...")
+                        collection.options = [x[0] for x in get_stac_collections(http_url.value)]
+                        output.clear_output()
+                else:
+                    print("Please enter a valid URL.")
+        elif change["new"] == "Items":
+            with output:
+                output.clear_output()
+                if collection.value is not None:
+                    if start_date.value is not None and end_date.value is not None:
+                        datetime = str(start_date.value) + '/' + str(end_date.value)
+                    elif start_date.value is not None:
+                        datetime = str(start_date.value)
+                    elif end_date.value is not None:
+                        datetime = str(end_date.value)
+                    else:
+                        datetime = None
+
+                    col_name = collection.value.split(' - ')[0].strip()
+                    if m.user_roi is not None:
+                        intersects = m.user_roi['geometry']
+                    else:
+                        print("Please draw a polygon to be used as an AOI.")
+                        print(
+                            "Since no AOI is specified, using the default sample AOI."
+                        )
+                        intersects = {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [-122.27508544921875, 47.54687159892238],
+                                    [-121.96128845214844, 47.54687159892238],
+                                    [-121.96128845214844, 47.745787772920934],
+                                    [-122.27508544921875, 47.745787772920934],
+                                    [-122.27508544921875, 47.54687159892238],
+                                ]
+                            ],
+                        }
+                    print("Retrieving items...")
+
+                    gdf = get_stac_items(
+                        http_url.value,
+                        col_name,
+                        datetime=datetime,
+                        intersects=intersects,
+                    )
+                    if gdf is not None:
+                        item.options = gdf['id'].tolist()
+                        if not hasattr(m, 'layers_control'):
+                            layers_control = m.add_control(
+                                ipyleaflet.LayersControl(position="topright")
+                            )
+                            setattr(m, 'layers_control', layers_control)
+                        m.add_gdf(gdf, 'Image footprints', style={'fill': False})
+                    output.clear_output()
+                    print(f'{len(item.options)} items found.')
+                else:
+                    print("Please select a valid collection.")
+
+        elif change["new"] == "Display":
+
+            with output:
+                output.clear_output()
+
+                if red.value is not None:
+
+                    print("Loading data...")
+
+                    if (
+                        checkbox.value
+                        and add_params.value.strip().startswith("{")
+                        and add_params.value.strip().endswith("}")
+                    ):
+                        vis_params = eval(add_params.value)
+                    else:
+                        vis_params = {}
+
+                    if (
+                        palette.value
+                        and len(set([red.value, green.value, blue.value])) == 1
+                    ) or (palette.value and "expression" in vis_params):
+                        vis_params["colormap_name"] = palette.value
+                    elif (
+                        palette.value
+                        and len(set([red.value, green.value, blue.value])) > 1
+                        and "expression" not in vis_params
+                    ):
+                        palette.value = None
+                        print("Palette can only be set for single band images.")
+
+                    if vmin.value and vmax.value:
+                        vis_params["rescale"] = f"{vmin.value},{vmax.value}"
+
+                    if nodata.value:
+                        vis_params["nodata"] = nodata.value
+
+                    col = collection.value.split(" - ")[0]
+                    if len(set([red.value, green.value, blue.value])) == 1:
+                        assets = red.value
+                    else:
+                        assets = f'{red.value},{green.value},{blue.value}'
+                    m.add_stac_layer(
+                        collection=col,
+                        item=item.value,
+                        assets=assets,
+                        name=layer_name.value,
+                        **vis_params,
+                    )
+                    output.clear_output()
+                else:
+                    print("Please select at least one band.")
+                    buttons.value = None
+
+        elif change["new"] == "Reset":
+            reset_options()
+
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
             toolbar_widget.close()
 
         buttons.value = None
