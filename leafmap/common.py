@@ -4859,3 +4859,123 @@ def get_palette_colors(cmap_name=None, n_class=None, hashtag=False):
     if hashtag:
         colors = ["#" + i for i in colors]
     return colors
+
+
+def mosaic_tile(url, titiler_endpoint=None, **kwargs):
+    """Get the tile URL from a MosaicJSON.
+
+    Args:
+        url (str): HTTP URL to a MosaicJSON.
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+
+    Returns:
+        str: The tile URL.
+    """
+
+    if titiler_endpoint is None:
+        titiler_endpoint = "https://titiler.xyz"
+
+    if isinstance(url, str) and url.startswith("http"):
+        kwargs["url"] = url
+    else:
+        raise ValueError("url must be a string and start with http.")
+
+    if isinstance(titiler_endpoint, str):
+        r = requests.get(
+            f"{titiler_endpoint}/mosaicjson/tilejson.json",
+            params=kwargs,
+        ).json()
+    else:
+        raise ValueError("titiler_endpoint must be a string.")
+
+    return r["tiles"][0]
+
+
+def mosaic_bounds(url, titiler_endpoint=None, **kwargs):
+    """Get the bounding box of a MosaicJSON.
+
+    Args:
+        url (str): HTTP URL to a MosaicJSON.
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+
+    Returns:
+        list: A list of values representing [left, bottom, right, top]
+    """
+
+    if titiler_endpoint is None:
+        titiler_endpoint = "https://titiler.xyz"
+
+    if isinstance(url, str) and url.startswith("http"):
+        kwargs["url"] = url
+    else:
+        raise ValueError("url must be a string and start with http.")
+
+    if isinstance(titiler_endpoint, str):
+        r = requests.get(
+            f"{titiler_endpoint}/mosaicjson/bounds",
+            params=kwargs,
+        ).json()
+    else:
+        raise ValueError("titiler_endpoint must be a string.")
+
+    return r["bounds"]
+
+
+def mosaic_info(url, titiler_endpoint=None, **kwargs):
+    """Get the info of a MosaicJSON.
+
+    Args:
+        url (str): HTTP URL to a MosaicJSON.
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+
+    Returns:
+        dict: A dictionary containing bounds, center, minzoom, maxzoom, and name as keys.
+    """
+
+    if titiler_endpoint is None:
+        titiler_endpoint = "https://titiler.xyz"
+
+    if isinstance(url, str) and url.startswith("http"):
+        kwargs["url"] = url
+    else:
+        raise ValueError("url must be a string and start with http.")
+
+    if isinstance(titiler_endpoint, str):
+        r = requests.get(
+            f"{titiler_endpoint}/mosaicjson/info",
+            params=kwargs,
+        ).json()
+    else:
+        raise ValueError("titiler_endpoint must be a string.")
+
+    return r
+
+
+def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
+    """Get the info of a MosaicJSON.
+
+    Args:
+        url (str): HTTP URL to a MosaicJSON.
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+
+    Returns:
+        dict: A dictionary representing a dict of GeoJSON.
+    """
+
+    if titiler_endpoint is None:
+        titiler_endpoint = "https://titiler.xyz"
+
+    if isinstance(url, str) and url.startswith("http"):
+        kwargs["url"] = url
+    else:
+        raise ValueError("url must be a string and start with http.")
+
+    if isinstance(titiler_endpoint, str):
+        r = requests.get(
+            f"{titiler_endpoint}/mosaicjson/info.geojson",
+            params=kwargs,
+        ).json()
+    else:
+        raise ValueError("titiler_endpoint must be a string.")
+
+    return r
