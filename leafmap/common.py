@@ -2251,7 +2251,7 @@ def shp_to_gdf(in_shp):
         raise Exception(e)
 
 
-def shp_to_geojson(in_shp, out_json=None, **kwargs):
+def shp_to_geojson(in_shp, out_json=None, encoding="utf-8", **kwargs):
     """Converts a shapefile to GeoJSON.
 
     Args:
@@ -2263,7 +2263,6 @@ def shp_to_geojson(in_shp, out_json=None, **kwargs):
     """
     try:
         import shapefile
-        from datetime import date
 
         in_shp = os.path.abspath(in_shp)
 
@@ -2286,7 +2285,7 @@ def shp_to_geojson(in_shp, out_json=None, **kwargs):
                 )
 
             try:
-                in_gdf = gpd.read_file(in_shp)
+                in_gdf = gpd.read_file(in_shp, encoding=encoding)
                 out_gdf = in_gdf.to_crs(epsg="4326")
                 out_shp = in_shp.replace(".shp", "_gcs.shp")
                 out_gdf.to_file(out_shp)
@@ -2294,6 +2293,7 @@ def shp_to_geojson(in_shp, out_json=None, **kwargs):
             except Exception as e:
                 raise Exception(e)
 
+        kwargs["encoding"] = encoding
         if "encoding" in kwargs:
             reader = shapefile.Reader(in_shp, encoding=kwargs.pop("encoding"))
         else:
@@ -2335,7 +2335,14 @@ def delete_shp(in_shp, verbose=False):
 
 
 def vector_to_geojson(
-    filename, out_geojson=None, bbox=None, mask=None, rows=None, epsg="4326", **kwargs
+    filename,
+    out_geojson=None,
+    bbox=None,
+    mask=None,
+    rows=None,
+    epsg="4326",
+    encoding="utf-8",
+    **kwargs,
 ):
     """Converts any geopandas-supported vector dataset to GeoJSON.
 
@@ -2346,6 +2353,8 @@ def vector_to_geojson(
         mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
         rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
         epsg (str, optional): The EPSG number to convert to. Defaults to "4326".
+        encoding (str, optional): The encoding of the input file. Defaults to "utf-8".
+
 
     Raises:
         ValueError: When the output file path is invalid.
@@ -2367,11 +2376,19 @@ def vector_to_geojson(
     if ext == ".kml":
         gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
         df = gpd.read_file(
-            filename, bbox=bbox, mask=mask, rows=rows, driver="KML", **kwargs
+            filename,
+            bbox=bbox,
+            mask=mask,
+            rows=rows,
+            driver="KML",
+            encoding=encoding,
+            **kwargs,
         )
     else:
 
-        df = gpd.read_file(filename, bbox=bbox, mask=mask, rows=rows, **kwargs)
+        df = gpd.read_file(
+            filename, bbox=bbox, mask=mask, rows=rows, encoding=encoding, **kwargs
+        )
     gdf = df.to_crs(epsg=epsg)
 
     if out_geojson is not None:
@@ -2416,7 +2433,9 @@ def screen_capture(outfile, monitor=1):
         raise Exception(e)
 
 
-def gdf_to_geojson(gdf, out_geojson=None, epsg=None, tuple_to_list=False):
+def gdf_to_geojson(
+    gdf, out_geojson=None, epsg=None, tuple_to_list=False, encoding="utf-8"
+):
     """Converts a GeoDataFame to GeoJSON.
 
     Args:
@@ -2424,7 +2443,7 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None, tuple_to_list=False):
         out_geojson (str, optional): File path to he output GeoJSON. Defaults to None.
         epsg (str, optional): An EPSG string, e.g., "4326". Defaults to None.
         tuple_to_list (bool, optional): Whether to convert tuples to lists. Defaults to False.
-
+        encoding (str, optional): The encoding to use for the GeoJSON. Defaults to "utf-8".
 
     Raises:
         TypeError: When the output file extension is incorrect.
@@ -2434,7 +2453,6 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None, tuple_to_list=False):
         dict: When the out_json is None returns a dict.
     """
     check_package(name="geopandas", URL="https://geopandas.org")
-    import pyproj
 
     def listit(t):
         return list(map(listit, t)) if isinstance(t, (list, tuple)) else t
@@ -2463,7 +2481,7 @@ def gdf_to_geojson(gdf, out_geojson=None, epsg=None, tuple_to_list=False):
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
 
-            gdf.to_file(out_geojson, driver="GeoJSON")
+            gdf.to_file(out_geojson, driver="GeoJSON", encoding=encoding)
     except Exception as e:
         raise Exception(e)
 
