@@ -825,6 +825,37 @@ class Map(folium.Map):
         )
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 
+    def add_mosaic_layer(
+        self,
+        url,
+        titiler_endpoint=None,
+        name="Mosaic Layer",
+        attribution=".",
+        opacity=1.0,
+        shown=True,
+        **kwargs,
+    ):
+        """Adds a STAC TileLayer to the map.
+
+        Args:
+            url (str): HTTP URL to a MosaicJSON.
+            titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+            name (str, optional): The layer name to use for the layer. Defaults to 'Mosaic Layer'.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.
+            shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+        """
+        tile_url = mosaic_tile(url, titiler_endpoint, **kwargs)
+        bounds = mosaic_bounds(url, titiler_endpoint)
+        self.add_tile_layer(
+            url=tile_url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            shown=shown,
+        )
+        self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+
     def add_legend(
         self,
         title="Legend",

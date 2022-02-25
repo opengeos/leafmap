@@ -443,6 +443,29 @@ class Map(go.FigureWidget):
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
+    def add_mosaic_layer(
+        self,
+        url,
+        titiler_endpoint=None,
+        name="Mosaic Layer",
+        attribution="",
+        opacity=1.0,
+        **kwargs,
+    ):
+        """Adds a STAC TileLayer to the map.
+
+        Args:
+            url (str): HTTP URL to a MosaicJSON.
+            titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+            name (str, optional): The layer name to use for the layer. Defaults to 'Mosaic Layer'.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.
+        """
+        tile_url = mosaic_tile(url, titiler_endpoint, **kwargs)
+        center = mosaic_info(url, titiler_endpoint)['center']
+        self.add_tile_layer(tile_url, name, attribution, opacity)
+        self.set_center(lon=center[0], lat=center[1], zoom=10)
+
     def add_planet_by_month(
         self,
         year=2016,
