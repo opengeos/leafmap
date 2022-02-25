@@ -1654,18 +1654,10 @@ class Map(folium.Map):
         for row in df.itertuples():
             html = ""
             for p in popup:
-                html = (
-                    html
-                    + "<b>"
-                    + p
-                    + "</b>"
-                    + ": "
-                    + str(eval(str("row." + p)))
-                    + "<br>"
-                )
+                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
             popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
             folium.Marker(
-                location=[eval(f"row.{y}"), eval(f"row.{x}")], popup=popup_html
+                location=[getattr(row, y), getattr(row, y)], popup=popup_html
             ).add_to(marker_cluster)
 
     def add_circle_markers_from_xy(
@@ -1732,15 +1724,7 @@ class Map(folium.Map):
         for row in df.itertuples():
             html = ""
             for p in popup:
-                html = (
-                    html
-                    + "<b>"
-                    + p
-                    + "</b>"
-                    + ": "
-                    + str(eval(str("row." + p)))
-                    + "<br>"
-                )
+                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
             popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
 
             if tooltip is not None:
@@ -1752,7 +1736,7 @@ class Map(folium.Map):
                         + p
                         + "</b>"
                         + ": "
-                        + str(eval(str("row." + p)))
+                        + str(getattr(row, p))
                         + "<br>"
                     )
 
@@ -1761,7 +1745,7 @@ class Map(folium.Map):
                 tooltip_str = None
 
             folium.CircleMarker(
-                location=[eval(f"row.{y}"), eval(f"row.{x}")],
+                location=[getattr(row, y), getattr(row, x)],
                 radius=radius,
                 popup=popup_html,
                 tooltip=tooltip_str,

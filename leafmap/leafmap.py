@@ -1000,19 +1000,11 @@ class Map(ipyleaflet.Map):
         for row in df.itertuples():
             html = ""
             for p in popup:
-                html = (
-                    html
-                    + "<b>"
-                    + p
-                    + "</b>"
-                    + ": "
-                    + str(eval(str("row." + p)))
-                    + "<br>"
-                )
+                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
             popup_html = widgets.HTML(html)
 
             marker = ipyleaflet.CircleMarker(
-                location=[eval(f"row.{y}"), eval(f"row.{x}")],
+                location=[getattr(row, y), getattr(row, x)],
                 radius=radius,
                 popup=popup_html,
                 **kwargs,
