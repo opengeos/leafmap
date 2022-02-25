@@ -1803,6 +1803,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
+        encoding="utf-8",
     ):
         """Adds a shapefile to the map.
 
@@ -1838,7 +1839,7 @@ class Map(ipyleaflet.Map):
             if not os.path.exists(in_shp):
                 raise FileNotFoundError("The provided shapefile could not be found.")
 
-        geojson = shp_to_geojson(in_shp)
+        geojson = shp_to_geojson(in_shp, encoding=encoding)
         self.add_geojson(
             geojson,
             layer_name,
@@ -1847,6 +1848,7 @@ class Map(ipyleaflet.Map):
             style_callback,
             fill_colors,
             info_mode,
+            encoding,
         )
 
     def add_geojson(
@@ -1858,6 +1860,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
+        encoding="utf-8",
     ):
         """Adds a GeoJSON file to the map.
 
@@ -1869,6 +1872,8 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
@@ -1894,7 +1899,7 @@ class Map(ipyleaflet.Map):
                             "The provided GeoJSON file could not be found."
                         )
 
-                    with open(in_geojson, encoding="utf-8") as f:
+                    with open(in_geojson, encoding=encoding) as f:
                         data = json.load(f)
             elif isinstance(in_geojson, dict):
                 data = in_geojson
@@ -2055,6 +2060,7 @@ class Map(ipyleaflet.Map):
         fill_colors=["black"],
         info_mode="on_hover",
         zoom_to_layer=True,
+        encoding="utf-8",
     ):
         """Adds a GeoDataFrame to the map.
 
@@ -2067,12 +2073,20 @@ class Map(ipyleaflet.Map):
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
         self.add_geojson(
-            data, layer_name, style, hover_style, style_callback, fill_colors, info_mode
+            data,
+            layer_name,
+            style,
+            hover_style,
+            style_callback,
+            fill_colors,
+            info_mode,
+            encoding,
         )
 
         if zoom_to_layer:
@@ -2184,6 +2198,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
+        encoding="utf-8",
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -2199,6 +2214,7 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            encoding (str, optional): The encoding to use to read the file. Defaults to "utf-8".
 
         """
         if not filename.startswith("http"):
@@ -2214,6 +2230,7 @@ class Map(ipyleaflet.Map):
                 style_callback,
                 fill_colors,
                 info_mode,
+                encoding,
             )
         elif ext in [".json", ".geojson"]:
             self.add_geojson(
@@ -2224,6 +2241,7 @@ class Map(ipyleaflet.Map):
                 style_callback,
                 fill_colors,
                 info_mode,
+                encoding,
             )
         else:
             geojson = vector_to_geojson(
@@ -2243,6 +2261,7 @@ class Map(ipyleaflet.Map):
                 style_callback,
                 fill_colors,
                 info_mode,
+                encoding,
             )
 
     def add_xy_data(
