@@ -213,6 +213,13 @@ here_tiles = {
 }
 
 
+def _unpack_sub_parameters(var, param):
+    temp = var
+    for sub_param in param.split("."):
+        temp = getattr(temp, sub_param)
+    return temp
+
+
 def get_xyz_dict(free_only=True):
     """Returns a dictionary of xyz services.
 
@@ -227,8 +234,8 @@ def get_xyz_dict(free_only=True):
     for item in xyz.values():
         try:
             name = item["name"]
-            tile = eval("xyz." + name)
-            if eval("xyz." + name + ".requires_token()"):
+            tile = _unpack_sub_parameters(xyz, name)
+            if _unpack_sub_parameters(xyz, name).requires_token():
                 if free_only:
                     pass
                 else:
@@ -239,8 +246,8 @@ def get_xyz_dict(free_only=True):
         except Exception:
             for sub_item in item:
                 name = item[sub_item]["name"]
-                tile = eval("xyz." + name)
-                if eval("xyz." + name + ".requires_token()"):
+                tile = _unpack_sub_parameters(xyz, name)
+                if _unpack_sub_parameters(xyz, name).requires_token():
                     if free_only:
                         pass
                     else:
