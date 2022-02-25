@@ -363,6 +363,17 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "World Cities" in out_str
 
+    def test_add_circle_markers_from_xy(self):
+        """Check adding xy circle marker data"""
+        m = leafmap.Map()
+        in_csv = "https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv"
+        
+        m.add_circle_markers_from_xy(
+            in_csv, x="longitude", y="latitude", name="World Cities"
+        )
+        out_str = m.to_html()
+        assert "World Cities" in out_str
+
     def test_basemap_demo(self):
         """Check basemap demo"""
         m = leafmap.Map()

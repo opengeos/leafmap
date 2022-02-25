@@ -6,6 +6,7 @@ import os
 import unittest
 import leafmap.foliumap as leafmap
 import geopandas as gpd
+import pandas as pd
 from unittest.mock import patch
 
 
@@ -354,12 +355,23 @@ class TestFoliumap(unittest.TestCase):
         """Check adding xy data"""
         with self.assertRaises(NotImplementedError):
             m = leafmap.Map()
-            in_csv = "https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv"
-            m.add_xy_data(
-                in_csv, x="longitude", y="latitude", layer_name="World Cities"
+            in_csv = (
+                "https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv"
             )
+            m.add_xy_data(in_csv, x="longitude", y="latitude", layer_name="World Cities")
             out_str = m.to_html()
             assert "World Cities" in out_str
+
+    def test_add_points_from_xy(self):
+        "Check adding point data"
+        m = leafmap.Map()
+        in_csv = "https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv"
+        m.add_points_from_xy(
+            in_csv, x="longitude", y="latitude", layer_name="World Cities"
+        )
+        out_str = m.to_html()
+        assert "World Cities" in out_str
+           
 
     def test_basemap_demo(self):
         """Check basemap demo"""
