@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.8.0 - Feb 25, 2022
+
+**New Features**:
+
+-   Added STAC search and visualization GUI [#181](https://github.com/giswqs/leafmap/issues/181)
+-   Added support for STAC MosaicJSON [#206](https://github.com/giswqs/leafmap/issues/206)
+-   Added encoding param for reading vector [#208](https://github.com/giswqs/leafmap/pull/208)
+
+**Improvement**
+
+-   Use getattr instead of eval [#207](https://github.com/giswqs/leafmap/pull/207)
+
 ## v0.7.8 - Feb 22, 2022
 
 **New Features**:
