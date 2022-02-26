@@ -990,9 +990,10 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
 
     if "rescale" not in kwargs:
         stats = cog_stats(url, titiler_endpoint)
-        percentile_2 = min([stats[s]["percentile_2"] for s in stats])
-        percentile_98 = max([stats[s]["percentile_98"] for s in stats])
-        kwargs["rescale"] = f"{percentile_2},{percentile_98}"
+        if 'message' not in stats:
+            percentile_2 = min([stats[s]["percentile_2"] for s in stats])
+            percentile_98 = max([stats[s]["percentile_98"] for s in stats])
+            kwargs["rescale"] = f"{percentile_2},{percentile_98}"
 
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
