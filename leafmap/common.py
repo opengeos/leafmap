@@ -4998,3 +4998,94 @@ def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
         raise ValueError("titiler_endpoint must be a string.")
 
     return r
+
+
+def view_lidar(filename, cmap="terrain", backend="pyvista", **kwargs):
+    """View LiDAR data in 3D.
+
+    Args:
+        filename (str): The filepath to the LiDAR data.
+        cmap (str, optional): The colormap to use. Defaults to "terrain". cmap currently does not work for the open3d backend.
+        backend (str, optional): The plotting backend to use, can be pyvista or open3d. Defaults to "pyvista".
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        ValueError: If the backend is not supported.
+    """
+    import warnings
+
+    warnings.filterwarnings("ignore")
+    filename = os.path.abspath(filename)
+    if not os.path.exists(filename):
+        raise FileNotFoundError(f"{filename} does not exist.")
+
+    backend = backend.lower()
+    if backend == "pyvista":
+
+        try:
+            import ipyvtklink
+            import pyvista
+            import pyntcloud
+        except ImportError:
+            print(
+                "The pyvista and pyntcloud packages are required for this function. Use pip install leafmap[lidar] to install them."
+            )
+            return
+
+        try:
+            data = pyntcloud.PyntCloud.from_file(filename)
+            mesh = data.to_instance("pyvista", mesh=False)
+            mesh = mesh.elevation()
+            mesh.plot(scalars='Elevation', cmap=cmap, **kwargs)
+
+        except Exception as e:
+            print("Something went wrong.")
+            print(e)
+            return
+
+    elif backend == "open3d":
+        try:
+            import laspy
+            import open3d as o3d
+            import numpy as np
+        except ImportError:
+            print(
+                "The laspy and open3d packages are required for this function. Use pip install laspy open3d to install them."
+            )
+            return
+
+        try:
+            las = laspy.read(filename)
+            point_data = np.stack([las.X, las.Y, las.Z], axis=0).transpose((1, 0))
+            geom = o3d.geometry.PointCloud()
+            geom.points = o3d.utility.Vector3dVector(point_data)
+            # geom.colors =  o3d.utility.Vector3dVector(colors)  # need to add colors. A list in the form of [[r,g,b], [r,g,b]] with value range 0-1. https://github.com/isl-org/Open3D/issues/614
+            o3d.visualization.draw_geometries([geom], **kwargs)
+
+        except Exception as e:
+            print("Something went wrong.")
+            print(e)
+            return
+
+    else:
+        raise ValueError(f"{backend} is not a valid backend.")
+
+
+def read_lidar(filename, **kwargs):
+    """Read a LAS file.
+
+    Args:
+        filename (str): Path to a LAS file.
+
+    Returns:
+        LasData: The LasData object return by laspy.read.
+    """
+    try:
+        import laspy
+    except ImportError:
+        print(
+            "The laspy package is required for this function. Use pip install laspy to install it."
+        )
+        return
+
+    return laspy.read(filename, **kwargs)
