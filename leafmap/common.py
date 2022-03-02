@@ -985,7 +985,7 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
             raise ValueError("Bands must be a list of integers or strings.")
 
     if "palette" in kwargs:
-        kwargs["colormap_name"] = kwargs["palette"]
+        kwargs["colormap_name"] = kwargs["palette"].lower()
         del kwargs["palette"]
 
     if "rescale" not in kwargs:
@@ -1333,7 +1333,7 @@ def stac_tile(
         kwargs["item"] = item
 
     if "palette" in kwargs:
-        kwargs["colormap_name"] = kwargs["palette"]
+        kwargs["colormap_name"] = kwargs["palette"].lower()
         del kwargs["palette"]
 
     if isinstance(bands, list) and len(set(bands)) == 1:
