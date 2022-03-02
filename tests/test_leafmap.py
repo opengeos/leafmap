@@ -366,8 +366,10 @@ class TestLeafmap(unittest.TestCase):
     def test_add_circle_markers_from_xy(self):
         """Check adding xy circle marker data"""
         m = leafmap.Map()
-        in_csv = "https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv"
-        
+        in_csv = (
+            "https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv"
+        )
+
         m.add_circle_markers_from_xy(
             in_csv, x="longitude", y="latitude", name="World Cities"
         )
