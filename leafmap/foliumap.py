@@ -1731,13 +1731,7 @@ class Map(folium.Map):
                 html = ""
                 for p in tooltip:
                     html = (
-                        html
-                        + "<b>"
-                        + p
-                        + "</b>"
-                        + ": "
-                        + str(getattr(row, p))
-                        + "<br>"
+                        html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
                     )
 
                 tooltip_str = folium.Tooltip(html)
