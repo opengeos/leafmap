@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.8.1 - Mar 2, 2022
+
+**New Features**:
+
+-   Added support for visualizing LiDAR data in 3D [#212](https://github.com/giswqs/leafmap/issues/212)
+-   Added support for downloading Googld Drive folder [#212](https://github.com/giswqs/leafmap/issues/212)
+
+**Improvement**
+
+-   Improved COG STAC palette
+-   Fixed getattr bug [#207](https://github.com/giswqs/leafmap/pull/207)
+
 ## v0.8.0 - Feb 25, 2022
 
 **New Features**:
