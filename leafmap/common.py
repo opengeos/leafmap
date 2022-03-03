@@ -5089,3 +5089,88 @@ def read_lidar(filename, **kwargs):
         return
 
     return laspy.read(filename, **kwargs)
+
+
+def download_file(
+    url=None,
+    output=None,
+    quiet=False,
+    proxy=None,
+    speed=None,
+    use_cookies=True,
+    verify=True,
+    id=None,
+    fuzzy=False,
+    resume=False,
+    unzip=True,
+):
+    """Download a file from URL, including Google Drive shared URL.
+
+    Args:
+        url (str, optional): Google Drive URL is also supported. Defaults to None.
+        output (str, optional): Output filename. Default is basename of URL.
+        quiet (bool, optional): Suppress terminal output. Default is False.
+        proxy (str, optional): Proxy. Defaults to None.
+        speed (float, optional): Download byte size per second (e.g., 256KB/s = 256 * 1024). Defaults to None.
+        use_cookies (bool, optional): Flag to use cookies. Defaults to True.
+        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string, in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
+        id (str, optional): Google Drive's file ID. Defaults to None.
+        fuzzy (bool, optional): Fuzzy extraction of Google Drive's file Id. Defaults to False.
+        resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
+        unzip (bool, optional): Unzip the file. Defaults to True.
+
+    Returns:
+        str: The output file path.
+    """
+
+    import gdown
+
+    if 'https://drive.google.com/file/d/' in url:
+        fuzzy = True
+
+    output = gdown.download(
+        url, output, quiet, proxy, speed, use_cookies, verify, id, fuzzy, resume
+    )
+
+    if unzip and output.endswith(".zip"):
+        import zipfile
+
+        with zipfile.ZipFile(output, "r") as zip_ref:
+            if not quiet:
+                print("Extracting files...")
+            zip_ref.extractall(os.path.dirname(output))
+
+    return os.path.abspath(output)
+
+
+def download_folder(
+    url=None,
+    id=None,
+    output=None,
+    quiet=False,
+    proxy=None,
+    speed=None,
+    use_cookies=True,
+    remaining_ok=False,
+):
+    """Downloads the entire folder from URL.
+
+    Args:
+        url (str, optional): URL of the Google Drive folder. Must be of the format 'https://drive.google.com/drive/folders/{url}'. Defaults to None.
+        id (str, optional): Google Drive's folder ID. Defaults to None.
+        output (str, optional):  String containing the path of the output folder. Defaults to current working directory.
+        quiet (bool, optional): Suppress terminal output. Defaults to False.
+        proxy (str, optional): Proxy. Defaults to None.
+        speed (float, optional): Download byte size per second (e.g., 256KB/s = 256 * 1024). Defaults to None.
+        use_cookies (bool, optional): Flag to use cookies. Defaults to True.
+        resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
+
+    Returns:
+        list: List of files downloaded, or None if failed.
+    """
+    import gdown
+
+    files = gdown.download_folder(
+        url, id, output, quiet, proxy, speed, use_cookies, remaining_ok
+    )
+    return files
