@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.2 - Mar 2, 2022
+
+**Improvement**
+
+-   Added missing requirements.txt to MANIFEST
+
 ## v0.8.1 - Mar 2, 2022
 
 **New Features**:
