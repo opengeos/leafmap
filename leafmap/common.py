@@ -5000,7 +5000,7 @@ def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
     return r
 
 
-def view_lidar(filename, cmap="terrain", backend="pyvista", background=None, **kwargs):
+def view_lidar(filename, cmap="terrain", backend="pyvista", background=None, eye_dome_lighting=False, **kwargs):
     """View LiDAR data in 3D.
 
     Args:
@@ -5008,6 +5008,7 @@ def view_lidar(filename, cmap="terrain", backend="pyvista", background=None, **k
         cmap (str, optional): The colormap to use. Defaults to "terrain". cmap currently does not work for the open3d backend.
         backend (str, optional): The plotting backend to use, can be pyvista, ipygany, panel, and open3d. Defaults to "pyvista".
         background (str, optional): The background color to use. Defaults to None.
+        eye_dome_lighting (bool, optional): Whether to use eye dome lighting. Defaults to False.
 
     Raises:
         FileNotFoundError: If the file does not exist.
@@ -5044,6 +5045,7 @@ def view_lidar(filename, cmap="terrain", backend="pyvista", background=None, **k
                 cmap=cmap,
                 jupyter_backend=backend,
                 background=background,
+                eye_dome_lighting=eye_dome_lighting,
                 **kwargs,
             )
 
