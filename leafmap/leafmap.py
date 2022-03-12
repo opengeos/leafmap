@@ -1022,10 +1022,49 @@ class Map(ipyleaflet.Map):
         try:
             if left_layer in leafmap_basemaps.keys():
                 left_layer = leafmap_basemaps[left_layer]
+            elif isinstance(left_layer, str):
+                if left_layer.startswith("http") and left_layer.endswith(".tif"):
+                    url = cog_tile(left_layer)
+                    left_layer = ipyleaflet.TileLayer(
+                        url=url,
+                        name="Left Layer",
+                        attribution=" ",
+                    )
+                else:
+                    left_layer = ipyleaflet.TileLayer(
+                        url=left_layer,
+                        name="Left Layer",
+                        attribution=" ",
+                    )
+            elif isinstance(left_layer, ipyleaflet.TileLayer):
+                pass
+            else:
+                raise ValueError(
+                    f"left_layer must be one of the following: {', '.join(leafmap_basemaps.keys())} or a string url to a tif file."
+                )
 
             if right_layer in leafmap_basemaps.keys():
                 right_layer = leafmap_basemaps[right_layer]
-
+            elif isinstance(right_layer, str):
+                if right_layer.startswith("http") and right_layer.endswith(".tif"):
+                    url = cog_tile(right_layer)
+                    right_layer = ipyleaflet.TileLayer(
+                        url=url,
+                        name="Right Layer",
+                        attribution=" ",
+                    )
+                else:
+                    right_layer = ipyleaflet.TileLayer(
+                        url=right_layer,
+                        name="Right Layer",
+                        attribution=" ",
+                    )
+            elif isinstance(right_layer, ipyleaflet.TileLayer):
+                pass
+            else:
+                raise ValueError(
+                    f"right_layer must be one of the following: {', '.join(leafmap_basemaps.keys())} or a string url to a tif file."
+                )
             control = ipyleaflet.SplitMapControl(
                 left_layer=left_layer, right_layer=right_layer
             )

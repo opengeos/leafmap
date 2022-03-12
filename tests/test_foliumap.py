@@ -432,14 +432,6 @@ class TestFoliumap(unittest.TestCase):
         with self.assertRaises(AttributeError):
             m.center
 
-    def test_split_map(self):
-        """Check split-panel map"""
-        with self.assertRaises(NotImplementedError):
-            m = leafmap.Map()
-            m.split_map(left_layer="HYBRID", right_layer="OpenStreetMap")
-            out_str = m.to_html()
-            assert "OpenStreetMap" in out_str
-
     def test_to_html(self):
         """Check map to html"""
         m = leafmap.Map()
