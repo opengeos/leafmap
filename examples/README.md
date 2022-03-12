@@ -62,7 +62,8 @@
 45. Creating vector data interactively without coding ([notebook](https://leafmap.org/notebooks/45_create_vector))
 46. Editing existing vector data interactively without coding ([notebook](https://leafmap.org/notebooks/46_edit_vector))
 47. Converting numpy array to COG ([notebook](https://leafmap.org/notebooks/47_numpy_to_cog))
-48. Visualizing LiDAR data in 3D with only one line of code ([notebook](https://leafmap.org/notebooks/47_lidar))
+48. Visualizing LiDAR data in 3D with only one line of code ([notebook](https://leafmap.org/notebooks/48_lidar))
+49. Creating a split-panel map with folium ([notebook](https://leafmap.org/notebooks/49_split_control))
 
 ## Demo
 
