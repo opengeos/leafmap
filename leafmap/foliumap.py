@@ -7,6 +7,10 @@ from .legends import builtin_legends
 from .basemaps import xyz_to_folium
 from .osm import *
 
+from branca.element import Figure, JavascriptLink
+from folium.map import Layer
+from jinja2 import Template
+
 folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
 
 
@@ -51,7 +55,11 @@ class Map(folium.Map):
         if "height" in kwargs and isinstance(kwargs["height"], str):
             kwargs["height"] = float(kwargs["height"].replace("px", ""))
 
-        if "width" in kwargs and isinstance(kwargs["width"], str):
+        if (
+            "width" in kwargs
+            and isinstance(kwargs["width"], str)
+            and ('%' not in kwargs["width"])
+        ):
             kwargs["width"] = float(kwargs["width"].replace("px", ""))
 
         height = None
@@ -62,6 +70,8 @@ class Map(folium.Map):
 
         if "width" in kwargs:
             width = kwargs.pop("width")
+        else:
+            width = '100%'
 
         super().__init__(**kwargs)
         self.baseclass = "folium"
@@ -86,7 +96,7 @@ class Map(folium.Map):
             plugins.MeasureControl(position="bottomleft").add_to(self)
 
         if "latlon_control" not in kwargs:
-            kwargs["latlon_control"] = True
+            kwargs["latlon_control"] = False
         if kwargs["latlon_control"]:
             folium.LatLngPopup().add_to(self)
 
@@ -1831,6 +1841,79 @@ class Map(folium.Map):
 
         layer_group.add_to(self)
 
+    def split_map(self, left_layer="TERRAIN", right_layer="OpenTopoMap", **kwargs):
+        """Adds a split-panel map.
+
+        Args:
+            left_layer (str, optional): The layer tile layer. Defaults to 'TERRAIN'.
+            right_layer (str, optional): The right tile layer. Defaults to 'OpenTopoMap'.
+        """
+        try:
+            if left_layer in folium_basemaps.keys():
+                left_layer = folium_basemaps[left_layer]
+            elif isinstance(left_layer, str):
+                if left_layer.startswith("http") and left_layer.endswith(".tif"):
+                    url = cog_tile(left_layer)
+                    left_layer = folium.raster_layers.TileLayer(
+                        tiles=url,
+                        name="Left Layer",
+                        attr=" ",
+                        overlay=True,
+                    )
+                else:
+                    left_layer = folium.raster_layers.TileLayer(
+                        tiles=left_layer,
+                        name="Left Layer",
+                        attr=" ",
+                        overlay=True,
+                    )
+            elif isinstance(left_layer, folium.raster_layers.TileLayer) or isinstance(
+                left_layer, folium.WmsTileLayer
+            ):
+                pass
+            else:
+                raise ValueError(
+                    f"left_layer must be one of the following: {', '.join(folium_basemaps.keys())} or a string url to a tif file."
+                )
+
+            if right_layer in folium_basemaps.keys():
+                right_layer = folium_basemaps[right_layer]
+            elif isinstance(right_layer, str):
+                if right_layer.startswith("http") and right_layer.endswith(".tif"):
+                    url = cog_tile(right_layer)
+                    right_layer = folium.raster_layers.TileLayer(
+                        tiles=url,
+                        name="Right Layer",
+                        attr=" ",
+                        overlay=True,
+                    )
+                else:
+                    right_layer = folium.raster_layers.TileLayer(
+                        tiles=right_layer,
+                        name="Right Layer",
+                        attr=" ",
+                        overlay=True,
+                    )
+            elif isinstance(right_layer, folium.raster_layers.TileLayer) or isinstance(
+                left_layer, folium.WmsTileLayer
+            ):
+                pass
+            else:
+                raise ValueError(
+                    f"right_layer must be one of the following: {', '.join(folium_basemaps.keys())} or a string url to a tif file."
+                )
+
+            control = SplitControl(
+                layer_left=left_layer, layer_right=right_layer, name='Split Control'
+            )
+            left_layer.add_to(self)
+            right_layer.add_to(self)
+            control.add_to(self)
+
+        except Exception as e:
+            print("The provided layers are invalid!")
+            raise ValueError(e)
+
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
         print("The folium plotting backend does not support removing labels.")
@@ -1949,12 +2032,6 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def split_map(self, left_layer="HYBRID", right_layer="OpenStreetMap"):
-        """Adds split map."""
-        raise NotImplementedError(
-            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
-        )
-
     def to_image(self, outfile=None, monitor=1):
         """Saves the map as a PNG or JPG image."""
         raise NotImplementedError(
@@ -1995,6 +2072,68 @@ class Map(folium.Map):
             data (dict | str): The data to edit. It can be a GeoJSON dictionary or a file path.
         """
         print("The folium plotting backend does not support this function.")
+
+
+class SplitControl(Layer):
+    """
+    Creates a SplitControl that takes two Layers and adds a sliding control with the leaflet-side-by-side plugin.
+    Uses the Leaflet leaflet-side-by-side plugin https://github.com/digidem/leaflet-side-by-side Parameters.
+    The source code is adapted from https://github.com/python-visualization/folium/pull/1292
+    ----------
+    layer_left: Layer.
+        The left Layer within the side by side control.
+        Must  be created and added to the map before being passed to this class.
+    layer_right: Layer.
+        The left Layer within the side by side control.
+        Must  be created and added to the map before being passed to this class.
+    name : string, default None
+        The name of the Layer, as it will appear in LayerControls.
+    overlay : bool, default True
+        Adds the layer as an optional overlay (True) or the base layer (False).
+    control : bool, default True
+        Whether the Layer will be included in LayerControls.
+    show: bool, default True
+        Whether the layer will be shown on opening (only for overlays).
+    Examples
+    --------
+    >>> sidebyside = SideBySideLayers(layer_left, layer_right)
+    >>> sidebyside.add_to(m)
+    """
+
+    _template = Template(
+        u"""
+        {% macro script(this, kwargs) %}
+            var {{ this.get_name() }} = L.control.sideBySide(
+                {{ this.layer_left.get_name() }}, {{ this.layer_right.get_name() }}
+            ).addTo({{ this._parent.get_name() }});
+        {% endmacro %}
+        """
+    )
+
+    def __init__(
+        self, layer_left, layer_right, name=None, overlay=True, control=True, show=True
+    ):
+        super(SplitControl, self).__init__(
+            name=name, overlay=overlay, control=control, show=show
+        )
+        self._name = 'SplitControl'
+        self.layer_left = layer_left
+        self.layer_right = layer_right
+
+    def render(self, **kwargs):
+        super(SplitControl, self).render()
+
+        figure = self.get_root()
+        assert isinstance(figure, Figure), (
+            'You cannot render this Element ' 'if it is not in a Figure.'
+        )
+
+        figure.header.add_child(
+            JavascriptLink(
+                'https://raw.githack.com/digidem/leaflet-side-by-side/gh-pages/leaflet-side-by-side.js'
+            ),  # noqa
+            name='leaflet.sidebyside',
+        )
 
 
 def delete_dp_report(name):
