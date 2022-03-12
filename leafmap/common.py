@@ -5000,7 +5000,14 @@ def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
     return r
 
 
-def view_lidar(filename, cmap="terrain", backend="pyvista", background=None, eye_dome_lighting=False, **kwargs):
+def view_lidar(
+    filename,
+    cmap="terrain",
+    backend="pyvista",
+    background=None,
+    eye_dome_lighting=False,
+    **kwargs,
+):
     """View LiDAR data in 3D.
 
     Args:
