@@ -70,7 +70,7 @@ class TestFoliumap(unittest.TestCase):
         """Check GeoDataFrame"""
         m = leafmap.Map()
         gdf = gpd.read_file(
-            "https://github.com/giswqs/leafmap/raw/master/examples/data/cable-geo.geojson"
+            "https://github.com/giswqs/leafmap/raw/master/examples/data/cable_geo.geojson"
         )
         m.add_gdf(gdf, layer_name="Cable lines")
         out_str = m.to_html()
@@ -107,7 +107,7 @@ class TestFoliumap(unittest.TestCase):
     def test_add_geojson(self):
         """Check GeoJSON"""
         m = leafmap.Map()
-        in_geojson = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/cable-geo.geojson"
+        in_geojson = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/cable_geo.geojson"
         m.add_geojson(in_geojson, layer_name="Cable lines")
         out_str = m.to_html()
         assert "Cable lines" in out_str
@@ -130,7 +130,7 @@ class TestFoliumap(unittest.TestCase):
     def test_add_kml(self):
         """Check KML"""
         m = leafmap.Map()
-        in_kml = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us-states.kml"
+        in_kml = "https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_states.kml"
         m.add_kml(in_kml, layer_name="US States KML")
         out_str = m.to_html()
         assert "US States KML" in out_str
@@ -477,7 +477,7 @@ class TestFoliumap(unittest.TestCase):
         """Check zoom to GeoDataFrame"""
         m = leafmap.Map()
         gdf = gpd.read_file(
-            "https://github.com/giswqs/leafmap/raw/master/examples/data/cable-geo.geojson"
+            "https://github.com/giswqs/leafmap/raw/master/examples/data/cable_geo.geojson"
         )
         m.zoom_to_gdf(gdf)
         out_str = m.to_html()
