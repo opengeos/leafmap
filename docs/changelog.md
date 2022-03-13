@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.8.3 - Mar 12, 2022
+
+**New Features**:
+
+-   Added split map for folium and streamlit [#218](https://github.com/giswqs/leafmap/pull/218)
+-   Added eye dome lighting for lidar data [#212](https://github.com/giswqs/leafmap/issues/212)
+-   Added ipygany and panel 3D plotting backends for LiDAR data [#212](https://github.com/giswqs/leafmap/issues/212)
+
+**Improvement**
+
+-   Updated binder env
+
 ## v0.8.2 - Mar 2, 2022
 
 **Improvement**
