@@ -30,7 +30,7 @@ m
 
 ```python
 m = leafmap.Map(center=[20, 0], zoom=1)
-lines = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/cable-geo.geojson'
+lines = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/cable_geo.geojson'
 m.add_geojson(lines, layer_name="Cable lines")
 m
 ```
@@ -41,7 +41,7 @@ Add a GeoJSON with US state boundaries to the map.
 
 ```python
 m = leafmap.Map(center=[50, -110], zoom=2)
-polygons = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us-states.json'
+polygons = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_states.json'
 m.add_geojson(polygons, layer_name="Countries")
 m
 ```
