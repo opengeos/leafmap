@@ -16,7 +16,7 @@ class TestCommon(unittest.TestCase):
         """Set up test fixtures, if any."""
 
         self.in_csv = os.path.abspath("examples/data/world_cities.csv")
-        self.in_geojson = os.path.abspath("examples/data/cable-geo.geojson")
+        self.in_geojson = os.path.abspath("examples/data/cable_geo.geojson")
         self.in_shp = os.path.abspath("examples/data/countries.shp")
         self.in_kml = os.path.abspath("examples/data/states.kml")
         self.in_kmz = os.path.abspath("examples/data/states.kmz")
