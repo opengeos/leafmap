@@ -1009,8 +1009,7 @@ class Map(ipyleaflet.Map):
                 popup=popup_html,
                 **kwargs,
             )
-
-            self.add_layer(marker)
+            super().add_layer(marker)
 
     def split_map(self, left_layer="HYBRID", right_layer="OpenStreetMap"):
         """Adds split map.
