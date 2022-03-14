@@ -1410,21 +1410,23 @@ class Map(folium.Map):
 
     def to_streamlit(
         self,
-        width=700,
+        width=1000,
         height=600,
         responsive=True,
         scrolling=False,
         add_layer_control=True,
+        bidirectional=False,
         **kwargs,
     ):
         """Renders `folium.Figure` or `folium.Map` in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
 
         Args:
-            width (int, optional): Width of the map. Defaults to 800.
+            width (int, optional): Width of the map. Defaults to 1000.
             height (int, optional): Height of the map. Defaults to 600.
             responsive (bool, optional): Whether to make the map responsive. Defaults to True.
             scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
             add_layer_control (bool, optional): Whether to add the layer control. Defaults to True.
+            bidirectional (bool, optional): Whether to add bidirectional functionality to the map. The streamlit-folium package is required to use the bidirectional functionality. Defaults to False.
 
         Raises:
             ImportError: If streamlit is not installed.
@@ -1440,19 +1442,97 @@ class Map(folium.Map):
             if add_layer_control:
                 self.add_layer_control()
 
-            if responsive:
-                make_map_responsive = """
-                <style>
-                [title~="st.iframe"] { width: 100%}
-                </style>
-                """
-                st.markdown(make_map_responsive, unsafe_allow_html=True)
-            return components.html(
-                self.to_html(), width=width, height=height, scrolling=scrolling
-            )
+            if bidirectional:
+                from streamlit_folium import st_folium
+
+                output = st_folium(self, width=width, height=height)
+                return output
+            else:
+
+                if responsive:
+                    make_map_responsive = """
+                    <style>
+                    [title~="st.iframe"] { width: 100%}
+                    </style>
+                    """
+                    st.markdown(make_map_responsive, unsafe_allow_html=True)
+                return components.html(
+                    self.to_html(), width=width, height=height, scrolling=scrolling
+                )
 
         except Exception as e:
             raise Exception(e)
+
+    def st_map_center(self, st_component):
+        """Get the center of the map.
+
+        Args:
+            st_folium: The streamlit component.
+
+        Returns:
+            tuple: The center of the map.
+        """
+
+        bounds = st_component['bounds']
+        minx = bounds['_southWest']['lng']
+        miny = bounds['_southWest']['lat']
+        maxx = bounds['_northEast']['lng']
+        maxy = bounds['_northEast']['lat']
+        return (miny + (maxy - miny) / 2, minx + (maxx - minx) / 2)
+
+    def st_map_bounds(self, st_component):
+        """Get the bounds of the map in the format of (miny, minx, maxy, maxx).
+
+        Args:
+            st_folium: The streamlit component.
+
+        Returns:
+            tuple: The bounds of the map.
+        """
+
+        bounds = st_component['bounds']
+        minx = bounds['_southWest']['lng']
+        miny = bounds['_southWest']['lat']
+        maxx = bounds['_northEast']['lng']
+        maxy = bounds['_northEast']['lat']
+        return (miny, minx, maxy, maxx)
+
+    def st_last_draw(self, st_component):
+        """Get the last draw feature of the map.
+
+        Args:
+            st_folium: The streamlit component.
+
+        Returns:
+            str: The last draw of the map.
+        """
+
+        return st_component['last_active_drawing']
+
+    def st_last_click(self, st_component):
+        """Get the last click feature of the map.
+
+        Args:
+            st_folium: The streamlit component.
+
+        Returns:
+            str: The last click of the map.
+        """
+
+        coords = st_component['last_clicked']
+        return (coords['lat'], coords['lng'])
+
+    def st_draw_features(self, st_component):
+        """Get the draw features of the map.
+
+        Args:
+            st_folium: The streamlit component.
+
+        Returns:
+            list: The draw features of the map.
+        """
+
+        return st_component['all_drawings']
 
     def add_title(self, title, align="center", font_size="16px", style=None):
         """Adds a title to the map.
