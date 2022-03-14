@@ -27,6 +27,7 @@ extras_requires = {
     "lidar": ["ipyvtklink", "laspy", "pyntcloud[LAS]", "pyvista"],
     "raster": ["localtileserver", "rio-cogeo", "xarray_leaflet"],
     "sql": ["psycopg2", "sqlalchemy"],
+    "streamlit": ["streamlit-folium"],
     "vector": ["geopandas", "osmnx"],
 }
 
