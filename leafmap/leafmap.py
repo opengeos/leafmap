@@ -2019,7 +2019,7 @@ class Map(ipyleaflet.Map):
         def update_html(feature, **kwargs):
 
             value = [
-                "<h5><b>{}: </b>{}</h5>".format(prop, feature["properties"][prop])
+                "<b>{}: </b>{}<br>".format(prop, feature["properties"][prop])
                 for prop in feature["properties"].keys()
             ][:-1]
 
@@ -2461,6 +2461,12 @@ class Map(ipyleaflet.Map):
         y="latitude",
         popup=None,
         layer_name="Marker Cluster",
+        color_column=None,
+        marker_colors=None,
+        icon_colors=['white'],
+        icon_names=['info'],
+        spin=False,
+        add_legend=True,
         **kwargs,
     ):
         """Adds a marker cluster to the map.
@@ -2471,9 +2477,37 @@ class Map(ipyleaflet.Map):
             y (str, optional): The column name for the y values. Defaults to "latitude".
             popup (list, optional): A list of column names to be used as the popup. Defaults to None.
             layer_name (str, optional): The name of the layer. Defaults to "Marker Cluster".
+            color_column (str, optional): The column name for the color values. Defaults to None.
+            marker_colors (list, optional): A list of colors to be used for the markers. Defaults to None.
+            icon_colors (list, optional): A list of colors to be used for the icons. Defaults to ['white'].
+            icon_names (list, optional): A list of names to be used for the icons. More icons can be found at https://fontawesome.com/v4/icons. Defaults to ['info'].
+            spin (bool, optional): If True, the icon will spin. Defaults to False.
+            add_legend (bool, optional): If True, a legend will be added to the map. Defaults to True.
 
         """
         import pandas as pd
+
+        color_options = [
+            'red',
+            'blue',
+            'green',
+            'purple',
+            'orange',
+            'darkred',
+            'lightred',
+            'beige',
+            'darkblue',
+            'darkgreen',
+            'cadetblue',
+            'darkpurple',
+            'white',
+            'pink',
+            'lightblue',
+            'lightgreen',
+            'gray',
+            'black',
+            'lightgray',
+        ]
 
         if isinstance(data, pd.DataFrame):
             df = data
@@ -2485,6 +2519,49 @@ class Map(ipyleaflet.Map):
         df = points_from_xy(df, x, y)
 
         col_names = df.columns.values.tolist()
+
+        if color_column is not None and color_column not in col_names:
+            raise ValueError(
+                f"The color column {color_column} does not exist in the dataframe."
+            )
+
+        if color_column is not None:
+            items = list(set(df[color_column]))
+
+        else:
+            items = None
+
+        if color_column is not None and marker_colors is None:
+            if len(items) > len(color_options):
+                raise ValueError(
+                    f"The number of unique values in the color column {color_column} is greater than the number of available colors."
+                )
+            else:
+                marker_colors = color_options[: len(items)]
+        elif color_column is not None and marker_colors is not None:
+            if len(items) != len(marker_colors):
+                raise ValueError(
+                    f"The number of unique values in the color column {color_column} is not equal to the number of available colors."
+                )
+            else:
+                marker_colors = marker_colors
+
+        if items is not None:
+
+            if len(icon_colors) == 1:
+                icon_colors = icon_colors * len(items)
+            elif len(items) != len(icon_colors):
+                raise ValueError(
+                    f"The number of unique values in the color column {color_column} is not equal to the number of available colors."
+                )
+
+            if len(icon_names) == 1:
+                icon_names = icon_names * len(items)
+            elif len(items) != len(icon_names):
+                raise ValueError(
+                    f"The number of unique values in the color column {color_column} is not equal to the number of available colors."
+                )
+
         if "geometry" in col_names:
             col_names.remove("geometry")
 
@@ -2510,14 +2587,33 @@ class Map(ipyleaflet.Map):
         if popup is not None:
             if isinstance(popup, str):
                 labels = df[popup]
-                markers = [
-                    ipyleaflet.Marker(
+
+                markers = []
+                for index, point in enumerate(points):
+
+                    if items is not None:
+                        marker_color = marker_colors[
+                            items.index(df[color_column][index])
+                        ]
+                        icon_name = icon_names[items.index(df[color_column][index])]
+                        icon_color = icon_colors[items.index(df[color_column][index])]
+                        marker_icon = ipyleaflet.AwesomeIcon(
+                            name=icon_name,
+                            marker_color=marker_color,
+                            icon_color=icon_color,
+                            spin=spin,
+                        )
+                    else:
+                        marker_icon = None
+
+                    marker = ipyleaflet.Marker(
                         location=point,
                         draggable=False,
                         popup=widgets.HTML(str(labels[index])),
+                        icon=marker_icon,
                     )
-                    for index, point in enumerate(points)
-                ]
+                    markers.append(marker)
+
             elif isinstance(popup, list):
                 labels = []
                 for i in range(len(points)):
@@ -2535,22 +2631,60 @@ class Map(ipyleaflet.Map):
                     labels.append(label)
                 df["popup"] = labels
 
-                markers = [
-                    ipyleaflet.Marker(
+                markers = []
+                for index, point in enumerate(points):
+                    if items is not None:
+                        marker_color = marker_colors[
+                            items.index(df[color_column][index])
+                        ]
+                        icon_name = icon_names[items.index(df[color_column][index])]
+                        icon_color = icon_colors[items.index(df[color_column][index])]
+                        marker_icon = ipyleaflet.AwesomeIcon(
+                            name=icon_name,
+                            marker_color=marker_color,
+                            icon_color=icon_color,
+                            spin=spin,
+                        )
+                    else:
+                        marker_icon = None
+
+                    marker = ipyleaflet.Marker(
                         location=point,
                         draggable=False,
                         popup=widgets.HTML(labels[index]),
+                        icon=marker_icon,
                     )
-                    for index, point in enumerate(points)
-                ]
+                    markers.append(marker)
 
         else:
-            markers = [
-                ipyleaflet.Marker(location=point, draggable=False) for point in points
-            ]
+            markers = []
+            for point in points:
+                if items is not None:
+                    marker_color = marker_colors[items.index(df[color_column][index])]
+                    icon_name = icon_names[items.index(df[color_column][index])]
+                    icon_color = icon_colors[items.index(df[color_column][index])]
+                    marker_icon = ipyleaflet.AwesomeIcon(
+                        name=icon_name,
+                        marker_color=marker_color,
+                        icon_color=icon_color,
+                        spin=spin,
+                    )
+                else:
+                    marker_icon = None
+
+                marker = ipyleaflet.Marker(
+                    location=point, draggable=False, icon=marker_icon
+                )
+                markers.append(marker)
 
         marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
         self.add_layer(marker_cluster)
+
+        if items is not None and add_legend:
+            marker_colors = [check_color(c) for c in marker_colors]
+            self.add_legend(
+                title=color_column.title(), colors=marker_colors, labels=items
+            )
 
         self.default_style = {"cursor": "default"}
 
