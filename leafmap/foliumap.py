@@ -110,6 +110,11 @@ class Map(folium.Map):
         if kwargs["minimap_control"]:
             plugins.MiniMap().add_to(self)
 
+        if "search_control" not in kwargs:
+            kwargs["search_control"] = True
+        if kwargs["search_control"]:
+            plugins.Geocoder(collapsed=True, position='topleft').add_to(self)
+
         if "google_map" not in kwargs:
             pass
         elif kwargs["google_map"] is not None:
