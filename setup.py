@@ -66,6 +66,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/giswqs/leafmap",
-    version="0.8.3",
+    version="0.8.4",
     zip_safe=False,
 )
