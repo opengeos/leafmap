@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.8.4 - Mar 15, 2022
+
+**New Features**:
+
+-   Added streamlit folium bidirectional functionality [#223](https://github.com/giswqs/leafmap/pull/223)
+-   Added marker icon options for marker cluster [#222](https://github.com/giswqs/leafmap/pull/222)
+-   Added folium search control
+
+**Improvement**
+
+-   Renamed data files [#221](https://github.com/giswqs/leafmap/pull/221)
+-   Fixed circle marker bug
+
 ## v0.8.3 - Mar 12, 2022
 
 **New Features**:
