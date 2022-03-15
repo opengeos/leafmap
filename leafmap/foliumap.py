@@ -1474,11 +1474,11 @@ class Map(folium.Map):
         """
 
         bounds = st_component['bounds']
-        minx = bounds['_southWest']['lng']
-        miny = bounds['_southWest']['lat']
-        maxx = bounds['_northEast']['lng']
-        maxy = bounds['_northEast']['lat']
-        return (miny + (maxy - miny) / 2, minx + (maxx - minx) / 2)
+        west = bounds['_southWest']['lng']
+        south = bounds['_southWest']['lat']
+        east = bounds['_northEast']['lng']
+        north = bounds['_northEast']['lat']
+        return (south + (north - south) / 2, west + (east - west) / 2)
 
     def st_map_bounds(self, st_component):
         """Get the bounds of the map in the format of (miny, minx, maxy, maxx).
@@ -1491,11 +1491,32 @@ class Map(folium.Map):
         """
 
         bounds = st_component['bounds']
-        minx = bounds['_southWest']['lng']
-        miny = bounds['_southWest']['lat']
-        maxx = bounds['_northEast']['lng']
-        maxy = bounds['_northEast']['lat']
-        return (miny, minx, maxy, maxx)
+        south = bounds['_southWest']['lat']
+        west = bounds['_southWest']['lng']
+        north = bounds['_northEast']['lat']
+        east = bounds['_northEast']['lng']
+
+        bounds = [[south, west], [north, east]]
+        return bounds
+
+    def st_fit_bounds(self):
+        """Fit the map to the bounds of the map.
+
+        Returns:
+            folium.Map: The map.
+        """
+
+        try:
+            import streamlit as st
+
+            if "map_bounds" in st.session_state:
+
+                bounds = st.session_state['map_bounds']
+
+                self.fit_bounds(bounds)
+
+        except Exception as e:
+            raise Exception(e)
 
     def st_last_draw(self, st_component):
         """Get the last draw feature of the map.
@@ -2382,3 +2403,53 @@ def split_map(
     raise NotImplementedError(
         "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
     )
+
+
+def st_map_center(lat, lon):
+    """Returns the map center coordinates for a given latitude and longitude. If the system variable 'map_center' exists, it is used. Otherwise, the default is returned.
+
+    Args:
+        lat (float): Latitude.
+        lon (float): Longitude.
+
+    Raises:
+        Exception: If streamlit is not installed.
+
+    Returns:
+        list: The map center coordinates.
+    """
+    try:
+        import streamlit as st
+
+        if 'map_center' in st.session_state:
+            return st.session_state['map_center']
+        else:
+            return [lat, lon]
+
+    except Exception as e:
+        raise Exception(e)
+
+
+def st_save_bounds(st_component):
+    """Saves the map bounds to the session state.
+
+    Args:
+        map (folium.folium.Map): The map to save the bounds from.
+    """
+    try:
+        import streamlit as st
+
+        if st_component is not None:
+            bounds = st_component['bounds']
+            south = bounds['_southWest']['lat']
+            west = bounds['_southWest']['lng']
+            north = bounds['_northEast']['lat']
+            east = bounds['_northEast']['lng']
+
+            bounds = [[south, west], [north, east]]
+            center = [south + (north - south) / 2, west + (east - west) / 2]
+
+            st.session_state['map_bounds'] = bounds
+            st.session_state['map_center'] = center
+    except Exception as e:
+        raise Exception(e)
