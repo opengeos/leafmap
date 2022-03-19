@@ -5267,3 +5267,51 @@ def clip_image(image, mask, output):
 
     with rasterio.open(output, "w", **out_meta) as dest:
         dest.write(out_image)
+
+
+def netcdf_to_tif(
+    netcdf_file, output=None, variable=None, shift_lon=True, lat='lat', lon='lon'
+):
+    """Convert a netcdf file to a GeoTIFF file.
+
+    Args:
+        netcdf_file (str): Path to the netcdf file.
+        output (str, optional): Path to the output GeoTIFF file. Defaults to None. If None, the output file will be the same as the input file with the extension changed to .tif.
+        variable (str, optional): Name of the variable to extract. Defaults to None. If None, all variables will be extracted.
+        shift_lon (bool, optional): Flag to shift longitude values from [0, 360] to the range [-180, 180]. Defaults to True.
+        lat (str, optional): Name of the latitude variable. Defaults to 'lat'.
+        lon (str, optional): Name of the longitude variable. Defaults to 'lon'.
+
+    Raises:
+        ImportError: If the xarray or rioxarray package is not installed.
+        FileNotFoundError: If the netcdf file is not found.
+        ValueError: If the variable is not found in the netcdf file.
+    """
+    try:
+        import rioxarray
+        import xarray as xr
+    except ImportError as e:
+        raise ImportError(e)
+
+    if not os.path.exists(netcdf_file):
+        raise FileNotFoundError(f"{netcdf_file} does not exist.")
+
+    if output is None:
+        output = netcdf_file.replace(".nc", ".tif")
+    else:
+        output = check_file_path(output)
+
+    xds = xr.open_dataset(netcdf_file)
+
+    if shift_lon:
+        xds.coords[lon] = (xds.coords[lon] + 180) % 360 - 180
+        xds = xds.sortby(xds.lon)
+
+    allowed_vars = list(xds.data_vars.keys())
+    if variable is not None and (variable not in allowed_vars):
+        raise ValueError(f"{variable} must be one of {', '.join(allowed_vars)}.")
+
+    if variable is None:
+        xds.rio.set_spatial_dims(x_dim=lon, y_dim=lat).rio.to_raster(output)
+    else:
+        xds[variable].rio.set_spatial_dims(x_dim=lon, y_dim=lat).rio.to_raster(output)
