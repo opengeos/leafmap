@@ -65,6 +65,7 @@
 48. Visualizing LiDAR data in 3D with only one line of code ([notebook](https://leafmap.org/notebooks/48_lidar))
 49. Creating a split-panel map with folium ([notebook](https://leafmap.org/notebooks/49_split_control))
 50. Creating a marker cluster with custom icons ([notebook](https://leafmap.org/notebooks/50_marker_cluster))
+51. Clipping an image by mask ([notebook](https://leafmap.org/notebooks/51_clip_image))
 
 ## Demo
 
