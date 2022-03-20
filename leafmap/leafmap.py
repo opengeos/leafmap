@@ -3171,6 +3171,67 @@ class Map(ipyleaflet.Map):
         self.draw_control.data = self.draw_control.data + (geojson["features"])
         self.draw_features = self.draw_features + (geojson["features"])
 
+    def add_velocity(
+        self,
+        data,
+        zonal_speed,
+        meridional_speed,
+        latitude_dimension='lat',
+        longitude_dimension='lon',
+        velocity_scale=0.01,
+        max_velocity=20,
+        display_options={},
+        name='Velocity',
+    ):
+        """Add a velocity layer to the map.
+
+        Args:
+            data (str | xr.Dataset): The data to use for the velocity layer. It can be a file path to a NetCDF file or an xarray Dataset.
+            zonal_speed (str): Name of the zonal speed in the dataset. See https://en.wikipedia.org/wiki/Zonal_and_meridional_flow.
+            meridional_speed (str): Name of the meridional speed in the dataset. See https://en.wikipedia.org/wiki/Zonal_and_meridional_flow.
+            latitude_dimension (str, optional): Name of the latitude dimension in the dataset. Defaults to 'lat'.
+            longitude_dimension (str, optional): Name of the longitude dimension in the dataset. Defaults to 'lon'.
+            velocity_scale (float, optional): The scale of the velocity. Defaults to 0.01.
+            max_velocity (int, optional): The maximum velocity to display. Defaults to 20.
+            display_options (dict, optional): The display options for the velocity layer. Defaults to {}. See https://bit.ly/3uf8t6w.
+            name (str, optional): Layer name to use . Defaults to 'Velocity'.
+
+        Raises:
+            ImportError: If the xarray package is not installed.
+            ValueError: If the data is not a NetCDF file or an xarray Dataset.
+        """
+        try:
+            import xarray as xr
+            from ipyleaflet.velocity import Velocity
+        except ImportError:
+            raise ImportError(
+                "The xarray package is required to add a velocity layer. "
+                "Please install it with `pip install xarray`."
+            )
+
+        if isinstance(data, str):
+            if data.startswith("http"):
+                data = download_file(data)
+            ds = xr.open_dataset(data)
+
+        elif isinstance(data, xr.Dataset):
+            ds = data
+        else:
+            raise ValueError("The data must be a file path or xarray dataset.")
+
+        wind = Velocity(
+            data=ds,
+            zonal_speed=zonal_speed,
+            meridional_speed=meridional_speed,
+            latitude_dimension=latitude_dimension,
+            longitude_dimension=longitude_dimension,
+            velocity_scale=velocity_scale,
+            max_velocity=max_velocity,
+            display_options=display_options,
+            name=name,
+        )
+        self.add_layer(wind)
+
 
 # The functions below are outside the Map class.
 
