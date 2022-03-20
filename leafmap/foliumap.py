@@ -2340,6 +2340,21 @@ class Map(folium.Map):
         """
         print("The folium plotting backend does not support this function.")
 
+    def add_velocity(
+        self,
+        data,
+        zonal_speed,
+        meridional_speed,
+        latitude_dimension='lat',
+        longitude_dimension='lon',
+        velocity_scale=0.01,
+        max_velocity=20,
+        display_options={},
+        name='Velocity',
+    ):
+
+        print(f"The folium plotting backend does not support this function.")
+
 
 class SplitControl(Layer):
     """
