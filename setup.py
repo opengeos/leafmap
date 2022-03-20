@@ -24,7 +24,7 @@ dependency_links = [x.strip().replace("git+", "") for x in all_reqs if "git+" no
 extras_requires = {
     "all": dev_reqs,
     "backends": ["keplergl", "pydeck"],
-    "lidar": ["ipyvtklink", "laspy", "pyntcloud[LAS]", "pyvista"],
+    "lidar": ["ipygany", "ipyvtklink", "laspy", "panel", "pyntcloud[LAS]", "pyvista"],
     "raster": [
         "localtileserver",
         "rio-cogeo",
@@ -72,6 +72,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/giswqs/leafmap",
-    version="0.8.4",
+    version="0.8.5",
     zip_safe=False,
 )
