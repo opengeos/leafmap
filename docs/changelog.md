@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.8.5 - Mar 19, 2022
+
+**New Features**:
+
+-   Added support for NetCDF data [#127](https://github.com/giswqs/leafmap/issues/127) [#226](https://github.com/giswqs/leafmap/pull/226)
+-   Converting NetCDF to GeoTIFF
+-   Adding velocity map
+-   Added clip_image function [#108](https://github.com/giswqs/leafmap/issues/108) [#225](https://github.com/giswqs/leafmap/pull/225)
+
+**Improvement**
+
+-   Added optional dependencies (netcdf4 and rioxarray) to setup.py
+
 ## v0.8.4 - Mar 15, 2022
 
 **New Features**:
