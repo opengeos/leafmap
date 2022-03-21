@@ -11,7 +11,7 @@ from branca.element import Figure, JavascriptLink
 from folium.map import Layer
 from jinja2 import Template
 
-folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
+basemaps = Box(xyz_to_folium(), frozen_box=True)
 
 
 class Map(folium.Map):
@@ -119,18 +119,18 @@ class Map(folium.Map):
             pass
         elif kwargs["google_map"] is not None:
             if kwargs["google_map"].upper() == "ROADMAP":
-                layer = folium_basemaps["ROADMAP"]
+                layer = basemaps["ROADMAP"]
             elif kwargs["google_map"].upper() == "HYBRID":
-                layer = folium_basemaps["HYBRID"]
+                layer = basemaps["HYBRID"]
             elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = folium_basemaps["TERRAIN"]
+                layer = basemaps["TERRAIN"]
             elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = folium_basemaps["SATELLITE"]
+                layer = basemaps["SATELLITE"]
             else:
                 print(
                     f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
                 )
-                layer = folium_basemaps["ROADMAP"]
+                layer = basemaps["ROADMAP"]
             layer.add_to(self)
 
         if "layers_control" not in kwargs:
@@ -218,18 +218,18 @@ class Map(folium.Map):
                 )
 
                 self.add_layer(layer)
-            elif basemap in folium_basemaps:
-                folium_basemaps[basemap].add_to(self)
+            elif basemap in basemaps:
+                basemaps[basemap].add_to(self)
             else:
                 print(
                     "Basemap can only be one of the following: {}".format(
-                        ", ".join(folium_basemaps.keys())
+                        ", ".join(basemaps.keys())
                     )
                 )
         except Exception:
             raise Exception(
                 "Basemap can only be one of the following: {}".format(
-                    ", ".join(folium_basemaps.keys())
+                    ", ".join(basemaps.keys())
                 )
             )
 
@@ -2116,8 +2116,8 @@ class Map(folium.Map):
             right_layer (str, optional): The right tile layer. Defaults to 'OpenTopoMap'.
         """
         try:
-            if left_layer in folium_basemaps.keys():
-                left_layer = folium_basemaps[left_layer]
+            if left_layer in basemaps.keys():
+                left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer)
@@ -2140,11 +2140,11 @@ class Map(folium.Map):
                 pass
             else:
                 raise ValueError(
-                    f"left_layer must be one of the following: {', '.join(folium_basemaps.keys())} or a string url to a tif file."
+                    f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
-            if right_layer in folium_basemaps.keys():
-                right_layer = folium_basemaps[right_layer]
+            if right_layer in basemaps.keys():
+                right_layer = basemaps[right_layer]
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(right_layer)
@@ -2167,7 +2167,7 @@ class Map(folium.Map):
                 pass
             else:
                 raise ValueError(
-                    f"right_layer must be one of the following: {', '.join(folium_basemaps.keys())} or a string url to a tif file."
+                    f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
             control = SplitControl(
