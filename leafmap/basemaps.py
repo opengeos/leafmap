@@ -528,14 +528,3 @@ def qms_to_leafmap(service_id):
 
     layer = ipyleaflet.TileLayer(url=url, name=name, attribution=attribution)
     return layer
-
-
-# leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
-# folium_basemaps = Box(xyz_to_folium(), frozen_box=True)
-# here_basemaps = Box(xyz_to_heremap(), frozen_box=True)
-# try:
-#     import pydeck
-
-#     pydeck_basemaps = Box(xyz_to_pydeck(), frozen_box=True)
-# except ImportError:
-#     pass

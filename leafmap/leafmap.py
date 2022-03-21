@@ -10,7 +10,7 @@ from .legends import builtin_legends
 from .osm import *
 from .pc import *
 
-leafmap_basemaps = Box(xyz_to_leaflet(), frozen_box=True)
+basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 
 class Map(ipyleaflet.Map):
@@ -166,18 +166,18 @@ class Map(ipyleaflet.Map):
             pass
         elif kwargs["google_map"] is not None:
             if kwargs["google_map"].upper() == "ROADMAP":
-                layer = leafmap_basemaps["ROADMAP"]
+                layer = basemaps["ROADMAP"]
             elif kwargs["google_map"].upper() == "HYBRID":
-                layer = leafmap_basemaps["HYBRID"]
+                layer = basemaps["HYBRID"]
             elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = leafmap_basemaps["TERRAIN"]
+                layer = basemaps["TERRAIN"]
             elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = leafmap_basemaps["SATELLITE"]
+                layer = basemaps["SATELLITE"]
             else:
                 print(
                     f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
                 )
-                layer = leafmap_basemaps["ROADMAP"]
+                layer = basemaps["ROADMAP"]
             self.add_layer(layer)
 
         if "toolbar_control" not in kwargs:
@@ -267,7 +267,7 @@ class Map(ipyleaflet.Map):
         """Adds a basemap to the map.
 
         Args:
-            basemap (str, optional): Can be one of string from leafmap_basemaps. Defaults to 'HYBRID'.
+            basemap (str, optional): Can be one of string from basemaps. Defaults to 'HYBRID'.
         """
         import xyzservices
 
@@ -285,27 +285,21 @@ class Map(ipyleaflet.Map):
                     url=url, name=name, max_zoom=max_zoom, attribution=attribution
                 )
                 self.add_layer(layer)
-            elif (
-                basemap in leafmap_basemaps
-                and leafmap_basemaps[basemap].name not in layer_names
-            ):
-                self.add_layer(leafmap_basemaps[basemap])
-            elif (
-                basemap in leafmap_basemaps
-                and leafmap_basemaps[basemap].name in layer_names
-            ):
+            elif basemap in basemaps and basemaps[basemap].name not in layer_names:
+                self.add_layer(basemaps[basemap])
+            elif basemap in basemaps and basemaps[basemap].name in layer_names:
                 print(f"{basemap} has been already added before.")
             else:
                 print(
                     "Basemap can only be one of the following:\n  {}".format(
-                        "\n  ".join(leafmap_basemaps.keys())
+                        "\n  ".join(basemaps.keys())
                     )
                 )
 
         except Exception:
             raise ValueError(
                 "Basemap can only be one of the following:\n  {}".format(
-                    "\n  ".join(leafmap_basemaps.keys())
+                    "\n  ".join(basemaps.keys())
                 )
             )
 
@@ -912,7 +906,7 @@ class Map(ipyleaflet.Map):
             attribution_control=False,
             zoom=zoom,
             center=self.center,
-            layers=[leafmap_basemaps["ROADMAP"]],
+            layers=[basemaps["ROADMAP"]],
         )
         minimap.layout.width = "150px"
         minimap.layout.height = "150px"
@@ -1019,8 +1013,8 @@ class Map(ipyleaflet.Map):
             right_layer (str, optional): The right tile layer. Defaults to 'OpenStreetMap'.
         """
         try:
-            if left_layer in leafmap_basemaps.keys():
-                left_layer = leafmap_basemaps[left_layer]
+            if left_layer in basemaps.keys():
+                left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer)
@@ -1039,11 +1033,11 @@ class Map(ipyleaflet.Map):
                 pass
             else:
                 raise ValueError(
-                    f"left_layer must be one of the following: {', '.join(leafmap_basemaps.keys())} or a string url to a tif file."
+                    f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
-            if right_layer in leafmap_basemaps.keys():
-                right_layer = leafmap_basemaps[right_layer]
+            if right_layer in basemaps.keys():
+                right_layer = basemaps[right_layer]
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(right_layer)
@@ -1062,7 +1056,7 @@ class Map(ipyleaflet.Map):
                 pass
             else:
                 raise ValueError(
-                    f"right_layer must be one of the following: {', '.join(leafmap_basemaps.keys())} or a string url to a tif file."
+                    f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
             control = ipyleaflet.SplitMapControl(
                 left_layer=left_layer, right_layer=right_layer
@@ -1076,7 +1070,7 @@ class Map(ipyleaflet.Map):
     def basemap_demo(self):
         """A demo for using leafmap basemaps."""
         dropdown = widgets.Dropdown(
-            options=list(leafmap_basemaps.keys()),
+            options=list(basemaps.keys()),
             value="HYBRID",
             description="Basemaps",
         )
@@ -1084,7 +1078,7 @@ class Map(ipyleaflet.Map):
         def on_click(change):
             basemap_name = change["new"]
             old_basemap = self.layers[-1]
-            self.substitute_layer(old_basemap, leafmap_basemaps[basemap_name])
+            self.substitute_layer(old_basemap, basemaps[basemap_name])
 
         dropdown.observe(on_click, "value")
         basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
@@ -3353,8 +3347,8 @@ def linked_maps(
                 **kwargs,
             )
 
-            if layers[index] in leafmap_basemaps:
-                # m.add_layer(leafmap_basemaps[layers[index]])
+            if layers[index] in basemaps:
+                # m.add_layer(basemaps[layers[index]])
                 m.add_basemap(layers[index])
             else:
                 try:
@@ -3395,8 +3389,8 @@ def split_map(
     """Creates a split-panel map.
 
     Args:
-        left_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.leafmap_basemaps.keys()) or an ipyleaflet Layer instance. Defaults to "ROADMAP".
-        right_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.leafmap_basemaps.keys()) or an ipyleaflet Layer instance. . Defaults to "HYBRID".
+        left_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemaps.keys()) or an ipyleaflet Layer instance. Defaults to "ROADMAP".
+        right_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemaps.keys()) or an ipyleaflet Layer instance. . Defaults to "HYBRID".
         left_label (str, optional): A label for the left layer to be shown on the map. Defaults to None.
         right_label (str, optional): A label for the right layer to be shown on the map. . Defaults to None.
         label_position (str, optional): Position of the labels, can be either "top" or "bottom". Defaults to "bottom".
@@ -3418,10 +3412,10 @@ def split_map(
     if "scale_control" not in kwargs:
         kwargs["scale_control"] = False
 
-    if left_layer in leafmap_basemaps:
-        left_layer = leafmap_basemaps[left_layer]
-    if right_layer in leafmap_basemaps:
-        right_layer = leafmap_basemaps[right_layer]
+    if left_layer in basemaps:
+        left_layer = basemaps[left_layer]
+    if right_layer in basemaps:
+        right_layer = basemaps[right_layer]
 
     m = Map(**kwargs)
 
@@ -3504,12 +3498,12 @@ def ts_inspector(
 
     if layers_dict is None:
         layers_dict = {}
-        keys = dict(leafmap_basemaps).keys()
+        keys = dict(basemaps).keys()
         for key in keys:
-            if isinstance(leafmap_basemaps[key], ipyleaflet.WMSLayer):
+            if isinstance(basemaps[key], ipyleaflet.WMSLayer):
                 pass
             else:
-                layers_dict[key] = leafmap_basemaps[key]
+                layers_dict[key] = basemaps[key]
 
     keys = list(layers_dict.keys())
     if left_name is None:
