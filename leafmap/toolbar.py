@@ -1521,21 +1521,21 @@ def change_basemap(m):
         m (object): leafmap.Map.
     """
     from .basemaps import get_xyz_dict
-    from .leafmap import leafmap_basemaps
+    from .leafmap import basemaps
 
     xyz_dict = get_xyz_dict()
 
     layers = list(m.layers)
     if len(layers) == 1:
-        layers = [layers[0]] + [leafmap_basemaps["OpenStreetMap"]]
+        layers = [layers[0]] + [basemaps["OpenStreetMap"]]
     elif len(layers) > 1 and (layers[1].name != "OpenStreetMap"):
-        layers = [layers[0]] + [leafmap_basemaps["OpenStreetMap"]] + layers[1:]
+        layers = [layers[0]] + [basemaps["OpenStreetMap"]] + layers[1:]
     m.layers = layers
 
     value = "OpenStreetMap"
 
     dropdown = widgets.Dropdown(
-        options=list(leafmap_basemaps.keys()),
+        options=list(basemaps.keys()),
         value=value,
         layout=widgets.Layout(width="200px"),
     )
@@ -1552,7 +1552,7 @@ def change_basemap(m):
     def on_click(change):
         basemap_name = change["new"]
         old_basemap = m.layers[1]
-        m.substitute_layer(old_basemap, leafmap_basemaps[basemap_name])
+        m.substitute_layer(old_basemap, basemaps[basemap_name])
         if basemap_name in xyz_dict:
             if "bounds" in xyz_dict[basemap_name]:
                 bounds = xyz_dict[basemap_name]["bounds"]
@@ -1689,7 +1689,7 @@ def split_basemaps(
         right_name (str, optional): The default value of the right dropdown list. Defaults to None.
         width (str, optional): The width of the dropdown list. Defaults to "120px".
     """
-    from .leafmap import leafmap_basemaps
+    from .leafmap import basemaps
 
     controls = m.controls
     layers = m.layers
@@ -1701,12 +1701,12 @@ def split_basemaps(
 
     if layers_dict is None:
         layers_dict = {}
-        keys = dict(leafmap_basemaps).keys()
+        keys = dict(basemaps).keys()
         for key in keys:
-            if isinstance(leafmap_basemaps[key], ipyleaflet.WMSLayer):
+            if isinstance(basemaps[key], ipyleaflet.WMSLayer):
                 pass
             else:
-                layers_dict[key] = leafmap_basemaps[key]
+                layers_dict[key] = basemaps[key]
 
     keys = list(layers_dict.keys())
     if left_name is None:
@@ -3171,7 +3171,7 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
     Args:
         m (object): leafmap.Map.
     """
-    from .plotlymap import plotly_basemaps
+    from .plotlymap import basemaps
 
     m = canvas.map
     layer_count = len(m.layout.mapbox.layers)
@@ -3184,7 +3184,7 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
     m.add_basemap(value)
 
     dropdown = widgets.Dropdown(
-        options=list(plotly_basemaps.keys()),
+        options=list(basemaps.keys()),
         value=value,
         layout=widgets.Layout(width="200px"),
     )
