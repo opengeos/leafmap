@@ -1,7 +1,7 @@
 import os
 from .common import *
 from .osm import *
-from .leafmap import leafmap_basemaps
+from .leafmap import basemaps
 
 try:
     import pydeck as pdk
@@ -90,7 +90,7 @@ class Map(pdk.Deck):
                 url = basemap.build_url()
                 self.add_layer(url, name)
 
-            elif basemap in leafmap_basemaps:
+            elif basemap in basemaps:
 
                 pdk.settings.custom_libraries = [
                     {
@@ -99,21 +99,21 @@ class Map(pdk.Deck):
                     }
                 ]
 
-                layer = pdk.Layer("MyTileLayer", leafmap_basemaps[basemap].url, basemap)
+                layer = pdk.Layer("MyTileLayer", basemaps[basemap].url, basemap)
 
                 self.add_layer(layer)
 
             else:
                 print(
                     "Basemap can only be one of the following:\n  {}".format(
-                        "\n  ".join(leafmap_basemaps.keys())
+                        "\n  ".join(basemaps.keys())
                     )
                 )
 
         except Exception:
             raise ValueError(
                 "Basemap can only be one of the following:\n  {}".format(
-                    "\n  ".join(leafmap_basemaps.keys())
+                    "\n  ".join(basemaps.keys())
                 )
             )
 
