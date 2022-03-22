@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.6 - Mar 22, 2022
+
+**Improvement**
+
+-   Renamed basemaps and updated notebooks [#228](https://github.com/giswqs/leafmap/pull/228)
+
 ## v0.8.5 - Mar 19, 2022
 
 **New Features**:
