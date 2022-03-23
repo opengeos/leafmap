@@ -4,21 +4,25 @@ This Get Started guide is intended as a quick way to start programming with **le
 
 ## Important Note
 
-**Leafmap** has four plotting backends, including [folium](https://github.com/python-visualization/folium), [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet), [plotly](https://plotly.com/), and [here-map-widget-for-jupyter](https://github.com/heremaps/here-map-widget-for-jupyter). An interactive map created using one of the plotting backends can be displayed in a Jupyter environment, such as Google Colab, Jupyter Notebook, and JupyterLab. By default, `import leafmap` will use the `ipyleaflet` plotting backend.
+**Geemap** has six plotting backends, including [folium](https://github.com/python-visualization/folium), [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet), [plotly](https://plotly.com/), [pydeck](https://deckgl.readthedocs.io/en/latest/), [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter), and [heremap](https://github.com/heremaps/here-map-widget-for-jupyter). An interactive map created using one of the plotting backends can be displayed in a Jupyter environment, such as Google Colab, Jupyter Notebook, and JupyterLab. By default, `import leafmap` will use the `ipyleaflet` plotting backend.
 
-The three plotting backends do not offer equal functionality. The `ipyleaflet` plotting backend provides the richest interactive functionality, including the custom toolset for loading, analyzing, and visualizing geospatial data interactively without coding. For example, users can add vector data (e.g., GeoJSON, Shapefile, KML, GeoDataFrame) and raster data (e.g., GeoTIFF, Cloud Optimized GeoTIFF [COG]) to the map with a few clicks (see Figure 1). Users can also perform geospatial analysis using the WhiteboxTools GUI with 468 geoprocessing tools directly within the map interface (see Figure 2). Other interactive functionality (e.g., split-panel map, linked map, time slider, time-series inspector) can also be useful for visualizing geospatial data. The `ipyleaflet` package is built upon `ipywidgets` and allows bidirectional communication between the front-end and the backend enabling the use of the map to capture user input ([source](https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a)). In contrast, `folium` has relatively limited interactive functionality. It is meant for displaying static data only. The `folium` plotting backend is included in this package to support using `leafmap` in Google Colab. Note that the aforementioned custom toolset and interactive functionality are not available for the `folium` plotting backend. Compared with `ipyleaflet` and `folium`, the `heremap widget` plotting backend provides some unique [3D functionality](https://github.com/heremaps/here-map-widget-for-jupyter#use-ipywidgets-controls-to-build-an-interactive-gui) for visualizing geospatial data. An [API key](https://developer.here.com/documentation/identity-access-management/dev_guide/topics/dev-apikey.html) from the [Here Developer Portal](https://developer.here.com/) is required to use `heremap`.
+The six plotting backends do not offer equal functionality. The `ipyleaflet` plotting backend provides the richest interactive functionality, including the custom toolset for loading, analyzing, and visualizing geospatial data interactively without coding. For example, users can add vector data (e.g., GeoJSON, Shapefile, KML, GeoDataFrame) and raster data (e.g., GeoTIFF, Cloud Optimized GeoTIFF [COG]) to the map with a few clicks (see Figure 1). Users can also perform geospatial analysis using the WhiteboxTools GUI with 468 geoprocessing tools directly within the map interface (see Figure 2). Other interactive functionality (e.g., split-panel map, linked map, time slider, time-series inspector) can also be useful for visualizing geospatial data. The `ipyleaflet` package is built upon `ipywidgets` and allows bidirectional communication between the front-end and the backend enabling the use of the map to capture user input ([source](https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a)). In contrast, `folium` has relatively limited interactive functionality. It is meant for displaying static data only. Note that the aforementioned custom toolset and interactive functionality are not available for other plotting backends. Compared with `ipyleaflet` and `folium`, the `pydeck`,  `kepler.gl`, and `heremap` plotting backend provides some unique 3D mapping functionality. An [API key](https://developer.here.com/documentation/identity-access-management/dev_guide/topics/dev-apikey.html) from the [Here Developer Portal](https://developer.here.com/) is required to use `heremap`.
+
+To choose a specific plotting backend, use one of the following:
+
+-   `import leafmap.leafmap as leafmap`
+-   `import leafmap.foliumap as leafmap`
+-   `import leafmap.deck as leafmap`
+-   `import leafmap.kepler as leafmap`
+-   `import leafmap.plotlymap as leafmap`
+-   `import leafmap.heremap as leafmap`
+
 
 ![](https://i.imgur.com/pe7CoC7.png)
 **Figure 1.** The leafmap user interface built upon ipyleaflet and ipywidgets.
 
 ![](https://i.imgur.com/5GzDG3W.png)
 **Figure 2.** The WhiteboxTools graphical user interface integrated into leafmap.
-
-To use a specific plotting backend, use one of the following:
-
--   `import leafmap.leafmap as leafmap`
--   `import leafmap.foliumap as leafmap`
--   `import leafmap.heremap as leafmap`
 
 ## Leafmap Modules
 
@@ -31,9 +35,13 @@ The key functionality of the leafmap Python package is organized into nine modul
 | common    | Functions being used by multiple plotting backends to process geospatial data |
 | foliumap  | A plotting backend built upon the folium Python package                       |
 | heremap   | A plotting backend built upon the here-map-widget-for-jupyter                 |
+| kepler    | A plotting backend built upon keplergl Python package                         |
 | leafmap   | The default plotting backend built upon the ipyleaflet Python package         |
 | legends   | Built-in legends for commonly used geospatial datasets                        |
 | osm       | Functions for extracting and downloading OpenStreetMap data                   |
+| pc        | Functions for working with Microsoft Planetary Computer                       |
+| plotlymap | A plotting backend built upon plotly Python package                           |
+| pydeck    | A plotting backend built upon pydeck Python package                           |
 | toolbar   | A custom toolset with interactive tools built upon ipywidgets and ipyleaflet  |
 
 ## Launch Jupyter notebook
