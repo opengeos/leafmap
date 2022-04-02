@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.1 - Apr 2, 2022
+
+**Improvement**
+
+-   Fixed heremap import error
+
 ## v0.9.0 - Apr 2, 2022
 
 **Improvement**
