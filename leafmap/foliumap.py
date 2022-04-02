@@ -1877,8 +1877,6 @@ class Map(folium.Map):
                 raise ValueError(
                     f"The number of unique values in the color column {color_column} is not equal to the number of available colors."
                 )
-            else:
-                marker_colors = marker_colors
 
         if items is not None:
 
