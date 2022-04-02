@@ -2601,8 +2601,6 @@ class Map(ipyleaflet.Map):
                 raise ValueError(
                     f"The number of unique values in the color column {color_column} is not equal to the number of available colors."
                 )
-            else:
-                marker_colors = marker_colors
 
         if items is not None:
 
@@ -3008,8 +3006,8 @@ class Map(ipyleaflet.Map):
         Raises:
             ValueError: The provider is not valid. It must start with xyz or qms.
         """
+        import xyzservices
         import xyzservices.providers as xyz
-        from xyzservices import TileProvider
 
         if provider.startswith("xyz"):
             name = provider[4:]
@@ -3021,7 +3019,7 @@ class Map(ipyleaflet.Map):
             self.add_tile_layer(url, name, attribution)
         elif provider.startswith("qms"):
             name = provider[4:]
-            qms_provider = TileProvider.from_qms(name)
+            qms_provider = xyzservices.TileProvider.from_qms(name)
             url = qms_provider.build_url()
             attribution = qms_provider.attribution
             if attribution.strip() == "":
