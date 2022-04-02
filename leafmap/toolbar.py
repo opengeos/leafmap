@@ -1904,7 +1904,7 @@ def census_widget(m=None):
     Returns:
         ipywidgets: The tool GUI widget.
     """
-    from owslib.wms import WebMapService
+    # from owslib.wms import WebMapService
 
     census_dict = get_census_dict()
     m.add_census_data("Census 2020", "States")
