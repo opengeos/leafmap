@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.0 - Apr 2, 2022
+
+**Improvement**
+
+-   Reduced number of dependencies, making plotting backends optional except ipyleaflet and folium [#230](https://github.com/giswqs/leafmap/pull/230)
+-   Updated clip image notebook
+-   Updated docs
+
 ## v0.8.6 - Mar 22, 2022
 
 **Improvement**
