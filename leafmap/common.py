@@ -675,7 +675,12 @@ def download_from_gdrive(gfile_url, file_name, out_dir=".", unzip=True, verbose=
         unzip (bool, optional): Whether to unzip the output file if it is a zip file. Defaults to True.
         verbose (bool, optional): Whether to display or not the output of the function
     """
-    from google_drive_downloader import GoogleDriveDownloader as gdd
+    try:
+        from google_drive_downloader import GoogleDriveDownloader as gdd
+    except ImportError:
+        raise ImportError(
+            'Please install googledrivedownloader using "pip install googledrivedownloader"'
+        )
 
     file_id = gfile_url.split("/")[5]
     if verbose:
@@ -2415,7 +2420,10 @@ def screen_capture(outfile, monitor=1):
         outfile (str): The output file path to the screenshot.
         monitor (int, optional): The monitor to take the screenshot. Defaults to 1.
     """
-    from mss import mss
+    try:
+        from mss import mss
+    except ImportError:
+        raise ImportError("Please install mss using 'pip install mss'")
 
     out_dir = os.path.dirname(outfile)
     if not os.path.exists(out_dir):
@@ -3304,7 +3312,10 @@ def get_census_dict(reset=False):
 
     if reset:
 
-        from owslib.wms import WebMapService
+        try:
+            from owslib.wms import WebMapService
+        except ImportError:
+            raise ImportError("Please install owslib using 'pip install owslib'.")
 
         census_dict = {}
 
@@ -3432,7 +3443,10 @@ def get_wms_layers(url):
     Returns:
         list: A list of WMS layers.
     """
-    from owslib.wms import WebMapService
+    try:
+        from owslib.wms import WebMapService
+    except ImportError:
+        raise ImportError("Please install owslib using 'pip install owslib'.")
 
     wms = WebMapService(url)
     layers = list(wms.contents)
@@ -3925,7 +3939,12 @@ def get_palettable(types=None):
     Returns:
         list: A list of palettable color palettes.
     """
-    import palettable
+    try:
+        import palettable
+    except ImportError:
+        raise ImportError(
+            "Please install the palettable package using 'pip install palettable'."
+        )
 
     if types is not None and (not isinstance(types, list)):
         raise ValueError("The types must be a list.")
@@ -4346,12 +4365,12 @@ def bbox_to_gdf(bbox, crs="EPSG:4326"):
     """
     check_package(name="geopandas", URL="https://geopandas.org")
     from shapely.geometry import box
-    from geopandas import GeoDataFrame
+    import geopandas as gpd
 
     minx, miny, maxx, maxy = bbox
     geometry = box(minx, miny, maxx, maxy)
     d = {"geometry": [geometry]}
-    gdf = GeoDataFrame(d, crs="EPSG:4326")
+    gdf = gpd.GeoDataFrame(d, crs="EPSG:4326")
     gdf.to_crs(crs=crs, inplace=True)
     return gdf
 
@@ -5151,7 +5170,6 @@ def download_file(
     )
 
     if unzip and output.endswith(".zip"):
-        import zipfile
 
         with zipfile.ZipFile(output, "r") as zip_ref:
             if not quiet:
