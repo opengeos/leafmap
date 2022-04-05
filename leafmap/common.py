@@ -5294,6 +5294,9 @@ def netcdf_to_tif(
     shift_lon=True,
     lat='lat',
     lon='lon',
+    lev='lev',
+    level_index=0,
+    time=0,
     return_vars=False,
     **kwargs,
 ):
@@ -5306,6 +5309,9 @@ def netcdf_to_tif(
         shift_lon (bool, optional): Flag to shift longitude values from [0, 360] to the range [-180, 180]. Defaults to True.
         lat (str, optional): Name of the latitude variable. Defaults to 'lat'.
         lon (str, optional): Name of the longitude variable. Defaults to 'lon'.
+        lev (str, optional): Name of the level variable. Defaults to 'lev'.
+        level_index (int, optional): Index of the level dimension. Defaults to 0'.
+        time (int, optional): Index of the time dimension. Defaults to 0'.
         return_vars (bool, optional): Flag to return all variables. Defaults to False.
 
     Raises:
@@ -5325,11 +5331,21 @@ def netcdf_to_tif(
         raise FileNotFoundError(f"{filename} does not exist.")
 
     if output is None:
-        output = filename.replace(".nc", ".tif")
+        ext = os.path.splitext(filename)[1].lower()
+        if ext not in [".nc", ".nc4"]:
+            raise TypeError("The output file must be a netCDF with extension .nc or .nc4.")
+        output = filename.replace(ext, ".tif")
     else:
         output = check_file_path(output)
 
     xds = xr.open_dataset(filename, **kwargs)
+
+    coords = list(xds.coords.keys())
+    if 'time' in coords:
+        xds = xds.isel(time=time, drop=True)
+
+    if lev in coords:
+        xds = xds.isel(lev=level_index, drop=True)
 
     if shift_lon:
         xds.coords[lon] = (xds.coords[lon] + 180) % 360 - 180
