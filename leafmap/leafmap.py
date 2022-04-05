@@ -1736,6 +1736,9 @@ class Map(ipyleaflet.Map):
         shift_lon=True,
         lat='lat',
         lon='lon',
+        lev='lev',
+        level_index=0,
+        time=0,
         **kwargs,
     ):
         """Generate an ipyleaflet/folium TileLayer from a netCDF file.
@@ -1758,10 +1761,13 @@ class Map(ipyleaflet.Map):
             shift_lon (bool, optional): Flag to shift longitude values from [0, 360] to the range [-180, 180]. Defaults to True.
             lat (str, optional): Name of the latitude variable. Defaults to 'lat'.
             lon (str, optional): Name of the longitude variable. Defaults to 'lon'.
+            lev (str, optional): Name of the level variable. Defaults to 'lev'.
+            level_index (int, optional): Index of level to use. Defaults to 0'.
+            time (int, optional): Index of time to use. Defaults to 0'.
         """
 
         tif, vars = netcdf_to_tif(
-            filename, shift_lon=shift_lon, lat=lat, lon=lon, return_vars=True
+            filename, shift_lon=shift_lon, lat=lat, lon=lon, lev=lev, level_index=level_index, time=time, return_vars=True
         )
 
         if variables is None:
@@ -3170,6 +3176,9 @@ class Map(ipyleaflet.Map):
         meridional_speed,
         latitude_dimension='lat',
         longitude_dimension='lon',
+        level_dimension='lev',
+        level_index=0,
+        time_index=0,
         velocity_scale=0.01,
         max_velocity=20,
         display_options={},
@@ -3183,6 +3192,9 @@ class Map(ipyleaflet.Map):
             meridional_speed (str): Name of the meridional speed in the dataset. See https://en.wikipedia.org/wiki/Zonal_and_meridional_flow.
             latitude_dimension (str, optional): Name of the latitude dimension in the dataset. Defaults to 'lat'.
             longitude_dimension (str, optional): Name of the longitude dimension in the dataset. Defaults to 'lon'.
+            level_dimension (str, optional): Name of the level dimension in the dataset. Defaults to 'lev'.
+            level_index (int, optional): The index of the level dimension to display. Defaults to 0.
+            time_index (int, optional): The index of the time dimension to display. Defaults to 0.
             velocity_scale (float, optional): The scale of the velocity. Defaults to 0.01.
             max_velocity (int, optional): The maximum velocity to display. Defaults to 20.
             display_options (dict, optional): The display options for the velocity layer. Defaults to {}. See https://bit.ly/3uf8t6w.
@@ -3210,6 +3222,14 @@ class Map(ipyleaflet.Map):
             ds = data
         else:
             raise ValueError("The data must be a file path or xarray dataset.")
+
+        coords = list(ds.coords.keys())
+
+        # Rasterio does not handle time or levels. So we must drop them
+        if 'time' in coords:
+            ds = ds.isel(time=time_index, drop=True)
+        if level_dimension in coords:
+            ds = ds.isel(lev=level_index, drop=True)
 
         wind = Velocity(
             data=ds,
