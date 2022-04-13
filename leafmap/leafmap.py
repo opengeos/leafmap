@@ -1734,9 +1734,9 @@ class Map(ipyleaflet.Map):
         attribution=None,
         layer_name="NetCDF layer",
         shift_lon=True,
-        lat='lat',
-        lon='lon',
-        lev='lev',
+        lat="lat",
+        lon="lon",
+        lev="lev",
         level_index=0,
         time=0,
         **kwargs,
@@ -1767,7 +1767,14 @@ class Map(ipyleaflet.Map):
         """
 
         tif, vars = netcdf_to_tif(
-            filename, shift_lon=shift_lon, lat=lat, lon=lon, lev=lev, level_index=level_index, time=time, return_vars=True
+            filename,
+            shift_lon=shift_lon,
+            lat=lat,
+            lon=lon,
+            lev=lev,
+            level_index=level_index,
+            time=time,
+            return_vars=True,
         )
 
         if variables is None:
@@ -2527,8 +2534,8 @@ class Map(ipyleaflet.Map):
         layer_name="Marker Cluster",
         color_column=None,
         marker_colors=None,
-        icon_colors=['white'],
-        icon_names=['info'],
+        icon_colors=["white"],
+        icon_names=["info"],
         spin=False,
         add_legend=True,
         **kwargs,
@@ -2552,25 +2559,25 @@ class Map(ipyleaflet.Map):
         import pandas as pd
 
         color_options = [
-            'red',
-            'blue',
-            'green',
-            'purple',
-            'orange',
-            'darkred',
-            'lightred',
-            'beige',
-            'darkblue',
-            'darkgreen',
-            'cadetblue',
-            'darkpurple',
-            'white',
-            'pink',
-            'lightblue',
-            'lightgreen',
-            'gray',
-            'black',
-            'lightgray',
+            "red",
+            "blue",
+            "green",
+            "purple",
+            "orange",
+            "darkred",
+            "lightred",
+            "beige",
+            "darkblue",
+            "darkgreen",
+            "cadetblue",
+            "darkpurple",
+            "white",
+            "pink",
+            "lightblue",
+            "lightgreen",
+            "gray",
+            "black",
+            "lightgray",
         ]
 
         if isinstance(data, pd.DataFrame):
@@ -3174,15 +3181,15 @@ class Map(ipyleaflet.Map):
         data,
         zonal_speed,
         meridional_speed,
-        latitude_dimension='lat',
-        longitude_dimension='lon',
-        level_dimension='lev',
+        latitude_dimension="lat",
+        longitude_dimension="lon",
+        level_dimension="lev",
         level_index=0,
         time_index=0,
         velocity_scale=0.01,
         max_velocity=20,
         display_options={},
-        name='Velocity',
+        name="Velocity",
     ):
         """Add a velocity layer to the map.
 
@@ -3226,10 +3233,12 @@ class Map(ipyleaflet.Map):
         coords = list(ds.coords.keys())
 
         # Rasterio does not handle time or levels. So we must drop them
-        if 'time' in coords:
+        if "time" in coords:
             ds = ds.isel(time=time_index, drop=True)
+
+        params = {level_dimension: level_index}
         if level_dimension in coords:
-            ds = ds.isel(lev=level_index, drop=True)
+            ds = ds.isel(drop=True, **params)
 
         wind = Velocity(
             data=ds,
