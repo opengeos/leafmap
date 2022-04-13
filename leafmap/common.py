@@ -5333,7 +5333,9 @@ def netcdf_to_tif(
     if output is None:
         ext = os.path.splitext(filename)[1].lower()
         if ext not in [".nc", ".nc4"]:
-            raise TypeError("The output file must be a netCDF with extension .nc or .nc4.")
+            raise TypeError(
+                "The output file must be a netCDF with extension .nc or .nc4."
+            )
         output = filename.replace(ext, ".tif")
     else:
         output = check_file_path(output)
