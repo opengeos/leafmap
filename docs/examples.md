@@ -1,0 +1,3 @@
+# examples module
+
+::: leafmap.examples
