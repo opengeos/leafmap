@@ -5515,6 +5515,8 @@ def classify(
     data,
     column,
     cmap=None,
+    colors=None,
+    labels=None,
     scheme="Quantiles",
     k=5,
     legend_kwds=None,
@@ -5526,6 +5528,8 @@ def classify(
         data (str | pd.DataFrame | gpd.GeoDataFrame): The data to classify. It can be a filepath to a vector dataset, a pandas dataframe, or a geopandas geodataframe.
         column (str): The column to classify.
         cmap (str, optional): The name of a colormap recognized by matplotlib. Defaults to None.
+        colors (list, optional): A list of colors to use for the classification. Defaults to None.
+        labels (list, optional): A list of labels to use for the legend. Defaults to None.
         scheme (str, optional): Name of a choropleth classification scheme (requires mapclassify).
             Name of a choropleth classification scheme (requires mapclassify).
             A mapclassify.MapClassifier object will be used
@@ -5622,8 +5626,13 @@ def classify(
     if cmap is None:
         cmap = "Blues"
     cmap = plt.cm.get_cmap(cmap, k)
-    colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
-    colors = ["#" + i for i in colors]
+    if colors is None:
+        colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
+        colors = ["#" + i for i in colors]
+    elif isinstance(colors, list):
+        colors = [check_color(i) for i in colors]
+    elif isinstance(colors, str):
+        colors = [check_color(colors)] * k
 
     allowed_schemes = [
         "BoxPlot",
@@ -5671,32 +5680,38 @@ def classify(
         else:
             legend_kwds["fmt"] = "{:.0f}"
 
-    # set categorical to True for creating the legend
-    if legend_kwds is not None and "labels" in legend_kwds:
-        if len(legend_kwds["labels"]) != binning.k:
-            raise ValueError(
-                "Number of labels must match number of bins, "
-                "received {} labels for {} bins".format(
-                    len(legend_kwds["labels"]), binning.k
+    if labels is None:
+        # set categorical to True for creating the legend
+        if legend_kwds is not None and "labels" in legend_kwds:
+            if len(legend_kwds["labels"]) != binning.k:
+                raise ValueError(
+                    "Number of labels must match number of bins, "
+                    "received {} labels for {} bins".format(
+                        len(legend_kwds["labels"]), binning.k
+                    )
                 )
-            )
+            else:
+                labels = list(legend_kwds.pop("labels"))
         else:
-            labels = list(legend_kwds.pop("labels"))
+            # fmt = "{:.2f}"
+            if legend_kwds is not None and "fmt" in legend_kwds:
+                fmt = legend_kwds.pop("fmt")
+
+            labels = binning.get_legend_classes(fmt)
+            if legend_kwds is not None:
+                show_interval = legend_kwds.pop("interval", False)
+            else:
+                show_interval = False
+            if not show_interval:
+                labels = [c[1:-1] for c in labels]
+
+        if init_column is not None:
+            labels = value_list
+    elif isinstance(labels, list):
+        if len(labels) != len(colors):
+            raise ValueError("The number of labels must match the number of colors.")
     else:
-        # fmt = "{:.2f}"
-        if legend_kwds is not None and "fmt" in legend_kwds:
-            fmt = legend_kwds.pop("fmt")
-
-        labels = binning.get_legend_classes(fmt)
-        if legend_kwds is not None:
-            show_interval = legend_kwds.pop("interval", False)
-        else:
-            show_interval = False
-        if not show_interval:
-            labels = [c[1:-1] for c in labels]
-
-    if init_column is not None:
-        labels = value_list
+        raise ValueError("labels must be a list or None.")
 
     legend_dict = dict(zip(labels, colors))
     df["category"] = df["category"] + 1

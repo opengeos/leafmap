@@ -3257,6 +3257,8 @@ class Map(ipyleaflet.Map):
         self,
         data,
         column,
+        colors=None,
+        labels=None,
         cmap=None,
         scheme="Quantiles",
         k=5,
@@ -3264,7 +3266,6 @@ class Map(ipyleaflet.Map):
         legend_title=None,
         legend_kwds=None,
         classification_kwds=None,
-        style_kwds=None,
         layer_name="Untitled",
         style=None,
         hover_style=None,
@@ -3279,6 +3280,8 @@ class Map(ipyleaflet.Map):
             data (str | pd.DataFrame | gpd.GeoDataFrame): The data to classify. It can be a filepath to a vector dataset, a pandas dataframe, or a geopandas geodataframe.
             column (str): The column to classify.
             cmap (str, optional): The name of a colormap recognized by matplotlib. Defaults to None.
+            colors (list, optional): A list of colors to use for the classification. Defaults to None.
+            labels (list, optional): A list of labels to use for the legend. Defaults to None.
             scheme (str, optional): Name of a choropleth classification scheme (requires mapclassify).
                 Name of a choropleth classification scheme (requires mapclassify).
                 A mapclassify.MapClassifier object will be used
@@ -3304,9 +3307,25 @@ class Map(ipyleaflet.Map):
                     If True, open/closed interval brackets are shown in the legend.
             classification_kwds (dict, optional): Keyword arguments to pass to mapclassify. Defaults to None.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
-            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to None.
+                style is a dictionary of the following form:
+                    style = {
+                    "stroke": False,
+                    "color": "#ff0000",
+                    "weight": 1,
+                    "opacity": 1,
+                    "fill": True,
+                    "fillColor": "#ffffff",
+                    "fillOpacity": 1.0,
+                    "dashArray": "9"
+                    "clickable": True,
+                }
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+                hover_style is a dictionary of the following form:
+                    hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+                style_callback is a function that takes the feature as argument and should return a dictionary of the following form:
+                style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
         """
@@ -3315,6 +3334,8 @@ class Map(ipyleaflet.Map):
             data=data,
             column=column,
             cmap=cmap,
+            colors=colors,
+            labels=labels,
             scheme=scheme,
             k=k,
             legend_kwds=legend_kwds,
@@ -3324,12 +3345,9 @@ class Map(ipyleaflet.Map):
         if legend_title is None:
             legend_title = column
 
-        if style_kwds is None:
-            style_kwds = {}
-
         if style is None:
             style = {
-                # "stroke": True,
+                # "stroke": False,
                 # "color": "#ff0000",
                 "weight": 1,
                 "opacity": 1,
@@ -3339,12 +3357,14 @@ class Map(ipyleaflet.Map):
                 # "dashArray": "9"
                 # "clickable": True,
             }
+            if colors is not None:
+                style["color"] = "#000000"
 
         if hover_style is None:
             hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
 
         if style_callback is None:
-            style_callback = lambda feat: {"color": feat["properties"]["color"]}
+            style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
 
         self.add_gdf(
             gdf,
