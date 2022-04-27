@@ -3253,6 +3253,132 @@ class Map(ipyleaflet.Map):
         )
         self.add_layer(wind)
 
+    def add_data(
+        self,
+        data,
+        column,
+        colors=None,
+        labels=None,
+        cmap=None,
+        scheme="Quantiles",
+        k=5,
+        add_legend=True,
+        legend_title=None,
+        legend_kwds=None,
+        classification_kwds=None,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        info_mode="on_hover",
+        encoding="utf-8",
+        **kwargs,
+    ):
+        """Add vector data to the map with a variety of classification schemes.
+
+        Args:
+            data (str | pd.DataFrame | gpd.GeoDataFrame): The data to classify. It can be a filepath to a vector dataset, a pandas dataframe, or a geopandas geodataframe.
+            column (str): The column to classify.
+            cmap (str, optional): The name of a colormap recognized by matplotlib. Defaults to None.
+            colors (list, optional): A list of colors to use for the classification. Defaults to None.
+            labels (list, optional): A list of labels to use for the legend. Defaults to None.
+            scheme (str, optional): Name of a choropleth classification scheme (requires mapclassify).
+                Name of a choropleth classification scheme (requires mapclassify).
+                A mapclassify.MapClassifier object will be used
+                under the hood. Supported are all schemes provided by mapclassify (e.g.
+                'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+                'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+                'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+                'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+                'UserDefined'). Arguments can be passed in classification_kwds.
+            k (int, optional): Number of classes (ignored if scheme is None or if column is categorical). Default to 5.
+            legend_kwds (dict, optional): Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or `matplotlib.pyplot.colorbar`. Defaults to None.
+                Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or
+                Additional accepted keywords when `scheme` is specified:
+                fmt : string
+                    A formatting specification for the bin edges of the classes in the
+                    legend. For example, to have no decimals: ``{"fmt": "{:.0f}"}``.
+                labels : list-like
+                    A list of legend labels to override the auto-generated labblels.
+                    Needs to have the same number of elements as the number of
+                    classes (`k`).
+                interval : boolean (default False)
+                    An option to control brackets from mapclassify legend.
+                    If True, open/closed interval brackets are shown in the legend.
+            classification_kwds (dict, optional): Keyword arguments to pass to mapclassify. Defaults to None.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to None.
+                style is a dictionary of the following form:
+                    style = {
+                    "stroke": False,
+                    "color": "#ff0000",
+                    "weight": 1,
+                    "opacity": 1,
+                    "fill": True,
+                    "fillColor": "#ffffff",
+                    "fillOpacity": 1.0,
+                    "dashArray": "9"
+                    "clickable": True,
+                }
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+                hover_style is a dictionary of the following form:
+                    hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
+            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+                style_callback is a function that takes the feature as argument and should return a dictionary of the following form:
+                style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+        """
+
+        gdf, legend_dict = classify(
+            data=data,
+            column=column,
+            cmap=cmap,
+            colors=colors,
+            labels=labels,
+            scheme=scheme,
+            k=k,
+            legend_kwds=legend_kwds,
+            classification_kwds=classification_kwds,
+        )
+
+        if legend_title is None:
+            legend_title = column
+
+        if style is None:
+            style = {
+                # "stroke": False,
+                # "color": "#ff0000",
+                "weight": 1,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 1.0,
+                # "dashArray": "9"
+                # "clickable": True,
+            }
+            if colors is not None:
+                style["color"] = "#000000"
+
+        if hover_style is None:
+            hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
+
+        if style_callback is None:
+            style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
+
+        self.add_gdf(
+            gdf,
+            layer_name=layer_name,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            info_mode=info_mode,
+            encoding=encoding,
+            **kwargs,
+        )
+        if add_legend:
+            self.add_legend(title=legend_title, legend_dict=legend_dict)
+
 
 # The functions below are outside the Map class.
 
