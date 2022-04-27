@@ -6,6 +6,7 @@ from .common import *
 from .legends import builtin_legends
 from .basemaps import xyz_to_folium
 from .osm import *
+from . import examples
 
 from branca.element import Figure, JavascriptLink
 from folium.map import Layer
@@ -1026,6 +1027,8 @@ class Map(folium.Map):
                         colors = ["#" + rgb_to_hex(x) for x in colors]
                     except Exception as e:
                         raise Exception(e)
+                elif all((item.startswith("#") and len(item) == 7) for item in colors):
+                    pass
                 elif all(isinstance(item, str) for item in colors):
                     colors = ["#" + color for color in colors]
 
@@ -1103,12 +1106,13 @@ class Map(folium.Map):
 
         self.add_child(colormap)
 
-    def add_shp(self, in_shp, layer_name="Untitled", **kwargs):
+    def add_shp(self, in_shp, layer_name="Untitled", info_mode="on_hover", **kwargs):
         """Adds a shapefile to the map. See https://python-visualization.github.io/folium/modules.html#folium.features.GeoJson for more info about setting style.
 
         Args:
             in_shp (str): The input file path to the shapefile.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
@@ -1134,14 +1138,23 @@ class Map(folium.Map):
 
         data = shp_to_geojson(in_shp)
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
-    def add_geojson(self, in_geojson, layer_name="Untitled", **kwargs):
+    def add_geojson(
+        self,
+        in_geojson,
+        layer_name="Untitled",
+        encoding="utf-8",
+        info_mode="on_hover",
+        **kwargs,
+    ):
         """Adds a GeoJSON file to the map.
 
         Args:
             in_geojson (str): The input file path to the GeoJSON.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
@@ -1163,7 +1176,7 @@ class Map(folium.Map):
                             "The provided GeoJSON file could not be found."
                         )
 
-                    with open(in_geojson) as f:
+                    with open(in_geojson, encoding=encoding) as f:
                         data = json.load(f)
             elif isinstance(in_geojson, dict):
                 data = in_geojson
@@ -1173,38 +1186,31 @@ class Map(folium.Map):
             raise Exception(e)
 
         # interchangeable parameters between ipyleaflet and folium.
-        if "style" in kwargs:
-            style_dict = kwargs["style"]
-            if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:
+        if "style_function" not in kwargs:
+            if "style" in kwargs:
+                style_dict = kwargs["style"]
+                if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:
+                    kwargs["style_function"] = lambda x: style_dict
+                kwargs.pop("style")
+            else:
+                style_dict = {
+                    # "stroke": True,
+                    "color": "#000000",
+                    "weight": 1,
+                    "opacity": 1,
+                    # "fill": True,
+                    # "fillColor": "#ffffff",
+                    "fillOpacity": 0.1,
+                    # "dashArray": "9"
+                    # "clickable": True,
+                }
                 kwargs["style_function"] = lambda x: style_dict
-            kwargs.pop("style")
-        else:
-            style_dict = {
-                # "stroke": True,
-                "color": "#000000",
-                "weight": 1,
-                "opacity": 1,
-                # "fill": True,
-                # "fillColor": "#ffffff",
-                "fillOpacity": 0.1,
-                # "dashArray": "9"
-                # "clickable": True,
-            }
-            kwargs["style_function"] = lambda x: style_dict
 
         if "style_callback" in kwargs:
-            if kwargs["style_callback"] is not None:
-                kwargs["style_function"] = kwargs["style_callback"]
             kwargs.pop("style_callback")
 
         if "hover_style" in kwargs:
-            if len(kwargs["hover_style"]) > 0:
-                hover_dict = kwargs["hover_style"]
-                kwargs["highlight_function"] = lambda x: hover_dict
             kwargs.pop("hover_style")
-        else:
-            hover_dict = {"weight": style_dict["weight"] + 1, "fillOpacity": 0.5}
-            kwargs["highlight_function"] = lambda x: hover_dict
 
         if "fill_colors" in kwargs:
             fill_colors = kwargs["fill_colors"]
@@ -1214,27 +1220,49 @@ class Map(folium.Map):
                 return style_dict
 
             kwargs["style_function"] = random_color
-
             kwargs.pop("fill_colors")
-        if "info_mode" in kwargs:
-            kwargs.pop("info_mode")
 
-        geojson = folium.GeoJson(data=data, name=layer_name, **kwargs)
+        if "highlight_function" not in kwargs:
+            kwargs["highlight_function"] = lambda feat: {
+                "weight": 2,
+                "fillOpacity": 0.5,
+            }
+
+        tooltip = None
+        popup = None
+        if info_mode is not None:
+            props = list(data["features"][0]["properties"].keys())
+            if info_mode == "on_hover":
+                tooltip = folium.GeoJsonTooltip(fields=props)
+            elif info_mode == "on_click":
+                popup = folium.GeoJsonPopup(fields=props)
+
+        geojson = folium.GeoJson(
+            data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
+        )
         geojson.add_to(self)
 
-    def add_gdf(self, gdf, layer_name="Untitled", zoom_to_layer=True, **kwargs):
+    def add_gdf(
+        self,
+        gdf,
+        layer_name="Untitled",
+        zoom_to_layer=True,
+        info_mode="on_hover",
+        **kwargs,
+    ):
         """Adds a GeoPandas GeoDataFrameto the map.
 
         Args:
             gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
         if zoom_to_layer:
             import numpy as np
@@ -1247,7 +1275,13 @@ class Map(folium.Map):
             self.fit_bounds([[south, east], [north, west]])
 
     def add_gdf_from_postgis(
-        self, sql, con, layer_name="Untitled", zoom_to_layer=True, **kwargs
+        self,
+        sql,
+        con,
+        layer_name="Untitled",
+        zoom_to_layer=True,
+        info_mode="on_hover",
+        **kwargs,
     ):
         """Adds a GeoPandas GeoDataFrameto the map.
 
@@ -1256,6 +1290,7 @@ class Map(folium.Map):
             con (sqlalchemy.engine.Engine): Active connection to the database to query.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
         if "fill_colors" in kwargs:
@@ -1263,7 +1298,7 @@ class Map(folium.Map):
         gdf = read_postgis(sql, con, **kwargs)
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
         if zoom_to_layer:
             import numpy as np
@@ -1275,12 +1310,13 @@ class Map(folium.Map):
             north = np.max(bounds["maxy"])
             self.fit_bounds([[south, east], [north, west]])
 
-    def add_kml(self, in_kml, layer_name="Untitled", **kwargs):
+    def add_kml(self, in_kml, layer_name="Untitled", info_mode="on_hover", **kwargs):
         """Adds a KML file to the map.
 
         Args:
             in_kml (str): The input file path to the KML.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided KML file could not be found.
@@ -1301,7 +1337,7 @@ class Map(folium.Map):
 
         data = kml_to_geojson(in_kml)
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
     def add_vector(
         self,
@@ -1310,6 +1346,7 @@ class Map(folium.Map):
         bbox=None,
         mask=None,
         rows=None,
+        info_mode="on_hover",
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -1320,6 +1357,7 @@ class Map(folium.Map):
             bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
             mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
             rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
         if not filename.startswith("http"):
@@ -1340,7 +1378,7 @@ class Map(folium.Map):
                 **kwargs,
             )
 
-            self.add_geojson(geojson, layer_name, **kwargs)
+            self.add_geojson(geojson, layer_name, info_mode=info_mode, **kwargs)
 
     def add_planet_by_month(
         self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
@@ -2192,15 +2230,137 @@ class Map(folium.Map):
         legend_title=None,
         legend_kwds=None,
         classification_kwds=None,
+        style_function=None,
+        highlight_function=None,
         layer_name="Untitled",
-        style=None,
-        hover_style=None,
-        style_callback=None,
         info_mode="on_hover",
         encoding="utf-8",
         **kwargs,
     ):
-        print("The folium plotting backend does not support this function yet.")
+        """Add vector data to the map with a variety of classification schemes.
+
+        Args:
+            data (str | pd.DataFrame | gpd.GeoDataFrame): The data to classify. It can be a filepath to a vector dataset, a pandas dataframe, or a geopandas geodataframe.
+            column (str): The column to classify.
+            cmap (str, optional): The name of a colormap recognized by matplotlib. Defaults to None.
+            colors (list, optional): A list of colors to use for the classification. Defaults to None.
+            labels (list, optional): A list of labels to use for the legend. Defaults to None.
+            scheme (str, optional): Name of a choropleth classification scheme (requires mapclassify).
+                Name of a choropleth classification scheme (requires mapclassify).
+                A mapclassify.MapClassifier object will be used
+                under the hood. Supported are all schemes provided by mapclassify (e.g.
+                'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+                'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+                'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+                'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+                'UserDefined'). Arguments can be passed in classification_kwds.
+            k (int, optional): Number of classes (ignored if scheme is None or if column is categorical). Default to 5.
+            legend_kwds (dict, optional): Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or `matplotlib.pyplot.colorbar`. Defaults to None.
+                Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or
+                Additional accepted keywords when `scheme` is specified:
+                fmt : string
+                    A formatting specification for the bin edges of the classes in the
+                    legend. For example, to have no decimals: ``{"fmt": "{:.0f}"}``.
+                labels : list-like
+                    A list of legend labels to override the auto-generated labblels.
+                    Needs to have the same number of elements as the number of
+                    classes (`k`).
+                interval : boolean (default False)
+                    An option to control brackets from mapclassify legend.
+                    If True, open/closed interval brackets are shown in the legend.
+            classification_kwds (dict, optional): Keyword arguments to pass to mapclassify. Defaults to None.
+            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+            style_function (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+                style_callback is a function that takes the feature as argument and should return a dictionary of the following form:
+                style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
+                style is a dictionary of the following form:
+                    style = {
+                    "stroke": False,
+                    "color": "#ff0000",
+                    "weight": 1,
+                    "opacity": 1,
+                    "fill": True,
+                    "fillColor": "#ffffff",
+                    "fillOpacity": 1.0,
+                    "dashArray": "9"
+                    "clickable": True,
+                }
+            hightlight_function (function, optional): Highlighting function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+                highlight_function is a function that takes the feature as argument and should return a dictionary of the following form:
+                highlight_function = lambda feat: {"fillColor": feat["properties"]["color"]}
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+        """
+
+        import warnings
+
+        gdf, legend_dict = classify(
+            data=data,
+            column=column,
+            cmap=cmap,
+            colors=colors,
+            labels=labels,
+            scheme=scheme,
+            k=k,
+            legend_kwds=legend_kwds,
+            classification_kwds=classification_kwds,
+        )
+
+        if legend_title is None:
+            legend_title = column
+
+        if "style" in kwargs:
+            warnings.warn(
+                "The style arguments is for ipyleaflet only. ",
+                UserWarning,
+            )
+            kwargs.pop("style")
+
+        if "hover_style" in kwargs:
+            warnings.warn(
+                "The hover_style arguments is for ipyleaflet only. ",
+                UserWarning,
+            )
+            kwargs.pop("hover_style")
+
+        if "style_callback" in kwargs:
+            warnings.warn(
+                "The style_callback arguments is for ipyleaflet only. ",
+                UserWarning,
+            )
+            kwargs.pop("style_callback")
+
+        if style_function is None:
+            style_function = lambda feat: {
+                # "stroke": False,
+                # "color": "#ff0000",
+                "weight": 1,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 1.0,
+                # "dashArray": "9"
+                # "clickable": True,
+                "fillColor": feat["properties"]["color"],
+            }
+
+        if highlight_function is None:
+            highlight_function = lambda feat: {
+                "weight": 2,
+                "fillOpacity": 0.5,
+            }
+
+        self.add_gdf(
+            gdf,
+            layer_name=layer_name,
+            style_function=style_function,
+            highlight_function=highlight_function,
+            info_mode=info_mode,
+            encoding=encoding,
+            **kwargs,
+        )
+        if add_legend:
+            self.add_legend(title=legend_title, legend_dict=legend_dict)
 
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
