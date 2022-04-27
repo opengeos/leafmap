@@ -5519,7 +5519,6 @@ def classify(
     k=5,
     legend_kwds=None,
     classification_kwds=None,
-    **kwargs,
 ):
     """Classify a dataframe column using a variety of classification schemes.
 
@@ -5621,7 +5620,7 @@ def classify(
     nan_idx = np.asarray(pd.isna(values), dtype="bool")
 
     if cmap is None:
-        cmap = "viridis"
+        cmap = "Blues"
     cmap = plt.cm.get_cmap(cmap, k)
     colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
     colors = ["#" + i for i in colors]
