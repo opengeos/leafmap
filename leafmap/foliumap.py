@@ -58,7 +58,7 @@ class Map(folium.Map):
         if (
             "width" in kwargs
             and isinstance(kwargs["width"], str)
-            and ('%' not in kwargs["width"])
+            and ("%" not in kwargs["width"])
         ):
             kwargs["width"] = float(kwargs["width"].replace("px", ""))
 
@@ -71,7 +71,7 @@ class Map(folium.Map):
         if "width" in kwargs:
             width = kwargs.pop("width")
         else:
-            width = '100%'
+            width = "100%"
 
         super().__init__(**kwargs)
         self.baseclass = "folium"
@@ -113,7 +113,7 @@ class Map(folium.Map):
         if "search_control" not in kwargs:
             kwargs["search_control"] = True
         if kwargs["search_control"]:
-            plugins.Geocoder(collapsed=True, position='topleft').add_to(self)
+            plugins.Geocoder(collapsed=True, position="topleft").add_to(self)
 
         if "google_map" not in kwargs:
             pass
@@ -429,8 +429,8 @@ class Map(folium.Map):
         attribution=None,
         layer_name="NetCDF layer",
         shift_lon=True,
-        lat='lat',
-        lon='lon',
+        lat="lat",
+        lon="lon",
         **kwargs,
     ):
         """Generate an ipyleaflet/folium TileLayer from a netCDF file.
@@ -1537,11 +1537,11 @@ class Map(folium.Map):
             tuple: The center of the map.
         """
 
-        bounds = st_component['bounds']
-        west = bounds['_southWest']['lng']
-        south = bounds['_southWest']['lat']
-        east = bounds['_northEast']['lng']
-        north = bounds['_northEast']['lat']
+        bounds = st_component["bounds"]
+        west = bounds["_southWest"]["lng"]
+        south = bounds["_southWest"]["lat"]
+        east = bounds["_northEast"]["lng"]
+        north = bounds["_northEast"]["lat"]
         return (south + (north - south) / 2, west + (east - west) / 2)
 
     def st_map_bounds(self, st_component):
@@ -1554,11 +1554,11 @@ class Map(folium.Map):
             tuple: The bounds of the map.
         """
 
-        bounds = st_component['bounds']
-        south = bounds['_southWest']['lat']
-        west = bounds['_southWest']['lng']
-        north = bounds['_northEast']['lat']
-        east = bounds['_northEast']['lng']
+        bounds = st_component["bounds"]
+        south = bounds["_southWest"]["lat"]
+        west = bounds["_southWest"]["lng"]
+        north = bounds["_northEast"]["lat"]
+        east = bounds["_northEast"]["lng"]
 
         bounds = [[south, west], [north, east]]
         return bounds
@@ -1575,7 +1575,7 @@ class Map(folium.Map):
 
             if "map_bounds" in st.session_state:
 
-                bounds = st.session_state['map_bounds']
+                bounds = st.session_state["map_bounds"]
 
                 self.fit_bounds(bounds)
 
@@ -1592,7 +1592,7 @@ class Map(folium.Map):
             str: The last draw of the map.
         """
 
-        return st_component['last_active_drawing']
+        return st_component["last_active_drawing"]
 
     def st_last_click(self, st_component):
         """Get the last click feature of the map.
@@ -1604,8 +1604,8 @@ class Map(folium.Map):
             str: The last click of the map.
         """
 
-        coords = st_component['last_clicked']
-        return (coords['lat'], coords['lng'])
+        coords = st_component["last_clicked"]
+        return (coords["lat"], coords["lng"])
 
     def st_draw_features(self, st_component):
         """Get the draw features of the map.
@@ -1617,7 +1617,7 @@ class Map(folium.Map):
             list: The draw features of the map.
         """
 
-        return st_component['all_drawings']
+        return st_component["all_drawings"]
 
     def add_title(self, title, align="center", font_size="16px", style=None):
         """Adds a title to the map.
@@ -1797,10 +1797,10 @@ class Map(folium.Map):
         layer_name="Marker Cluster",
         color_column=None,
         marker_colors=None,
-        icon_colors=['white'],
-        icon_names=['info'],
+        icon_colors=["white"],
+        icon_names=["info"],
         angle=0,
-        prefix='fa',
+        prefix="fa",
         add_legend=True,
         **kwargs,
     ):
@@ -1825,25 +1825,25 @@ class Map(folium.Map):
         import pandas as pd
 
         color_options = [
-            'red',
-            'blue',
-            'green',
-            'purple',
-            'orange',
-            'darkred',
-            'lightred',
-            'beige',
-            'darkblue',
-            'darkgreen',
-            'cadetblue',
-            'darkpurple',
-            'white',
-            'pink',
-            'lightblue',
-            'lightgreen',
-            'gray',
-            'black',
-            'lightgray',
+            "red",
+            "blue",
+            "green",
+            "purple",
+            "orange",
+            "darkred",
+            "lightred",
+            "beige",
+            "darkblue",
+            "darkgreen",
+            "cadetblue",
+            "darkpurple",
+            "white",
+            "pink",
+            "lightblue",
+            "lightgreen",
+            "gray",
+            "black",
+            "lightgray",
         ]
 
         if isinstance(data, pd.DataFrame):
@@ -2169,7 +2169,7 @@ class Map(folium.Map):
                 )
 
             control = SplitControl(
-                layer_left=left_layer, layer_right=right_layer, name='Split Control'
+                layer_left=left_layer, layer_right=right_layer, name="Split Control"
             )
             left_layer.add_to(self)
             right_layer.add_to(self)
@@ -2178,6 +2178,29 @@ class Map(folium.Map):
         except Exception as e:
             print("The provided layers are invalid!")
             raise ValueError(e)
+
+    def add_data(
+        self,
+        data,
+        column,
+        colors=None,
+        labels=None,
+        cmap=None,
+        scheme="Quantiles",
+        k=5,
+        add_legend=True,
+        legend_title=None,
+        legend_kwds=None,
+        classification_kwds=None,
+        layer_name="Untitled",
+        style=None,
+        hover_style=None,
+        style_callback=None,
+        info_mode="on_hover",
+        encoding="utf-8",
+        **kwargs,
+    ):
+        print("The folium plotting backend does not support this function yet.")
 
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
@@ -2343,12 +2366,12 @@ class Map(folium.Map):
         data,
         zonal_speed,
         meridional_speed,
-        latitude_dimension='lat',
-        longitude_dimension='lon',
+        latitude_dimension="lat",
+        longitude_dimension="lon",
         velocity_scale=0.01,
         max_velocity=20,
         display_options={},
-        name='Velocity',
+        name="Velocity",
     ):
 
         print(f"The folium plotting backend does not support this function.")
@@ -2381,7 +2404,7 @@ class SplitControl(Layer):
     """
 
     _template = Template(
-        u"""
+        """
         {% macro script(this, kwargs) %}
             var {{ this.get_name() }} = L.control.sideBySide(
                 {{ this.layer_left.get_name() }}, {{ this.layer_right.get_name() }}
@@ -2396,7 +2419,7 @@ class SplitControl(Layer):
         super(SplitControl, self).__init__(
             name=name, overlay=overlay, control=control, show=show
         )
-        self._name = 'SplitControl'
+        self._name = "SplitControl"
         self.layer_left = layer_left
         self.layer_right = layer_right
 
@@ -2405,14 +2428,14 @@ class SplitControl(Layer):
 
         figure = self.get_root()
         assert isinstance(figure, Figure), (
-            'You cannot render this Element ' 'if it is not in a Figure.'
+            "You cannot render this Element " "if it is not in a Figure."
         )
 
         figure.header.add_child(
             JavascriptLink(
-                'https://raw.githack.com/digidem/leaflet-side-by-side/gh-pages/leaflet-side-by-side.js'
+                "https://raw.githack.com/digidem/leaflet-side-by-side/gh-pages/leaflet-side-by-side.js"
             ),  # noqa
-            name='leaflet.sidebyside',
+            name="leaflet.sidebyside",
         )
 
 
@@ -2498,8 +2521,8 @@ def st_map_center(lat, lon):
     try:
         import streamlit as st
 
-        if 'map_center' in st.session_state:
-            return st.session_state['map_center']
+        if "map_center" in st.session_state:
+            return st.session_state["map_center"]
         else:
             return [lat, lon]
 
@@ -2517,16 +2540,16 @@ def st_save_bounds(st_component):
         import streamlit as st
 
         if st_component is not None:
-            bounds = st_component['bounds']
-            south = bounds['_southWest']['lat']
-            west = bounds['_southWest']['lng']
-            north = bounds['_northEast']['lat']
-            east = bounds['_northEast']['lng']
+            bounds = st_component["bounds"]
+            south = bounds["_southWest"]["lat"]
+            west = bounds["_southWest"]["lng"]
+            north = bounds["_northEast"]["lat"]
+            east = bounds["_northEast"]["lng"]
 
             bounds = [[south, west], [north, east]]
             center = [south + (north - south) / 2, west + (east - west) / 2]
 
-            st.session_state['map_bounds'] = bounds
-            st.session_state['map_center'] = center
+            st.session_state["map_bounds"] = bounds
+            st.session_state["map_center"] = center
     except Exception as e:
         raise Exception(e)
