@@ -56,6 +56,7 @@
 50. Creating a marker cluster with custom icons ([notebook](https://leafmap.org/notebooks/50_marker_cluster))
 51. Clipping an image by mask ([notebook](https://leafmap.org/notebooks/51_clip_image))
 52. Visualizing NetCDF data ([notebook](https://leafmap.org/notebooks/52_netcdf))
+53. Creating choropleth maps with a variety of classification schemes ([notebook](https://leafmap.org/notebooks/53_choropleth))
 
 ## Demo
 
