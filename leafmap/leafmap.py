@@ -9,6 +9,7 @@ from .common import *
 from .legends import builtin_legends
 from .osm import *
 from .pc import *
+from . import examples
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
