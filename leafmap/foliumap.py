@@ -2246,9 +2246,9 @@ class Map(folium.Map):
                     "dashArray": "9"
                     "clickable": True,
                 }
-            hightlight_function (function, optional): Hightlighting function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-                hightlight_function is a function that takes the feature as argument and should return a dictionary of the following form:
-                hightlight_function = lambda feat: {"fillColor": feat["properties"]["color"]}
+            hightlight_function (function, optional): Highlighting function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+                highlight_function is a function that takes the feature as argument and should return a dictionary of the following form:
+                highlight_function = lambda feat: {"fillColor": feat["properties"]["color"]}
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
         """
