@@ -995,7 +995,7 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
 
     if "rescale" not in kwargs:
         stats = cog_stats(url, titiler_endpoint)
-        if 'message' not in stats:
+        if "message" not in stats:
             percentile_2 = min([stats[s]["percentile_2"] for s in stats])
             percentile_98 = max([stats[s]["percentile_98"] for s in stats])
             kwargs["rescale"] = f"{percentile_2},{percentile_98}"
@@ -1395,7 +1395,7 @@ def stac_tile(
                 assets=assets,
                 titiler_endpoint=titiler_endpoint,
             )
-            if 'detail' not in stats:
+            if "detail" not in stats:
 
                 percentile_2 = min(
                     [stats[s][list(stats[s].keys())[0]]["percentile_2"] for s in stats]
@@ -1405,7 +1405,7 @@ def stac_tile(
                 )
                 kwargs["rescale"] = f"{percentile_2},{percentile_98}"
             else:
-                print(stats['detail'])  # When operation times out.
+                print(stats["detail"])  # When operation times out.
 
     else:
         if isinstance(bands, str):
@@ -4624,7 +4624,7 @@ def image_to_numpy(image):
     if not os.path.exists(image):
         raise FileNotFoundError("The provided input file could not be found.")
 
-    with rasterio.open(image, 'r') as ds:
+    with rasterio.open(image, "r") as ds:
         arr = ds.read()  # read all raster values
 
     return arr
@@ -4823,7 +4823,7 @@ def get_stac_items(
             iterable = catalog.get_all_items()
             items = list(itertools.islice(iterable, limit))
         except Exception as _:
-            print('Ooops, it looks like this collection does not have items.')
+            print("Ooops, it looks like this collection does not have items.")
             return None
     # Iterating over items to collect main information
     for item in items:
@@ -4831,13 +4831,13 @@ def get_stac_items(
         geometry = shape(item.geometry)
         datetime = (
             item.datetime
-            or item.properties['datetime']
-            or item.properties['end_datetime']
-            or item.properties['start_datetime']
+            or item.properties["datetime"]
+            or item.properties["end_datetime"]
+            or item.properties["start_datetime"]
         )
         links = item.links
         for link in links:
-            if link.rel == 'self':
+            if link.rel == "self":
                 self_url = link.target
         assets_list = []
         assets = item.assets
@@ -4850,9 +4850,9 @@ def get_stac_items(
     if limit is not None:
         items_list = items_list[:limit]
     items_df = gpd.GeoDataFrame(items_list)
-    items_df.columns = ['id', 'geometry', 'datetime', 'self_url', 'assets_list']
+    items_df.columns = ["id", "geometry", "datetime", "self_url", "assets_list"]
 
-    items_gdf = items_df.set_geometry('geometry')
+    items_gdf = items_df.set_geometry("geometry")
     items_gdf["datetime"] = items_gdf["datetime"].astype(
         str
     )  # specifically for KeplerGL. See https://github.com/keplergl/kepler.gl/issues/602
@@ -5067,7 +5067,7 @@ def view_lidar(
             mesh = data.to_instance("pyvista", mesh=False)
             mesh = mesh.elevation()
             mesh.plot(
-                scalars='Elevation',
+                scalars="Elevation",
                 cmap=cmap,
                 jupyter_backend=backend,
                 background=background,
@@ -5162,7 +5162,7 @@ def download_file(
 
     import gdown
 
-    if 'https://drive.google.com/file/d/' in url:
+    if "https://drive.google.com/file/d/" in url:
         fuzzy = True
 
     output = gdown.download(
@@ -5292,9 +5292,9 @@ def netcdf_to_tif(
     output=None,
     variables=None,
     shift_lon=True,
-    lat='lat',
-    lon='lon',
-    lev='lev',
+    lat="lat",
+    lon="lon",
+    lev="lev",
     level_index=0,
     time=0,
     return_vars=False,
@@ -5343,7 +5343,7 @@ def netcdf_to_tif(
     xds = xr.open_dataset(filename, **kwargs)
 
     coords = list(xds.coords.keys())
-    if 'time' in coords:
+    if "time" in coords:
         xds = xds.isel(time=time, drop=True)
 
     if lev in coords:
@@ -5416,8 +5416,8 @@ def netcdf_tile_layer(
     layer_name="NetCDF layer",
     return_client=False,
     shift_lon=True,
-    lat='lat',
-    lon='lon',
+    lat="lat",
+    lon="lon",
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a netCDF file.
@@ -5509,3 +5509,196 @@ def netcdf_tile_layer(
         return_client=return_client,
     )
     return tile_layer
+
+
+def classify(
+    data,
+    column,
+    cmap=None,
+    scheme="Quantiles",
+    k=5,
+    legend_kwds=None,
+    classification_kwds=None,
+    **kwargs,
+):
+    """Classify a dataframe column using a variety of classification schemes.
+
+    Args:
+        data (str | pd.DataFrame | gpd.GeoDataFrame): The data to classify. It can be a filepath to a vector dataset, a pandas dataframe, or a geopandas geodataframe.
+        column (str): The column to classify.
+        cmap (str, optional): The name of a colormap recognized by matplotlib. Defaults to None.
+        scheme (str, optional): Name of a choropleth classification scheme (requires mapclassify).
+            Name of a choropleth classification scheme (requires mapclassify).
+            A mapclassify.MapClassifier object will be used
+            under the hood. Supported are all schemes provided by mapclassify (e.g.
+            'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+            'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+            'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+            'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+            'UserDefined'). Arguments can be passed in classification_kwds.
+        k (int, optional): Number of classes (ignored if scheme is None or if column is categorical). Default to 5.
+        legend_kwds (dict, optional): Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or `matplotlib.pyplot.colorbar`. Defaults to None.
+            Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or
+            Additional accepted keywords when `scheme` is specified:
+            fmt : string
+                A formatting specification for the bin edges of the classes in the
+                legend. For example, to have no decimals: ``{"fmt": "{:.0f}"}``.
+            labels : list-like
+                A list of legend labels to override the auto-generated labblels.
+                Needs to have the same number of elements as the number of
+                classes (`k`).
+            interval : boolean (default False)
+                An option to control brackets from mapclassify legend.
+                If True, open/closed interval brackets are shown in the legend.
+        classification_kwds (dict, optional): Keyword arguments to pass to mapclassify. Defaults to None.
+
+    Returns:
+        pd.DataFrame, dict: A pandas dataframe with the classification applied and a legend dictionary.
+    """
+
+    import warnings
+    import mapclassify
+    import numpy as np
+    import pandas as pd
+    import geopandas as gpd
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+
+    if isinstance(data, gpd.GeoDataFrame) or isinstance(data, pd.DataFrame):
+        df = data
+    else:
+        try:
+            df = gpd.read_file(data)
+        except Exception:
+            raise TypeError(
+                "Data must be a GeoDataFrame or a path to a file that can be read by geopandas.read_file()."
+            )
+
+    if df.empty:
+        warnings.warn(
+            "The GeoDataFrame you are attempting to plot is "
+            "empty. Nothing has been displayed.",
+            UserWarning,
+        )
+        return
+
+    columns = df.columns.values.tolist()
+    if column not in columns:
+        raise ValueError(
+            f"{column} is not a column in the GeoDataFrame. It must be one of {columns}."
+        )
+
+    # Convert categorical data to numeric
+    init_column = None
+    value_list = None
+    if np.issubdtype(df[column].dtype, np.object0):
+        value_list = df[column].unique().tolist()
+        value_list.sort()
+        df["category"] = df[column].replace(value_list, range(0, len(value_list)))
+        init_column = column
+        column = "category"
+        k = len(value_list)
+
+    if legend_kwds is not None:
+        legend_kwds = legend_kwds.copy()
+
+    # To accept pd.Series and np.arrays as column
+    if isinstance(column, (np.ndarray, pd.Series)):
+        if column.shape[0] != df.shape[0]:
+            raise ValueError(
+                "The dataframe and given column have different number of rows."
+            )
+        else:
+            values = column
+
+            # Make sure index of a Series matches index of df
+            if isinstance(values, pd.Series):
+                values = values.reindex(df.index)
+    else:
+        values = df[column]
+
+    values = df[column]
+    nan_idx = np.asarray(pd.isna(values), dtype="bool")
+
+    if cmap is None:
+        cmap = "viridis"
+    cmap = plt.cm.get_cmap(cmap, k)
+    colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
+    colors = ["#" + i for i in colors]
+
+    allowed_schemes = [
+        "BoxPlot",
+        "EqualInterval",
+        "FisherJenks",
+        "FisherJenksSampled",
+        "HeadTailBreaks",
+        "JenksCaspall",
+        "JenksCaspallForced",
+        "JenksCaspallSampled",
+        "MaxP",
+        "MaximumBreaks",
+        "NaturalBreaks",
+        "Quantiles",
+        "Percentiles",
+        "StdMean",
+        "UserDefined",
+    ]
+
+    if scheme.lower() not in [s.lower() for s in allowed_schemes]:
+        raise ValueError(
+            f"{scheme} is not a valid scheme. It must be one of {allowed_schemes}."
+        )
+
+    if classification_kwds is None:
+        classification_kwds = {}
+    if "k" not in classification_kwds:
+        classification_kwds["k"] = k
+
+    binning = mapclassify.classify(
+        np.asarray(values[~nan_idx]), scheme, **classification_kwds
+    )
+    df["category"] = binning.yb
+    df["color"] = [colors[i] for i in df["category"]]
+
+    if legend_kwds is None:
+        legend_kwds = {}
+
+    if "interval" not in legend_kwds:
+        legend_kwds["interval"] = True
+
+    if "fmt" not in legend_kwds:
+        if np.issubdtype(df[column].dtype, np.floating):
+            legend_kwds["fmt"] = "{:.2f}"
+        else:
+            legend_kwds["fmt"] = "{:.0f}"
+
+    # set categorical to True for creating the legend
+    if legend_kwds is not None and "labels" in legend_kwds:
+        if len(legend_kwds["labels"]) != binning.k:
+            raise ValueError(
+                "Number of labels must match number of bins, "
+                "received {} labels for {} bins".format(
+                    len(legend_kwds["labels"]), binning.k
+                )
+            )
+        else:
+            labels = list(legend_kwds.pop("labels"))
+    else:
+        # fmt = "{:.2f}"
+        if legend_kwds is not None and "fmt" in legend_kwds:
+            fmt = legend_kwds.pop("fmt")
+
+        labels = binning.get_legend_classes(fmt)
+        if legend_kwds is not None:
+            show_interval = legend_kwds.pop("interval", False)
+        else:
+            show_interval = False
+        if not show_interval:
+            labels = [c[1:-1] for c in labels]
+
+    if init_column is not None:
+        labels = value_list
+
+    legend_dict = dict(zip(labels, colors))
+    df["category"] = df["category"] + 1
+    return df, legend_dict
