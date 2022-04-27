@@ -5,6 +5,7 @@ import ipywidgets as widgets
 from .basemaps import xyz_to_plotly
 from .common import *
 from .osm import *
+from . import examples
 
 try:
     import plotly.express as px
@@ -468,7 +469,7 @@ class Map(go.FigureWidget):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
         """
         tile_url = mosaic_tile(url, titiler_endpoint, **kwargs)
-        center = mosaic_info(url, titiler_endpoint)['center']
+        center = mosaic_info(url, titiler_endpoint)["center"]
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
