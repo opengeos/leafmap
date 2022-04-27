@@ -1106,12 +1106,13 @@ class Map(folium.Map):
 
         self.add_child(colormap)
 
-    def add_shp(self, in_shp, layer_name="Untitled", **kwargs):
+    def add_shp(self, in_shp, layer_name="Untitled", info_mode="on_hover", **kwargs):
         """Adds a shapefile to the map. See https://python-visualization.github.io/folium/modules.html#folium.features.GeoJson for more info about setting style.
 
         Args:
             in_shp (str): The input file path to the shapefile.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
@@ -1137,10 +1138,15 @@ class Map(folium.Map):
 
         data = shp_to_geojson(in_shp)
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
     def add_geojson(
-        self, in_geojson, layer_name="Untitled", encoding="utf-8", **kwargs
+        self,
+        in_geojson,
+        layer_name="Untitled",
+        encoding="utf-8",
+        info_mode="on_hover",
+        **kwargs,
     ):
         """Adds a GeoJSON file to the map.
 
@@ -1148,6 +1154,7 @@ class Map(folium.Map):
             in_geojson (str): The input file path to the GeoJSON.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
@@ -1213,27 +1220,49 @@ class Map(folium.Map):
                 return style_dict
 
             kwargs["style_function"] = random_color
-
             kwargs.pop("fill_colors")
-        if "info_mode" in kwargs:
-            kwargs.pop("info_mode")
 
-        geojson = folium.GeoJson(data=data, name=layer_name, **kwargs)
+        if "highlight_function" not in kwargs:
+            kwargs["highlight_function"] = lambda feat: {
+                "weight": 2,
+                "fillOpacity": 0.5,
+            }
+
+        tooltip = None
+        popup = None
+        if info_mode is not None:
+            props = list(data["features"][0]["properties"].keys())
+            if info_mode == "on_hover":
+                tooltip = folium.GeoJsonTooltip(fields=props)
+            elif info_mode == "on_click":
+                popup = folium.GeoJsonPopup(fields=props)
+
+        geojson = folium.GeoJson(
+            data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
+        )
         geojson.add_to(self)
 
-    def add_gdf(self, gdf, layer_name="Untitled", zoom_to_layer=True, **kwargs):
+    def add_gdf(
+        self,
+        gdf,
+        layer_name="Untitled",
+        zoom_to_layer=True,
+        info_mode="on_hover",
+        **kwargs,
+    ):
         """Adds a GeoPandas GeoDataFrameto the map.
 
         Args:
             gdf (GeoDataFrame): A GeoPandas GeoDataFrame.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
         if zoom_to_layer:
             import numpy as np
@@ -1246,7 +1275,13 @@ class Map(folium.Map):
             self.fit_bounds([[south, east], [north, west]])
 
     def add_gdf_from_postgis(
-        self, sql, con, layer_name="Untitled", zoom_to_layer=True, **kwargs
+        self,
+        sql,
+        con,
+        layer_name="Untitled",
+        zoom_to_layer=True,
+        info_mode="on_hover",
+        **kwargs,
     ):
         """Adds a GeoPandas GeoDataFrameto the map.
 
@@ -1255,6 +1290,7 @@ class Map(folium.Map):
             con (sqlalchemy.engine.Engine): Active connection to the database to query.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
         if "fill_colors" in kwargs:
@@ -1262,7 +1298,7 @@ class Map(folium.Map):
         gdf = read_postgis(sql, con, **kwargs)
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
         if zoom_to_layer:
             import numpy as np
@@ -1274,12 +1310,13 @@ class Map(folium.Map):
             north = np.max(bounds["maxy"])
             self.fit_bounds([[south, east], [north, west]])
 
-    def add_kml(self, in_kml, layer_name="Untitled", **kwargs):
+    def add_kml(self, in_kml, layer_name="Untitled", info_mode="on_hover", **kwargs):
         """Adds a KML file to the map.
 
         Args:
             in_kml (str): The input file path to the KML.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided KML file could not be found.
@@ -1300,7 +1337,7 @@ class Map(folium.Map):
 
         data = kml_to_geojson(in_kml)
 
-        self.add_geojson(data, layer_name=layer_name, **kwargs)
+        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
     def add_vector(
         self,
@@ -1309,6 +1346,7 @@ class Map(folium.Map):
         bbox=None,
         mask=None,
         rows=None,
+        info_mode="on_hover",
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -1319,6 +1357,7 @@ class Map(folium.Map):
             bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
             mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
             rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
         if not filename.startswith("http"):
@@ -1339,7 +1378,7 @@ class Map(folium.Map):
                 **kwargs,
             )
 
-            self.add_geojson(geojson, layer_name, **kwargs)
+            self.add_geojson(geojson, layer_name, info_mode=info_mode, **kwargs)
 
     def add_planet_by_month(
         self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
