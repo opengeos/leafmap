@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.9.2 - Apr 27, 2022
+
+**New Features**:
+
+-   Added support for creating interactive choropleth maps with a variety of classification schemes [#235](https://github.com/giswqs/leafmap/issues/235) [#239](https://github.com/giswqs/leafmap/pull/239) [#240](https://github.com/giswqs/leafmap/pull/240)
+-   Added tooltip and popup for GeoJSON
+-   Added examples module [#238](https://github.com/giswqs/leafmap/pull/238)
+
+**Improvement**
+
+-   Fixed add velocity bug [#234](https://github.com/giswqs/leafmap/issues/234)
+-   Added ability to handle levels and times in netCDF files [#232](https://github.com/giswqs/leafmap/pull/232)
+
 ## v0.9.1 - Apr 2, 2022
 
 **Improvement**
