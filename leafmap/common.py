@@ -1397,12 +1397,22 @@ def stac_tile(
             )
             if "detail" not in stats:
 
-                percentile_2 = min(
-                    [stats[s][list(stats[s].keys())[0]]["percentile_2"] for s in stats]
-                )
-                percentile_98 = max(
-                    [stats[s][list(stats[s].keys())[0]]["percentile_98"] for s in stats]
-                )
+                try:
+                    percentile_2 = min([stats[s]["percentile_2"] for s in stats])
+                    percentile_98 = max([stats[s]["percentile_98"] for s in stats])
+                except:
+                    percentile_2 = min(
+                        [
+                            stats[s][list(stats[s].keys())[0]]["percentile_2"]
+                            for s in stats
+                        ]
+                    )
+                    percentile_98 = max(
+                        [
+                            stats[s][list(stats[s].keys())[0]]["percentile_98"]
+                            for s in stats
+                        ]
+                    )
                 kwargs["rescale"] = f"{percentile_2},{percentile_98}"
             else:
                 print(stats["detail"])  # When operation times out.
