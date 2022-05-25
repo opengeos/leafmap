@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.3 - Apr 27, 2022
+
+**Improvement**
+
+-   Fixed stac stats bug [#245](https://github.com/giswqs/leafmap/issues/245)
+
 ## v0.9.2 - Apr 27, 2022
 
 **New Features**:
