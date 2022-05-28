@@ -613,7 +613,7 @@ def system_fonts(show_full_path=False):
 
 
 def download_from_url(url, out_file_name=None, out_dir=".", unzip=True, verbose=True):
-    """Download a file from a URL (e.g., https://github.com/giswqs/whitebox/raw/master/examples/testdata.zip)
+    """Download a file from a URL (e.g., https://github.com/giswqs/whitebox-python/raw/master/examples/testdata.zip)
 
     Args:
         url (str): The HTTP URL to download.
