@@ -27,7 +27,7 @@
 10. Adding local vector data (e.g., shp, geojson, kml) to the map ([notebook](https://leafmap.org/notebooks/10_add_vector))
 11. Creating linked maps for visualizing multiple maps simultaneously ([notebook](https://leafmap.org/notebooks/11_linked_maps))
 12. Creating a split-panel map with a single line of code ([notebook](https://leafmap.org/notebooks/12_split_map))
-13. Adding a GeoPandas GeoDataFrame to the map with a single line of code ([notebook](https://leafmap.org/notebooks/13_geopandas))
+13. Adding a GeoPandas GeoDataFrame to the map with a single line of code ([notebook](https://leafmap.org/notebooks/13_geopandas/))
 14. Adding data from a PostGIS database to the map ([notebook](https://leafmap.org/notebooks/14_postgis))
 15. Downloading OpenStreetMap data to the map with a single line of code ([notebook](https://leafmap.org/notebooks/15_add_osm))
 16. Use [HERE Map Widget for Jupyter](https://github.com/heremaps/here-map-widget-for-jupyter) as plotting backend ([notebook](https://leafmap.org/notebooks/16_heremap))
@@ -66,7 +66,7 @@
 49. Creating a split-panel map with folium ([notebook](https://leafmap.org/notebooks/49_split_control))
 50. Creating a marker cluster with custom icons ([notebook](https://leafmap.org/notebooks/50_marker_cluster))
 51. Clipping an image by mask ([notebook](https://leafmap.org/notebooks/51_clip_image))
-52. Visualizing NetCDF data ([notebook](https://leafmap.org/notebooks/52_netcdf))
+52. Visualizing NetCDF data ([notebook](https://leafmap.org/notebooks/52_netcdf/))
 53. Creating choropleth maps with a variety of classification schemes ([notebook](https://leafmap.org/notebooks/53_choropleth))
 
 ## Demo
