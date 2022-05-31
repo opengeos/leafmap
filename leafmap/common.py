@@ -5726,3 +5726,29 @@ def classify(
     legend_dict = dict(zip(labels, colors))
     df["category"] = df["category"] + 1
     return df, legend_dict
+
+
+def check_cmap(cmap):
+    """Check the colormap and return a list of colors.
+
+    Args:
+        cmap (str | list | Box): The colormap to check.
+
+    Returns:
+        list: A list of colors.
+    """
+
+    from box import Box
+    from .colormaps import get_palette
+
+    if isinstance(cmap, str):
+        try:
+            return get_palette(cmap)
+        except Exception as e:
+            raise Exception(f"{cmap} is not a valid colormap.")
+    elif isinstance(cmap, Box):
+        return list(cmap["default"])
+    elif isinstance(cmap, list) or isinstance(cmap, tuple):
+        return cmap
+    else:
+        raise Exception(f"{cmap} is not a valid colormap.")
