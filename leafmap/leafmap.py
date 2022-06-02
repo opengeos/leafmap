@@ -992,14 +992,14 @@ class Map(ipyleaflet.Map):
         if y not in col_names:
             raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
 
-        for row in df.itertuples():
+        for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
+                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
             popup_html = widgets.HTML(html)
 
             marker = ipyleaflet.CircleMarker(
-                location=[getattr(row, y), getattr(row, x)],
+                location=[row[y], row[x]],
                 radius=radius,
                 popup=popup_html,
                 **kwargs,

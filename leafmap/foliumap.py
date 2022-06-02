@@ -1943,14 +1943,14 @@ class Map(folium.Map):
 
         marker_cluster = plugins.MarkerCluster(name=layer_name).add_to(self)
 
-        for row in df.itertuples():
+        for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
+                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
             popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
 
             if items is not None:
-                index = items.index(getattr(row, color_column))
+                index = items.index(row[color_column])
                 marker_icon = folium.Icon(
                     color=marker_colors[index],
                     icon_color=icon_colors[index],
@@ -1962,7 +1962,7 @@ class Map(folium.Map):
                 marker_icon = None
 
             folium.Marker(
-                location=[getattr(row, y), getattr(row, x)],
+                location=[row[y], row[x]],
                 popup=popup_html,
                 icon=marker_icon,
             ).add_to(marker_cluster)
@@ -2034,17 +2034,17 @@ class Map(folium.Map):
         if y not in col_names:
             raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
 
-        for row in df.itertuples():
+        for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
+                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
             popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
 
             if tooltip is not None:
                 html = ""
                 for p in tooltip:
                     html = (
-                        html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
+                        html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
                     )
 
                 tooltip_str = folium.Tooltip(html)
@@ -2052,7 +2052,7 @@ class Map(folium.Map):
                 tooltip_str = None
 
             folium.CircleMarker(
-                location=[getattr(row, y), getattr(row, x)],
+                location=[row[y], row[x]],
                 radius=radius,
                 popup=popup_html,
                 tooltip=tooltip_str,
