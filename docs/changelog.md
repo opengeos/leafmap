@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.9.4 - Jun 7, 2022
+
+**Improvement**
+
+-   Added ESA WorldCover and USGS NAIP basemaps [#250](https://github.com/giswqs/leafmap/pull/250)
+-   Fixed bugs in add_points_from_xy functions [#249](https://github.com/giswqs/leafmap/pull/249)
+-   Fixed link redirects [#247](https://github.com/giswqs/leafmap/pull/247)
+-   Added check_cmap function
+
 ## v0.9.3 - Apr 27, 2022
 
 **Improvement**
