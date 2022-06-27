@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.9.5 - Jun 26, 2022
+
+**Improvement**
+
+-   Made mapclassify optional [#257](https://github.com/giswqs/leafmap/pull/257)
+-   Improved wording on the home page [#256](https://github.com/giswqs/leafmap/pull/256)
+-   Fixed typos [#251](https://github.com/giswqs/leafmap/pull/251)
+
 ## v0.9.4 - Jun 7, 2022
 
 **Improvement**
