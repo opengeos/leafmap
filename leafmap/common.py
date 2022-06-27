@@ -5578,8 +5578,10 @@ def classify(
 
     try:
         import mapclassify
-    except ImportError
-        raise ImportError("mapclassify is required for this function. Install with `pip install mapclassify`.")
+    except ImportError:
+        raise ImportError(
+            "mapclassify is required for this function. Install with `pip install mapclassify`."
+        )
 
     if isinstance(data, gpd.GeoDataFrame) or isinstance(data, pd.DataFrame):
         df = data
