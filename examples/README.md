@@ -68,6 +68,7 @@
 51. Clipping an image by mask ([notebook](https://leafmap.org/notebooks/51_clip_image))
 52. Visualizing NetCDF data ([notebook](https://leafmap.org/notebooks/52_netcdf/))
 53. Creating choropleth maps with a variety of classification schemes ([notebook](https://leafmap.org/notebooks/53_choropleth))
+54. Plotting elevation data in 3D without only one line of code ([notebook](https://leafmap.org/notebooks/54_plot_raster))
 
 ## Demo
 
