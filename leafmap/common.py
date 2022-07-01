@@ -5840,9 +5840,6 @@ def plot_raster_3d(
             "pyxarray and rioxarray are required for plotting. Please install them using 'pip install rioxarray pyvista-xarray'."
         )
 
-    if band is not None:
-        da = da[dict(band=band)]
-
     if isinstance(background, str):
         pyvista.global_theme.background = background
 
@@ -5852,6 +5849,9 @@ def plot_raster_3d(
         da = image
     else:
         raise ValueError("image must be a string or xarray.Dataset.")
+
+    if band is not None:
+        da = da[dict(band=band)]
 
     da = da.rio.reproject(proj)
     mesh_kwargs["factor"] = factor
