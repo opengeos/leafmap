@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.9.6 - Jul 1, 2022
+
+**New Features**:
+
+-   Added plotting raster in 3D [#259](https://github.com/giswqs/leafmap/pull/259)
+-   Added scooby report for reporting issues [#260](https://github.com/giswqs/leafmap/pull/260)
+
 ## v0.9.5 - Jun 26, 2022
 
 **Improvement**
