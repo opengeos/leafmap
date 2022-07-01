@@ -5781,6 +5781,9 @@ def plot_raster(
         **kwargs: Additional keyword arguments to pass to xarray.DataArray.plot().
 
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
     try:
         import pvxarray
         import rioxarray
@@ -5830,6 +5833,10 @@ def plot_raster_3d(
         mesh_kwargs (dict, optional): The keyword arguments to pass to pyvista.mesh.warp_by_scalar(). Defaults to {}.
         **kwargs: Additional keyword arguments to pass to xarray.DataArray.plot().
     """
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
     try:
         import pvxarray
         import pyvista
