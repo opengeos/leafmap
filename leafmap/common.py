@@ -5253,6 +5253,8 @@ def clip_image(image, mask, output):
     output = check_file_path(output)
 
     if isinstance(mask, str):
+        if mask.startswith("http"):
+            mask = download_file(mask, output)
         if not os.path.exists(mask):
             raise FileNotFoundError(f"{mask} does not exist.")
     elif isinstance(mask, list) or isinstance(mask, dict):
