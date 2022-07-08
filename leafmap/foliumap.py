@@ -1381,36 +1381,52 @@ class Map(folium.Map):
             self.add_geojson(geojson, layer_name, info_mode=info_mode, **kwargs)
 
     def add_planet_by_month(
-        self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
+        self,
+        year=2016,
+        month=1,
+        layer_name=None,
+        api_key=None,
+        token_name="PLANET_API_KEY",
+        **kwargs,
     ):
         """Adds a Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
 
         Args:
             year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
             month (int, optional): The month of Planet global mosaic, must be 1-12. Defaults to 1.
-            name (str, optional): The layer name to use. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to None.
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
+        if layer_name is None and "name" in kwargs:
+            layer_name = kwargs.pop("name")
         layer = planet_tile_by_month(
-            year, month, name, api_key, token_name, tile_format="folium"
+            year, month, layer_name, api_key, token_name, tile_format="folium"
         )
         layer.add_to(self)
 
     def add_planet_by_quarter(
-        self, year=2016, quarter=1, name=None, api_key=None, token_name="PLANET_API_KEY"
+        self,
+        year=2016,
+        quarter=1,
+        layer_name=None,
+        api_key=None,
+        token_name="PLANET_API_KEY",
+        **kwargs,
     ):
         """Adds a Planet global mosaic by quarter to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
 
         Args:
             year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
             quarter (int, optional): The quarter of Planet global mosaic, must be 1-12. Defaults to 1.
-            name (str, optional): The layer name to use. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to None.
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
+        if layer_name is None and "name" in kwargs:
+            layer_name = kwargs.pop("name")
         layer = planet_tile_by_quarter(
-            year, quarter, name, api_key, token_name, tile_format="folium"
+            year, quarter, layer_name, api_key, token_name, tile_format="folium"
         )
         layer.add_to(self)
 
