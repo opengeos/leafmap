@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.10.0 - Jul 8, 2022
+
+**New Features**:
+
+-   Added support for changing geojson layer opacity [#265](https://github.com/giswqs/leafmap/pull/265)
+
+**Improvement**
+
+-   Updated plot raster 3d function [#264](https://github.com/giswqs/leafmap/pull/264)
+-   Fixed clip image bug
+
+## v0.9.5 - Jun 26, 2022
+
+**Improvement**
+
+-   Made mapclassify optional [#257](https://github.com/giswqs/leafmap/pull/257)
+
 ## v0.9.6 - Jul 1, 2022
 
 **New Features**:
