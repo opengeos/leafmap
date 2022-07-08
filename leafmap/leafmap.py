@@ -2125,6 +2125,17 @@ class Map(ipyleaflet.Map):
         self.add_layer(geojson)
         self.geojson_layers.append(geojson)
 
+        if not hasattr(self, "json_layer_dict"):
+            self.json_layer_dict = {}
+
+        params = {
+            "data": geojson,
+            "style": style,
+            "hover_style": hover_style,
+            "style_callback": style_callback,
+        }
+        self.json_layer_dict[layer_name] = params
+
     def add_search_control(
         self, url, marker=None, zoom=None, position="topleft", **kwargs
     ):
