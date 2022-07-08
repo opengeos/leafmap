@@ -1912,7 +1912,7 @@ class Map(ipyleaflet.Map):
         """Adds a shapefile to the map.
 
         Args:
-            in_shp (str): The input file path to the shapefile.
+            in_shp (str): The input file path or HTTP URL (*.zip) to the shapefile.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
@@ -1930,7 +1930,10 @@ class Map(ipyleaflet.Map):
             out_dir = os.path.abspath("./cache/shp")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            basename = os.path.basename(in_shp)
+            filename = os.path.join(out_dir, basename)
+            # download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            download_file(in_shp, filename)
             files = list(glob.glob(os.path.join(out_dir, "*.shp")))
             if len(files) > 0:
                 in_shp = files[0]
@@ -2266,7 +2269,7 @@ class Map(ipyleaflet.Map):
         """Adds a KML file to the map.
 
         Args:
-            in_kml (str): The input file path to the KML.
+            in_kml (str): The input file path or HTTP URL to the KML.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
@@ -2282,8 +2285,7 @@ class Map(ipyleaflet.Map):
             out_dir = os.path.abspath("./cache")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_kml, out_dir=out_dir, unzip=False, verbose=False)
-            in_kml = os.path.join(out_dir, os.path.basename(in_kml))
+            in_kml = download_file(in_kml)
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The downloaded kml file could not be found.")
         else:
