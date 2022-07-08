@@ -481,10 +481,10 @@ def main_toolbar(m):
             layers = [
                 lyr
                 for lyr in m.layers
-                if (
-                    isinstance(lyr, ipyleaflet.TileLayer)
-                    or isinstance(lyr, ipyleaflet.WMSLayer)
-                )
+                # if (
+                #     isinstance(lyr, ipyleaflet.TileLayer)
+                #     or isinstance(lyr, ipyleaflet.WMSLayer)
+                # )
             ]
 
             # if the layers contain unsupported layers (e.g., GeoJSON, GeoData), adds the ipyleaflet built-in LayerControl
@@ -504,8 +504,19 @@ def main_toolbar(m):
                     layout=widgets.Layout(height="18px"),
                 )
                 layer_chk.layout.width = "25ex"
+
+                if layer in m.geojson_layers:
+                    try:
+                        opacity = max(
+                            layer.style["opacity"], layer.style["fillOpacity"]
+                        )
+                    except KeyError:
+                        opacity = 1.0
+                else:
+                    opacity = layer.opacity
+
                 layer_opacity = widgets.FloatSlider(
-                    value=layer.opacity,
+                    value=opacity,
                     min=0,
                     max=1,
                     step=0.01,
@@ -520,6 +531,13 @@ def main_toolbar(m):
                     ),
                 )
 
+                def layer_opacity_changed(change):
+                    if change["new"]:
+                        layer.style = {
+                            "opacity": change["new"],
+                            "fillOpacity": change["new"],
+                        }
+
                 # def layer_vis_on_click(change):
                 #     if change["new"]:
                 #         layer_name = change["owner"].tooltip
@@ -533,7 +551,13 @@ def main_toolbar(m):
                 # layer_chk.observe(layer_chk_changed, "value")
 
                 widgets.jslink((layer_chk, "value"), (layer, "visible"))
-                widgets.jsdlink((layer_opacity, "value"), (layer, "opacity"))
+
+                if layer in m.geojson_layers:
+                    layer_opacity.observe(layer_opacity_changed, "value")
+                else:
+                    widgets.jsdlink((layer_opacity, "value"), (layer, "opacity"))
+
+                # widgets.jsdlink((layer_opacity, "value"), (layer, "opacity"))
                 hbox = widgets.HBox(
                     [layer_chk, layer_settings, layer_opacity],
                     layout=widgets.Layout(padding="0px 8px 0px 8px"),
@@ -4439,13 +4463,13 @@ def stac_gui(m=None):
     )
 
     start_date = widgets.DatePicker(
-        description='Start date:',
+        description="Start date:",
         disabled=False,
         style=style,
         layout=widgets.Layout(width="225px", padding=padding),
     )
     end_date = widgets.DatePicker(
-        description='End date:',
+        description="End date:",
         disabled=False,
         style=style,
         layout=widgets.Layout(width="225px", padding=padding),
@@ -4453,20 +4477,20 @@ def stac_gui(m=None):
 
     collection = widgets.Dropdown(
         options=get_pc_collection_list(),
-        value='landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2',
+        value="landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2",
         description="Collection:",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
     )
 
-    col_name = collection.value.split(' - ')[0].strip()
+    col_name = collection.value.split(" - ")[0].strip()
     band_names = get_pc_inventory()[col_name]["bands"]
     # red.options = band_names
     # green.options = band_names
     # blue.options = band_names
 
     item = widgets.Dropdown(
-        options=['LC08_L2SP_047027_20201204_02_T1'],
+        options=["LC08_L2SP_047027_20201204_02_T1"],
         description="Item:",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
@@ -4490,7 +4514,7 @@ def stac_gui(m=None):
 
     band_width = "149px"
     red = widgets.Dropdown(
-        value='SR_B5',
+        value="SR_B5",
         options=band_names,
         description="Red:",
         tooltip="Select a band for the red channel",
@@ -4499,7 +4523,7 @@ def stac_gui(m=None):
     )
 
     green = widgets.Dropdown(
-        value='SR_B4',
+        value="SR_B4",
         options=band_names,
         description="Green:",
         tooltip="Select a band for the green channel",
@@ -4508,7 +4532,7 @@ def stac_gui(m=None):
     )
 
     blue = widgets.Dropdown(
-        value='SR_B3',
+        value="SR_B3",
         options=band_names,
         description="Blue:",
         tooltip="Select a band for the blue channel",
@@ -4592,7 +4616,7 @@ def stac_gui(m=None):
         output.clear_output()
 
     with output:
-        col_name = collection.value.split(' - ')[0].strip()
+        col_name = collection.value.split(" - ")[0].strip()
         band_names = get_pc_inventory()[col_name]["bands"]
         red.options = band_names
         green.options = band_names
@@ -4742,7 +4766,7 @@ def stac_gui(m=None):
                 output.clear_output()
                 if collection.value is not None:
                     if start_date.value is not None and end_date.value is not None:
-                        datetime = str(start_date.value) + '/' + str(end_date.value)
+                        datetime = str(start_date.value) + "/" + str(end_date.value)
                     elif start_date.value is not None:
                         datetime = str(start_date.value)
                     elif end_date.value is not None:
@@ -4750,9 +4774,9 @@ def stac_gui(m=None):
                     else:
                         datetime = None
 
-                    col_name = collection.value.split(' - ')[0].strip()
+                    col_name = collection.value.split(" - ")[0].strip()
                     if m.user_roi is not None:
-                        intersects = m.user_roi['geometry']
+                        intersects = m.user_roi["geometry"]
                     else:
                         print("Please draw a polygon to be used as an AOI.")
                         print(
@@ -4779,15 +4803,15 @@ def stac_gui(m=None):
                         intersects=intersects,
                     )
                     if gdf is not None:
-                        item.options = gdf['id'].tolist()
-                        if not hasattr(m, 'layers_control'):
+                        item.options = gdf["id"].tolist()
+                        if not hasattr(m, "layers_control"):
                             layers_control = m.add_control(
                                 ipyleaflet.LayersControl(position="topright")
                             )
-                            setattr(m, 'layers_control', layers_control)
-                        m.add_gdf(gdf, 'Image footprints', style={'fill': False})
+                            setattr(m, "layers_control", layers_control)
+                        m.add_gdf(gdf, "Image footprints", style={"fill": False})
                     output.clear_output()
-                    print(f'{len(item.options)} items found.')
+                    print(f"{len(item.options)} items found.")
                 else:
                     print("Please select a valid collection.")
 
@@ -4832,7 +4856,7 @@ def stac_gui(m=None):
                     if len(set([red.value, green.value, blue.value])) == 1:
                         assets = red.value
                     else:
-                        assets = f'{red.value},{green.value},{blue.value}'
+                        assets = f"{red.value},{green.value},{blue.value}"
                     m.add_stac_layer(
                         collection=col,
                         item=item.value,
