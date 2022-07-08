@@ -459,7 +459,7 @@ class TestLeafmap(unittest.TestCase):
         m = leafmap.Map()
         url = "https://www.mapbox.com/bites/00188/patricia_nasa.webm"
         bounds = [(13, -130), (32, -100)]
-        m.video_overlay(url=url, bounds=bounds, name="Video")
+        m.video_overlay(url=url, bounds=bounds, layer_name="Video")
         out_str = m.to_html()
         assert "Video" in out_str
 
