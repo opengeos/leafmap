@@ -1110,7 +1110,7 @@ class Map(folium.Map):
         """Adds a shapefile to the map. See https://python-visualization.github.io/folium/modules.html#folium.features.GeoJson for more info about setting style.
 
         Args:
-            in_shp (str): The input file path to the shapefile.
+            in_shp (str): The input file path or HTTP URL (*.zip) to the shapefile.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
@@ -1123,7 +1123,10 @@ class Map(folium.Map):
             out_dir = os.path.abspath("./cache/shp")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            basename = os.path.basename(in_shp)
+            filename = os.path.join(out_dir, basename)
+            # download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            download_file(in_shp, filename)
             files = list(glob.glob(os.path.join(out_dir, "*.shp")))
             if len(files) > 0:
                 in_shp = files[0]
@@ -1326,8 +1329,7 @@ class Map(folium.Map):
             out_dir = os.path.abspath("./cache")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_kml, out_dir=out_dir, unzip=False, verbose=False)
-            in_kml = os.path.join(out_dir, os.path.basename(in_kml))
+            in_kml = download_file(in_kml)
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The downloaded kml file could not be found.")
         else:
@@ -1381,36 +1383,52 @@ class Map(folium.Map):
             self.add_geojson(geojson, layer_name, info_mode=info_mode, **kwargs)
 
     def add_planet_by_month(
-        self, year=2016, month=1, name=None, api_key=None, token_name="PLANET_API_KEY"
+        self,
+        year=2016,
+        month=1,
+        layer_name=None,
+        api_key=None,
+        token_name="PLANET_API_KEY",
+        **kwargs,
     ):
         """Adds a Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
 
         Args:
             year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
             month (int, optional): The month of Planet global mosaic, must be 1-12. Defaults to 1.
-            name (str, optional): The layer name to use. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to None.
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
+        if layer_name is None and "name" in kwargs:
+            layer_name = kwargs.pop("name")
         layer = planet_tile_by_month(
-            year, month, name, api_key, token_name, tile_format="folium"
+            year, month, layer_name, api_key, token_name, tile_format="folium"
         )
         layer.add_to(self)
 
     def add_planet_by_quarter(
-        self, year=2016, quarter=1, name=None, api_key=None, token_name="PLANET_API_KEY"
+        self,
+        year=2016,
+        quarter=1,
+        layer_name=None,
+        api_key=None,
+        token_name="PLANET_API_KEY",
+        **kwargs,
     ):
         """Adds a Planet global mosaic by quarter to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
 
         Args:
             year (int, optional): The year of Planet global mosaic, must be >=2016. Defaults to 2016.
             quarter (int, optional): The quarter of Planet global mosaic, must be 1-12. Defaults to 1.
-            name (str, optional): The layer name to use. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to None.
             api_key (str, optional): The Planet API key. Defaults to None.
             token_name (str, optional): The environment variable name of the API key. Defaults to "PLANET_API_KEY".
         """
+        if layer_name is None and "name" in kwargs:
+            layer_name = kwargs.pop("name")
         layer = planet_tile_by_quarter(
-            year, quarter, name, api_key, token_name, tile_format="folium"
+            year, quarter, layer_name, api_key, token_name, tile_format="folium"
         )
         layer.add_to(self)
 
