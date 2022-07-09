@@ -3871,6 +3871,9 @@ def get_local_tile_layer(
                 source = os.path.abspath(source)
             if not os.path.exists(source):
                 raise ValueError("The source path does not exist.")
+                raise ValueError("The source path does not exist.")
+        else:
+            source = github_raw_url(source)
     else:
         raise ValueError("The source must either be a string or TileClient")
 
@@ -5901,3 +5904,18 @@ def plot_raster_3d(
 
     # Warp top and plot in 3D
     mesh.warp_by_scalar(**mesh_kwargs).plot(**kwargs)
+
+
+def github_raw_url(url):
+    """Get the raw URL for a GitHub file.
+
+    Args:
+        url (str): The GitHub URL.
+    Returns:
+        str: The raw URL.
+    """
+    if isinstance(url, str) and url.startswith("https://github.com/") and "blob" in url:
+        url = url.replace("github.com", "raw.githubusercontent.com").replace(
+            "blob/", ""
+        )
+    return url
