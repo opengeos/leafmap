@@ -5153,6 +5153,7 @@ def download_file(
     fuzzy=False,
     resume=False,
     unzip=True,
+    overwrite=False,
 ):
     """Download a file from URL, including Google Drive shared URL.
 
@@ -5168,12 +5169,26 @@ def download_file(
         fuzzy (bool, optional): Fuzzy extraction of Google Drive's file Id. Defaults to False.
         resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
         unzip (bool, optional): Unzip the file. Defaults to True.
+        overwrite (bool, optional): Overwrite the file if it already exists. Defaults to False.
 
     Returns:
         str: The output file path.
     """
 
     import gdown
+
+    if output is None:
+        if isinstance(url, str) and url.startswith("http"):
+            output = os.path.basename(url)
+
+    if isinstance(url, str):
+        if os.path.exists(os.path.abspath(output)) and (not overwrite):
+            print(
+                f"{output} already exists. Skip downloading. Set overwrite=True to overwrite."
+            )
+            return os.path.abspath(output)
+        else:
+            url = github_raw_url(url)
 
     if "https://drive.google.com/file/d/" in url:
         fuzzy = True
