@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.10.1 - Jul 11, 2022
+
+**New Features**:
+
+-   Added github_raw_url function [#267](https://github.com/giswqs/leafmap/pull/267)
+
+**Improvement**
+
+-   Pin ipyleaflet version for Colab [#269](https://github.com/giswqs/leafmap/pull/269)
+-   Improved add data methods to accept HTTP URL [#262](https://github.com/giswqs/leafmap/issues/262)
+-   Changed parameter name to layer_name [#262](https://github.com/giswqs/leafmap/issues/262)
+-   Improved download_file function
+
 ## v0.10.0 - Jul 8, 2022
 
 **New Features**:
