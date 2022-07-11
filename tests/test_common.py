@@ -37,9 +37,9 @@ class TestCommon(unittest.TestCase):
 
         self.assertIsInstance(csv_to_geojson(self.in_csv), dict)
 
-    def test_csv_to_pandas(self):
+    def test_csv_to_df(self):
 
-        self.assertIsInstance(csv_to_pandas(self.in_csv), pandas.DataFrame)
+        self.assertIsInstance(csv_to_df(self.in_csv), pandas.DataFrame)
 
     def test_gdf_to_geojson(self):
 
