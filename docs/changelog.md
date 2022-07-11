@@ -437,7 +437,7 @@
 **New Features**:
 
 -   Added troubleshooting section [#76](https://github.com/giswqs/leafmap/issues/76)
--   Added pandas_to_geojson function [#75](https://github.com/giswqs/leafmap/issues/75)
+-   Added df_to_geojson function [#75](https://github.com/giswqs/leafmap/issues/75)
 -   Added creating heat map from csv [#64](https://github.com/giswqs/leafmap/issues/64)
 -   Added cog mosaic from file [#61](https://github.com/giswqs/leafmap/issues/61)
 -   Added colormap notebook [#60](https://github.com/giswqs/leafmap/issues/60)
