@@ -779,7 +779,9 @@ def csv_points_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude
     wbt.csv_points_to_vector(in_csv, out_shp, xfield=xfield, yfield=yfield, epsg=4326)
 
 
-def csv_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude"):
+def csv_to_shp(
+    in_csv, out_shp, latitude="latitude", longitude="longitude", encoding="utf-8"
+):
     """Converts a csv file with latlon info to a point shapefile.
 
     Args:
@@ -791,21 +793,12 @@ def csv_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude"):
     import shapefile as shp
 
     if in_csv.startswith("http") and in_csv.endswith(".csv"):
-        out_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-        out_name = os.path.basename(in_csv)
-
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
-        download_from_url(in_csv, out_dir=out_dir)
-        in_csv = os.path.join(out_dir, out_name)
-
-    out_dir = os.path.dirname(out_shp)
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+        in_csv = github_raw_url(in_csv)
+        in_csv = download_file(in_csv, quiet=True, overwrite=True)
 
     try:
         points = shp.Writer(out_shp, shapeType=shp.POINT)
-        with open(in_csv, encoding="utf-8") as csvfile:
+        with open(in_csv, encoding=encoding) as csvfile:
             csvreader = csv.DictReader(csvfile)
             header = csvreader.fieldnames
             [points.field(field) for field in header]
@@ -822,7 +815,7 @@ def csv_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude"):
         raise Exception(e)
 
 
-def pandas_to_geojson(
+def df_to_geojson(
     df,
     out_geojson=None,
     latitude="latitude",
@@ -883,16 +876,15 @@ def csv_to_geojson(
 
     """
 
-    import json
     import pandas as pd
 
+    in_csv = github_raw_url(in_csv)
+
     if out_geojson is not None:
-        out_dir = os.path.dirname(os.path.abspath(out_geojson))
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+        out_geojson = check_file_path(out_geojson)
 
     df = pd.read_csv(in_csv)
-    geojson = pandas_to_geojson(
+    geojson = df_to_geojson(
         df, latitude=latitude, longitude=longitude, encoding=encoding
     )
 
@@ -928,6 +920,28 @@ def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude", encoding="utf
     gdf = gpd.read_file(out_geojson)
     os.remove(out_geojson)
     return gdf
+
+
+def csv_to_vector(
+    in_csv,
+    output,
+    latitude="latitude",
+    longitude="longitude",
+    encoding="utf-8",
+    **kwargs,
+):
+    """Creates points for a CSV file and converts them to a vector dataset.
+
+    Args:
+        in_csv (str): The file path to the input CSV file.
+        output (str): The file path to the output vector dataset.
+        latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
+        longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+        encoding (str, optional): The encoding of characters. Defaults to "utf-8".
+
+    """
+    gdf = csv_to_gdf(in_csv, latitude, longitude, encoding)
+    gdf.to_file(output, **kwargs)
 
 
 def create_code_cell(code="", where="below"):
@@ -2220,7 +2234,7 @@ def kml_to_geojson(in_kml, out_geojson=None):
         return gdf.__geo_interface__
 
 
-def csv_to_pandas(in_csv, **kwargs):
+def csv_to_df(in_csv, **kwargs):
     """Converts a CSV file to pandas dataframe.
 
     Args:
