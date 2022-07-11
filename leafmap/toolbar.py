@@ -471,10 +471,12 @@ def main_toolbar(m):
             def all_layers_chk_changed(change):
                 if change["new"]:
                     for layer in m.layers:
-                        layer.visible = True
+                        if hasattr(layer, "visible"):
+                            layer.visible = True
                 else:
                     for layer in m.layers:
-                        layer.visible = False
+                        if hasattr(layer, "visible"):
+                            layer.visible = False
 
             all_layers_chk.observe(all_layers_chk_changed, "value")
 
@@ -497,8 +499,11 @@ def main_toolbar(m):
 
             # for non-TileLayer, use layer.style={'opacity':0, 'fillOpacity': 0} to turn layer off.
             for layer in layers:
+                visible = True
+                if hasattr(layer, "visible"):
+                    visible = layer.visible
                 layer_chk = widgets.Checkbox(
-                    value=layer.visible,
+                    value=visible,
                     description=layer.name,
                     indent=False,
                     layout=widgets.Layout(height="18px"),
@@ -550,7 +555,8 @@ def main_toolbar(m):
 
                 # layer_chk.observe(layer_chk_changed, "value")
 
-                widgets.jslink((layer_chk, "value"), (layer, "visible"))
+                if hasattr(layer, "visible"):
+                    widgets.jslink((layer_chk, "value"), (layer, "visible"))
 
                 if layer in m.geojson_layers:
                     layer_opacity.observe(layer_opacity_changed, "value")
