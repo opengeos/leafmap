@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.10.2 - Jul 15, 2022
+
+**New Features**:
+
+-   Added csv_to_vector function [#270](https://github.com/giswqs/leafmap/pull/270)
+
+**Improvement**
+
+-   Pin ipyleaflet version > 0.17.0
+-   Updated sample datasets
+-   Fixed json import error
+
 ## v0.10.1 - Jul 11, 2022
 
 **New Features**:
