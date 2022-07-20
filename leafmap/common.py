@@ -6020,3 +6020,23 @@ def github_raw_url(url):
             "blob/", ""
         )
     return url
+
+
+def get_direct_url(url):
+    """Get the direct URL for a given URL.
+
+    Args:
+        url (str): The URL to get the direct URL for.
+
+    Returns:
+        str: The direct URL.
+    """
+
+    if not isinstance(url, str):
+        raise ValueError("url must be a string.")
+
+    if not url.startswith("http"):
+        raise ValueError("url must start with http.")
+
+    r = requests.head(url, allow_redirects=True)
+    return r.url
