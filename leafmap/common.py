@@ -3920,6 +3920,8 @@ def get_local_tile_layer(
             nodata=nodata,
             attribution=attribution,
             name=layer_name,
+            max_zoom=30,
+            max_native_zoom=30,
             **kwargs,
         )
     else:
@@ -3936,6 +3938,8 @@ def get_local_tile_layer(
             attr=attribution,
             overlay=True,
             name=layer_name,
+            max_zoom=30,
+            max_native_zoom=30,
             **kwargs,
         )
 
