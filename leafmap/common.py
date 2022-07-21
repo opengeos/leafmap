@@ -6040,3 +6040,33 @@ def get_direct_url(url):
 
     r = requests.head(url, allow_redirects=True)
     return r.url
+
+
+def add_crs(filename, epsg):
+    """Add a CRS to a raster dataset.
+
+    Args:
+        filename (str): The filename of the raster dataset.
+        epsg (int | str): The EPSG code of the CRS.
+
+    """
+    try:
+        import rasterio
+    except ImportError:
+        raise ImportError(
+            "rasterio is required for adding a CRS to a raster. Please install it using 'pip install rasterio'."
+        )
+
+    if not os.path.exists(filename):
+        raise ValueError("filename must exist.")
+
+    if isinstance(epsg, int):
+        epsg = f"EPSG:{epsg}"
+    elif isinstance(epsg, str):
+        epsg = "EPSG:" + epsg
+    else:
+        raise ValueError("epsg must be an integer or string.")
+
+    crs = rasterio.crs.CRS({"init": epsg})
+    with rasterio.open(filename, mode="r+") as src:
+        src.crs = crs
