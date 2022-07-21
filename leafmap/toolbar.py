@@ -591,6 +591,7 @@ def open_data_widget(m):
         m (object): leafmap.Map
     """
     import warnings
+    from .colormaps import list_colormaps
 
     warnings.filterwarnings("ignore")
 
@@ -850,7 +851,7 @@ def open_data_widget(m):
             http_widget.children = [filepath]
         elif change["new"] == "Raster":
             file_chooser.filter_pattern = ["*.tif", "*.img"]
-            palette.options = get_palettable(types=["matplotlib", "cartocolors"])
+            palette.options = list_colormaps(add_extra=True)
             palette.value = None
             raster_options.children = [
                 widgets.HBox([bands, vmin, vmax]),
@@ -915,7 +916,7 @@ def open_data_widget(m):
                         except Exception as _:
                             pass
 
-                        m.add_local_tile(
+                        m.add_raster(
                             file_path,
                             layer_name=layer_name.value,
                             band=band,
@@ -1396,7 +1397,7 @@ def open_raster_gui(m):
                     except Exception as e:
                         pass
 
-                    m.add_local_tile(
+                    m.add_raster(
                         file_chooser.selected,
                         layer_name=layer_name.value,
                         band=band,
