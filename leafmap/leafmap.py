@@ -1618,7 +1618,7 @@ class Map(ipyleaflet.Map):
         for tool in toolbar_grid.children:
             tool.value = False
 
-    def add_local_tile(
+    def add_raster(
         self,
         source,
         band=None,
@@ -1685,7 +1685,7 @@ class Map(ipyleaflet.Map):
         }
         self.cog_layer_dict[layer_name] = params
 
-    add_geotiff = add_local_tile
+    add_local_tile = add_raster
 
     def add_remote_tile(
         self,
@@ -1712,7 +1712,7 @@ class Map(ipyleaflet.Map):
             layer_name (str, optional): The layer name to use. Defaults to None.
         """
         if isinstance(source, str) and source.startswith("http"):
-            self.add_local_tile(
+            self.add_raster(
                 source,
                 band=band,
                 palette=palette,
@@ -1791,7 +1791,7 @@ class Map(ipyleaflet.Map):
             else:
                 band_idx = [vars.index(v) + 1 for v in variables]
 
-        self.add_local_tile(
+        self.add_raster(
             tif,
             band=band_idx,
             palette=palette,
@@ -1803,7 +1803,7 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
-    def add_raster(
+    def add_raster_legacy(
         self,
         image,
         bands=None,
