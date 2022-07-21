@@ -188,7 +188,7 @@
 **New Features**:
 
 -   Added raster support for JupyterHub
--   Added new function add_geotiff
+-   Added new function add_raster
 
 **Improvement**
 
