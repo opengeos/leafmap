@@ -323,7 +323,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-    def add_local_tile(
+    def add_raster(
         self,
         source,
         band=None,
@@ -378,7 +378,7 @@ class Map(folium.Map):
         )  # [minx, miny, maxx, maxy]
         self.zoom_to_bounds(bounds)
 
-    add_geotiff = add_local_tile
+    add_local_tile = add_raster
 
     def add_remote_tile(
         self,
@@ -405,7 +405,7 @@ class Map(folium.Map):
             layer_name (str, optional): The layer name to use. Defaults to None.
         """
         if isinstance(source, str) and source.startswith("http"):
-            self.add_local_tile(
+            self.add_raster(
                 source,
                 band=band,
                 palette=palette,
@@ -471,7 +471,7 @@ class Map(folium.Map):
             else:
                 band_idx = [vars.index(v) + 1 for v in variables]
 
-        self.add_local_tile(
+        self.add_raster(
             tif,
             band=band_idx,
             palette=palette,
@@ -2396,7 +2396,7 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def add_raster(
+    def add_raster_legacy(
         self,
         image,
         bands=None,
