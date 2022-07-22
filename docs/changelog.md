@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.10.3 - Jul 22, 2022
+
+**New Features**:
+
+-   Added lidar tutorial [#276](https://github.com/giswqs/leafmap/pull/276)
+-   Added add_crs function [#275](https://github.com/giswqs/leafmap/pull/275)
+-   Added more lidar functions
+-   Added get_direct_url function
+
+**Improvement**
+
+-   Improved add_raster function [#275](https://github.com/giswqs/leafmap/pull/275)
+
 ## v0.10.2 - Jul 15, 2022
 
 **New Features**:
