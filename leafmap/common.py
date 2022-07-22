@@ -5073,6 +5073,14 @@ def view_lidar(
         ValueError: If the backend is not supported.
     """
     import warnings
+    import sys
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
+    if "google.colab" in sys.modules:
+        print("This function is not supported in Google Colab.")
+        return
 
     warnings.filterwarnings("ignore")
     filename = os.path.abspath(filename)
@@ -5953,8 +5961,13 @@ def plot_raster_3d(
         mesh_kwargs (dict, optional): The keyword arguments to pass to pyvista.mesh.warp_by_scalar(). Defaults to {}.
         **kwargs: Additional keyword arguments to pass to xarray.DataArray.plot().
     """
+    import sys
 
     if os.environ.get("USE_MKDOCS") is not None:
+        return
+
+    if "google.colab" in sys.modules:
+        print("This function is not supported in Google Colab.")
         return
 
     try:
