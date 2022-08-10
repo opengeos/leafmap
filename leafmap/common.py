@@ -6087,3 +6087,38 @@ def add_crs(filename, epsg):
     crs = rasterio.crs.CRS({"init": epsg})
     with rasterio.open(filename, mode="r+") as src:
         src.crs = crs
+
+
+def html_to_streamlit(
+    filename, width=None, height=None, scrolling=False, replace_dict={}
+):
+
+    """Renders an HTML file as a Streamlit component.
+    Args:
+        filename (str): The filename of the HTML file.
+        width (int, optional): Width of the map. Defaults to None.
+        height (int, optional): Height of the map. Defaults to 600.
+        scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
+        replace_dict (dict, optional): A dictionary of strings to replace in the HTML file. Defaults to {}.
+
+    Raises:
+        ValueError: If the filename does not exist.
+
+    Returns:
+        streamlit.components: components.html object.
+    """
+
+    import streamlit.components.v1 as components
+
+    if not os.path.exists(filename):
+        raise ValueError("filename must exist.")
+
+    f = open(filename, "r")
+
+    html = f.read()
+
+    for key, value in replace_dict.items():
+        html = html.replace(key, value)
+
+    f.close()
+    return components.html(html, width=width, height=height, scrolling=scrolling)
