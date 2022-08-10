@@ -1554,7 +1554,6 @@ class Map(folium.Map):
         """
 
         try:
-            import streamlit as st
             import streamlit.components.v1 as components
 
             if add_layer_control:
