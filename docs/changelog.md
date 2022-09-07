@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.10.4 - Sep 7, 2022
+
+**New Features**:
+
+-   Added download_ned and mosaic image functions
+-   Added html_to_streamlit function
+
+**Improvement**
+
+-   Updated Map.to_streamlit()
+
 ## v0.10.3 - Jul 22, 2022
 
 **New Features**:
