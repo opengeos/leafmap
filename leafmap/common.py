@@ -6122,3 +6122,127 @@ def html_to_streamlit(
 
     f.close()
     return components.html(html, width=width, height=height, scrolling=scrolling)
+
+
+def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwargs):
+    """Download the US National Elevation Datasets (NED) for a region.
+
+    Args:
+        region (str | list): A filepath to a vector dataset or a list of bounds in the form of [minx, miny, maxx, maxy].
+        out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
+        return_url (bool, optional): Whether to return the download URLs of the files. Defaults to False.
+        download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
+
+    Returns:
+        list: A list of the download URLs of the files if return_url is True.
+    """
+    import geopandas as gpd
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+    else:
+        out_dir = os.path.abspath(out_dir)
+
+    if isinstance(region, str):
+        if region.startswith("http"):
+            region = github_raw_url(region)
+            region = download_file(region)
+        elif not os.path.exists(region):
+            raise ValueError("region must be a path or a URL to a vector dataset.")
+
+        roi = gpd.read_file(region, **kwargs)
+        roi = roi.to_crs(epsg=4326)
+        bounds = roi.total_bounds
+
+    elif isinstance(region, list):
+        bounds = region
+
+    else:
+        raise ValueError(
+            "region must be a filepath or a list of bounds in the form of [minx, miny, maxx, maxy]."
+        )
+    minx, miny, maxx, maxy = [float(x) for x in bounds]
+    tiles = []
+    left = abs(math.floor(minx))
+    right = abs(math.floor(maxx)) - 1
+    upper = math.ceil(maxy)
+    bottom = math.ceil(miny) - 1
+
+    for y in range(upper, bottom, -1):
+        for x in range(left, right, -1):
+            tile_id = "n{}w{}".format(str(y).zfill(2), str(x).zfill(3))
+            tiles.append(tile_id)
+
+    links = []
+    filepaths = []
+
+    for index, tile in enumerate(tiles):
+        tif_url = f"https://prd-tnm.s3.amazonaws.com/StagedProducts/Elevation/13/TIFF/current/{tile}/USGS_13_{tile}.tif"
+
+        r = requests.head(tif_url)
+        if r.status_code == 200:
+            tif = os.path.join(out_dir, os.path.basename(tif_url))
+            links.append(tif_url)
+            filepaths.append(tif)
+        else:
+            print(f"{tif_url} does not exist.")
+
+    if return_url:
+        return links
+    else:
+        for index, link in enumerate(links):
+            print(f"Downloading {index + 1} of {len(links)}: {os.path.basename(link)}")
+            download_file(link, filepaths[index], **download_args)
+
+
+def mosaic(images, output, merge_args={}, verbose=True, **kwargs):
+    """Mosaics a list of images into a single image. Inspried by https://bit.ly/3A6roDK.
+
+    Args:
+        images (str | list): An input directory containing images or a list of images.
+        output (str): The output image filepath.
+        merge_args (dict, optional): A dictionary of arguments to pass to the rasterio.merge function. Defaults to {}.
+        verbose (bool, optional): Whether to print progress. Defaults to True.
+
+    """
+    from rasterio.merge import merge
+    import rasterio as rio
+    from pathlib import Path
+
+    output = os.path.abspath(output)
+
+    if isinstance(images, str):
+        path = Path(images)
+        raster_files = list(path.iterdir())
+    elif isinstance(images, list):
+        raster_files = images
+    else:
+        raise ValueError("images must be a list of raster files.")
+
+    raster_to_mosiac = []
+
+    if not os.path.exists(os.path.dirname(output)):
+        os.makedirs(os.path.dirname(output))
+
+    for index, p in enumerate(raster_files):
+        if verbose:
+            print(f"Reading {index+1}/{len(raster_files)}: {os.path.basename(p)}")
+        raster = rio.open(p, **kwargs)
+        raster_to_mosiac.append(raster)
+
+    if verbose:
+        print("Merging rasters...")
+    arr, transform = merge(raster_to_mosiac, **merge_args)
+
+    output_meta = raster.meta.copy()
+    output_meta.update(
+        {
+            "driver": "GTiff",
+            "height": arr.shape[1],
+            "width": arr.shape[2],
+            "transform": transform,
+        }
+    )
+
+    with rio.open(output, "w", **output_meta) as m:
+        m.write(arr)
