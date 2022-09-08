@@ -3410,6 +3410,20 @@ class Map(ipyleaflet.Map):
         if add_legend:
             self.add_legend(title=legend_title, legend_dict=legend_dict)
 
+    def user_roi_bounds(self, decimals=4):
+        """Get the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
+
+        Args:
+            decimals (int, optional): The number of decimals to round the coordinates to. Defaults to 4.
+
+        Returns:
+            list: The bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
+        """
+        if self.user_roi is not None:
+            return geometry_bounds(self.user_roi, decimals=decimals)
+        else:
+            return None
+
 
 # The functions below are outside the Map class.
 
