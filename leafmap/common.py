@@ -6137,6 +6137,7 @@ def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwa
         list: A list of the download URLs of the files if return_url is True.
     """
     import geopandas as gpd
+    import math
 
     if out_dir is None:
         out_dir = os.getcwd()
@@ -6246,3 +6247,31 @@ def mosaic(images, output, merge_args={}, verbose=True, **kwargs):
 
     with rio.open(output, "w", **output_meta) as m:
         m.write(arr)
+
+
+def geometry_bounds(geometry, decimals=4):
+    """Returns the bounds of a geometry.
+
+    Args:
+        geometry (dict): A GeoJSON geometry.
+        decimals (int, optional): The number of decimal places to round the bounds to. Defaults to 4.
+
+    Returns:
+        list: A list of bounds in the form of [minx, miny, maxx, maxy].
+    """
+    if isinstance(geometry, dict):
+        if "geometry" in geometry:
+            coords = geometry["geometry"]["coordinates"][0]
+        else:
+            coords = geometry["coordinates"][0]
+
+    else:
+        raise ValueError("geometry must be a GeoJSON-like dictionary.")
+
+    x = [p[0] for p in coords]
+    y = [p[1] for p in coords]
+    west = round(min(x), decimals)
+    east = round(max(x), decimals)
+    south = round(min(y), decimals)
+    north = round(max(y), decimals)
+    return [west, south, east, north]
