@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.10.5 - Sep 7, 2022
+
+**New Features**:
+
+-   Added geometry_bounds() function
+-   Added Map.user_roi_bounds() method
+
+**Improvement**
+
+-   Fixed download NED bug
+
 ## v0.10.4 - Sep 7, 2022
 
 **New Features**:
