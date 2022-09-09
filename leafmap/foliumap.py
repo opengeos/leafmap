@@ -2549,6 +2549,17 @@ class Map(folium.Map):
 
         print(f"The folium plotting backend does not support this function.")
 
+    def user_roi_bounds(self, decimals=4):
+        """Get the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
+
+        Args:
+            decimals (int, optional): The number of decimals to round the coordinates to. Defaults to 4.
+
+        Returns:
+            list: The bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
+        """
+        print(f"The folium plotting backend does not support this function.")
+
 
 class SplitControl(Layer):
     """
