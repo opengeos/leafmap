@@ -59,6 +59,7 @@
 53. Creating choropleth maps with a variety of classification schemes ([notebook](https://leafmap.org/notebooks/53_choropleth))
 54. Plotting elevation data in 3D without only one line of code ([notebook](https://leafmap.org/notebooks/54_plot_raster))
 55. LiDAR data analysis and visualization with whitebox and leafmap ([notebook](https://leafmap.org/notebooks/55_lidar))
+56. Downloading 10-m National Elevation Dataset (NED) with only one line of code ([notebook](https://leafmap.org/notebooks/56_download_ned))
 
 ## Demo
 
