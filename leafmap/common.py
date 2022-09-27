@@ -6124,6 +6124,159 @@ def html_to_streamlit(
     return components.html(html, width=width, height=height, scrolling=scrolling)
 
 
+import requests
+import json
+
+class The_national_map_USGS():
+    """
+    The national map is a collection of topological datasets, maintained by the USGS. 
+
+    It provides an API endpoint which can be used to find downloadable links for the products offered.
+        - Full description of datasets available can retrieved.
+          This consists of metadata such as detail description and publication dates.
+        - A wide range of dataformats are availble
+
+    More complete documentation for the API can be found at
+        https://apps.nationalmap.gov/tnmaccess/#/
+    """
+
+    def __init__(self):
+        self.api_endpoint = r'https://tnmaccess.nationalmap.gov/api/v1/'
+        self.DS = self.datasets_full()
+    
+    def datasets_full(self):
+        """
+        Full description of datasets provided.
+        Returns a JSON or empty list.
+        """
+        try:
+            return requests.get(f'{self.api_endpoint}datasets?').json()
+        except:
+            print('Failed to load metadata from The National Map API endpoint V1')
+            return []
+
+    @property
+    def prodFormats(self):
+        """
+        Return all datatypes available in any of the collections. 
+        Note that "All" is only peculiar to one dataset. 
+        """
+        return set(i['displayName'] for ds in self.DS for i in ds['formats'])
+
+    @property
+    def datasets(self):
+        """
+        Returns a list of dataset tags (most common human readable self description for specific datasets).
+        """
+        return set(y['sbDatasetTag'] for x in self.DS for y in x['tags'])
+
+    def find_tiles(self, 
+                   bbox:list[float] = None, 
+                   polygon:list[tuple[float,float]] = None, 
+                   datasets:list[str] | str = [], 
+                   prodFormats:list[str] | str = [],
+                   prodExtents:list[str] | str = [], 
+                   q:str = None, 
+                   dateType:str = None, 
+                   start:str = None, 
+                   end:str = None, 
+                   offset:int = 0, 
+                   max:int = None, 
+                   outputFormat:str = 'JSON', 
+                   polyType:str = None, 
+                   polyCode:str = None, 
+                   extentQuery:int = None) -> dict:
+        """
+        Possible search parameters (kwargs) support by API
+
+        Parameter               Values                      
+            Description
+        ---------------------------------------------------------------------------------------------------    
+        bbox                    'minx, miny, maxx, maxy'
+            Geographic longitude/latitude values expressed in  decimal degrees in a comma-delimited list.
+        polygon                 '[x,y x,y x,y x,y x,y]'       
+            Polygon, longitude/latitude values expressed in decimal degrees in a space-delimited list.
+        datasets                See: Datasets (Optional)       
+            Comma-delimited list of valid dataset tag names (sbDatasetTag)
+            From https://apps.nationalmap.gov/tnmaccess/#/product
+        prodFormats             See: Product Formats (Optional)
+            Comma-delimited list of dataset-specific formats
+            From https://apps.nationalmap.gov/tnmaccess/#/product
+        prodExtents             See: Product Extents (Optional)
+            Comma-delimited list of dataset-specific extents
+            From https://apps.nationalmap.gov/tnmaccess/#/product
+        q                       free text 
+            Text input which can be used to filter by product titles and text descriptions.
+        dateType                dateCreated | lastUpdated | Publication 
+            Type of date to search by.
+        start                   'YYYY-MM-DD' 
+            Start date
+        end                     'YYYY-MM-DD' 
+            End date (required if start date is provided)
+        offset                  integer 
+            Offset into paginated results - default=0
+        max                     integer 
+            Number of results returned
+        outputFormat            JSON | CSV | pjson
+            Default=JSON
+        polyType                state | huc2 | huc4 | huc8 
+            Well Known Polygon Type. Use this parameter to deliver data by state or HUC
+            (hydrologic unit codes defined by the Watershed Boundary Dataset/WBD)
+        polyCode                state FIPS code or huc number 
+            Well Known Polygon Code. This value needs to coordinate with the polyType parameter.
+        extentQuery             integer 
+            A Polygon code in the science base system, typically from an uploaded shapefile
+        """
+
+       
+        # call locals before creating new locals
+        used_locals = {k:v for k,v in locals().items() if v and k != 'self'}
+
+        # Parsing
+    
+        def convert_polygon(x):
+            return ','.join(' '.join(map(str,point)) for point in x)
+        if polygon:
+            used_locals['polygon'] = convert_polygon(polygon)        
+        
+        # Partial validation
+        
+        assert set(datasets).issubset(self.datasets) or datasets in self.datasets, f'Unknown datasets, must be elements of {self.datasets}'
+        assert set(prodFormats).issubset(self.prodFormats) or prodFormats in self.prodFormats, f'Unknown prodFormats, must be element of {self.prodFormats}'
+
+        # Validations handled (better: f.e. psjon) by API endpoint error responses
+
+        '''
+        import datetime
+        def validate_date(date_text):
+            try:
+                datetime.datetime.strptime(date_text, '%Y-%m-%d')
+                return True
+            except ValueError:
+                return False
+
+        can = {'JSON', 'CSV'} # psjon added
+        assert not outputFormat or outputFormat in can, f'Unknown outputFormat, must be element of {can}'
+        can = {'dateCreated', 'lastUpdated', 'Publication'}
+        assert not dateType or dateType in can, f'Unknown dataType, must be element of {can}'       
+        if start or end or dateType:
+            assert start and end and dateType and validate_date(start) and validate_date(end), """
+            Argument 'start', 'end' and 'dateType' should be used together, 
+            and 'start', 'end' should be formatted as YYYY-MM-DD"""
+        '''
+            
+        # Fetch response
+
+        response = requests.get(f'{self.api_endpoint}products?', params=used_locals)
+        if response.status_code//100 == 2:
+            return response.json()
+        else:
+            print(response.json())
+        return {}
+
+def download_ned(collection=None, datatype=None, keyword=None, region=[]):
+    pass
+
 def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwargs):
     """Download the US National Elevation Datasets (NED) for a region.
 
