@@ -6240,7 +6240,9 @@ class The_national_map_USGS():
             used_locals['polygon'] = convert_polygon(polygon)        
         
         # Partial validation
-        
+        # Fetch list seems broken in API ???, only takes list with 1 item or str.
+        # Could be map AND instead of OR for processing list
+
         assert set(datasets).issubset(self.datasets) or datasets in self.datasets, f'Unknown datasets, must be elements of {self.datasets}'
         assert set(prodFormats).issubset(self.prodFormats) or prodFormats in self.prodFormats, f'Unknown prodFormats, must be element of {self.prodFormats}'
 
