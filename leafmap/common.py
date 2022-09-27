@@ -6244,7 +6244,7 @@ class The_national_map_USGS():
         assert set(datasets).issubset(self.datasets) or datasets in self.datasets, f'Unknown datasets, must be elements of {self.datasets}'
         assert set(prodFormats).issubset(self.prodFormats) or prodFormats in self.prodFormats, f'Unknown prodFormats, must be element of {self.prodFormats}'
 
-        # Validations handled (better: f.e. psjon) by API endpoint error responses
+        # Validations handled better (f.e. psjon) by API endpoint error responses
 
         '''
         import datetime
