@@ -6481,3 +6481,130 @@ def reproject(image, output, dst_crs="EPSG:4326", resampling="nearest", **kwargs
                     resampling=resampling,
                     **kwargs,
                 )
+
+
+def download_ned_by_huc(
+    huc_id,
+    huc_type="huc8",
+    datasets=None,
+    out_dir=None,
+    return_url=False,
+    download_args={},
+    **kwargs,
+):
+    """Download the US National Elevation Datasets (NED) for a Hydrologic Unit region. See https://apps.nationalmap.gov/tnmaccess/#/ for more information.
+
+    Args:
+        huc_id (str): The HUC ID.
+        huc_type (str, optional): The HUC type, e.g., huc2, huc4, huc8. Defaults to "huc8".
+        datasets (str, optional): Comma-delimited list of valid dataset tag names. Defaults to None.
+        out_dir (str, optional): The output directory. Defaults to None, which will use the current working directory.
+        return_url (bool, optional): If True, the URL will be returned instead of downloading the data. Defaults to False.
+        download_args (dict, optional): The download arguments to be passed to the download_file function. Defaults to {}.
+
+    Returns:
+        list: The list of downloaded files.
+    """
+
+    import requests
+
+    endpoint = "https://tnmaccess.nationalmap.gov/api/v1/products?"
+
+    if datasets is None:
+        datasets = "National Elevation Dataset (NED) 1/3 arc-second Current"
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    kwargs["datasets"] = datasets
+    kwargs["polyType"] = huc_type
+    kwargs["polyCode"] = huc_id
+
+    result = requests.get(endpoint, params=kwargs).json()
+    if "errorMessage" in result:
+        raise ValueError(result["errorMessage"])
+    else:
+        links = [x["downloadURL"] for x in result["items"]]
+        for index, link in enumerate(links):
+            if "historical" in link:
+                link = link.replace("historical", "current")[:-13] + ".tif"
+                links[index] = link
+
+    if return_url:
+        return links
+    else:
+        for index, link in enumerate(links):
+
+            r = requests.head(link)
+            if r.status_code == 200:
+                filepath = os.path.join(out_dir, os.path.basename(link))
+                print(
+                    f"Downloading {index + 1} of {len(links)}: {os.path.basename(link)}"
+                )
+                download_file(link, filepath, **download_args)
+            else:
+                print(f"{link} does not exist.")
+
+
+def download_ned_by_bbox(
+    bbox,
+    datasets=None,
+    out_dir=None,
+    return_url=False,
+    download_args={},
+    **kwargs,
+):
+    """Download the US National Elevation Datasets (NED) for a bounding box. See https://apps.nationalmap.gov/tnmaccess/#/ for more information.
+
+    Args:
+        bbox (list): The bounding box in the form [xmin, ymin, xmax, ymax].
+        huc_type (str, optional): The HUC type, e.g., huc2, huc4, huc8. Defaults to "huc8".
+        datasets (str, optional): Comma-delimited list of valid dataset tag names. Defaults to None.
+        out_dir (str, optional): The output directory. Defaults to None, which will use the current working directory.
+        return_url (bool, optional): If True, the URL will be returned instead of downloading the data. Defaults to False.
+        download_args (dict, optional): The download arguments to be passed to the download_file function. Defaults to {}.
+
+    Returns:
+        list: The list of downloaded files.
+    """
+
+    import requests
+
+    endpoint = "https://tnmaccess.nationalmap.gov/api/v1/products?"
+
+    if datasets is None:
+        datasets = "National Elevation Dataset (NED) 1/3 arc-second Current"
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if isinstance(bbox, list):
+        bbox = ",".join([str(x) for x in bbox])
+
+    kwargs["datasets"] = datasets
+    kwargs["bbox"] = bbox
+
+    result = requests.get(endpoint, params=kwargs).json()
+    if "errorMessage" in result:
+        raise ValueError(result["errorMessage"])
+    else:
+        links = [x["downloadURL"] for x in result["items"]]
+        for index, link in enumerate(links):
+            if "historical" in link:
+                link = link.replace("historical", "current")[:-13] + ".tif"
+                links[index] = link
+
+    if return_url:
+        return links
+    else:
+        for index, link in enumerate(links):
+
+            r = requests.head(link)
+            if r.status_code == 200:
+                filepath = os.path.join(out_dir, os.path.basename(link))
+                print(
+                    f"Downloading {index + 1} of {len(links)}: {os.path.basename(link)}"
+                )
+                download_file(link, filepath, **download_args)
+            else:
+                print(f"{link} does not exist.")
