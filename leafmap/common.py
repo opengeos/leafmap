@@ -6147,7 +6147,7 @@ class The_national_map_USGS():
         """
         try:
             return requests.get(f'{self.api_endpoint}datasets?').json()
-        except BaseException:
+        except Exception:
             print('Failed to load metadata from The National Map API endpoint V1')
             return []
 
