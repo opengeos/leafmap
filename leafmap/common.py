@@ -6123,10 +6123,6 @@ def html_to_streamlit(
     f.close()
     return components.html(html, width=width, height=height, scrolling=scrolling)
 
-
-import requests
-import json
-
 class The_national_map_USGS():
     """
     The national map is a collection of topological datasets, maintained by the USGS. 
@@ -6144,19 +6140,19 @@ class The_national_map_USGS():
         self.api_endpoint = r'https://tnmaccess.nationalmap.gov/api/v1/'
         self.DS = self.datasets_full()
     
-    def datasets_full(self):
+    def datasets_full(self) -> list:
         """
         Full description of datasets provided.
         Returns a JSON or empty list.
         """
         try:
             return requests.get(f'{self.api_endpoint}datasets?').json()
-        except:
+        except BaseException:
             print('Failed to load metadata from The National Map API endpoint V1')
             return []
 
     @property
-    def prodFormats(self):
+    def prodFormats(self) -> list:
         """
         Return all datatypes available in any of the collections. 
         Note that "All" is only peculiar to one dataset. 
@@ -6164,7 +6160,7 @@ class The_national_map_USGS():
         return set(i['displayName'] for ds in self.DS for i in ds['formats'])
 
     @property
-    def datasets(self):
+    def datasets(self) -> list:
         """
         Returns a list of dataset tags (most common human readable self description for specific datasets).
         """
@@ -6275,9 +6271,6 @@ class The_national_map_USGS():
         else:
             print(response.json())
         return {}
-
-def download_ned(collection=None, datatype=None, keyword=None, region=[]):
-    pass
 
 def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwargs):
     """Download the US National Elevation Datasets (NED) for a region.
