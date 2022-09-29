@@ -6177,11 +6177,6 @@ class The_national_map_USGS():
         """
         import geopandas as gpd
 
-        if out_dir is None:
-            out_dir = os.getcwd()
-        else:
-            out_dir = os.path.abspath(out_dir)
-
         if isinstance(region, str):
             if region.startswith("http"):
                 region = github_raw_url(region)
@@ -6341,7 +6336,6 @@ class The_national_map_USGS():
         # 'JSON', 'CSV' (misses pjson)
         # 'dateCreated', 'lastUpdated', 'Publication'
         # start or end or dateType / YYYY-MM-DD
-
             
         # Fetch response
 
@@ -6352,7 +6346,7 @@ class The_national_map_USGS():
             print(response.json())
         return {}
 
-def download_tnm(region, out_dir=None, return_url=False, download_args={}, geopandas_args={}, API={'max':10}):
+def download_tnm(region, out_dir=None, download_args={}, geopandas_args={}, API={'max':10}):
     """
     Download the US National Elevation Datasets (NED) for a region.
 
@@ -6387,7 +6381,6 @@ def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwa
     Returns:
         list: A list of the download URLs of the files if return_url is True.
     """
-
 
     import geopandas as gpd
     import math
