@@ -6188,7 +6188,7 @@ class The_national_map_USGS():
             roi = roi.to_crs(epsg=4326)
         return roi.total_bounds
         
-    def download_tiles(self, region, out_dir, download_args={}, geopandas_args={}, API={'max':10}):
+    def download_tiles(self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={'max':10}):
         """
         Download the US National Elevation Datasets (NED) for a region.
 
@@ -6214,6 +6214,7 @@ class The_national_map_USGS():
         tiles = self.find_tiles(region, return_type='list', geopandas_args=geopandas_args, API=API)
         T = len(tiles)
         errors = 0
+        done = 0
 
         for i, link in enumerate(tiles):
             file_name = os.path.basename(link)
@@ -6222,13 +6223,19 @@ class The_national_map_USGS():
                 print(f"Downloading {i+1} of {T}: {file_name}")
             try:
                 download_file(link, out_name, **download_args)
+                done += 1
+            except KeyboardInterrupt:
+                print('Cancelled download')
+                break
             except Exception:     
                 errors += 1           
                 print(f"Failed to download {i+1} of {T}: {file_name}")
-        print(f"{T-errors} Downloads completed, {errors} downloads failed")
+                
+        print(f"{done} Downloads completed, {errors} downloads failed")
         return 
 
-    def find_tiles(self, region, return_type='list', geopandas_args={}, API={}):
+
+    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}):
         """
         Download the US National Elevation Datasets (NED) for a region.
 
@@ -6346,7 +6353,7 @@ class The_national_map_USGS():
             print(response.json())
         return {}
 
-def download_tnm(region, out_dir=None, download_args={}, geopandas_args={}, API={'max':10}):
+def download_tnm(region=None, out_dir=None, download_args={}, geopandas_args={}, API={}):
     """
     Download the US National Elevation Datasets (NED) for a region.
 
@@ -6359,13 +6366,16 @@ def download_tnm(region, out_dir=None, download_args={}, geopandas_args={}, API=
             Used for reading a region URL|filepath.
         API (dict, optional): A dictionary of arguments to pass to the The_national_map_USGS.find_details() function. 
             Exposes most of the documented API.
-            Defaults to {'max':100, 'q':'NED'} to avoid accidental large downloads.
+            Defaults to {'max':10}
             Using API={'q':'NED'} yields similar results to download_ned
 
     Returns:
         None
     """    
+    assert region or API, 'Provide a region or use the API' 
     TNM = The_national_map_USGS()
+    if not(API.get('max')):
+        API['max'] = 10
     return TNM.download_tiles(region, out_dir, download_args, geopandas_args, API)
 
 
