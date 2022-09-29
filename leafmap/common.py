@@ -6166,7 +6166,108 @@ class The_national_map_USGS():
         """
         return set(y['sbDatasetTag'] for x in self.DS for y in x['tags'])
 
-    def find_tiles(self, 
+    def parse_region(region, geopandas_args={}):
+        """
+        Translate a Vector dataset to a polygon.
+
+        Args:
+            region (str | list): an URL|filepath to a vector dataset to a polygon
+            geopandas_reader_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+                Used for reading a region URL|filepath.
+        """
+        import geopandas as gpd
+
+        if out_dir is None:
+            out_dir = os.getcwd()
+        else:
+            out_dir = os.path.abspath(out_dir)
+
+        if isinstance(region, str):
+            if region.startswith("http"):
+                region = github_raw_url(region)
+                region = download_file(region)
+            elif not os.path.exists(region):
+                raise ValueError("region must be a path or a URL to a vector dataset.")
+
+            roi = gpd.read_file(region, **geopandas_args)
+            roi = roi.to_crs(epsg=4326)
+        return roi.total_bounds
+        
+    def download_tiles(self, region, out_dir, download_args={}, geopandas_args={}, API={'max':10}, print=True):
+        """
+        Download the US National Elevation Datasets (NED) for a region.
+
+        Args:
+            region (str | list, optional): An URL|filepath to a vector dataset Or a list of bounds in the form of [minx, miny, maxx, maxy].
+                Alternatively you could use API parameters such as polygon or bbox.
+            out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
+            download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
+            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+                Used for reading a region URL|filepath.
+            API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
+                Exposes most of the documented API.
+                Defaults to {'max':10} to avoid accidental large downloads.
+            print (bool): Defaults to true, w
+
+        Returns:
+            list: A list of the download URLs of the files if return_url is True.
+        """
+        if out_dir is None:
+            out_dir = os.getcwd()
+        else:
+            out_dir = os.path.abspath(out_dir)
+        
+        tiles = self.find_tiles(region, return_type='list', geopandas_args=geopandas_args, API=API)
+        T = len(tiles)
+
+        for i, link in enumerate(tiles):
+            file_name = os.path.basename(link)
+            out_name = os.path.join(out_dir, file_name)
+            if not(i%5):
+                print(f"Downloading {i+1} of {T}: {file_name}")
+            try:
+                download_file(link, out_name, **download_args)
+            except Exception:                
+                print(f"Failed to download {i+1} of {T}: {file_name}")
+        print("/nDownloads completed")
+        return 
+
+    def find_tiles(self, region, return_type='list', geopandas_args={}, API={}):
+        """
+        Download the US National Elevation Datasets (NED) for a region.
+
+        Args:
+            region (str | list, optional): An URL|filepath to a vector dataset Or a list of bounds in the form of [minx, miny, maxx, maxy].
+                Alternatively you could use API parameters such as polygon or bbox.
+            out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
+            return_type (str): list | dict. Defaults to list. Changes the return output type and content.
+                Donwload: Downloads the files and return the number of downloads
+                URL: return a list of download_urls
+                Details: return a dictionary containing the metadata of the download_urls
+            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+                Used for reading a region URL|filepath.
+            API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
+                Exposes most of the documented API. Defaults to {}
+            
+            kwargs are passed as arguments to self.find_details(**kwargs), allowing full use of API GET parameters.
+
+        Returns:
+            list: A list of download_urls to the found tiles. 
+            dict: A dictionary containing the metadata of the found tiles.
+        """
+        assert region or API, 'Provide a region or use the API'
+
+        if isinstance(region,str):
+            API['polygon'] = self.parse_region(region, geopandas_args={})
+        if isinstance(region, list):
+            API['bbox'] = region
+
+        results = self.find_details(**API)
+        if return_type == 'list':
+            return [i["downloadURL"] for i in results.get('items')]
+        return results
+
+    def find_details(self, 
                    bbox:list[float] = None, 
                    polygon:list[tuple[float,float]] = None, 
                    datasets:list[str] | str = [], 
@@ -6223,7 +6324,6 @@ class The_national_map_USGS():
         extentQuery             integer 
             A Polygon code in the science base system, typically from an uploaded shapefile
         """
-
        
         # call locals before creating new locals
         used_locals = {k:v for k,v in locals().items() if v and k != 'self'}
@@ -6235,33 +6335,17 @@ class The_national_map_USGS():
         if polygon:
             used_locals['polygon'] = convert_polygon(polygon)        
         
-        # Partial validation
         # Fetch list seems broken in API ???, only takes list with 1 item or str.
-        # Could be map AND instead of OR for processing list
+        # Looks like list is evaluated as AND instead of OR.
 
         assert set(datasets).issubset(self.datasets) or datasets in self.datasets, f'Unknown datasets, must be elements of {self.datasets}'
         assert set(prodFormats).issubset(self.prodFormats) or prodFormats in self.prodFormats, f'Unknown prodFormats, must be element of {self.prodFormats}'
 
         # Validations handled better (f.e. psjon) by API endpoint error responses
+        # 'JSON', 'CSV' (misses pjson)
+        # 'dateCreated', 'lastUpdated', 'Publication'
+        # start or end or dateType / YYYY-MM-DD
 
-        '''
-        import datetime
-        def validate_date(date_text):
-            try:
-                datetime.datetime.strptime(date_text, '%Y-%m-%d')
-                return True
-            except ValueError:
-                return False
-
-        can = {'JSON', 'CSV'} # psjon added
-        assert not outputFormat or outputFormat in can, f'Unknown outputFormat, must be element of {can}'
-        can = {'dateCreated', 'lastUpdated', 'Publication'}
-        assert not dateType or dateType in can, f'Unknown dataType, must be element of {can}'       
-        if start or end or dateType:
-            assert start and end and dateType and validate_date(start) and validate_date(end), """
-            Argument 'start', 'end' and 'dateType' should be used together, 
-            and 'start', 'end' should be formatted as YYYY-MM-DD"""
-        '''
             
         # Fetch response
 
