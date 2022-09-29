@@ -6166,7 +6166,7 @@ class The_national_map_USGS():
         """
         return set(y['sbDatasetTag'] for x in self.DS for y in x['tags'])
 
-    def parse_region(region, geopandas_args={}):
+    def parse_region(self, region, geopandas_args={}):
         """
         Translate a Vector dataset to a polygon.
 
