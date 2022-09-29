@@ -6193,7 +6193,7 @@ class The_national_map_USGS():
             roi = roi.to_crs(epsg=4326)
         return roi.total_bounds
         
-    def download_tiles(self, region, out_dir, download_args={}, geopandas_args={}, API={'max':10}, print=True):
+    def download_tiles(self, region, out_dir, download_args={}, geopandas_args={}, API={'max':10}):
         """
         Download the US National Elevation Datasets (NED) for a region.
 
@@ -6207,10 +6207,9 @@ class The_national_map_USGS():
             API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
                 Exposes most of the documented API.
                 Defaults to {'max':10} to avoid accidental large downloads.
-            print (bool): Defaults to true, w
 
         Returns:
-            list: A list of the download URLs of the files if return_url is True.
+            None
         """
         if out_dir is None:
             out_dir = os.getcwd()
@@ -6219,17 +6218,19 @@ class The_national_map_USGS():
         
         tiles = self.find_tiles(region, return_type='list', geopandas_args=geopandas_args, API=API)
         T = len(tiles)
+        errors = 0
 
         for i, link in enumerate(tiles):
             file_name = os.path.basename(link)
             out_name = os.path.join(out_dir, file_name)
-            if not(i%5):
+            if i<5 or (i<50 and not(i%5)) or not(i%20):
                 print(f"Downloading {i+1} of {T}: {file_name}")
             try:
                 download_file(link, out_name, **download_args)
-            except Exception:                
+            except Exception:     
+                errors += 1           
                 print(f"Failed to download {i+1} of {T}: {file_name}")
-        print("/nDownloads completed")
+        print(f"{T-errors} Downloads completed, {errors} downloads failed")
         return 
 
     def find_tiles(self, region, return_type='list', geopandas_args={}, API={}):
@@ -6241,15 +6242,10 @@ class The_national_map_USGS():
                 Alternatively you could use API parameters such as polygon or bbox.
             out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
             return_type (str): list | dict. Defaults to list. Changes the return output type and content.
-                Donwload: Downloads the files and return the number of downloads
-                URL: return a list of download_urls
-                Details: return a dictionary containing the metadata of the download_urls
             geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
                 Used for reading a region URL|filepath.
             API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
-                Exposes most of the documented API. Defaults to {}
-            
-            kwargs are passed as arguments to self.find_details(**kwargs), allowing full use of API GET parameters.
+                Exposes most of the documented API parameters. Defaults to {}.
 
         Returns:
             list: A list of download_urls to the found tiles. 
@@ -6258,7 +6254,7 @@ class The_national_map_USGS():
         assert region or API, 'Provide a region or use the API'
 
         if isinstance(region,str):
-            API['polygon'] = self.parse_region(region, geopandas_args={})
+            API['polygon'] = self.parse_region(region, geopandas_args)
         if isinstance(region, list):
             API['bbox'] = region
 
@@ -6356,6 +6352,29 @@ class The_national_map_USGS():
             print(response.json())
         return {}
 
+def download_tnm(region, out_dir=None, return_url=False, download_args={}, geopandas_args={}, API={'max':10}):
+    """
+    Download the US National Elevation Datasets (NED) for a region.
+
+    Args:
+        region (str | list, optional): An URL|filepath to a vector dataset Or a list of bounds in the form of [minx, miny, maxx, maxy].
+            Alternatively you could use API parameters such as polygon or bbox.
+        out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
+        download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
+        geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+            Used for reading a region URL|filepath.
+        API (dict, optional): A dictionary of arguments to pass to the The_national_map_USGS.find_details() function. 
+            Exposes most of the documented API.
+            Defaults to {'max':100, 'q':'NED'} to avoid accidental large downloads.
+            Using API={'q':'NED'} yields similar results to download_ned
+
+    Returns:
+        None
+    """    
+    TNM = The_national_map_USGS()
+    return TNM.download_tiles(region, out_dir, download_args, geopandas_args, API)
+
+
 def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwargs):
     """Download the US National Elevation Datasets (NED) for a region.
 
@@ -6368,6 +6387,8 @@ def download_ned(region, out_dir=None, return_url=False, download_args={}, **kwa
     Returns:
         list: A list of the download URLs of the files if return_url is True.
     """
+
+
     import geopandas as gpd
     import math
 
