@@ -6132,6 +6132,8 @@ class The_national_map_USGS():
           This consists of metadata such as detail description and publication dates.
         - A wide range of dataformats are availble
 
+    Most features provided by the API 
+
     More complete documentation for the API can be found at
         https://apps.nationalmap.gov/tnmaccess/#/
     """
@@ -6145,10 +6147,11 @@ class The_national_map_USGS():
         Full description of datasets provided.
         Returns a JSON or empty list.
         """
+        link = f'{self.api_endpoint}datasets?'
         try:
-            return requests.get(f'{self.api_endpoint}datasets?').json()
+            return requests.get(link).json()
         except Exception:
-            print('Failed to load metadata from The National Map API endpoint V1')
+            print(f'Failed to load metadata from The National Map API endpoint\n{link}')
             return []
 
     @property
@@ -6331,8 +6334,14 @@ class The_national_map_USGS():
         def convert_polygon(x):
             return ','.join(' '.join(map(str,point)) for point in x)
         if polygon:
-            used_locals['polygon'] = convert_polygon(polygon)        
-        
+            used_locals['polygon'] = convert_polygon(polygon)      
+
+        def convert_bbox(x):
+            # return list as '-115.9689, 35.9758, -115.3619, 36.4721'
+            return str(x)[1:-1]
+        if bbox:
+            used_locals['bbox'] = convert_bbox(bbox)    
+
         # Fetch list seems broken in API ???, only takes list with 1 item or str.
         # Looks like list is evaluated as AND instead of OR.
 
