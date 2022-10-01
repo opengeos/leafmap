@@ -6205,8 +6205,7 @@ class The_national_map_USGS():
             geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
                 Used for reading a region URL|filepath.
             API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
-                Exposes most of the documented API.
-                Defaults to {'max':10} to avoid accidental large downloads.
+                Exposes most of the documented API. Defaults to {}.
 
         Returns:
             None
@@ -6327,16 +6326,10 @@ class The_national_map_USGS():
         used_locals = {k:v for k,v in locals().items() if v and k != 'self'}
 
         # Parsing
-        def convert_polygon(x):
-            return ','.join(' '.join(map(str,point)) for point in x)
         if polygon:
-            used_locals['polygon'] = convert_polygon(polygon)      
-
-        def convert_bbox(x):
-            # return list as '-115.9689, 35.9758, -115.3619, 36.4721'
-            return str(x)[1:-1]
+            used_locals['polygon'] = ','.join(' '.join(map(str,point)) for point in polygon) 
         if bbox:
-            used_locals['bbox'] = convert_bbox(bbox)    
+            used_locals['bbox'] = str(bbox)[1:-1]
 
         if max:
             max += 2
@@ -6369,8 +6362,6 @@ def download_tnm(region=None, out_dir=None, download_args={}, geopandas_args={},
     """    
     assert region or API, 'Provide a region or use the API' 
     TNM = The_national_map_USGS()
-    if not(API.get('max')):
-        API['max'] = 10
     return TNM.download_tiles(region, out_dir, download_args, geopandas_args, API)
 
 
