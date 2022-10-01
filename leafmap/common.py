@@ -6171,7 +6171,8 @@ class The_national_map_USGS():
 
     def parse_region(self, region, geopandas_args={}):
         """
-        Translate a Vector dataset to a polygon.
+
+        Translate a Vector dataset to its bounding box.
 
         Args:
             region (str | list): an URL|filepath to a vector dataset to a polygon
@@ -6191,8 +6192,9 @@ class The_national_map_USGS():
             roi = roi.to_crs(epsg=4326)
         return roi.total_bounds
         
-    def download_tiles(self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={'max':10}):
+    def download_tiles(self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={}):
         """
+
         Download the US National Elevation Datasets (NED) for a region.
 
         Args:
@@ -6234,13 +6236,13 @@ class The_national_map_USGS():
                 errors += 1           
                 print(f"Failed to download {i+1} of {T}: {file_name}")
                 
-        print(f"{done} Downloads completed, {errors} downloads failed")
+        print(f"{done} Downloads completed, {errors} downloads failed, {T} files available")
         return 
 
 
     def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}):
         """
-        Download the US National Elevation Datasets (NED) for a region.
+        Find a list of downloadable files.
 
         Args:
             region (str | list, optional): An URL|filepath to a vector dataset Or a list of bounds in the form of [minx, miny, maxx, maxy].
@@ -6253,15 +6255,12 @@ class The_national_map_USGS():
                 Exposes most of the documented API parameters. Defaults to {}.
 
         Returns:
-            list: A list of download_urls to the found tiles. 
-            dict: A dictionary containing the metadata of the found tiles.
+            list: A list of download_urls. 
         """
         assert region or API, 'Provide a region or use the API'
 
-        if isinstance(region,str):
-            API['polygon'] = self.parse_region(region, geopandas_args)
-        if isinstance(region, list):
-            API['bbox'] = region
+        if region:
+            API['bbox'] = self.parse_region(region, geopandas_args)   
 
         results = self.find_details(**API)
         if return_type == 'list':
@@ -6271,9 +6270,9 @@ class The_national_map_USGS():
     def find_details(self, 
                    bbox:list[float] = None, 
                    polygon:list[tuple[float,float]] = None, 
-                   datasets:list[str] | str = [], 
-                   prodFormats:list[str] | str = [],
-                   prodExtents:list[str] | str = [], 
+                   datasets:str = None, 
+                   prodFormats:str = None,
+                   prodExtents:str = None, 
                    q:str = None, 
                    dateType:str = None, 
                    start:str = None, 
@@ -6295,14 +6294,12 @@ class The_national_map_USGS():
         polygon                 '[x,y x,y x,y x,y x,y]'       
             Polygon, longitude/latitude values expressed in decimal degrees in a space-delimited list.
         datasets                See: Datasets (Optional)       
-            Comma-delimited list of valid dataset tag names (sbDatasetTag)
+            Dataset tag name (sbDatasetTag)
             From https://apps.nationalmap.gov/tnmaccess/#/product
         prodFormats             See: Product Formats (Optional)
-            Comma-delimited list of dataset-specific formats
-            From https://apps.nationalmap.gov/tnmaccess/#/product
+            Dataset-specific format
         prodExtents             See: Product Extents (Optional)
-            Comma-delimited list of dataset-specific extents
-            From https://apps.nationalmap.gov/tnmaccess/#/product
+            Dataset-specific extent
         q                       free text 
             Text input which can be used to filter by product titles and text descriptions.
         dateType                dateCreated | lastUpdated | Publication 
@@ -6330,7 +6327,6 @@ class The_national_map_USGS():
         used_locals = {k:v for k,v in locals().items() if v and k != 'self'}
 
         # Parsing
-    
         def convert_polygon(x):
             return ','.join(' '.join(map(str,point)) for point in x)
         if polygon:
@@ -6342,23 +6338,15 @@ class The_national_map_USGS():
         if bbox:
             used_locals['bbox'] = convert_bbox(bbox)    
 
-        # Fetch list seems broken in API ???, only takes list with 1 item or str.
-        # Looks like list is evaluated as AND instead of OR.
-
-        assert set(datasets).issubset(self.datasets) or datasets in self.datasets, f'Unknown datasets, must be elements of {self.datasets}'
-        assert set(prodFormats).issubset(self.prodFormats) or prodFormats in self.prodFormats, f'Unknown prodFormats, must be element of {self.prodFormats}'
-
-        # Validations handled better (f.e. psjon) by API endpoint error responses
-        # 'JSON', 'CSV' (misses pjson)
-        # 'dateCreated', 'lastUpdated', 'Publication'
-        # start or end or dateType / YYYY-MM-DD
+        if max:
+            max += 2
             
         # Fetch response
-
         response = requests.get(f'{self.api_endpoint}products?', params=used_locals)
         if response.status_code//100 == 2:
             return response.json()
         else:
+            # Parameter validation handled by API endpoint error responses
             print(response.json())
         return {}
 
@@ -6374,9 +6362,7 @@ def download_tnm(region=None, out_dir=None, download_args={}, geopandas_args={},
         geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
             Used for reading a region URL|filepath.
         API (dict, optional): A dictionary of arguments to pass to the The_national_map_USGS.find_details() function. 
-            Exposes most of the documented API.
-            Defaults to {'max':10}
-            Using API={'q':'NED'} yields similar results to download_ned
+            Exposes most of the documented API. Defaults to {}
 
     Returns:
         None
