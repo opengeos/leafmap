@@ -6130,9 +6130,9 @@ class The_national_map_USGS():
     It provides an API endpoint which can be used to find downloadable links for the products offered.
         - Full description of datasets available can retrieved.
           This consists of metadata such as detail description and publication dates.
-        - A wide range of dataformats are availble
+        - A wide range of dataformats are available
 
-    Most features provided by the API 
+    This class is a tiny wrapper to find and download files using the API.
 
     More complete documentation for the API can be found at
         https://apps.nationalmap.gov/tnmaccess/#/
@@ -6140,8 +6140,9 @@ class The_national_map_USGS():
 
     def __init__(self):
         self.api_endpoint = r'https://tnmaccess.nationalmap.gov/api/v1/'
-        self.DS = self.datasets_full()
+        self.DS = self.datasets_full
     
+    @property
     def datasets_full(self) -> list:
         """
         Full description of datasets provided.
@@ -6169,7 +6170,7 @@ class The_national_map_USGS():
         """
         return set(y['sbDatasetTag'] for x in self.DS for y in x['tags'])
 
-    def parse_region(self, region, geopandas_args={}):
+    def parse_region(self, region, geopandas_args={}) -> list:
         """
 
         Translate a Vector dataset to its bounding box.
@@ -6192,7 +6193,7 @@ class The_national_map_USGS():
             roi = roi.to_crs(epsg=4326)
         return roi.total_bounds
         
-    def download_tiles(self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={}):
+    def download_tiles(self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={}) -> None:
         """
 
         Download the US National Elevation Datasets (NED) for a region.
@@ -6239,7 +6240,7 @@ class The_national_map_USGS():
         return 
 
 
-    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}):
+    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}) -> list|dict:
         """
         Find a list of downloadable files.
 
@@ -6255,6 +6256,7 @@ class The_national_map_USGS():
 
         Returns:
             list: A list of download_urls. 
+            dict: A dictionary with urls and related metadata
         """
         assert region or API, 'Provide a region or use the API'
 
@@ -6343,7 +6345,7 @@ class The_national_map_USGS():
             print(response.json())
         return {}
 
-def download_tnm(region=None, out_dir=None, download_args={}, geopandas_args={}, API={}):
+def download_tnm(region=None, out_dir=None, download_args={}, geopandas_args={}, API={}) -> None:
     """
     Download the US National Elevation Datasets (NED) for a region.
 
@@ -6360,7 +6362,6 @@ def download_tnm(region=None, out_dir=None, download_args={}, geopandas_args={},
     Returns:
         None
     """    
-    assert region or API, 'Provide a region or use the API' 
     TNM = The_national_map_USGS()
     return TNM.download_tiles(region, out_dir, download_args, geopandas_args, API)
 
