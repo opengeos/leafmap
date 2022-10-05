@@ -13,7 +13,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
-from typing import Union
+from typing import Union, List, Dict, Tuple
 from IPython.display import display, IFrame
 
 
@@ -6243,7 +6243,7 @@ class The_national_map_USGS():
         return 
 
 
-    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}) -> Union[list,dict]:
+    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}) ->list|dict:
         """
         Find a list of downloadable files.
 
@@ -6272,8 +6272,8 @@ class The_national_map_USGS():
         return results
 
     def find_details(self, 
-                   bbox:list[float] = None, 
-                   polygon:list[tuple[float,float]] = None, 
+                   bbox:List[float] = None, 
+                   polygon:List[Tuple[float,float]] = None, 
                    datasets:str = None, 
                    prodFormats:str = None,
                    prodExtents:str = None, 
@@ -6286,7 +6286,7 @@ class The_national_map_USGS():
                    outputFormat:str = 'JSON', 
                    polyType:str = None, 
                    polyCode:str = None, 
-                   extentQuery:int = None) -> dict:
+                   extentQuery:int = None) -> Dict:
         """
         Possible search parameters (kwargs) support by API
 
@@ -6348,7 +6348,7 @@ class The_national_map_USGS():
             print(response.json())
         return {}
 
-def download_tnm(region=None, out_dir=None, return_url=False, download_args={}, geopandas_args={}, API={}) -> Union[None,list]:
+def download_tnm(region=None, out_dir=None, return_url=False, download_args={}, geopandas_args={}, API={}) -> Union[None,List]:
     """Download the US National Elevation Datasets (NED) for a region.
 
     Args:
@@ -6370,7 +6370,7 @@ def download_tnm(region=None, out_dir=None, return_url=False, download_args={}, 
         return TNM.find_tiles(region=region, geopandas_args=geopandas_args, API=API)
     return TNM.download_tiles(region=region, out_dir=out_dir, download_args=download_args, geopandas_args=geopandas_args, API=API)
 
-def download_ned(region, out_dir=None, return_url=False, download_args={}, geopandas_args={}) -> Union[None,list]:
+def download_ned(region, out_dir=None, return_url=False, download_args={}, geopandas_args={}) -> Union[None,List]:
     """Download the US National Elevation Datasets (NED) for a region.
 
     Args:
