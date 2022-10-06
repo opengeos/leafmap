@@ -6243,7 +6243,7 @@ class The_national_map_USGS():
         return 
 
 
-    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}) ->list|dict:
+    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}):
         """
         Find a list of downloadable files.
 
