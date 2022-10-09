@@ -28,11 +28,18 @@ def _use_folium():
 if _use_folium():
     from .foliumap import *
 else:
-    from .leafmap import *
+    try:
+        from .leafmap import *
+    except Exception as e:
+        if _in_colab_shell():
+            print(
+                "Please restart Colab runtime after installation if you encounter any errors when importing leafmap."
+            )
+        else:
+            print(
+                "Please restart Jupyter kernel after installation if you encounter any errors when importing leafmap."
+            )
+        raise Exception(e)
 
-    if _in_colab_shell():
-        from google.colab import output
-
-        output.enable_custom_widget_manager()
 
 from .report import Report
