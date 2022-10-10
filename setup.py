@@ -56,6 +56,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     description="A Python package for geospatial analysis and interactive mapping in a Jupyter environment.",
     install_requires=install_requires,
