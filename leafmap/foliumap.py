@@ -307,6 +307,10 @@ class Map(folium.Map):
             opacity (float, optional): Sets the opacity for the layer.
             API_key (str, optional): – API key for Cloudmade or Mapbox tiles. Defaults to True.
         """
+        if "max_zoom" not in kwargs:
+            kwargs["max_zoom"] = 100
+        if "max_native_zoom" not in kwargs:
+            kwargs["max_native_zoom"] = 100
 
         try:
             folium.raster_layers.TileLayer(
