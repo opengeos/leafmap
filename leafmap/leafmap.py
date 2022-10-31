@@ -1010,13 +1010,17 @@ class Map(ipyleaflet.Map):
             )
             super().add_layer(marker)
 
-    def split_map(self, left_layer="HYBRID", right_layer="OpenStreetMap"):
+    def split_map(self, left_layer="HYBRID", right_layer="OpenStreetMap", **kwargs):
         """Adds split map.
 
         Args:
             left_layer (str, optional): The layer tile layer. Defaults to 'HYBRID'.
             right_layer (str, optional): The right tile layer. Defaults to 'OpenStreetMap'.
         """
+        if "max_zoom" not in kwargs:
+            kwargs["max_zoom"] = 100
+        if "max_native_zoom" not in kwargs:
+            kwargs["max_native_zoom"] = 100
         try:
             if left_layer in basemaps.keys():
                 left_layer = basemaps[left_layer]
@@ -1027,12 +1031,14 @@ class Map(ipyleaflet.Map):
                         url=url,
                         name="Left Layer",
                         attribution=" ",
+                        **kwargs,
                     )
                 else:
                     left_layer = ipyleaflet.TileLayer(
                         url=left_layer,
                         name="Left Layer",
                         attribution=" ",
+                        **kwargs,
                     )
             elif isinstance(left_layer, ipyleaflet.TileLayer):
                 pass
@@ -1050,12 +1056,14 @@ class Map(ipyleaflet.Map):
                         url=url,
                         name="Right Layer",
                         attribution=" ",
+                        **kwargs,
                     )
                 else:
                     right_layer = ipyleaflet.TileLayer(
                         url=right_layer,
                         name="Right Layer",
                         attribution=" ",
+                        **kwargs,
                     )
             elif isinstance(right_layer, ipyleaflet.TileLayer):
                 pass
