@@ -197,14 +197,14 @@ class TestFoliumap(unittest.TestCase):
         out_str = m.to_html()
         assert "NYC" in out_str
 
-    def test_add_osm_from_place(self):
-        """Check OSM data from place"""
-        m = leafmap.Map()
-        place = "Bunker Hill, Los Angeles, California"
-        tags = {"building": True}
-        m.add_osm_from_place(place, tags, layer_name="Los Angeles, CA")
-        out_str = m.to_html()
-        assert "Los Angeles, CA" in out_str
+    # def test_add_osm_from_place(self):
+    #     """Check OSM data from place"""
+    #     m = leafmap.Map()
+    #     place = "Bunker Hill, Los Angeles, California"
+    #     tags = {"building": True}
+    #     m.add_osm_from_place(place, tags, layer_name="Los Angeles, CA")
+    #     out_str = m.to_html()
+    #     assert "Los Angeles, CA" in out_str
 
     def test_add_osm_from_point(self):
         """Check OSM data from point"""
