@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.10.6 - Oct 31, 2022
+
+**New Features**:
+
+-   Added reproject image function
+-   Added download ned notebook tutorial [#285](https://github.com/giswqs/leafmap/pull/285)
+-   Added download ned by huc and bbox [#287](https://github.com/giswqs/leafmap/discussions/287) [#289](https://github.com/giswqs/leafmap/pull/289)
+-   Added USGS The national map API wrapper [#290](https://github.com/giswqs/leafmap/pull/290)
+
+**Improvement**
+
+-   Added codeql.yml
+-   Improved Colab import error message
+-   Added Python 3.11 to CI
+-   Fixed max zoom bug
+-   Improved split control
+
 ## v0.10.5 - Sep 7, 2022
 
 **New Features**:
