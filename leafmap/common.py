@@ -17,7 +17,6 @@ from typing import Union, List, Dict, Tuple
 from IPython.display import display, IFrame
 
 
-
 class TitilerEndpoint:
     """This class contains the methods for the titiler endpoint."""
 
@@ -3839,11 +3838,11 @@ def get_local_tile_layer(
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
-        If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer),
-        try adding to following two lines to the beginning of the notebook if the raster does not render properly.
+        If you are using this function in JupyterHub on a remote server and the raster does not render properly, try
+        running the following two lines before calling this function:
 
         import os
-        os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = f'{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}'
+        os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = 'proxy/{port}'
 
     Args:
         source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
@@ -3887,7 +3886,6 @@ def get_local_tile_layer(
             else:
                 source = os.path.abspath(source)
             if not os.path.exists(source):
-                raise ValueError("The source path does not exist.")
                 raise ValueError("The source path does not exist.")
         else:
             source = github_raw_url(source)
@@ -6125,9 +6123,10 @@ def html_to_streamlit(
     f.close()
     return components.html(html, width=width, height=height, scrolling=scrolling)
 
-class The_national_map_USGS():
+
+class The_national_map_USGS:
     """
-    The national map is a collection of topological datasets, maintained by the USGS. 
+    The national map is a collection of topological datasets, maintained by the USGS.
 
     It provides an API endpoint which can be used to find downloadable links for the products offered.
         - Full description of datasets available can retrieved.
@@ -6141,36 +6140,36 @@ class The_national_map_USGS():
     """
 
     def __init__(self):
-        self.api_endpoint = r'https://tnmaccess.nationalmap.gov/api/v1/'
+        self.api_endpoint = r"https://tnmaccess.nationalmap.gov/api/v1/"
         self.DS = self.datasets_full
-    
+
     @property
     def datasets_full(self) -> list:
         """
         Full description of datasets provided.
         Returns a JSON or empty list.
         """
-        link = f'{self.api_endpoint}datasets?'
+        link = f"{self.api_endpoint}datasets?"
         try:
             return requests.get(link).json()
         except Exception:
-            print(f'Failed to load metadata from The National Map API endpoint\n{link}')
+            print(f"Failed to load metadata from The National Map API endpoint\n{link}")
             return []
 
     @property
     def prodFormats(self) -> list:
         """
-        Return all datatypes available in any of the collections. 
-        Note that "All" is only peculiar to one dataset. 
+        Return all datatypes available in any of the collections.
+        Note that "All" is only peculiar to one dataset.
         """
-        return set(i['displayName'] for ds in self.DS for i in ds['formats'])
+        return set(i["displayName"] for ds in self.DS for i in ds["formats"])
 
     @property
     def datasets(self) -> list:
         """
         Returns a list of dataset tags (most common human readable self description for specific datasets).
         """
-        return set(y['sbDatasetTag'] for x in self.DS for y in x['tags'])
+        return set(y["sbDatasetTag"] for x in self.DS for y in x["tags"])
 
     def parse_region(self, region, geopandas_args={}) -> list:
         """
@@ -6179,7 +6178,7 @@ class The_national_map_USGS():
 
         Args:
             region (str | list): an URL|filepath to a vector dataset to a polygon
-            geopandas_reader_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+            geopandas_reader_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
                 Used for reading a region URL|filepath.
         """
         import geopandas as gpd
@@ -6195,8 +6194,10 @@ class The_national_map_USGS():
             roi = roi.to_crs(epsg=4326)
             return roi.total_bounds
         return region
-        
-    def download_tiles(self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={}) -> None:
+
+    def download_tiles(
+        self, region=None, out_dir=None, download_args={}, geopandas_args={}, API={}
+    ) -> None:
         """
 
         Download the US National Elevation Datasets (NED) for a region.
@@ -6206,9 +6207,9 @@ class The_national_map_USGS():
                 Alternatively you could use API parameters such as polygon or bbox.
             out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
             download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
-            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
                 Used for reading a region URL|filepath.
-            API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
+            API (dict, optional): A dictionary of arguments to pass to the self.find_details() function.
                 Exposes most of the documented API. Defaults to {}.
 
         Returns:
@@ -6218,8 +6219,10 @@ class The_national_map_USGS():
             out_dir = os.getcwd()
         else:
             out_dir = os.path.abspath(out_dir)
-        
-        tiles = self.find_tiles(region, return_type='list', geopandas_args=geopandas_args, API=API)
+
+        tiles = self.find_tiles(
+            region, return_type="list", geopandas_args=geopandas_args, API=API
+        )
         T = len(tiles)
         errors = 0
         done = 0
@@ -6227,23 +6230,24 @@ class The_national_map_USGS():
         for i, link in enumerate(tiles):
             file_name = os.path.basename(link)
             out_name = os.path.join(out_dir, file_name)
-            if i<5 or (i<50 and not(i%5)) or not(i%20):
+            if i < 5 or (i < 50 and not (i % 5)) or not (i % 20):
                 print(f"Downloading {i+1} of {T}: {file_name}")
             try:
                 download_file(link, out_name, **download_args)
                 done += 1
             except KeyboardInterrupt:
-                print('Cancelled download')
+                print("Cancelled download")
                 break
-            except Exception:     
-                errors += 1           
+            except Exception:
+                errors += 1
                 print(f"Failed to download {i+1} of {T}: {file_name}")
-                
-        print(f"{done} Downloads completed, {errors} downloads failed, {T} files available")
-        return 
 
+        print(
+            f"{done} Downloads completed, {errors} downloads failed, {T} files available"
+        )
+        return
 
-    def find_tiles(self, region=None, return_type='list', geopandas_args={}, API={}):
+    def find_tiles(self, region=None, return_type="list", geopandas_args={}, API={}):
         """
         Find a list of downloadable files.
 
@@ -6252,125 +6256,146 @@ class The_national_map_USGS():
                 Alternatively you could use API parameters such as polygon or bbox.
             out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
             return_type (str): list | dict. Defaults to list. Changes the return output type and content.
-            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
                 Used for reading a region URL|filepath.
-            API (dict, optional): A dictionary of arguments to pass to the self.find_details() function. 
+            API (dict, optional): A dictionary of arguments to pass to the self.find_details() function.
                 Exposes most of the documented API parameters. Defaults to {}.
 
         Returns:
-            list: A list of download_urls. 
+            list: A list of download_urls.
             dict: A dictionary with urls and related metadata
         """
-        assert region or API, 'Provide a region or use the API'
+        assert region or API, "Provide a region or use the API"
 
         if region:
-            API['bbox'] = self.parse_region(region, geopandas_args)   
+            API["bbox"] = self.parse_region(region, geopandas_args)
 
         results = self.find_details(**API)
-        if return_type == 'list':
-            return [i["downloadURL"] for i in results.get('items')]
+        if return_type == "list":
+            return [i["downloadURL"] for i in results.get("items")]
         return results
 
-    def find_details(self, 
-                   bbox:List[float] = None, 
-                   polygon:List[Tuple[float,float]] = None, 
-                   datasets:str = None, 
-                   prodFormats:str = None,
-                   prodExtents:str = None, 
-                   q:str = None, 
-                   dateType:str = None, 
-                   start:str = None, 
-                   end:str = None, 
-                   offset:int = 0, 
-                   max:int = None, 
-                   outputFormat:str = 'JSON', 
-                   polyType:str = None, 
-                   polyCode:str = None, 
-                   extentQuery:int = None) -> Dict:
+    def find_details(
+        self,
+        bbox: List[float] = None,
+        polygon: List[Tuple[float, float]] = None,
+        datasets: str = None,
+        prodFormats: str = None,
+        prodExtents: str = None,
+        q: str = None,
+        dateType: str = None,
+        start: str = None,
+        end: str = None,
+        offset: int = 0,
+        max: int = None,
+        outputFormat: str = "JSON",
+        polyType: str = None,
+        polyCode: str = None,
+        extentQuery: int = None,
+    ) -> Dict:
         """
         Possible search parameters (kwargs) support by API
 
-        Parameter               Values                      
+        Parameter               Values
             Description
-        ---------------------------------------------------------------------------------------------------    
+        ---------------------------------------------------------------------------------------------------
         bbox                    'minx, miny, maxx, maxy'
             Geographic longitude/latitude values expressed in  decimal degrees in a comma-delimited list.
-        polygon                 '[x,y x,y x,y x,y x,y]'       
+        polygon                 '[x,y x,y x,y x,y x,y]'
             Polygon, longitude/latitude values expressed in decimal degrees in a space-delimited list.
-        datasets                See: Datasets (Optional)       
+        datasets                See: Datasets (Optional)
             Dataset tag name (sbDatasetTag)
             From https://apps.nationalmap.gov/tnmaccess/#/product
         prodFormats             See: Product Formats (Optional)
             Dataset-specific format
         prodExtents             See: Product Extents (Optional)
             Dataset-specific extent
-        q                       free text 
+        q                       free text
             Text input which can be used to filter by product titles and text descriptions.
-        dateType                dateCreated | lastUpdated | Publication 
+        dateType                dateCreated | lastUpdated | Publication
             Type of date to search by.
-        start                   'YYYY-MM-DD' 
+        start                   'YYYY-MM-DD'
             Start date
-        end                     'YYYY-MM-DD' 
+        end                     'YYYY-MM-DD'
             End date (required if start date is provided)
-        offset                  integer 
+        offset                  integer
             Offset into paginated results - default=0
-        max                     integer 
+        max                     integer
             Number of results returned
         outputFormat            JSON | CSV | pjson
             Default=JSON
-        polyType                state | huc2 | huc4 | huc8 
+        polyType                state | huc2 | huc4 | huc8
             Well Known Polygon Type. Use this parameter to deliver data by state or HUC
             (hydrologic unit codes defined by the Watershed Boundary Dataset/WBD)
-        polyCode                state FIPS code or huc number 
+        polyCode                state FIPS code or huc number
             Well Known Polygon Code. This value needs to coordinate with the polyType parameter.
-        extentQuery             integer 
+        extentQuery             integer
             A Polygon code in the science base system, typically from an uploaded shapefile
         """
-       
+
         # call locals before creating new locals
-        used_locals = {k:v for k,v in locals().items() if v and k != 'self'}
+        used_locals = {k: v for k, v in locals().items() if v and k != "self"}
 
         # Parsing
         if polygon:
-            used_locals['polygon'] = ','.join(' '.join(map(str,point)) for point in polygon) 
+            used_locals["polygon"] = ",".join(
+                " ".join(map(str, point)) for point in polygon
+            )
         if bbox:
-            used_locals['bbox'] = str(bbox)[1:-1]
+            used_locals["bbox"] = str(bbox)[1:-1]
 
         if max:
             max += 2
-            
+
         # Fetch response
-        response = requests.get(f'{self.api_endpoint}products?', params=used_locals)
-        if response.status_code//100 == 2:
+        response = requests.get(f"{self.api_endpoint}products?", params=used_locals)
+        if response.status_code // 100 == 2:
             return response.json()
         else:
             # Parameter validation handled by API endpoint error responses
             print(response.json())
         return {}
 
-def download_tnm(region=None, out_dir=None, return_url=False, download_args={}, geopandas_args={}, API={}) -> Union[None,List]:
+
+def download_tnm(
+    region=None,
+    out_dir=None,
+    return_url=False,
+    download_args={},
+    geopandas_args={},
+    API={},
+) -> Union[None, List]:
     """Download the US National Elevation Datasets (NED) for a region.
 
     Args:
         region (str | list, optional): An URL|filepath to a vector dataset Or a list of bounds in the form of [minx, miny, maxx, maxy].
             Alternatively you could use API parameters such as polygon or bbox.
         out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
-        return_url (bool, optional): Whether to return the download URLs of the files. Defaults to False.        
+        return_url (bool, optional): Whether to return the download URLs of the files. Defaults to False.
         download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
-        geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+        geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
             Used for reading a region URL|filepath.
-        API (dict, optional): A dictionary of arguments to pass to the The_national_map_USGS.find_details() function. 
+        API (dict, optional): A dictionary of arguments to pass to the The_national_map_USGS.find_details() function.
             Exposes most of the documented API. Defaults to {}
 
     Returns:
         list: A list of the download URLs of the files if return_url is True.
-    """    
+    """
     TNM = The_national_map_USGS()
     if return_url:
         return TNM.find_tiles(region=region, geopandas_args=geopandas_args, API=API)
-    return TNM.download_tiles(region=region, out_dir=out_dir, download_args=download_args, geopandas_args=geopandas_args, API=API)
+    return TNM.download_tiles(
+        region=region,
+        out_dir=out_dir,
+        download_args=download_args,
+        geopandas_args=geopandas_args,
+        API=API,
+    )
 
-def download_ned(region, out_dir=None, return_url=False, download_args={}, geopandas_args={}) -> Union[None,List]:
+
+def download_ned(
+    region, out_dir=None, return_url=False, download_args={}, geopandas_args={}
+) -> Union[None, List]:
     """Download the US National Elevation Datasets (NED) for a region.
 
     Args:
@@ -6378,7 +6403,7 @@ def download_ned(region, out_dir=None, return_url=False, download_args={}, geopa
         out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
         return_url (bool, optional): Whether to return the download URLs of the files. Defaults to False.
         download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
-        geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function. 
+        geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
             Used for reading a region URL|filepath.
 
     Returns:
@@ -6387,8 +6412,17 @@ def download_ned(region, out_dir=None, return_url=False, download_args={}, geopa
 
     TNM = The_national_map_USGS()
     if return_url:
-        return TNM.find_tiles(region=region, geopandas_args=geopandas_args, API={'q':'NED'})
-    return TNM.download_tiles(region=region, out_dir=out_dir, download_args=download_args, geopandas_args=geopandas_args, API={'q':'NED'})    
+        return TNM.find_tiles(
+            region=region, geopandas_args=geopandas_args, API={"q": "NED"}
+        )
+    return TNM.download_tiles(
+        region=region,
+        out_dir=out_dir,
+        download_args=download_args,
+        geopandas_args=geopandas_args,
+        API={"q": "NED"},
+    )
+
 
 def mosaic(images, output, merge_args={}, verbose=True, **kwargs):
     """Mosaics a list of images into a single image. Inspired by https://bit.ly/3A6roDK.
