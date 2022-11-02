@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.11.1 - Nov 2, 2022
+
+**New Features**:
+
+-   Added find_files() function for searching files recursively in a directory
+
+**Improvement**
+
+-   Improved the mosaic() function
+
 ## v0.11.0 - Nov 2, 2022
 
 **New Features**:
