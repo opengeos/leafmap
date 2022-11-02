@@ -6428,12 +6428,14 @@ def download_ned(
     )
 
 
-def mosaic(images, output, merge_args={}, verbose=True, **kwargs):
+def mosaic(images, output, ext='tif', recursive=True, merge_args={}, verbose=True, **kwargs):
     """Mosaics a list of images into a single image. Inspired by https://bit.ly/3A6roDK.
 
     Args:
         images (str | list): An input directory containing images or a list of images.
         output (str): The output image filepath.
+        ext (str, optional): The file extension of the images. Defaults to 'tif'.
+        recursive (bool, optional): Whether to recursively search for images in the input directory. Defaults to True.
         merge_args (dict, optional): A dictionary of arguments to pass to the rasterio.merge function. Defaults to {}.
         verbose (bool, optional): Whether to print progress. Defaults to True.
 
@@ -6445,8 +6447,7 @@ def mosaic(images, output, merge_args={}, verbose=True, **kwargs):
     output = os.path.abspath(output)
 
     if isinstance(images, str):
-        path = Path(images)
-        raster_files = list(path.iterdir())
+        raster_files = find_files(images, ext=ext, recursive=recursive)
     elif isinstance(images, list):
         raster_files = images
     else:
@@ -6479,6 +6480,9 @@ def mosaic(images, output, merge_args={}, verbose=True, **kwargs):
 
     with rio.open(output, "w", **output_meta) as m:
         m.write(arr)
+
+    if verbose:
+        print(f"Saved mosaic to {output}")
 
 
 def geometry_bounds(geometry, decimals=4):
@@ -6736,3 +6740,41 @@ def image_resolution(image, **kwargs):
     else:
         client = image
     return client.metadata()["GeoTransform"][1]
+
+
+def find_files(input_dir, ext=None, fullpath=True, recursive=True):
+    """Find files in a directory.
+
+    Args:
+        input_dir (str): The input directory.
+        ext (str, optional): The file extension to match. Defaults to None.
+        fullpath (bool, optional): Whether to return the full path. Defaults to True.
+        recursive (bool, optional): Whether to search recursively. Defaults to True.
+
+    Returns:
+        list: A list of matching files.
+    """
+
+    from pathlib import Path
+
+    files = []
+
+    if ext is None:
+        ext = "*"
+    else:
+        ext = ext.replace(".", "")
+
+    ext = f'*.{ext}'
+
+    if recursive:
+        if fullpath:
+            files = [str(path.joinpath()) for path in Path(input_dir).rglob(ext)]
+        else:
+            files = [str(path.name) for path in Path(input_dir).rglob(ext)]
+    else:
+        if fullpath:
+            files = [str(path.joinpath()) for path in Path(input_dir).glob(ext)]
+        else:
+            files = [path.name for path in Path(input_dir).glob(ext)]
+
+    return files
