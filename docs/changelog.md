@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.11.2 - Nov 2, 2022
+
+**Improvement**
+
+-   Improved the mosaic() function to support creating COG
+-   Improved the download_file() function to support downloading and extracting files
+
 ## v0.11.1 - Nov 2, 2022
 
 **New Features**:
