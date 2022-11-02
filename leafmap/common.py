@@ -3879,6 +3879,9 @@ def get_local_tile_layer(
         TileClient,
     )
 
+    if "show_loading" not in kwargs:
+        kwargs["show_loading"] = False
+
     if isinstance(source, str):
         if not source.startswith("http"):
             if source.startswith("~"):
@@ -6554,3 +6557,181 @@ def reproject(image, output, dst_crs="EPSG:4326", resampling="nearest", **kwargs
                     resampling=resampling,
                     **kwargs,
                 )
+
+
+def image_check(image):
+
+    from localtileserver import TileClient
+
+    if isinstance(image, str):
+        if image.startswith("http") or os.path.exists(image):
+            pass
+        else:
+            raise ValueError("image must be a URL or filepath.")
+    elif isinstance(image, TileClient):
+        pass
+    else:
+        raise ValueError("image must be a URL or filepath.")
+
+
+def image_client(image, **kwargs):
+    """Get a LocalTileserver TileClient from an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        TileClient: A LocalTileserver TileClient.
+    """
+    image_check(image)
+
+    _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    return client
+
+
+def image_center(image, **kwargs):
+    """Get the center of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        tuple: A tuple of (latitude, longitude).
+    """
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    return client.center()
+
+
+def image_bounds(image, **kwargs):
+    """Get the bounds of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        list: A list of bounds in the form of [(south, west), (north, east)].
+    """
+
+    image_check(image)
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    bounds = client.bounds()
+    return [(bounds[0], bounds[2]), (bounds[1], bounds[3])]
+
+
+def image_metadata(image, **kwargs):
+    """Get the metadata of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        dict: A dictionary of image metadata.
+    """
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    return client.metadata()
+
+
+def image_bandcount(image, **kwargs):
+    """Get the number of bands in an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        int: The number of bands in the image.
+    """
+
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    return len(client.metadata()["bands"])
+
+
+def image_size(image, **kwargs):
+    """Get the size (width, height) of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        tuple: A tuple of (width, height).
+    """
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+
+    metadata = client.metadata()
+    return metadata["sourceSizeX"], metadata["sourceSizeY"]
+
+
+def image_projection(image, **kwargs):
+    """Get the projection of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        str: The projection of the image.
+    """
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    return client.metadata()["Projection"]
+
+
+def image_geotransform(image, **kwargs):
+    """Get the geotransform of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        list: A list of geotransform values.
+    """
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    return client.metadata()["GeoTransform"]
+
+
+def image_resolution(image, **kwargs):
+    """Get the resolution of an image.
+
+    Args:
+        image (str): The input image filepath or URL.
+
+    Returns:
+        float: The resolution of the image.
+    """
+    image_check(image)
+
+    if isinstance(image, str):
+        _, client = get_local_tile_layer(image, return_client=True, **kwargs)
+    else:
+        client = image
+    return client.metadata()["GeoTransform"][1]
