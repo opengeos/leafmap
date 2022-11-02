@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.11.0 - Nov 2, 2022
+
+**New Features**:
+
+-   Improved support for creating split-panel map [#297](https://github.com/giswqs/leafmap/pull/297)
+-   Split-panel map supports any local or remote raster datasets
+-   Added several image functions:
+-   `image_center()`
+-   `image_bounds()`
+-   `image_size()`
+-   `image_resolution()`
+-   `image_metadata()`
+-   `image_projection()`
+-   `image_geotransform()`
+
 ## v0.10.6 - Oct 31, 2022
 
 **New Features**:
