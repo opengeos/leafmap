@@ -3867,6 +3867,11 @@ def get_local_tile_layer(
         "localtileserver", URL="https://github.com/banesullivan/localtileserver"
     )
 
+    if "max_zoom" not in kwargs:
+        kwargs["max_zoom"] = 100
+    if "max_native_zoom" not in kwargs:
+        kwargs["max_native_zoom"] = 100
+
     # Make it compatible with binder and JupyterHub
     if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
         os.environ[
@@ -3923,8 +3928,6 @@ def get_local_tile_layer(
             nodata=nodata,
             attribution=attribution,
             name=layer_name,
-            max_zoom=30,
-            max_native_zoom=30,
             **kwargs,
         )
     else:
@@ -3941,8 +3944,6 @@ def get_local_tile_layer(
             attr=attribution,
             overlay=True,
             name=layer_name,
-            max_zoom=30,
-            max_native_zoom=30,
             **kwargs,
         )
 
