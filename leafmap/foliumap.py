@@ -2161,37 +2161,70 @@ class Map(folium.Map):
 
         layer_group.add_to(self)
 
-    def split_map(self, left_layer="TERRAIN", right_layer="OpenTopoMap", **kwargs):
+    def split_map(
+        self,
+        left_layer="TERRAIN",
+        right_layer="OpenTopoMap",
+        left_args={},
+        right_args={},
+    ):
         """Adds a split-panel map.
 
         Args:
-            left_layer (str, optional): The layer tile layer. Defaults to 'TERRAIN'.
-            right_layer (str, optional): The right tile layer. Defaults to 'OpenTopoMap'.
+            left_layer (str, optional): The left tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'TERRAIN'.
+            right_layer (str, optional): The right tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'OpenTopoMap'.
+            left_args (dict, optional): The arguments for the left tile layer. Defaults to {}.
+            right_args (dict, optional): The arguments for the right tile layer. Defaults to {}.
         """
-        if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 100
-        if "max_native_zoom" not in kwargs:
-            kwargs["max_native_zoom"] = 100
+        if "max_zoom" not in left_args:
+            left_args["max_zoom"] = 100
+        if "max_native_zoom" not in left_args:
+            left_args["max_native_zoom"] = 100
+
+        if "max_zoom" not in right_args:
+            right_args["max_zoom"] = 100
+        if "max_native_zoom" not in right_args:
+            right_args["max_native_zoom"] = 100
+
+        if "layer_name" not in left_args:
+            left_args["layer_name"] = "Left Layer"
+
+        if "layer_name" not in right_args:
+            right_args["layer_name"] = "Right Layer"
+
+        bounds = None
+
         try:
             if left_layer in basemaps.keys():
                 left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer)
+                    bbox = cog_bounds(left_layer)
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=url,
                         name="Left Layer",
                         attr=" ",
                         overlay=True,
-                        **kwargs,
+                        **left_args,
                     )
+                elif os.path.exists(left_layer):
+                    left_layer, left_client = get_local_tile_layer(
+                        left_layer,
+                        tile_format="folium",
+                        return_client=True,
+                        **left_args,
+                    )
+                    bounds = image_bounds(left_client)
+
                 else:
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=left_layer,
                         name="Left Layer",
                         attr=" ",
                         overlay=True,
-                        **kwargs,
+                        **left_args,
                     )
             elif isinstance(left_layer, folium.raster_layers.TileLayer) or isinstance(
                 left_layer, folium.WmsTileLayer
@@ -2207,20 +2240,30 @@ class Map(folium.Map):
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(right_layer)
+                    bbox = cog_bounds(right_layer)
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=url,
                         name="Right Layer",
                         attr=" ",
                         overlay=True,
-                        **kwargs,
+                        **right_args,
                     )
+                elif os.path.exists(right_layer):
+                    right_layer, right_client = get_local_tile_layer(
+                        right_layer,
+                        tile_format="folium",
+                        return_client=True,
+                        **right_args,
+                    )
+                    bounds = image_bounds(right_client)
                 else:
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=right_layer,
                         name="Right Layer",
                         attr=" ",
                         overlay=True,
-                        **kwargs,
+                        **right_args,
                     )
             elif isinstance(right_layer, folium.raster_layers.TileLayer) or isinstance(
                 left_layer, folium.WmsTileLayer
@@ -2237,6 +2280,8 @@ class Map(folium.Map):
             left_layer.add_to(self)
             right_layer.add_to(self)
             control.add_to(self)
+            if bounds is not None:
+                self.fit_bounds(bounds)
 
         except Exception as e:
             print("The provided layers are invalid!")
