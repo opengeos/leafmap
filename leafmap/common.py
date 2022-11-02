@@ -5256,6 +5256,7 @@ def download_file(
     resume=False,
     unzip=True,
     overwrite=False,
+    subfolder=False,
 ):
     """Download a file from URL, including Google Drive shared URL.
 
@@ -5272,6 +5273,7 @@ def download_file(
         resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
         unzip (bool, optional): Unzip the file. Defaults to True.
         overwrite (bool, optional): Overwrite the file if it already exists. Defaults to False.
+        subfolder (bool, optional): Create a subfolder with the same name as the file. Defaults to False.
 
     Returns:
         str: The output file path.
@@ -5282,6 +5284,10 @@ def download_file(
     if output is None:
         if isinstance(url, str) and url.startswith("http"):
             output = os.path.basename(url)
+
+    out_dir = os.path.abspath(os.path.dirname(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
 
     if isinstance(url, str):
         if os.path.exists(os.path.abspath(output)) and (not overwrite):
@@ -5304,7 +5310,15 @@ def download_file(
         with zipfile.ZipFile(output, "r") as zip_ref:
             if not quiet:
                 print("Extracting files...")
-            zip_ref.extractall(os.path.dirname(output))
+            if subfolder:
+                basename = os.path.splitext(os.path.basename(output))[0]
+
+                output = os.path.join(out_dir, basename)
+                if not os.path.exists(output):
+                    os.makedirs(output)
+                zip_ref.extractall(output)
+            else:
+                zip_ref.extractall(os.path.dirname(output))
 
     return os.path.abspath(output)
 
@@ -6428,7 +6442,16 @@ def download_ned(
     )
 
 
-def mosaic(images, output, ext='tif', recursive=True, merge_args={}, verbose=True, **kwargs):
+def mosaic(
+    images,
+    output,
+    ext="tif",
+    recursive=True,
+    merge_args={},
+    to_cog=True,
+    verbose=True,
+    **kwargs,
+):
     """Mosaics a list of images into a single image. Inspired by https://bit.ly/3A6roDK.
 
     Args:
@@ -6437,6 +6460,7 @@ def mosaic(images, output, ext='tif', recursive=True, merge_args={}, verbose=Tru
         ext (str, optional): The file extension of the images. Defaults to 'tif'.
         recursive (bool, optional): Whether to recursively search for images in the input directory. Defaults to True.
         merge_args (dict, optional): A dictionary of arguments to pass to the rasterio.merge function. Defaults to {}.
+        to_cog (bool, optional): Whether to convert the output image to a Cloud Optimized GeoTIFF. Defaults to True.
         verbose (bool, optional): Whether to print progress. Defaults to True.
 
     """
@@ -6480,6 +6504,11 @@ def mosaic(images, output, ext='tif', recursive=True, merge_args={}, verbose=Tru
 
     with rio.open(output, "w", **output_meta) as m:
         m.write(arr)
+
+    if to_cog:
+        if verbose:
+            print("Converting to COG...")
+        image_to_cog(output, output)
 
     if verbose:
         print(f"Saved mosaic to {output}")
@@ -6764,7 +6793,7 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
     else:
         ext = ext.replace(".", "")
 
-    ext = f'*.{ext}'
+    ext = f"*.{ext}"
 
     if recursive:
         if fullpath:
