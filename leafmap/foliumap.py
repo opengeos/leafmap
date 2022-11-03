@@ -2199,7 +2199,7 @@ class Map(folium.Map):
                 left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
-                    url = cog_tile(left_layer)
+                    url = cog_tile(left_layer, **left_args)
                     bbox = cog_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
@@ -2207,7 +2207,6 @@ class Map(folium.Map):
                         name="Left Layer",
                         attr=" ",
                         overlay=True,
-                        **left_args,
                     )
                 elif os.path.exists(left_layer):
                     left_layer, left_client = get_local_tile_layer(
@@ -2239,7 +2238,7 @@ class Map(folium.Map):
                 right_layer = basemaps[right_layer]
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
-                    url = cog_tile(right_layer)
+                    url = cog_tile(right_layer, **right_args)
                     bbox = cog_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
@@ -2247,7 +2246,6 @@ class Map(folium.Map):
                         name="Right Layer",
                         attr=" ",
                         overlay=True,
-                        **right_args,
                     )
                 elif os.path.exists(right_layer):
                     right_layer, right_client = get_local_tile_layer(
