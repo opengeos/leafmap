@@ -1048,14 +1048,13 @@ class Map(ipyleaflet.Map):
                 left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
-                    url = cog_tile(left_layer)
+                    url = cog_tile(left_layer, **left_args)
                     bbox = cog_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = ipyleaflet.TileLayer(
                         url=url,
                         name="Left Layer",
                         attribution=" ",
-                        **left_args,
                     )
                 elif os.path.exists(left_layer):
                     left_layer, left_client = get_local_tile_layer(
@@ -1083,14 +1082,16 @@ class Map(ipyleaflet.Map):
                 right_layer = basemaps[right_layer]
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
-                    url = cog_tile(right_layer)
+                    url = cog_tile(
+                        right_layer,
+                        **right_args,
+                    )
                     bbox = cog_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=url,
                         name="Right Layer",
                         attribution=" ",
-                        **right_args,
                     )
                 elif os.path.exists(right_layer):
                     right_layer, right_client = get_local_tile_layer(
@@ -3546,6 +3547,7 @@ def linked_maps(
     layers=[],
     labels=[],
     label_position="topright",
+    layer_args=[],
     **kwargs,
 ):
     """Create linked maps of XYZ tile layers.
@@ -3582,6 +3584,14 @@ def linked_maps(
         elif len(labels) < count:
             raise ValueError(f"The length of labels must be equal to {count}.")
 
+    if len(layer_args) > 0:
+        if len(layer_args) == 1:
+            layer_args = layer_args * count
+        elif len(layer_args) < count:
+            raise ValueError(f"The length of layer_args must be equal to {count}.")
+    else:
+        layer_args = [{}] * count
+
     for i in range(rows):
         for j in range(cols):
             index = i * cols + j
@@ -3601,15 +3611,38 @@ def linked_maps(
                 **kwargs,
             )
 
-            if layers[index] in basemaps:
-                # m.add_layer(basemaps[layers[index]])
-                m.add_basemap(layers[index])
+            if layers[index] in basemaps.keys():
+                layers[index] = basemaps[layers[index]]
+            elif isinstance(layers[index], str):
+                if layers[index].startswith("http") and layers[index].endswith(".tif"):
+                    url = cog_tile(layers[index], **layer_args[index])
+                    layers[index] = ipyleaflet.TileLayer(
+                        url=url,
+                        name="Left Layer",
+                        attribution=" ",
+                    )
+                elif os.path.exists(layers[index]):
+                    layers[index], left_client = get_local_tile_layer(
+                        layers[index],
+                        tile_format="ipyleaflet",
+                        return_client=True,
+                        **layer_args[index],
+                    )
+                else:
+                    layers[index] = ipyleaflet.TileLayer(
+                        url=layers[index],
+                        name="Left Layer",
+                        attribution=" ",
+                        **layer_args[index],
+                    )
+            elif isinstance(layers[index], ipyleaflet.TileLayer):
+                pass
             else:
-                try:
-                    m.add_layer(layers[index])
-                except Exception as e:
-                    print("The layer is invalid.")
-                    raise Exception(e)
+                raise ValueError(
+                    f"layers[index] must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
+                )
+
+            m.add_layer(layers[index])
 
             if len(labels) > 0:
                 label = widgets.Label(
