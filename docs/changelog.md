@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.11.3 - Nov 3, 2022
+
+**Improvement**
+
+-   Fixed split map bug (layer visualization args)
+-   Improved linked maps to support COG and local GeoTIFFs
+
 ## v0.11.2 - Nov 2, 2022
 
 **Improvement**
