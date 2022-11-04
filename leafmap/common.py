@@ -4667,7 +4667,12 @@ def image_to_numpy(image):
 
 
 def numpy_to_cog(
-    np_array, out_cog, bounds=None, profile=None, dtype=None, crs="epsg:4326"
+    np_array,
+    out_cog,
+    bounds=None,
+    profile=None,
+    dtype=None,
+    crs=None,
 ):
     """Converts a numpy array to a COG file.
 
@@ -4702,6 +4707,8 @@ def numpy_to_cog(
                 raise FileNotFoundError("The provided file could not be found.")
             with rasterio.open(profile) as ds:
                 bounds = ds.bounds
+                crs = ds.crs
+
         elif isinstance(profile, rasterio.profiles.Profile):
             profile = dict(profile)
         elif not isinstance(profile, dict):
@@ -4730,6 +4737,9 @@ def numpy_to_cog(
     src_transform = from_bounds(*bounds, width=width, height=height)
     if dtype is None:
         dtype = str(np_array.dtype)
+
+    if crs is None:
+        crs = "epsg:4326"
 
     if isinstance(profile, dict):
         src_profile = profile
