@@ -977,7 +977,9 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
         bands (list, optional): List of bands to use. Defaults to None.
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.xyz".
+        **kwargs: Additional arguments to pass to the titiler endpoint. For more information about the available arguments, see https://developmentseed.org/titiler/endpoints/cog/#tiles.
+            For example, to apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
 
     Returns:
         tuple: Returns the COG Tile layer URL and bounds.
@@ -1009,12 +1011,27 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
         kwargs["colormap_name"] = kwargs["palette"].lower()
         del kwargs["palette"]
 
+    if "bidx" not in kwargs:
+        kwargs["bidx"] = [1]
+    elif isinstance(kwargs["bidx"], int):
+        kwargs["bidx"] = [kwargs["bidx"]]
+
     if "rescale" not in kwargs:
         stats = cog_stats(url, titiler_endpoint)
+
         if "message" not in stats:
-            percentile_2 = min([stats[s]["percentile_2"] for s in stats])
-            percentile_98 = max([stats[s]["percentile_98"] for s in stats])
-            kwargs["rescale"] = f"{percentile_2},{percentile_98}"
+            try:
+                rescale = []
+                for i in kwargs["bidx"]:
+                    rescale.append(
+                        "{},{}".format(
+                            stats[str(i)]["percentile_2"],
+                            stats[str(i)]["percentile_98"],
+                        )
+                    )
+                kwargs["rescale"] = rescale
+            except Exception as e:
+                print(e)
 
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
@@ -6552,7 +6569,9 @@ def geometry_bounds(geometry, decimals=4):
     return [west, south, east, north]
 
 
-def reproject(image, output, dst_crs="EPSG:4326", resampling="nearest", **kwargs):
+def reproject(
+    image, output, dst_crs="EPSG:4326", resampling="nearest", to_cog=True, **kwargs
+):
     """Reprojects an image.
 
     Args:
@@ -6560,6 +6579,7 @@ def reproject(image, output, dst_crs="EPSG:4326", resampling="nearest", **kwargs
         output (str): The output image filepath.
         dst_crs (str, optional): The destination CRS. Defaults to "EPSG:4326".
         resampling (Resampling, optional): The resampling method. Defaults to "nearest".
+        to_cog (bool, optional): Whether to convert the output image to a Cloud Optimized GeoTIFF. Defaults to True.
         **kwargs: Additional keyword arguments to pass to rasterio.open.
 
     """
@@ -6601,6 +6621,9 @@ def reproject(image, output, dst_crs="EPSG:4326", resampling="nearest", **kwargs
                     resampling=resampling,
                     **kwargs,
                 )
+
+    if to_cog:
+        image_to_cog(output, output)
 
 
 def image_check(image):
