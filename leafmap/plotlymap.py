@@ -410,7 +410,10 @@ class Map(go.FigureWidget):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             bands (list, optional): The bands to use. Defaults to None.
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-            **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale, color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/ and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3]
+            **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
+                color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
+                and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
+                apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
         tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
         center = cog_center(url, titiler_endpoint)  # (lon, lat)
