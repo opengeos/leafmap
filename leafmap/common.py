@@ -6840,3 +6840,87 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
             files = [path.name for path in Path(input_dir).glob(ext)]
 
     return files
+
+
+def zoom_level_resolution(zoom, latitude=0):
+    """Returns the approximate pixel scale based on zoom level and latutude.
+        See https://blogs.bing.com/maps/2006/02/25/map-control-zoom-levels-gt-resolution
+
+    Args:
+        zoom (int): The zoom level.
+        latitude (float, optional): The latitude. Defaults to 0.
+
+    Returns:
+        float: Map resolution in meters.
+    """
+    import math
+
+    resolution = 156543.04 * math.cos(latitude) / math.pow(2, zoom)
+    return abs(resolution)
+
+
+def lnglat_to_meters(longitude, latitude):
+    """coordinate conversion between lat/lon in decimal degrees to web mercator
+
+    Args:
+        longitude (float): The longitude.
+        latitude (float): The latitude.
+
+    Returns:
+        tuple: A tuple of (x, y) in meters.
+    """
+    import numpy as np
+
+    origin_shift = np.pi * 6378137
+    easting = longitude * origin_shift / 180.0
+    northing = np.log(np.tan((90 + latitude) * np.pi / 360.0)) * origin_shift / np.pi
+    return (easting, northing)
+
+
+def meters_to_lnglat(x, y):
+    """coordinate conversion between web mercator to lat/lon in decimal degrees
+
+    Args:
+        x (float): The x coordinate.
+        y (float): The y coordinate.
+
+    Returns:
+        tuple: A tuple of (longitude, latitude) in decimal degrees.
+    """
+    import numpy as np
+
+    origin_shift = np.pi * 6378137
+    longitude = (x / origin_shift) * 180.0
+    latitude = (y / origin_shift) * 180.0
+    latitude = (
+        180 / np.pi * (2 * np.arctan(np.exp(latitude * np.pi / 180.0)) - np.pi / 2.0)
+    )
+    return (longitude, latitude)
+
+
+def bounds_to_xy_range(bounds):
+    """Convert bounds to x and y range to be used as input to bokeh map.
+
+    Args:
+        bounds (list): A list of bounds in the form [(south, west), (north, east)].
+
+    Returns:
+        tuple: A tuple of (x_range, y_range).
+    """
+
+    if isinstance(bounds, tuple):
+        bounds = list(bounds)
+    elif not isinstance(bounds, list):
+        raise TypeError("bounds must be a list")
+
+    if len(bounds) == 4:
+        south, west, north, east = bounds
+    elif len(bounds) == 2:
+        south, west = bounds[0]
+        north, east = bounds[1]
+
+    xmin, ymin = lnglat_to_meters(west, south)
+    xmax, ymax = lnglat_to_meters(east, north)
+    x_range = (xmin, xmax)
+    y_range = (ymin, ymax)
+    return x_range, y_range
