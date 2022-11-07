@@ -1059,14 +1059,27 @@ class Map(ipyleaflet.Map):
                         name="Left Layer",
                         attribution=" ",
                     )
+                elif left_layer.startswith("http") and left_layer.endswith(".geojson"):
+                    if "max_zoom" in left_args:
+                        del left_args["max_zoom"]
+                    if "max_native_zoom" in left_args:
+                        del left_args["max_native_zoom"]
+                    left_layer = geojson_layer(left_layer, **left_args)
                 elif os.path.exists(left_layer):
-                    left_layer, left_client = get_local_tile_layer(
-                        left_layer,
-                        tile_format="ipyleaflet",
-                        return_client=True,
-                        **left_args,
-                    )
-                    bounds = image_bounds(left_client)
+                    if left_layer.endswith(".geojson"):
+                        if "max_zoom" in left_args:
+                            del left_args["max_zoom"]
+                        if "max_native_zoom" in left_args:
+                            del left_args["max_native_zoom"]
+                        left_layer = geojson_layer(left_layer, **left_args)
+                    else:
+                        left_layer, left_client = get_local_tile_layer(
+                            left_layer,
+                            tile_format="ipyleaflet",
+                            return_client=True,
+                            **left_args,
+                        )
+                        bounds = image_bounds(left_client)
                 else:
                     left_layer = ipyleaflet.TileLayer(
                         url=left_layer,
@@ -1074,7 +1087,9 @@ class Map(ipyleaflet.Map):
                         attribution=" ",
                         **left_args,
                     )
-            elif isinstance(left_layer, ipyleaflet.TileLayer):
+            elif isinstance(left_layer, ipyleaflet.TileLayer) or isinstance(
+                left_layer, ipyleaflet.GeoJSON
+            ):
                 pass
             else:
                 raise ValueError(
@@ -1096,14 +1111,30 @@ class Map(ipyleaflet.Map):
                         name="Right Layer",
                         attribution=" ",
                     )
+                elif right_layer.startswith("http") and right_layer.endswith(
+                    ".geojson"
+                ):
+
+                    if "max_zoom" in right_args:
+                        del right_args["max_zoom"]
+                    if "max_native_zoom" in right_args:
+                        del right_args["max_native_zoom"]
+                    right_layer = geojson_layer(right_layer, **right_args)
                 elif os.path.exists(right_layer):
-                    right_layer, right_client = get_local_tile_layer(
-                        right_layer,
-                        tile_format="ipyleaflet",
-                        return_client=True,
-                        **right_args,
-                    )
-                    bounds = image_bounds(right_client)
+                    if "max_zoom" in right_args:
+                        del right_args["max_zoom"]
+                    if "max_native_zoom" in right_args:
+                        del right_args["max_native_zoom"]
+                    if right_layer.endswith(".geojson"):
+                        right_layer = geojson_layer(right_layer, **right_args)
+                    else:
+                        right_layer, right_client = get_local_tile_layer(
+                            right_layer,
+                            tile_format="ipyleaflet",
+                            return_client=True,
+                            **right_args,
+                        )
+                        bounds = image_bounds(right_client)
                 else:
                     right_layer = ipyleaflet.TileLayer(
                         url=right_layer,
@@ -1111,7 +1142,9 @@ class Map(ipyleaflet.Map):
                         attribution=" ",
                         **right_args,
                     )
-            elif isinstance(right_layer, ipyleaflet.TileLayer):
+            elif isinstance(right_layer, ipyleaflet.TileLayer) or isinstance(
+                right_layer, ipyleaflet.GeoJSON
+            ):
                 pass
             else:
                 raise ValueError(
@@ -3669,28 +3702,22 @@ def linked_maps(
 
 
 def split_map(
-    left_layer="ROADMAP",
-    right_layer="HYBRID",
-    left_label=None,
-    right_label=None,
-    label_position="bottom",
+    left_layer="TERRAIN",
+    right_layer="OpenTopoMap",
+    left_args={},
+    right_args={},
     **kwargs,
 ):
-    """Creates a split-panel map.
+    """Adds split map.
 
     Args:
-        left_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemaps.keys()) or an ipyleaflet Layer instance. Defaults to "ROADMAP".
-        right_layer (str | ipyleaflet Layer instance, optional): A string from the built-in basemaps (leafmap.basemaps.keys()) or an ipyleaflet Layer instance. . Defaults to "HYBRID".
-        left_label (str, optional): A label for the left layer to be shown on the map. Defaults to None.
-        right_label (str, optional): A label for the right layer to be shown on the map. . Defaults to None.
-        label_position (str, optional): Position of the labels, can be either "top" or "bottom". Defaults to "bottom".
-
-    Raises:
-        Exception: If the provided layer is invalid.
-
-    Returns:
-        leafmap.Map: The Map instance.
+        left_layer (str, optional): The left tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'TERRAIN'.
+        right_layer (str, optional): The right tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'OpenTopoMap'.
+        left_args (dict, optional): The arguments for the left tile layer. Defaults to {}.
+        right_args (dict, optional): The arguments for the right tile layer. Defaults to {}.
+        kwargs (dict, optional): The arguments for the Map widget. Defaults to {}.
     """
+
     if "draw_control" not in kwargs:
         kwargs["draw_control"] = False
     if "toolbar_control" not in kwargs:
@@ -3702,46 +3729,139 @@ def split_map(
     if "scale_control" not in kwargs:
         kwargs["scale_control"] = False
 
-    if left_layer in basemaps:
-        left_layer = basemaps[left_layer]
-    if right_layer in basemaps:
-        right_layer = basemaps[right_layer]
-
     m = Map(**kwargs)
 
+    if "max_zoom" not in left_args:
+        left_args["max_zoom"] = 100
+    if "max_native_zoom" not in left_args:
+        left_args["max_native_zoom"] = 100
+
+    if "max_zoom" not in right_args:
+        right_args["max_zoom"] = 100
+    if "max_native_zoom" not in right_args:
+        right_args["max_native_zoom"] = 100
+
+    if "layer_name" not in left_args:
+        left_args["layer_name"] = "Left Layer"
+
+    if "layer_name" not in right_args:
+        right_args["layer_name"] = "Right Layer"
+
+    bounds = None
+
     try:
+        if left_layer in basemaps.keys():
+            left_layer = basemaps[left_layer]
+        elif isinstance(left_layer, str):
+            if left_layer.startswith("http") and left_layer.endswith(".tif"):
+                url = cog_tile(left_layer, **left_args)
+                bbox = cog_bounds(left_layer)
+                bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                left_layer = ipyleaflet.TileLayer(
+                    url=url,
+                    name="Left Layer",
+                    attribution=" ",
+                )
+            elif left_layer.startswith("http") and left_layer.endswith(".geojson"):
+                if "max_zoom" in left_args:
+                    del left_args["max_zoom"]
+                if "max_native_zoom" in left_args:
+                    del left_args["max_native_zoom"]
+                left_layer = geojson_layer(left_layer, **left_args)
+            elif os.path.exists(left_layer):
+                if left_layer.endswith(".geojson"):
+                    if "max_zoom" in left_args:
+                        del left_args["max_zoom"]
+                    if "max_native_zoom" in left_args:
+                        del left_args["max_native_zoom"]
+                    left_layer = geojson_layer(left_layer, **left_args)
+                else:
+                    left_layer, left_client = get_local_tile_layer(
+                        left_layer,
+                        tile_format="ipyleaflet",
+                        return_client=True,
+                        **left_args,
+                    )
+                    bounds = image_bounds(left_client)
+            else:
+                left_layer = ipyleaflet.TileLayer(
+                    url=left_layer,
+                    name="Left Layer",
+                    attribution=" ",
+                    **left_args,
+                )
+        elif isinstance(left_layer, ipyleaflet.TileLayer) or isinstance(
+            left_layer, ipyleaflet.GeoJSON
+        ):
+            pass
+        else:
+            raise ValueError(
+                f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
+            )
+
+        if right_layer in basemaps.keys():
+            right_layer = basemaps[right_layer]
+        elif isinstance(right_layer, str):
+            if right_layer.startswith("http") and right_layer.endswith(".tif"):
+                url = cog_tile(
+                    right_layer,
+                    **right_args,
+                )
+                bbox = cog_bounds(right_layer)
+                bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                right_layer = ipyleaflet.TileLayer(
+                    url=url,
+                    name="Right Layer",
+                    attribution=" ",
+                )
+            elif right_layer.startswith("http") and right_layer.endswith(".geojson"):
+
+                if "max_zoom" in right_args:
+                    del right_args["max_zoom"]
+                if "max_native_zoom" in right_args:
+                    del right_args["max_native_zoom"]
+                right_layer = geojson_layer(right_layer, **right_args)
+            elif os.path.exists(right_layer):
+                if "max_zoom" in right_args:
+                    del right_args["max_zoom"]
+                if "max_native_zoom" in right_args:
+                    del right_args["max_native_zoom"]
+                if right_layer.endswith(".geojson"):
+                    right_layer = geojson_layer(right_layer, **right_args)
+                else:
+                    right_layer, right_client = get_local_tile_layer(
+                        right_layer,
+                        tile_format="ipyleaflet",
+                        return_client=True,
+                        **right_args,
+                    )
+                    bounds = image_bounds(right_client)
+            else:
+                right_layer = ipyleaflet.TileLayer(
+                    url=right_layer,
+                    name="Right Layer",
+                    attribution=" ",
+                    **right_args,
+                )
+        elif isinstance(right_layer, ipyleaflet.TileLayer) or isinstance(
+            right_layer, ipyleaflet.GeoJSON
+        ):
+            pass
+        else:
+            raise ValueError(
+                f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
+            )
         control = ipyleaflet.SplitMapControl(
             left_layer=left_layer, right_layer=right_layer
         )
         m.add_control(control)
-
-        if left_label is not None:
-            label1 = widgets.Label(
-                str(left_label), layout=widgets.Layout(padding="0px 5px 0px 5px")
-            )
-            if label_position == "bottom":
-                position = "bottomleft"
-            else:
-                position = "topleft"
-            left_control = ipyleaflet.WidgetControl(widget=label1, position=position)
-            m.add_control(left_control)
-
-        if right_label is not None:
-            label2 = widgets.Label(
-                str(right_label), layout=widgets.Layout(padding="0px 5px 0px 5px")
-            )
-            if label_position == "bottom":
-                position = "bottomright"
-            else:
-                position = "topright"
-            right_control = ipyleaflet.WidgetControl(widget=label2, position=position)
-            m.add_control(right_control)
+        if bounds is not None:
+            m.fit_bounds(bounds)
+        return m
 
     except Exception as e:
-        print("The provided layers are invalid.")
-        raise Exception(e)
-
-    return m
+        print("The provided layers are invalid!")
+        raise ValueError(e)
 
 
 def ts_inspector(
@@ -3844,3 +3964,105 @@ def ts_inspector(
     right_dropdown.observe(right_change, "value")
 
     return m
+
+
+def geojson_layer(
+    in_geojson,
+    layer_name="Untitled",
+    style={},
+    hover_style={},
+    style_callback=None,
+    fill_colors=["black"],
+    encoding="utf-8",
+):
+    """Adds a GeoJSON file to the map.
+
+    Args:
+        in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+        layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
+        style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+        hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+        style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+        fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
+        info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+        encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+
+    Raises:
+        FileNotFoundError: The provided GeoJSON file could not be found.
+    """
+    import json
+    import random
+    import requests
+
+    style_callback_only = False
+
+    if len(style) == 0 and style_callback is not None:
+        style_callback_only = True
+
+    try:
+
+        if isinstance(in_geojson, str):
+
+            if in_geojson.startswith("http"):
+                in_geojson = github_raw_url(in_geojson)
+                data = requests.get(in_geojson).json()
+            else:
+                in_geojson = os.path.abspath(in_geojson)
+                if not os.path.exists(in_geojson):
+                    raise FileNotFoundError(
+                        "The provided GeoJSON file could not be found."
+                    )
+
+                with open(in_geojson, encoding=encoding) as f:
+                    data = json.load(f)
+        elif isinstance(in_geojson, dict):
+            data = in_geojson
+        else:
+            raise TypeError("The input geojson must be a type of str or dict.")
+    except Exception as e:
+        raise Exception(e)
+
+    if not style:
+        style = {
+            # "stroke": True,
+            "color": "#000000",
+            "weight": 1,
+            "opacity": 1,
+            # "fill": True,
+            # "fillColor": "#ffffff",
+            "fillOpacity": 0.1,
+            # "dashArray": "9"
+            # "clickable": True,
+        }
+    elif "weight" not in style:
+        style["weight"] = 1
+
+    if not hover_style:
+        hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
+
+    def random_color(feature):
+        return {
+            "color": "black",
+            "fillColor": random.choice(fill_colors),
+        }
+
+    if style_callback is None:
+        style_callback = random_color
+
+    if style_callback_only:
+        geojson = ipyleaflet.GeoJSON(
+            data=data,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            name=layer_name,
+        )
+    else:
+        geojson = ipyleaflet.GeoJSON(
+            data=data,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            name=layer_name,
+        )
+
+    return geojson
