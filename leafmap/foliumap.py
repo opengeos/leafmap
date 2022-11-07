@@ -2796,3 +2796,105 @@ def st_save_bounds(st_component):
             st.session_state["map_center"] = center
     except Exception as e:
         raise Exception(e)
+
+
+def geojson_layer(
+    in_geojson,
+    layer_name="Untitled",
+    encoding="utf-8",
+    info_mode="on_hover",
+    **kwargs,
+):
+    """Adds a GeoJSON file to the map.
+
+    Args:
+        in_geojson (str): The input file path to the GeoJSON.
+        layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+        encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+        info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+
+    Raises:
+        FileNotFoundError: The provided GeoJSON file could not be found.
+    """
+    import json
+    import requests
+    import random
+
+    try:
+
+        if isinstance(in_geojson, str):
+
+            if in_geojson.startswith("http"):
+                data = requests.get(in_geojson).json()
+            else:
+                in_geojson = os.path.abspath(in_geojson)
+                if not os.path.exists(in_geojson):
+                    raise FileNotFoundError(
+                        "The provided GeoJSON file could not be found."
+                    )
+
+                with open(in_geojson, encoding=encoding) as f:
+                    data = json.load(f)
+        elif isinstance(in_geojson, dict):
+            data = in_geojson
+        else:
+            raise TypeError("The input geojson must be a type of str or dict.")
+    except Exception as e:
+        raise Exception(e)
+
+    # interchangeable parameters between ipyleaflet and folium.
+    if "style_function" not in kwargs:
+        if "style" in kwargs:
+            style_dict = kwargs["style"]
+            if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:
+                kwargs["style_function"] = lambda x: style_dict
+            kwargs.pop("style")
+        else:
+            style_dict = {
+                # "stroke": True,
+                "color": "#000000",
+                "weight": 1,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 0.1,
+                # "dashArray": "9"
+                # "clickable": True,
+            }
+            kwargs["style_function"] = lambda x: style_dict
+
+    if "style_callback" in kwargs:
+        kwargs.pop("style_callback")
+
+    if "hover_style" in kwargs:
+        kwargs.pop("hover_style")
+
+    if "fill_colors" in kwargs:
+        fill_colors = kwargs["fill_colors"]
+
+        def random_color(feature):
+            style_dict["fillColor"] = random.choice(fill_colors)
+            return style_dict
+
+        kwargs["style_function"] = random_color
+        kwargs.pop("fill_colors")
+
+    if "highlight_function" not in kwargs:
+        kwargs["highlight_function"] = lambda feat: {
+            "weight": 2,
+            "fillOpacity": 0.5,
+        }
+
+    tooltip = None
+    popup = None
+    if info_mode is not None:
+        props = list(data["features"][0]["properties"].keys())
+        if info_mode == "on_hover":
+            tooltip = folium.GeoJsonTooltip(fields=props)
+        elif info_mode == "on_click":
+            popup = folium.GeoJsonPopup(fields=props)
+
+    geojson = folium.GeoJson(
+        data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
+    )
+    return geojson
