@@ -45,7 +45,7 @@ class Map:
 
         if basemap is not None:
             if basemap == "OpenStreetMap":
-                fig.add_tile(xyz.OpenStreetMap.Mapnik)
+                fig.add_tile(xyz.OpenStreetMap.Mapnik, retina=True)
             else:
                 self.add_basemap(basemap)
         fig.toolbar.active_scroll = fig.select_one(WheelZoomTool)
@@ -63,7 +63,7 @@ class Map:
             os.environ["OUTPUT_NOTEBOOK"] = "True"
         show(self.figure)
 
-    def add_basemap(self, basemap="OpenStreetMap"):
+    def add_basemap(self, basemap="OpenStreetMap", retina=True):
         """Adds a basemap to the map.
 
         Args:
@@ -84,15 +84,15 @@ class Map:
                 "max_zoom": max_zoom,
             }
             tile_source = WMTSTileSource(**tile_options)
-            self.figure.add_tile(tile_source)
+            self.figure.add_tile(tile_source, retina=retina)
         elif isinstance(basemap, WMTSTileSource):
-            self.figure.add_tile(basemap)
+            self.figure.add_tile(basemap, retina=retina)
         elif isinstance(basemap, str):
             if basemap in basemaps.keys():
-                self.figure.add_tile(basemaps[basemap])
+                self.figure.add_tile(basemaps[basemap], retina=retina)
             else:
                 try:
-                    self.figure.add_tile(basemap)
+                    self.figure.add_tile(basemap, retina=retina)
                 except Exception as e:
                     print(e)
                     raise ValueError(
@@ -154,7 +154,7 @@ class Map:
             vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
             vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
-            attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
+            attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
         """
 
@@ -173,6 +173,39 @@ class Map:
 
         tile_options = {
             "url": tile_layer.url,
+            "attribution": attribution,
+        }
+        tile_source = WMTSTileSource(**tile_options)
+        self.figure.add_tile(tile_source, **kwargs)
+
+    def add_stac_layer(
+        self,
+        url=None,
+        collection=None,
+        item=None,
+        assets=None,
+        bands=None,
+        titiler_endpoint=None,
+        attribution="",
+        **kwargs,
+    ):
+        """Adds a STAC TileLayer to the map.
+
+        Args:
+            url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
+            collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
+            item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
+            assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
+            bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
+            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.xyz", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+            shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+        """
+        tile_url = stac_tile(
+            url, collection, item, assets, bands, titiler_endpoint, **kwargs
+        )
+        tile_options = {
+            "url": tile_url,
             "attribution": attribution,
         }
         tile_source = WMTSTileSource(**tile_options)
