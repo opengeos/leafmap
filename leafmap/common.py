@@ -6876,6 +6876,19 @@ def lnglat_to_meters(longitude, latitude):
     origin_shift = np.pi * 6378137
     easting = longitude * origin_shift / 180.0
     northing = np.log(np.tan((90 + latitude) * np.pi / 360.0)) * origin_shift / np.pi
+
+    if np.isnan(easting):
+        if longitude > 0:
+            easting = 20026376
+        else:
+            easting = -20026376
+
+    if np.isnan(northing):
+        if latitude > 0:
+            northing = 20048966
+        else:
+            northing = -20048966
+
     return (easting, northing)
 
 
@@ -6925,6 +6938,48 @@ def bounds_to_xy_range(bounds):
     xmax, ymax = lnglat_to_meters(east, north)
     x_range = (xmin, xmax)
     y_range = (ymin, ymax)
+    return x_range, y_range
+
+
+def center_zoom_to_xy_range(center, zoom):
+    """Convert center and zoom to x and y range to be used as input to bokeh map.
+
+    Args:
+        center (tuple): A tuple of (latitude, longitude).
+        zoom (int): The zoom level.
+
+    Returns:
+        tuple: A tuple of (x_range, y_range).
+    """
+
+    if isinstance(center, tuple) or isinstance(center, list):
+        pass
+    else:
+        raise TypeError("center must be a tuple or list")
+
+    if not isinstance(zoom, int):
+        raise TypeError("zoom must be an integer")
+
+    latitude, longitude = center
+    x_range = (-179, 179)
+    y_range = (-70, 70)
+    x_full_length = x_range[1] - x_range[0]
+    y_full_length = y_range[1] - y_range[0]
+
+    x_length = x_full_length / 2 ** (zoom - 2)
+    y_length = y_full_length / 2 ** (zoom - 2)
+
+    south = latitude - y_length / 2
+    north = latitude + y_length / 2
+    west = longitude - x_length / 2
+    east = longitude + x_length / 2
+
+    xmin, ymin = lnglat_to_meters(west, south)
+    xmax, ymax = lnglat_to_meters(east, north)
+
+    x_range = (xmin, xmax)
+    y_range = (ymin, ymax)
+
     return x_range, y_range
 
 
