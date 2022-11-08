@@ -363,3 +363,15 @@ class Map:
             **kwargs: Arbitrary keyword arguments for bokeh.figure.save().
         """
         save(self.figure, filename=filename, title=title, **kwargs)
+
+
+    def fit_bounds(self, bounds):
+        """Fits the map to the specified bounds in the form of [xmin, ymin, xmax, ymax].
+
+        Args:
+            bounds (list): A list of bounds in the form of [xmin, ymin, xmax, ymax].
+        """
+        self.figure.x_range.start = bounds[0]
+        self.figure.x_range.end = bounds[2]
+        self.figure.y_range.start = bounds[1]
+        self.figure.y_range.end = bounds[3]
