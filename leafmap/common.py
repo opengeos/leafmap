@@ -4283,7 +4283,8 @@ def geom_type(in_geojson, encoding="utf-8"):
         encoding (str, optional): The encoding of the GeoJSON object. Defaults to "utf-8".
 
     Returns:
-        str: The geometry type of the GeoJSON object.
+        str: The geometry type of the GeoJSON object, such as Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
+            For more info, see https://shapely.readthedocs.io/en/stable/manual.html
     """
     import json
 
@@ -4494,7 +4495,8 @@ def gdf_geom_type(gdf, first_only=True):
         first_only (bool, optional): Whether to return the geometry type of the first feature in the GeoDataFrame. Defaults to True.
 
     Returns:
-        str: The geometry type of the GeoDataFrame.
+        str: The geometry type of the GeoDataFrame, such as Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
+            For more info, see https://shapely.readthedocs.io/en/stable/manual.html
     """
     import geopandas as gpd
 
@@ -5383,13 +5385,14 @@ def download_folder(
     return files
 
 
-def clip_image(image, mask, output):
+def clip_image(image, mask, output, to_cog=True):
     """Clip an image by mask.
 
     Args:
         image (str): Path to the image file in GeoTIFF format.
         mask (str | list | dict): The mask used to extract the image. It can be a path to vector datasets (e.g., GeoJSON, Shapefile), a list of coordinates, or m.user_roi.
         output (str): Path to the output file.
+        to_cog (bool, optional): Flags to indicate if you want to convert the output to COG. Defaults to True.
 
     Raises:
         ImportError: If the fiona or rasterio package is not installed.
@@ -5458,6 +5461,9 @@ def clip_image(image, mask, output):
 
     with rasterio.open(output, "w", **out_meta) as dest:
         dest.write(out_image)
+
+    if to_cog:
+        image_to_cog(output, output)
 
 
 def netcdf_to_tif(
@@ -6840,3 +6846,284 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
             files = [path.name for path in Path(input_dir).glob(ext)]
 
     return files
+
+
+def zoom_level_resolution(zoom, latitude=0):
+    """Returns the approximate pixel scale based on zoom level and latutude.
+        See https://blogs.bing.com/maps/2006/02/25/map-control-zoom-levels-gt-resolution
+
+    Args:
+        zoom (int): The zoom level.
+        latitude (float, optional): The latitude. Defaults to 0.
+
+    Returns:
+        float: Map resolution in meters.
+    """
+    import math
+
+    resolution = 156543.04 * math.cos(latitude) / math.pow(2, zoom)
+    return abs(resolution)
+
+
+def lnglat_to_meters(longitude, latitude):
+    """coordinate conversion between lat/lon in decimal degrees to web mercator
+
+    Args:
+        longitude (float): The longitude.
+        latitude (float): The latitude.
+
+    Returns:
+        tuple: A tuple of (x, y) in meters.
+    """
+    import numpy as np
+
+    origin_shift = np.pi * 6378137
+    easting = longitude * origin_shift / 180.0
+    northing = np.log(np.tan((90 + latitude) * np.pi / 360.0)) * origin_shift / np.pi
+
+    if np.isnan(easting):
+        if longitude > 0:
+            easting = 20026376
+        else:
+            easting = -20026376
+
+    if np.isnan(northing):
+        if latitude > 0:
+            northing = 20048966
+        else:
+            northing = -20048966
+
+    return (easting, northing)
+
+
+def meters_to_lnglat(x, y):
+    """coordinate conversion between web mercator to lat/lon in decimal degrees
+
+    Args:
+        x (float): The x coordinate.
+        y (float): The y coordinate.
+
+    Returns:
+        tuple: A tuple of (longitude, latitude) in decimal degrees.
+    """
+    import numpy as np
+
+    origin_shift = np.pi * 6378137
+    longitude = (x / origin_shift) * 180.0
+    latitude = (y / origin_shift) * 180.0
+    latitude = (
+        180 / np.pi * (2 * np.arctan(np.exp(latitude * np.pi / 180.0)) - np.pi / 2.0)
+    )
+    return (longitude, latitude)
+
+
+def bounds_to_xy_range(bounds):
+    """Convert bounds to x and y range to be used as input to bokeh map.
+
+    Args:
+        bounds (list): A list of bounds in the form [(south, west), (north, east)].
+
+    Returns:
+        tuple: A tuple of (x_range, y_range).
+    """
+
+    if isinstance(bounds, tuple):
+        bounds = list(bounds)
+    elif not isinstance(bounds, list):
+        raise TypeError("bounds must be a list")
+
+    if len(bounds) == 4:
+        south, west, north, east = bounds
+    elif len(bounds) == 2:
+        south, west = bounds[0]
+        north, east = bounds[1]
+
+    xmin, ymin = lnglat_to_meters(west, south)
+    xmax, ymax = lnglat_to_meters(east, north)
+    x_range = (xmin, xmax)
+    y_range = (ymin, ymax)
+    return x_range, y_range
+
+
+def center_zoom_to_xy_range(center, zoom):
+    """Convert center and zoom to x and y range to be used as input to bokeh map.
+
+    Args:
+        center (tuple): A tuple of (latitude, longitude).
+        zoom (int): The zoom level.
+
+    Returns:
+        tuple: A tuple of (x_range, y_range).
+    """
+
+    if isinstance(center, tuple) or isinstance(center, list):
+        pass
+    else:
+        raise TypeError("center must be a tuple or list")
+
+    if not isinstance(zoom, int):
+        raise TypeError("zoom must be an integer")
+
+    latitude, longitude = center
+    x_range = (-179, 179)
+    y_range = (-70, 70)
+    x_full_length = x_range[1] - x_range[0]
+    y_full_length = y_range[1] - y_range[0]
+
+    x_length = x_full_length / 2 ** (zoom - 2)
+    y_length = y_full_length / 2 ** (zoom - 2)
+
+    south = latitude - y_length / 2
+    north = latitude + y_length / 2
+    west = longitude - x_length / 2
+    east = longitude + x_length / 2
+
+    xmin, ymin = lnglat_to_meters(west, south)
+    xmax, ymax = lnglat_to_meters(east, north)
+
+    x_range = (xmin, xmax)
+    y_range = (ymin, ymax)
+
+    return x_range, y_range
+
+
+def get_geometry_coords(row, geom, coord_type, shape_type, mercator=False):
+    """
+    Returns the coordinates ('x' or 'y') of edges of a Polygon exterior.
+
+    :param: (GeoPandas Series) row : The row of each of the GeoPandas DataFrame.
+    :param: (str) geom : The column name.
+    :param: (str) coord_type : Whether it's 'x' or 'y' coordinate.
+    :param: (str) shape_type
+    """
+
+    # Parse the exterior of the coordinate
+    if shape_type.lower() in ["polygon", "multipolygon"]:
+        exterior = row[geom].geoms[0].exterior
+        if coord_type == "x":
+            # Get the x coordinates of the exterior
+            coords = list(exterior.coords.xy[0])
+            if mercator:
+                coords = [lnglat_to_meters(x, 0)[0] for x in coords]
+            return coords
+
+        elif coord_type == "y":
+            # Get the y coordinates of the exterior
+            coords = list(exterior.coords.xy[1])
+            if mercator:
+                coords = [lnglat_to_meters(0, y)[1] for y in coords]
+            return coords
+
+    elif shape_type.lower() in ["linestring", "multilinestring"]:
+        if coord_type == "x":
+            coords = list(row[geom].coords.xy[0])
+            if mercator:
+                coords = [lnglat_to_meters(x, 0)[0] for x in coords]
+            return coords
+        elif coord_type == "y":
+            coords = list(row[geom].coords.xy[1])
+            if mercator:
+                coords = [lnglat_to_meters(0, y)[1] for y in coords]
+            return coords
+
+    elif shape_type.lower() in ["point", "multipoint"]:
+        exterior = row[geom]
+
+        if coord_type == "x":
+            # Get the x coordinates of the exterior
+            coords = exterior.coords.xy[0][0]
+            if mercator:
+                coords = lnglat_to_meters(coords, 0)[0]
+            return coords
+
+        elif coord_type == "y":
+            # Get the y coordinates of the exterior
+            coords = exterior.coords.xy[1][0]
+            if mercator:
+                coords = lnglat_to_meters(0, coords)[1]
+            return coords
+
+
+def gdf_to_bokeh(gdf):
+    """
+    Function to convert a GeoPandas GeoDataFrame to a Bokeh
+    ColumnDataSource object.
+
+    :param: (GeoDataFrame) gdf: GeoPandas GeoDataFrame with polygon(s) under
+                                the column name 'geometry.'
+
+    :return: ColumnDataSource for Bokeh.
+    """
+    from bokeh.plotting import ColumnDataSource
+
+    shape_type = gdf_geom_type(gdf)
+
+    gdf_new = gdf.drop("geometry", axis=1).copy()
+    gdf_new["x"] = gdf.apply(
+        get_geometry_coords,
+        geom="geometry",
+        coord_type="x",
+        shape_type=shape_type,
+        mercator=True,
+        axis=1,
+    )
+
+    gdf_new["y"] = gdf.apply(
+        get_geometry_coords,
+        geom="geometry",
+        coord_type="y",
+        shape_type=shape_type,
+        mercator=True,
+        axis=1,
+    )
+
+    return ColumnDataSource(gdf_new)
+
+
+def get_overlap(img1, img2, overlap, out_img1=None, out_img2=None, to_cog=True):
+    """Get overlapping area of two images.
+
+    Args:
+        img1 (str): Path to the first image.
+        img2 (str): Path to the second image.
+        overlap (str): Path to the output overlap area in GeoJSON format.
+        out_img1 (str, optional): Path to the cropped image of the first image.
+        out_img2 (str, optional): Path to the cropped image of the second image.
+        to_cog (bool, optional): Whether to convert the output images to COG.
+
+    Returns:
+        str: Path to the overlap area in GeoJSON format.
+    """
+    import json
+    from osgeo import gdal, ogr, osr
+    import geopandas as gpd
+
+    extent = gdal.Info(img1, format="json")["wgs84Extent"]
+    poly1 = ogr.CreateGeometryFromJson(json.dumps(extent))
+    extent = gdal.Info(img2, format="json")["wgs84Extent"]
+    poly2 = ogr.CreateGeometryFromJson(json.dumps(extent))
+    intersection = poly1.Intersection(poly2)
+    gg = gdal.OpenEx(intersection.ExportToJson())
+    ds = gdal.VectorTranslate(
+        overlap,
+        srcDS=gg,
+        format="GeoJSON",
+        layerCreationOptions=["RFC7946=YES", "WRITE_BBOX=YES"],
+    )
+    ds = None
+
+    d = gdal.Open(img1)
+    proj = osr.SpatialReference(wkt=d.GetProjection())
+    epsg = proj.GetAttrValue("AUTHORITY", 1)
+
+    gdf = gpd.read_file(overlap)
+    gdf.to_crs(epsg=epsg, inplace=True)
+    gdf.to_file(overlap)
+
+    if out_img1 is not None:
+        clip_image(img1, overlap, out_img1, to_cog=to_cog)
+
+    if out_img2 is not None:
+        clip_image(img2, overlap, out_img2, to_cog=to_cog)
+
+    return overlap

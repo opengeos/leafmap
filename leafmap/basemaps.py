@@ -538,6 +538,39 @@ def xyz_to_plotly():
     return plotly_dict
 
 
+def xyz_to_bokeh():
+    """Convert xyz tile services to bokeh tile layers.
+
+    Returns:
+        dict: A dictionary of bokeh tile layers.
+    """
+    from bokeh.models import WMTSTileSource
+
+    bokeh_dict = {}
+
+    for key in xyz_tiles:
+        url = xyz_tiles[key]["url"]
+        attribution = xyz_tiles[key]["attribution"]
+        tile_options = {
+            "url": url,
+            "attribution": attribution,
+        }
+        bokeh_dict[key] = WMTSTileSource(**tile_options)
+
+    xyz_dict = get_xyz_dict()
+    for item in xyz_dict:
+        url = xyz_dict[item].build_url()
+        attribution = xyz_dict[item].attribution
+        key = xyz_dict[item].name
+        tile_options = {
+            "url": url,
+            "attribution": attribution,
+        }
+        bokeh_dict[key] = WMTSTileSource(**tile_options)
+
+    return bokeh_dict
+
+
 def search_qms(keywords, limit=10):
     """Search qms files for keywords. Reference: https://github.com/geopandas/xyzservices/issues/65
 
