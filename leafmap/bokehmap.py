@@ -14,7 +14,7 @@ basemaps = Box(xyz_to_bokeh(), frozen_box=True)
 class Map:
     def __init__(
         self,
-        center=[20, 0],
+        center=[10, 0],
         zoom=2,
         width=800,
         height=400,
@@ -36,9 +36,9 @@ class Map:
             kwargs["height"] = height
 
         if "x_range" not in kwargs:
-            kwargs["x_range"] = (-18026376.39, 18026376.39)
+            kwargs["x_range"] = center_zoom_to_xy_range(center, zoom)[0]
         if "y_range" not in kwargs:
-            kwargs["y_range"] = (-9470853.55, 14010601.53)
+            kwargs["y_range"] = center_zoom_to_xy_range(center, zoom)[1]
 
         fig = figure(**kwargs)
         self.figure = fig
