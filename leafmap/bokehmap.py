@@ -1,8 +1,8 @@
 import os
 from box import Box
 import xyzservices.providers as xyz
-from bokeh.models import WheelZoomTool, WMTSTileSource
-from bokeh.plotting import figure, show
+from bokeh.models import WheelZoomTool, WMTSTileSource, GeoJSONDataSource, HoverTool
+from bokeh.plotting import figure, show, save
 from bokeh.io import output_notebook
 from .basemaps import xyz_to_bokeh
 from .common import *
@@ -210,3 +210,156 @@ class Map:
         }
         tile_source = WMTSTileSource(**tile_options)
         self.figure.add_tile(tile_source, **kwargs)
+
+    def add_gdf(self, gdf, to_crs="epsg:3857", tooltips=None, **kwargs):
+        """Adds a GeoDataFrame to the map.
+
+        Args:
+            gdf (GeoDataFrame): The GeoDataFrame to add to the map.
+            to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
+            tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
+        """
+        import geopandas as gpd
+
+        if not isinstance(gdf, gpd.GeoDataFrame):
+            raise TypeError("gdf must be a GeoDataFrame")
+
+        geom_type = gdf_geom_type(gdf)
+        gdf_new = gdf.to_crs(to_crs)
+
+        columns = gdf_new.columns.to_list()
+        if "geometry" in columns:
+            columns.remove("geometry")
+
+        if tooltips is None:
+            tooltips = [(col, f"@{col}") for col in columns]
+
+        source = GeoJSONDataSource(geojson=gdf_new.to_json())
+
+        if geom_type in ["Point", "MultiPoint"]:
+            self.figure.circle(x="x", y="y", source=source, **kwargs)
+        elif geom_type in ["LineString", "MultiLineString"]:
+            self.figure.multi_line(xs="xs", ys="ys", source=source, **kwargs)
+        elif geom_type in ["Polygon", "MultiPolygon"]:
+            self.figure.patches(xs="xs", ys="ys", source=source, **kwargs)
+
+        if len(tooltips) > 0:
+            hover = HoverTool(tooltips=tooltips)
+            self.figure.add_tools(hover)
+
+    def add_geojson(
+        self,
+        filename,
+        encoding="utf-8",
+        read_file_args={},
+        to_crs="epsg:3857",
+        tooltips=None,
+        **kwargs,
+    ):
+        """Adds a GeoJSON file to the map.
+
+        Args:
+            filename (str): The path to the GeoJSON file. Can be a local file or a URL.
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
+            tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
+        """
+        import geopandas as gpd
+
+        if filename.startswith("http"):
+            filename = github_raw_url(filename)
+
+        gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
+        self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
+
+    def add_shp(
+        self,
+        filename,
+        encoding="utf-8",
+        read_file_args={},
+        to_crs="epsg:3857",
+        tooltips=None,
+        **kwargs,
+    ):
+        """Adds a shapefile to the map.
+
+        Args:
+            filename (str): The path to the shapefile.
+            encoding (str, optional): The encoding of the shapefile. Defaults to "utf-8".
+            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
+            tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
+        """
+        import geopandas as gpd
+
+        import glob
+
+        if filename.startswith("http"):
+            filename = github_raw_url(filename)
+
+        if filename.startswith("http") and filename.endswith(".zip"):
+            out_dir = os.path.abspath("./cache/shp")
+            if not os.path.exists(out_dir):
+                os.makedirs(out_dir)
+            basename = os.path.basename(filename)
+            output = os.path.join(out_dir, basename)
+            download_file(filename, output)
+            files = list(glob.glob(os.path.join(out_dir, "*.shp")))
+            if len(files) > 0:
+                filename = files[0]
+            else:
+                raise FileNotFoundError(
+                    "The downloaded zip file does not contain any shapefile in the root directory."
+                )
+        else:
+            filename = os.path.abspath(filename)
+            if not os.path.exists(filename):
+                raise FileNotFoundError("The provided shapefile could not be found.")
+
+        gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
+        self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
+
+    def add_vector(
+        self,
+        filename,
+        encoding="utf-8",
+        read_file_args={},
+        to_crs="epsg:3857",
+        tooltips=None,
+        **kwargs,
+    ):
+        """Adds a vector dataset to the map.
+
+        Args:
+            filename (str): The path to the vector dataset. Can be a local file or a URL.
+            encoding (str, optional): The encoding of the vector dataset. Defaults to "utf-8".
+            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
+            tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
+        """
+        import geopandas as gpd
+
+        if filename.startswith("http"):
+            filename = github_raw_url(filename)
+
+        gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
+        self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
+
+    def to_html(self, filename=None, title=None, **kwargs):
+        """Converts the map to HTML.
+
+        Args:
+            filename (str, optional): The filename to save the HTML to. Defaults to None.
+            title (str, optional): The title to use for the HTML. Defaults to None.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.save().
+        """
+        save(self.figure, filename=filename, title=title, **kwargs)
