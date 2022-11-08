@@ -5385,13 +5385,14 @@ def download_folder(
     return files
 
 
-def clip_image(image, mask, output):
+def clip_image(image, mask, output, to_cog=True):
     """Clip an image by mask.
 
     Args:
         image (str): Path to the image file in GeoTIFF format.
         mask (str | list | dict): The mask used to extract the image. It can be a path to vector datasets (e.g., GeoJSON, Shapefile), a list of coordinates, or m.user_roi.
         output (str): Path to the output file.
+        to_cog (bool, optional): Flags to indicate if you want to convert the output to COG. Defaults to True.
 
     Raises:
         ImportError: If the fiona or rasterio package is not installed.
@@ -5460,6 +5461,9 @@ def clip_image(image, mask, output):
 
     with rasterio.open(output, "w", **out_meta) as dest:
         dest.write(out_image)
+
+    if to_cog:
+        image_to_cog(output, output)
 
 
 def netcdf_to_tif(
@@ -7074,3 +7078,52 @@ def gdf_to_bokeh(gdf):
     )
 
     return ColumnDataSource(gdf_new)
+
+
+def get_overlap(img1, img2, overlap, out_img1=None, out_img2=None, to_cog=True):
+    """Get overlapping area of two images.
+
+    Args:
+        img1 (str): Path to the first image.
+        img2 (str): Path to the second image.
+        overlap (str): Path to the output overlap area in GeoJSON format.
+        out_img1 (str, optional): Path to the cropped image of the first image.
+        out_img2 (str, optional): Path to the cropped image of the second image.
+        to_cog (bool, optional): Whether to convert the output images to COG.
+
+    Returns:
+        str: Path to the overlap area in GeoJSON format.
+    """
+    import json
+    from osgeo import gdal, ogr, osr
+    import geopandas as gpd
+
+    extent = gdal.Info(img1, format="json")["wgs84Extent"]
+    poly1 = ogr.CreateGeometryFromJson(json.dumps(extent))
+    extent = gdal.Info(img2, format="json")["wgs84Extent"]
+    poly2 = ogr.CreateGeometryFromJson(json.dumps(extent))
+    intersection = poly1.Intersection(poly2)
+    gg = gdal.OpenEx(intersection.ExportToJson())
+    ds = gdal.VectorTranslate(
+        overlap,
+        srcDS=gg,
+        format="GeoJSON",
+        layerCreationOptions=["RFC7946=YES", "WRITE_BBOX=YES"],
+    )
+    ds = None
+
+    d = gdal.Open(img1)
+    proj = osr.SpatialReference(wkt=d.GetProjection())
+    epsg = proj.GetAttrValue("AUTHORITY", 1)
+
+    gdf = gpd.read_file(overlap)
+    gdf.to_crs(epsg=epsg, inplace=True)
+    gdf.to_file(overlap)
+
+    if out_img1 is not None:
+        clip_image(img1, overlap, out_img1, to_cog=to_cog)
+
+    if out_img2 is not None:
+        clip_image(img2, overlap, out_img2, to_cog=to_cog)
+
+    return overlap
