@@ -4283,7 +4283,8 @@ def geom_type(in_geojson, encoding="utf-8"):
         encoding (str, optional): The encoding of the GeoJSON object. Defaults to "utf-8".
 
     Returns:
-        str: The geometry type of the GeoJSON object.
+        str: The geometry type of the GeoJSON object, such as Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
+            For more info, see https://shapely.readthedocs.io/en/stable/manual.html
     """
     import json
 
@@ -4494,7 +4495,8 @@ def gdf_geom_type(gdf, first_only=True):
         first_only (bool, optional): Whether to return the geometry type of the first feature in the GeoDataFrame. Defaults to True.
 
     Returns:
-        str: The geometry type of the GeoDataFrame.
+        str: The geometry type of the GeoDataFrame, such as Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
+            For more info, see https://shapely.readthedocs.io/en/stable/manual.html
     """
     import geopandas as gpd
 
@@ -6924,3 +6926,96 @@ def bounds_to_xy_range(bounds):
     x_range = (xmin, xmax)
     y_range = (ymin, ymax)
     return x_range, y_range
+
+
+def get_geometry_coords(row, geom, coord_type, shape_type, mercator=False):
+    """
+    Returns the coordinates ('x' or 'y') of edges of a Polygon exterior.
+
+    :param: (GeoPandas Series) row : The row of each of the GeoPandas DataFrame.
+    :param: (str) geom : The column name.
+    :param: (str) coord_type : Whether it's 'x' or 'y' coordinate.
+    :param: (str) shape_type
+    """
+
+    # Parse the exterior of the coordinate
+    if shape_type.lower() in ["polygon", "multipolygon"]:
+        exterior = row[geom].geoms[0].exterior
+        if coord_type == "x":
+            # Get the x coordinates of the exterior
+            coords = list(exterior.coords.xy[0])
+            if mercator:
+                coords = [lnglat_to_meters(x, 0)[0] for x in coords]
+            return coords
+
+        elif coord_type == "y":
+            # Get the y coordinates of the exterior
+            coords = list(exterior.coords.xy[1])
+            if mercator:
+                coords = [lnglat_to_meters(0, y)[1] for y in coords]
+            return coords
+
+    elif shape_type.lower() in ["linestring", "multilinestring"]:
+        if coord_type == "x":
+            coords = list(row[geom].coords.xy[0])
+            if mercator:
+                coords = [lnglat_to_meters(x, 0)[0] for x in coords]
+            return coords
+        elif coord_type == "y":
+            coords = list(row[geom].coords.xy[1])
+            if mercator:
+                coords = [lnglat_to_meters(0, y)[1] for y in coords]
+            return coords
+
+    elif shape_type.lower() in ["point", "multipoint"]:
+        exterior = row[geom]
+
+        if coord_type == "x":
+            # Get the x coordinates of the exterior
+            coords = exterior.coords.xy[0][0]
+            if mercator:
+                coords = lnglat_to_meters(coords, 0)[0]
+            return coords
+
+        elif coord_type == "y":
+            # Get the y coordinates of the exterior
+            coords = exterior.coords.xy[1][0]
+            if mercator:
+                coords = lnglat_to_meters(0, coords)[1]
+            return coords
+
+
+def gdf_to_bokeh(gdf):
+    """
+    Function to convert a GeoPandas GeoDataFrame to a Bokeh
+    ColumnDataSource object.
+
+    :param: (GeoDataFrame) gdf: GeoPandas GeoDataFrame with polygon(s) under
+                                the column name 'geometry.'
+
+    :return: ColumnDataSource for Bokeh.
+    """
+    from bokeh.plotting import ColumnDataSource
+
+    shape_type = gdf_geom_type(gdf)
+
+    gdf_new = gdf.drop("geometry", axis=1).copy()
+    gdf_new["x"] = gdf.apply(
+        get_geometry_coords,
+        geom="geometry",
+        coord_type="x",
+        shape_type=shape_type,
+        mercator=True,
+        axis=1,
+    )
+
+    gdf_new["y"] = gdf.apply(
+        get_geometry_coords,
+        geom="geometry",
+        coord_type="y",
+        shape_type=shape_type,
+        mercator=True,
+        axis=1,
+    )
+
+    return ColumnDataSource(gdf_new)
