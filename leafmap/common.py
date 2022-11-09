@@ -6921,7 +6921,7 @@ def bounds_to_xy_range(bounds):
     """Convert bounds to x and y range to be used as input to bokeh map.
 
     Args:
-        bounds (list): A list of bounds in the form [(south, west), (north, east)].
+        bounds (list): A list of bounds in the form [(south, west), (north, east)] or [xmin, ymin, xmax, ymax].
 
     Returns:
         tuple: A tuple of (x_range, y_range).
@@ -6933,7 +6933,7 @@ def bounds_to_xy_range(bounds):
         raise TypeError("bounds must be a list")
 
     if len(bounds) == 4:
-        south, west, north, east = bounds
+        west, south, east, north = bounds
     elif len(bounds) == 2:
         south, west = bounds[0]
         north, east = bounds[1]
