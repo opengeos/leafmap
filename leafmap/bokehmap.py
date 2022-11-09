@@ -45,7 +45,12 @@ class Map:
 
         if basemap is not None:
             if basemap == "OpenStreetMap":
-                fig.add_tile(xyz.OpenStreetMap.Mapnik, retina=True)
+                try:
+                    fig.add_tile(xyz.OpenStreetMap.Mapnik, retina=True)
+                except:
+                    from bokeh.tile_providers import get_provider
+
+                    fig.add_tile(get_provider(xyz.OpenStreetMap.Mapnik))
             else:
                 self.add_basemap(basemap)
         fig.toolbar.active_scroll = fig.select_one(WheelZoomTool)
@@ -63,11 +68,13 @@ class Map:
             os.environ["OUTPUT_NOTEBOOK"] = "True"
         show(self.figure)
 
-    def add_basemap(self, basemap="OpenStreetMap", retina=True):
+    def add_basemap(self, basemap="OpenStreetMap", retina=True, **kwargs):
         """Adds a basemap to the map.
 
         Args:
             basemap (str, optional): Can be one of string from basemaps. Defaults to 'OpenStreetMap'.
+            retina (bool, optional): Whether to use retina tiles. Defaults to True.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
         """
         import xyzservices
 
@@ -84,20 +91,34 @@ class Map:
                 "max_zoom": max_zoom,
             }
             tile_source = WMTSTileSource(**tile_options)
-            self.figure.add_tile(tile_source, retina=retina)
+            self.add_tile(tile_source, retina=retina, **kwargs)
         elif isinstance(basemap, WMTSTileSource):
-            self.figure.add_tile(basemap, retina=retina)
+            self.add_tile(basemap, retina=retina, **kwargs)
         elif isinstance(basemap, str):
             if basemap in basemaps.keys():
-                self.figure.add_tile(basemaps[basemap], retina=retina)
+                self.add_tile(basemaps[basemap], retina=retina, **kwargs)
             else:
                 try:
-                    self.figure.add_tile(basemap, retina=retina)
+                    self.add_tile(basemap, retina=retina, **kwargs)
                 except Exception as e:
                     print(e)
                     raise ValueError(
                         f"Basemap {basemap} is not supported. Please choose one from {basemaps.keys()}"
                     )
+
+    def add_tile(self, tile, **kwargs):
+        """Adds a tile to the map.
+
+        Args:
+            tile (bokeh.models.tiles.WMTSTileSource): A bokeh tile.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
+        """
+        try:
+            self.figure.add_tile(tile, **kwargs)
+        except Exception as e:
+            if "retina" in kwargs.keys():
+                kwargs.pop("retina")
+            self.figure.add_tile(tile, **kwargs)
 
     def add_cog_layer(
         self,
@@ -116,10 +137,11 @@ class Map:
             attribution (str, optional): The attribution to use. Defaults to ''.
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-            **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
+            cog_args: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
         """
         tile_url = cog_tile(url, bands, titiler_endpoint, **cog_args)
         tile_options = {
@@ -143,6 +165,7 @@ class Map:
         attribution="",
         layer_name="Local COG",
         fit_bounds=True,
+        open_args={},
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -162,7 +185,12 @@ class Map:
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
             fit_bounds (bool, optional): Whether to fit the map bounds to the raster bounds. Defaults to True.
+            open_args: Arbitrary keyword arguments for get_local_tile_layer(). Defaults to {}.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
         """
+
+        if source.startswith("http"):
+            source = download_file(source)
 
         tile_layer, client = get_local_tile_layer(
             source,
@@ -174,7 +202,7 @@ class Map:
             attribution=attribution,
             layer_name=layer_name,
             return_client=True,
-            **kwargs,
+            **open_args,
         )
 
         tile_options = {
@@ -199,6 +227,7 @@ class Map:
         titiler_endpoint=None,
         attribution="",
         fit_bounds=True,
+        open_args={},
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -211,10 +240,13 @@ class Map:
             bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
             titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.xyz", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
             attribution (str, optional): The attribution to use. Defaults to ''.
-            shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+            fit_bounds (bool, optional): Whether to fit the map bounds to the raster bounds. Defaults to True.
+            open_args: Arbitrary keyword arguments for get_local_tile_layer(). Defaults to {}.
+            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
+
         """
         tile_url = stac_tile(
-            url, collection, item, assets, bands, titiler_endpoint, **kwargs
+            url, collection, item, assets, bands, titiler_endpoint, **open_args
         )
         tile_options = {
             "url": tile_url,
@@ -299,10 +331,9 @@ class Map:
             filename = github_raw_url(filename)
 
         gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
-        self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
-
-        if fit_bounds:
-            self.fit_bounds(gdf.total_bounds.tolist())
+        self.add_gdf(
+            gdf, to_crs=to_crs, tooltips=tooltips, fit_bounds=fit_bounds, **kwargs
+        )
 
     def add_shp(
         self,
@@ -353,10 +384,9 @@ class Map:
                 raise FileNotFoundError("The provided shapefile could not be found.")
 
         gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
-        self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
-
-        if fit_bounds:
-            self.fit_bounds(gdf.total_bounds.tolist())
+        self.add_gdf(
+            gdf, to_crs=to_crs, tooltips=tooltips, fit_bounds=fit_bounds, **kwargs
+        )
 
     def add_vector(
         self,
@@ -385,11 +415,14 @@ class Map:
         if filename.startswith("http"):
             filename = github_raw_url(filename)
 
-        gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
-        self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
+        if isinstance(filename, gpd.GeoDataFrame):
+            gdf = filename
+        else:
+            gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
 
-        if fit_bounds:
-            self.fit_bounds(gdf.total_bounds.tolist())
+        self.add_gdf(
+            gdf, to_crs=to_crs, tooltips=tooltips, fit_bounds=fit_bounds, **kwargs
+        )
 
     def to_html(self, filename=None, title=None, **kwargs):
         """Converts the map to HTML.
@@ -414,3 +447,23 @@ class Map:
         self.figure.x_range.end = bounds[0][1]
         self.figure.y_range.start = bounds[1][0]
         self.figure.y_range.end = bounds[1][1]
+
+    def to_streamlit(self, width=800, height=600, use_container_width=True, **kwargs):
+        """Displays the map in a Streamlit app.
+
+        Args:
+            width (int, optional): The width of the map. Defaults to 800.
+            height (int, optional): The height of the map. Defaults to 600.
+            use_container_width (bool, optional): A flag indicating whether to use the full width of the container. Defaults to True.
+            **kwargs: Arbitrary keyword arguments for bokeh.plotting.show().
+        """
+        import streamlit as st
+
+        self.figure.width = width
+        self.figure.height = height
+
+        st.bokeh_chart(
+            self.figure,
+            use_container_width=use_container_width,
+            **kwargs,
+        )
