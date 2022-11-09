@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.12.0 - Nov 8, 2022
+
+**New Features**
+
+-   Added bokeh as a new plotting backend [#298](https://github.com/giswqs/leafmap/issues/298) [#301](https://github.com/giswqs/leafmap/pull/301)
+-   The bokeh backend supports loading COG, STAC, local rasters, GeoJSON, Shapefile, etc.
+-   Added GeoJSON support for split-view map [#291](https://github.com/giswqs/leafmap/issues/291) [#300](https://github.com/giswqs/leafmap/pull/300)
+
+**Improvement**
+
+-   Fixed numpy to cog crs bug
+-   Improved cog rescale param and docs [#284](https://github.com/giswqs/leafmap/issues/284) [#299](https://github.com/giswqs/leafmap/pull/299)
+
 ## v0.11.3 - Nov 3, 2022
 
 **Improvement**
