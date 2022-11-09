@@ -106,6 +106,7 @@ class Map:
         bands=None,
         titiler_endpoint="https://titiler.xyz",
         cog_args={},
+        fit_bounds=True,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -128,6 +129,9 @@ class Map:
         tile_source = WMTSTileSource(**tile_options)
         self.figure.add_tile(tile_source, **kwargs)
 
+        if fit_bounds:
+            self.fit_bounds(cog_bounds(url, titiler_endpoint))
+
     def add_raster(
         self,
         source,
@@ -138,6 +142,7 @@ class Map:
         nodata=None,
         attribution="",
         layer_name="Local COG",
+        fit_bounds=True,
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -156,9 +161,10 @@ class Map:
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
+            fit_bounds (bool, optional): Whether to fit the map bounds to the raster bounds. Defaults to True.
         """
 
-        tile_layer = get_local_tile_layer(
+        tile_layer, client = get_local_tile_layer(
             source,
             band=band,
             palette=palette,
@@ -167,7 +173,7 @@ class Map:
             nodata=nodata,
             attribution=attribution,
             layer_name=layer_name,
-            return_client=False,
+            return_client=True,
             **kwargs,
         )
 
@@ -178,6 +184,11 @@ class Map:
         tile_source = WMTSTileSource(**tile_options)
         self.figure.add_tile(tile_source, **kwargs)
 
+        if fit_bounds:
+            bounds = client.bounds()
+            bounds = [bounds[2], bounds[0], bounds[3], bounds[1]]
+            self.fit_bounds(bounds)
+
     def add_stac_layer(
         self,
         url=None,
@@ -187,6 +198,7 @@ class Map:
         bands=None,
         titiler_endpoint=None,
         attribution="",
+        fit_bounds=True,
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -211,7 +223,12 @@ class Map:
         tile_source = WMTSTileSource(**tile_options)
         self.figure.add_tile(tile_source, **kwargs)
 
-    def add_gdf(self, gdf, to_crs="epsg:3857", tooltips=None, **kwargs):
+        if fit_bounds:
+            self.fit_bounds(stac_bounds(url, collection, item, titiler_endpoint))
+
+    def add_gdf(
+        self, gdf, to_crs="epsg:3857", tooltips=None, fit_bounds=True, **kwargs
+    ):
         """Adds a GeoDataFrame to the map.
 
         Args:
@@ -243,11 +260,16 @@ class Map:
         elif geom_type in ["LineString", "MultiLineString"]:
             self.figure.multi_line(xs="xs", ys="ys", source=source, **kwargs)
         elif geom_type in ["Polygon", "MultiPolygon"]:
+            if "fill_alpha" not in kwargs:
+                kwargs["fill_alpha"] = 0.5
             self.figure.patches(xs="xs", ys="ys", source=source, **kwargs)
 
         if len(tooltips) > 0:
             hover = HoverTool(tooltips=tooltips)
             self.figure.add_tools(hover)
+
+        if fit_bounds:
+            self.fit_bounds(gdf.total_bounds.tolist())
 
     def add_geojson(
         self,
@@ -256,6 +278,7 @@ class Map:
         read_file_args={},
         to_crs="epsg:3857",
         tooltips=None,
+        fit_bounds=True,
         **kwargs,
     ):
         """Adds a GeoJSON file to the map.
@@ -266,6 +289,7 @@ class Map:
             read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the GeoJSON. Defaults to True.
             **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
@@ -277,6 +301,9 @@ class Map:
         gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
         self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
 
+        if fit_bounds:
+            self.fit_bounds(gdf.total_bounds.tolist())
+
     def add_shp(
         self,
         filename,
@@ -284,6 +311,7 @@ class Map:
         read_file_args={},
         to_crs="epsg:3857",
         tooltips=None,
+        fit_bounds=True,
         **kwargs,
     ):
         """Adds a shapefile to the map.
@@ -294,6 +322,7 @@ class Map:
             read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the shapefile. Defaults to True.
             **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
@@ -326,6 +355,9 @@ class Map:
         gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
         self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
 
+        if fit_bounds:
+            self.fit_bounds(gdf.total_bounds.tolist())
+
     def add_vector(
         self,
         filename,
@@ -333,6 +365,7 @@ class Map:
         read_file_args={},
         to_crs="epsg:3857",
         tooltips=None,
+        fit_bounds=True,
         **kwargs,
     ):
         """Adds a vector dataset to the map.
@@ -343,6 +376,7 @@ class Map:
             read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
+            fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the vector dataset. Defaults to True.
             **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
@@ -354,6 +388,9 @@ class Map:
         gdf = gpd.read_file(filename, encoding=encoding, **read_file_args)
         self.add_gdf(gdf, to_crs=to_crs, tooltips=tooltips, **kwargs)
 
+        if fit_bounds:
+            self.fit_bounds(gdf.total_bounds.tolist())
+
     def to_html(self, filename=None, title=None, **kwargs):
         """Converts the map to HTML.
 
@@ -364,14 +401,16 @@ class Map:
         """
         save(self.figure, filename=filename, title=title, **kwargs)
 
-
     def fit_bounds(self, bounds):
         """Fits the map to the specified bounds in the form of [xmin, ymin, xmax, ymax].
 
         Args:
             bounds (list): A list of bounds in the form of [xmin, ymin, xmax, ymax].
         """
-        self.figure.x_range.start = bounds[0]
-        self.figure.x_range.end = bounds[2]
-        self.figure.y_range.start = bounds[1]
-        self.figure.y_range.end = bounds[3]
+
+        bounds = bounds_to_xy_range(bounds)
+
+        self.figure.x_range.start = bounds[0][0]
+        self.figure.x_range.end = bounds[0][1]
+        self.figure.y_range.start = bounds[1][0]
+        self.figure.y_range.end = bounds[1][1]
