@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.1 - Nov 10, 2022
+
+**New Features**
+
+-   Added `add_mask_to_image()` function ([#306](https://github.com/giswqs/leafmap/pull/306))
+
 ## v0.12.0 - Nov 8, 2022
 
 **New Features**
