@@ -3895,6 +3895,9 @@ def get_local_tile_layer(
             "LOCALTILESERVER_CLIENT_PREFIX"
         ] = f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
 
+    if is_on_aws():
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
+
     from localtileserver import (
         get_leaflet_tile_layer,
         get_folium_tile_layer,
@@ -7170,3 +7173,21 @@ def add_mask_to_image(image, mask, output, color="red"):
 
     if ds.crs is not None:
         numpy_to_cog(output, output, profile=image)
+
+
+def is_on_aws():
+    """Check if the current notebook is running on AWS.
+
+    Returns:
+        bool: True if the notebook is running on AWS.
+    """
+
+    import psutil
+
+    output = psutil.Process().parent().cmdline()
+
+    on_aws = False
+    for item in output:
+        if item.endswith(".aws"):
+            on_aws = True
+    return on_aws
