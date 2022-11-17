@@ -7179,6 +7179,7 @@ def bbox_to_gdf(bbox, crs="epsg:4326"):
 
     Args:
         bbox (list): A bounding box in the format of [minx, miny, maxx, maxy].
+        crs (str, optional): The CRS of the bounding box. Defaults to 'epsg:4326'.
 
     Returns:
         GeoDataFrame: A GeoDataFrame with a single polygon.
@@ -7204,3 +7205,93 @@ def bbox_to_polygon(bbox):
     from shapely.geometry import Polygon
 
     return Polygon.from_bounds(*bbox)
+
+
+def vector_area(vector, unit="m2", crs="epsg:3857"):
+    """Calculate the area of a vector.
+
+    Args:
+        vector (str): A local path or HTTP URL to a vector.
+        unit (str, optional): The unit of the area, can be 'm2', 'km2', 'ha', or 'acres'. Defaults to 'm2'.
+
+    Returns:
+        float: The area of the vector.
+    """
+    import geopandas as gpd
+
+    if isinstance(vector, str):
+        gdf = gpd.read_file(vector)
+    elif isinstance(vector, gpd.GeoDataFrame):
+        gdf = vector
+
+    area = gdf.to_crs(crs).area.sum()
+
+    if unit == "m2":
+        return area
+    elif unit == "km2":
+        return area / 1000000
+    elif unit == "ha":
+        return area / 10000
+    elif unit == "acres":
+        return area / 4046.8564224
+    else:
+        raise ValueError("Invalid unit.")
+
+def image_filesize(region, cellsize, bands=1, dtype="uint8", unit="MB", source_crs="epsg:4326", dst_crs='epsg:3857', bbox=False):
+    """Calculate the size of an image in a given region and cell size.
+
+    Args:
+        region (list): A bounding box in the format of [minx, miny, maxx, maxy].
+        cellsize (float): The resolution of the image.
+        bands (int, optional): Number of bands. Defaults to 1.
+        dtype (str, optional): Data type, such as unit8, float32. For more info, 
+            see https://numpy.org/doc/stable/user/basics.types.html. Defaults to 'uint8'.
+        unit (str, optional): The unit of the output. Defaults to 'MB'.
+        source_crs (str, optional): The CRS of the region. Defaults to 'epsg:4326'.
+        dst_crs (str, optional): The destination CRS to calculate the area. Defaults to 'epsg:3857'.
+        bbox (bool, optional): Whether to use the bounding box of the region to calculate the area. Defaults to False.
+
+    Returns:
+        float: The size of the image in a given unit.
+    """
+    import numpy as np
+    import geopandas as gpd
+
+    if bbox:
+        if isinstance(region, gpd.GeoDataFrame):
+            region = region.to_crs(dst_crs).total_bounds.tolist()
+        elif isinstance(region, str) and os.path.exists(region):
+            region = gpd.read_file(region).to_crs(dst_crs).total_bounds.tolist()
+        elif isinstance(region, list):
+            region = bbox_to_gdf(region, crs=source_crs).to_crs(dst_crs).total_bounds.tolist()
+        else:
+            raise ValueError("Invalid input region.")
+
+        bytes =  np.prod(
+            [
+                int((region[2] - region[0]) / cellsize),
+                int((region[3] - region[1]) / cellsize),
+                bands,
+            ]
+        ) * np.dtype(dtype).itemsize
+    else:
+        if isinstance(region, list):
+            region = bbox_to_gdf(region, crs=source_crs)
+
+        bytes = vector_area(region, crs=dst_crs) / pow(cellsize, 2) * np.dtype(dtype).itemsize * bands
+
+    unit = unit.upper()
+
+    if unit == "KB":
+        return bytes / 1024
+    elif unit == "MB":
+        return bytes / pow(1024, 2)
+    elif unit == "GB":
+        return bytes / pow(1024, 3)
+    elif unit == "TB":
+        return bytes / pow(1024, 4)
+    elif unit == "PB":
+        return bytes / pow(1024, 5)
+    else:
+        return bytes
+    
