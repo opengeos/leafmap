@@ -4410,28 +4410,6 @@ def geojson_to_gpkg(in_geojson, out_gpkg, **kwargs):
     gdf.to_file(out_gpkg, layer=name, driver="GPKG")
 
 
-def bbox_to_gdf(bbox, crs="EPSG:4326"):
-    """Converts a bounding box to a GeoDataFrame.
-
-    Args:
-        bbox (tuple): A bounding box in the form of a tuple (minx, miny, maxx, maxy).
-        crs (str, optional): The coordinate reference system of the bounding box to convert to. Defaults to "EPSG:4326".
-
-    Returns:
-        geopandas.GeoDataFrame: A GeoDataFrame containing the bounding box.
-    """
-    check_package(name="geopandas", URL="https://geopandas.org")
-    from shapely.geometry import box
-    import geopandas as gpd
-
-    minx, miny, maxx, maxy = bbox
-    geometry = box(minx, miny, maxx, maxy)
-    d = {"geometry": [geometry]}
-    gdf = gpd.GeoDataFrame(d, crs="EPSG:4326")
-    gdf.to_crs(crs=crs, inplace=True)
-    return gdf
-
-
 def gdf_to_df(gdf, drop_geom=True):
     """Converts a GeoDataFrame to a pandas DataFrame.
 
@@ -7188,6 +7166,38 @@ def is_on_aws():
 
     on_aws = False
     for item in output:
-        if item.endswith(".aws"):
+        if item.endswith(".aws") or "studiolab/bin" in item:
             on_aws = True
     return on_aws
+
+
+def bbox_to_gdf(bbox, crs="epsg:4326"):
+    """Convert a bounding box to a GeoPandas GeoDataFrame.
+
+    Args:
+        bbox (list): A bounding box in the format of [minx, miny, maxx, maxy].
+
+    Returns:
+        GeoDataFrame: A GeoDataFrame with a single polygon.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    return gpd.GeoDataFrame(
+        geometry=[Polygon.from_bounds(*bbox)],
+        crs=crs,
+    )
+
+
+def bbox_to_polygon(bbox):
+    """Convert a bounding box to a shapely Polygon.
+
+    Args:
+        bbox (list): A bounding box in the format of [minx, miny, maxx, maxy].
+
+    Returns:
+        Polygon: A shapely Polygon.
+    """
+    from shapely.geometry import Polygon
+
+    return Polygon.from_bounds(*bbox)
