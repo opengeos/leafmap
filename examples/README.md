@@ -10,7 +10,7 @@
 [![image](https://github.com/giswqs/leafmap/workflows/docs/badge.svg)](https://leafmap.org)
 [![image](https://github.com/giswqs/leafmap/workflows/Linux%20build/badge.svg)](https://github.com/giswqs/leafmap/actions)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![image](https://img.shields.io/badge/YouTube-Channel-red)](https://www.youtube.com/c/QiushengWu)
+[![image](https://img.shields.io/badge/YouTube-Channel-red)](https://youtube.com/@giswqs)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
 
 ## Tutorials
@@ -80,6 +80,6 @@
 
 ## YouTube Channel
 
-I have created a [YouTube Channel](https://www.youtube.com/c/QiushengWu) for sharing geospaital tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
+I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospaital tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
 
-[![Earth Engine Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://www.youtube.com/c/QiushengWu)
+[![Earth Engine Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://youtube.com/@giswqs)

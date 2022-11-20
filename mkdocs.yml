@@ -1,52 +1,74 @@
 site_name: leafmap
-
+site_description: A Python package for interactive mapping and geospatial analysis with minimal coding in a Jupyter environment
+site_author: Qiusheng Wu
 site_url: https://leafmap.org
 
 repo_url: https://github.com/giswqs/leafmap
 
+copyright: "Copyright &copy; 2021 - 2023 Qiusheng Wu"
+
 theme:
     palette:
-        scheme: preference
+        - scheme: default
+          #   primary: blue
+          #   accent: indigo
+          toggle:
+              icon: material/toggle-switch-off-outline
+              name: Switch to dark mode
+        - scheme: slate
+          primary: indigo
+          accent: indigo
+          toggle:
+              icon: material/toggle-switch
+              name: Switch to light mode
     name: material
     icon:
         repo: fontawesome/brands/github
     features:
         - navigation.instant
+        - navigation.tracking
+        - navigation.top
         - search.highlight
-        # - navigation.expand
-        # - navigation.tabs
+        - search.share
     custom_dir: "docs/overrides"
-
-# extra_javascript:
-#     - javascripts/embed-amd.js
-#     - javascripts/require.min.js
+    font:
+        text: Google Sans
+        code: Regular
 
 plugins:
     - search
     - mkdocstrings
     - git-revision-date
+    - git-revision-date-localized:
+          enable_creation_date: true
+          type: timeago
+    # - pdf-export
     - mkdocs-jupyter:
           include_source: True
           ignore_h1_titles: True
           execute: True
-          execute_ignore: "workshops/*.ipynb"
+          allow_errors: false
+          ignore: ["conf.py", "data/README.md", "usage.md"]
+          #   execute_ignore: "workshops/*.ipynb"
 
 markdown_extensions:
+    - admonition
+    - abbr
     - attr_list
+    - def_list
+    - footnotes
+    - meta
+    - md_in_html
     - pymdownx.superfences
     - pymdownx.highlight:
           linenums: true
     - toc:
           permalink: true
 
-# google_analytics:
-#     - UA-198454981-1
-#     - auto
-
 extra:
     analytics:
         provider: google
-        property: UA-198454981-1
+        property: G-B1C88N45QG
 
 nav:
     - Home: index.md
@@ -59,7 +81,7 @@ nav:
     - Contributing: contributing.md
     - FAQ: faq.md
     - Changelog: changelog.md
-    - YouTube Channel: https://www.youtube.com/c/QiushengWu
+    - YouTube Channel: https://youtube.com/@giswqs
     - Report Issues: https://github.com/giswqs/leafmap/issues
     - API Reference:
           - basemaps module: basemaps.md
@@ -139,4 +161,5 @@ nav:
           - notebooks/54_plot_raster.ipynb
           - notebooks/55_lidar.ipynb
           - notebooks/56_download_ned.ipynb
+          - notebooks/57_national_map.ipynb
           - notebooks/58_bokeh.ipynb
