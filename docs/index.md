@@ -2,6 +2,7 @@
 
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
+[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
 [![image](https://pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
@@ -9,7 +10,7 @@
 [![image](https://github.com/giswqs/leafmap/workflows/Linux%20build/badge.svg)](https://github.com/giswqs/leafmap/actions)
 [![image](https://img.shields.io/lgtm/grade/python/g/giswqs/leafmap.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/giswqs/leafmap/context:python)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![image](https://img.shields.io/badge/YouTube-Channel-red)](https://www.youtube.com/c/QiushengWu)
+[![image](https://img.shields.io/badge/YouTube-Channel-red)](https://youtube.com/@giswqs)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
 [![status](https://joss.theoj.org/papers/10.21105/joss.03414/status.svg)](https://doi.org/10.21105/joss.03414)
 
@@ -19,7 +20,7 @@
 -   Documentation: <https://leafmap.org>
 -   PyPI: <https://pypi.org/project/leafmap>
 -   Conda-forge: <https://anaconda.org/conda-forge/leafmap>
--   Leafmap tutorials on YouTube: <https://www.youtube.com/c/QiushengWu>
+-   Leafmap tutorials on YouTube: <https://youtube.com/@giswqs>
 -   Free software: [MIT license](https://opensource.org/licenses/MIT)
 
 ## Introduction
@@ -72,6 +73,6 @@ If you find **leafmap** useful in your research, please consider citing the foll
 
 ## YouTube Channel
 
-I have created a [YouTube Channel](https://www.youtube.com/c/QiushengWu) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
+I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
 
-[![Leafmap Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://www.youtube.com/c/QiushengWu)
+[![Leafmap Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://youtube.com/@giswqs)
