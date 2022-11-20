@@ -197,6 +197,7 @@ class Map(pdk.Deck):
         try:
 
             import geopandas as gpd
+            import fiona
 
             if not filename.startswith("http"):
                 filename = os.path.abspath(filename)
@@ -204,7 +205,7 @@ class Map(pdk.Deck):
                     filename = "zip://" + filename
 
             if filename.endswith(".kml"):
-                gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+                fiona.drvsupport.supported_drivers["KML"] = "rw"
                 gdf = gpd.read_file(filename, driver="KML")
             else:
                 gdf = gpd.read_file(filename)
