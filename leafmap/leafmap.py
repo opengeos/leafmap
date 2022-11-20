@@ -2561,6 +2561,7 @@ class Map(ipyleaflet.Map):
         warnings.filterwarnings("ignore")
         check_package(name="geopandas", URL="https://geopandas.org")
         import geopandas as gpd
+        import fiona
 
         self.default_style = {"cursor": "wait"}
 
@@ -2571,7 +2572,7 @@ class Map(ipyleaflet.Map):
                 filename = os.path.abspath(filename)
             ext = os.path.splitext(filename)[1].lower()
             if ext == ".kml":
-                gpd.io.file.fiona.drvsupport.supported_drivers["KML"] = "rw"
+                fiona.drvsupport.supported_drivers["KML"] = "rw"
                 gdf = gpd.read_file(filename, driver="KML", **kwargs)
             else:
                 gdf = gpd.read_file(filename, **kwargs)
@@ -3615,6 +3616,7 @@ def linked_maps(
             raise ValueError(f"The length of layers must be equal to {count}.")
 
     if len(labels) > 0:
+        labels = labels.copy()
         if len(labels) == 1:
             labels = labels * count
         elif len(labels) < count:

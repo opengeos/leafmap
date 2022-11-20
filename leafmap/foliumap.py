@@ -1467,6 +1467,9 @@ class Map(folium.Map):
         import webbrowser
         import warnings
 
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         warnings.filterwarnings("ignore")
         try:
             import datapane as dp
@@ -1592,7 +1595,7 @@ class Map(folium.Map):
         """Get the center of the map.
 
         Args:
-            st_folium: The streamlit component.
+            st_component (st_folium): The streamlit component.
 
         Returns:
             tuple: The center of the map.
@@ -1609,7 +1612,7 @@ class Map(folium.Map):
         """Get the bounds of the map in the format of (miny, minx, maxy, maxx).
 
         Args:
-            st_folium: The streamlit component.
+            st_component (st_folium): The streamlit component.
 
         Returns:
             tuple: The bounds of the map.
@@ -1647,7 +1650,7 @@ class Map(folium.Map):
         """Get the last draw feature of the map.
 
         Args:
-            st_folium: The streamlit component.
+            st_component (st_folium): The streamlit component.
 
         Returns:
             str: The last draw of the map.
@@ -1659,7 +1662,7 @@ class Map(folium.Map):
         """Get the last click feature of the map.
 
         Args:
-            st_folium: The streamlit component.
+            st_component (st_folium): The streamlit component.
 
         Returns:
             str: The last click of the map.
@@ -1672,7 +1675,7 @@ class Map(folium.Map):
         """Get the draw features of the map.
 
         Args:
-            st_folium: The streamlit component.
+            st_component (st_folium): The streamlit component.
 
         Returns:
             list: The draw features of the map.

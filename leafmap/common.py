@@ -6256,6 +6256,10 @@ class The_national_map_USGS:
         Returns:
             None
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return 
+
         if out_dir is None:
             out_dir = os.getcwd()
         else:
@@ -6374,28 +6378,33 @@ class The_national_map_USGS:
             A Polygon code in the science base system, typically from an uploaded shapefile
         """
 
-        # call locals before creating new locals
-        used_locals = {k: v for k, v in locals().items() if v and k != "self"}
+        try:
 
-        # Parsing
-        if polygon:
-            used_locals["polygon"] = ",".join(
-                " ".join(map(str, point)) for point in polygon
-            )
-        if bbox:
-            used_locals["bbox"] = str(bbox)[1:-1]
+            # call locals before creating new locals
+            used_locals = {k: v for k, v in locals().items() if v and k != "self"}
 
-        if max:
-            max += 2
+            # Parsing
+            if polygon:
+                used_locals["polygon"] = ",".join(
+                    " ".join(map(str, point)) for point in polygon
+                )
+            if bbox:
+                used_locals["bbox"] = str(bbox)[1:-1]
 
-        # Fetch response
-        response = requests.get(f"{self.api_endpoint}products?", params=used_locals)
-        if response.status_code // 100 == 2:
-            return response.json()
-        else:
-            # Parameter validation handled by API endpoint error responses
-            print(response.json())
-        return {}
+            if max:
+                max += 2
+
+            # Fetch response
+            response = requests.get(f"{self.api_endpoint}products?", params=used_locals)
+            if response.status_code // 100 == 2:
+                return response.json()
+            else:
+                # Parameter validation handled by API endpoint error responses
+                print(response.json())
+            return {}
+        except Exception as e:
+            print(e)
+            return {}
 
 
 def download_tnm(
@@ -6422,6 +6431,10 @@ def download_tnm(
     Returns:
         list: A list of the download URLs of the files if return_url is True.
     """
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
     TNM = The_national_map_USGS()
     if return_url:
         return TNM.find_tiles(region=region, geopandas_args=geopandas_args, API=API)
@@ -6451,6 +6464,9 @@ def download_ned(
         list: A list of the download URLs of the files if return_url is True.
     """
 
+    if os.environ.get("USE_MKDOCS") is not None:
+        return 
+        
     TNM = The_national_map_USGS()
     if return_url:
         return TNM.find_tiles(
