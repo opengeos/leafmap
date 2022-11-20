@@ -19,7 +19,7 @@ def _in_colab_shell():
 
 def _use_folium():
     """Whether to use the folium or ipyleaflet plotting backend."""
-    if os.environ.get("USE_FOLIUM") is not None:
+    if os.environ.get("USE_MKDOCS") is not None:
         return True
     else:
         return False
