@@ -2303,6 +2303,7 @@ class Map(folium.Map):
         k=5,
         add_legend=True,
         legend_title=None,
+        legend_position="bottomright",
         legend_kwds=None,
         classification_kwds=None,
         style_function=None,
@@ -2330,6 +2331,9 @@ class Map(folium.Map):
                 'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
                 'UserDefined'). Arguments can be passed in classification_kwds.
             k (int, optional): Number of classes (ignored if scheme is None or if column is categorical). Default to 5.
+            add_legend (bool, optional): Whether to add a legend to the map. Defaults to True.
+            legend_title (str, optional): The title of the legend. Defaults to None.
+            legend_position (str, optional): The position of the legend. Can be 'topleft', 'topright', 'bottomleft', or 'bottomright'. Defaults to 'bottomright'.
             legend_kwds (dict, optional): Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or `matplotlib.pyplot.colorbar`. Defaults to None.
                 Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or
                 Additional accepted keywords when `scheme` is specified:
