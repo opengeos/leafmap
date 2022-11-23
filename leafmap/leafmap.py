@@ -3389,6 +3389,7 @@ class Map(ipyleaflet.Map):
         k=5,
         add_legend=True,
         legend_title=None,
+        legend_position="bottomright",
         legend_kwds=None,
         classification_kwds=None,
         layer_name="Untitled",
@@ -3417,6 +3418,9 @@ class Map(ipyleaflet.Map):
                 'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
                 'UserDefined'). Arguments can be passed in classification_kwds.
             k (int, optional): Number of classes (ignored if scheme is None or if column is categorical). Default to 5.
+            add_legend (bool, optional): Whether to add a legend to the map. Defaults to True.
+            legend_title (str, optional): The title of the legend. Defaults to None.
+            legend_position (str, optional): The position of the legend. Can be 'topleft', 'topright', 'bottomleft', or 'bottomright'. Defaults to 'bottomright'.
             legend_kwds (dict, optional): Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or `matplotlib.pyplot.colorbar`. Defaults to None.
                 Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or
                 Additional accepted keywords when `scheme` is specified:
@@ -3502,7 +3506,9 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
         if add_legend:
-            self.add_legend(title=legend_title, legend_dict=legend_dict)
+            self.add_legend(
+                title=legend_title, legend_dict=legend_dict, position=legend_position
+            )
 
     def user_roi_bounds(self, decimals=4):
         """Get the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
