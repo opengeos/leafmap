@@ -3,6 +3,7 @@
 """The setup script."""
 
 import io
+import sys
 from os import path as op
 from setuptools import setup, find_packages
 
@@ -12,7 +13,14 @@ with open("README.md") as readme_file:
 here = op.abspath(op.dirname(__file__))
 
 # get the dependencies and installs
-with io.open(op.join(here, "requirements.txt"), encoding="utf-8") as f:
+
+if "pyodide" in sys.modules:
+    requirements = "requirements_lite.txt"
+else:
+    requirements = "requirements.txt"
+
+
+with io.open(op.join(here, requirements), encoding="utf-8") as f:
     all_reqs = f.read().split("\n")
 
 with io.open(op.join(here, "requirements_dev.txt"), encoding="utf-8") as f:
