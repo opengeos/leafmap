@@ -3,7 +3,6 @@
 """The setup script."""
 
 import io
-import sys
 from os import path as op
 from setuptools import setup, find_packages
 
@@ -14,13 +13,8 @@ here = op.abspath(op.dirname(__file__))
 
 # get the dependencies and installs
 
-if "pyodide" in sys.modules:
-    requirements = "requirements_lite.txt"
-else:
-    requirements = "requirements.txt"
 
-
-with io.open(op.join(here, requirements), encoding="utf-8") as f:
+with io.open(op.join(here, "requirements.txt"), encoding="utf-8") as f:
     all_reqs = f.read().split("\n")
 
 with io.open(op.join(here, "requirements_dev.txt"), encoding="utf-8") as f:
@@ -31,7 +25,13 @@ dependency_links = [x.strip().replace("git+", "") for x in all_reqs if "git+" no
 
 extras_requires = {
     "all": dev_reqs,
-    "backends": ["keplergl", "pydeck", "plotly", "here-map-widget-for-jupyter"],
+    "backends": [
+        "bokeh",
+        "keplergl",
+        "pydeck",
+        "plotly",
+        "here-map-widget-for-jupyter",
+    ],
     "lidar": ["ipygany", "ipyvtklink", "laspy", "panel", "pyntcloud[LAS]", "pyvista"],
     "raster": [
         "localtileserver",
