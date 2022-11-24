@@ -6258,7 +6258,7 @@ class The_national_map_USGS:
         """
 
         if os.environ.get("USE_MKDOCS") is not None:
-            return 
+            return
 
         if out_dir is None:
             out_dir = os.getcwd()
@@ -6465,8 +6465,8 @@ def download_ned(
     """
 
     if os.environ.get("USE_MKDOCS") is not None:
-        return 
-        
+        return
+
     TNM = The_national_map_USGS()
     if return_url:
         return TNM.find_tiles(
@@ -7253,14 +7253,24 @@ def vector_area(vector, unit="m2", crs="epsg:3857"):
     else:
         raise ValueError("Invalid unit.")
 
-def image_filesize(region, cellsize, bands=1, dtype="uint8", unit="MB", source_crs="epsg:4326", dst_crs='epsg:3857', bbox=False):
+
+def image_filesize(
+    region,
+    cellsize,
+    bands=1,
+    dtype="uint8",
+    unit="MB",
+    source_crs="epsg:4326",
+    dst_crs="epsg:3857",
+    bbox=False,
+):
     """Calculate the size of an image in a given region and cell size.
 
     Args:
         region (list): A bounding box in the format of [minx, miny, maxx, maxy].
         cellsize (float): The resolution of the image.
         bands (int, optional): Number of bands. Defaults to 1.
-        dtype (str, optional): Data type, such as unit8, float32. For more info, 
+        dtype (str, optional): Data type, such as unit8, float32. For more info,
             see https://numpy.org/doc/stable/user/basics.types.html. Defaults to 'uint8'.
         unit (str, optional): The unit of the output. Defaults to 'MB'.
         source_crs (str, optional): The CRS of the region. Defaults to 'epsg:4326'.
@@ -7279,22 +7289,34 @@ def image_filesize(region, cellsize, bands=1, dtype="uint8", unit="MB", source_c
         elif isinstance(region, str) and os.path.exists(region):
             region = gpd.read_file(region).to_crs(dst_crs).total_bounds.tolist()
         elif isinstance(region, list):
-            region = bbox_to_gdf(region, crs=source_crs).to_crs(dst_crs).total_bounds.tolist()
+            region = (
+                bbox_to_gdf(region, crs=source_crs)
+                .to_crs(dst_crs)
+                .total_bounds.tolist()
+            )
         else:
             raise ValueError("Invalid input region.")
 
-        bytes =  np.prod(
-            [
-                int((region[2] - region[0]) / cellsize),
-                int((region[3] - region[1]) / cellsize),
-                bands,
-            ]
-        ) * np.dtype(dtype).itemsize
+        bytes = (
+            np.prod(
+                [
+                    int((region[2] - region[0]) / cellsize),
+                    int((region[3] - region[1]) / cellsize),
+                    bands,
+                ]
+            )
+            * np.dtype(dtype).itemsize
+        )
     else:
         if isinstance(region, list):
             region = bbox_to_gdf(region, crs=source_crs)
 
-        bytes = vector_area(region, crs=dst_crs) / pow(cellsize, 2) * np.dtype(dtype).itemsize * bands
+        bytes = (
+            vector_area(region, crs=dst_crs)
+            / pow(cellsize, 2)
+            * np.dtype(dtype).itemsize
+            * bands
+        )
 
     unit = unit.upper()
 
@@ -7310,4 +7332,17 @@ def image_filesize(region, cellsize, bands=1, dtype="uint8", unit="MB", source_c
         return bytes / pow(1024, 5)
     else:
         return bytes
-    
+
+
+def is_jupyterlite():
+    """Check if the current notebook is running on JupyterLite.
+
+    Returns:
+        book: True if the notebook is running on JupyterLite.
+    """
+    import sys
+
+    if "pyodide" in sys.modules:
+        return True
+    else:
+        return False
