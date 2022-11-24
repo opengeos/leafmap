@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.13.0 - Nov 23, 2022
+
+**New Features**
+
+-   Added support for JupyterLite ([#316](https://github.com/giswqs/leafmap/pull/316))
+-   Added choropleth map legend position option #305 ([#315](https://github.com/giswqs/leafmap/pull/315))
+-   Added dark mode and fix bugs ([#312](https://github.com/giswqs/leafmap/pull/312))
+-   Added vector_area and image_filesize functions ([#309](https://github.com/giswqs/leafmap/pull/309))
+-   Added bbox to gdf and polygon func
+-   Added raster support for SageMaker AWS ([#307](https://github.com/giswqs/leafmap/pull/307))
+
+**Improvement**
+
+-   Fixed kml bug ([#308](https://github.com/giswqs/leafmap/pull/308))
+
+## v0.12.1 - Nov 10, 2022
+
+**New Features**
+
+-   Added add_mask_to_image() function ([#306](https://github.com/giswqs/leafmap/pull/306))
+
 ## v0.12.0 - Nov 8, 2022
 
 **New Features**
