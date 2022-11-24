@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.13.1 - Nov 24, 2022
+
+**New Features**
+
+-   Added support for JupyterLite ([#317](https://github.com/giswqs/leafmap/pull/317))
+
 ## v0.13.0 - Nov 23, 2022
 
 **New Features**
