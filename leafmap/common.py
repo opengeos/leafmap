@@ -5297,8 +5297,13 @@ def download_file(
     Returns:
         str: The output file path.
     """
-
-    import gdown
+    try:
+        import gdown
+    except ImportError:
+        print(
+            "The gdown package is required for this function. Use `pip install gdown` to install it."
+        )
+        return
 
     if output is None:
         if isinstance(url, str) and url.startswith("http"):
@@ -5367,7 +5372,14 @@ def download_folder(
     Returns:
         list: List of files downloaded, or None if failed.
     """
-    import gdown
+
+    try:
+        import gdown
+    except ImportError:
+        print(
+            "The gdown package is required for this function. Use `pip install gdown` to install it."
+        )
+        return
 
     files = gdown.download_folder(
         url, id, output, quiet, proxy, speed, use_cookies, remaining_ok
