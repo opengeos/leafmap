@@ -111,7 +111,6 @@ class Map(ipyleaflet.Map):
             self.add_control(control)
 
             def handle_draw(target, action, geo_json):
-                import ipysheet
 
                 if "style" in geo_json["properties"]:
                     del geo_json["properties"]["style"]
@@ -137,6 +136,8 @@ class Map(ipyleaflet.Map):
                             self.draw_features.remove(feature)
 
                 if self.edit_mode:
+                    import ipysheet
+
                     with self.edit_output:
                         self.edit_output.clear_output()
                         self.edit_sheet = ipysheet.from_dataframe(
