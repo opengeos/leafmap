@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.13.3 - Nov 25, 2022
+
+**New Features**
+
+-   Added function for downloading files using pyodide ([#320](https://github.com/giswqs/leafmap/pull/320))
+-   Added JupyterLite badge to notebook examples ([#319](https://github.com/giswqs/leafmap/pull/319))
+-   Added gdown and JupyterLite badge to docs ([#318](https://github.com/giswqs/leafmap/pull/318))
+
 ## v0.13.1 - Nov 24, 2022
 
 **New Features**
