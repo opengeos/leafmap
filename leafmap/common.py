@@ -7358,3 +7358,46 @@ def is_jupyterlite():
         return True
     else:
         return False
+
+
+async def download_file_lite(url, output=None, binary=False, overwrite=False, **kwargs):
+    """Download a file using Pyodide. This function is only available on JupyterLite. Call the function with await, such as await download_file_lite(url).
+
+    Args:
+        url (str): The URL of the file.
+        output (str, optional): The local path to save the file. Defaults to None.
+        binary (bool, optional): Whether the file is binary. Defaults to False.
+        overwrite (bool, optional): Whether to overwrite the file if it exists. Defaults to False.
+    """
+    import sys
+    import pyodide
+
+    if "pyodide" not in sys.modules:
+        raise ValueError("Pyodide is not available.")
+
+    if output is None:
+        output = os.path.basename(url)
+
+    output = os.path.abspath(output)
+
+    ext = os.path.splitext(output)[1]
+
+    if ext in [".png", "jpg", ".tif", ".tiff", "zip", "gz", "bz2", "xz"]:
+        binary = True
+
+    if os.path.exists(output) and not overwrite:
+        print(f"{output} already exists, skip downloading.")
+        return output
+
+    if binary:
+        response = await pyodide.http.pyfetch(url)
+        with open(output, "wb") as f:
+            f.write(await response.bytes())
+
+    else:
+
+        obj = pyodide.http.open_url(url)
+        with open(output, 'w') as fd:
+            shutil.copyfileobj(obj, fd)
+
+    return output
