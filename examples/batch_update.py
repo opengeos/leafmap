@@ -33,7 +33,7 @@ for file in files:
 
     out_lines = []
     for index, line in enumerate(lines):
-        if 'colab-badge.svg' in line and 'jupyterlite' not in line[index-1]:
+        if 'colab-badge.svg' in line and 'jupyterlite' not in lines[index-1]:
             badge = (
                 '[![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)]'
             )
@@ -78,6 +78,8 @@ for file in files:
     for index, line in enumerate(lines):
         if '"id":' in line:
             pass
+        elif "display_name" in line:
+            out_lines.append('   "display_name": "Python 3",\n')
         else:
             out_lines.append(line)
 
