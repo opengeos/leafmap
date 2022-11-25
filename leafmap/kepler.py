@@ -132,7 +132,20 @@ class Map(keplergl.KeplerGl):
             if isinstance(in_geojson, str):
 
                 if in_geojson.startswith("http"):
-                    data = requests.get(in_geojson).json()
+                    if is_jupyterlite():
+                        import pyodide
+
+                        output = os.path.basename(in_geojson)
+
+                        output = os.path.abspath(output)
+                        obj = pyodide.http.open_url(in_geojson)
+                        with open(output, 'w') as fd:
+                            shutil.copyfileobj(obj, fd)
+                        with open(output, 'r') as fd:
+                            data = json.load(fd)
+                    else:
+                        in_geojson = github_raw_url(in_geojson)
+                        data = requests.get(in_geojson).json()
                 else:
                     in_geojson = os.path.abspath(in_geojson)
                     if not os.path.exists(in_geojson):
