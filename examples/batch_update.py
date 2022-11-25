@@ -33,7 +33,7 @@ for file in files:
 
     out_lines = []
     for index, line in enumerate(lines):
-        if 'colab-badge.svg' in line and 'jupyterlite' not in lines[index-1]:
+        if 'colab-badge.svg' in line and 'jupyterlite' not in lines[index - 1]:
             badge = (
                 '[![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)]'
             )
@@ -87,5 +87,9 @@ for file in files:
         f.writelines(out_lines)
 
 
-shutil.copytree(notebook_dir, notebook_dir.replace('examples', 'docs'), dirs_exist_ok=True)
-shutil.copytree(workshop_dir, workshop_dir.replace('examples', 'docs'), dirs_exist_ok=True)
+shutil.copytree(
+    notebook_dir, notebook_dir.replace('examples', 'docs'), dirs_exist_ok=True
+)
+shutil.copytree(
+    workshop_dir, workshop_dir.replace('examples', 'docs'), dirs_exist_ok=True
+)
