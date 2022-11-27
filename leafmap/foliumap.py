@@ -8,7 +8,8 @@ from .basemaps import xyz_to_folium
 from .osm import *
 from . import examples
 
-from branca.element import Figure, JavascriptLink
+from branca.element import Figure, JavascriptLink, MacroElement
+from folium.elements import JSCSSMixin
 from folium.map import Layer
 from jinja2 import Template
 
@@ -47,8 +48,15 @@ class Map(folium.Map):
         if "max_zoom" not in kwargs:
             kwargs["max_zoom"] = 24
 
-        if "control_scale" not in kwargs:
+        if "scale_control" not in kwargs:
+            kwargs["scale_control"] = True
+
+        if kwargs["scale_control"]:
             kwargs["control_scale"] = True
+            kwargs.pop("scale_control")
+
+        # if "control_scale" not in kwargs:
+        #     kwargs["control_scale"] = True
 
         if "draw_export" not in kwargs:
             kwargs["draw_export"] = False
@@ -947,123 +955,70 @@ class Map(folium.Map):
     def add_legend(
         self,
         title="Legend",
-        colors=None,
         labels=None,
+        colors=None,
         legend_dict=None,
         builtin_legend=None,
         opacity=1.0,
-        **kwargs,
+        position="bottomright",
+        draggable=True,
+        style={},
     ):
-        """Adds a customized legend to the map. Reference: https://bit.ly/3oV6vnH
+        """Adds a customized legend to the map. Reference: https://bit.ly/3oV6vnH.
+            If you want to add multiple legends to the map, you need to set the `draggable` argument to False.
 
         Args:
-            title (str, optional): Title of the legend. Defaults to 'Legend'. Defaults to "Legend".
-            colors (list, optional): A list of legend colors. Defaults to None.
-            labels (list, optional): A list of legend labels. Defaults to None.
-            legend_dict (dict, optional): A dictionary containing legend items as keys and color as values. If provided, legend_keys and legend_colors will be ignored. Defaults to None.
-            builtin_legend (str, optional): Name of the builtin legend to add to the map. Defaults to None.
-            opacity (float, optional): The opacity of the legend. Defaults to 1.0.
+        title (str, optional): Title of the legend. Defaults to 'Legend'. Defaults to "Legend".
+        colors (list, optional): A list of legend colors. Defaults to None.
+        labels (list, optional): A list of legend labels. Defaults to None.
+        legend_dict (dict, optional): A dictionary containing legend items as keys and color as values.
+            If provided, legend_keys and legend_colors will be ignored. Defaults to None.
+        builtin_legend (str, optional): Name of the builtin legend to add to the map. Defaults to None.
+        opacity (float, optional): The opacity of the legend. Defaults to 1.0.
+        position (str, optional): The position of the legend, can be one of the following:
+            "topleft", "topright", "bottomleft", "bottomright". Defaults to "bottomright".
+        draggable (bool, optional): If True, the legend can be dragged to a new position. Defaults to True.
+        style: Additional keyword arguments to style the legend, such as position, bottom, right, z-index,
+            border, background-color, border-radius, padding, font-size, etc. The default style is:
+            style = {
+                'position': 'fixed',
+                'z-index': '9999',
+                'border': '2px solid grey',
+                'background-color': 'rgba(255, 255, 255, 0.8)',
+                'border-radius': '5px',
+                'padding': '10px',
+                'font-size': '14px',
+                'bottom': '20px',
+                'right': '5px'
+            }
 
         """
-
-        import pkg_resources
-        from branca.element import Template, MacroElement
-
-        pkg_dir = os.path.dirname(
-            pkg_resources.resource_filename("leafmap", "leafmap.py")
+        content = create_legend(
+            title,
+            labels,
+            colors,
+            legend_dict,
+            builtin_legend,
+            opacity,
+            position,
+            draggable,
+            style=style,
         )
-        legend_template = os.path.join(pkg_dir, "data/template/legend.txt")
+        if draggable:
+            from branca.element import Template, MacroElement
 
-        if not os.path.exists(legend_template):
-            raise FileNotFoundError("The legend template does not exist.")
+            content = (
+                '"""\n{% macro html(this, kwargs) %}\n'
+                + content
+                + '\n{% endmacro %}"""'
+            )
 
-        if labels is not None:
-            if not isinstance(labels, list):
-                raise ValueError("The legend labels must be a list.")
+            macro = MacroElement()
+            macro._template = Template(content)
+
+            self.get_root().add_child(macro)
         else:
-            labels = ["One", "Two", "Three", "Four", "etc"]
-
-        if colors is not None:
-            if not isinstance(colors, list):
-                raise ValueError("The legend colors must be a list.")
-            elif all(isinstance(item, tuple) for item in colors):
-                try:
-                    colors = ["#" + rgb_to_hex(x) for x in colors]
-                except Exception as e:
-                    raise Exception(e)
-            elif all((item.startswith("#") and len(item) == 7) for item in colors):
-                pass
-            elif all((len(item) == 6) for item in colors):
-                pass
-            else:
-                raise ValueError("The legend colors must be a list of tuples.")
-        else:
-            colors = ["#8DD3C7", "#FFFFB3", "#BEBADA", "#FB8072", "#80B1D3"]
-
-        if len(labels) != len(colors):
-            raise ValueError("The legend keys and values must be the same length.")
-
-        allowed_builtin_legends = builtin_legends.keys()
-        if builtin_legend is not None:
-            if builtin_legend not in allowed_builtin_legends:
-                raise ValueError(
-                    "The builtin legend must be one of the following: {}".format(
-                        ", ".join(allowed_builtin_legends)
-                    )
-                )
-            else:
-                legend_dict = builtin_legends[builtin_legend]
-                labels = list(legend_dict.keys())
-                colors = list(legend_dict.values())
-                if all(isinstance(item, tuple) for item in colors):
-                    try:
-                        colors = [rgb_to_hex(x) for x in colors]
-                    except Exception as e:
-                        raise Exception(e)
-                elif all(isinstance(item, str) for item in colors):
-                    colors = ["#" + color for color in colors]
-
-        if legend_dict is not None:
-            if not isinstance(legend_dict, dict):
-                raise ValueError("The legend dict must be a dictionary.")
-            else:
-                labels = list(legend_dict.keys())
-                colors = list(legend_dict.values())
-
-                if all(isinstance(item, tuple) for item in colors):
-                    try:
-                        colors = ["#" + rgb_to_hex(x) for x in colors]
-                    except Exception as e:
-                        raise Exception(e)
-                elif all((item.startswith("#") and len(item) == 7) for item in colors):
-                    pass
-                elif all(isinstance(item, str) for item in colors):
-                    colors = ["#" + color for color in colors]
-
-        content = []
-
-        with open(legend_template) as f:
-            lines = f.readlines()
-            for index, line in enumerate(lines):
-                if index < 36:
-                    content.append(line)
-                elif index == 36:
-                    line = lines[index].replace("Legend", title)
-                    content.append(line)
-                elif index < 39:
-                    content.append(line)
-                elif index == 39:
-                    for i, color in enumerate(colors):
-                        item = f"    <li><span style='background:{check_color(color)};opacity:{opacity};'></span>{labels[i]}</li>\n"
-                        content.append(item)
-                elif index > 41:
-                    content.append(line)
-
-        template = "".join(content)
-        macro = MacroElement()
-        macro._template = Template(template)
-
-        self.get_root().add_child(macro)
+            self.add_html(content, position=position)
 
     def add_colorbar(
         self,
@@ -1186,9 +1141,9 @@ class Map(folium.Map):
 
                         output = os.path.abspath(output)
                         obj = pyodide.http.open_url(in_geojson)
-                        with open(output, 'w') as fd:
+                        with open(output, "w") as fd:
                             shutil.copyfileobj(obj, fd)
-                        with open(output, 'r') as fd:
+                        with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
                         in_geojson = github_raw_url(in_geojson)
@@ -2187,6 +2142,11 @@ class Map(folium.Map):
         right_layer="OpenTopoMap",
         left_args={},
         right_args={},
+        left_label=None,
+        right_label=None,
+        left_position="bottomleft",
+        right_position="bottomright",
+        **kwargs,
     ):
         """Adds a split-panel map.
 
@@ -2215,6 +2175,17 @@ class Map(folium.Map):
         bounds = None
 
         try:
+
+            if left_label is not None:
+                left_name = left_label
+            else:
+                left_name = "Left Layer"
+
+            if right_label is not None:
+                right_name = right_label
+            else:
+                right_name = "Right Layer"
+
             if left_layer in basemaps.keys():
                 left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
@@ -2224,7 +2195,7 @@ class Map(folium.Map):
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=url,
-                        name="Left Layer",
+                        name=left_name,
                         attr=" ",
                         overlay=True,
                     )
@@ -2240,7 +2211,7 @@ class Map(folium.Map):
                 else:
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=left_layer,
-                        name="Left Layer",
+                        name=left_name,
                         attr=" ",
                         overlay=True,
                         **left_args,
@@ -2263,7 +2234,7 @@ class Map(folium.Map):
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=url,
-                        name="Right Layer",
+                        name=right_name,
                         attr=" ",
                         overlay=True,
                     )
@@ -2278,7 +2249,7 @@ class Map(folium.Map):
                 else:
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=right_layer,
-                        name="Right Layer",
+                        name=right_name,
                         attr=" ",
                         overlay=True,
                         **right_args,
@@ -2292,12 +2263,20 @@ class Map(folium.Map):
                     f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
-            control = SplitControl(
-                layer_left=left_layer, layer_right=right_layer, name="Split Control"
-            )
+            control = SideBySideLayers(layer_left=left_layer, layer_right=right_layer)
             left_layer.add_to(self)
             right_layer.add_to(self)
             control.add_to(self)
+
+            if left_label is not None:
+                if "<" not in left_label:
+                    left_label = f"<h4>{left_label}</h4>"
+                self.add_html(left_label, position=left_position)
+
+            if right_label is not None:
+                if "<" not in right_label:
+                    right_label = f"<h4>{right_label}</h4>"
+                self.add_html(right_label, position=right_position)
             if bounds is not None:
                 self.fit_bounds(bounds)
 
@@ -2453,6 +2432,101 @@ class Map(folium.Map):
         )
         if add_legend:
             self.add_legend(title=legend_title, legend_dict=legend_dict)
+
+    def add_image(self, image, position=(0, 0), **kwargs):
+        """Add an image to the map.
+
+        Args:
+            image (str | ipywidgets.Image): The image to add.
+            position (tuple, optional): The position of the image in the format of (x, y),
+                the percentage ranging from 0 to 100, starting from the lower-left corner. Defaults to (0, 0).
+        """
+        import base64
+
+        if isinstance(image, str):
+            if image.startswith("http"):
+                image = download_file(image)
+
+            if os.path.exists(image):
+                with open(image, "rb") as lf:
+                    # open in binary mode, read bytes, encode, decode obtained bytes as utf-8 string
+                    b64_content = base64.b64encode(lf.read()).decode("utf-8")
+                    widget = plugins.FloatImage(
+                        "data:image/png;base64,{}".format(b64_content),
+                        bottom=position[1],
+                        left=position[0],
+                    )
+                    widget.add_to(self)
+
+        else:
+            raise Exception("Invalid image")
+
+    def add_widget(self, content, position="bottomright", **kwargs):
+        """Add a widget (e.g., text, HTML, figure) to the map.
+
+        Args:
+            content (str): The widget to add.
+            position (str, optional): The position of the widget. Defaults to "bottomright".
+        """
+
+        allowed_positions = ["topleft", "topright", "bottomleft", "bottomright"]
+
+        if position not in allowed_positions:
+            raise Exception(f"position must be one of {allowed_positions}")
+
+        try:
+            widget = CustomControl(content, position=position)
+            widget.add_to(self)
+
+        except Exception as e:
+            raise Exception(f"Error adding widget: {e}")
+
+    def add_html(self, html, position="bottomright", **kwargs):
+        """Add HTML to the map.
+
+        Args:
+            html (str): The HTML to add.
+            position (str, optional): The position of the widget. Defaults to "bottomright".
+        """
+
+        self.add_widget(html, position=position, **kwargs)
+
+    def add_text(
+        self,
+        text,
+        fontsize=20,
+        fontcolor="black",
+        bold=False,
+        padding="5px",
+        background=True,
+        bg_color="white",
+        border_radius="5px",
+        position="bottomright",
+        **kwargs,
+    ):
+        """Add text to the map.
+
+        Args:
+            text (str): The text to add.
+            fontsize (int, optional): The font size. Defaults to 20.
+            fontcolor (str, optional): The font color. Defaults to "black".
+            bold (bool, optional): Whether to use bold font. Defaults to False.
+            padding (str, optional): The padding. Defaults to "5px".
+            background (bool, optional): Whether to use background. Defaults to True.
+            bg_color (str, optional): The background color. Defaults to "white".
+            border_radius (str, optional): The border radius. Defaults to "5px".
+            position (str, optional): The position of the widget. Defaults to "bottomright".
+        """
+
+        if background:
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'}; 
+            padding: {padding}; background-color: {bg_color}; 
+            border-radius: {border_radius};">{text}</div>"""
+        else:
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'}; 
+            padding: {padding};">{text}</div>"""
+
+        self.add_html(text, position=position, **kwargs)
 
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
@@ -2700,6 +2774,144 @@ class SplitControl(Layer):
             ),  # noqa
             name="leaflet.sidebyside",
         )
+
+
+class SideBySideLayers(JSCSSMixin, Layer):
+    """
+    Creates a SideBySideLayers that takes two Layers and adds a sliding
+    control with the leaflet-side-by-side plugin.
+    Uses the Leaflet leaflet-side-by-side plugin https://github.com/digidem/leaflet-side-by-side.
+    Adopted from https://github.com/python-visualization/folium/pull/1292/files.
+    Parameters
+    ----------
+    layer_left: Layer.
+        The left Layer within the side by side control.
+        Must be created and added to the map before being passed to this class.
+    layer_right: Layer.
+        The right Layer within the side by side control.
+        Must be created and added to the map before being passed to this class.
+    Examples
+    --------
+    >>> sidebyside = SideBySideLayers(layer_left, layer_right)
+    >>> sidebyside.add_to(m)
+    """
+
+    _template = Template(
+        """
+        {% macro script(this, kwargs) %}
+            var {{ this.get_name() }} = L.control.sideBySide(
+                {{ this.layer_left.get_name() }}, {{ this.layer_right.get_name() }}
+            ).addTo({{ this._parent.get_name() }});
+        {% endmacro %}
+        """
+    )
+
+    default_js = [
+        (
+            "leaflet.sidebyside",
+            "https://cdn.jsdelivr.net/gh/digidem/leaflet-side-by-side@gh-pages/leaflet-side-by-side.min.js",
+        ),
+    ]
+
+    def __init__(self, layer_left, layer_right):
+        super().__init__(control=False)
+        self._name = "SideBySideLayers"
+        self.layer_left = layer_left
+        self.layer_right = layer_right
+
+
+class CustomControl(MacroElement):
+    """Put any HTML on the map as a Leaflet Control.
+    Adopted from https://github.com/python-visualization/folium/pull/1662
+
+    """
+
+    _template = Template(
+        """
+        {% macro script(this, kwargs) %}
+        L.Control.CustomControl = L.Control.extend({
+            onAdd: function(map) {
+                let div = L.DomUtil.create('div');
+                div.innerHTML = `{{ this.html }}`;
+                return div;
+            },
+            onRemove: function(map) {
+                // Nothing to do here
+            }
+        });
+        L.control.customControl = function(opts) {
+            return new L.Control.CustomControl(opts);
+        }
+        L.control.customControl(
+            { position: "{{ this.position }}" }
+        ).addTo({{ this._parent.get_name() }});
+        {% endmacro %}
+    """
+    )
+
+    def __init__(self, html, position="bottomleft"):
+        def escape_backticks(text):
+            """Escape backticks so text can be used in a JS template."""
+            import re
+
+            return re.sub(r"(?<!\\)`", r"\`", text)
+
+        super().__init__()
+        self.html = escape_backticks(html)
+        self.position = position
+
+
+class FloatText(MacroElement):
+    """Adds a floating image in HTML canvas on top of the map."""
+
+    _template = Template(
+        """
+            {% macro header(this,kwargs) %}
+                <style>
+                    #{{this.get_name()}} {
+                        position:absolute;
+                        bottom:{{this.bottom}}%;
+                        left:{{this.left}}%;
+                        }
+                </style>
+            {% endmacro %}
+
+            {% macro html(this, kwargs) %}
+
+            <!doctype html>
+            <html lang="en">
+            <head>
+            </head>
+            <body>
+
+            <div id='{{this.get_name()}}' class='{{this.get_name()}}'
+                style='position: absolute; z-index:9999; border:2px solid grey; background-color:rgba(255, 255, 255, 0.8);
+                border-radius:5px; padding: 5px; font-size:14px; '>
+
+            <div class='text'>{{this.text}}</div>
+            </div>
+
+            </body>
+            </html>
+
+            <style type='text/css'>
+            .{{this.get_name()}} .text {
+                text-align: left;
+                margin-bottom: 0px;
+                font-size: 90%;
+                float: left;
+                }
+            </style>
+            {% endmacro %}
+            """
+    )
+
+    def __init__(self, text, bottom=75, left=75):
+        super(FloatText, self).__init__()
+        self._name = "FloatText"
+        self.text = text
+        self.bottom = bottom
+        self.left = left
 
 
 def delete_dp_report(name):
