@@ -60,7 +60,10 @@
 54. Plotting elevation data in 3D without only one line of code ([notebook](https://leafmap.org/notebooks/54_plot_raster))
 55. LiDAR data analysis and visualization with whitebox and leafmap ([notebook](https://leafmap.org/notebooks/55_lidar))
 56. Downloading 10-m National Elevation Dataset (NED) with only one line of code ([notebook](https://leafmap.org/notebooks/56_download_ned))
-57. Creating interactive maps with bokeh ([notebook](https://leafmap.org/notebooks/58_bokeh))
+57. Download data from The National Map ([notebook](https://leafmap.org/notebooks/57_national_map))
+58. Creating interactive maps with bokeh ([notebook](https://leafmap.org/notebooks/58_bokeh))
+59. Creating multiple legends and add them to the map ([notebook](https://leafmap.org/notebooks/59_create_legend))
+60. Adding text, images, HTML, and widgets to the map ([notebook](https://leafmap.org/notebooks/60_add_widget))
 
 ## Demo
 
