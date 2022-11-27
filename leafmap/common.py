@@ -579,7 +579,7 @@ def check_color(in_color):
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
-        in_color (str or tuple): It can be a string (e.g., 'red', '#ffff00') or tuple (e.g., (255, 127, 0)).
+        in_color (str or tuple): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple (e.g., (255, 127, 0)).
 
     Returns:
         str: A hex color code.
@@ -588,23 +588,33 @@ def check_color(in_color):
 
     out_color = "#000000"  # default black color
     if isinstance(in_color, tuple) and len(in_color) == 3:
+
+        # rescale color if necessary
         if all(isinstance(item, int) for item in in_color):
-            rescaled_color = [x / 255.0 for x in in_color]
-            out_color = colour.Color(rgb=tuple(rescaled_color))
-            return out_color.hex_l
-        else:
-            print(
-                "RGB color must be a tuple with three integer values ranging from 0 to 255."
-            )
-            return
+            in_color = [c / 255.0 for c in in_color]
+
+        return colour.Color(rgb=tuple(in_color)).hex_l
+
     else:
+
+        # try to guess the color system
         try:
-            out_color = colour.Color(in_color)
-            return out_color.hex_l
+            return colour.Color(in_color).hex_l
+
         except Exception as e:
-            print("The provided color is invalid. Using the default black color.")
+            pass
+
+        # try again by adding an extra # (GEE handle hex codes without #)
+        try:
+            return colour.Color(f"#{in_color}").hex_l
+
+        except Exception as e:
+            print(
+                f"The provided color ({in_color}) is invalid. Using the default black color."
+            )
             print(e)
-            return out_color
+
+        return out_color
 
 
 def system_fonts(show_full_path=False):
@@ -3525,149 +3535,6 @@ def get_wms_layers(url):
     layers = list(wms.contents)
     layers.sort()
     return layers
-
-
-def create_legend(
-    legend_title="Legend",
-    legend_dict=None,
-    legend_keys=None,
-    legend_colors=None,
-    builtin_legend=None,
-    **kwargs,
-):
-    """Create a custom legend.
-
-    Args:
-        legend_title (str, optional): Title of the legend. Defaults to 'Legend'.
-        legend_dict (dict, optional): A dictionary containing legend items as keys and color as values. If provided, legend_keys and legend_colors will be ignored. Defaults to None.
-        legend_keys (list, optional): A list of legend keys. Defaults to None.
-        legend_colors (list, optional): A list of legend colors. Defaults to None.
-        builtin_legend (str, optional): Name of the builtin legend to add to the map. Defaults to None.
-
-    """
-    import pkg_resources
-    from .legends import builtin_legends
-
-    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
-    legend_template = os.path.join(pkg_dir, "data/template/legend.html")
-
-    # if "min_width" not in kwargs.keys():
-    #     min_width = None
-    # if "max_width" not in kwargs.keys():
-    #     max_width = None
-    # else:
-    #     max_width = kwargs["max_width"]
-    # if "min_height" not in kwargs.keys():
-    #     min_height = None
-    # else:
-    #     min_height = kwargs["min_height"]
-    # if "max_height" not in kwargs.keys():
-    #     max_height = None
-    # else:
-    #     max_height = kwargs["max_height"]
-    # if "height" not in kwargs.keys():
-    #     height = None
-    # else:
-    #     height = kwargs["height"]
-    # if "width" not in kwargs.keys():
-    #     width = None
-    # else:
-    #     width = kwargs["width"]
-
-    # if width is None:
-    #     max_width = "300px"
-    # if height is None:
-    #     max_height = "400px"
-
-    if not os.path.exists(legend_template):
-        print("The legend template does not exist.")
-        return
-
-    if legend_keys is not None:
-        if not isinstance(legend_keys, list):
-            print("The legend keys must be a list.")
-            return
-    else:
-        legend_keys = ["One", "Two", "Three", "Four", "etc"]
-
-    if legend_colors is not None:
-        if not isinstance(legend_colors, list):
-            print("The legend colors must be a list.")
-            return
-        elif all(isinstance(item, tuple) for item in legend_colors):
-            try:
-                legend_colors = [rgb_to_hex(x) for x in legend_colors]
-            except Exception as e:
-                print(e)
-        elif all((item.startswith("#") and len(item) == 7) for item in legend_colors):
-            pass
-        elif all((len(item) == 6) for item in legend_colors):
-            pass
-        else:
-            print("The legend colors must be a list of tuples.")
-            return
-    else:
-        legend_colors = [
-            "#8DD3C7",
-            "#FFFFB3",
-            "#BEBADA",
-            "#FB8072",
-            "#80B1D3",
-        ]
-
-    if len(legend_keys) != len(legend_colors):
-        print("The legend keys and values must be the same length.")
-        return
-
-    allowed_builtin_legends = builtin_legends.keys()
-    if builtin_legend is not None:
-        if builtin_legend not in allowed_builtin_legends:
-            print(
-                "The builtin legend must be one of the following: {}".format(
-                    ", ".join(allowed_builtin_legends)
-                )
-            )
-            return
-        else:
-            legend_dict = builtin_legends[builtin_legend]
-            legend_keys = list(legend_dict.keys())
-            legend_colors = list(legend_dict.values())
-
-    if legend_dict is not None:
-        if not isinstance(legend_dict, dict):
-            print("The legend dict must be a dictionary.")
-            return
-        else:
-            legend_keys = list(legend_dict.keys())
-            legend_colors = list(legend_dict.values())
-            if all(isinstance(item, tuple) for item in legend_colors):
-                try:
-                    legend_colors = [rgb_to_hex(x) for x in legend_colors]
-                except Exception as e:
-                    print(e)
-
-    header = []
-    content = []
-    footer = []
-
-    with open(legend_template) as f:
-        lines = f.readlines()
-        lines[3] = lines[3].replace("Legend", legend_title)
-        header = lines[:6]
-        footer = lines[11:]
-
-    for index, key in enumerate(legend_keys):
-        color = legend_colors[index]
-        if not color.startswith("#"):
-            color = "#" + color
-        item = "      <li><span style='background:{};'></span>{}</li>\n".format(
-            color, key
-        )
-        content.append(item)
-
-    legend_html = header + content + footer
-    legend_text = "".join(legend_html)
-    return legend_text
 
 
 def streamlit_legend(html, width=None, height=None, scrolling=True):
