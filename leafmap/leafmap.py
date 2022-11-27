@@ -1020,6 +1020,14 @@ class Map(ipyleaflet.Map):
         right_layer="OpenTopoMap",
         left_args={},
         right_args={},
+        zoom_control=True,
+        fullscreen_control=True,
+        add_close_button=False,
+        left_label=None,
+        right_label=None,
+        left_position="bottomleft",
+        right_position="bottomright",
+        widget_layout=None,
     ):
         """Adds split map.
 
@@ -1048,6 +1056,26 @@ class Map(ipyleaflet.Map):
         bounds = None
 
         try:
+
+            controls = self.controls
+            layers = self.layers
+            self.clear_controls()
+
+            if zoom_control:
+                self.add_control(ipyleaflet.ZoomControl())
+            if fullscreen_control:
+                self.add_control(ipyleaflet.FullScreenControl())
+
+            if left_label is not None:
+                left_name = left_label
+            else:
+                left_name = "Left Layer"
+
+            if right_label is not None:
+                right_name = right_label
+            else:
+                right_name = "Right Layer"
+
             if left_layer in basemaps.keys():
                 left_layer = basemaps[left_layer]
             elif isinstance(left_layer, str):
@@ -1057,7 +1085,7 @@ class Map(ipyleaflet.Map):
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = ipyleaflet.TileLayer(
                         url=url,
-                        name="Left Layer",
+                        name=left_name,
                         attribution=" ",
                     )
                 elif left_layer.startswith("http") and left_layer.endswith(".geojson"):
@@ -1084,7 +1112,7 @@ class Map(ipyleaflet.Map):
                 else:
                     left_layer = ipyleaflet.TileLayer(
                         url=left_layer,
-                        name="Left Layer",
+                        name=left_name,
                         attribution=" ",
                         **left_args,
                     )
@@ -1109,7 +1137,7 @@ class Map(ipyleaflet.Map):
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=url,
-                        name="Right Layer",
+                        name=right_name,
                         attribution=" ",
                     )
                 elif right_layer.startswith("http") and right_layer.endswith(
@@ -1139,7 +1167,7 @@ class Map(ipyleaflet.Map):
                 else:
                     right_layer = ipyleaflet.TileLayer(
                         url=right_layer,
-                        name="Right Layer",
+                        name=right_name,
                         attribution=" ",
                         **right_args,
                     )
@@ -1155,6 +1183,27 @@ class Map(ipyleaflet.Map):
                 left_layer=left_layer, right_layer=right_layer
             )
             self.add_control(control)
+
+            if left_label is not None:
+                if widget_layout is None:
+                    widget_layout = widgets.Layout(padding="0px 4px 0px 4px")
+                left_widget = widgets.HTML(value=left_label, layout=widget_layout)
+
+                left_control = ipyleaflet.WidgetControl(
+                    widget=left_widget, position=left_position
+                )
+                self.add_control(left_control)
+
+            if right_label is not None:
+
+                if widget_layout is None:
+                    widget_layout = widgets.Layout(padding="0px 4px 0px 4px")
+                right_widget = widgets.HTML(value=right_label, layout=widget_layout)
+                right_control = ipyleaflet.WidgetControl(
+                    widget=right_widget, position=right_position
+                )
+                self.add_control(right_control)
+
             if bounds is not None:
                 self.fit_bounds(bounds)
 
@@ -2097,9 +2146,9 @@ class Map(ipyleaflet.Map):
 
                         output = os.path.abspath(output)
                         obj = pyodide.http.open_url(in_geojson)
-                        with open(output, 'w') as fd:
+                        with open(output, "w") as fd:
                             shutil.copyfileobj(obj, fd)
-                        with open(output, 'r') as fd:
+                        with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
                         in_geojson = github_raw_url(in_geojson)
@@ -3537,6 +3586,69 @@ class Map(ipyleaflet.Map):
             return geometry_bounds(self.user_roi, decimals=decimals)
         else:
             return None
+
+    def add_widget(self, content, position="bottomright", **kwargs):
+        """Add a widget (e.g., text, HTML, figure) to the map.
+
+        Args:
+            content (str | ipywidgets.Widget | object): The widget to add.
+            position (str, optional): The position of the widget. Defaults to "bottomright".
+            **kwargs: Other keyword arguments for ipywidgets.HTML().
+        """
+
+        allowed_positions = ["topleft", "topright", "bottomleft", "bottomright"]
+
+        if position not in allowed_positions:
+            raise Exception(f"position must be one of {allowed_positions}")
+
+        if "layout" not in kwargs:
+            kwargs["layout"] = widgets.Layout(padding="0px 4px 0px 4px")
+        try:
+            if isinstance(content, str):
+                widget = widgets.HTML(value=content, **kwargs)
+                control = ipyleaflet.WidgetControl(widget=widget, position=position)
+            else:
+                output = widgets.Output(**kwargs)
+                with output:
+                    display(content)
+                control = ipyleaflet.WidgetControl(widget=output, position=position)
+            self.add_control(control)
+
+        except Exception as e:
+            raise Exception(f"Error adding widget: {e}")
+
+    def add_image(self, image, position="bottomright", **kwargs):
+        """Add an image to the map.
+
+        Args:
+            image (str | ipywidgets.Image): The image to add.
+            position (str, optional): The position of the image, can be one of "topleft",
+                "topright", "bottomleft", "bottomright". Defaults to "bottomright".
+
+        """
+
+        if isinstance(image, str):
+            if image.startswith("http"):
+                image = widgets.Image(value=requests.get(image).content, **kwargs)
+            elif os.path.exists(image):
+                with open(image, "rb") as f:
+                    image = widgets.Image(value=f.read(), **kwargs)
+        elif isinstance(image, widgets.Image):
+            pass
+        else:
+            raise Exception("Invalid image")
+
+        self.add_widget(image, position=position)
+
+    def add_html(self, html, position="bottomright", **kwargs):
+        """Add HTML to the map.
+
+        Args:
+            html (str): The HTML to add.
+            position (str, optional): The position of the HTML, can be one of "topleft",
+                "topright", "bottomleft", "bottomright". Defaults to "bottomright".
+        """
+        self.add_widget(html, position=position, **kwargs)
 
 
 # The functions below are outside the Map class.
