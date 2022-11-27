@@ -1,12 +1,14 @@
 # Changelog
 
-## v0.13.3 - Nov 25, 2022
+## v0.14.0 - Nov 27, 2022
 
 **New Features**
 
--   Added function for downloading files using pyodide ([#320](https://github.com/giswqs/leafmap/pull/320))
--   Added JupyterLite badge to notebook examples ([#319](https://github.com/giswqs/leafmap/pull/319))
--   Added gdown and JupyterLite badge to docs ([#318](https://github.com/giswqs/leafmap/pull/318))
+-   Added functions for creating legends and adding widgets to the map ([#321](https://github.com/giswqs/leafmap/pull/321))
+-   New functions include `create_legend()`, `add_legend()`, `add_text()`, `add_image()`, `add_html()`, and `add_widget()`
+-   Added two notebook examples for using newly added functions
+-   Split-map now supports adding multiple legends
+-   Added ESA World Cover 2021 basemaps
 
 ## v0.13.1 - Nov 24, 2022
 
