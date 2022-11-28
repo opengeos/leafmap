@@ -7543,3 +7543,890 @@ def create_legend(
             f.write(legend_text)
     else:
         return legend_text
+
+
+def png_to_gif(in_dir, out_gif, fps=10, loop=0):
+    """Convert a list of png images to gif.
+
+    Args:
+        in_dir (str): The input directory containing png images.
+        out_gif (str): The output file path to the gif.
+        fps (int, optional): Frames per second. Defaults to 10.
+        loop (bool, optional): controls how many times the animation repeats. 1 means that the animation will play once and then stop (displaying the last frame). A value of 0 means that the animation will repeat forever. Defaults to 0.
+
+    Raises:
+        FileNotFoundError: No png images could be found.
+    """
+    import glob
+
+    from PIL import Image
+
+    if not out_gif.endswith(".gif"):
+        raise ValueError("The out_gif must be a gif file.")
+
+    out_gif = os.path.abspath(out_gif)
+
+    out_dir = os.path.dirname(out_gif)
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    # Create the frames
+    frames = []
+    imgs = list(glob.glob(os.path.join(in_dir, "*.png")))
+    imgs.sort()
+
+    if len(imgs) == 0:
+        raise FileNotFoundError(f"No png could be found in {in_dir}.")
+
+    for i in imgs:
+        new_frame = Image.open(i)
+        frames.append(new_frame)
+
+    # Save into a GIF file that loops forever
+    frames[0].save(
+        out_gif,
+        format="GIF",
+        append_images=frames[1:],
+        save_all=True,
+        duration=1000 / fps,
+        loop=loop,
+    )
+
+
+def add_text_to_gif(
+    in_gif,
+    out_gif,
+    xy=None,
+    text_sequence=None,
+    font_type="arial.ttf",
+    font_size=20,
+    font_color="#000000",
+    add_progress_bar=True,
+    progress_bar_color="white",
+    progress_bar_height=5,
+    duration=100,
+    loop=0,
+):
+    """Adds animated text to a GIF image.
+
+    Args:
+        in_gif (str): The file path to the input GIF image.
+        out_gif (str): The file path to the output GIF image.
+        xy (tuple, optional): Top left corner of the text. It can be formatted like this: (10, 10) or ('15%', '25%'). Defaults to None.
+        text_sequence (int, str, list, optional): Text to be drawn. It can be an integer number, a string, or a list of strings. Defaults to None.
+        font_type (str, optional): Font type. Defaults to "arial.ttf".
+        font_size (int, optional): Font size. Defaults to 20.
+        font_color (str, optional): Font color. It can be a string (e.g., 'red'), rgb tuple (e.g., (255, 127, 0)), or hex code (e.g., '#ff00ff').  Defaults to '#000000'.
+        add_progress_bar (bool, optional): Whether to add a progress bar at the bottom of the GIF. Defaults to True.
+        progress_bar_color (str, optional): Color for the progress bar. Defaults to 'white'.
+        progress_bar_height (int, optional): Height of the progress bar. Defaults to 5.
+        duration (int, optional): controls how long each frame will be displayed for, in milliseconds. It is the inverse of the frame rate. Setting it to 100 milliseconds gives 10 frames per second. You can decrease the duration to give a smoother animation.. Defaults to 100.
+        loop (int, optional): controls how many times the animation repeats. The default, 1, means that the animation will play once and then stop (displaying the last frame). A value of 0 means that the animation will repeat forever. Defaults to 0.
+
+    """
+    import io
+    import warnings
+
+    import pkg_resources
+    from PIL import Image, ImageDraw, ImageFont, ImageSequence
+
+    warnings.simplefilter("ignore")
+    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+    default_font = os.path.join(pkg_dir, "data/fonts/arial.ttf")
+
+    in_gif = os.path.abspath(in_gif)
+    out_gif = os.path.abspath(out_gif)
+
+    if not os.path.exists(in_gif):
+        print("The input gif file does not exist.")
+        return
+
+    if not os.path.exists(os.path.dirname(out_gif)):
+        os.makedirs(os.path.dirname(out_gif))
+
+    if font_type == "arial.ttf":
+        font = ImageFont.truetype(default_font, font_size)
+    elif font_type == "alibaba.otf":
+        default_font = os.path.join(pkg_dir, "data/fonts/alibaba.otf")
+        font = ImageFont.truetype(default_font, font_size)
+    else:
+        try:
+            font_list = system_fonts(show_full_path=True)
+            font_names = [os.path.basename(f) for f in font_list]
+            if (font_type in font_list) or (font_type in font_names):
+                font = ImageFont.truetype(font_type, font_size)
+            else:
+                print(
+                    "The specified font type could not be found on your system. Using the default font instead."
+                )
+                font = ImageFont.truetype(default_font, font_size)
+        except Exception as e:
+            print(e)
+            font = ImageFont.truetype(default_font, font_size)
+
+    color = check_color(font_color)
+    progress_bar_color = check_color(progress_bar_color)
+
+    try:
+        image = Image.open(in_gif)
+    except Exception as e:
+        print("An error occurred while opening the gif.")
+        print(e)
+        return
+
+    count = image.n_frames
+    W, H = image.size
+    progress_bar_widths = [i * 1.0 / count * W for i in range(1, count + 1)]
+    progress_bar_shapes = [
+        [(0, H - progress_bar_height), (x, H)] for x in progress_bar_widths
+    ]
+
+    if xy is None:
+        # default text location is 5% width and 5% height of the image.
+        xy = (int(0.05 * W), int(0.05 * H))
+    elif (xy is not None) and (not isinstance(xy, tuple)) and (len(xy) == 2):
+        print("xy must be a tuple, e.g., (10, 10), ('10%', '10%')")
+        return
+    elif all(isinstance(item, int) for item in xy) and (len(xy) == 2):
+        x, y = xy
+        if (x > 0) and (x < W) and (y > 0) and (y < H):
+            pass
+        else:
+            print(
+                f"xy is out of bounds. x must be within [0, {W}], and y must be within [0, {H}]"
+            )
+            return
+    elif all(isinstance(item, str) for item in xy) and (len(xy) == 2):
+        x, y = xy
+        if ("%" in x) and ("%" in y):
+            try:
+                x = int(float(x.replace("%", "")) / 100.0 * W)
+                y = int(float(y.replace("%", "")) / 100.0 * H)
+                xy = (x, y)
+            except Exception:
+                raise Exception(
+                    "The specified xy is invalid. It must be formatted like this ('10%', '10%')"
+                )
+    else:
+        print(
+            "The specified xy is invalid. It must be formatted like this: (10, 10) or ('10%', '10%')"
+        )
+        return
+
+    if text_sequence is None:
+        text = [str(x) for x in range(1, count + 1)]
+    elif isinstance(text_sequence, int):
+        text = [str(x) for x in range(text_sequence, text_sequence + count + 1)]
+    elif isinstance(text_sequence, str):
+        try:
+            text_sequence = int(text_sequence)
+            text = [str(x) for x in range(text_sequence, text_sequence + count + 1)]
+        except Exception:
+            text = [text_sequence] * count
+    elif isinstance(text_sequence, list) and len(text_sequence) != count:
+        print(
+            f"The length of the text sequence must be equal to the number ({count}) of frames in the gif."
+        )
+        return
+    else:
+        text = [str(x) for x in text_sequence]
+
+    try:
+
+        frames = []
+        # Loop over each frame in the animated image
+        for index, frame in enumerate(ImageSequence.Iterator(image)):
+            # Draw the text on the frame
+            frame = frame.convert("RGB")
+            draw = ImageDraw.Draw(frame)
+            # w, h = draw.textsize(text[index])
+            draw.text(xy, text[index], font=font, fill=color)
+            if add_progress_bar:
+                draw.rectangle(progress_bar_shapes[index], fill=progress_bar_color)
+            del draw
+
+            b = io.BytesIO()
+            frame.save(b, format="GIF")
+            frame = Image.open(b)
+
+            frames.append(frame)
+        # https://www.pythoninformer.com/python-libraries/pillow/creating-animated-gif/
+        # Save the frames as a new image
+
+        frames[0].save(
+            out_gif,
+            save_all=True,
+            append_images=frames[1:],
+            duration=duration,
+            loop=loop,
+            optimize=True,
+        )
+    except Exception as e:
+        print(e)
+
+
+def add_progress_bar_to_gif(
+    in_gif,
+    out_gif,
+    progress_bar_color="blue",
+    progress_bar_height=5,
+    duration=100,
+    loop=0,
+):
+    """Adds a progress bar to a GIF image.
+
+    Args:
+        in_gif (str): The file path to the input GIF image.
+        out_gif (str): The file path to the output GIF image.
+        progress_bar_color (str, optional): Color for the progress bar. Defaults to 'white'.
+        progress_bar_height (int, optional): Height of the progress bar. Defaults to 5.
+        duration (int, optional): controls how long each frame will be displayed for, in milliseconds. It is the inverse of the frame rate. Setting it to 100 milliseconds gives 10 frames per second. You can decrease the duration to give a smoother animation.. Defaults to 100.
+        loop (int, optional): controls how many times the animation repeats. The default, 1, means that the animation will play once and then stop (displaying the last frame). A value of 0 means that the animation will repeat forever. Defaults to 0.
+
+    """
+    import io
+    import warnings
+
+    from PIL import Image, ImageDraw, ImageSequence
+
+    warnings.simplefilter("ignore")
+
+    in_gif = os.path.abspath(in_gif)
+    out_gif = os.path.abspath(out_gif)
+
+    if not os.path.exists(in_gif):
+        print("The input gif file does not exist.")
+        return
+
+    if not os.path.exists(os.path.dirname(out_gif)):
+        os.makedirs(os.path.dirname(out_gif))
+
+    progress_bar_color = check_color(progress_bar_color)
+
+    try:
+        image = Image.open(in_gif)
+    except Exception as e:
+        raise Exception("An error occurred while opening the gif.")
+
+    count = image.n_frames
+    W, H = image.size
+    progress_bar_widths = [i * 1.0 / count * W for i in range(1, count + 1)]
+    progress_bar_shapes = [
+        [(0, H - progress_bar_height), (x, H)] for x in progress_bar_widths
+    ]
+
+    try:
+
+        frames = []
+        # Loop over each frame in the animated image
+        for index, frame in enumerate(ImageSequence.Iterator(image)):
+            # Draw the text on the frame
+            frame = frame.convert("RGB")
+            draw = ImageDraw.Draw(frame)
+            # w, h = draw.textsize(text[index])
+            draw.rectangle(progress_bar_shapes[index], fill=progress_bar_color)
+            del draw
+
+            b = io.BytesIO()
+            frame.save(b, format="GIF")
+            frame = Image.open(b)
+
+            frames.append(frame)
+        # https://www.pythoninformer.com/python-libraries/pillow/creating-animated-gif/
+        # Save the frames as a new image
+
+        frames[0].save(
+            out_gif,
+            save_all=True,
+            append_images=frames[1:],
+            duration=duration,
+            loop=loop,
+            optimize=True,
+        )
+    except Exception as e:
+        raise Exception(e)
+
+
+def add_image_to_gif(
+    in_gif, out_gif, in_image, xy=None, image_size=(80, 80), circle_mask=False
+):
+    """Adds an image logo to a GIF image.
+
+    Args:
+        in_gif (str): Input file path to the GIF image.
+        out_gif (str): Output file path to the GIF image.
+        in_image (str): Input file path to the image.
+        xy (tuple, optional): Top left corner of the text. It can be formatted like this: (10, 10) or ('15%', '25%'). Defaults to None.
+        image_size (tuple, optional): Resize image. Defaults to (80, 80).
+        circle_mask (bool, optional): Whether to apply a circle mask to the image. This only works with non-png images. Defaults to False.
+    """
+    import io
+    import warnings
+
+    from PIL import Image, ImageDraw, ImageSequence
+
+    warnings.simplefilter("ignore")
+
+    in_gif = os.path.abspath(in_gif)
+
+    is_url = False
+    if in_image.startswith("http"):
+        is_url = True
+
+    if not os.path.exists(in_gif):
+        print("The input gif file does not exist.")
+        return
+
+    if (not is_url) and (not os.path.exists(in_image)):
+        print("The provided logo file does not exist.")
+        return
+
+    out_dir = check_dir((os.path.dirname(out_gif)))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    try:
+        gif = Image.open(in_gif)
+    except Exception as e:
+        print("An error occurred while opening the image.")
+        print(e)
+        return
+
+    logo_raw_image = None
+    try:
+        if in_image.startswith("http"):
+            logo_raw_image = open_image_from_url(in_image)
+        else:
+            in_image = os.path.abspath(in_image)
+            logo_raw_image = Image.open(in_image)
+    except Exception as e:
+        print(e)
+
+    logo_raw_size = logo_raw_image.size
+
+    ratio = max(
+        logo_raw_size[0] / image_size[0],
+        logo_raw_size[1] / image_size[1],
+    )
+    image_resize = (int(logo_raw_size[0] / ratio), int(logo_raw_size[1] / ratio))
+    image_size = min(logo_raw_size[0], image_size[0]), min(
+        logo_raw_size[1], image_size[1]
+    )
+
+    logo_image = logo_raw_image.convert("RGBA")
+    logo_image.thumbnail(image_size, Image.ANTIALIAS)
+
+    gif_width, gif_height = gif.size
+    mask_im = None
+
+    if circle_mask:
+        mask_im = Image.new("L", image_size, 0)
+        draw = ImageDraw.Draw(mask_im)
+        draw.ellipse((0, 0, image_size[0], image_size[1]), fill=255)
+
+    if has_transparency(logo_raw_image):
+        mask_im = logo_image.copy()
+
+    if xy is None:
+        # default logo location is 5% width and 5% height of the image.
+        delta = 10
+        xy = (gif_width - image_resize[0] - delta, gif_height - image_resize[1] - delta)
+        # xy = (int(0.05 * gif_width), int(0.05 * gif_height))
+    elif (xy is not None) and (not isinstance(xy, tuple)) and (len(xy) == 2):
+        print("xy must be a tuple, e.g., (10, 10), ('10%', '10%')")
+        return
+    elif all(isinstance(item, int) for item in xy) and (len(xy) == 2):
+        x, y = xy
+        if (x > 0) and (x < gif_width) and (y > 0) and (y < gif_height):
+            pass
+        else:
+            print(
+                "xy is out of bounds. x must be within [0, {}], and y must be within [0, {}]".format(
+                    gif_width, gif_height
+                )
+            )
+            return
+    elif all(isinstance(item, str) for item in xy) and (len(xy) == 2):
+        x, y = xy
+        if ("%" in x) and ("%" in y):
+            try:
+                x = int(float(x.replace("%", "")) / 100.0 * gif_width)
+                y = int(float(y.replace("%", "")) / 100.0 * gif_height)
+                xy = (x, y)
+            except Exception:
+                raise Exception(
+                    "The specified xy is invalid. It must be formatted like this ('10%', '10%')"
+                )
+
+    else:
+        raise Exception(
+            "The specified xy is invalid. It must be formatted like this: (10, 10) or ('10%', '10%')"
+        )
+
+    try:
+
+        frames = []
+        for _, frame in enumerate(ImageSequence.Iterator(gif)):
+            frame = frame.convert("RGBA")
+            frame.paste(logo_image, xy, mask_im)
+
+            b = io.BytesIO()
+            frame.save(b, format="GIF")
+            frame = Image.open(b)
+            frames.append(frame)
+
+        frames[0].save(out_gif, save_all=True, append_images=frames[1:])
+    except Exception as e:
+        print(e)
+
+
+def reduce_gif_size(in_gif, out_gif=None):
+    """Reduces a GIF image using ffmpeg.
+
+    Args:
+        in_gif (str): The input file path to the GIF image.
+        out_gif (str, optional): The output file path to the GIF image. Defaults to None.
+    """
+    import ffmpeg
+    import warnings
+
+    warnings.filterwarnings("ignore")
+
+    if not is_tool("ffmpeg"):
+        print("ffmpeg is not installed on your computer.")
+        return
+
+    if not os.path.exists(in_gif):
+        print("The input gif file does not exist.")
+        return
+
+    if out_gif is None:
+        out_gif = in_gif
+    elif not os.path.exists(os.path.dirname(out_gif)):
+        os.makedirs(os.path.dirname(out_gif))
+
+    if in_gif == out_gif:
+        tmp_gif = in_gif.replace(".gif", "_tmp.gif")
+        shutil.copyfile(in_gif, tmp_gif)
+        stream = ffmpeg.input(tmp_gif)
+        stream = ffmpeg.output(stream, in_gif, loglevel="quiet").overwrite_output()
+        ffmpeg.run(stream)
+        os.remove(tmp_gif)
+
+    else:
+        stream = ffmpeg.input(in_gif)
+        stream = ffmpeg.output(stream, out_gif, loglevel="quiet").overwrite_output()
+        ffmpeg.run(stream)
+
+
+def make_gif(images, out_gif, ext="jpg", fps=10, loop=0, mp4=False, clean_up=False):
+    """Creates a gif from a list of images.
+
+    Args:
+        images (list | str): The list of images or input directory to create the gif from.
+        out_gif (str): File path to the output gif.
+        ext (str, optional): The extension of the images. Defaults to 'jpg'.
+        fps (int, optional): The frames per second of the gif. Defaults to 10.
+        loop (int, optional): The number of times to loop the gif. Defaults to 0.
+        mp4 (bool, optional): Whether to convert the gif to mp4. Defaults to False.
+
+    """
+    import glob
+    from PIL import Image
+
+    if isinstance(images, str) and os.path.isdir(images):
+        images = list(glob.glob(os.path.join(images, f"*.{ext}")))
+        if len(images) == 0:
+            raise ValueError("No images found in the input directory.")
+    elif not isinstance(images, list):
+        raise ValueError("images must be a list or a path to the image directory.")
+
+    images.sort()
+
+    frames = [Image.open(image) for image in images]
+    frame_one = frames[0]
+    frame_one.save(
+        out_gif,
+        format="GIF",
+        append_images=frames,
+        save_all=True,
+        duration=int(1000 / fps),
+        loop=loop,
+    )
+
+    if mp4:
+        if not is_tool("ffmpeg"):
+            print("ffmpeg is not installed on your computer.")
+            return
+
+        if os.path.exists(out_gif):
+            out_mp4 = out_gif.replace(".gif", ".mp4")
+            cmd = f"ffmpeg -loglevel error -i {out_gif} -vcodec libx264 -crf 25 -pix_fmt yuv420p {out_mp4}"
+            os.system(cmd)
+            if not os.path.exists(out_mp4):
+                raise Exception(f"Failed to create mp4 file.")
+    if clean_up:
+        for image in images:
+            os.remove(image)
+
+
+def gif_to_mp4(in_gif, out_mp4):
+    """Converts a gif to mp4.
+
+    Args:
+        in_gif (str): The input gif file.
+        out_mp4 (str): The output mp4 file.
+    """
+    from PIL import Image
+
+    if not os.path.exists(in_gif):
+        raise FileNotFoundError(f"{in_gif} does not exist.")
+
+    out_mp4 = os.path.abspath(out_mp4)
+    if not out_mp4.endswith(".mp4"):
+        out_mp4 = out_mp4 + ".mp4"
+
+    if not os.path.exists(os.path.dirname(out_mp4)):
+        os.makedirs(os.path.dirname(out_mp4))
+
+    if not is_tool("ffmpeg"):
+        print("ffmpeg is not installed on your computer.")
+        return
+
+    width, height = Image.open(in_gif).size
+
+    if width % 2 == 0 and height % 2 == 0:
+        cmd = f"ffmpeg -loglevel error -i {in_gif} -vcodec libx264 -crf 25 -pix_fmt yuv420p {out_mp4}"
+        os.system(cmd)
+    else:
+        width += width % 2
+        height += height % 2
+        cmd = f"ffmpeg -loglevel error -i {in_gif} -vf scale={width}:{height} -vcodec libx264 -crf 25 -pix_fmt yuv420p {out_mp4}"
+        os.system(cmd)
+
+    if not os.path.exists(out_mp4):
+        raise Exception(f"Failed to create mp4 file.")
+
+
+def merge_gifs(in_gifs, out_gif):
+    """Merge multiple gifs into one.
+
+    Args:
+        in_gifs (str | list): The input gifs as a list or a directory path.
+        out_gif (str): The output gif.
+
+    Raises:
+        Exception:  Raise exception when gifsicle is not installed.
+    """
+    import glob
+
+    try:
+        if isinstance(in_gifs, str) and os.path.isdir(in_gifs):
+            in_gifs = glob.glob(os.path.join(in_gifs, "*.gif"))
+        elif not isinstance(in_gifs, list):
+            raise Exception("in_gifs must be a list.")
+
+        in_gifs = " ".join(in_gifs)
+
+        cmd = f"gifsicle {in_gifs} > {out_gif}"
+        os.system(cmd)
+
+    except Exception as e:
+        print(
+            "gifsicle is not installed. Run 'sudo apt-get install -y gifsicle' to install it."
+        )
+        print(e)
+
+
+def gif_to_png(in_gif, out_dir=None, prefix="", verbose=True):
+    """Converts a gif to png.
+
+    Args:
+        in_gif (str): The input gif file.
+        out_dir (str, optional): The output directory. Defaults to None.
+        prefix (str, optional): The prefix of the output png files. Defaults to None.
+        verbose (bool, optional): Whether to print the progress. Defaults to True.
+
+    Raises:
+        FileNotFoundError: Raise exception when the input gif does not exist.
+        Exception: Raise exception when ffmpeg is not installed.
+    """
+    import tempfile
+
+    in_gif = os.path.abspath(in_gif)
+    if " " in in_gif:
+        raise Exception("in_gif cannot contain spaces.")
+    if not os.path.exists(in_gif):
+        raise FileNotFoundError(f"{in_gif} does not exist.")
+
+    basename = os.path.basename(in_gif).replace(".gif", "")
+    if out_dir is None:
+        out_dir = os.path.join(tempfile.gettempdir(), basename)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+    elif isinstance(out_dir, str) and not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    elif not isinstance(out_dir, str):
+        raise Exception("out_dir must be a string.")
+
+    out_dir = os.path.abspath(out_dir)
+    cmd = f"ffmpeg -loglevel error -i {in_gif} -vsync 0 {out_dir}/{prefix}%d.png"
+    os.system(cmd)
+
+    if verbose:
+        print(f"Images are saved to {out_dir}")
+
+
+def gif_fading(in_gif, out_gif, duration=1, verbose=True):
+    """Fade in/out the gif.
+
+    Args:
+        in_gif (str): The input gif file. Can be a directory path or http URL, e.g., "https://i.imgur.com/ZWSZC5z.gif"
+        out_gif (str): The output gif file.
+        duration (float, optional): The duration of the fading. Defaults to 1.
+        verbose (bool, optional): Whether to print the progress. Defaults to True.
+
+    Raises:
+        FileNotFoundError: Raise exception when the input gif does not exist.
+        Exception: Raise exception when ffmpeg is not installed.
+    """
+    import glob
+    import tempfile
+
+    current_dir = os.getcwd()
+
+    if isinstance(in_gif, str) and in_gif.startswith("http"):
+        ext = os.path.splitext(in_gif)[1]
+        file_path = temp_file_path(ext)
+        download_from_url(in_gif, file_path, verbose=verbose)
+        in_gif = file_path
+
+    in_gif = os.path.abspath(in_gif)
+    if not in_gif.endswith(".gif"):
+        raise Exception("in_gif must be a gif file.")
+
+    if " " in in_gif:
+        raise Exception("The filename cannot contain spaces.")
+
+    out_gif = os.path.abspath(out_gif)
+    if not os.path.exists(os.path.dirname(out_gif)):
+        os.makedirs(os.path.dirname(out_gif))
+
+    if not os.path.exists(in_gif):
+        raise FileNotFoundError(f"{in_gif} does not exist.")
+
+    basename = os.path.basename(in_gif).replace(".gif", "")
+    temp_dir = os.path.join(tempfile.gettempdir(), basename)
+    if os.path.exists(temp_dir):
+        shutil.rmtree(temp_dir)
+
+    gif_to_png(in_gif, temp_dir, verbose=verbose)
+
+    os.chdir(temp_dir)
+
+    images = list(glob.glob(os.path.join(temp_dir, "*.png")))
+    count = len(images)
+
+    files = []
+    for i in range(1, count + 1):
+        files.append(f"-loop 1 -t {duration} -i {i}.png")
+    inputs = " ".join(files)
+
+    filters = []
+    for i in range(1, count):
+        if i == 1:
+            filters.append(
+                f"\"[1:v][0:v]blend=all_expr='A*(if(gte(T,3),1,T/3))+B*(1-(if(gte(T,3),1,T/3)))'[v0];"
+            )
+        else:
+            filters.append(
+                f"[{i}:v][{i-1}:v]blend=all_expr='A*(if(gte(T,3),1,T/3))+B*(1-(if(gte(T,3),1,T/3)))'[v{i-1}];"
+            )
+
+    last_filter = ""
+    for i in range(count - 1):
+        last_filter += f"[v{i}]"
+    last_filter += f'concat=n={count-1}:v=1:a=0[v]" -map "[v]"'
+    filters.append(last_filter)
+    filters = " ".join(filters)
+
+    cmd = f"ffmpeg -y -loglevel error {inputs} -filter_complex {filters} {out_gif}"
+
+    os.system(cmd)
+    try:
+        shutil.rmtree(temp_dir)
+    except Exception as e:
+        print(e)
+
+    os.chdir(current_dir)
+
+
+def is_tool(name):
+    """Check whether `name` is on PATH and marked as executable."""
+
+    return shutil.which(name) is not None
+
+
+def vector_to_gif(
+    filename,
+    out_gif,
+    colname,
+    vmin=None,
+    vmax=None,
+    step=1,
+    facecolor="black",
+    figsize=(10, 8),
+    padding=3,
+    title=None,
+    add_text=True,
+    xy=("1%", "1%"),
+    fontsize=20,
+    add_progress_bar=True,
+    progress_bar_color="blue",
+    progress_bar_height=5,
+    dpi=300,
+    fps=10,
+    loop=0,
+    mp4=False,
+    keep_png=False,
+    verbose=True,
+    open_args={},
+    plot_args={},
+):
+    """Convert a vector to a gif.
+
+    Args:
+        filename (str): The input vector file. Can be a directory path or http URL, e.g., "https://i.imgur.com/ZWSZC5z.gif"
+        out_gif (str): The output gif file.
+        colname (str): The column name of the vector that contains numerical values.
+        vmin (float, optional): The minimum value to filter the data. Defaults to None.
+        vmax (float, optional): The maximum value to filter the data. Defaults to None.
+        step (float, optional): The step to filter the data. Defaults to 1.
+        facecolor (str, optional): The color to visualize the data. Defaults to "black".
+        figsize (tuple, optional): The figure size. Defaults to (10, 8).
+        padding (int, optional): The padding of the figure tight_layout. Defaults to 3.
+        title (str, optional): The title of the figure. Defaults to None.
+        add_text (bool, optional): Whether to add text to the figure. Defaults to True.
+        xy (tuple, optional): The position of the text from the lower-left corner. Defaults to ("1%", "1%").
+        fontsize (int, optional): The font size of the text. Defaults to 20.
+        add_progress_bar (bool, optional): Whether to add a progress bar to the figure. Defaults to True.
+        progress_bar_color (str, optional): The color of the progress bar. Defaults to "blue".
+        progress_bar_height (int, optional): The height of the progress bar. Defaults to 5.
+        dpi (int, optional): The dpi of the figure. Defaults to 300.
+        fps (int, optional): The frames per seconc (fps) of the gif. Defaults to 10.
+        loop (int, optional): The number of loops of the gif. Defaults to 0, infinite loop.
+        mp4 (bool, optional): Whether to convert the gif to mp4. Defaults to False.
+        keep_png (bool, optional): Whether to keep the png files. Defaults to False.
+        verbose (bool, optional): Whether to print the progress. Defaults to True.
+        open_args (dict, optional): The arguments for the geopandas.read_file() function. Defaults to {}.
+        plot_args (dict, optional): The arguments for the geopandas.GeoDataFrame.plot() function. Defaults to {}.
+
+    """
+    import geopandas as gpd
+    import matplotlib.pyplot as plt
+
+    out_dir = os.path.dirname(out_gif)
+    tmp_dir = os.path.join(out_dir, "tmp_png")
+    if not os.path.exists(tmp_dir):
+        os.makedirs(tmp_dir)
+
+    if isinstance(filename, str):
+        gdf = gpd.read_file(filename, **open_args)
+    elif isinstance(filename, gpd.GeoDataFrame):
+        gdf = filename
+    else:
+        raise ValueError(
+            "filename must be a string or a geopandas.GeoDataFrame object."
+        )
+
+    bbox = gdf.total_bounds
+
+    if colname not in gdf.columns:
+        raise Exception(
+            f"{colname} is not in the columns of the GeoDataFrame. It must be one of {gdf.columns}"
+        )
+
+    values = gdf[colname].unique().tolist()
+    values.sort()
+
+    if vmin is None:
+        vmin = values[0]
+    if vmax is None:
+        vmax = values[-1]
+
+    options = range(vmin, vmax + step, step)
+
+    W = bbox[2] - bbox[0]
+    H = bbox[3] - bbox[1]
+
+    if xy is None:
+        # default text location is 5% width and 5% height of the image.
+        xy = (int(0.05 * W), int(0.05 * H))
+    elif (xy is not None) and (not isinstance(xy, tuple)) and (len(xy) == 2):
+        raise Exception("xy must be a tuple, e.g., (10, 10), ('10%', '10%')")
+
+    elif all(isinstance(item, int) for item in xy) and (len(xy) == 2):
+        x, y = xy
+        if (x > 0) and (x < W) and (y > 0) and (y < H):
+            pass
+        else:
+            print(
+                f"xy is out of bounds. x must be within [0, {W}], and y must be within [0, {H}]"
+            )
+            return
+    elif all(isinstance(item, str) for item in xy) and (len(xy) == 2):
+        x, y = xy
+        if ("%" in x) and ("%" in y):
+            try:
+                x = float(x.replace("%", "")) / 100.0 * W
+                y = float(y.replace("%", "")) / 100.0 * H
+            except Exception:
+                raise Exception(
+                    "The specified xy is invalid. It must be formatted like this ('10%', '10%')"
+                )
+    else:
+        raise Exception(
+            "The specified xy is invalid. It must be formatted like this: (10, 10) or ('10%', '10%')"
+        )
+
+    x = bbox[0] + x
+    y = bbox[1] + y
+
+    for index, v in enumerate(options):
+        if verbose:
+            print(f"Processing {index+1}/{len(options)}: {v}...")
+        yrdf = gdf[gdf[colname] <= v]
+        fig, ax = plt.subplots()
+        ax = yrdf.plot(facecolor=facecolor, figsize=figsize, **plot_args)
+        ax.set_title(title, fontsize=fontsize)
+        ax.set_axis_off()
+        ax.set_xlim([bbox[0], bbox[2]])
+        ax.set_ylim([bbox[1], bbox[3]])
+        if add_text:
+            ax.text(x, y, v, fontsize=fontsize)
+        fig = ax.get_figure()
+        plt.tight_layout(pad=padding)
+        fig.savefig(tmp_dir + os.sep + "%s.png" % v, dpi=dpi)
+        plt.clf()
+        plt.close("all")
+
+    png_to_gif(tmp_dir, out_gif, fps=fps, loop=loop)
+
+    if add_progress_bar:
+        add_progress_bar_to_gif(
+            out_gif,
+            out_gif,
+            progress_bar_color,
+            progress_bar_height,
+            duration=1000 / fps,
+            loop=loop,
+        )
+
+    if mp4:
+        gif_to_mp4(out_gif, out_gif.replace(".gif", ".mp4"))
+
+    if not keep_png:
+        shutil.rmtree(tmp_dir)
+
+    if verbose:
+        print(f"Done. The GIF is saved to {out_gif}.")
