@@ -72,9 +72,9 @@
 55. LiDAR data analysis and visualization with whitebox and leafmap ([notebook](https://leafmap.org/notebooks/55_lidar))
 56. Downloading 10-m National Elevation Dataset (NED) with only one line of code ([notebook](https://leafmap.org/notebooks/56_download_ned))
 57. Download data from The National Map ([notebook](https://leafmap.org/notebooks/57_national_map))
-58. Creating interactive maps with bokeh ([notebook](https://leafmap.org/notebooks/58_bokeh))
-59. Creating multiple legends and add them to the map ([notebook](https://leafmap.org/notebooks/59_create_legend))
-60. Adding text, images, HTML, and widgets to the map ([notebook](https://leafmap.org/notebooks/60_add_widget))
+58. Creating legends using leafmap with only one line of code ([notebook](https://leafmap.org/notebooks/59_create_legend))
+59. Adding text, images, HTML, and widgets to the map ([notebook](https://leafmap.org/notebooks/60_add_widget))
+60. Creating an animated GIF from a vector dataset ([notebook](https://leafmap.org/notebooks/61_vector_to_gif))
 
 ## Demo
 
@@ -82,6 +82,6 @@
 
 ## YouTube Channel
 
-I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospaital tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
+I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/giswqs/leafmap/issues).
 
 [![Earth Engine Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://youtube.com/@giswqs)

@@ -62,8 +62,9 @@
 56. Downloading 10-m National Elevation Dataset (NED) with only one line of code ([notebook](https://leafmap.org/notebooks/56_download_ned))
 57. Download data from The National Map ([notebook](https://leafmap.org/notebooks/57_national_map))
 58. Creating interactive maps with bokeh ([notebook](https://leafmap.org/notebooks/58_bokeh))
-59. Creating multiple legends and add them to the map ([notebook](https://leafmap.org/notebooks/59_create_legend))
+59. Creating legends using leafmap with only one line of code ([notebook](https://leafmap.org/notebooks/59_create_legend))
 60. Adding text, images, HTML, and widgets to the map ([notebook](https://leafmap.org/notebooks/60_add_widget))
+61. Creating an animated GIF from a vector dataset ([notebook](https://leafmap.org/notebooks/61_vector_to_gif))
 
 ## Demo
 
