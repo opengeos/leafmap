@@ -125,7 +125,7 @@ class Map:
         url,
         attribution="",
         bands=None,
-        titiler_endpoint="https://titiler.xyz",
+        titiler_endpoint=None,
         cog_args={},
         fit_bounds=True,
         **kwargs,

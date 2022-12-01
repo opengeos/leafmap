@@ -126,10 +126,13 @@ def check_titiler_endpoint(titiler_endpoint=None):
         object: A titiler endpoint.
     """
     if titiler_endpoint is None:
-        if os.environ.get("TITILER_ENDPOINT") == "planetary-computer":
-            titiler_endpoint = PlanetaryComputerEndpoint()
+        if os.environ.get("TITILER_ENDPOINT") is not None:
+            titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
+
+            if titiler_endpoint == "planetary-computer":
+                titiler_endpoint = PlanetaryComputerEndpoint()
         else:
-            titiler_endpoint = TitilerEndpoint()
+            titiler_endpoint = "https://titiler.xyz"
     elif titiler_endpoint in ["planetary-computer", "pc"]:
         titiler_endpoint = PlanetaryComputerEndpoint()
 
@@ -1007,7 +1010,7 @@ def create_code_cell(code="", where="below"):
     )
 
 
-def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
+def cog_tile(url, bands=None, titiler_endpoint=None, **kwargs):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
         Source code adapted from https://developmentseed.org/titiler/examples/notebooks/Working_with_CloudOptimizedGeoTIFF_simple/
 
@@ -1021,6 +1024,8 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
     Returns:
         tuple: Returns the COG Tile layer URL and bounds.
     """
+
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
     kwargs["url"] = url
 
@@ -1082,7 +1087,7 @@ def cog_tile(url, bands=None, titiler_endpoint="https://titiler.xyz", **kwargs):
 
 
 def cog_tile_vmin_vmax(
-    url, bands=None, titiler_endpoint="https://titiler.xyz", percentile=True, **kwargs
+    url, bands=None, titiler_endpoint=None, percentile=True, **kwargs
 ):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG) and return the minimum and maximum values.
 
@@ -1094,6 +1099,8 @@ def cog_tile_vmin_vmax(
     Returns:
         tuple: Returns the minimum and maximum values.
     """
+
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     stats = cog_stats(url, titiler_endpoint)
 
     if isinstance(bands, str):
@@ -1114,7 +1121,7 @@ def cog_tile_vmin_vmax(
 
 def cog_mosaic(
     links,
-    titiler_endpoint="https://titiler.xyz",
+    titiler_endpoint=None,
     username="anonymous",
     layername=None,
     overwrite=False,
@@ -1138,6 +1145,7 @@ def cog_mosaic(
         str: The tile URL for the COG mosaic.
     """
 
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     if layername is None:
         layername = "layer_" + random_string(5)
 
@@ -1179,7 +1187,7 @@ def cog_mosaic(
 def cog_mosaic_from_file(
     filepath,
     skip_rows=0,
-    titiler_endpoint="https://titiler.xyz",
+    titiler_endpoint=None,
     username="anonymous",
     layername=None,
     overwrite=False,
@@ -1202,6 +1210,7 @@ def cog_mosaic_from_file(
     """
     import urllib
 
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     links = []
     if filepath.startswith("http"):
         data = urllib.request.urlopen(filepath)
@@ -1220,7 +1229,7 @@ def cog_mosaic_from_file(
     return mosaic
 
 
-def cog_bounds(url, titiler_endpoint="https://titiler.xyz"):
+def cog_bounds(url, titiler_endpoint=None):
     """Get the bounding box of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -1231,6 +1240,7 @@ def cog_bounds(url, titiler_endpoint="https://titiler.xyz"):
         list: A list of values representing [left, bottom, right, top]
     """
 
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     r = requests.get(f"{titiler_endpoint}/cog/bounds", params={"url": url}).json()
 
     if "bounds" in r.keys():
@@ -1240,7 +1250,7 @@ def cog_bounds(url, titiler_endpoint="https://titiler.xyz"):
     return bounds
 
 
-def cog_center(url, titiler_endpoint="https://titiler.xyz"):
+def cog_center(url, titiler_endpoint=None):
     """Get the centroid of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -1250,12 +1260,13 @@ def cog_center(url, titiler_endpoint="https://titiler.xyz"):
     Returns:
         tuple: A tuple representing (longitude, latitude)
     """
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     bounds = cog_bounds(url, titiler_endpoint)
     center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lat, lon)
     return center
 
 
-def cog_bands(url, titiler_endpoint="https://titiler.xyz"):
+def cog_bands(url, titiler_endpoint=None):
     """Get band names of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -1266,6 +1277,7 @@ def cog_bands(url, titiler_endpoint="https://titiler.xyz"):
         list: A list of band names
     """
 
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     r = requests.get(
         f"{titiler_endpoint}/cog/info",
         params={
@@ -1277,7 +1289,7 @@ def cog_bands(url, titiler_endpoint="https://titiler.xyz"):
     return bands
 
 
-def cog_stats(url, titiler_endpoint="https://titiler.xyz"):
+def cog_stats(url, titiler_endpoint=None):
     """Get band statistics of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -1288,6 +1300,7 @@ def cog_stats(url, titiler_endpoint="https://titiler.xyz"):
         list: A dictionary of band statistics.
     """
 
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     r = requests.get(
         f"{titiler_endpoint}/cog/statistics",
         params={
@@ -1298,7 +1311,7 @@ def cog_stats(url, titiler_endpoint="https://titiler.xyz"):
     return r
 
 
-def cog_info(url, titiler_endpoint="https://titiler.xyz", return_geojson=False):
+def cog_info(url, titiler_endpoint=None, return_geojson=False):
     """Get band statistics of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -1309,6 +1322,7 @@ def cog_info(url, titiler_endpoint="https://titiler.xyz", return_geojson=False):
         list: A dictionary of band info.
     """
 
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     info = "info"
     if return_geojson:
         info = "info.geojson"
@@ -1328,7 +1342,7 @@ def cog_pixel_value(
     lat,
     url,
     bidx=None,
-    titiler_endpoint="https://titiler.xyz",
+    titiler_endpoint=None,
     verbose=True,
     **kwargs,
 ):
@@ -4859,8 +4873,7 @@ def mosaic_tile(url, titiler_endpoint=None, **kwargs):
         str: The tile URL.
     """
 
-    if titiler_endpoint is None:
-        titiler_endpoint = "https://titiler.xyz"
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
     if isinstance(url, str) and url.startswith("http"):
         kwargs["url"] = url
@@ -4889,8 +4902,7 @@ def mosaic_bounds(url, titiler_endpoint=None, **kwargs):
         list: A list of values representing [left, bottom, right, top]
     """
 
-    if titiler_endpoint is None:
-        titiler_endpoint = "https://titiler.xyz"
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
     if isinstance(url, str) and url.startswith("http"):
         kwargs["url"] = url
@@ -4919,8 +4931,7 @@ def mosaic_info(url, titiler_endpoint=None, **kwargs):
         dict: A dictionary containing bounds, center, minzoom, maxzoom, and name as keys.
     """
 
-    if titiler_endpoint is None:
-        titiler_endpoint = "https://titiler.xyz"
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
     if isinstance(url, str) and url.startswith("http"):
         kwargs["url"] = url
@@ -4949,8 +4960,7 @@ def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
         dict: A dictionary representing a dict of GeoJSON.
     """
 
-    if titiler_endpoint is None:
-        titiler_endpoint = "https://titiler.xyz"
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
     if isinstance(url, str) and url.startswith("http"):
         kwargs["url"] = url
