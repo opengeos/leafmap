@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.14.1 - Dec 11, 2022
+
+**New Features**
+
+-   Added support for vector_to_gif ([#323](https://github.com/giswqs/leafmap/pull/323))
+
+**Improvement**
+-   Updated TiTiler endpoint ([#325](https://github.com/giswqs/leafmap/pull/325))
+-   Fixed `stac_pixel_value()` bug
+
 ## v0.14.0 - Nov 27, 2022
 
 **New Features**
