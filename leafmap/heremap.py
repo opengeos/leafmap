@@ -315,23 +315,26 @@ class Map(here_map_widget.Map):
             value = """{}""".format("".join(value))
             html.value = value
 
-        geojson = GeoJSON(
-            data=data,
-            style=style if style else {},
-            hover_style=hover_style if hover_style else {},
-            style_callback=style_callback,
-            name=layer_name,
-            point_style=point_style if point_style else {},
-            show_bubble=default_popup,
-        )
+        try:
+            geojson = GeoJSON(
+                data=data,
+                style=style if style else {},
+                hover_style=hover_style if hover_style else {},
+                style_callback=style_callback,
+                name=layer_name,
+                point_style=point_style if point_style else {},
+                show_bubble=default_popup,
+            )
 
-        if not default_popup:
-            if info_mode == "on_hover":
-                geojson.on_hover(_update_html)
-            elif info_mode == "on_click":
-                geojson.on_click(_update_html)
+            if not default_popup:
+                if info_mode == "on_hover":
+                    geojson.on_hover(_update_html)
+                elif info_mode == "on_click":
+                    geojson.on_click(_update_html)
 
-        self.add_layer(geojson)
+            self.add_layer(geojson)
+        except Exception as e:
+            print(e)
 
     def add_shp(
         self,
