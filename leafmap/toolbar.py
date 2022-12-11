@@ -2727,7 +2727,7 @@ def inspector_gui(m=None):
                     lat,
                     layer_dict["url"],
                     layer_dict["collection"],
-                    layer_dict["items"],
+                    layer_dict["item"],
                     assets,
                     layer_dict["titiler_endpoint"],
                     verbose=False,
