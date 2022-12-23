@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.14.2 - Dec 22, 2022
+
+**New Features**
+
+-   Added colorbar support for folium ([#330](https://github.com/giswqs/leafmap/pull/330))
+
+**Improvement**
+
+-   Updated vector_to_gif notebook
+
 ## v0.14.1 - Dec 11, 2022
 
 **New Features**
@@ -7,6 +17,7 @@
 -   Added support for vector_to_gif ([#323](https://github.com/giswqs/leafmap/pull/323))
 
 **Improvement**
+
 -   Updated TiTiler endpoint ([#325](https://github.com/giswqs/leafmap/pull/325))
 -   Fixed `stac_pixel_value()` bug
 
