@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.15.0 - Dec 23, 2022
+
+**New Features**
+
+-   Added support for ArcGIS Pro ([#334](https://github.com/giswqs/leafmap/pull/334))
+
 ## v0.14.2 - Dec 22, 2022
 
 **New Features**
