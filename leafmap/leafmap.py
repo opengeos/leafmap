@@ -35,9 +35,6 @@ class Map(ipyleaflet.Map):
         if "scroll_wheel_zoom" not in kwargs:
             kwargs["scroll_wheel_zoom"] = True
 
-        if "attribution_control" not in kwargs:
-            kwargs["attribution_control"] = True
-
         super().__init__(**kwargs)
         self.baseclass = "ipyleaflet"
         self.toolbar = None
@@ -1497,14 +1494,14 @@ class Map(ipyleaflet.Map):
         colors=None,
         discrete=False,
         label=None,
-        width=8.0,
-        height=0.4,
+        width=3,
+        height=0.25,
         orientation="horizontal",
         vmin=0,
         vmax=1.0,
         axis_off=False,
         show_name=False,
-        font_size=12,
+        font_size=8,
         transparent_bg=False,
         position="bottomright",
         **kwargs,
