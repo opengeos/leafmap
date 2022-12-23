@@ -236,7 +236,11 @@ class Map(folium.Map):
 
             elif basemap in basemaps:
                 basemaps[basemap].add_to(self)
-                arc_add_layer(basemaps[basemap].tiles, basemap)
+                if isinstance(basemaps[basemap], folium.TileLayer):
+                    url = basemaps[basemap].tiles
+                elif isinstance(basemaps[basemap], folium.WmsTileLayer):
+                    url = basemaps[basemap].url
+                arc_add_layer(url, basemap)
             else:
                 print(
                     "Basemap can only be one of the following: {}".format(
