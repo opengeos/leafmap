@@ -184,6 +184,8 @@ class Map(folium.Map):
         """
         self.fit_bounds([[lat, lon], [lat, lon]], max_zoom=zoom)
 
+        arc_zoom_to_extent(lon, lat, lon, lat)
+
     def zoom_to_bounds(self, bounds):
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
 
@@ -229,14 +231,19 @@ class Map(folium.Map):
                 )
 
                 self.add_layer(layer)
+
+                arc_add_layer(url, name)
+
             elif basemap in basemaps:
                 basemaps[basemap].add_to(self)
+                arc_add_layer(basemaps[basemap].tiles, basemap)
             else:
                 print(
                     "Basemap can only be one of the following: {}".format(
                         ", ".join(basemaps.keys())
                     )
                 )
+
         except Exception:
             raise Exception(
                 "Basemap can only be one of the following: {}".format(
@@ -334,6 +341,9 @@ class Map(folium.Map):
                 API_key=API_key,
                 **kwargs,
             ).add_to(self)
+
+            arc_add_layer(url, name, shown, opacity)
+
         except Exception as e:
             raise Exception(e)
 
@@ -391,6 +401,9 @@ class Map(folium.Map):
             bounds[1],
         )  # [minx, miny, maxx, maxy]
         self.zoom_to_bounds(bounds)
+
+        arc_add_layer(tile_layer.tiles, layer_name, True, 1.0)
+        arc_zoom_to_extent(bounds[2], bounds[0], bounds[3], bounds[1])
 
     add_local_tile = add_raster
 
@@ -871,6 +884,7 @@ class Map(folium.Map):
             shown=shown,
         )
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def add_cog_mosaic(self, **kwargs):
         raise NotImplementedError(
@@ -922,6 +936,7 @@ class Map(folium.Map):
             shown=shown,
         )
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def add_mosaic_layer(
         self,
