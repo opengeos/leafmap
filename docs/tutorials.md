@@ -65,7 +65,8 @@
 59. Creating legends using leafmap with only one line of code ([notebook](https://leafmap.org/notebooks/59_create_legend))
 60. Adding text, images, HTML, and widgets to the map ([notebook](https://leafmap.org/notebooks/60_add_widget))
 61. Creating an animated GIF from a vector dataset ([notebook](https://leafmap.org/notebooks/61_vector_to_gif))
-62. Add colorbars to a folium map ([notebook](https://leafmap.org/notebooks/62_folium_colorbar))
+62. Adding colorbars to a folium map ([notebook](https://leafmap.org/notebooks/62_folium_colorbar))
+63. Using leafmap with ArcGIS Pro ([notebook](https://leafmap.org/notebooks/63_arcgis))
 
 ## Demo
 
