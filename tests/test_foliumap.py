@@ -57,14 +57,14 @@ class TestFoliumap(unittest.TestCase):
         out_str = m.to_html()
         assert "Elevation" in out_str
 
-    @patch("matplotlib.pyplot.show")
-    def test_add_colormap(self, mock_show):
-        """Check colormap"""
-        with self.assertRaises(NotImplementedError):
-            m = leafmap.Map()
-            m.add_colormap(cmap="gray", label="Elevation")
-            out_str = m.to_html()
-            assert "Elevation" in out_str
+    # @patch("matplotlib.pyplot.show")
+    # def test_add_colormap(self, mock_show):
+    #     """Check colormap"""
+    #     with self.assertRaises(NotImplementedError):
+    #         m = leafmap.Map()
+    #         m.add_colormap(cmap="gray", label="Elevation")
+    #         out_str = m.to_html()
+    #         assert "Elevation" in out_str
 
     def test_add_gdf(self):
         """Check GeoDataFrame"""
