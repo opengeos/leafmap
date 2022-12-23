@@ -284,8 +284,10 @@ class Map(ipyleaflet.Map):
                     url=url, name=name, max_zoom=max_zoom, attribution=attribution
                 )
                 self.add_layer(layer)
+                arc_add_layer(url, name)
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
                 self.add_layer(basemaps[basemap])
+                arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
                 print(f"{basemap} has been already added before.")
             else:
@@ -437,6 +439,8 @@ class Map(ipyleaflet.Map):
                 **kwargs,
             )
             self.add_layer(tile_layer)
+
+            arc_add_layer(url, name, shown, opacity)
 
         except Exception as e:
             print("Failed to add the specified TileLayer.")
@@ -798,6 +802,7 @@ class Map(ipyleaflet.Map):
         bounds = cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -854,6 +859,7 @@ class Map(ipyleaflet.Map):
         bounds = stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -1808,6 +1814,9 @@ class Map(ipyleaflet.Map):
             bounds[1],
         )  # [minx, miny, maxx, maxy]
         self.zoom_to_bounds(bounds)
+
+        arc_add_layer(tile_layer.url, layer_name, True, 1.0)
+        arc_zoom_to_extent(bounds[2], bounds[0], bounds[3], bounds[1])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
