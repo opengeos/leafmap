@@ -4444,7 +4444,9 @@ def stac_gui(m=None):
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
 
-    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+    output = widgets.Output(
+        layout=widgets.Layout(width=widget_width, padding=padding, overflow="auto")
+    )
 
     toolbar_button = widgets.ToggleButton(
         value=False,
@@ -4864,14 +4866,18 @@ def stac_gui(m=None):
                         assets = red.value
                     else:
                         assets = f"{red.value},{green.value},{blue.value}"
-                    m.add_stac_layer(
-                        collection=col,
-                        item=item.value,
-                        assets=assets,
-                        name=layer_name.value,
-                        **vis_params,
-                    )
-                    output.clear_output()
+
+                    try:
+                        m.add_stac_layer(
+                            collection=col,
+                            item=item.value,
+                            assets=assets,
+                            name=layer_name.value,
+                            **vis_params,
+                        )
+                        output.clear_output()
+                    except Exception as e:
+                        print(e)
                 else:
                     print("Please select at least one band.")
                     buttons.value = None
