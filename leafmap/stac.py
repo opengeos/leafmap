@@ -1168,3 +1168,39 @@ def stac_search(
             return gdf
         else:
             return search
+
+
+def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
+    """Download geospatial data catalogs from https://github.com/giswqs/geospatial-data-catalogs.
+
+    Args:
+        out_dir (str, optional): The output directory. Defaults to None.
+        quiet (bool, optional): Whether to suppress the download progress bar. Defaults to True.
+        overwrite (bool, optional): Whether to overwrite the existing data catalog. Defaults to False.
+
+    Returns:
+        str: The path to the downloaded data catalog.
+    """
+    import tempfile
+    import gdown
+    import zipfile
+
+    if out_dir is None:
+        out_dir = tempfile.gettempdir()
+    elif not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    url = "https://github.com/giswqs/geospatial-data-catalogs/archive/refs/heads/master.zip"
+
+    out_file = os.path.join(out_dir, "geospatial-data-catalogs.zip")
+    work_dir = os.path.join(out_dir, "geospatial-data-catalogs-master")
+
+    if os.path.exists(work_dir) and not overwrite:
+        return work_dir
+    else:
+       
+        gdown.download(url, out_file, quiet=quiet)
+        with zipfile.ZipFile(out_file, "r") as zip_ref:
+            zip_ref.extractall(out_dir)
+        return work_dir
+    
