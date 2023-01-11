@@ -560,28 +560,6 @@ def stac_tile(
 
         kwargs["assets"] = assets
 
-        # if ("expression" in kwargs) and ("rescale" not in kwargs):
-        #     stats = stac_stats(
-        #         collection=collection,
-        #         item=item,
-        #         expression=kwargs["expression"],
-        #         titiler_endpoint=titiler_endpoint,
-        #     )
-        #     kwargs[
-        #         "rescale"
-        #     ] = f"{stats[0]['percentile_2']},{stats[0]['percentile_98']}"
-
-        # if ("asset_expression" in kwargs) and ("rescale" not in kwargs):
-        #     stats = stac_stats(
-        #         collection=collection,
-        #         item=item,
-        #         expression=kwargs["asset_expression"],
-        #         titiler_endpoint=titiler_endpoint,
-        #     )
-        #     kwargs[
-        #         "rescale"
-        #     ] = f"{stats[0]['percentile_2']},{stats[0]['percentile_98']}"
-
         if (
             (assets is not None)
             and ("asset_expression" not in kwargs)
@@ -966,17 +944,17 @@ def stac_pixel_value(
         return result
 
 
-def stac_object_type(href):
+def stac_object_type(url):
     """Get the STAC object type.
 
     Args:
-        href (str): The STAC object URL.
+        url (str): The STAC object URL.
 
     Returns:
         str: The STAC object type, can be catalog, collection, or item.
     """
     try:
-        obj = pystac.STACObject.from_file(href)
+        obj = pystac.STACObject.from_file(url)
 
         if isinstance(obj, pystac.Collection):
             return "collection"
@@ -990,17 +968,17 @@ def stac_object_type(href):
         return None
 
 
-def stac_root_link(href):
+def stac_root_link(url):
     """Get the root link of a STAC object.
 
     Args:
-        href (str): The STAC object URL.
+        url (str): The STAC object URL.
 
     Returns:
         str: The root link of the STAC object.
     """
     try:
-        obj = pystac.STACObject.from_file(href)
+        obj = pystac.STACObject.from_file(url)
 
         return obj.get_root_link().get_href()
 
@@ -1009,11 +987,24 @@ def stac_root_link(href):
         return None
 
 
-def stac_client(href):
-    """Get the STAC client.
+def stac_client(
+    url, headers=None, parameters=None, ignore_conformance=False, modifier=None
+):
+    """Get the STAC client. It wraps the pystac.Client.open() method. See
+        https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.open
 
     Args:
-        href (str): The STAC object URL.
+        url (str): The URL of a STAC Catalog.
+        headers (dict, optional):  A dictionary of additional headers to use in all requests
+            made to any part of this Catalog/API. Defaults to None.
+        parameters (dict, optional): Optional dictionary of query string parameters to include in all requests.
+            Defaults to None.
+        ignore_conformance (bool, optional): Ignore any advertised Conformance Classes in this Catalog/API.
+            This means that functions will skip checking conformance, and may throw an unknown error
+            if that feature is not supported, rather than a NotImplementedError. Defaults to False.
+        modifier (function, optional): A callable that modifies the children collection and items
+            returned by this Client. This can be useful for injecting authentication parameters
+            into child assets to access data from non-public sources. Defaults to None.
 
     Returns:
         pystac.Client: The STAC client.
@@ -1021,8 +1012,8 @@ def stac_client(href):
     from pystac_client import Client
 
     try:
-        root = stac_root_link(href)
-        client = Client.open(root)
+        root = stac_root_link(url)
+        client = Client.open(root, headers, parameters, ignore_conformance, modifier)
 
         return client
 
@@ -1031,8 +1022,34 @@ def stac_client(href):
         return None
 
 
+def stac_collections(url, return_ids=False):
+
+    """Get the collection IDs of a STAC catalog.
+
+    Args:
+        url (str): The STAC catalog URL.
+        return_ids (bool, optional): Return collection IDs. Defaults to False.
+
+    Returns:
+        list: A list of collection IDs.
+    """
+    try:
+        client = stac_client(url)
+        collections = client.get_all_collections()
+
+        if return_ids:
+
+            return [c.id for c in collections]
+        else:
+            return collections
+
+    except Exception as e:
+        print(e)
+        return None
+
+
 def stac_search(
-    href,
+    url,
     method="POST",
     max_items=None,
     limit=100,
@@ -1046,14 +1063,17 @@ def stac_search(
     filter_lang=None,
     sortby=None,
     fields=None,
+    get_item_col=False,
     get_items=False,
     get_links=False,
+    get_gdf=False,
+    **kwargs,
 ):
     """Search a STAC API. The function wraps the pysatc_client.Client.search() method. See
         https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.search
 
     Args:
-        href (str): The STAC API URL.
+        url (str): The STAC API URL.
         method (str, optional): The HTTP method to use when making a request to the service.
             This must be either "GET", "POST", or None. If None, this will default to "POST".
             If a "POST" request receives a 405 status for the response, it will automatically
@@ -1075,7 +1095,7 @@ def stac_search(
         intersects (str | dict, optional):  A string or dictionary representing a GeoJSON geometry, or
             an object that implements a __geo_interface__ property, as supported by several
             libraries including Shapely, ArcPy, PySAL, and geojson. Results filtered to only
-            those intersecting the geometry.. Defaults to None.
+            those intersecting the geometry. Defaults to None.
         datetime (str, optional): Either a single datetime or datetime range used to filter results.
             You may express a single datetime using a datetime.datetime instance, a RFC 3339-compliant
             timestamp, or a simple date string (see below). Instances of datetime.datetime may be either
@@ -1084,10 +1104,10 @@ def stac_search(
             UTC timestamps. You may represent a datetime range using a "/" separated string as described
             in the spec, or a list, tuple, or iterator of 2 timestamps or datetime instances.
             For open-ended ranges, use either ".." ('2020-01-01:00:00:00Z/..', ['2020-01-01:00:00:00Z', '..'])
-             or a value of None (['2020-01-01:00:00:00Z', None]). If using a simple date string,
-             the datetime can be specified in YYYY-mm-dd format, optionally truncating to
-             YYYY-mm or just YYYY. Simple date strings will be expanded to include the entire
-             time period. Defaults to None.
+            or a value of None (['2020-01-01:00:00:00Z', None]). If using a simple date string,
+            the datetime can be specified in YYYY-mm-dd format, optionally truncating to
+            YYYY-mm or just YYYY. Simple date strings will be expanded to include the entire
+            time period. Defaults to None.
         query (list, optional): List or JSON of query parameters as per the STAC API query extension.
             such as {"eo:cloud_cover":{"lt":10}}. Defaults to None.
         filter (dict, optional): JSON of query parameters as per the STAC API filter extension. Defaults to None.
@@ -1098,18 +1118,25 @@ def stac_search(
         fields (list, optional): A list of fields to include in the response. Note this may result in
             invalid STAC objects, as they may not have required fields. Use items_as_dicts to avoid object
             unmarshalling errors. Defaults to None.
-        get_items (bool, optional): True to return a pystac.ItemCollection. Defaults to False.
+        get_item_col (bool, optional): True to return a pystac.ItemCollection. Defaults to False.
+        get_items (bool, optional): True to return a list of pystac.Item. Defaults to False.
         get_links (bool, optional): True to return a list of links. Defaults to False.
+        get_gdf (bool, optional): True to return a GeoDataFrame. Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the stac_client() function.
 
     Returns:
         list | pystac.ItemCollection : The search results as a list of links or a pystac.ItemCollection.
     """
 
-    client = stac_client(href)
+    client = stac_client(url, **kwargs)
 
     if client is None:
         return None
     else:
+
+        if isinstance(intersects, dict) and "geometry" in intersects:
+            intersects = intersects["geometry"]
+
         search = client.search(
             method=method,
             max_items=max_items,
@@ -1126,9 +1153,18 @@ def stac_search(
             fields=fields,
         )
 
-        if get_items:
+        if get_item_col:
             return search.item_collection()
+        elif get_items:
+            return list(search.item_collection())
         elif get_links:
             return [item.get_self_href() for item in search.items()]
+        elif get_gdf:
+            import geopandas as gpd
+
+            gdf = gpd.GeoDataFrame.from_features(
+                search.item_collection().to_dict(), crs="EPSG:4326"
+            )
+            return gdf
         else:
             return search
