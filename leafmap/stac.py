@@ -968,19 +968,27 @@ def stac_object_type(url):
         return None
 
 
-def stac_root_link(url):
+def stac_root_link(url, return_col_id=False):
     """Get the root link of a STAC object.
 
     Args:
         url (str): The STAC object URL.
+        return_col_id (bool, optional): Return the collection ID if the STAC object is a collection. Defaults to False.
 
     Returns:
         str: The root link of the STAC object.
     """
+    collection_id = None
     try:
         obj = pystac.STACObject.from_file(url)
+        if isinstance(obj, pystac.Collection):
+            collection_id = obj.id
+        href = obj.get_root_link().get_href()
 
-        return obj.get_root_link().get_href()
+        if return_col_id:
+            return href, collection_id
+        else:
+            return href
 
     except Exception as e:
         print(e)
@@ -988,7 +996,7 @@ def stac_root_link(url):
 
 
 def stac_client(
-    url, headers=None, parameters=None, ignore_conformance=False, modifier=None
+    url, headers=None, parameters=None, ignore_conformance=False, modifier=None, return_col_id=False
 ):
     """Get the STAC client. It wraps the pystac.Client.open() method. See
         https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.open
@@ -1005,17 +1013,25 @@ def stac_client(
         modifier (function, optional): A callable that modifies the children collection and items
             returned by this Client. This can be useful for injecting authentication parameters
             into child assets to access data from non-public sources. Defaults to None.
+        return_col_id (bool, optional): Return the collection ID. Defaults to False.
 
     Returns:
         pystac.Client: The STAC client.
     """
     from pystac_client import Client
 
-    try:
-        root = stac_root_link(url)
-        client = Client.open(root, headers, parameters, ignore_conformance, modifier)
+    collection_id = None
 
-        return client
+    try:
+        root = stac_root_link(url, return_col_id=return_col_id)
+
+        if return_col_id:
+            client = Client.open(root[0], headers, parameters, ignore_conformance, modifier)
+            collection_id = root[1]
+            return client, collection_id
+        else:
+            client = Client.open(root, headers, parameters, ignore_conformance, modifier)
+            return client
 
     except Exception as e:
         print(e)
@@ -1067,6 +1083,7 @@ def stac_search(
     get_items=False,
     get_links=False,
     get_gdf=False,
+    get_info=False,
     **kwargs,
 ):
     """Search a STAC API. The function wraps the pysatc_client.Client.search() method. See
@@ -1128,7 +1145,7 @@ def stac_search(
         list | pystac.ItemCollection : The search results as a list of links or a pystac.ItemCollection.
     """
 
-    client = stac_client(url, **kwargs)
+    client, collection_id = stac_client(url, return_col_id=True, **kwargs)
 
     if client is None:
         return None
@@ -1136,6 +1153,9 @@ def stac_search(
 
         if isinstance(intersects, dict) and "geometry" in intersects:
             intersects = intersects["geometry"]
+
+        if collection_id is not None and collections is None:
+            collections = [collection_id]
 
         search = client.search(
             method=method,
@@ -1166,6 +1186,12 @@ def stac_search(
                 search.item_collection().to_dict(), crs="EPSG:4326"
             )
             return gdf
+        elif get_info:
+            items = list(search.item_collection())
+            info = {}
+            for item in items:
+                info[item.id] = {'id': item.id, 'href': item.get_self_href(), 'bands': list(item.get_assets().keys()), 'assets': item.get_assets()}
+            return info
         else:
             return search
 
@@ -1204,3 +1230,26 @@ def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
             zip_ref.extractall(out_dir)
         return work_dir
     
+
+def set_default_bands(bands):
+
+    if len(bands) == 0:
+        return [None, None, None]
+
+    if isinstance(bands, str):
+        bands = [bands]
+
+    if not isinstance(bands, list):
+        raise ValueError("bands must be a list or a string.")
+
+    if (set(['nir', 'red', 'green']) <= set(bands)):
+        return ['nir', 'red', 'green']
+    elif (set(['red', 'green', 'blue']) <= set(bands)):
+        return ['red', 'green', 'blue']
+    elif (set(["B3", "B2", "B1"]) <= set(bands)):
+        return ["B3", "B2", "B1"]
+    elif len(bands) < 3:
+        return bands[0] * 3
+    else:
+        return bands[:3]
+        
