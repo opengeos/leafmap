@@ -14,133 +14,12 @@ import ipyleaflet
 import ipywidgets as widgets
 import whitebox
 from typing import Union, List, Dict, Tuple
+from .stac import *
 
 try:
     from IPython.display import display, IFrame
 except ImportError:
     pass
-
-
-class TitilerEndpoint:
-    """This class contains the methods for the titiler endpoint."""
-
-    def __init__(
-        self,
-        endpoint="https://titiler.xyz",
-        name="stac",
-        TileMatrixSetId="WebMercatorQuad",
-    ):
-        """Initialize the TitilerEndpoint object.
-
-        Args:
-            endpoint (str, optional): The endpoint of the titiler server. Defaults to "https://titiler.xyz".
-            name (str, optional): The name to be used in the file path. Defaults to "stac".
-            TileMatrixSetId (str, optional): The TileMatrixSetId to be used in the file path. Defaults to "WebMercatorQuad".
-        """
-        self.endpoint = endpoint
-        self.name = name
-        self.TileMatrixSetId = TileMatrixSetId
-
-    def url_for_stac_item(self):
-        return f"{self.endpoint}/{self.name}/{self.TileMatrixSetId}/tilejson.json"
-
-    def url_for_stac_assets(self):
-        return f"{self.endpoint}/{self.name}/assets"
-
-    def url_for_stac_bounds(self):
-        return f"{self.endpoint}/{self.name}/bounds"
-
-    def url_for_stac_info(self):
-        return f"{self.endpoint}/{self.name}/info"
-
-    def url_for_stac_info_geojson(self):
-        return f"{self.endpoint}/{self.name}/info.geojson"
-
-    def url_for_stac_statistics(self):
-        return f"{self.endpoint}/{self.name}/statistics"
-
-    def url_for_stac_pixel_value(self, lon, lat):
-        return f"{self.endpoint}/{self.name}/point/{lon},{lat}"
-
-    def url_for_stac_wmts(self):
-        return (
-            f"{self.endpoint}/{self.name}/{self.TileMatrixSetId}/WMTSCapabilities.xml"
-        )
-
-
-class PlanetaryComputerEndpoint(TitilerEndpoint):
-    """This class contains the methods for the Microsoft Planetary Computer endpoint."""
-
-    def __init__(
-        self,
-        endpoint="https://planetarycomputer.microsoft.com/api/data/v1",
-        name="item",
-        TileMatrixSetId="WebMercatorQuad",
-    ):
-        """Initialize the PlanetaryComputerEndpoint object.
-
-        Args:
-            endpoint (str, optional): The endpoint of the titiler server. Defaults to "https://planetarycomputer.microsoft.com/api/data/v1".
-            name (str, optional): The name to be used in the file path. Defaults to "item".
-            TileMatrixSetId (str, optional): The TileMatrixSetId to be used in the file path. Defaults to "WebMercatorQuad".
-        """
-        super().__init__(endpoint, name, TileMatrixSetId)
-
-    def url_for_stac_collection(self):
-        return f"{self.endpoint}/collection/{self.TileMatrixSetId}/tilejson.json"
-
-    def url_for_collection_assets(self):
-        return f"{self.endpoint}/collection/assets"
-
-    def url_for_collection_bounds(self):
-        return f"{self.endpoint}/collection/bounds"
-
-    def url_for_collection_info(self):
-        return f"{self.endpoint}/collection/info"
-
-    def url_for_collection_info_geojson(self):
-        return f"{self.endpoint}/collection/info.geojson"
-
-    def url_for_collection_pixel_value(self, lon, lat):
-        return f"{self.endpoint}/collection/point/{lon},{lat}"
-
-    def url_for_collection_wmts(self):
-        return f"{self.endpoint}/collection/{self.TileMatrixSetId}/WMTSCapabilities.xml"
-
-    def url_for_collection_lat_lon_assets(self, lng, lat):
-        return f"{self.endpoint}/collection/{lng},{lat}/assets"
-
-    def url_for_collection_bbox_assets(self, minx, miny, maxx, maxy):
-        return f"{self.endpoint}/collection/{minx},{miny},{maxx},{maxy}/assets"
-
-    def url_for_stac_mosaic(self, searchid):
-        return f"{self.endpoint}/mosaic/{searchid}/{self.TileMatrixSetId}/tilejson.json"
-
-    def url_for_mosaic_info(self, searchid):
-        return f"{self.endpoint}/mosaic/{searchid}/info"
-
-    def url_for_mosaic_lat_lon_assets(self, searchid, lon, lat):
-        return f"{self.endpoint}/mosaic/{searchid}/{lon},{lat}/assets"
-
-
-def check_titiler_endpoint(titiler_endpoint=None):
-    """Returns the default titiler endpoint.
-
-    Returns:
-        object: A titiler endpoint.
-    """
-    if titiler_endpoint is None:
-        if os.environ.get("TITILER_ENDPOINT") is not None:
-            titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
-
-            if titiler_endpoint == "planetary-computer":
-                titiler_endpoint = PlanetaryComputerEndpoint()
-        else:
-            titiler_endpoint = "https://titiler.xyz"
-    elif titiler_endpoint in ["planetary-computer", "pc"]:
-        titiler_endpoint = PlanetaryComputerEndpoint()
-
-    return titiler_endpoint
 
 
 class WhiteboxTools(whitebox.WhiteboxTools):
@@ -1012,840 +891,6 @@ def create_code_cell(code="", where="below"):
             )
         )
     )
-
-
-def cog_tile(url, bands=None, titiler_endpoint=None, **kwargs):
-    """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
-        Source code adapted from https://developmentseed.org/titiler/examples/notebooks/Working_with_CloudOptimizedGeoTIFF_simple/
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        bands (list, optional): List of bands to use. Defaults to None.
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.xyz".
-        **kwargs: Additional arguments to pass to the titiler endpoint. For more information about the available arguments, see https://developmentseed.org/titiler/endpoints/cog/#tiles.
-            For example, to apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
-
-    Returns:
-        tuple: Returns the COG Tile layer URL and bounds.
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-
-    kwargs["url"] = url
-
-    band_names = cog_bands(url, titiler_endpoint)
-
-    if isinstance(bands, str):
-        bands = [bands]
-
-    if bands is None and "bidx" not in kwargs:
-        if len(band_names) >= 3:
-            kwargs["bidx"] = [1, 2, 3]
-    elif isinstance(bands, list) and "bidx" not in kwargs:
-        if all(isinstance(x, int) for x in bands):
-            if len(set(bands)) == 1:
-                bands = bands[0]
-            kwargs["bidx"] = bands
-        elif all(isinstance(x, str) for x in bands):
-            if len(set(bands)) == 1:
-                bands = bands[0]
-            kwargs["bidx"] = [band_names.index(x) + 1 for x in bands]
-        else:
-            raise ValueError("Bands must be a list of integers or strings.")
-
-    if "palette" in kwargs:
-        kwargs["colormap_name"] = kwargs["palette"].lower()
-        del kwargs["palette"]
-
-    if "bidx" not in kwargs:
-        kwargs["bidx"] = [1]
-    elif isinstance(kwargs["bidx"], int):
-        kwargs["bidx"] = [kwargs["bidx"]]
-
-    if "rescale" not in kwargs:
-        stats = cog_stats(url, titiler_endpoint)
-
-        if "message" not in stats:
-            try:
-                rescale = []
-                for i in band_names:
-                    rescale.append(
-                        "{},{}".format(
-                            stats[i]["percentile_2"],
-                            stats[i]["percentile_98"],
-                        )
-                    )
-                kwargs["rescale"] = rescale
-            except Exception as e:
-                print(e)
-
-    TileMatrixSetId = "WebMercatorQuad"
-    if "TileMatrixSetId" in kwargs.keys():
-        TileMatrixSetId = kwargs["TileMatrixSetId"]
-        kwargs.pop("TileMatrixSetId")
-
-    r = requests.get(
-        f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json", params=kwargs
-    ).json()
-    return r["tiles"][0]
-
-
-def cog_tile_vmin_vmax(
-    url, bands=None, titiler_endpoint=None, percentile=True, **kwargs
-):
-    """Get a tile layer from a Cloud Optimized GeoTIFF (COG) and return the minimum and maximum values.
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        bands (list, optional): List of bands to use. Defaults to None.
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-        percentile (bool, optional): Whether to use percentiles or not. Defaults to True.
-    Returns:
-        tuple: Returns the minimum and maximum values.
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    stats = cog_stats(url, titiler_endpoint)
-
-    if isinstance(bands, str):
-        bands = [bands]
-
-    if bands is not None:
-        stats = {s: stats[s] for s in stats if s in bands}
-
-    if percentile:
-        vmin = min([stats[s]["percentile_2"] for s in stats])
-        vmax = max([stats[s]["percentile_98"] for s in stats])
-    else:
-        vmin = min([stats[s]["min"] for s in stats])
-        vmax = max([stats[s]["max"] for s in stats])
-
-    return vmin, vmax
-
-
-def cog_mosaic(
-    links,
-    titiler_endpoint=None,
-    username="anonymous",
-    layername=None,
-    overwrite=False,
-    verbose=True,
-    **kwargs,
-):
-    """Creates a COG mosaic from a list of COG URLs.
-
-    Args:
-        links (list): A list containing COG HTTP URLs.
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-        username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
-        layername ([type], optional): Layer name to use. Defaults to None.
-        overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
-        verbose (bool, optional): Whether to print out descriptive information. Defaults to True.
-
-    Raises:
-        Exception: If the COG mosaic fails to create.
-
-    Returns:
-        str: The tile URL for the COG mosaic.
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if layername is None:
-        layername = "layer_" + random_string(5)
-
-    try:
-        if verbose:
-            print("Creating COG masaic ...")
-
-        # Create token
-        r = requests.post(
-            f"{titiler_endpoint}/tokens/create",
-            json={"username": username, "scope": ["mosaic:read", "mosaic:create"]},
-        ).json()
-        token = r["token"]
-
-        # Create mosaic
-        requests.post(
-            f"{titiler_endpoint}/mosaicjson/create",
-            json={
-                "username": username,
-                "layername": layername,
-                "files": links,
-                # "overwrite": overwrite
-            },
-            params={
-                "access_token": token,
-            },
-        ).json()
-
-        r2 = requests.get(
-            f"{titiler_endpoint}/mosaicjson/{username}.{layername}/tilejson.json",
-        ).json()
-
-        return r2["tiles"][0]
-
-    except Exception as e:
-        raise Exception(e)
-
-
-def cog_mosaic_from_file(
-    filepath,
-    skip_rows=0,
-    titiler_endpoint=None,
-    username="anonymous",
-    layername=None,
-    overwrite=False,
-    verbose=True,
-    **kwargs,
-):
-    """Creates a COG mosaic from a csv/txt file stored locally for through HTTP URL.
-
-    Args:
-        filepath (str): Local path or HTTP URL to the csv/txt file containing COG URLs.
-        skip_rows (int, optional): The number of rows to skip in the file. Defaults to 0.
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-        username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
-        layername ([type], optional): Layer name to use. Defaults to None.
-        overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
-        verbose (bool, optional): Whether to print out descriptive information. Defaults to True.
-
-    Returns:
-        str: The tile URL for the COG mosaic.
-    """
-    import urllib
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    links = []
-    if filepath.startswith("http"):
-        data = urllib.request.urlopen(filepath)
-        for line in data:
-            links.append(line.decode("utf-8").strip())
-
-    else:
-        with open(filepath) as f:
-            links = [line.strip() for line in f.readlines()]
-
-    links = links[skip_rows:]
-    # print(links)
-    mosaic = cog_mosaic(
-        links, titiler_endpoint, username, layername, overwrite, verbose, **kwargs
-    )
-    return mosaic
-
-
-def cog_bounds(url, titiler_endpoint=None):
-    """Get the bounding box of a Cloud Optimized GeoTIFF (COG).
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-
-    Returns:
-        list: A list of values representing [left, bottom, right, top]
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    r = requests.get(f"{titiler_endpoint}/cog/bounds", params={"url": url}).json()
-
-    if "bounds" in r.keys():
-        bounds = r["bounds"]
-    else:
-        bounds = None
-    return bounds
-
-
-def cog_center(url, titiler_endpoint=None):
-    """Get the centroid of a Cloud Optimized GeoTIFF (COG).
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-
-    Returns:
-        tuple: A tuple representing (longitude, latitude)
-    """
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    bounds = cog_bounds(url, titiler_endpoint)
-    center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lat, lon)
-    return center
-
-
-def cog_bands(url, titiler_endpoint=None):
-    """Get band names of a Cloud Optimized GeoTIFF (COG).
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-
-    Returns:
-        list: A list of band names
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    r = requests.get(
-        f"{titiler_endpoint}/cog/info",
-        params={
-            "url": url,
-        },
-    ).json()
-
-    bands = [b[0] for b in r["band_descriptions"]]
-    return bands
-
-
-def cog_stats(url, titiler_endpoint=None):
-    """Get band statistics of a Cloud Optimized GeoTIFF (COG).
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-
-    Returns:
-        list: A dictionary of band statistics.
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    r = requests.get(
-        f"{titiler_endpoint}/cog/statistics",
-        params={
-            "url": url,
-        },
-    ).json()
-
-    return r
-
-
-def cog_info(url, titiler_endpoint=None, return_geojson=False):
-    """Get band statistics of a Cloud Optimized GeoTIFF (COG).
-
-    Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
-
-    Returns:
-        list: A dictionary of band info.
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    info = "info"
-    if return_geojson:
-        info = "info.geojson"
-
-    r = requests.get(
-        f"{titiler_endpoint}/cog/{info}",
-        params={
-            "url": url,
-        },
-    ).json()
-
-    return r
-
-
-def cog_pixel_value(
-    lon,
-    lat,
-    url,
-    bidx=None,
-    titiler_endpoint=None,
-    verbose=True,
-    **kwargs,
-):
-    """Get pixel value from COG.
-
-    Args:
-        lon (float): Longitude of the pixel.
-        lat (float): Latitude of the pixel.
-        url (str): HTTP URL to a COG, e.g., 'https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif'
-        bidx (str, optional): Dataset band indexes (e.g bidx=1, bidx=1&bidx=2&bidx=3). Defaults to None.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-        verbose (bool, optional): Print status messages. Defaults to True.
-
-    Returns:
-        list: A dictionary of band info.
-    """
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    kwargs["url"] = url
-    if bidx is not None:
-        kwargs["bidx"] = bidx
-
-    r = requests.get(f"{titiler_endpoint}/cog/point/{lon},{lat}", params=kwargs).json()
-    bands = cog_bands(url, titiler_endpoint)
-    # if isinstance(titiler_endpoint, str):
-    #     r = requests.get(f"{titiler_endpoint}/cog/point/{lon},{lat}", params=kwargs).json()
-    # else:
-    #     r = requests.get(
-    #         titiler_endpoint.url_for_stac_pixel_value(lon, lat), params=kwargs
-    #     ).json()
-
-    if "detail" in r:
-        if verbose:
-            print(r["detail"])
-        return None
-    else:
-        values = r["values"]
-        result = dict(zip(bands, values))
-        return result
-
-
-def stac_tile(
-    url=None,
-    collection=None,
-    item=None,
-    assets=None,
-    bands=None,
-    titiler_endpoint=None,
-    **kwargs,
-):
-
-    """Get a tile layer from a single SpatialTemporal Asset Catalog (STAC) item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        str: Returns the STAC Tile layer URL.
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-
-    if "palette" in kwargs:
-        kwargs["colormap_name"] = kwargs["palette"].lower()
-        del kwargs["palette"]
-
-    if isinstance(bands, list) and len(set(bands)) == 1:
-        bands = bands[0]
-
-    if isinstance(assets, list) and len(set(assets)) == 1:
-        assets = assets[0]
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-
-    if isinstance(titiler_endpoint, PlanetaryComputerEndpoint):
-        if isinstance(bands, str):
-            bands = bands.split(",")
-        if isinstance(assets, str):
-            assets = assets.split(",")
-        if assets is None and (bands is not None):
-            assets = bands
-        else:
-            kwargs["bidx"] = bands
-
-        kwargs["assets"] = assets
-
-        # if ("expression" in kwargs) and ("rescale" not in kwargs):
-        #     stats = stac_stats(
-        #         collection=collection,
-        #         item=item,
-        #         expression=kwargs["expression"],
-        #         titiler_endpoint=titiler_endpoint,
-        #     )
-        #     kwargs[
-        #         "rescale"
-        #     ] = f"{stats[0]['percentile_2']},{stats[0]['percentile_98']}"
-
-        # if ("asset_expression" in kwargs) and ("rescale" not in kwargs):
-        #     stats = stac_stats(
-        #         collection=collection,
-        #         item=item,
-        #         expression=kwargs["asset_expression"],
-        #         titiler_endpoint=titiler_endpoint,
-        #     )
-        #     kwargs[
-        #         "rescale"
-        #     ] = f"{stats[0]['percentile_2']},{stats[0]['percentile_98']}"
-
-        if (
-            (assets is not None)
-            and ("asset_expression" not in kwargs)
-            and ("expression" not in kwargs)
-            and ("rescale" not in kwargs)
-        ):
-            stats = stac_stats(
-                collection=collection,
-                item=item,
-                assets=assets,
-                titiler_endpoint=titiler_endpoint,
-            )
-            if "detail" not in stats:
-
-                try:
-                    percentile_2 = min([stats[s]["percentile_2"] for s in stats])
-                    percentile_98 = max([stats[s]["percentile_98"] for s in stats])
-                except:
-                    percentile_2 = min(
-                        [
-                            stats[s][list(stats[s].keys())[0]]["percentile_2"]
-                            for s in stats
-                        ]
-                    )
-                    percentile_98 = max(
-                        [
-                            stats[s][list(stats[s].keys())[0]]["percentile_98"]
-                            for s in stats
-                        ]
-                    )
-                kwargs["rescale"] = f"{percentile_2},{percentile_98}"
-            else:
-                print(stats["detail"])  # When operation times out.
-
-    else:
-        if isinstance(bands, str):
-            bands = bands.split(",")
-        if isinstance(assets, str):
-            assets = assets.split(",")
-
-        if assets is None and (bands is not None):
-            assets = bands
-        else:
-            kwargs["asset_bidx"] = bands
-        kwargs["assets"] = assets
-
-    TileMatrixSetId = "WebMercatorQuad"
-    if "TileMatrixSetId" in kwargs.keys():
-        TileMatrixSetId = kwargs["TileMatrixSetId"]
-        kwargs.pop("TileMatrixSetId")
-
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(
-            f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
-            params=kwargs,
-        ).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_item(), params=kwargs).json()
-
-    return r["tiles"][0]
-
-
-def stac_bounds(url=None, collection=None, item=None, titiler_endpoint=None, **kwargs):
-    """Get the bounding box of a single SpatialTemporal Asset Catalog (STAC) item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        list: A list of values representing [left, bottom, right, top]
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_bounds(), params=kwargs).json()
-
-    bounds = r["bounds"]
-    return bounds
-
-
-def stac_center(url=None, collection=None, item=None, titiler_endpoint=None, **kwargs):
-    """Get the centroid of a single SpatialTemporal Asset Catalog (STAC) item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        tuple: A tuple representing (longitude, latitude)
-    """
-    bounds = stac_bounds(url, collection, item, titiler_endpoint, **kwargs)
-    center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lon, lat)
-    return center
-
-
-def stac_bands(url=None, collection=None, item=None, titiler_endpoint=None, **kwargs):
-    """Get band names of a single SpatialTemporal Asset Catalog (STAC) item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        list: A list of band names
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/assets", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_assets(), params=kwargs).json()
-
-    return r
-
-
-def stac_stats(
-    url=None, collection=None, item=None, assets=None, titiler_endpoint=None, **kwargs
-):
-    """Get band statistics of a STAC item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        list: A dictionary of band statistics.
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-    if assets is not None:
-        kwargs["assets"] = assets
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/statistics", params=kwargs).json()
-    else:
-        r = requests.get(
-            titiler_endpoint.url_for_stac_statistics(), params=kwargs
-        ).json()
-
-    return r
-
-
-def stac_info(
-    url=None, collection=None, item=None, assets=None, titiler_endpoint=None, **kwargs
-):
-    """Get band info of a STAC item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        list: A dictionary of band info.
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-    if assets is not None:
-        kwargs["assets"] = assets
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/info", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_info(), params=kwargs).json()
-
-    return r
-
-
-def stac_info_geojson(
-    url=None, collection=None, item=None, assets=None, titiler_endpoint=None, **kwargs
-):
-    """Get band info of a STAC item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        list: A dictionary of band info.
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-    if assets is not None:
-        kwargs["assets"] = assets
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/info.geojson", params=kwargs).json()
-    else:
-        r = requests.get(
-            titiler_endpoint.url_for_stac_info_geojson(), params=kwargs
-        ).json()
-
-    return r
-
-
-def stac_assets(url=None, collection=None, item=None, titiler_endpoint=None, **kwargs):
-    """Get all assets of a STAC item.
-
-    Args:
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-
-    Returns:
-        list: A list of assets.
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/assets", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_assets(), params=kwargs).json()
-
-    return r
-
-
-def stac_pixel_value(
-    lon,
-    lat,
-    url=None,
-    collection=None,
-    item=None,
-    assets=None,
-    titiler_endpoint=None,
-    verbose=True,
-    **kwargs,
-):
-    """Get pixel value from STAC assets.
-
-    Args:
-        lon (float): Longitude of the pixel.
-        lat (float): Latitude of the pixel.
-        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
-        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
-        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
-        verbose (bool, optional): Print out the error message. Defaults to True.
-
-    Returns:
-        list: A dictionary of pixel values for each asset.
-    """
-
-    if url is None and collection is None:
-        raise ValueError("Either url or collection must be specified.")
-
-    if collection is not None and titiler_endpoint is None:
-        titiler_endpoint = "planetary-computer"
-
-    if url is not None:
-        kwargs["url"] = url
-    if collection is not None:
-        kwargs["collection"] = collection
-    if item is not None:
-        kwargs["item"] = item
-
-    if assets is None:
-        assets = stac_assets(
-            url=url,
-            collection=collection,
-            item=item,
-            titiler_endpoint=titiler_endpoint,
-        )
-        assets = ",".join(assets)
-    kwargs["assets"] = assets
-
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/{lon},{lat}", params=kwargs).json()
-    else:
-        r = requests.get(
-            titiler_endpoint.url_for_stac_pixel_value(lon, lat), params=kwargs
-        ).json()
-
-    if "detail" in r:
-        if verbose:
-            print(r["detail"])
-        return None
-    else:
-        values = [v[0] for v in r["values"]]
-        result = dict(zip(assets.split(","), values))
-        return result
 
 
 def local_tile_pixel_value(
@@ -4230,6 +3275,29 @@ def geom_type(in_geojson, encoding="utf-8"):
 
     except Exception as e:
         raise Exception(e)
+
+
+def geojson_to_gdf(in_geojson, encoding="utf-8", **kwargs):
+    """Converts a GeoJSON object to a geopandas GeoDataFrame.
+
+    Args:
+        in_geojson (str | dict): The input GeoJSON file or GeoJSON object as a dict.
+        encoding (str, optional): The encoding of the GeoJSON object. Defaults to "utf-8".
+
+    Returns:
+        geopandas.GeoDataFrame: A geopandas GeoDataFrame containing the GeoJSON object.
+    """
+
+    import geopandas as gpd
+
+    if isinstance(in_geojson, dict):
+        out_file = temp_file_path(extension="geojson")
+        with open(out_file, "w") as f:
+            json.dump(in_geojson, f)
+            in_geojson = out_file
+
+    gdf = gpd.read_file(in_geojson, encoding=encoding, **kwargs)
+    return gdf
 
 
 def geojson_to_df(in_geojson, encoding="utf-8", drop_geometry=True):
@@ -6700,6 +5768,21 @@ def image_projection(image, **kwargs):
     return client.metadata()["Projection"]
 
 
+def image_set_crs(image, epsg):
+    """Define the CRS of an image.
+
+    Args:
+        image (str): The input image filepath
+        epsg (int): The EPSG code of the CRS to set.
+    """
+
+    from rasterio.crs import CRS
+    import rasterio
+
+    with rasterio.open(image, "r+") as rds:
+        rds.crs = CRS.from_epsg(epsg)
+
+
 def image_geotransform(image, **kwargs):
     """Get the geotransform of an image.
 
@@ -8307,7 +7390,7 @@ def vector_to_gif(
     open_args={},
     plot_args={},
 ):
-    """Convert a vector to a gif. This function was inspired by by Johannes Uhl's shapefile2gif repo at 
+    """Convert a vector to a gif. This function was inspired by by Johannes Uhl's shapefile2gif repo at
             https://github.com/johannesuhl/shapefile2gif. Credits to Johannes Uhl.
 
     Args:
@@ -8666,3 +7749,77 @@ def arc_zoom_to_extent(xmin, ymin, xmax, ymax):
         # if isinstance(zoom, int):
         #     scale = 156543.04 * math.cos(0) / math.pow(2, zoom)
         #     view.camera.scale = scale  # Not working properly
+
+
+def vector_to_raster(
+    vector,
+    output,
+    field="FID",
+    assign="last",
+    nodata=True,
+    cell_size=None,
+    base=None,
+    callback=None,
+    verbose=False,
+    to_epsg=None,
+):
+    """Convert a vector to a raster.
+
+    Args:
+        vector (str | GeoPandas.GeoDataFrame): The input vector data, can be a file path or a GeoDataFrame.
+        output (str): The output raster file path.
+        field (str, optional): Input field name in attribute table. Defaults to 'FID'.
+        assign (str, optional): Assignment operation, where multiple points are in the same grid cell; options
+            include 'first', 'last' (default), 'min', 'max', 'sum', 'number'. Defaults to 'last'.
+        nodata (bool, optional): Background value to set to NoData. Without this flag, it will be set to 0.0.
+        cell_size (float, optional): Optionally specified cell size of output raster. Not used when base raster is specified
+        base (str, optional): Optionally specified input base raster file. Not used when a cell size is specified. Defaults to None.
+        callback (fuct, optional): A callback function to report progress. Defaults to None.
+        verbose (bool, optional): Whether to print progress to the console. Defaults to False.
+        to_epsg (integer, optional): Optionally specified the EPSG code to reproject the raster to. Defaults to None.
+
+    """
+    import geopandas as gpd
+    import whitebox
+
+    output = os.path.abspath(output)
+
+    if isinstance(vector, str):
+        gdf = gpd.read_file(vector)
+    elif isinstance(vector, gpd.GeoDataFrame):
+        gdf = vector
+    else:
+        raise TypeError("vector must be a file path or a GeoDataFrame")
+
+    if to_epsg is None:
+        to_epsg = 3857
+
+    if to_epsg == 4326:
+        raise ValueError("to_epsg cannot be 4326")
+
+    if gdf.crs.is_geographic:
+        gdf = gdf.to_crs(epsg=to_epsg)
+        vector = temp_file_path(extension=".shp")
+        gdf.to_file(vector)
+    else:
+        to_epsg = gdf.crs.to_epsg()
+
+    wbt = whitebox.WhiteboxTools()
+    wbt.verbose = verbose
+
+    goem_type = gdf.geom_type[0]
+
+    if goem_type == "LineString":
+        wbt.vector_lines_to_raster(
+            vector, output, field, nodata, cell_size, base, callback
+        )
+    elif goem_type == "Polygon":
+        wbt.vector_polygons_to_raster(
+            vector, output, field, nodata, cell_size, base, callback
+        )
+    else:
+        wbt.vector_points_to_raster(
+            vector, output, field, assign, nodata, cell_size, base, callback
+        )
+
+    image_set_crs(output, to_epsg)
