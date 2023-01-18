@@ -5768,6 +5768,21 @@ def image_projection(image, **kwargs):
     return client.metadata()["Projection"]
 
 
+def image_set_crs(image, epsg):
+    """Define the CRS of an image.
+
+    Args:
+        image (str): The input image filepath
+        epsg (int): The EPSG code of the CRS to set.
+    """
+
+    from rasterio.crs import CRS
+    import rasterio
+
+    with rasterio.open(image, "r+") as rds:
+        rds.crs = CRS.from_epsg(epsg)
+
+
 def image_geotransform(image, **kwargs):
     """Get the geotransform of an image.
 
@@ -7734,3 +7749,77 @@ def arc_zoom_to_extent(xmin, ymin, xmax, ymax):
         # if isinstance(zoom, int):
         #     scale = 156543.04 * math.cos(0) / math.pow(2, zoom)
         #     view.camera.scale = scale  # Not working properly
+
+
+def vector_to_raster(
+    vector,
+    output,
+    field="FID",
+    assign="last",
+    nodata=True,
+    cell_size=None,
+    base=None,
+    callback=None,
+    verbose=False,
+    to_epsg=None,
+):
+    """Convert a vector to a raster.
+
+    Args:
+        vector (str | GeoPandas.GeoDataFrame): The input vector data, can be a file path or a GeoDataFrame.
+        output (str): The output raster file path.
+        field (str, optional): Input field name in attribute table. Defaults to 'FID'.
+        assign (str, optional): Assignment operation, where multiple points are in the same grid cell; options
+            include 'first', 'last' (default), 'min', 'max', 'sum', 'number'. Defaults to 'last'.
+        nodata (bool, optional): Background value to set to NoData. Without this flag, it will be set to 0.0.
+        cell_size (float, optional): Optionally specified cell size of output raster. Not used when base raster is specified
+        base (str, optional): Optionally specified input base raster file. Not used when a cell size is specified. Defaults to None.
+        callback (fuct, optional): A callback function to report progress. Defaults to None.
+        verbose (bool, optional): Whether to print progress to the console. Defaults to False.
+        to_epsg (integer, optional): Optionally specified the EPSG code to reproject the raster to. Defaults to None.
+
+    """
+    import geopandas as gpd
+    import whitebox
+
+    output = os.path.abspath(output)
+
+    if isinstance(vector, str):
+        gdf = gpd.read_file(vector)
+    elif isinstance(vector, gpd.GeoDataFrame):
+        gdf = vector
+    else:
+        raise TypeError("vector must be a file path or a GeoDataFrame")
+
+    if to_epsg is None:
+        to_epsg = 3857
+
+    if to_epsg == 4326:
+        raise ValueError("to_epsg cannot be 4326")
+
+    if gdf.crs.is_geographic:
+        gdf = gdf.to_crs(epsg=to_epsg)
+        vector = temp_file_path(extension=".shp")
+        gdf.to_file(vector)
+    else:
+        to_epsg = gdf.crs.to_epsg()
+
+    wbt = whitebox.WhiteboxTools()
+    wbt.verbose = verbose
+
+    goem_type = gdf.geom_type[0]
+
+    if goem_type == "LineString":
+        wbt.vector_lines_to_raster(
+            vector, output, field, nodata, cell_size, base, callback
+        )
+    elif goem_type == "Polygon":
+        wbt.vector_polygons_to_raster(
+            vector, output, field, nodata, cell_size, base, callback
+        )
+    else:
+        wbt.vector_points_to_raster(
+            vector, output, field, assign, nodata, cell_size, base, callback
+        )
+
+    image_set_crs(output, to_epsg)
