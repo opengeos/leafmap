@@ -985,6 +985,9 @@ def stac_root_link(url, return_col_id=False):
             collection_id = obj.id
         href = obj.get_root_link().get_href()
 
+        if not url.startswith(href):
+            href = obj.get_self_href()
+
         if return_col_id:
             return href, collection_id
         else:
@@ -992,7 +995,10 @@ def stac_root_link(url, return_col_id=False):
 
     except Exception as e:
         print(e)
-        return None
+        if return_col_id:
+            return None, None
+        else:
+            return None
 
 
 def stac_client(
