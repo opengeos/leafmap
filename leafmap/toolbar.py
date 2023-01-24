@@ -4682,7 +4682,7 @@ def stac_gui(m=None):
         style=style,
     )
 
-    add_params_text = "Additional parameters in the format of a dictionary, for example: {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5'], 'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
+    add_params_text = "Additional parameters to visualize imagery, for example: {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5'], 'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
     add_params = widgets.Textarea(
         value="",
         placeholder=add_params_text,
@@ -4815,7 +4815,7 @@ def stac_gui(m=None):
     def http_url_changed(change):
 
         with output:
-            print("Getting collections...")
+            print("Searching...")
             try:
 
                 if connection.value == "Custom STAC Endpoint":
@@ -4916,9 +4916,9 @@ def stac_gui(m=None):
                     if start_date.value is not None and end_date.value is not None:
                         datetime = str(start_date.value) + "/" + str(end_date.value)
                     elif start_date.value is not None:
-                        datetime = str(start_date.value)
+                        datetime = str(start_date.value) + "/.."
                     elif end_date.value is not None:
-                        datetime = str(end_date.value)
+                        datetime = "../" + str(end_date.value)
                     else:
                         datetime = None
 
