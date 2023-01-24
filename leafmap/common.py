@@ -996,11 +996,15 @@ def bbox_to_geojson(bounds):
     """Convert coordinates of a bounding box to a geojson.
 
     Args:
-        bounds (list): A list of coordinates representing [left, bottom, right, top].
+        bounds (list | tuple): A list of coordinates representing [left, bottom, right, top] or m.bounds.
 
     Returns:
         dict: A geojson feature.
     """
+
+    if isinstance(bounds, tuple) and len(bounds) == 2:
+        bounds = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
+
     return {
         "geometry": {
             "type": "Polygon",

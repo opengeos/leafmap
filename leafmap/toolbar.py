@@ -4922,10 +4922,28 @@ def stac_gui(m=None):
                     else:
                         datetime = None
 
-                    if m is not None and m.user_roi is not None:
-                        intersects = m.user_roi["geometry"]
+                    if m is not None:
+                        if m.user_roi is not None:
+                            intersects = m.user_roi["geometry"]
+                        else:
+                            intersects = bbox_to_geojson(m.bounds)
+
                     else:
                         intersects = None
+
+                    if (
+                        checkbox.value
+                        and query_params.value.strip().startswith("{")
+                        and query_params.value.strip().endswith("}")
+                    ):
+                        query = eval(query_params.value)
+                    elif query_params.value.strip() == "":
+                        query = {}
+                    else:
+                        print(
+                            "Invalid query parameters. It must be a dictionary with keys such as 'query', 'sortby', 'filter', 'fields'"
+                        )
+                        query = {}
 
                 print("Retrieving items...")
                 try:
@@ -4938,6 +4956,7 @@ def stac_gui(m=None):
                             datetime=datetime,
                             collections=custom_dataset.value,
                             get_info=True,
+                            **query,
                         )
                     else:
                         search = stac_search(
@@ -4946,6 +4965,7 @@ def stac_gui(m=None):
                             intersects=intersects,
                             datetime=datetime,
                             get_info=True,
+                            **query,
                         )
                     item.options = list(search.keys())
 
