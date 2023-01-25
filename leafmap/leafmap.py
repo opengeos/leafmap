@@ -837,6 +837,7 @@ class Map(ipyleaflet.Map):
         attribution="",
         opacity=1.0,
         shown=True,
+        fit_bounds=True,
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -852,14 +853,16 @@ class Map(ipyleaflet.Map):
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+            fit_bounds (bool, optional): A flag indicating whether the map should be zoomed to the layer extent. Defaults to True.
         """
         tile_url = stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
         bounds = stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
-        self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+        if fit_bounds:
+            self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
