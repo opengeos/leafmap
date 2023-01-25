@@ -4989,7 +4989,12 @@ def stac_gui(m=None):
                             "fillColor": "#000000",
                             "fillOpacity": 0.1,
                         }
-                        m.add_gdf(gdf, style=style, layer_name="Footprints")
+                        m.add_gdf(
+                            gdf,
+                            style=style,
+                            layer_name="Footprints",
+                            zoom_to_layer=False,
+                        )
                         setattr(m, "stac_gdf", gdf)
 
                     stac_data.clear()
@@ -5049,6 +5054,7 @@ def stac_gui(m=None):
                             item=item.value,
                             assets=assets,
                             name=layer_name.value,
+                            fit_bounds=False,
                             **vis_params,
                         )
                         setattr(m, "stac_item", stac_data[0][item.value])
