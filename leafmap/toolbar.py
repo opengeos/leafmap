@@ -4667,7 +4667,7 @@ def stac_gui(m=None):
     )
 
     add_footprints = widgets.Checkbox(
-        value=False,
+        value=True,
         description="Add footprints",
         indent=False,
         layout=widgets.Layout(width="120px", padding=padding),
@@ -4987,11 +4987,13 @@ def stac_gui(m=None):
                             "opacity": 1,
                             "fill": True,
                             "fillColor": "#000000",
-                            "fillOpacity": 0.1,
+                            "fillOpacity": 0,
                         }
+                        hover_style = {"fillOpacity": 0.3}
                         m.add_gdf(
                             gdf,
                             style=style,
+                            hover_style=hover_style,
                             layer_name="Footprints",
                             zoom_to_layer=False,
                         )
