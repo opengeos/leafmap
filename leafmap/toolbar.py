@@ -4662,7 +4662,15 @@ def stac_gui(m=None):
         options=palette_options,
         value=None,
         description="palette:",
-        layout=widgets.Layout(width="300px", padding=padding),
+        layout=widgets.Layout(width="180px", padding=padding),
+        style=style,
+    )
+
+    add_footprints = widgets.Checkbox(
+        value=False,
+        description="Add footprints",
+        indent=False,
+        layout=widgets.Layout(width="120px", padding=padding),
         style=style,
     )
 
@@ -4722,7 +4730,7 @@ def stac_gui(m=None):
     raster_options = widgets.VBox()
     raster_options.children = [
         widgets.HBox([red, green, blue]),
-        widgets.HBox([palette, checkbox]),
+        widgets.HBox([palette, add_footprints, checkbox]),
         params_widget,
     ]
 
@@ -4955,7 +4963,6 @@ def stac_gui(m=None):
                             intersects=intersects,
                             datetime=datetime,
                             collections=custom_dataset.value,
-                            get_info=True,
                             **query,
                         )
                     else:
@@ -4964,13 +4971,29 @@ def stac_gui(m=None):
                             max_items=int(max_items.value),
                             intersects=intersects,
                             datetime=datetime,
-                            get_info=True,
                             **query,
                         )
-                    item.options = list(search.keys())
+                    search_dict = stac_search_to_dict(search)
+                    item.options = list(search_dict.keys())
+                    setattr(m, "stac_search", search)
+                    setattr(m, "stac_dict", search_dict)
+
+                    if add_footprints.value and m is not None:
+                        gdf = stac_search_to_gdf(search)
+                        style = {
+                            "stroke": True,
+                            "color": "#000000",
+                            "weight": 2,
+                            "opacity": 1,
+                            "fill": True,
+                            "fillColor": "#000000",
+                            "fillOpacity": 0.1,
+                        }
+                        m.add_gdf(gdf, style=style, layer_name="Footprints")
+                        setattr(m, "stac_gdf", gdf)
 
                     stac_data.clear()
-                    stac_data.append(search)
+                    stac_data.append(search_dict)
                     update_bands()
                     output.clear_output()
 
@@ -5028,7 +5051,7 @@ def stac_gui(m=None):
                             name=layer_name.value,
                             **vis_params,
                         )
-                        m.stac_data = stac_data[0][item.value]
+                        setattr(m, "stac_item", stac_data[0][item.value])
                         output.clear_output()
                     except Exception as e:
                         print(e)
