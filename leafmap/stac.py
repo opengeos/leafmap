@@ -1202,6 +1202,55 @@ def stac_search(
             return search
 
 
+def stac_search_to_gdf(search, **kwargs):
+    """Convert STAC search result to a GeoDataFrame.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        **kwargs: Additional keyword arguments to pass to the GeoDataFrame.from_features() function.
+
+    Returns:
+        GeoDataFrame: A GeoPandas GeoDataFrame object.
+    """
+    import geopandas as gpd
+
+    gdf = gpd.GeoDataFrame.from_features(
+        search.item_collection().to_dict(), crs="EPSG:4326", **kwargs
+    )
+    return gdf
+
+
+def stac_search_to_df(search, **kwargs):
+    """Convert STAC search result to a DataFrame.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        **kwargs: Additional keyword arguments to pass to the DataFrame.drop() function.
+
+    Returns:
+        DataFrame: A Pandas DataFrame object.
+    """    
+    gdf = stac_search_to_gdf(search)
+    return gdf.drop(columns=["geometry"], **kwargs)
+
+
+def stac_search_to_dict(search, **kwargs):
+    """Convert STAC search result to a dictionary.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+
+    Returns:
+        dict: A dictionary of STAC items, with the stac item id as the key, and the stac item as the value.
+    """
+
+    items = list(search.item_collection())
+    info = {}
+    for item in items:
+        info[item.id] = {'id': item.id, 'href': item.get_self_href(), 'bands': list(item.get_assets().keys()), 'assets': item.get_assets()}
+    return info
+
+
 def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
     """Download geospatial data catalogs from https://github.com/giswqs/geospatial-data-catalogs.
 
