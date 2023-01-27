@@ -4834,7 +4834,6 @@ def stac_gui(m=None):
                         custom_dataset.options = custom_collections
 
                         collection_id = http_url.value.split("/")[-1]
-                        print(collection_id)
                         if collection_id in custom_collections:
                             custom_dataset.value = collection_id
 
@@ -4977,6 +4976,7 @@ def stac_gui(m=None):
                     item.options = list(search_dict.keys())
                     setattr(m, "stac_search", search)
                     setattr(m, "stac_dict", search_dict)
+                    setattr(m, "stac_items", stac_search_to_list(search))
 
                     if add_footprints.value and m is not None:
                         gdf = stac_search_to_gdf(search)
@@ -5051,15 +5051,36 @@ def stac_gui(m=None):
 
                     try:
 
-                        m.add_stac_layer(
-                            url=stac_data[0][item.value]["href"],
-                            item=item.value,
-                            assets=assets,
-                            name=layer_name.value,
-                            fit_bounds=False,
-                            **vis_params,
-                        )
-                        setattr(m, "stac_item", stac_data[0][item.value])
+                        if connection.value == "Microsoft Planetary Computer":
+                            m.add_stac_layer(
+                                collection=http_url.value.split("/")[-1],
+                                item=item.value,
+                                assets=assets,
+                                name=layer_name.value,
+                                fit_bounds=False,
+                                **vis_params,
+                            )
+                            setattr(
+                                m,
+                                "stac_item",
+                                {
+                                    "collection": http_url.value.split("/")[-1],
+                                    "item": item.value,
+                                    "assets": assets,
+                                },
+                            )
+
+                        else:
+
+                            m.add_stac_layer(
+                                url=stac_data[0][item.value]["href"],
+                                item=item.value,
+                                assets=assets,
+                                name=layer_name.value,
+                                fit_bounds=False,
+                                **vis_params,
+                            )
+                            setattr(m, "stac_item", stac_data[0][item.value])
                         output.clear_output()
                     except Exception as e:
                         print(e)
