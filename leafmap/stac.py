@@ -985,6 +985,9 @@ def stac_root_link(url, return_col_id=False):
             collection_id = obj.id
         href = obj.get_root_link().get_href()
 
+        if not url.startswith(href):
+            href = obj.get_self_href()
+
         if return_col_id:
             return href, collection_id
         else:
@@ -992,11 +995,19 @@ def stac_root_link(url, return_col_id=False):
 
     except Exception as e:
         print(e)
-        return None
+        if return_col_id:
+            return None, None
+        else:
+            return None
 
 
 def stac_client(
-    url, headers=None, parameters=None, ignore_conformance=False, modifier=None, return_col_id=False
+    url,
+    headers=None,
+    parameters=None,
+    ignore_conformance=False,
+    modifier=None,
+    return_col_id=False,
 ):
     """Get the STAC client. It wraps the pystac.Client.open() method. See
         https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.open
@@ -1026,11 +1037,15 @@ def stac_client(
         root = stac_root_link(url, return_col_id=return_col_id)
 
         if return_col_id:
-            client = Client.open(root[0], headers, parameters, ignore_conformance, modifier)
+            client = Client.open(
+                root[0], headers, parameters, ignore_conformance, modifier
+            )
             collection_id = root[1]
             return client, collection_id
         else:
-            client = Client.open(root, headers, parameters, ignore_conformance, modifier)
+            client = Client.open(
+                root, headers, parameters, ignore_conformance, modifier
+            )
             return client
 
     except Exception as e:
@@ -1190,10 +1205,83 @@ def stac_search(
             items = list(search.item_collection())
             info = {}
             for item in items:
-                info[item.id] = {'id': item.id, 'href': item.get_self_href(), 'bands': list(item.get_assets().keys()), 'assets': item.get_assets()}
+                info[item.id] = {
+                    "id": item.id,
+                    "href": item.get_self_href(),
+                    "bands": list(item.get_assets().keys()),
+                    "assets": item.get_assets(),
+                }
             return info
         else:
             return search
+
+
+def stac_search_to_gdf(search, **kwargs):
+    """Convert STAC search result to a GeoDataFrame.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        **kwargs: Additional keyword arguments to pass to the GeoDataFrame.from_features() function.
+
+    Returns:
+        GeoDataFrame: A GeoPandas GeoDataFrame object.
+    """
+    import geopandas as gpd
+
+    gdf = gpd.GeoDataFrame.from_features(
+        search.item_collection().to_dict(), crs="EPSG:4326", **kwargs
+    )
+    return gdf
+
+
+def stac_search_to_df(search, **kwargs):
+    """Convert STAC search result to a DataFrame.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        **kwargs: Additional keyword arguments to pass to the DataFrame.drop() function.
+
+    Returns:
+        DataFrame: A Pandas DataFrame object.
+    """
+    gdf = stac_search_to_gdf(search)
+    return gdf.drop(columns=["geometry"], **kwargs)
+
+
+def stac_search_to_dict(search, **kwargs):
+    """Convert STAC search result to a dictionary.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+
+    Returns:
+        dict: A dictionary of STAC items, with the stac item id as the key, and the stac item as the value.
+    """
+
+    items = list(search.item_collection())
+    info = {}
+    for item in items:
+        info[item.id] = {
+            "id": item.id,
+            "href": item.get_self_href(),
+            "bands": list(item.get_assets().keys()),
+            "assets": item.get_assets(),
+        }
+    return info
+
+
+def stac_search_to_list(search, **kwargs):
+
+    """Convert STAC search result to a list.
+
+    Args:
+        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+
+    Returns:
+        list: A list of STAC items.
+    """
+
+    return search.item_collections()
 
 
 def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
@@ -1224,14 +1312,34 @@ def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
     if os.path.exists(work_dir) and not overwrite:
         return work_dir
     else:
-       
+
         gdown.download(url, out_file, quiet=quiet)
         with zipfile.ZipFile(out_file, "r") as zip_ref:
             zip_ref.extractall(out_dir)
         return work_dir
-    
+
 
 def set_default_bands(bands):
+
+    excluded = [
+        "index",
+        "metadata",
+        "mtl.json",
+        "mtl.txt",
+        "mtl.xml",
+        "qa",
+        "qa-browse",
+        "QA",
+        "rendered_preview",
+        "tilejson",
+        "tir-browse",
+        "vnir-browse",
+        "xml",
+    ]
+
+    for band in excluded:
+        if band in bands:
+            bands.remove(band)
 
     if len(bands) == 0:
         return [None, None, None]
@@ -1242,14 +1350,23 @@ def set_default_bands(bands):
     if not isinstance(bands, list):
         raise ValueError("bands must be a list or a string.")
 
-    if (set(['nir', 'red', 'green']) <= set(bands)):
-        return ['nir', 'red', 'green']
-    elif (set(['red', 'green', 'blue']) <= set(bands)):
-        return ['red', 'green', 'blue']
-    elif (set(["B3", "B2", "B1"]) <= set(bands)):
+    if set(["nir", "red", "green"]) <= set(bands):
+        return ["nir", "red", "green"]
+    elif set(["nir08", "red", "green"]) <= set(bands):
+        return ["nir08", "red", "green"]
+    elif set(["red", "green", "blue"]) <= set(bands):
+        return ["red", "green", "blue"]
+    elif set(["B8", "B4", "B3"]) <= set(bands):
+        return ["B8", "B4", "B3"]
+    elif set(["B4", "B3", "B2"]) <= set(bands):
+        return ["B4", "B3", "B2"]
+    elif set(["B3", "B2", "B1"]) <= set(bands):
         return ["B3", "B2", "B1"]
+    elif set(["B08", "B04", "B03"]) <= set(bands):
+        return ["B08", "B04", "B03"]
+    elif set(["B04", "B03", "B02"]) <= set(bands):
+        return ["B04", "B03", "B02"]
     elif len(bands) < 3:
-        return bands[0] * 3
+        return [bands[0]] * 3
     else:
         return bands[:3]
-        
