@@ -9,7 +9,6 @@
 [![image](https://pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
 [![image](https://github.com/giswqs/leafmap/workflows/docs/badge.svg)](https://leafmap.org)
 [![image](https://github.com/giswqs/leafmap/workflows/Linux%20build/badge.svg)](https://github.com/giswqs/leafmap/actions)
-[![image](https://img.shields.io/lgtm/grade/python/g/giswqs/leafmap.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/giswqs/leafmap/context:python)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![image](https://img.shields.io/badge/YouTube-Channel-red)](https://youtube.com/@giswqs)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
