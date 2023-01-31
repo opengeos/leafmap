@@ -1094,8 +1094,9 @@ def stac_search(
     filter_lang=None,
     sortby=None,
     fields=None,
-    get_item_col=False,
+    get_collection=False,
     get_items=False,
+    get_assets=False,
     get_links=False,
     get_gdf=False,
     get_info=False,
@@ -1150,8 +1151,9 @@ def stac_search(
         fields (list, optional): A list of fields to include in the response. Note this may result in
             invalid STAC objects, as they may not have required fields. Use items_as_dicts to avoid object
             unmarshalling errors. Defaults to None.
-        get_item_col (bool, optional): True to return a pystac.ItemCollection. Defaults to False.
+        get_collection (bool, optional): True to return a pystac.ItemCollection. Defaults to False.
         get_items (bool, optional): True to return a list of pystac.Item. Defaults to False.
+        get_assets (bool, optional): True to return a list of pystac.Asset. Defaults to False.
         get_links (bool, optional): True to return a list of links. Defaults to False.
         get_gdf (bool, optional): True to return a GeoDataFrame. Defaults to False.
         **kwargs: Additional keyword arguments to pass to the stac_client() function.
@@ -1188,10 +1190,17 @@ def stac_search(
             fields=fields,
         )
 
-        if get_item_col:
+        if get_collection:
             return search.item_collection()
         elif get_items:
-            return list(search.item_collection())
+            return list(search.items())
+        elif get_assets:
+            assets = {}
+            for item in search.items():
+                assets[item.id] = {}
+                for key, value in item.get_assets().items():
+                    assets[item.id][key] = value.href
+            return assets
         elif get_links:
             return [item.get_self_href() for item in search.items()]
         elif get_gdf:
@@ -1202,7 +1211,7 @@ def stac_search(
             )
             return gdf
         elif get_info:
-            items = list(search.item_collection())
+            items = search.items()
             info = {}
             for item in items:
                 info[item.id] = {

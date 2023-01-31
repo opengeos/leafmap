@@ -7851,3 +7851,38 @@ def vector_to_raster(
         )
 
     image_set_crs(output, to_epsg)
+
+
+def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwargs):
+
+    """
+    Displays a Youtube video in a Jupyter notebook.
+
+    Args:
+        url (string): a link to a Youtube video.
+        width (int, optional): the width of the video. Defaults to 800.
+        height (int, optional): the height of the video. Defaults to 600.
+        allow_autoplay (bool, optional): whether to allow autoplay. Defaults to False.
+        **kwargs: further arguments for IPython.display.YouTubeVideo
+
+    Returns:
+        YouTubeVideo: a video that is displayed in your notebook.
+    """
+    import re
+    from IPython.display import YouTubeVideo
+
+    try:
+        video_id = re.match("^[^v]+v=(.{11}).*", url).group(1)
+    except:
+
+        if "youtube.com" in url or "youtu.be" in url:
+            if "youtube.com" in url:
+                video_id = url.split("v=")[1].split("&")[0]
+            else:
+                video_id = url.split("/")[-1]
+        else:
+            raise ValueError("Invalid Youtube URL")
+
+    return YouTubeVideo(
+        video_id, width=width, height=height, allow_autoplay=allow_autoplay, **kwargs
+    )
