@@ -348,6 +348,15 @@ class Map(ipyleaflet.Map):
             self.remove_layer(existing_layer)
         super().add_layer(layer)
 
+    def add_layer_control(self, position="topright"):
+        """Adds a layer control to the map.
+
+        Args:
+            position (str, optional): The position of the layer control. Defaults to 'topright'.
+        """        
+
+        self.add(ipyleaflet.LayersControl(position=position))
+
     def layer_opacity(self, name, value=1.0):
         """Changes layer opacity.
 
@@ -446,32 +455,43 @@ class Map(ipyleaflet.Map):
             print("Failed to add the specified TileLayer.")
             raise Exception(e)
 
-    def add_vector_tile_layer(
+    def add_vector_tile(
         self,
-        url="https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w",
+        url,
         attribution="",
-        vector_tile_layer_styles=dict(),
+        styles={},
+        layer_name="Vector Tile",
         **kwargs,
     ):
-        """Adds a VectorTileLayer to the map.
+        """Adds a VectorTileLayer to the map. It wraps the ipyleaflet.VectorTileLayer class. See
+            https://ipyleaflet.readthedocs.io/en/latest/layers/vector_tile.html
 
         Args:
-            url (str, optional): The URL of the tile layer. Defaults to 'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
+            url (str, optional): The URL of the tile layer, such as
+                'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
             attribution (str, optional): The attribution to use. Defaults to ''.
-            vector_tile_layer_styles (dict,optional): Style dict, specific to the vector tile source.
+            styles (dict,optional): Style dict, specific to the vector tile source.
+            layer_name (str, optional): The layer name to use for the layer. Defaults to 'Vector Tile'.
+            kwargs: Additional keyword arguments to pass to the ipyleaflet.VectorTileLayer class.
         """
+        if "vector_tile_layer_styles" in kwargs:
+            styles = kwargs["vector_tile_layer_styles"]
+            del kwargs["vector_tile_layer_styles"]
         try:
             vector_tile_layer = ipyleaflet.VectorTileLayer(
                 url=url,
                 attribution=attribution,
-                vector_tile_layer_styles=vector_tile_layer_styles,
+                vector_tile_layer_styles=styles,
                 **kwargs,
             )
+            vector_tile_layer.name = layer_name
             self.add_layer(vector_tile_layer)
 
         except Exception as e:
             print("Failed to add the specified VectorTileLayer.")
             raise Exception(e)
+
+    add_vector_tile_layer = add_vector_tile
 
     def add_osm_from_geocode(
         self,

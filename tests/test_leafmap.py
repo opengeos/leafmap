@@ -330,12 +330,12 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "Countries" in out_str
 
-    def test_add_vector_tile_layer(self):
+    def test_add_vector_tile(self):
         """Check adding vector tile layer"""
         m = leafmap.Map()
         url = "https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w"
         attribution = "Nextzen"
-        m.add_vector_tile_layer(url, attribution)
+        m.add_vector_tile(url, attribution)
         out_str = m.to_html()
         assert "Nextzen" in out_str
 
