@@ -517,8 +517,10 @@ def main_toolbar(m):
                         )
                     except KeyError:
                         opacity = 1.0
-                else:
+                elif hasattr(layer, "opacity"):
                     opacity = layer.opacity
+                else:
+                    opacity = 1.0
 
                 layer_opacity = widgets.FloatSlider(
                     value=opacity,
@@ -560,7 +562,7 @@ def main_toolbar(m):
 
                 if layer in m.geojson_layers:
                     layer_opacity.observe(layer_opacity_changed, "value")
-                else:
+                elif hasattr(layer, "opacity"):
                     widgets.jsdlink((layer_opacity, "value"), (layer, "opacity"))
 
                 # widgets.jsdlink((layer_opacity, "value"), (layer, "opacity"))
