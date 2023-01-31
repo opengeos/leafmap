@@ -67,6 +67,7 @@
 61. Creating an animated GIF from a vector dataset ([notebook](https://leafmap.org/notebooks/61_vector_to_gif))
 62. Adding colorbars to a folium map ([notebook](https://leafmap.org/notebooks/62_folium_colorbar))
 63. Using leafmap with ArcGIS Pro ([notebook](https://leafmap.org/notebooks/63_arcgis))
+64. Searching open geospatial datasets using STAC API ([notebook](https://leafmap.org/notebooks/64_stac_search))
 
 ## Demo
 
