@@ -4143,6 +4143,11 @@ def edit_draw_gui(m):
     if n_props == 0:
         n_props = 1
 
+    if "MAX_PROPS" in os.environ:
+        max_props = int(os.environ["MAX_PROPS"])
+    else:
+        max_props = n_props + 10
+
     sheet = ipysheet.from_dataframe(m.get_draw_props(n_props, return_df=True))
     m.edit_sheet = sheet
 
@@ -4188,7 +4193,7 @@ def edit_draw_gui(m):
 
     int_slider = widgets.IntSlider(
         min=n_props,
-        max=n_props + 10,
+        max=max_props,
         description="Rows:",
         readout=False,
         continuous_update=True,
@@ -4197,14 +4202,6 @@ def edit_draw_gui(m):
     )
 
     int_slider_label = widgets.Label()
-
-    def int_slider_changed(change):
-        if change["new"]:
-            int_slider_label.value = str(int_slider.value)
-
-    int_slider.observe(int_slider_changed, "value")
-
-    # widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
 
     buttons = widgets.ToggleButtons(
         value=None,
@@ -4220,6 +4217,7 @@ def edit_draw_gui(m):
 
     def int_slider_changed(change):
         if change["new"]:
+            int_slider_label.value = str(int_slider.value)
             m.edit_sheet.rows = int_slider.value
             m.num_attributes = int_slider.value
             with output:
@@ -4298,6 +4296,9 @@ def edit_draw_gui(m):
             m.draw_control.data = m.draw_control.data + (geojson["features"])
             m.draw_features = m.draw_features + (geojson["features"])
             open_button.value = False
+
+            m.edit_props = gdf.drop(["geometry"], axis=1).columns.tolist()
+            int_slider.value = len(m.edit_props)
 
         if m.open_control in m.controls:
             m.remove_control(m.open_control)
