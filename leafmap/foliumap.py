@@ -2633,6 +2633,41 @@ class Map(folium.Map):
 
         self.add_html(text, position=position, **kwargs)
 
+    def add_vector_tile(
+        self,
+        url,
+        attribution="",
+        styles={},
+        layer_name="Vector Tile",
+        **kwargs,
+    ):
+        """Adds a VectorTileLayer to the map. It wraps the folium.plugins.VectorGridProtobuf class. See
+            https://github.com/python-visualization/folium/blob/main/folium/plugins/vectorgrid_protobuf.py#L7
+
+        Args:
+            url (str, optional): The URL of the tile layer, such as
+                'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+            styles (dict,optional): Style dict, specific to the vector tile source.
+            layer_name (str, optional): The layer name to use for the layer. Defaults to 'Vector Tile'.
+            kwargs: Additional keyword arguments to pass to the ipyleaflet.VectorTileLayer class.
+        """
+
+        options = {}
+
+        for key, value in kwargs.items():
+            options[key] = value
+
+        if "vector_tile_layer_styles" in options:
+            styles = options["vector_tile_layer_styles"]
+            del options["vector_tile_layer_styles"]
+
+        if styles:
+            options["vectorTileLayerStyles"] = styles
+
+        vc = plugins.VectorGridProtobuf(url, layer_name, options)
+        self.add_child(vc)
+
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
         print("The folium plotting backend does not support removing labels.")
@@ -2674,18 +2709,6 @@ class Map(folium.Map):
         slider_length="150px",
     ):
         """Adds a time slider to the map."""
-        raise NotImplementedError(
-            "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
-        )
-
-    def add_vector_tile_layer(
-        self,
-        url="https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w",
-        attribution="",
-        vector_tile_layer_styles=dict(),
-        **kwargs,
-    ):
-        """Adds a VectorTileLayer to the map."""
         raise NotImplementedError(
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
