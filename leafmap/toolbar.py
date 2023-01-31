@@ -4438,7 +4438,6 @@ def stac_gui(m=None):
     Returns:
         ipywidgets: The tool GUI widget.
     """
-    from .pc import get_pc_collection_list
     import pandas as pd
 
     widget_width = "450px"
@@ -4486,6 +4485,12 @@ def stac_gui(m=None):
             "name": "title",
             "url": "url",
             "description": "summary",
+        },
+        "Custom STAC Endpoint": {
+            "filename": "",
+            "name": "",
+            "url": "",
+            "description": "",
         },
     }
 
@@ -4540,6 +4545,15 @@ def stac_gui(m=None):
         value="https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a",
         description="URL:",
         tooltip="STAC Catalog URL",
+        placeholder="Enter a STAC URL, e.g., https://earth-search.aws.element84.com/v1",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    custom_dataset = widgets.Dropdown(
+        options=[],
+        value=None,
+        description="Dataset:",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
     )
@@ -4558,8 +4572,8 @@ def stac_gui(m=None):
     )
 
     collection = widgets.Dropdown(
-        options=get_pc_collection_list(),
-        value="landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2",
+        options=[],
+        value=None,
         description="Collection:",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
@@ -4610,12 +4624,21 @@ def stac_gui(m=None):
         layout=widgets.Layout(width=band_width, padding=padding),
     )
 
+    max_items = widgets.Text(
+        value="20",
+        description="Max items:",
+        placeholder="Maximum number of items to return from the STAC API",
+        tooltip="Maximum number of items to return from the STAC API",
+        style=style,
+        layout=widgets.Layout(width="130px", padding=padding),
+    )
+
     vmin = widgets.Text(
         value=None,
         description="vmin:",
         tooltip="Minimum value of the raster to visualize",
         style=style,
-        layout=widgets.Layout(width="148px", padding=padding),
+        layout=widgets.Layout(width="100px", padding=padding),
     )
 
     vmax = widgets.Text(
@@ -4623,7 +4646,7 @@ def stac_gui(m=None):
         description="vmax:",
         tooltip="Maximum value of the raster to visualize",
         style=style,
-        layout=widgets.Layout(width="148px", padding=padding),
+        layout=widgets.Layout(width="100px", padding=padding),
     )
 
     nodata = widgets.Text(
@@ -4631,7 +4654,7 @@ def stac_gui(m=None):
         description="Nodata:",
         tooltip="Nodata the raster to visualize",
         style=style,
-        layout=widgets.Layout(width="150px", padding=padding),
+        layout=widgets.Layout(width="113px", padding=padding),
     )
 
     palette_options = list_palettes(lowercase=True)
@@ -4639,7 +4662,15 @@ def stac_gui(m=None):
         options=palette_options,
         value=None,
         description="palette:",
-        layout=widgets.Layout(width="300px", padding=padding),
+        layout=widgets.Layout(width="180px", padding=padding),
+        style=style,
+    )
+
+    add_footprints = widgets.Checkbox(
+        value=True,
+        description="Add footprints",
+        indent=False,
+        layout=widgets.Layout(width="120px", padding=padding),
         style=style,
     )
 
@@ -4651,7 +4682,15 @@ def stac_gui(m=None):
         style=style,
     )
 
-    add_params_text = "Additional parameters in the format of a dictionary, for example, \n {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5'], 'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
+    query_params_text = "Additional parameters to query the STAC API, for example: {'query': {'eo:cloud_cover':{'lt':10}}}"
+    query_params = widgets.Textarea(
+        value="",
+        placeholder=query_params_text,
+        layout=widgets.Layout(width="454px", padding=padding),
+        style=style,
+    )
+
+    add_params_text = "Additional parameters to visualize imagery, for example: {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5'], 'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
     add_params = widgets.Textarea(
         value="",
         placeholder=add_params_text,
@@ -4678,6 +4717,7 @@ def stac_gui(m=None):
         red.value = "red"
         green.value = "green"
         blue.value = "blue"
+        max_items.value = "20"
         vmin.value = ""
         vmax.value = ""
         nodata.value = ""
@@ -4690,7 +4730,7 @@ def stac_gui(m=None):
     raster_options = widgets.VBox()
     raster_options.children = [
         widgets.HBox([red, green, blue]),
-        widgets.HBox([palette, checkbox]),
+        widgets.HBox([palette, add_footprints, checkbox]),
         params_widget,
     ]
 
@@ -4702,6 +4742,13 @@ def stac_gui(m=None):
     )
     buttons.style.button_width = "65px"
 
+    dataset_widget = widgets.VBox()
+    dataset_widget.children = [
+        dataset,
+        description,
+        http_url,
+    ]
+
     toolbar_widget = widgets.VBox()
     toolbar_widget.children = [toolbar_button]
     toolbar_header = widgets.HBox()
@@ -4709,9 +4756,7 @@ def stac_gui(m=None):
     toolbar_footer = widgets.VBox()
     toolbar_footer.children = [
         connection,
-        dataset,
-        description,
-        http_url,
+        dataset_widget,
         widgets.HBox([start_date, end_date]),
         item,
         raster_options,
@@ -4747,26 +4792,65 @@ def stac_gui(m=None):
     def connection_changed(change):
         if change["new"]:
 
-            df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
-            datasets = df[stac_info[connection.value]["name"]].tolist()
-            dataset.options = datasets
-            dataset.value = datasets[0]
+            if connection.value != "Custom STAC Endpoint":
+                df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
+                datasets = df[stac_info[connection.value]["name"]].tolist()
+                dataset.options = datasets
+                dataset.value = datasets[0]
+                dataset_widget.children = [dataset, description, http_url]
+            else:
+                http_url.value = "https://earth-search.aws.element84.com/v1"
+                dataset_widget.children = [http_url, custom_dataset]
 
     connection.observe(connection_changed, names="value")
 
     def dataset_changed(change):
         if change["new"]:
-            df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
-            df = df[df[stac_info[connection.value]["name"]] == dataset.value]
-            description.value = df[stac_info[connection.value]["description"]].tolist()[
-                0
-            ]
-            http_url.value = df[stac_info[connection.value]["url"]].tolist()[0]
-            item.options = []
-            stac_data.clear()
-            update_bands()
+            if connection.value != "Custom STAC Endpoint":
+                df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
+                df = df[df[stac_info[connection.value]["name"]] == dataset.value]
+                description.value = df[
+                    stac_info[connection.value]["description"]
+                ].tolist()[0]
+                http_url.value = df[stac_info[connection.value]["url"]].tolist()[0]
+                item.options = []
+                custom_dataset.options = []
+                stac_data.clear()
+                update_bands()
 
     dataset.observe(dataset_changed, names="value")
+
+    def http_url_changed(change):
+
+        with output:
+            print("Searching...")
+            try:
+
+                if connection.value == "Custom STAC Endpoint":
+                    custom_collections = stac_collections(
+                        http_url.value, return_ids=True
+                    )
+                    if custom_collections:
+                        custom_dataset.options = custom_collections
+
+                        collection_id = http_url.value.split("/")[-1]
+                        if collection_id in custom_collections:
+                            custom_dataset.value = collection_id
+
+                    else:
+                        custom_dataset.options = []
+
+                else:
+
+                    custom_cols = stac_collections(http_url.value, return_ids=True)
+                    item.options = custom_cols
+                    stac_data.clear()
+                update_bands()
+                output.clear_output()
+            except Exception as e:
+                print(e)
+
+    http_url.on_submit(http_url_changed)
 
     def item_changed(change):
         if change["new"]:
@@ -4787,7 +4871,8 @@ def stac_gui(m=None):
         if change["new"]:
             params_widget.children = [
                 layer_name,
-                widgets.HBox([vmin, vmax, nodata]),
+                widgets.HBox([max_items, vmin, vmax, nodata]),
+                query_params,
                 add_params,
             ]
         else:
@@ -4838,30 +4923,84 @@ def stac_gui(m=None):
                     if start_date.value is not None and end_date.value is not None:
                         datetime = str(start_date.value) + "/" + str(end_date.value)
                     elif start_date.value is not None:
-                        datetime = str(start_date.value)
+                        datetime = str(start_date.value) + "/.."
                     elif end_date.value is not None:
-                        datetime = str(end_date.value)
+                        datetime = "../" + str(end_date.value)
                     else:
                         datetime = None
 
-                    if m is not None and m.user_roi is not None:
-                        intersects = m.user_roi["geometry"]
+                    if m is not None:
+                        if m.user_roi is not None:
+                            intersects = m.user_roi["geometry"]
+                        else:
+                            intersects = bbox_to_geojson(m.bounds)
+
                     else:
                         intersects = None
 
+                    if (
+                        checkbox.value
+                        and query_params.value.strip().startswith("{")
+                        and query_params.value.strip().endswith("}")
+                    ):
+                        query = eval(query_params.value)
+                    elif query_params.value.strip() == "":
+                        query = {}
+                    else:
+                        print(
+                            "Invalid query parameters. It must be a dictionary with keys such as 'query', 'sortby', 'filter', 'fields'"
+                        )
+                        query = {}
+
                 print("Retrieving items...")
                 try:
-                    search = stac_search(
-                        url=http_url.value,
-                        max_items=MAX_ITEMS,
-                        intersects=intersects,
-                        datetime=datetime,
-                        get_info=True,
-                    )
-                    item.options = list(search.keys())
+
+                    if connection.value == "Custom STAC Endpoint":
+                        search = stac_search(
+                            url=http_url.value,
+                            max_items=int(max_items.value),
+                            intersects=intersects,
+                            datetime=datetime,
+                            collections=custom_dataset.value,
+                            **query,
+                        )
+                    else:
+                        search = stac_search(
+                            url=http_url.value,
+                            max_items=int(max_items.value),
+                            intersects=intersects,
+                            datetime=datetime,
+                            **query,
+                        )
+                    search_dict = stac_search_to_dict(search)
+                    item.options = list(search_dict.keys())
+                    setattr(m, "stac_search", search)
+                    setattr(m, "stac_dict", search_dict)
+                    setattr(m, "stac_items", stac_search_to_list(search))
+
+                    if add_footprints.value and m is not None:
+                        gdf = stac_search_to_gdf(search)
+                        style = {
+                            "stroke": True,
+                            "color": "#000000",
+                            "weight": 2,
+                            "opacity": 1,
+                            "fill": True,
+                            "fillColor": "#000000",
+                            "fillOpacity": 0,
+                        }
+                        hover_style = {"fillOpacity": 0.3}
+                        m.add_gdf(
+                            gdf,
+                            style=style,
+                            hover_style=hover_style,
+                            layer_name="Footprints",
+                            zoom_to_layer=False,
+                        )
+                        setattr(m, "stac_gdf", gdf)
 
                     stac_data.clear()
-                    stac_data.append(search)
+                    stac_data.append(search_dict)
                     update_bands()
                     output.clear_output()
 
@@ -4905,7 +5044,6 @@ def stac_gui(m=None):
                     if nodata.value:
                         vis_params["nodata"] = nodata.value
 
-                    col = collection.value.split(" - ")[0]
                     if len(set([red.value, green.value, blue.value])) == 1:
                         assets = red.value
                     else:
@@ -4913,14 +5051,36 @@ def stac_gui(m=None):
 
                     try:
 
-                        m.add_stac_layer(
-                            url=stac_data[0][item.value]["href"],
-                            item=item.value,
-                            assets=assets,
-                            name=layer_name.value,
-                            **vis_params,
-                        )
-                        m.stac_data = stac_data[0][item.value]
+                        if connection.value == "Microsoft Planetary Computer":
+                            m.add_stac_layer(
+                                collection=http_url.value.split("/")[-1],
+                                item=item.value,
+                                assets=assets,
+                                name=layer_name.value,
+                                fit_bounds=False,
+                                **vis_params,
+                            )
+                            setattr(
+                                m,
+                                "stac_item",
+                                {
+                                    "collection": http_url.value.split("/")[-1],
+                                    "item": item.value,
+                                    "assets": assets,
+                                },
+                            )
+
+                        else:
+
+                            m.add_stac_layer(
+                                url=stac_data[0][item.value]["href"],
+                                item=item.value,
+                                assets=assets,
+                                name=layer_name.value,
+                                fit_bounds=False,
+                                **vis_params,
+                            )
+                            setattr(m, "stac_item", stac_data[0][item.value])
                         output.clear_output()
                     except Exception as e:
                         print(e)
