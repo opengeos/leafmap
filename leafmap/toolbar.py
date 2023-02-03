@@ -4489,7 +4489,7 @@ def stac_gui(m=None):
             "url": "url",
             "description": "summary",
         },
-        "Custom STAC Endpoint": {
+        "Custom STAC API Endpoint": {
             "filename": "",
             "name": "",
             "url": "",
@@ -4795,7 +4795,7 @@ def stac_gui(m=None):
     def connection_changed(change):
         if change["new"]:
 
-            if connection.value != "Custom STAC Endpoint":
+            if connection.value != "Custom STAC API Endpoint":
                 df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
                 datasets = df[stac_info[connection.value]["name"]].tolist()
                 dataset.options = datasets
@@ -4804,12 +4804,14 @@ def stac_gui(m=None):
             else:
                 http_url.value = "https://earth-search.aws.element84.com/v1"
                 dataset_widget.children = [http_url, custom_dataset]
+                with output:
+                    print("Enter a STAC API endpoint and press Enter to list datasets")
 
     connection.observe(connection_changed, names="value")
 
     def dataset_changed(change):
         if change["new"]:
-            if connection.value != "Custom STAC Endpoint":
+            if connection.value != "Custom STAC API Endpoint":
                 df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
                 df = df[df[stac_info[connection.value]["name"]] == dataset.value]
                 description.value = df[
@@ -4826,10 +4828,11 @@ def stac_gui(m=None):
     def http_url_changed(change):
 
         with output:
+            output.clear_output()
             print("Searching...")
             try:
 
-                if connection.value == "Custom STAC Endpoint":
+                if connection.value == "Custom STAC API Endpoint":
                     custom_collections = stac_collections(
                         http_url.value, return_ids=True
                     )
@@ -4958,54 +4961,64 @@ def stac_gui(m=None):
                 print("Retrieving items...")
                 try:
 
-                    if connection.value == "Custom STAC Endpoint":
-                        search = stac_search(
-                            url=http_url.value,
-                            max_items=int(max_items.value),
-                            intersects=intersects,
-                            datetime=datetime,
-                            collections=custom_dataset.value,
-                            **query,
-                        )
+                    if connection.value in [
+                        "Google Earth Engine",
+                        "NASA Common Metadata Repository",
+                    ]:
+                        output.clear_output()
+                        print(f"{connection.value} is not supported yet.")
                     else:
-                        search = stac_search(
-                            url=http_url.value,
-                            max_items=int(max_items.value),
-                            intersects=intersects,
-                            datetime=datetime,
-                            **query,
-                        )
-                    search_dict = stac_search_to_dict(search)
-                    item.options = list(search_dict.keys())
-                    setattr(m, "stac_search", search)
-                    setattr(m, "stac_dict", search_dict)
-                    setattr(m, "stac_items", stac_search_to_list(search))
+                        if connection.value == "Custom STAC API Endpoint":
+                            search = stac_search(
+                                url=http_url.value,
+                                max_items=int(max_items.value),
+                                intersects=intersects,
+                                datetime=datetime,
+                                collections=custom_dataset.value,
+                                **query,
+                            )
 
-                    if add_footprints.value and m is not None:
-                        gdf = stac_search_to_gdf(search)
-                        style = {
-                            "stroke": True,
-                            "color": "#000000",
-                            "weight": 2,
-                            "opacity": 1,
-                            "fill": True,
-                            "fillColor": "#000000",
-                            "fillOpacity": 0,
-                        }
-                        hover_style = {"fillOpacity": 0.3}
-                        m.add_gdf(
-                            gdf,
-                            style=style,
-                            hover_style=hover_style,
-                            layer_name="Footprints",
-                            zoom_to_layer=False,
-                        )
-                        setattr(m, "stac_gdf", gdf)
+                        else:
+                            search = stac_search(
+                                url=http_url.value,
+                                max_items=int(max_items.value),
+                                intersects=intersects,
+                                datetime=datetime,
+                                **query,
+                            )
+                        search_dict = stac_search_to_dict(search)
+                        item.options = list(search_dict.keys())
+                        setattr(m, "stac_search", search)
+                        setattr(m, "stac_dict", search_dict)
+                        setattr(m, "stac_items", stac_search_to_list(search))
 
-                    stac_data.clear()
-                    stac_data.append(search_dict)
-                    update_bands()
-                    output.clear_output()
+                        if add_footprints.value and m is not None:
+                            gdf = stac_search_to_gdf(search)
+                            style = {
+                                "stroke": True,
+                                "color": "#000000",
+                                "weight": 2,
+                                "opacity": 1,
+                                "fill": True,
+                                "fillColor": "#000000",
+                                "fillOpacity": 0,
+                            }
+                            hover_style = {"fillOpacity": 0.3}
+                            m.add_gdf(
+                                gdf,
+                                style=style,
+                                hover_style=hover_style,
+                                layer_name="Footprints",
+                                zoom_to_layer=False,
+                            )
+                            setattr(m, "stac_gdf", gdf)
+
+                        stac_data.clear()
+                        stac_data.append(search_dict)
+                        update_bands()
+                        output.clear_output()
+                except NotImplementedError as e:
+                    print(e)
 
                 except Exception as e:
                     print(e)
@@ -5066,12 +5079,9 @@ def stac_gui(m=None):
                             setattr(
                                 m,
                                 "stac_item",
-                                {
-                                    "collection": http_url.value.split("/")[-1],
-                                    "item": item.value,
-                                    "assets": assets,
-                                },
+                                m.stac_dict[item.value],
                             )
+                            m.stac_item["collection"] = http_url.value.split("/")[-1]
 
                         else:
 
@@ -5083,7 +5093,7 @@ def stac_gui(m=None):
                                 fit_bounds=False,
                                 **vis_params,
                             )
-                            setattr(m, "stac_item", stac_data[0][item.value])
+                            setattr(m, "stac_item", m.stac_dict[item.value])
                         output.clear_output()
                     except Exception as e:
                         print(e)
