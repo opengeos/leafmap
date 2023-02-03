@@ -1276,6 +1276,11 @@ def stac_search_to_dict(search, **kwargs):
             "bands": list(item.get_assets().keys()),
             "assets": item.get_assets(),
         }
+        links = {}
+        assets = item.get_assets()
+        for key, value in assets.items():
+            links[key] = value.href
+        info[item.id]["links"] = links
     return info
 
 
