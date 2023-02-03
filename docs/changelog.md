@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.16.0 - Feb 3, 2023
+
+**New Features**
+
+-   Added STAC API Browser GUI ([#347](https://github.com/giswqs/leafmap/pull/347), [#354](https://github.com/giswqs/leafmap/pull/354))
+-   Added support for vector tiles ([#352](https://github.com/giswqs/leafmap/pull/352))
+-   Added support for editing an empty vector dataset interactively ([#353](https://github.com/giswqs/leafmap/pull/353))
+-   Added vector-to-raster function ([#343](https://github.com/giswqs/leafmap/pull/343))
+
+**Improvement**
+
+-   Updated 04_cog_mosaic.ipynb ([#342](https://github.com/giswqs/leafmap/pull/342))
+-   Fixed tar file bug CVE-2007-4559 ([#350](https://github.com/giswqs/leafmap/pull/350))
+-   Fixed folium add basemap bug
+
 ## v0.15.0 - Dec 23, 2022
 
 **New Features**
