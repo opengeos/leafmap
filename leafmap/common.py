@@ -2883,8 +2883,15 @@ def get_local_tile_layer(
             "LOCALTILESERVER_CLIENT_PREFIX"
         ] = f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
 
-    if is_on_aws():
+    if is_studio_lab():
+        os.environ[
+            "LOCALTILESERVER_CLIENT_PREFIX"
+        ] = f"studiolab/default/jupyter/proxy/{{port}}"
+    elif is_on_aws():
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
+    elif "prefix" in kwargs:
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
+        kwargs.pop("prefix")
 
     from localtileserver import (
         get_leaflet_tile_layer,
@@ -6219,6 +6226,24 @@ def is_on_aws():
         if item.endswith(".aws") or "studiolab/bin" in item:
             on_aws = True
     return on_aws
+
+
+def is_studio_lab():
+    """Check if the current notebook is running on Studio Lab.
+
+    Returns:
+        bool: True if the notebook is running on Studio Lab.
+    """
+
+    import psutil
+
+    output = psutil.Process().parent().cmdline()
+
+    on_studio_lab = False
+    for item in output:
+        if "studiolab/bin" in item:
+            on_studio_lab = True
+    return on_studio_lab
 
 
 def bbox_to_gdf(bbox, crs="epsg:4326"):
