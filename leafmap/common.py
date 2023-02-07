@@ -6223,7 +6223,7 @@ def is_on_aws():
 
     on_aws = False
     for item in output:
-        if item.endswith(".aws") or "studiolab/bin" in item:
+        if item.endswith(".aws") or "ec2-user" in item:
             on_aws = True
     return on_aws
 
