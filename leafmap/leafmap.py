@@ -353,7 +353,7 @@ class Map(ipyleaflet.Map):
 
         Args:
             position (str, optional): The position of the layer control. Defaults to 'topright'.
-        """        
+        """
 
         self.add(ipyleaflet.LayersControl(position=position))
 
