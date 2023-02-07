@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.16.1 - Feb 7, 2023
+
+**New Features**
+
+-   Added support for visualizing raster datasets in AWS SageMaker ([#359](https://github.com/giswqs/leafmap/pull/359))
+
 ## v0.16.0 - Feb 3, 2023
 
 **New Features**
