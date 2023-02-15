@@ -7911,3 +7911,56 @@ def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwarg
     return YouTubeVideo(
         video_id, width=width, height=height, allow_autoplay=allow_autoplay, **kwargs
     )
+
+
+def html_to_gradio(html, width='100%', height='500px', **kwargs):
+    """Converts the map to an HTML string that can be used in Gradio. Removes unsupported elements, such as
+        attribution and any code blocks containing functions. See https://github.com/gradio-app/gradio/issues/3190
+
+    Args:
+        width (str, optional): The width of the map. Defaults to '100%'.
+        height (str, optional): The height of the map. Defaults to '500px'.
+
+    Returns:
+        str: The HTML string to use in Gradio.
+    """
+
+    if isinstance(width, int):
+        width = f"{width}px"
+
+    if isinstance(height, int):
+        height = f"{height}px"
+
+    if isinstance(html, str):
+        with open(html, 'r') as f:
+            lines = f.readlines()
+    elif isinstance(html, list):
+        lines = html
+    else:
+        raise TypeError("html must be a file path or a list of strings")
+
+    output = []
+    skipped_lines = []
+    for index, line in enumerate(lines):
+        if index in skipped_lines:
+            continue
+        if line.lstrip().startswith('{"attribution":'):
+            continue
+        elif 'on(L.Draw.Event.CREATED, function(e)' in line:
+            for i in range(14):
+                skipped_lines.append(index + i)
+        elif 'L.Control.geocoder' in line:
+            for i in range(5):
+                skipped_lines.append(index + i)
+        elif 'function(e)' in line:
+            print(
+                f"Warning: The folium plotting backend does not support functions in code blocks. Please delete line {index + 1}."
+            )
+        else:
+            output.append(line + "\n")
+
+    return f"""<iframe style="width: {width}; height: {height}" name="result" allow="midi; geolocation; microphone; camera; 
+    display-capture; encrypted-media;" sandbox="allow-modals allow-forms 
+    allow-scripts allow-same-origin allow-popups 
+    allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
+    allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
