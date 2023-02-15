@@ -1235,7 +1235,11 @@ class Map(folium.Map):
         tooltip = None
         popup = None
         if info_mode is not None:
-            props = list(data["features"][0]["properties"].keys())
+            if "fields" in kwargs:
+                props = kwargs["fields"]
+                kwargs.pop("fields")
+            else:
+                props = list(data["features"][0]["properties"].keys())
             if info_mode == "on_hover":
                 tooltip = folium.GeoJsonTooltip(fields=props)
             elif info_mode == "on_click":
@@ -2435,6 +2439,7 @@ class Map(folium.Map):
                 highlight_function = lambda feat: {"fillColor": feat["properties"]["color"]}
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            **kwargs: Additional keyword arguments to pass to the GeoJSON class, such as fields, which can be a list of column names to be included in the popup.
         """
 
         import warnings

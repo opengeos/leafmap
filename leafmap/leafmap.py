@@ -2137,6 +2137,7 @@ class Map(ipyleaflet.Map):
         fill_colors=["black"],
         info_mode="on_hover",
         encoding="utf-8",
+        **kwargs,
     ):
         """Adds a GeoJSON file to the map.
 
@@ -2276,12 +2277,23 @@ class Map(ipyleaflet.Map):
 
         close_button.observe(close_btn_click, "value")
 
-        def update_html(feature, **kwargs):
+        if "fields" in kwargs:
+            fields = kwargs["fields"]
+            kwargs.pop("fields")
+        else:
+            fields = None
+
+        def update_html(feature, fields=fields, **kwargs):
+
+            if fields is None:
+                fields = list(feature["properties"].keys())
+                if "style" in fields:
+                    fields.remove("style")
 
             value = [
                 "<b>{}: </b>{}<br>".format(prop, feature["properties"][prop])
-                for prop in feature["properties"].keys()
-            ][:-1]
+                for prop in fields
+            ]
 
             value = """{}""".format("".join(value))
             html.value = value
@@ -2362,6 +2374,7 @@ class Map(ipyleaflet.Map):
         info_mode="on_hover",
         zoom_to_layer=True,
         encoding="utf-8",
+        **kwargs
     ):
         """Adds a GeoDataFrame to the map.
 
@@ -2388,6 +2401,7 @@ class Map(ipyleaflet.Map):
             fill_colors,
             info_mode,
             encoding,
+            **kwargs,
         )
 
         if zoom_to_layer:
@@ -3549,6 +3563,8 @@ class Map(ipyleaflet.Map):
                 style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            **kwargs: Additional keyword arguments to pass to the GeoJSON class, such as fields, which can be a list of column names to be included in the popup.
+
         """
 
         gdf, legend_dict = classify(
