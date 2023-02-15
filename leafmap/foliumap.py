@@ -2669,11 +2669,21 @@ class Map(folium.Map):
         self.add_child(vc)
 
     def to_gradio(self, width='100%', height='500px', **kwargs):
-        """Converts the map to a gradio interface.
+        """Converts the map to an HTML string that can be used in Gradio. Removes unsupported elements, such as
+            attribution and any code blocks containing functions. See https://github.com/gradio-app/gradio/issues/3190
+
+        Args:
+            width (str, optional): The width of the map. Defaults to '100%'.
+            height (str, optional): The height of the map. Defaults to '500px'.
 
         Returns:
-            gradio.Interface: The gradio interface.
+            str: The HTML string to use in Gradio.
         """
+
+        if isinstance(width, int):
+            width = f"{width}px"
+        if isinstance(height, int):
+            height = f"{height}px"
 
         html = self.to_html()
         lines = html.split("\n")
@@ -2690,6 +2700,10 @@ class Map(folium.Map):
             elif 'L.Control.geocoder' in line:
                 for i in range(5):
                     skipped_lines.append(index + i)
+            elif 'function(e)' in line:
+                print(
+                    f"Warning: The folium plotting backend does not support functions in code blocks. Please delete line {index + 1}."
+                )
             else:
                 output.append(line + "\n")
 
@@ -2698,7 +2712,6 @@ class Map(folium.Map):
         allow-scripts allow-same-origin allow-popups 
         allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
         allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
-
 
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""

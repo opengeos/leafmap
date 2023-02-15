@@ -69,6 +69,7 @@
 63. Using leafmap with ArcGIS Pro ([notebook](https://leafmap.org/notebooks/63_arcgis))
 64. Searching open geospatial datasets using STAC API ([notebook](https://leafmap.org/notebooks/64_stac_search))
 65. Visualizing raster datasets interactively in SageMaker Studio Lab ([notebook](https://leafmap.org/notebooks/65_sagemaker))
+66. Developing interactive web apps with gradio and leafmap ([notebook](https://leafmap.org/notebooks/66_gradio))
 
 ## Demo
 
