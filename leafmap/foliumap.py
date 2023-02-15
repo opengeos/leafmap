@@ -2668,6 +2668,38 @@ class Map(folium.Map):
         vc = plugins.VectorGridProtobuf(url, layer_name, options)
         self.add_child(vc)
 
+    def to_gradio(self, width='100%', height='500px', **kwargs):
+        """Converts the map to a gradio interface.
+
+        Returns:
+            gradio.Interface: The gradio interface.
+        """
+
+        html = self.to_html()
+        lines = html.split("\n")
+        output = []
+        skipped_lines = []
+        for index, line in enumerate(lines):
+            if index in skipped_lines:
+                continue
+            if line.lstrip().startswith('{"attribution":'):
+                continue
+            elif 'on(L.Draw.Event.CREATED, function(e)' in line:
+                for i in range(14):
+                    skipped_lines.append(index + i)
+            elif 'L.Control.geocoder' in line:
+                for i in range(5):
+                    skipped_lines.append(index + i)
+            else:
+                output.append(line + "\n")
+
+        return f"""<iframe style="width: {width}; height: {height}" name="result" allow="midi; geolocation; microphone; camera; 
+        display-capture; encrypted-media;" sandbox="allow-modals allow-forms 
+        allow-scripts allow-same-origin allow-popups 
+        allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
+        allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
+
+
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
         print("The folium plotting backend does not support removing labels.")
