@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.17.0 - Feb 15, 2023
+
+**New Features**
+
+-   Added support for gradio for developing interactive web apps ([#364](https://github.com/giswqs/leafmap/pull/364))
+
 ## v0.16.1 - Feb 7, 2023
 
 **New Features**
