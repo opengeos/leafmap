@@ -143,7 +143,6 @@ def tool_template(m=None):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -332,7 +331,6 @@ def main_toolbar(m):
     m.toolbar = toolbar_grid
 
     def tool_callback(change):
-
         if change["new"]:
             current_tool = change["owner"]
             for tool in toolbar_grid.children:
@@ -434,7 +432,6 @@ def main_toolbar(m):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -457,7 +454,6 @@ def main_toolbar(m):
 
     def layers_btn_click(change):
         if change["new"]:
-
             layers_hbox = []
             all_layers_chk = widgets.Checkbox(
                 value=False,
@@ -796,7 +792,6 @@ def open_data_widget(m):
     bands.observe(bands_changed, "value")
 
     def chooser_callback(chooser):
-
         filepath.value = file_chooser.selected
 
         if file_type.value == "CSV":
@@ -884,11 +879,9 @@ def open_data_widget(m):
                     elif ext.lower() == ".shp":
                         m.add_shp(file_path, style={}, layer_name=layer_name.value)
                     elif ext.lower() == ".geojson":
-
                         m.add_geojson(file_path, style={}, layer_name=layer_name.value)
 
                     elif ext.lower() == ".csv" and file_type.value == "CSV":
-
                         m.add_xy_data(
                             file_path,
                             x=longitude.value,
@@ -900,7 +893,6 @@ def open_data_widget(m):
                     elif (
                         ext.lower() in [".tif", "img"]
                     ) and file_type.value == "Raster":
-
                         band = None
                         vis_min = None
                         vis_max = None
@@ -1135,7 +1127,6 @@ def open_raster_gui(m):
     ]
 
     def collection_changed(change):
-
         if change["new"]:
             if not hasattr(m, "pc_inventory"):
                 setattr(m, "pc_inventory", get_pc_inventory())
@@ -1263,7 +1254,6 @@ def open_raster_gui(m):
     bands.observe(bands_changed, "value")
 
     def chooser_callback(chooser):
-
         try:
             source = file_chooser.selected
             tile_layer, tile_client = get_local_tile_layer(source, return_client=True)
@@ -1358,7 +1348,6 @@ def open_raster_gui(m):
                 tool_output.clear_output()
                 print("Loading data...")
                 if file_type.value == "GeoTIFF" and file_chooser.selected:
-
                     band = None
                     vis_min = None
                     vis_max = None
@@ -1879,7 +1868,6 @@ def time_slider(
     slider_widget = widgets.HBox([label, slider, play_btn, pause_btn, close_btn])
 
     def play_click(b):
-
         play_chk.value = True
 
         def work(slider):
@@ -2003,7 +1991,6 @@ def census_widget(m=None):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -2190,7 +2177,6 @@ def search_basemaps(m=None):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -2316,6 +2302,7 @@ def download_osm(m=None):
     )
 
     int_slider_label = widgets.Label()
+
     # widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
     def int_slider_changed(change):
         if change["new"]:
@@ -2334,6 +2321,7 @@ def download_osm(m=None):
     )
 
     float_slider_label = widgets.Label()
+
     # widgets.jslink((float_slider, "value"), (float_slider_label, "value"))
     def float_slider_changed(change):
         if change["new"]:
@@ -2395,7 +2383,6 @@ def download_osm(m=None):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -2477,7 +2464,6 @@ def inspector_gui(m=None):
     style = {"description_width": "initial"}
 
     if m is not None:
-
         marker_cluster = ipyleaflet.MarkerCluster(name="Inspector Markers")
         setattr(m, "pixel_values", [])
         setattr(m, "marker_cluster", marker_cluster)
@@ -2599,7 +2585,6 @@ def inspector_gui(m=None):
     bands_chk.observe(chk_change, "value")
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -2821,7 +2806,6 @@ def inspector_gui(m=None):
         m.add_layer(marker_cluster)
 
         if not m.interact_mode:
-
             m.on_interaction(handle_interaction)
             m.interact_mode = True
 
@@ -2921,7 +2905,6 @@ def plotly_toolbar(
     canvas.toolbar = toolbar_grid
 
     def tool_callback(change):
-
         if change["new"]:
             current_tool = change["owner"]
             for tool in toolbar_grid.children:
@@ -2981,7 +2964,6 @@ def plotly_toolbar(
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
             # map_widget.layout.width = "85%"
@@ -3017,7 +2999,6 @@ def plotly_toolbar(
 
     def layers_btn_click(change):
         if change["new"]:
-
             layer_names = list(m.get_layers().keys())
             layers_hbox = []
             all_layers_chk = widgets.Checkbox(
@@ -3074,7 +3055,6 @@ def plotly_toolbar(
                 )
 
                 def layer_chk_change(change):
-
                     if change["new"]:
                         m.set_layer_visibility(change["owner"].description, True)
                     else:
@@ -3119,7 +3099,6 @@ def plotly_toolbar(
 
 
 def plotly_tool_template(canvas):
-
     container_widget = canvas.container_widget
     map_widget = canvas.map_widget
     map_width = "70%"
@@ -3161,7 +3140,6 @@ def plotly_tool_template(canvas):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
             map_widget.layout.width = map_width
@@ -3374,7 +3352,6 @@ def plotly_search_basemaps(canvas):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -3487,7 +3464,6 @@ def plotly_whitebox_gui(canvas):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
             map_widget.layout.width = map_width
@@ -3621,7 +3597,6 @@ def search_geojson_gui(m=None):
     layers.observe(layer_change, names="value")
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -3791,7 +3766,6 @@ def select_table_gui(m=None):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -3897,7 +3871,6 @@ def show_table_gui(m, df):
     sheet.layout.width = output.layout.width
 
     def checkbox_clicked(change):
-
         output.clear_output()
 
         if change["new"]:
@@ -3941,7 +3914,6 @@ def show_table_gui(m, df):
     )
 
     def reset_btn_clicked(b):
-
         output.layout.width = widget_width
         output.layout.max_height = str(int(m.layout.height[:-2]) - 220) + "px"
 
@@ -3954,7 +3926,6 @@ def show_table_gui(m, df):
     )
 
     def fullscreen_btn_clicked(b):
-
         output.layout.width = "1000px"
         output.layout.max_height = str(int(m.layout.height[:-2]) - 220) + "px"
 
@@ -4066,7 +4037,6 @@ def show_table_gui(m, df):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
             toolbar_button.icon = "window-minimize"
@@ -4106,7 +4076,6 @@ def show_table_gui(m, df):
     close_button.observe(close_btn_click, "value")
 
     with output:
-
         display(sheet)
 
     toolbar_button.value = True
@@ -4253,7 +4222,6 @@ def edit_draw_gui(m):
     )
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -4399,7 +4367,6 @@ def edit_draw_gui(m):
                         m.update_draw_features()
                     m.update_draw_props(ipysheet.to_dataframe(m.edit_sheet))
         elif change["new"] == "Reset":
-
             m.edit_sheet = ipysheet.from_dataframe(
                 m.get_draw_props(int_slider.value, return_df=True)
             )
@@ -4772,7 +4739,6 @@ def stac_gui(m=None):
     )
 
     def update_bands():
-
         if len(stac_data) > 0:
             bnames = stac_data[0][item.value]["bands"]
         else:
@@ -4794,7 +4760,6 @@ def stac_gui(m=None):
 
     def connection_changed(change):
         if change["new"]:
-
             if connection.value != "Custom STAC API Endpoint":
                 df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
                 datasets = df[stac_info[connection.value]["name"]].tolist()
@@ -4826,12 +4791,10 @@ def stac_gui(m=None):
     dataset.observe(dataset_changed, names="value")
 
     def http_url_changed(change):
-
         with output:
             output.clear_output()
             print("Searching...")
             try:
-
                 if connection.value == "Custom STAC API Endpoint":
                     custom_collections = stac_collections(
                         http_url.value, return_ids=True
@@ -4847,7 +4810,6 @@ def stac_gui(m=None):
                         custom_dataset.options = []
 
                 else:
-
                     custom_cols = stac_collections(http_url.value, return_ids=True)
                     item.options = custom_cols
                     stac_data.clear()
@@ -4887,7 +4849,6 @@ def stac_gui(m=None):
     checkbox.observe(checkbox_changed, names="value")
 
     def handle_toolbar_event(event):
-
         if event["type"] == "mouseenter":
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         elif event["type"] == "mouseleave":
@@ -4921,7 +4882,6 @@ def stac_gui(m=None):
     close_button.observe(close_btn_click, "value")
 
     def button_clicked(change):
-
         if change["new"] == "Search":
             with output:
                 output.clear_output()
@@ -4960,7 +4920,6 @@ def stac_gui(m=None):
 
                 print("Retrieving items...")
                 try:
-
                     if connection.value in [
                         "Google Earth Engine",
                         "NASA Common Metadata Repository",
@@ -5024,12 +4983,10 @@ def stac_gui(m=None):
                     print(e)
 
         elif change["new"] == "Display":
-
             with output:
                 output.clear_output()
 
                 if item.value and m is not None:
-
                     print("Loading data...")
 
                     if (
@@ -5066,7 +5023,6 @@ def stac_gui(m=None):
                         assets = f"{red.value},{green.value},{blue.value}"
 
                     try:
-
                         if connection.value == "Microsoft Planetary Computer":
                             m.add_stac_layer(
                                 collection=http_url.value.split("/")[-1],
@@ -5084,7 +5040,6 @@ def stac_gui(m=None):
                             m.stac_item["collection"] = http_url.value.split("/")[-1]
 
                         else:
-
                             m.add_stac_layer(
                                 url=stac_data[0][item.value]["href"],
                                 item=item.value,

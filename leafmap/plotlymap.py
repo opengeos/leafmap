@@ -649,7 +649,6 @@ class Map(go.FigureWidget):
         color_continuous_scale="Viridis",
         **kwargs,
     ):
-
         check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 

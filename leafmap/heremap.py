@@ -49,7 +49,6 @@ class Map(here_map_widget.Map):
     """
 
     def __init__(self, api_key=None, **kwargs):
-
         if api_key is None:
             api_key = os.environ.get("HEREMAPS_API_KEY")
             if api_key is None:
@@ -306,7 +305,6 @@ class Map(here_map_widget.Map):
         close_button.observe(_close_btn_click, "value")
 
         def _update_html(feature, **_):
-
             value = [
                 "<h5><b>{}: </b>{}</h5>".format(prop, feature["properties"][prop])
                 for prop in feature["properties"].keys()

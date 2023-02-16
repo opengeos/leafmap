@@ -157,7 +157,6 @@ def create_colormap(
             )
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
     else:
-
         col_map = plt.get_cmap(cmap)
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
@@ -227,7 +226,6 @@ def plot_colormap(
             )
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
     else:
-
         col_map = plt.get_cmap(cmap)
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 

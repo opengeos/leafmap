@@ -30,7 +30,6 @@ class Map(keplergl.KeplerGl):
     """
 
     def __init__(self, **kwargs):
-
         if "center" not in kwargs:
             kwargs["center"] = [20, 0]
 
@@ -128,9 +127,7 @@ class Map(keplergl.KeplerGl):
             encoding = "utf-8"
 
         try:
-
             if isinstance(in_geojson, str):
-
                 if in_geojson.startswith("http"):
                     if is_jupyterlite():
                         import pyodide
@@ -417,7 +414,6 @@ class Map(keplergl.KeplerGl):
 
         """
         try:
-
             save = True
             if outfile is not None:
                 if not outfile.endswith(".html"):

@@ -24,7 +24,6 @@ class Map(folium.Map):
     """
 
     def __init__(self, **kwargs):
-
         # Default map center location and zoom level
         latlon = [20, 0]
         zoom = 2
@@ -270,7 +269,6 @@ class Map(folium.Map):
         styles="",
         **kwargs,
     ):
-
         """Add a WMS layer to the map.
 
         Args:
@@ -540,7 +538,6 @@ class Map(folium.Map):
         import pandas as pd
 
         try:
-
             if isinstance(data, str):
                 df = pd.read_csv(data)
                 data = df[[latitude, longitude, value]].values.tolist()
@@ -1155,9 +1152,7 @@ class Map(folium.Map):
         import random
 
         try:
-
             if isinstance(in_geojson, str):
-
                 if in_geojson.startswith("http"):
                     if is_jupyterlite():
                         import pyodide
@@ -1488,7 +1483,6 @@ class Map(folium.Map):
             dp.login(token)
 
         try:
-
             dp.Report(dp.Plot(self)).upload(
                 name=name,
                 description=description,
@@ -1573,7 +1567,6 @@ class Map(folium.Map):
                 output = st_folium(self, width=width, height=height)
                 return output
             else:
-
                 # if responsive:
                 #     make_map_responsive = """
                 #     <style>
@@ -1635,7 +1628,6 @@ class Map(folium.Map):
             import streamlit as st
 
             if "map_bounds" in st.session_state:
-
                 bounds = st.session_state["map_bounds"]
 
                 self.fit_bounds(bounds)
@@ -1989,7 +1981,6 @@ class Map(folium.Map):
                 )
 
         if items is not None:
-
             if len(icon_colors) == 1:
                 icon_colors = icon_colors * len(items)
             elif len(items) != len(icon_colors):
@@ -2253,7 +2244,6 @@ class Map(folium.Map):
         bounds = None
 
         try:
-
             if left_label is not None:
                 left_name = left_label
             else:
@@ -2530,7 +2520,6 @@ class Map(folium.Map):
                 self.add_html(html, position=position, **kwargs)
 
             elif os.path.exists(image):
-
                 if position == "bottomleft":
                     position = (5, 5)
                 elif position == "bottomright":
@@ -2571,7 +2560,6 @@ class Map(folium.Map):
             raise Exception(f"position must be one of {allowed_positions}")
 
         try:
-
             if isinstance(content, str):
                 widget = CustomControl(content, position=position)
                 widget.add_to(self)
@@ -2877,7 +2865,6 @@ class Map(folium.Map):
         display_options={},
         name="Velocity",
     ):
-
         print(f"The folium plotting backend does not support this function.")
 
     def user_roi_bounds(self, decimals=4):
@@ -3231,9 +3218,7 @@ def geojson_layer(
     import random
 
     try:
-
         if isinstance(in_geojson, str):
-
             if in_geojson.startswith("http"):
                 data = requests.get(in_geojson).json()
             else:

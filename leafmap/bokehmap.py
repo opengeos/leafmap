@@ -23,7 +23,6 @@ class Map:
         output_notebook=True,
         **kwargs,
     ):
-
         if "x_axis_type" not in kwargs:
             kwargs["x_axis_type"] = "mercator"
         if "y_axis_type" not in kwargs:
