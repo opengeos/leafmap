@@ -26,48 +26,37 @@ class TestCommon(unittest.TestCase):
         """Tear down test fixtures, if any."""
 
     def test_basemap_xyz_tiles(self):
-
         self.assertIsInstance(basemap_xyz_tiles(), dict)
 
     def test_csv_to_gdf(self):
-
         self.assertIsInstance(csv_to_gdf(self.in_csv), geopandas.GeoDataFrame)
 
     def test_csv_to_geojson(self):
-
         self.assertIsInstance(csv_to_geojson(self.in_csv), dict)
 
     def test_csv_to_df(self):
-
         self.assertIsInstance(csv_to_df(self.in_csv), pandas.DataFrame)
 
     def test_gdf_to_geojson(self):
-
         self.assertIsInstance(gdf_to_geojson(csv_to_gdf(self.in_csv)), dict)
 
     def test_kml_to_geojson(self):
-
         self.assertIsInstance(kml_to_geojson(self.in_kml), dict)
 
     def test_shp_to_gdf(self):
-
         self.assertIsInstance(shp_to_gdf(self.in_shp), geopandas.GeoDataFrame)
 
     def test_shp_to_geojson(self):
-
         self.assertIsInstance(shp_to_geojson(self.in_shp), dict)
 
     def test_vector_to_geojson(self):
-
         self.assertIsInstance(vector_to_geojson(self.in_shp), dict)
 
     def test_cog_bounds(self):
-
         self.assertIsInstance(cog_bounds(self.in_cog), list)
         self.assertEqual(len(cog_bounds(self.in_cog)), 4)
 
     def test_cog_center(self):
-
         self.assertIsInstance(cog_center(self.in_cog), tuple)
         self.assertEqual(len(cog_center(self.in_cog)), 2)
 
