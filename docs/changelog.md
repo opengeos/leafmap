@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.17.1 - Feb 16, 2023
+
+**New Features**
+
+-   Added support for visualizing Maxar Open Data ([#367](https://github.com/giswqs/leafmap/pull/367))
+
 ## v0.17.0 - Feb 15, 2023
 
 **New Features**
