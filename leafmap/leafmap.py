@@ -22,7 +22,6 @@ class Map(ipyleaflet.Map):
     """
 
     def __init__(self, **kwargs):
-
         if "center" not in kwargs:
             kwargs["center"] = [20, 0]
 
@@ -108,13 +107,11 @@ class Map(ipyleaflet.Map):
             self.add_control(control)
 
             def handle_draw(target, action, geo_json):
-
                 if "style" in geo_json["properties"]:
                     del geo_json["properties"]["style"]
                 self.user_roi = geo_json
 
                 if action in ["created", "edited"]:
-
                     # feature = {
                     #     "type": "Feature",
                     #     "geometry": geo_json["geometry"],
@@ -1082,7 +1079,6 @@ class Map(ipyleaflet.Map):
         bounds = None
 
         try:
-
             controls = self.controls
             layers = self.layers
             self.clear_controls()
@@ -1169,7 +1165,6 @@ class Map(ipyleaflet.Map):
                 elif right_layer.startswith("http") and right_layer.endswith(
                     ".geojson"
                 ):
-
                     if "max_zoom" in right_args:
                         del right_args["max_zoom"]
                     if "max_native_zoom" in right_args:
@@ -1221,7 +1216,6 @@ class Map(ipyleaflet.Map):
                 self.add_control(left_control)
 
             if right_label is not None:
-
                 if widget_layout is None:
                     widget_layout = widgets.Layout(padding="0px 4px 0px 4px")
                 right_widget = widgets.HTML(value=right_label, layout=widget_layout)
@@ -1417,7 +1411,6 @@ class Map(ipyleaflet.Map):
         legend_text = "".join(legend_html)
 
         try:
-
             legend_output_widget = widgets.Output(
                 layout={
                     # "border": "1px solid black",
@@ -1597,7 +1590,6 @@ class Map(ipyleaflet.Map):
 
         try:
             if not url.startswith("http"):
-
                 if not os.path.exists(url):
                     print("The provided file does not exist.")
                     return
@@ -1669,7 +1661,6 @@ class Map(ipyleaflet.Map):
 
         """
         try:
-
             save = True
             if outfile is not None:
                 if not outfile.endswith(".html"):
@@ -2164,11 +2155,8 @@ class Map(ipyleaflet.Map):
             style_callback_only = True
 
         try:
-
             if isinstance(in_geojson, str):
-
                 if in_geojson.startswith("http"):
-
                     if is_jupyterlite():
                         import pyodide
 
@@ -2284,7 +2272,6 @@ class Map(ipyleaflet.Map):
             fields = None
 
         def update_html(feature, fields=fields, **kwargs):
-
             if fields is None:
                 fields = list(feature["properties"].keys())
                 if "style" in fields:
@@ -2374,7 +2361,7 @@ class Map(ipyleaflet.Map):
         info_mode="on_hover",
         zoom_to_layer=True,
         encoding="utf-8",
-        **kwargs
+        **kwargs,
     ):
         """Adds a GeoDataFrame to the map.
 
@@ -2831,7 +2818,6 @@ class Map(ipyleaflet.Map):
                 )
 
         if items is not None:
-
             if len(icon_colors) == 1:
                 icon_colors = icon_colors * len(items)
             elif len(items) != len(icon_colors):
@@ -2874,7 +2860,6 @@ class Map(ipyleaflet.Map):
 
                 markers = []
                 for index, point in enumerate(points):
-
                     if items is not None:
                         marker_color = marker_colors[
                             items.index(df[color_column][index])
@@ -2999,7 +2984,6 @@ class Map(ipyleaflet.Map):
         from ipyleaflet import Heatmap
 
         try:
-
             if isinstance(data, str):
                 df = pd.read_csv(data)
                 data = df[[latitude, longitude, value]].values.tolist()
@@ -3312,7 +3296,6 @@ class Map(ipyleaflet.Map):
         if ext == ".geojson":
             pass
         elif ext in [".shp", ".gpkg"]:
-
             if ext == ".shp":
                 geojson_to_shp(geojson, out_file)
             else:
@@ -3745,7 +3728,6 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
     """
 
     def __init__(self, **kwargs):
-
         from base64 import b64encode
         from PIL import Image, ImageSequence
         from io import BytesIO
@@ -3753,7 +3735,6 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
         try:
             url = kwargs.get("url")
             if not url.startswith("http"):
-
                 url = os.path.abspath(url)
                 if not os.path.exists(url):
                     raise FileNotFoundError("The provided file does not exist.")
@@ -4031,7 +4012,6 @@ def split_map(
                     attribution=" ",
                 )
             elif right_layer.startswith("http") and right_layer.endswith(".geojson"):
-
                 if "max_zoom" in right_args:
                     del right_args["max_zoom"]
                 if "max_native_zoom" in right_args:
@@ -4216,9 +4196,7 @@ def geojson_layer(
         style_callback_only = True
 
     try:
-
         if isinstance(in_geojson, str):
-
             if in_geojson.startswith("http"):
                 in_geojson = github_raw_url(in_geojson)
                 data = requests.get(in_geojson).json()

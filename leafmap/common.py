@@ -26,7 +26,6 @@ class WhiteboxTools(whitebox.WhiteboxTools):
     """This class inherits the whitebox WhiteboxTools class."""
 
     def __init__(self, **kwargs):
-
         super().__init__(**kwargs)
 
 
@@ -79,7 +78,6 @@ def set_proxy(port=1080, ip="http://127.0.0.1"):
     """
 
     try:
-
         if not ip.startswith("http"):
             ip = "http://" + ip
         proxy = "{}:{}".format(ip, port)
@@ -152,7 +150,6 @@ def update_package():
 
 
 def check_package(name, URL=""):
-
     try:
         __import__(name.lower())
     except Exception:
@@ -356,7 +353,6 @@ def show_html(html):
         ipywidgets.HTML: HTML widget.
     """
     if os.path.exists(html):
-
         with open(html, "r") as f:
             content = f.read()
 
@@ -415,7 +411,6 @@ def upload_to_imgur(in_gif):
         if (
             (IMGUR_API_ID is not None) and (IMGUR_API_SECRET is not None)
         ) or os.path.exists(credentials_path):
-
             proc = subprocess.Popen(["imgur-uploader", in_gif], stdout=subprocess.PIPE)
             for _ in range(0, 2):
                 line = proc.stdout.readline()
@@ -474,7 +469,6 @@ def check_color(in_color):
 
     out_color = "#000000"  # default black color
     if isinstance(in_color, tuple) and len(in_color) == 3:
-
         # rescale color if necessary
         if all(isinstance(item, int) for item in in_color):
             in_color = [c / 255.0 for c in in_color]
@@ -482,7 +476,6 @@ def check_color(in_color):
         return colour.Color(rgb=tuple(in_color)).hex_l
 
     else:
-
         # try to guess the color system
         try:
             return colour.Color(in_color).hex_l
@@ -580,11 +573,9 @@ def download_from_url(url, out_file_name=None, out_dir=".", unzip=True, verbose=
             if verbose:
                 print("Unzipping {} ...".format(out_file_name))
             with tarfile.open(out_file_path, "r") as tar_ref:
-
                 with tarfile.open(out_file_path, "r") as tar_ref:
 
                     def is_within_directory(directory, target):
-
                         abs_directory = os.path.abspath(directory)
                         abs_target = os.path.abspath(target)
 
@@ -595,7 +586,6 @@ def download_from_url(url, out_file_name=None, out_dir=".", unzip=True, verbose=
                     def safe_extract(
                         tar, path=".", members=None, *, numeric_owner=False
                     ):
-
                         for member in tar.getmembers():
                             member_path = os.path.join(path, member.name)
                             if not is_within_directory(path, member_path):
@@ -1194,11 +1184,9 @@ def adjust_longitude(in_fc):
         dict: A dictionary containing the converted longitudes
     """
     try:
-
         keys = in_fc.keys()
 
         if "geometry" in keys:
-
             coordinates = in_fc["geometry"]["coordinates"]
 
             if in_fc["geometry"]["type"] == "Point":
@@ -1229,7 +1217,6 @@ def adjust_longitude(in_fc):
                     in_fc["geometry"]["coordinates"][index][0] = longitude
 
         elif "type" in keys:
-
             coordinates = in_fc["coordinates"]
 
             if in_fc["type"] == "Point":
@@ -1267,7 +1254,6 @@ def adjust_longitude(in_fc):
 
 
 def is_GCS(in_shp):
-
     import warnings
     import pycrs
 
@@ -1285,7 +1271,6 @@ def is_GCS(in_shp):
         )
         return True
     else:
-
         with open(in_prj) as f:
             esri_wkt = f.read()
         epsg4326 = pycrs.parse.from_epsg_code(4326).to_proj4()
@@ -1564,14 +1549,12 @@ def vector_to_geojson(
             **kwargs,
         )
     else:
-
         df = gpd.read_file(
             filename, bbox=bbox, mask=mask, rows=rows, encoding=encoding, **kwargs
         )
     gdf = df.to_crs(epsg=epsg)
 
     if out_geojson is not None:
-
         if not out_geojson.lower().endswith(".geojson"):
             raise ValueError("The output file must have a geojson file extension.")
 
@@ -1825,7 +1808,6 @@ def planet_monthly_tropical(api_key=None, token_name="PLANET_API_KEY"):
     subfix = "_mosaic/gmap/{z}/{x}/{y}.png?api_key="
 
     for year in range(2020, year_now + 1):
-
         for month in range(1, 13):
             m_str = str(year) + "-" + str(month).zfill(2)
 
@@ -2039,7 +2021,6 @@ def planet_monthly(api_key=None, token_name="PLANET_API_KEY"):
     subfix = "_mosaic/gmap/{z}/{x}/{y}.png?api_key="
 
     for year in range(2016, year_now + 1):
-
         for month in range(1, 13):
             m_str = str(year) + "_" + str(month).zfill(2)
 
@@ -2082,7 +2063,6 @@ def planet_quarterly(api_key=None, token_name="PLANET_API_KEY"):
     subfix = "_mosaic/gmap/{z}/{x}/{y}.png?api_key="
 
     for year in range(2016, year_now + 1):
-
         for quarter in range(1, 5):
             m_str = str(year) + "q" + str(quarter)
 
@@ -2485,7 +2465,6 @@ def get_census_dict(reset=False):
     census_data = os.path.join(pkg_dir, "data/census_data.json")
 
     if reset:
-
         try:
             from owslib.wms import WebMapService
         except ImportError:
@@ -2541,7 +2520,6 @@ def get_census_dict(reset=False):
             json.dump(census_dict, f, indent=4)
 
     else:
-
         with open(census_data, "r") as f:
             census_dict = json.load(f)
 
@@ -2704,7 +2682,6 @@ def st_download_button(
         import pandas as pd
 
         if isinstance(data, str):
-
             if file_name is None:
                 file_name = data.split("/")[-1]
 
@@ -2781,7 +2758,6 @@ def save_data(data, file_ext=None, file_name=None):
     import uuid
 
     try:
-
         if file_ext is None:
             if hasattr(data, "name"):
                 _, file_ext = os.path.splitext(data.name)
@@ -2916,7 +2892,6 @@ def get_local_tile_layer(
         raise ValueError("The source must either be a string or TileClient")
 
     if isinstance(palette, str):
-
         palette = get_palette_colors(palette, hashtag=True)
 
     if tile_format not in ["ipyleaflet", "folium"]:
@@ -3026,7 +3001,6 @@ def get_palettable(types=None):
     palettes = []
 
     if "cartocolors" in types:
-
         cartocolors_diverging = [
             f"cartocolors.diverging.{c}"
             for c in dir(palettable.cartocolors.diverging)[:-19]
@@ -3048,7 +3022,6 @@ def get_palettable(types=None):
         )
 
     if "cmocean" in types:
-
         cmocean_diverging = [
             f"cmocean.diverging.{c}" for c in dir(palettable.cmocean.diverging)[:-19]
         ]
@@ -3059,7 +3032,6 @@ def get_palettable(types=None):
         palettes = palettes + cmocean_diverging + cmocean_sequential
 
     if "colorbrewer" in types:
-
         colorbrewer_diverging = [
             f"colorbrewer.diverging.{c}"
             for c in dir(palettable.colorbrewer.diverging)[:-19]
@@ -3200,7 +3172,6 @@ def html_to_streamlit(
         import streamlit.components.v1 as components
 
         if isinstance(html, str):
-
             temp_path = None
             if html.startswith("http") and html.endswith(".html"):
                 temp_path = temp_file_path(".html")
@@ -3287,9 +3258,7 @@ def geom_type(in_geojson, encoding="utf-8"):
     import json
 
     try:
-
         if isinstance(in_geojson, str):
-
             if in_geojson.startswith("http"):
                 data = requests.get(in_geojson).json()
             else:
@@ -3355,7 +3324,6 @@ def geojson_to_df(in_geojson, encoding="utf-8", drop_geometry=True):
     from urllib.request import urlopen
 
     if isinstance(in_geojson, str):
-
         if in_geojson.startswith("http"):
             with urlopen(in_geojson) as f:
                 data = json.load(f)
@@ -3715,7 +3683,6 @@ def numpy_to_cog(
     warnings.filterwarnings("ignore")
 
     if isinstance(np_array, str):
-
         with rasterio.open(np_array, "r") as ds:
             np_array = ds.read()
 
@@ -4123,7 +4090,6 @@ def view_lidar(
 
     backend = backend.lower()
     if backend in ["pyvista", "ipygany", "panel"]:
-
         try:
             import pyntcloud
         except ImportError:
@@ -4341,7 +4307,6 @@ def download_file(
     )
 
     if unzip and output.endswith(".zip"):
-
         with zipfile.ZipFile(output, "r") as zip_ref:
             if not quiet:
                 print("Extracting files...")
@@ -4435,7 +4400,6 @@ def clip_image(image, mask, output, to_cog=True):
         if not os.path.exists(mask):
             raise FileNotFoundError(f"{mask} does not exist.")
     elif isinstance(mask, list) or isinstance(mask, dict):
-
         if isinstance(mask, list):
             geojson = {
                 "type": "FeatureCollection",
@@ -5156,7 +5120,6 @@ def add_crs(filename, epsg):
 def html_to_streamlit(
     filename, width=None, height=None, scrolling=False, replace_dict={}
 ):
-
     """Renders an HTML file as a Streamlit component.
     Args:
         filename (str): The filename of the HTML file.
@@ -5402,7 +5365,6 @@ class The_national_map_USGS:
         """
 
         try:
-
             # call locals before creating new locals
             used_locals = {k: v for k, v in locals().items() if v and k != "self"}
 
@@ -5662,7 +5624,6 @@ def reproject(
 
 
 def image_check(image):
-
     from localtileserver import TileClient
 
     if isinstance(image, str):
@@ -6439,7 +6400,6 @@ async def download_file_lite(url, output=None, binary=False, overwrite=False, **
             f.write(await response.bytes())
 
     else:
-
         obj = pyodide.http.open_url(url)
         with open(output, "w") as fd:
             shutil.copyfileobj(obj, fd)
@@ -6459,7 +6419,6 @@ def create_legend(
     output=None,
     style={},
 ):
-
     """Create a legend in HTML format. Reference: https://bit.ly/3oV6vnH
 
     Args:
@@ -6636,7 +6595,6 @@ def create_legend(
         lines = f.readlines()
 
     if draggable:
-
         for index, line in enumerate(lines):
             if index < 36:
                 content.append(line)
@@ -6654,9 +6612,7 @@ def create_legend(
         content = content[3:-1]
 
     else:
-
         for index, line in enumerate(lines):
-
             if index < 8:
                 content.append(line)
             elif index == 8:
@@ -6882,7 +6838,6 @@ def add_text_to_gif(
         text = [str(x) for x in text_sequence]
 
     try:
-
         frames = []
         # Loop over each frame in the animated image
         for index, frame in enumerate(ImageSequence.Iterator(image)):
@@ -6966,7 +6921,6 @@ def add_progress_bar_to_gif(
     ]
 
     try:
-
         frames = []
         # Loop over each frame in the animated image
         for index, frame in enumerate(ImageSequence.Iterator(image)):
@@ -7114,7 +7068,6 @@ def add_image_to_gif(
         )
 
     try:
-
         frames = []
         for _, frame in enumerate(ImageSequence.Iterator(gif)):
             frame = frame.convert("RGBA")
@@ -7664,7 +7617,6 @@ def save_colorbar(
         alpha = 1
 
     if cmap is not None:
-
         cmap = mpl.pyplot.get_cmap(cmap)
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
@@ -7682,7 +7634,6 @@ def save_colorbar(
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     elif cmap is not None:
-
         cmap = mpl.pyplot.get_cmap(cmap)
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
@@ -7879,7 +7830,6 @@ def vector_to_raster(
 
 
 def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwargs):
-
     """
     Displays a Youtube video in a Jupyter notebook.
 
@@ -7899,7 +7849,6 @@ def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwarg
     try:
         video_id = re.match("^[^v]+v=(.{11}).*", url).group(1)
     except:
-
         if "youtube.com" in url or "youtu.be" in url:
             if "youtube.com" in url:
                 video_id = url.split("v=")[1].split("&")[0]
