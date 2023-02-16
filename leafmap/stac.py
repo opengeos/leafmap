@@ -508,7 +508,6 @@ def stac_tile(
     titiler_endpoint=None,
     **kwargs,
 ):
-
     """Get a tile layer from a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -573,7 +572,6 @@ def stac_tile(
                 titiler_endpoint=titiler_endpoint,
             )
             if "detail" not in stats:
-
                 try:
                     percentile_2 = min([stats[s]["percentile_2"] for s in stats])
                     percentile_98 = max([stats[s]["percentile_98"] for s in stats])
@@ -1054,7 +1052,6 @@ def stac_client(
 
 
 def stac_collections(url, return_ids=False):
-
     """Get the collection IDs of a STAC catalog.
 
     Args:
@@ -1069,7 +1066,6 @@ def stac_collections(url, return_ids=False):
         collections = client.get_all_collections()
 
         if return_ids:
-
             return [c.id for c in collections]
         else:
             return collections
@@ -1167,7 +1163,6 @@ def stac_search(
     if client is None:
         return None
     else:
-
         if isinstance(intersects, dict) and "geometry" in intersects:
             intersects = intersects["geometry"]
 
@@ -1285,7 +1280,6 @@ def stac_search_to_dict(search, **kwargs):
 
 
 def stac_search_to_list(search, **kwargs):
-
     """Convert STAC search result to a list.
 
     Args:
@@ -1326,7 +1320,6 @@ def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
     if os.path.exists(work_dir) and not overwrite:
         return work_dir
     else:
-
         gdown.download(url, out_file, quiet=quiet)
         with zipfile.ZipFile(out_file, "r") as zip_ref:
             zip_ref.extractall(out_dir)
@@ -1334,7 +1327,6 @@ def download_data_catalogs(out_dir=None, quiet=True, overwrite=False):
 
 
 def set_default_bands(bands):
-
     excluded = [
         "index",
         "metadata",
@@ -1384,3 +1376,168 @@ def set_default_bands(bands):
         return [bands[0]] * 3
     else:
         return bands[:3]
+
+
+def maxar_collections(return_ids=True):
+    """Get a list of Maxar collections.
+
+    Args:
+        return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
+
+    Returns:
+        list : A list of Maxar collections.
+    """
+
+    import tempfile
+    from pystac import Catalog
+
+    file_path = os.path.join(tempfile.gettempdir(), "maxar-collections.txt")
+    if return_ids:
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                return [line.strip() for line in f.readlines()]
+
+    if "MAXAR_STAC_API" in os.environ:
+        url = os.environ["MAXAR_STAC_API"]
+    else:
+        url = "https://maxar-opendata.s3.amazonaws.com/events/catalog.json"
+
+    root_catalog = Catalog.from_file(url)
+
+    collections = root_catalog.get_collections()
+
+    if return_ids:
+        collection_ids = [collection.id for collection in collections]
+        with open(file_path, "w") as f:
+            f.write("\n".join(collection_ids))
+
+        return collection_ids
+    else:
+        return collections
+
+
+def maxar_child_collections(collection_id, return_ids=True):
+    """Get a list of Maxar child collections.
+
+    Args:
+        collection_id (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23
+            Use maxar_collections() to retrieve all available collection IDs.
+        return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
+
+    Returns:
+        list: A list of Maxar child collections.
+    """
+
+    import tempfile
+    from pystac import Catalog
+
+    file_path = os.path.join(tempfile.gettempdir(), f"maxar-{collection_id}.txt")
+    if return_ids:
+        if os.path.exists(file_path):
+            with open(file_path, "r") as f:
+                return [line.strip() for line in f.readlines()]
+
+    if "MAXAR_STAC_API" in os.environ:
+        url = os.environ["MAXAR_STAC_API"]
+    else:
+        url = "https://maxar-opendata.s3.amazonaws.com/events/catalog.json"
+
+    root_catalog = Catalog.from_file(url)
+
+    collections = root_catalog.get_child(collection_id).get_collections()
+
+    if return_ids:
+        collection_ids = [collection.id for collection in collections]
+        with open(file_path, "w") as f:
+            f.write("\n".join(collection_ids))
+        return collection_ids
+
+    else:
+        return collections
+
+
+def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
+    """Retrieve STAC items from Maxar's public STAC API.
+
+    Args:
+        collection_id (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23
+            Use maxar_collections() to retrieve all available collection IDs.
+        child_id (str): The child collection ID, e.g., 1050050044DE7E00
+            Use maxar_child_collections() to retrieve all available child collection IDs.
+        return_gdf (bool, optional): If True, return a GeoDataFrame. Defaults to True.
+        assets (list, optional): A list of asset names to include in the GeoDataFrame.
+            It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
+
+    Returns:
+        GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
+    """
+
+    import pickle
+    import tempfile
+    from pystac import Catalog, ItemCollection
+
+    file_path = os.path.join(
+        tempfile.gettempdir(), f"maxar-{collection_id}-{child_id}.pkl"
+    )
+
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as f:
+            items = pickle.load(f)
+        if return_gdf:
+            import geopandas as gpd
+
+            gdf = gpd.GeoDataFrame.from_features(
+                pystac.ItemCollection(items).to_dict(), crs="EPSG:4326"
+            )
+
+            if assets is not None:
+                if isinstance(assets, str):
+                    assets = [assets]
+                elif not isinstance(assets, list):
+                    raise ValueError("assets must be a list or a string.")
+
+                for asset in assets:
+                    links = [
+                        item.get_assets()[asset].get_absolute_href() for item in items
+                    ]
+                    gdf[asset] = links
+
+            return gdf
+        else:
+            return items
+
+    if "MAXAR_STAC_API" in os.environ:
+        url = os.environ["MAXAR_STAC_API"]
+    else:
+        url = "https://maxar-opendata.s3.amazonaws.com/events/catalog.json"
+
+    root_catalog = Catalog.from_file(url)
+
+    collection = root_catalog.get_child(collection_id)
+    child = collection.get_child(child_id)
+
+    items = ItemCollection(child.get_all_items())
+
+    with open(file_path, "wb") as f:
+        pickle.dump(items, f)
+
+    if return_gdf:
+        import geopandas as gpd
+
+        gdf = gpd.GeoDataFrame.from_features(
+            pystac.ItemCollection(items).to_dict(), crs="EPSG:4326"
+        )
+
+        if assets is not None:
+            if isinstance(assets, str):
+                assets = [assets]
+            elif not isinstance(assets, list):
+                raise ValueError("assets must be a list or a string.")
+
+            for asset in assets:
+                links = [item.get_assets()[asset].get_absolute_href() for item in items]
+                gdf[asset] = links
+
+        return gdf
+    else:
+        return items
