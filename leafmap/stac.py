@@ -546,6 +546,7 @@ def stac_tile(
         assets = assets[0]
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+    mosaic_json = False
 
     if isinstance(titiler_endpoint, PlanetaryComputerEndpoint):
         if isinstance(bands, str):
@@ -603,26 +604,38 @@ def stac_tile(
                 assets = bands
             else:
                 bnames = stac_bands(url)
-                if len(bnames) >= 3:
-                    assets = bnames[0:3]
+                if isinstance(bnames, list):
+                    if len(bnames) >= 3:
+                        assets = bnames[0:3]
+                    else:
+                        assets = bnames[0]
                 else:
-                    assets = bnames[0]
+                    assets = None
+                    if 'mosaicjson' in bnames['detail']:
+                        mosaic_json = True
         else:
             kwargs["asset_bidx"] = bands
-        kwargs["assets"] = assets
+        if assets is not None:
+            kwargs["assets"] = assets
 
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
         TileMatrixSetId = kwargs["TileMatrixSetId"]
         kwargs.pop("TileMatrixSetId")
 
-    if isinstance(titiler_endpoint, str):
+    if mosaic_json:
         r = requests.get(
-            f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
-            params=kwargs,
+            f"{titiler_endpoint}/mosaicjson/tilejson.json", params=kwargs
         ).json()
     else:
-        r = requests.get(titiler_endpoint.url_for_stac_item(), params=kwargs).json()
+
+        if isinstance(titiler_endpoint, str):
+            r = requests.get(
+                f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
+                params=kwargs,
+            ).json()
+        else:
+            r = requests.get(titiler_endpoint.url_for_stac_item(), params=kwargs).json()
 
     return r["tiles"][0]
 
@@ -648,12 +661,19 @@ def stac_bounds(url=None, collection=None, item=None, titiler_endpoint=None, **k
 
     if url is not None:
         kwargs["url"] = url
+        response = requests.get(url)
+        r = response.json()
+        if 'mosaicjson' in r:
+            if 'bounds' in r:
+                return r['bounds']
+
     if collection is not None:
         kwargs["collection"] = collection
     if item is not None:
         kwargs["item"] = item
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+
     if isinstance(titiler_endpoint, str):
         r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
     else:
@@ -1593,3 +1613,42 @@ def maxar_refresh():
             os.remove(os.path.join(temp_dir, f))
 
     print("Maxar STAC items cache has been refreshed.")
+
+
+def create_mosaicjson(images, output):
+    """Create a mosaicJSON file from a list of images.
+
+    Args:
+        images (str | list): A list of image URLs or a URL to a text file containing a list of image URLs.
+        output (str): The output mosaicJSON file path.
+
+    Raises:
+        ImportError: _description_
+        FileNotFoundError: _description_
+        ValueError: _description_
+    """
+    try:
+        from cogeo_mosaic.mosaic import MosaicJSON
+        from cogeo_mosaic.backends import MosaicBackend
+    except ImportError:
+        raise ImportError(
+            "cogeo-mosaic is required to use this function. "
+            "Install with `pip install cogeo-mosaic`."
+        )
+
+    if isinstance(images, str):
+        if images.startswith("http"):
+            import urllib.request
+
+            with urllib.request.urlopen(images) as f:
+                file_contents = f.read().decode('utf-8')
+                images = file_contents.strip().split('\n')
+        elif not os.path.exists(images):
+            raise FileNotFoundError(f"{images} does not exist.")
+
+    elif not isinstance(images, list):
+        raise ValueError("images must be a list or a URL.")
+
+    mosaic = MosaicJSON.from_urls(images)
+    with MosaicBackend(output, mosaic_def=mosaic) as f:
+        f.write(overwrite=True)
