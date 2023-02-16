@@ -628,7 +628,6 @@ def stac_tile(
             f"{titiler_endpoint}/mosaicjson/tilejson.json", params=kwargs
         ).json()
     else:
-
         if isinstance(titiler_endpoint, str):
             r = requests.get(
                 f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
@@ -1518,9 +1517,14 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
                     raise ValueError("assets must be a list or a string.")
 
                 for asset in assets:
-                    links = [
-                        item.get_assets()[asset].get_absolute_href() for item in items
-                    ]
+                    links = []
+                    for item in items:
+                        if asset in item.get_assets():
+                            link = item.get_assets()[asset].get_absolute_href()
+                            links.append(link)
+                        else:
+                            links.append("")
+
                     gdf[asset] = links
 
             return gdf
@@ -1557,7 +1561,14 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
                 raise ValueError("assets must be a list or a string.")
 
             for asset in assets:
-                links = [item.get_assets()[asset].get_absolute_href() for item in items]
+                links = []
+                for item in items:
+                    if asset in item.get_assets():
+                        link = item.get_assets()[asset].get_absolute_href()
+                        links.append(link)
+                    else:
+                        links.append("")
+
                 gdf[asset] = links
 
         return gdf
