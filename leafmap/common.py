@@ -5339,6 +5339,7 @@ class The_national_map_USGS:
             From https://apps.nationalmap.gov/tnmaccess/#/product
         prodFormats             See: Product Formats (Optional)
             Dataset-specific format
+
         prodExtents             See: Product Extents (Optional)
             Dataset-specific extent
         q                       free text
@@ -5433,7 +5434,7 @@ def download_tnm(
 
 
 def download_ned(
-    region, out_dir=None, return_url=False, download_args={}, geopandas_args={}
+    region, out_dir=None, return_url=False, download_args={}, geopandas_args={}, query={},
 ) -> Union[None, List]:
     """Download the US National Elevation Datasets (NED) for a region.
 
@@ -5444,6 +5445,8 @@ def download_ned(
         download_args (dict, optional): A dictionary of arguments to pass to the download_file function. Defaults to {}.
         geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
             Used for reading a region URL|filepath.
+        query (dict, optional): A dictionary of arguments to pass to the The_national_map_USGS.find_details() function.
+            See https://apps.nationalmap.gov/tnmaccess/#/product for more information.
 
     Returns:
         list: A list of the download URLs of the files if return_url is True.
@@ -5451,18 +5454,21 @@ def download_ned(
 
     if os.environ.get("USE_MKDOCS") is not None:
         return
+    
+    if not query:
+        query = {"datasets": "National Elevation Dataset (NED) 1/3 arc-second", 'prodFormats': 'GeoTIFF'}
 
     TNM = The_national_map_USGS()
     if return_url:
         return TNM.find_tiles(
-            region=region, geopandas_args=geopandas_args, API={"q": "NED"}
+            region=region, geopandas_args=geopandas_args, API=query
         )
     return TNM.download_tiles(
         region=region,
         out_dir=out_dir,
         download_args=download_args,
         geopandas_args=geopandas_args,
-        API={"q": "NED"},
+        API=query,
     )
 
 
