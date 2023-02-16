@@ -1489,7 +1489,8 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
             gdf = gpd.GeoDataFrame.from_features(
                 pystac.ItemCollection(items).to_dict(), crs="EPSG:4326"
             )
-
+            # convert bbox column type from list to string
+            gdf["proj:bbox"] = [','.join(map(str, l)) for l in gdf['proj:bbox']]
             if assets is not None:
                 if isinstance(assets, str):
                     assets = [assets]
@@ -1527,7 +1528,8 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
         gdf = gpd.GeoDataFrame.from_features(
             pystac.ItemCollection(items).to_dict(), crs="EPSG:4326"
         )
-
+        # convert bbox column type from list to string
+        gdf["proj:bbox"] = [','.join(map(str, l)) for l in gdf['proj:bbox']]
         if assets is not None:
             if isinstance(assets, str):
                 assets = [assets]
@@ -1541,3 +1543,53 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
         return gdf
     else:
         return items
+
+
+def maxar_all_items(collection_id, return_gdf=True, assets=['visual'], verbose=True):
+    """Retrieve STAC items from Maxar's public STAC API.
+
+    Args:
+        collection_id (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23
+            Use maxar_collections() to retrieve all available collection IDs.
+        return_gdf (bool, optional): If True, return a GeoDataFrame. Defaults to True.
+        assets (list, optional): A list of asset names to include in the GeoDataFrame.
+            It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
+
+    Returns:
+        GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
+    """
+
+    child_ids = maxar_child_collections(collection_id)
+    for index, child_id in enumerate(child_ids):
+        if verbose:
+            print(
+                f"Processing ({str(index+1).zfill(len(str(len(child_ids))))} out of {len(child_ids)}): {child_id} ..."
+            )
+        items = maxar_items(collection_id, child_id, return_gdf, assets)
+        if return_gdf:
+            if child_id == child_ids[0]:
+                gdf = items
+            else:
+                gdf = gdf.append(items)
+        else:
+            if child_id == child_ids[0]:
+                items_all = items
+            else:
+                items_all.extend(items)
+
+    if return_gdf:
+        return gdf
+    else:
+        return items_all
+
+
+def maxar_refresh():
+    """Refresh the cached Maxar STAC items."""
+    import tempfile
+
+    temp_dir = tempfile.gettempdir()
+    for f in os.listdir(temp_dir):
+        if f.startswith("maxar-"):
+            os.remove(os.path.join(temp_dir, f))
+
+    print("Maxar STAC items cache has been refreshed.")
