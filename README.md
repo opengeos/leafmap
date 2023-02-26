@@ -14,6 +14,8 @@
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
 [![status](https://joss.theoj.org/papers/10.21105/joss.03414/status.svg)](https://doi.org/10.21105/joss.03414)
 
+[![logo](https://i.imgur.com/tekMHkz.png)](https://github.com/giswqs/leafmap/blob/master/docs/assets/logo.png)
+
 **A Python package for geospatial analysis and interactive mapping in a Jupyter environment.**
 
 -   GitHub repo: <https://github.com/giswqs/leafmap>
