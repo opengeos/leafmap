@@ -7919,3 +7919,5 @@ def html_to_gradio(html, width='100%', height='500px', **kwargs):
     allow-scripts allow-same-origin allow-popups 
     allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
     allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
+
+

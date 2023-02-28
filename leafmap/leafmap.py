@@ -3716,6 +3716,64 @@ class Map(ipyleaflet.Map):
         self.add_html(text, position=position, **kwargs)
 
 
+    def oam_search(self, bbox=None, start_date=None, end_date=None, limit=100, layer_args={}, add_image=True, **kwargs):
+        """Search OpenAerialMap for images within a bounding box and time range.
+
+        Args:
+            bbox (list | str, optional): The bounding box [xmin, ymin, xmax, ymax] to search within. Defaults to None.
+            start_date (str, optional): The start date to search within, such as "2015-04-20T00:00:00.000Z". Defaults to None.
+            end_date (str, optional): The end date to search within, such as "2015-04-21T00:00:00.000Z". Defaults to None.
+            limit (int, optional): The maximum number of results to return. Defaults to 100.
+            layer_args (dict, optional): The layer arguments for add_gdf() function. Defaults to {}.
+            add_image (bool, optional): Whether to add the first 10 images to the map. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
+        """
+
+        bounds = self.bounds
+        if bbox is None:
+            if self.user_roi is not None:
+                bbox = self.user_roi_bounds()
+            else:
+                bbox = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
+
+        gdf = oam_search(bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs)
+
+        if "layer_name" not in layer_args:
+            layer_args["layer_name"] = "Footprints"
+
+        if 'style' not in layer_args:
+            layer_args['style'] = {
+                # "stroke": True,
+                "color": "#3388ff",
+                "weight": 2,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 0,
+                # "dashArray": "9"
+                # "clickable": True,
+            }
+
+
+        if 'hover_style' not in layer_args:
+            layer_args['hover_style'] = {"weight": layer_args['style']["weight"] + 2}
+
+        self.add_gdf(gdf, **layer_args)
+
+        if add_image:
+            ids = gdf['_id'].tolist()
+            images = gdf['tms'].tolist()
+
+            if len(images) > 10:
+                print(f"Found {len(images)} images. Showing the first 10.")
+
+            for index, image in enumerate(images):
+                if index == 10:
+                    break
+                self.add_tile_layer(url=image, name=ids[index], attribution='OpenAerialMap')
+
+
+
 # The functions below are outside the Map class.
 
 
