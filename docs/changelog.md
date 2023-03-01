@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.18.1 - Mar 1, 2023
+
+**Improvement**
+
+-   Deprecated ipyleaflet add_layer and add_control methods ([#377](https://github.com/giswqs/leafmap/pull/377))
+-   Fixed add geojson style bug ([#376](https://github.com/giswqs/leafmap/pull/376))
+
 ## v0.18.0 - Mar 1, 2023
 
 **New Features**
