@@ -2714,6 +2714,77 @@ class Map(folium.Map):
         allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
         allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
 
+    def oam_search(
+        self,
+        bbox=None,
+        start_date=None,
+        end_date=None,
+        limit=100,
+        info_mode='on_click',
+        layer_args={},
+        add_image=True,
+        **kwargs,
+    ):
+        """Search OpenAerialMap for images within a bounding box and time range.
+
+        Args:
+            bbox (list | str, optional): The bounding box [xmin, ymin, xmax, ymax] to search within. Defaults to None.
+            start_date (str, optional): The start date to search within, such as "2015-04-20T00:00:00.000Z". Defaults to None.
+            end_date (str, optional): The end date to search within, such as "2015-04-21T00:00:00.000Z". Defaults to None.
+            limit (int, optional): The maximum number of results to return. Defaults to 100.
+            info_mode (str, optional): The mode to use for the info popup. Can be 'on_hover' or 'on_click'. Defaults to 'on_click'.
+            layer_args (dict, optional): The layer arguments for add_gdf() function. Defaults to {}.
+            add_image (bool, optional): Whether to add the first 10 images to the map. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
+        """
+
+        gdf = oam_search(
+            bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs
+        )
+
+        if "layer_name" not in layer_args:
+            layer_args["layer_name"] = "Footprints"
+
+        if 'style' not in layer_args:
+            layer_args['style'] = {
+                # "stroke": True,
+                "color": "#3388ff",
+                "weight": 2,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 0,
+                # "dashArray": "9"
+                # "clickable": True,
+            }
+
+        if "highlight_function" not in layer_args:
+            layer_args["highlight_function"] = lambda feat: {
+                "weight": layer_args['style']['weight'] + 2,
+                "fillOpacity": 0,
+            }
+
+        print(layer_args)
+        if gdf is not None:
+            self.add_gdf(gdf, info_mode=info_mode, **layer_args)
+            setattr(self, "oam_gdf", gdf)
+
+            if add_image:
+                ids = gdf['_id'].tolist()
+                images = gdf['tms'].tolist()
+
+                if len(images) > 5:
+                    print(f"Found {len(images)} images. \nShowing the first 5.")
+
+                for index, image in enumerate(images):
+                    if index == 5:
+                        break
+                    self.add_tile_layer(
+                        url=image, name=ids[index], attribution='OpenAerialMap'
+                    )
+        else:
+            print("No images found.")
+
     def remove_labels(self, **kwargs):
         """Removes a layer from the map."""
         print("The folium plotting backend does not support removing labels.")

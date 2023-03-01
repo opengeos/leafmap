@@ -3752,6 +3752,7 @@ class Map(ipyleaflet.Map):
         start_date=None,
         end_date=None,
         limit=100,
+        info_mode="on_click",
         layer_args={},
         add_image=True,
         **kwargs,
@@ -3763,6 +3764,7 @@ class Map(ipyleaflet.Map):
             start_date (str, optional): The start date to search within, such as "2015-04-20T00:00:00.000Z". Defaults to None.
             end_date (str, optional): The end date to search within, such as "2015-04-21T00:00:00.000Z". Defaults to None.
             limit (int, optional): The maximum number of results to return. Defaults to 100.
+            info_mode (str, optional): The mode to use for the info popup. Can be 'on_hover' or 'on_click'. Defaults to 'on_click'.
             layer_args (dict, optional): The layer arguments for add_gdf() function. Defaults to {}.
             add_image (bool, optional): Whether to add the first 10 images to the map. Defaults to True.
             **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
@@ -3777,6 +3779,7 @@ class Map(ipyleaflet.Map):
 
         if self.zoom <= 4:
             print("Zoom in to search for images")
+            return None
 
         gdf = oam_search(
             bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs
@@ -3802,7 +3805,7 @@ class Map(ipyleaflet.Map):
             layer_args['hover_style'] = {"weight": layer_args['style']["weight"] + 2}
 
         if gdf is not None:
-            self.add_gdf(gdf, **layer_args)
+            self.add_gdf(gdf, info_mode=info_mode, **layer_args)
             setattr(self, "oam_gdf", gdf)
 
             if add_image:
