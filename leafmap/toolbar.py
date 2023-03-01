@@ -202,7 +202,7 @@ def tool_template(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -371,7 +371,7 @@ def main_toolbar(m):
                     widget=wbt_toolbox, position="bottomright"
                 )
                 m.whitebox = wbt_control
-                m.add_control(wbt_control)
+                m.add(wbt_control)
             elif tool_name == "timeslider":
                 m.add_time_slider()
             elif tool_name == "save_map":
@@ -497,7 +497,7 @@ def main_toolbar(m):
                     layer_control = ipyleaflet.LayersControl(position="topright")
                     m.layer_control = layer_control
                 if m.layer_control not in m.controls:
-                    m.add_control(m.layer_control)
+                    m.add(m.layer_control)
 
             # for non-TileLayer, use layer.style={'opacity':0, 'fillOpacity': 0} to turn layer off.
             for layer in layers:
@@ -585,7 +585,7 @@ def main_toolbar(m):
         widget=toolbar_widget, position="topright"
     )
 
-    m.add_control(toolbar_control)
+    m.add(toolbar_control)
 
 
 def open_data_widget(m):
@@ -949,7 +949,7 @@ def open_data_widget(m):
     ok_cancel.observe(ok_cancel_clicked, names="value")
     # file_chooser.register_callback(chooser_callback)
 
-    m.add_control(tool_output_ctrl)
+    m.add(tool_output_ctrl)
     m.tool_output_ctrl = tool_output_ctrl
 
 
@@ -1538,7 +1538,7 @@ def open_raster_gui(m):
     file_type.observe(file_type_changed, names="value")
     ok_cancel.observe(ok_cancel_clicked, names="value")
 
-    m.add_control(tool_output_ctrl)
+    m.add(tool_output_ctrl)
     m.tool_output_ctrl = tool_output_ctrl
 
 
@@ -1600,7 +1600,7 @@ def change_basemap(m):
     basemap_control = ipyleaflet.WidgetControl(
         widget=basemap_widget, position="topright"
     )
-    m.add_control(basemap_control)
+    m.add(basemap_control)
     m.basemap_ctrl = basemap_control
 
 
@@ -1701,7 +1701,7 @@ def save_map(m):
     save_map_control = ipyleaflet.WidgetControl(
         widget=save_map_widget, position="topright"
     )
-    m.add_control(save_map_control)
+    m.add(save_map_control)
     m.save_map_control = save_map_control
 
 
@@ -1746,21 +1746,21 @@ def split_basemaps(
     right_layer = layers_dict[right_name]
 
     control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
-    m.add_control(control)
+    m.add(control)
 
     left_dropdown = widgets.Dropdown(
         options=keys, value=left_name, layout=widgets.Layout(width=width)
     )
 
     left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
-    m.add_control(left_control)
+    m.add(left_control)
 
     right_dropdown = widgets.Dropdown(
         options=keys, value=right_name, layout=widgets.Layout(width=width)
     )
 
     right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
-    m.add_control(right_control)
+    m.add(right_control)
 
     close_button = widgets.ToggleButton(
         value=False,
@@ -1780,13 +1780,13 @@ def split_basemaps(
     close_control = ipyleaflet.WidgetControl(
         widget=close_button, position="bottomright"
     )
-    m.add_control(close_control)
+    m.add(close_control)
 
     if add_zoom:
-        m.add_control(ipyleaflet.ZoomControl())
+        m.add(ipyleaflet.ZoomControl())
     if add_fullscreen:
-        m.add_control(ipyleaflet.FullScreenControl())
-    m.add_control(ipyleaflet.ScaleControl(position="bottomleft"))
+        m.add(ipyleaflet.FullScreenControl())
+    m.add(ipyleaflet.ScaleControl(position="bottomleft"))
 
     split_control = None
     for ctrl in m.controls:
@@ -1895,7 +1895,7 @@ def time_slider(
 
     keys = list(layers_dict.keys())
     layer = layers_dict[keys[0]]
-    m.add_layer(layer)
+    m.add(layer)
 
     def slider_changed(change):
         m.default_style = {"cursor": "wait"}
@@ -1918,7 +1918,7 @@ def time_slider(
     close_btn.on_click(close_click)
 
     slider_ctrl = ipyleaflet.WidgetControl(widget=slider_widget, position=position)
-    m.add_control(slider_ctrl)
+    m.add(slider_ctrl)
     m.slider_ctrl = slider_ctrl
 
 
@@ -2055,7 +2055,7 @@ def census_widget(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -2249,7 +2249,7 @@ def search_basemaps(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -2448,7 +2448,7 @@ def download_osm(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -2809,7 +2809,7 @@ def inspector_gui(m=None):
     if m is not None:
         if not hasattr(m, "marker_cluster"):
             setattr(m, "marker_cluster", marker_cluster)
-        m.add_layer(marker_cluster)
+        m.add(marker_cluster)
 
         if not m.interact_mode:
             m.on_interaction(handle_interaction)
@@ -2821,7 +2821,7 @@ def inspector_gui(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
 
         if not hasattr(m, "inspector_mode"):
@@ -3522,7 +3522,7 @@ def search_geojson_gui(m=None):
     if len(m.geojson_layers) > 0:
         geojson_layer_group = ipyleaflet.LayerGroup()
         for geojson_layer in m.geojson_layers:
-            geojson_layer_group.add_layer(geojson_layer)
+            geojson_layer_group.add(geojson_layer)
         if not hasattr(m, "geojson_layer_group"):
             setattr(m, "geojson_layer_group", geojson_layer_group)
         else:
@@ -3656,7 +3656,7 @@ def search_geojson_gui(m=None):
                             )
                         ),
                     )
-                    m.add_control(geojson_control)
+                    m.add(geojson_control)
                     m.search_control = geojson_control
                 else:
                     m.search_control.property_name = attributes.value
@@ -3694,7 +3694,7 @@ def search_geojson_gui(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -3838,7 +3838,7 @@ def select_table_gui(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -4091,7 +4091,7 @@ def show_table_gui(m, df):
         )
 
         if table_control not in m.controls:
-            m.add_control(table_control)
+            m.add(table_control)
             m.table_control = table_control
     else:
         return toolbar_widget
@@ -4294,7 +4294,7 @@ def edit_draw_gui(m):
             open_control = ipyleaflet.WidgetControl(
                 widget=open_chooser, position="topright"
             )
-            m.add_control(open_control)
+            m.add(open_control)
             m.open_control = open_control
 
     open_button.observe(open_btn_click, "value")
@@ -4324,7 +4324,7 @@ def edit_draw_gui(m):
             file_control = ipyleaflet.WidgetControl(
                 widget=file_chooser, position="topright"
             )
-            m.add_control(file_control)
+            m.add(file_control)
             m.file_control = file_control
 
     save_button.observe(save_btn_click, "value")
@@ -4399,7 +4399,7 @@ def edit_draw_gui(m):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -5085,7 +5085,7 @@ def stac_gui(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -5304,7 +5304,7 @@ def oam_search_gui(m=None):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget

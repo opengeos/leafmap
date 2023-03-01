@@ -78,12 +78,12 @@ class Map(ipyleaflet.Map):
         if "layers_control" not in kwargs:
             kwargs["layers_control"] = False
         if kwargs["layers_control"]:
-            self.add_control(ipyleaflet.LayersControl(position="topright"))
+            self.add(ipyleaflet.LayersControl(position="topright"))
 
         if "fullscreen_control" not in kwargs:
             kwargs["fullscreen_control"] = True
         if kwargs["fullscreen_control"]:
-            self.add_control(ipyleaflet.FullScreenControl())
+            self.add(ipyleaflet.FullScreenControl())
 
         if "search_control" not in kwargs:
             kwargs["search_control"] = True
@@ -95,7 +95,7 @@ class Map(ipyleaflet.Map):
                 zoom=12,
                 marker=None,
             )
-            self.add_control(search_control)
+            self.add(search_control)
             self.search_control = search_control
 
         if "draw_control" not in kwargs:
@@ -110,14 +110,14 @@ class Map(ipyleaflet.Map):
                 remove=True,
                 position="topleft",
             )
-            self.add_control(draw_control)
+            self.add(draw_control)
             self.draw_control = draw_control
 
             draw_output = widgets.Output()
             control = ipyleaflet.WidgetControl(
                 widget=draw_output, position="bottomright"
             )
-            self.add_control(control)
+            self.add(control)
 
             def handle_draw(target, action, geo_json):
                 if "style" in geo_json["properties"]:
@@ -162,12 +162,12 @@ class Map(ipyleaflet.Map):
         if "measure_control" not in kwargs:
             kwargs["measure_control"] = True
         if kwargs["measure_control"]:
-            self.add_control(ipyleaflet.MeasureControl(position="topleft"))
+            self.add(ipyleaflet.MeasureControl(position="topleft"))
 
         if "scale_control" not in kwargs:
             kwargs["scale_control"] = True
         if kwargs["scale_control"]:
-            self.add_control(ipyleaflet.ScaleControl(position="bottomleft"))
+            self.add(ipyleaflet.ScaleControl(position="bottomleft"))
 
         self.layers[0].name = "OpenStreetMap"
 
@@ -187,7 +187,7 @@ class Map(ipyleaflet.Map):
                     f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
                 )
                 layer = basemaps["ROADMAP"]
-            self.add_layer(layer)
+            self.add(layer)
 
         if "toolbar_control" not in kwargs:
             kwargs["toolbar_control"] = True
@@ -268,7 +268,7 @@ class Map(ipyleaflet.Map):
             location = tuple(location)
         if isinstance(location, tuple):
             marker = ipyleaflet.Marker(location=location, **kwargs)
-            self.add_layer(marker)
+            self.add(marker)
         else:
             raise TypeError("The location must be a list or a tuple.")
 
@@ -300,10 +300,10 @@ class Map(ipyleaflet.Map):
                     visible=show,
                     **kwargs,
                 )
-                self.add_layer(layer)
+                self.add(layer)
                 arc_add_layer(url, name)
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
-                self.add_layer(basemaps[basemap])
+                self.add(basemaps[basemap])
                 self.layers[-1].visible = show
                 arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
@@ -364,7 +364,7 @@ class Map(ipyleaflet.Map):
         existing_layer = self.find_layer(layer.name)
         if existing_layer is not None:
             self.remove_layer(existing_layer)
-        super().add_layer(layer)
+        super().add(layer)
 
     def add_layer_control(self, position="topright"):
         """Adds a layer control to the map.
@@ -428,7 +428,7 @@ class Map(ipyleaflet.Map):
                 visible=shown,
                 **kwargs,
             )
-            self.add_layer(wms_layer)
+            self.add(wms_layer)
 
         except Exception as e:
             print("Failed to add the specified WMS TileLayer.")
@@ -465,7 +465,7 @@ class Map(ipyleaflet.Map):
                 visible=shown,
                 **kwargs,
             )
-            self.add_layer(tile_layer)
+            self.add(tile_layer)
 
             arc_add_layer(url, name, shown, opacity)
 
@@ -503,7 +503,7 @@ class Map(ipyleaflet.Map):
                 **kwargs,
             )
             vector_tile_layer.name = layer_name
-            self.add_layer(vector_tile_layer)
+            self.add(vector_tile_layer)
 
         except Exception as e:
             print("Failed to add the specified VectorTileLayer.")
@@ -965,7 +965,7 @@ class Map(ipyleaflet.Map):
         minimap.layout.height = "150px"
         ipyleaflet.link((minimap, "center"), (self, "center"))
         minimap_control = ipyleaflet.WidgetControl(widget=minimap, position=position)
-        self.add_control(minimap_control)
+        self.add(minimap_control)
 
     def add_marker_cluster(self, event="click", add_marker=True):
         """Captures user inputs and add markers to the map.
@@ -983,7 +983,7 @@ class Map(ipyleaflet.Map):
         self.last_click = []
         self.all_clicks = []
         if add_marker:
-            self.add_layer(marker_cluster)
+            self.add(marker_cluster)
 
         def handle_interaction(**kwargs):
             latlon = kwargs.get("coordinates")
@@ -1056,7 +1056,7 @@ class Map(ipyleaflet.Map):
                 popup=popup_html,
                 **kwargs,
             )
-            super().add_layer(marker)
+            super().add(marker)
 
     def split_map(
         self,
@@ -1105,9 +1105,9 @@ class Map(ipyleaflet.Map):
             self.clear_controls()
 
             if zoom_control:
-                self.add_control(ipyleaflet.ZoomControl())
+                self.add(ipyleaflet.ZoomControl())
             if fullscreen_control:
-                self.add_control(ipyleaflet.FullScreenControl())
+                self.add(ipyleaflet.FullScreenControl())
 
             if left_label is not None:
                 left_name = left_label
@@ -1224,7 +1224,7 @@ class Map(ipyleaflet.Map):
             control = ipyleaflet.SplitMapControl(
                 left_layer=left_layer, right_layer=right_layer
             )
-            self.add_control(control)
+            self.add(control)
 
             if left_label is not None:
                 if widget_layout is None:
@@ -1234,7 +1234,7 @@ class Map(ipyleaflet.Map):
                 left_control = ipyleaflet.WidgetControl(
                     widget=left_widget, position=left_position
                 )
-                self.add_control(left_control)
+                self.add(left_control)
 
             if right_label is not None:
                 if widget_layout is None:
@@ -1243,7 +1243,7 @@ class Map(ipyleaflet.Map):
                 right_control = ipyleaflet.WidgetControl(
                     widget=right_widget, position=right_position
                 )
-                self.add_control(right_control)
+                self.add(right_control)
 
             if bounds is not None:
                 self.fit_bounds(bounds)
@@ -1267,7 +1267,7 @@ class Map(ipyleaflet.Map):
 
         dropdown.observe(on_click, "value")
         basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
-        self.add_control(basemap_control)
+        self.add(basemap_control)
 
     def add_legend(
         self,
@@ -1453,7 +1453,7 @@ class Map(ipyleaflet.Map):
 
             self.legend_widget = legend_output_widget
             self.legend_control = legend_control
-            self.add_control(legend_control)
+            self.add(legend_control)
 
         except Exception as e:
             raise Exception(e)
@@ -1529,7 +1529,7 @@ class Map(ipyleaflet.Map):
             display(colormap)
 
         self.colorbar = colormap_ctrl
-        self.add_control(colormap_ctrl)
+        self.add(colormap_ctrl)
 
     def add_colormap(
         self,
@@ -1595,7 +1595,7 @@ class Map(ipyleaflet.Map):
             )
 
         self.colorbar = colormap_ctrl
-        self.add_control(colormap_ctrl)
+        self.add(colormap_ctrl)
 
     def image_overlay(self, url, bounds, name):
         """Overlays an image from the Internet or locally on the map.
@@ -1642,7 +1642,7 @@ class Map(ipyleaflet.Map):
                 data = data.decode("ascii")
                 url = "data:image/{};base64,".format(ext) + data
             img = ipyleaflet.ImageOverlay(url=url, bounds=bounds, name=name)
-            self.add_layer(img)
+            self.add(img)
         except Exception as e:
             raise Exception(e)
 
@@ -1658,7 +1658,7 @@ class Map(ipyleaflet.Map):
             layer_name = kwargs.pop("name")
         try:
             video = ipyleaflet.VideoOverlay(url=url, bounds=bounds, name=layer_name)
-            self.add_layer(video)
+            self.add(video)
         except Exception as e:
             raise Exception(e)
 
@@ -1697,7 +1697,7 @@ class Map(ipyleaflet.Map):
             if add_layer_control and self.layer_control is None:
                 layer_control = ipyleaflet.LayersControl(position="topright")
                 self.layer_control = layer_control
-                self.add_control(layer_control)
+                self.add(layer_control)
 
             before_width = self.layout.width
             before_height = self.layout.height
@@ -1839,7 +1839,7 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
-        self.add_layer(tile_layer)
+        self.add(tile_layer)
 
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
         bounds = (
@@ -2264,7 +2264,7 @@ class Map(ipyleaflet.Map):
         )
 
         if info_mode in ["on_hover", "on_click"]:
-            self.add_control(info_control)
+            self.add(info_control)
 
         def toolbar_btn_click(change):
             if change["new"]:
@@ -2330,7 +2330,7 @@ class Map(ipyleaflet.Map):
         elif info_mode == "on_click":
             geojson.on_click(update_html)
 
-        self.add_layer(geojson)
+        self.add(geojson)
         self.geojson_layers.append(geojson)
 
         if not hasattr(self, "json_layer_dict"):
@@ -2368,7 +2368,7 @@ class Map(ipyleaflet.Map):
             zoom=zoom,
             marker=marker,
         )
-        self.add_control(search_control)
+        self.add(search_control)
         self.search_control = search_control
 
     def add_gdf(
@@ -2652,7 +2652,7 @@ class Map(ipyleaflet.Map):
             ]
 
         marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
-        self.add_layer(marker_cluster)
+        self.add(marker_cluster)
 
         self.default_style = {"cursor": "default"}
 
@@ -2744,7 +2744,7 @@ class Map(ipyleaflet.Map):
             ]
 
         marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
-        self.add_layer(marker_cluster)
+        self.add(marker_cluster)
 
         self.default_style = {"cursor": "default"}
 
@@ -2968,7 +2968,7 @@ class Map(ipyleaflet.Map):
                 markers.append(marker)
 
         marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
-        self.add_layer(marker_cluster)
+        self.add(marker_cluster)
 
         if items is not None and add_legend:
             marker_colors = [check_color(c) for c in marker_colors]
@@ -3016,7 +3016,7 @@ class Map(ipyleaflet.Map):
                 raise ValueError("data must be a list, a DataFrame, or a file path.")
 
             heatmap = Heatmap(locations=data, radius=radius, name=name, **kwargs)
-            self.add_layer(heatmap)
+            self.add(heatmap)
 
         except Exception as e:
             raise Exception(e)
@@ -3108,7 +3108,7 @@ class Map(ipyleaflet.Map):
             )
             labels.append(marker)
         layer_group = ipyleaflet.LayerGroup(layers=labels, name=layer_name)
-        self.add_layer(layer_group)
+        self.add(layer_group)
         self.labels = layer_group
 
     def remove_labels(self):
@@ -3138,7 +3138,7 @@ class Map(ipyleaflet.Map):
         if layer_name is None and "name" in kwargs:
             layer_name = kwargs.pop("name")
         layer = planet_tile_by_month(year, month, layer_name, api_key, token_name)
-        self.add_layer(layer)
+        self.add(layer)
 
     def add_planet_by_quarter(
         self,
@@ -3161,7 +3161,7 @@ class Map(ipyleaflet.Map):
         if layer_name is None and "name" in kwargs:
             layer_name = kwargs.pop("name")
         layer = planet_tile_by_quarter(year, quarter, layer_name, api_key, token_name)
-        self.add_layer(layer)
+        self.add(layer)
 
     def add_time_slider(
         self,
@@ -3486,7 +3486,7 @@ class Map(ipyleaflet.Map):
             display_options=display_options,
             name=name,
         )
-        self.add_layer(wind)
+        self.add(wind)
 
     def add_data(
         self,
@@ -3661,7 +3661,7 @@ class Map(ipyleaflet.Map):
                 with output:
                     display(content)
                 control = ipyleaflet.WidgetControl(widget=output, position=position)
-            self.add_control(control)
+            self.add(control)
 
         except Exception as e:
             raise Exception(f"Error adding widget: {e}")
@@ -3984,7 +3984,7 @@ def linked_maps(
                     f"layers[index] must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
-            m.add_layer(layers[index])
+            m.add(layers[index])
 
             if len(labels) > 0:
                 label = widgets.Label(
@@ -3993,7 +3993,7 @@ def linked_maps(
                 control = ipyleaflet.WidgetControl(
                     widget=label, position=label_position
                 )
-                m.add_control(control)
+                m.add(control)
 
             maps.append(m)
             widgets.jslink((maps[0], "center"), (m, "center"))
@@ -4159,7 +4159,7 @@ def split_map(
         control = ipyleaflet.SplitMapControl(
             left_layer=left_layer, right_layer=right_layer
         )
-        m.add_control(control)
+        m.add(control)
         if bounds is not None:
             m.fit_bounds(bounds)
         return m
@@ -4231,26 +4231,26 @@ def ts_inspector(
 
     m = Map(center=center, zoom=zoom, **kwargs)
     control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
-    m.add_control(control)
+    m.add(control)
 
     left_dropdown = widgets.Dropdown(
         options=keys, value=left_name, layout=widgets.Layout(width=width)
     )
 
     left_control = ipyleaflet.WidgetControl(widget=left_dropdown, position="topleft")
-    m.add_control(left_control)
+    m.add(left_control)
 
     right_dropdown = widgets.Dropdown(
         options=keys, value=right_name, layout=widgets.Layout(width=width)
     )
 
     right_control = ipyleaflet.WidgetControl(widget=right_dropdown, position="topright")
-    m.add_control(right_control)
+    m.add(right_control)
 
     if add_zoom:
-        m.add_control(ipyleaflet.ZoomControl())
+        m.add(ipyleaflet.ZoomControl())
     if add_fullscreen:
-        m.add_control(ipyleaflet.FullScreenControl())
+        m.add(ipyleaflet.FullScreenControl())
 
     split_control = None
     for ctrl in m.controls:

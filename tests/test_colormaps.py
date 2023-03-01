@@ -43,7 +43,7 @@ class TestColormaps(unittest.TestCase):
             cm.get_colorbar(colors, discrete=False)
             cm.get_colorbar(colors, discrete=True)
         control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
-        m.add_control(control)
+        m.add(control)
         out_str = m.to_html()
         assert "image/png" in out_str
 
@@ -57,7 +57,7 @@ class TestColormaps(unittest.TestCase):
             output.clear_output()
             cm.list_colormaps()
         control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
-        m.add_control(control)
+        m.add(control)
         out_str = m.to_html()
         assert "image/png" in out_str
 
@@ -84,7 +84,7 @@ class TestColormaps(unittest.TestCase):
                 font_size=12,
             )
         control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
-        m.add_control(control)
+        m.add(control)
         out_str = m.to_html()
         assert "image/png" in out_str
         m.remove_control(control)
@@ -114,7 +114,7 @@ class TestColormaps(unittest.TestCase):
                 font_size=12,
             )
         control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
-        m.add_control(control)
+        m.add(control)
         out_str = m.to_html()
         assert "image/png" in out_str
 
@@ -128,6 +128,6 @@ class TestColormaps(unittest.TestCase):
             output.clear_output()
             cm.plot_colormaps(width=8.0, height=0.4)
         control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
-        m.add_control(control)
+        m.add(control)
         out_str = m.to_html()
         assert "image/png" in out_str
