@@ -3771,19 +3771,21 @@ class Map(ipyleaflet.Map):
         if 'hover_style' not in layer_args:
             layer_args['hover_style'] = {"weight": layer_args['style']["weight"] + 2}
 
-        self.add_gdf(gdf, **layer_args)
+        if gdf is not None:
 
-        if add_image:
-            ids = gdf['_id'].tolist()
-            images = gdf['tms'].tolist()
+            self.add_gdf(gdf, **layer_args)
 
-            if len(images) > 10:
-                print(f"Found {len(images)} images. Showing the first 10.")
+            if add_image:
+                ids = gdf['_id'].tolist()
+                images = gdf['tms'].tolist()
 
-            for index, image in enumerate(images):
-                if index == 10:
-                    break
-                self.add_tile_layer(url=image, name=ids[index], attribution='OpenAerialMap')
+                if len(images) > 10:
+                    print(f"Found {len(images)} images. Showing the first 10.")
+
+                for index, image in enumerate(images):
+                    if index == 10:
+                        break
+                    self.add_tile_layer(url=image, name=ids[index], attribution='OpenAerialMap')
 
 
 
