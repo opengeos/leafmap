@@ -85,6 +85,19 @@ class Map(ipyleaflet.Map):
         if kwargs["fullscreen_control"]:
             self.add_control(ipyleaflet.FullScreenControl())
 
+        if "search_control" not in kwargs:
+            kwargs["search_control"] = True
+        if kwargs["search_control"]:
+            url = 'https://nominatim.openstreetmap.org/search?format=json&q={s}'
+            search_control = ipyleaflet.SearchControl(
+                position='topleft',
+                url=url,
+                zoom=12,
+                marker=None,
+            )
+            self.add_control(search_control)
+            self.search_control = search_control
+
         if "draw_control" not in kwargs:
             kwargs["draw_control"] = True
         if kwargs["draw_control"]:
