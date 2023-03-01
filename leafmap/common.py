@@ -4365,7 +4365,6 @@ def download_files(
         filenames = [None] * len(urls)
 
     for url, output in zip(urls, filenames):
-
         if output is None:
             filename = os.path.join(out_dir, os.path.basename(url))
         else:
@@ -4385,7 +4384,8 @@ def download_files(
             unzip,
             overwrite,
             subfolder,
-        ) 
+        )
+
 
 def download_folder(
     url=None,
@@ -5498,7 +5498,12 @@ def download_tnm(
 
 
 def download_ned(
-    region, out_dir=None, return_url=False, download_args={}, geopandas_args={}, query={},
+    region,
+    out_dir=None,
+    return_url=False,
+    download_args={},
+    geopandas_args={},
+    query={},
 ) -> Union[None, List]:
     """Download the US National Elevation Datasets (NED) for a region.
 
@@ -5518,15 +5523,16 @@ def download_ned(
 
     if os.environ.get("USE_MKDOCS") is not None:
         return
-    
+
     if not query:
-        query = {"datasets": "National Elevation Dataset (NED) 1/3 arc-second", 'prodFormats': 'GeoTIFF'}
+        query = {
+            "datasets": "National Elevation Dataset (NED) 1/3 arc-second",
+            'prodFormats': 'GeoTIFF',
+        }
 
     TNM = The_national_map_USGS()
     if return_url:
-        return TNM.find_tiles(
-            region=region, geopandas_args=geopandas_args, API=query
-        )
+        return TNM.find_tiles(region=region, geopandas_args=geopandas_args, API=query)
     return TNM.download_tiles(
         region=region,
         out_dir=out_dir,
@@ -7983,5 +7989,3 @@ def html_to_gradio(html, width='100%', height='500px', **kwargs):
     allow-scripts allow-same-origin allow-popups 
     allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
     allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
-
-

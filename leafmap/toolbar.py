@@ -283,14 +283,18 @@ def main_toolbar(m):
             "name": "stac",
             "tooltip": "Discover STAC Catalog",
         },
+        "plane": {
+            "name": "oam",
+            "tooltip": "Search OpenAerialMap",
+        },
         # "spinner": {
         #     "name": "placeholder2",
         #     "tooltip": "This is a placeholder",
         # },
-        "question": {
-            "name": "help",
-            "tooltip": "Get help",
-        },
+        # "question": {
+        #     "name": "help",
+        #     "tooltip": "Get help",
+        # },
     }
 
     # if m.sandbox_path is None and (os.environ.get("USE_VOILA") is not None):
@@ -390,6 +394,8 @@ def main_toolbar(m):
                 edit_draw_gui(m)
             elif tool_name == "stac":
                 stac_gui(m)
+            elif tool_name == "oam":
+                oam_search_gui(m)
             elif tool_name == "help":
                 import webbrowser
 
@@ -5060,6 +5066,225 @@ def stac_gui(m=None):
         elif change["new"] == "Reset":
             reset_options()
 
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def oam_search_gui(m=None):
+    """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="plane",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    dropdown = widgets.Dropdown(
+        options=["Map bounds", "User drawn ROI", "Custom bbox"],
+        value='Map bounds',
+        description="bbox:",
+        layout=widgets.Layout(width=widget_width, padding=padding),
+        style=style,
+    )
+
+    start_date = widgets.DatePicker(
+        description="start date:",
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+    end_date = widgets.DatePicker(
+        description="end date:",
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
+    checkbox = widgets.Checkbox(
+        description="Additional parameters",
+        indent=False,
+        layout=widgets.Layout(padding=padding, width=widget_width),
+    )
+
+    textarea = widgets.Textarea(
+        placeholder="Addition parameters as a dictionary, e.g., {'platform': 'UAV'}",
+        layout=widgets.Layout(width=widget_width),
+    )
+
+    params_hbox = widgets.HBox()
+
+    def checkbox_changed(change):
+        if checkbox.value:
+            params_hbox.children = [textarea]
+        else:
+            params_hbox.children = []
+
+    checkbox.observe(checkbox_changed, "value")
+
+    int_slider = widgets.IntSlider(
+        value=100,
+        min=1,
+        max=200,
+        description="Limit: ",
+        readout=False,
+        continuous_update=True,
+        layout=widgets.Layout(width="220px", padding=padding),
+        style=style,
+    )
+
+    int_slider_label = widgets.Label("100")
+
+    def int_slider_changed(change):
+        if change["new"]:
+            int_slider_label.value = str(int_slider.value)
+
+    int_slider.observe(int_slider_changed, "value")
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Search", "Reset", "Close"],
+        tooltips=["Search", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "80px"
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        dropdown,
+        start_date,
+        end_date,
+        widgets.HBox([int_slider, int_slider_label]),
+        checkbox,
+        params_hbox,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Search":
+            with output:
+                output.clear_output()
+                if m is not None:
+                    if dropdown.value == 'Map bounds':
+                        bbox = m.get_bbox()
+                    elif dropdown.value == 'User drawn ROI':
+                        bbox = m.user_roi_bounds()
+                    else:
+                        bbox = None
+
+                    if start_date.value is not None:
+                        start = str(start_date.value)
+                    else:
+                        start = None
+                    if end_date.value is not None:
+                        end = str(end_date.value)
+                    else:
+                        end = None
+
+                    if (
+                        checkbox.value
+                        and textarea.value.strip().startswith("{")
+                        and textarea.value.strip().endswith("}")
+                    ):
+                        params = eval(textarea.value)
+                    else:
+                        params = {}
+
+                    limit = int_slider.value
+
+                    m.oam_search(bbox, start, end, limit=limit, **params)
+
+        elif change["new"] == "Reset":
+            textarea.value = ""
+            dropdown.value = "Map bounds"
+            start_date.value = None
+            end_date.value = None
+            checkbox.value = False
+            int_slider.value = 100
+            output.clear_output()
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()

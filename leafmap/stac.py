@@ -1688,12 +1688,14 @@ def flatten_dict(my_dict, parent_key=False, sep='.'):
                     flat_dict[parent_key + sep + sub_key] = sub_value
                 else:
                     flat_dict[sub_key] = sub_value
-    
+
     return flat_dict
 
 
-def oam_search(bbox=None, start_date=None, end_date=None, limit=100, return_gdf=True, **kwargs):
-    """Search OpenAerialMap and return a GeoDataFrame or list
+def oam_search(
+    bbox=None, start_date=None, end_date=None, limit=100, return_gdf=True, **kwargs
+):
+    """Search OpenAerialMap (https://openaerialmap.org) and return a GeoDataFrame or list of image metadata.
 
     Args:
         bbox (list | str, optional): The bounding box [xmin, ymin, xmax, ymax] to search within. Defaults to None.
@@ -1707,9 +1709,8 @@ def oam_search(bbox=None, start_date=None, end_date=None, limit=100, return_gdf=
         GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
     """
 
-
     if return_gdf:
-        import pandas as pd    
+        import pandas as pd
         from shapely.geometry import Polygon
         import geopandas as gpd
 
@@ -1723,9 +1724,9 @@ def oam_search(bbox=None, start_date=None, end_date=None, limit=100, return_gdf=
             raise ValueError("bbox must be a list of 4 numbers.")
         bbox = ','.join(map(str, bbox))
         kwargs['bbox'] = bbox
-        
+
     if start_date is not None:
-        kwargs['acquisition_fromoptional'] = start_date
+        kwargs['acquisition_from'] = start_date
 
     if end_date is not None:
         kwargs['acquisition_to'] = end_date
@@ -1734,7 +1735,6 @@ def oam_search(bbox=None, start_date=None, end_date=None, limit=100, return_gdf=
         kwargs['limit'] = limit
 
     try:
-
         r = requests.get(url, params=kwargs).json()
         if 'results' in r:
             results = []
@@ -1751,17 +1751,16 @@ def oam_search(bbox=None, start_date=None, end_date=None, limit=100, return_gdf=
             if not return_gdf:
                 return results
             else:
-
                 df = pd.DataFrame(results)
-                    
+
                 polygons = [Polygon.from_bounds(*bbox) for bbox in df['bbox']]
                 gdf = gpd.GeoDataFrame(geometry=polygons, crs="epsg:4326")
 
                 return pd.concat([gdf, df], axis=1)
 
-        else: 
+        else:
             print("No results found.")
             return None
-        
+
     except Exception as e:
         return None
