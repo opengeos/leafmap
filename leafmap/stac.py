@@ -1764,5 +1764,4 @@ def oam_search(bbox=None, start_date=None, end_date=None, limit=100, return_gdf=
             return None
         
     except Exception as e:
-        print(e)
         return None
