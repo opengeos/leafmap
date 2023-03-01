@@ -203,11 +203,13 @@ class Map(folium.Map):
         bounds = gdf.total_bounds
         self.zoom_to_bounds(bounds)
 
-    def add_basemap(self, basemap="HYBRID"):
+    def add_basemap(self, basemap="HYBRID", show=True, **kwargs):
         """Adds a basemap to the map.
 
         Args:
             basemap (str, optional): Can be one of string from ee_basemaps. Defaults to 'HYBRID'.
+            show (bool, optional): Whether to show the basemap. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to folium.TileLayer.
         """
         import xyzservices
 
@@ -227,6 +229,8 @@ class Map(folium.Map):
                     max_zoom=max_zoom,
                     overlay=True,
                     control=True,
+                    show=show,
+                    **kwargs,
                 )
 
                 self.add_layer(layer)
@@ -234,7 +238,9 @@ class Map(folium.Map):
                 arc_add_layer(url, name)
 
             elif basemap in basemaps:
-                basemaps[basemap].add_to(self)
+                bmap = basemaps[basemap]
+                bmap.show = show
+                bmap.add_to(self)
                 if isinstance(basemaps[basemap], folium.TileLayer):
                     url = basemaps[basemap].tiles
                 elif isinstance(basemaps[basemap], folium.WmsTileLayer):

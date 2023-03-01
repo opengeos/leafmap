@@ -272,11 +272,13 @@ class Map(ipyleaflet.Map):
         else:
             raise TypeError("The location must be a list or a tuple.")
 
-    def add_basemap(self, basemap="HYBRID"):
+    def add_basemap(self, basemap="HYBRID", show=True, **kwargs):
         """Adds a basemap to the map.
 
         Args:
             basemap (str, optional): Can be one of string from basemaps. Defaults to 'HYBRID'.
+            visible (bool, optional): Whether the basemap is visible or not. Defaults to True.
+            **kwargs: Keyword arguments for the TileLayer.
         """
         import xyzservices
 
@@ -291,12 +293,18 @@ class Map(ipyleaflet.Map):
                 else:
                     max_zoom = 22
                 layer = ipyleaflet.TileLayer(
-                    url=url, name=name, max_zoom=max_zoom, attribution=attribution
+                    url=url,
+                    name=name,
+                    max_zoom=max_zoom,
+                    attribution=attribution,
+                    visible=show,
+                    **kwargs,
                 )
                 self.add_layer(layer)
                 arc_add_layer(url, name)
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
                 self.add_layer(basemaps[basemap])
+                self.layers[-1].visible = show
                 arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
                 print(f"{basemap} has been already added before.")
@@ -3728,8 +3736,26 @@ class Map(ipyleaflet.Map):
 
         self.add_html(text, position=position, **kwargs)
 
+    def get_bbox(self):
+        """Get the bounds of the map as a list of [(]minx, miny, maxx, maxy].
 
-    def oam_search(self, bbox=None, start_date=None, end_date=None, limit=100, layer_args={}, add_image=True, **kwargs):
+        Returns:
+            list: The bounds of the map as a list of [(]minx, miny, maxx, maxy].
+        """
+        bounds = self.bounds
+        bbox = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
+        return bbox
+
+    def oam_search(
+        self,
+        bbox=None,
+        start_date=None,
+        end_date=None,
+        limit=100,
+        layer_args={},
+        add_image=True,
+        **kwargs,
+    ):
         """Search OpenAerialMap for images within a bounding box and time range.
 
         Args:
@@ -3749,7 +3775,12 @@ class Map(ipyleaflet.Map):
             else:
                 bbox = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
 
-        gdf = oam_search(bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs)
+        if self.zoom <= 4:
+            print("Zoom in to search for images")
+
+        gdf = oam_search(
+            bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs
+        )
 
         if "layer_name" not in layer_args:
             layer_args["layer_name"] = "Footprints"
@@ -3767,26 +3798,28 @@ class Map(ipyleaflet.Map):
                 # "clickable": True,
             }
 
-
         if 'hover_style' not in layer_args:
             layer_args['hover_style'] = {"weight": layer_args['style']["weight"] + 2}
 
         if gdf is not None:
-
             self.add_gdf(gdf, **layer_args)
+            setattr(self, "oam_gdf", gdf)
 
             if add_image:
                 ids = gdf['_id'].tolist()
                 images = gdf['tms'].tolist()
 
-                if len(images) > 10:
-                    print(f"Found {len(images)} images. Showing the first 10.")
+                if len(images) > 5:
+                    print(f"Found {len(images)} images. \nShowing the first 5.")
 
                 for index, image in enumerate(images):
-                    if index == 10:
+                    if index == 5:
                         break
-                    self.add_tile_layer(url=image, name=ids[index], attribution='OpenAerialMap')
-
+                    self.add_tile_layer(
+                        url=image, name=ids[index], attribution='OpenAerialMap'
+                    )
+        else:
+            print("No images found.")
 
 
 # The functions below are outside the Map class.
