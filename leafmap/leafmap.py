@@ -85,6 +85,19 @@ class Map(ipyleaflet.Map):
         if kwargs["fullscreen_control"]:
             self.add_control(ipyleaflet.FullScreenControl())
 
+        if "search_control" not in kwargs:
+            kwargs["search_control"] = True
+        if kwargs["search_control"]:
+            url = 'https://nominatim.openstreetmap.org/search?format=json&q={s}'
+            search_control = ipyleaflet.SearchControl(
+                position='topleft',
+                url=url,
+                zoom=12,
+                marker=None,
+            )
+            self.add_control(search_control)
+            self.search_control = search_control
+
         if "draw_control" not in kwargs:
             kwargs["draw_control"] = True
         if kwargs["draw_control"]:
@@ -259,11 +272,13 @@ class Map(ipyleaflet.Map):
         else:
             raise TypeError("The location must be a list or a tuple.")
 
-    def add_basemap(self, basemap="HYBRID"):
+    def add_basemap(self, basemap="HYBRID", show=True, **kwargs):
         """Adds a basemap to the map.
 
         Args:
             basemap (str, optional): Can be one of string from basemaps. Defaults to 'HYBRID'.
+            visible (bool, optional): Whether the basemap is visible or not. Defaults to True.
+            **kwargs: Keyword arguments for the TileLayer.
         """
         import xyzservices
 
@@ -278,12 +293,18 @@ class Map(ipyleaflet.Map):
                 else:
                     max_zoom = 22
                 layer = ipyleaflet.TileLayer(
-                    url=url, name=name, max_zoom=max_zoom, attribution=attribution
+                    url=url,
+                    name=name,
+                    max_zoom=max_zoom,
+                    attribution=attribution,
+                    visible=show,
+                    **kwargs,
                 )
                 self.add_layer(layer)
                 arc_add_layer(url, name)
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
                 self.add_layer(basemaps[basemap])
+                self.layers[-1].visible = show
                 arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
                 print(f"{basemap} has been already added before.")
@@ -2190,12 +2211,12 @@ class Map(ipyleaflet.Map):
         if not style:
             style = {
                 # "stroke": True,
-                "color": "#000000",
-                "weight": 1,
+                "color": "#3388ff",
+                "weight": 2,
                 "opacity": 1,
                 # "fill": True,
                 # "fillColor": "#ffffff",
-                "fillOpacity": 0.1,
+                "fillOpacity": 0,
                 # "dashArray": "9"
                 # "clickable": True,
             }
@@ -2203,7 +2224,7 @@ class Map(ipyleaflet.Map):
             style["weight"] = 1
 
         if not hover_style:
-            hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
+            hover_style = {"weight": style["weight"] + 2, "fillOpacity": 0}
 
         def random_color(feature):
             return {
@@ -3714,6 +3735,94 @@ class Map(ipyleaflet.Map):
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)
+
+    def get_bbox(self):
+        """Get the bounds of the map as a list of [(]minx, miny, maxx, maxy].
+
+        Returns:
+            list: The bounds of the map as a list of [(]minx, miny, maxx, maxy].
+        """
+        bounds = self.bounds
+        bbox = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
+        return bbox
+
+    def oam_search(
+        self,
+        bbox=None,
+        start_date=None,
+        end_date=None,
+        limit=100,
+        info_mode="on_click",
+        layer_args={},
+        add_image=True,
+        **kwargs,
+    ):
+        """Search OpenAerialMap for images within a bounding box and time range.
+
+        Args:
+            bbox (list | str, optional): The bounding box [xmin, ymin, xmax, ymax] to search within. Defaults to None.
+            start_date (str, optional): The start date to search within, such as "2015-04-20T00:00:00.000Z". Defaults to None.
+            end_date (str, optional): The end date to search within, such as "2015-04-21T00:00:00.000Z". Defaults to None.
+            limit (int, optional): The maximum number of results to return. Defaults to 100.
+            info_mode (str, optional): The mode to use for the info popup. Can be 'on_hover' or 'on_click'. Defaults to 'on_click'.
+            layer_args (dict, optional): The layer arguments for add_gdf() function. Defaults to {}.
+            add_image (bool, optional): Whether to add the first 10 images to the map. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
+        """
+
+        bounds = self.bounds
+        if bbox is None:
+            if self.user_roi is not None:
+                bbox = self.user_roi_bounds()
+            else:
+                bbox = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
+
+        if self.zoom <= 4:
+            print("Zoom in to search for images")
+            return None
+
+        gdf = oam_search(
+            bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs
+        )
+
+        if "layer_name" not in layer_args:
+            layer_args["layer_name"] = "Footprints"
+
+        if 'style' not in layer_args:
+            layer_args['style'] = {
+                # "stroke": True,
+                "color": "#3388ff",
+                "weight": 2,
+                "opacity": 1,
+                # "fill": True,
+                # "fillColor": "#ffffff",
+                "fillOpacity": 0,
+                # "dashArray": "9"
+                # "clickable": True,
+            }
+
+        if 'hover_style' not in layer_args:
+            layer_args['hover_style'] = {"weight": layer_args['style']["weight"] + 2}
+
+        if gdf is not None:
+            self.add_gdf(gdf, info_mode=info_mode, **layer_args)
+            setattr(self, "oam_gdf", gdf)
+
+            if add_image:
+                ids = gdf['_id'].tolist()
+                images = gdf['tms'].tolist()
+
+                if len(images) > 5:
+                    print(f"Found {len(images)} images. \nShowing the first 5.")
+
+                for index, image in enumerate(images):
+                    if index == 5:
+                        break
+                    self.add_tile_layer(
+                        url=image, name=ids[index], attribution='OpenAerialMap'
+                    )
+        else:
+            print("No images found.")
 
 
 # The functions below are outside the Map class.

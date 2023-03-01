@@ -1663,3 +1663,104 @@ def create_mosaicjson(images, output):
     mosaic = MosaicJSON.from_urls(images)
     with MosaicBackend(output, mosaic_def=mosaic) as f:
         f.write(overwrite=True)
+
+
+def flatten_dict(my_dict, parent_key=False, sep='.'):
+    """Flattens a nested dictionary.
+
+    Args:
+        my_dict (dict): The dictionary to flatten.
+        parent_key (bool, optional): Whether to include the parent key. Defaults to False.
+        sep (str, optional): The separator to use. Defaults to '.'.
+
+    Returns:
+        dict: The flattened dictionary.
+    """
+
+    flat_dict = {}
+    for key, value in my_dict.items():
+        if not isinstance(value, dict):
+            flat_dict[key] = value
+        else:
+            sub_dict = flatten_dict(value)
+            for sub_key, sub_value in sub_dict.items():
+                if parent_key:
+                    flat_dict[parent_key + sep + sub_key] = sub_value
+                else:
+                    flat_dict[sub_key] = sub_value
+
+    return flat_dict
+
+
+def oam_search(
+    bbox=None, start_date=None, end_date=None, limit=100, return_gdf=True, **kwargs
+):
+    """Search OpenAerialMap (https://openaerialmap.org) and return a GeoDataFrame or list of image metadata.
+
+    Args:
+        bbox (list | str, optional): The bounding box [xmin, ymin, xmax, ymax] to search within. Defaults to None.
+        start_date (str, optional): The start date to search within, such as "2015-04-20T00:00:00.000Z". Defaults to None.
+        end_date (str, optional): The end date to search within, such as "2015-04-21T00:00:00.000Z". Defaults to None.
+        limit (int, optional): The maximum number of results to return. Defaults to 100.
+        return_gdf (bool, optional): If True, return a GeoDataFrame, otherwise return a list. Defaults to True.
+        **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
+
+    Returns:
+        GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
+    """
+
+    if return_gdf:
+        import pandas as pd
+        from shapely.geometry import Polygon
+        import geopandas as gpd
+
+    url = 'https://api.openaerialmap.org/meta'
+    if bbox is not None:
+        if isinstance(bbox, str):
+            bbox = [float(x) for x in bbox.split(',')]
+        if not isinstance(bbox, list):
+            raise ValueError("bbox must be a list.")
+        if len(bbox) != 4:
+            raise ValueError("bbox must be a list of 4 numbers.")
+        bbox = ','.join(map(str, bbox))
+        kwargs['bbox'] = bbox
+
+    if start_date is not None:
+        kwargs['acquisition_from'] = start_date
+
+    if end_date is not None:
+        kwargs['acquisition_to'] = end_date
+
+    if limit is not None:
+        kwargs['limit'] = limit
+
+    try:
+        r = requests.get(url, params=kwargs).json()
+        if 'results' in r:
+            results = []
+            for result in r['results']:
+                if 'geojson' in result:
+                    del result['geojson']
+                if 'projection' in result:
+                    del result['projection']
+                if 'footprint' in result:
+                    del result['footprint']
+                result = flatten_dict(result)
+                results.append(result)
+
+            if not return_gdf:
+                return results
+            else:
+                df = pd.DataFrame(results)
+
+                polygons = [Polygon.from_bounds(*bbox) for bbox in df['bbox']]
+                gdf = gpd.GeoDataFrame(geometry=polygons, crs="epsg:4326")
+
+                return pd.concat([gdf, df], axis=1)
+
+        else:
+            print("No results found.")
+            return None
+
+    except Exception as e:
+        return None
