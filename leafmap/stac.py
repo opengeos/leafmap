@@ -195,6 +195,9 @@ def cog_tile(url, bands=None, titiler_endpoint=None, **kwargs):
         TileMatrixSetId = kwargs["TileMatrixSetId"]
         kwargs.pop("TileMatrixSetId")
 
+    if 'default_vis' in kwargs.keys() and kwargs['default_vis']:
+        kwargs = {"url": url}
+
     r = requests.get(
         f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json", params=kwargs
     ).json()
