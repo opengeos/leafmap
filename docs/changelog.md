@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.18.0 - Mar 1, 2023
+
+**New Features**
+
+-   Added support for searching OpenAerialMap imagery ([#375](https://github.com/giswqs/leafmap/pull/375))
+-   Added Google Search for docs ([#374](https://github.com/giswqs/leafmap/pull/374))
+-   Added leafmap logo ([#372](https://github.com/giswqs/leafmap/pull/372))
+
+**Improvement**
+
+-   Fixed datapane bug ([#373](https://github.com/giswqs/leafmap/pull/373))
+-   Pin osmnx version lower bound ([#369](https://github.com/giswqs/leafmap/pull/368))
+
 ## v0.17.1 - Feb 16, 2023
 
 **New Features**
