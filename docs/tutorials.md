@@ -71,6 +71,7 @@
 65. Visualizing raster datasets interactively in SageMaker Studio Lab ([notebook](https://leafmap.org/notebooks/65_sagemaker))
 66. Developing interactive web apps with gradio and leafmap ([notebook](https://leafmap.org/notebooks/66_gradio))
 67. Visualizing Maxar Open Data with Leafmap ([notebook](https://leafmap.org/notebooks/67_maxar_open_data))
+68. Searching and visualizing OpenAerialMap imagery with leafmap ([notebook](https://leafmap.org/notebooks/68_openaerialmap))
 
 ## Demo
 
