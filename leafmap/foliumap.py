@@ -1228,6 +1228,9 @@ class Map(folium.Map):
             kwargs["style_function"] = random_color
             kwargs.pop("fill_colors")
 
+        if "weight" not in style_dict:
+            style_dict["weight"] = 2
+
         if "highlight_function" not in kwargs:
             kwargs["highlight_function"] = lambda feat: {
                 "weight": style_dict['weight'] + 2,
