@@ -2211,12 +2211,12 @@ class Map(ipyleaflet.Map):
         if not style:
             style = {
                 # "stroke": True,
-                "color": "#000000",
-                "weight": 1,
+                "color": "#3388ff",
+                "weight": 2,
                 "opacity": 1,
                 # "fill": True,
                 # "fillColor": "#ffffff",
-                "fillOpacity": 0.1,
+                "fillOpacity": 0,
                 # "dashArray": "9"
                 # "clickable": True,
             }
@@ -2224,7 +2224,7 @@ class Map(ipyleaflet.Map):
             style["weight"] = 1
 
         if not hover_style:
-            hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
+            hover_style = {"weight": style["weight"] + 2, "fillOpacity": 0}
 
         def random_color(feature):
             return {

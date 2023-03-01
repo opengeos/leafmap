@@ -1191,6 +1191,7 @@ class Map(folium.Map):
             raise Exception(e)
 
         # interchangeable parameters between ipyleaflet and folium.
+        style_dict = {}
         if "style_function" not in kwargs:
             if "style" in kwargs:
                 style_dict = kwargs["style"]
@@ -1200,12 +1201,12 @@ class Map(folium.Map):
             else:
                 style_dict = {
                     # "stroke": True,
-                    "color": "#000000",
-                    "weight": 1,
+                    "color": "#3388ff",
+                    "weight": 2,
                     "opacity": 1,
                     # "fill": True,
                     # "fillColor": "#ffffff",
-                    "fillOpacity": 0.1,
+                    "fillOpacity": 0,
                     # "dashArray": "9"
                     # "clickable": True,
                 }
@@ -1229,8 +1230,8 @@ class Map(folium.Map):
 
         if "highlight_function" not in kwargs:
             kwargs["highlight_function"] = lambda feat: {
-                "weight": 2,
-                "fillOpacity": 0.5,
+                "weight": style_dict['weight'] + 2,
+                "fillOpacity": 0,
             }
 
         tooltip = None
@@ -2764,7 +2765,6 @@ class Map(folium.Map):
                 "fillOpacity": 0,
             }
 
-        print(layer_args)
         if gdf is not None:
             self.add_gdf(gdf, info_mode=info_mode, **layer_args)
             setattr(self, "oam_gdf", gdf)
