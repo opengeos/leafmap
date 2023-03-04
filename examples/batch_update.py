@@ -81,12 +81,13 @@ for file in files:
         elif ':id:' in line:
             print(file)
             print(line)
-        elif '"vscode": {' in line:
+        elif '---' in line and 'vscode:' in lines[index + 1]:
             print(file)
-            print(line)
+            print(f"Found vscode metadata in {file} at line {index}")
             skip_lines.append(index)
             skip_lines.append(index + 1)
             skip_lines.append(index + 2)
+            skip_lines.append(index + 3)
         elif index in skip_lines:
             skip_lines.remove(index)
         else:
