@@ -56,7 +56,7 @@ for file in files:
         elif 'jupyterlite.rtfd' in line and "Open In Studio Lab" not in lines[index + 1]:
             # Add Studio Lab badge
             badge = (
-                '[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)]'
+                '[![image](https://studiolab.sagemaker.aws/studiolab.svg)]'
             )
             baseurl = 'https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/'
             base_dir = os.path.basename(os.path.dirname(file))
@@ -69,7 +69,7 @@ for file in files:
 
             # Add Planetary Computer badge
             badge = (
-                '[![Open in Planetary Computer](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)]'
+                '[![image](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)]'
             )
             baseurl = 'https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/'
             base_dir = os.path.basename(os.path.dirname(file))
