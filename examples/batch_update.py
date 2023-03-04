@@ -40,8 +40,9 @@ for file in files:
         print(f'No Colab badge found in {file}')
 
     out_lines = []
+    skip_lines = []
     for index, line in enumerate(lines):
-        if 'colab-badge.svg' in line and 'jupyterlite' not in lines[index - 1]:
+        if 'studiolab.sagemaker.aws' in line and 'jupyterlite' not in lines[index - 1]:
             badge = (
                 '[![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)]'
             )
@@ -54,7 +55,7 @@ for file in files:
             out_lines.append(line)
 
         elif (
-            'jupyterlite.rtfd' in line and "Open In Studio Lab" not in lines[index + 1]
+            'jupyterlite.rtfd' in line and "studiolab.sagemaker.aws" not in lines[index + 1]
         ):
             # Add Studio Lab badge
             badge = '[![image](https://studiolab.sagemaker.aws/studiolab.svg)]'
@@ -80,7 +81,15 @@ for file in files:
         elif ':id:' in line:
             print(file)
             print(line)
-            pass
+        elif '---' in line and 'vscode:' in lines[index + 1]:
+            print(file)
+            print(f"Found vscode metadata in {file} at line {index}")
+            skip_lines.append(index)
+            skip_lines.append(index + 1)
+            skip_lines.append(index + 2)
+            skip_lines.append(index + 3)
+        elif index in skip_lines:
+            skip_lines.remove(index)
         else:
             out_lines.append(line)
 
