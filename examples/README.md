@@ -1,9 +1,10 @@
 # leafmap
 
 [![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://demo.leafmap.org)
+[![image](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
+[![image](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)](https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/giswqs/leafmap&urlpath=lab/tree/leafmap/examples/notebooks/00_key_features.ipynb&branch=master)
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
-[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
 [![image](https://pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
