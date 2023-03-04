@@ -31,6 +31,14 @@ for file in files:
     with open(file, 'r') as f:
         lines = f.readlines()
 
+    has_colab = False
+    for line in lines:
+        if 'colab-badge.svg' in line:
+            has_colab = True
+            break
+    if not has_colab:
+        print(f'No Colab badge found in {file}')
+
     out_lines = []
     for index, line in enumerate(lines):
         if 'colab-badge.svg' in line and 'jupyterlite' not in lines[index - 1]:
@@ -44,6 +52,33 @@ for file in files:
             badge_url = f"{badge}({url})\n"
             out_lines.append(badge_url)
             out_lines.append(line)
+
+        elif 'jupyterlite.rtfd' in line and "Open In Studio Lab" not in lines[index + 1]:
+            # Add Studio Lab badge
+            badge = (
+                '[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)]'
+            )
+            baseurl = 'https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/'
+            base_dir = os.path.basename(os.path.dirname(file))
+            basename = os.path.basename(file).replace('.md', '.ipynb')
+            url = baseurl + base_dir + '/' + basename
+            badge_url = f"{badge}({url})\n"
+            out_lines.append(line)
+
+            out_lines.append(badge_url)
+
+            # Add Planetary Computer badge
+            badge = (
+                '[![Open in Planetary Computer](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)]'
+            )
+            baseurl = 'https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/'
+            base_dir = os.path.basename(os.path.dirname(file))
+            basename = os.path.basename(file).replace('.md', '.ipynb')
+
+            url = f'https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/giswqs/leafmap&urlpath=lab/tree/leafmap/examples/{base_dir}/{basename}&branch=master'
+            badge_url = f"{badge}({url})\n"
+            out_lines.append(badge_url)
+
         elif ':id:' in line:
             print(file)
             print(line)
