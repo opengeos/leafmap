@@ -1,9 +1,10 @@
 # Welcome to leafmap
 
 [![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://demo.leafmap.org)
+[![image](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
+[![image](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)](https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/giswqs/leafmap&urlpath=lab/tree/leafmap/examples/notebooks/00_key_features.ipynb&branch=master)
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
-[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
 [![image](https://pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
@@ -35,12 +36,13 @@ There is a plethora of Python packages for geospatial analysis, such as [geopand
 
 Leafmap is built on the bidirectional communication between the front end (your browser) and the backend (Python) provided by ipleaflet (and similarly by hvPlot and GeoViews) to provide many convenient functions for loading and visualizing geospatial datasets with only one line of code. Users can also use the interactive GUI to load geospatial datasets without coding. Leafmap is intended for anyone who would like to analyze and visualize geospatial data interactively in a Jupyter environment. It is particularly suited for novice users with limited programming skills. Advanced programmers can also find leafmap a useful tool for analyzing geospatial data and building interactive web apps.
 
-Launch the interactive notebook tutorial for the **leafmap** Python package with JupyterLite, Google Colab, Binder, or Amazon Sagemaker Studio Lab now:
+Launch the interactive notebook tutorial for the **leafmap** Python package with JupyterLite, Amazon SageMaker Studio Lab, Microsoft Planetary Computer, Google Colab, or Binder:
 
 [![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://demo.leafmap.org)
+[![image](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
+[![image](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)](https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/giswqs/leafmap&urlpath=lab/tree/leafmap/examples/notebooks/00_key_features.ipynb&branch=master)
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
-[![Open In Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
 
 Check out this excellent article on Medium - [Leafmap a new Python Package for Geospatial data science](https://link.medium.com/HRRKDcynYgb)
 
