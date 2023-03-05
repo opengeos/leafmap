@@ -4263,7 +4263,8 @@ def download_file(
         proxy (str, optional): Proxy. Defaults to None.
         speed (float, optional): Download byte size per second (e.g., 256KB/s = 256 * 1024). Defaults to None.
         use_cookies (bool, optional): Flag to use cookies. Defaults to True.
-        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string, in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
+        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string,
+            in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
         id (str, optional): Google Drive's file ID. Defaults to None.
         fuzzy (bool, optional): Fuzzy extraction of Google Drive's file Id. Defaults to False.
         resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
