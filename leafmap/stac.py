@@ -1751,6 +1751,78 @@ def maxar_tile_url(collection, tile, dtype='geojson', raw=True):
     return url
 
 
+def maxar_download(
+    images,
+    out_dir=None,
+    quiet=False,
+    proxy=None,
+    speed=None,
+    use_cookies=True,
+    verify=True,
+    id=None,
+    fuzzy=False,
+    resume=False,
+    overwrite=False,
+):
+    """Download Mxar Open Data images.
+
+    Args:
+        images (str | images): The list of image links or a file path to a geojson or tsv containing the Maxar dowload links.
+        out_dir (str, optional): The output directory. Defaults to None.
+        quiet (bool, optional): Suppress terminal output. Default is False.
+        proxy (str, optional): Proxy. Defaults to None.
+        speed (float, optional): Download byte size per second (e.g., 256KB/s = 256 * 1024). Defaults to None.
+        use_cookies (bool, optional): Flag to use cookies. Defaults to True.
+        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string,
+            in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
+        id (str, optional): Google Drive's file ID. Defaults to None.
+        fuzzy (bool, optional): Fuzzy extraction of Google Drive's file Id. Defaults to False.
+        resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
+        overwrite (bool, optional): Overwrite the file if it already exists. Defaults to False.
+
+    """
+    import gdown
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if isinstance(images, str):
+        if images.endswith('.geojson'):
+            import geopandas as gpd
+
+            data = gpd.read_file(images)
+            images = data['visual'].tolist()
+        elif images.endswith('.tsv'):
+            import pandas as pd
+
+            data = pd.read_csv(images, sep='\t')
+            images = data['visual'].tolist()
+        else:
+            raise ValueError(f"Invalid file type. It can be 'geojson' or 'tsv'.")
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    for index, image in enumerate(images):
+        items = image.split('/')
+        file_name = items[7] + '.tif'
+        dir_name = items[-1].split('-')[0]
+        if not os.path.exists(os.path.join(out_dir, dir_name)):
+            os.makedirs(os.path.join(out_dir, dir_name))
+        out_file = os.path.join(out_dir, dir_name, file_name)
+        if os.path.exists(out_file) and (not overwrite):
+            print(f"{out_file} already exists. Skipping...")
+            continue
+        if not quiet:
+            print(
+                f"Downloading {str(index+1).zfill(len(str(len(images))))} out of {len(images)}: {dir_name}/{file_name}"
+            )
+
+        gdown.download(
+            image, out_file, quiet, proxy, speed, use_cookies, verify, id, fuzzy, resume
+        )
+
+
 def create_mosaicjson(images, output):
     """Create a mosaicJSON file from a list of images.
 
@@ -1758,10 +1830,6 @@ def create_mosaicjson(images, output):
         images (str | list): A list of image URLs or a URL to a text file containing a list of image URLs.
         output (str): The output mosaicJSON file path.
 
-    Raises:
-        ImportError: _description_
-        FileNotFoundError: _description_
-        ValueError: _description_
     """
     try:
         from cogeo_mosaic.mosaic import MosaicJSON
