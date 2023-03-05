@@ -1767,7 +1767,7 @@ def maxar_download(
     """Download Mxar Open Data images.
 
     Args:
-        images (str | images): The list of image links or a file path to a geojson or tsv containing the Maxar dowload links.
+        images (str | images): The list of image links or a file path to a geojson or tsv containing the Maxar download links.
         out_dir (str, optional): The output directory. Defaults to None.
         quiet (bool, optional): Suppress terminal output. Default is False.
         proxy (str, optional): Proxy. Defaults to None.
