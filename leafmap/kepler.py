@@ -386,7 +386,7 @@ class Map(keplergl.KeplerGl):
 
         if os.environ.get("USE_MKDOCS") is not None:
             return
-        
+
         if isinstance(self, keplergl.KeplerGl):
             if out_file is None:
                 if os.environ.get("USE_MKDOCS") is not None:
