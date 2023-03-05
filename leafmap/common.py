@@ -4999,9 +4999,10 @@ def plot_raster(
         import rioxarray
         import xarray
     except ImportError:
-        raise ImportError(
+        print(
             "pyxarray and rioxarray are required for plotting. Please install them using 'pip install rioxarray pyvista-xarray'."
         )
+        return
 
     if isinstance(image, str):
         da = rioxarray.open_rasterio(image, **open_kwargs)
@@ -5068,9 +5069,10 @@ def plot_raster_3d(
         import rioxarray
         import xarray
     except ImportError:
-        raise ImportError(
+        print(
             "pyxarray and rioxarray are required for plotting. Please install them using 'pip install rioxarray pyvista-xarray'."
         )
+        return
 
     if isinstance(background, str):
         pyvista.global_theme.background = background

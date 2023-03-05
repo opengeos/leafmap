@@ -383,6 +383,10 @@ class Map(keplergl.KeplerGl):
             read_only (bool, optional): Whether to hide the side panel to disable map customization. Defaults to False.
             out_file (str, optional): Output html file path. Defaults to None.
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+        
         if isinstance(self, keplergl.KeplerGl):
             if out_file is None:
                 if os.environ.get("USE_MKDOCS") is not None:
@@ -413,6 +417,10 @@ class Map(keplergl.KeplerGl):
             read_only (bool, optional): Whether to hide the side panel to disable map customization. Defaults to False.
 
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         try:
             save = True
             if outfile is not None:
@@ -516,6 +524,10 @@ class Map(keplergl.KeplerGl):
             ValueError: The output file extension must be json.
             TypeError: The provided filepath is invalid.
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         if isinstance(out_json, str):
             if not out_json.endswith(".json"):
                 raise ValueError("The output file extension must be json.")
