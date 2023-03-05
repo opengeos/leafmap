@@ -8069,3 +8069,15 @@ def filter_date(
     mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
     result = data.loc[mask]
     return result.drop(columns=[new_field], axis=1)
+
+
+def skip_mkdocs_build():
+    """Skips the MkDocs build if the USE_MKDOCS environment variable is set.
+
+    Returns:
+        bool: Whether to skip the MkDocs build.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return True
+    else:
+        return False
