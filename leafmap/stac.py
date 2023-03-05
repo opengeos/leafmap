@@ -1719,6 +1719,38 @@ def maxar_collection_url(collection, dtype='geojson', raw=True):
     return url
 
 
+def maxar_tile_url(collection, tile, dtype='geojson', raw=True):
+    """Retrieve the URL to a Maxar Open Data tile.
+
+    Args:
+
+        collection (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23.
+            Use maxar_collections() to retrieve all available collection IDs.
+        tile (str): The tile ID, e.g., 10300500D9F8E600.
+        dtype (str, optional): The data type. It can be 'geojson', 'json' or 'tsv'. Defaults to 'geojson'.
+        raw (bool, optional): If True, return the raw URL. Defaults to True.
+
+    Returns:
+        str: The URL to the tile.
+    """
+
+    collections = maxar_collections()
+    if collection not in collections:
+        raise ValueError(
+            f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
+        )
+
+    if dtype not in ['geojson', 'json', 'tsv']:
+        raise ValueError(f"Invalid dtype. It can be 'geojson', 'json' or 'tsv'.")
+
+    if raw:
+        url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}/{tile}.{dtype}'
+    else:
+        url = f'https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}/{tile}.{dtype}'
+
+    return url
+
+
 def create_mosaicjson(images, output):
     """Create a mosaicJSON file from a list of images.
 
