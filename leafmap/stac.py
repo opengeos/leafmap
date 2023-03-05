@@ -1412,6 +1412,12 @@ def maxar_collections(return_ids=True):
 
     import tempfile
     from pystac import Catalog
+    import pandas as pd
+
+    if return_ids:
+        url = 'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets.csv'
+        df = pd.read_csv(url)
+        return df['dataset'].tolist()
 
     file_path = os.path.join(tempfile.gettempdir(), "maxar-collections.txt")
     if return_ids:
@@ -1428,14 +1434,14 @@ def maxar_collections(return_ids=True):
 
     collections = root_catalog.get_collections()
 
-    if return_ids:
-        collection_ids = [collection.id for collection in collections]
-        with open(file_path, "w") as f:
-            f.write("\n".join(collection_ids))
+    # if return_ids:
+    #     collection_ids = [collection.id for collection in collections]
+    #     with open(file_path, "w") as f:
+    #         f.write("\n".join(collection_ids))
 
-        return collection_ids
-    else:
-        return collections
+    #     return collection_ids
+    # else:
+    return collections
 
 
 def maxar_child_collections(collection_id, return_ids=True):
@@ -1627,6 +1633,90 @@ def maxar_refresh():
             os.remove(os.path.join(temp_dir, f))
 
     print("Maxar STAC items cache has been refreshed.")
+
+
+def maxar_search(
+    collection, start_date=None, end_date=None, bbox=None, within=False, align=True
+):
+    """Search Maxar Open Data by collection ID, date range, and/or bounding box.
+
+    Args:
+        collection (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23.
+            Use maxar_collections() to retrieve all available collection IDs.
+        start_date (str, optional): The start date, e.g., 2023-01-01. Defaults to None.
+        end_date (str, optional): The end date, e.g., 2023-12-31. Defaults to None.
+        bbox (list | GeoDataFrame): The bounding box to filter by. Can be a list of 4 coordinates or a file path or a GeoDataFrame.
+        within (bool, optional): Whether to filter by the bounding box or the bounding box's interior. Defaults to False.
+        align (bool, optional): If True, automatically aligns GeoSeries based on their indices. If False, the order of elements is preserved.
+
+    Returns:
+        GeoDataFrame: A GeoDataFrame containing the search results.
+    """
+    import datetime
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    collections = maxar_collections()
+    if collection not in collections:
+        raise ValueError(
+            f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
+        )
+
+    url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.geojson'
+    data = gpd.read_file(url)
+
+    if bbox is not None:
+        bbox = gpd.GeoDataFrame(
+            geometry=[Polygon.from_bounds(*bbox)],
+            crs="epsg:4326",
+        )
+        if within:
+            data = data[data.within(bbox.unary_union, align=align)]
+        else:
+            data = data[data.intersects(bbox.unary_union, align=align)]
+
+    date_field = "datetime"
+    new_field = f"{date_field}_temp"
+    data[new_field] = pd.to_datetime(data[date_field])
+
+    if end_date is None:
+        end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+    if start_date is None:
+        start_date = data[new_field].min()
+
+    mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
+    result = data.loc[mask]
+    return result.drop(columns=[new_field], axis=1)
+
+
+def maxar_collection_url(collection, dtype='geojson', raw=True):
+    """Retrieve the URL to a Maxar Open Data collection.
+
+    Args:
+        collection (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23.
+            Use maxar_collections() to retrieve all available collection IDs.
+        dtype (str, optional): The data type. It can be 'geojson' or 'tsv'. Defaults to 'geojson'.
+        raw (bool, optional): If True, return the raw URL. Defaults to True.
+
+    Returns:
+        str: The URL to the collection.
+    """
+    collections = maxar_collections()
+    if collection not in collections:
+        raise ValueError(
+            f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
+        )
+
+    if dtype not in ['geojson', 'tsv']:
+        raise ValueError(f"Invalid dtype. It can be 'geojson' or 'tsv'.")
+
+    if raw:
+        url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.{dtype}'
+    else:
+        url = f'https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}.{dtype}'
+    return url
 
 
 def create_mosaicjson(images, output):
