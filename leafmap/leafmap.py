@@ -3908,6 +3908,10 @@ def linked_maps(
     Returns:
         ipywidget: A GridspecLayout widget.
     """
+
+    if skip_mkdocs_build():
+        return
+
     grid = widgets.GridspecLayout(rows, cols, grid_gap="0px")
     count = rows * cols
 
