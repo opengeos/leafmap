@@ -1273,6 +1273,10 @@ class Map(folium.Map):
 
         """
 
+        for col in gdf.columns:
+            if gdf[col].dtype in ['datetime64[ns]', 'datetime64[ns, UTC]']:
+                gdf[col] = gdf[col].astype(str)
+
         data = gdf_to_geojson(gdf, epsg="4326")
 
         self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
@@ -2279,6 +2283,18 @@ class Map(folium.Map):
                         attr=" ",
                         overlay=True,
                     )
+
+                elif left_layer.startswith("http") and left_layer.endswith(".json"):
+                    left_tile_url = stac_tile(left_layer, **left_args)
+                    bbox = stac_bounds(left_layer)
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    left_layer = folium.raster_layers.TileLayer(
+                        tiles=left_tile_url,
+                        name=left_name,
+                        attr=" ",
+                        overlay=True,
+                    )
+
                 elif os.path.exists(left_layer):
                     left_layer, left_client = get_local_tile_layer(
                         left_layer,
@@ -2318,6 +2334,19 @@ class Map(folium.Map):
                         attr=" ",
                         overlay=True,
                     )
+
+                elif right_layer.startswith("http") and right_layer.endswith(".json"):
+                    right_tile_url = stac_tile(right_layer, **left_args)
+                    bbox = stac_bounds(right_layer)
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    right_layer = folium.raster_layers.TileLayer(
+                        tiles=right_tile_url,
+                        name=right_name,
+                        attr=" ",
+                        overlay=True,
+                    )
+                    print(bounds)
+
                 elif os.path.exists(right_layer):
                     right_layer, right_client = get_local_tile_layer(
                         right_layer,

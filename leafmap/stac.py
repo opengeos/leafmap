@@ -1412,6 +1412,12 @@ def maxar_collections(return_ids=True):
 
     import tempfile
     from pystac import Catalog
+    import pandas as pd
+
+    if return_ids:
+        url = 'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets.csv'
+        df = pd.read_csv(url)
+        return df['dataset'].tolist()
 
     file_path = os.path.join(tempfile.gettempdir(), "maxar-collections.txt")
     if return_ids:
@@ -1428,14 +1434,14 @@ def maxar_collections(return_ids=True):
 
     collections = root_catalog.get_collections()
 
-    if return_ids:
-        collection_ids = [collection.id for collection in collections]
-        with open(file_path, "w") as f:
-            f.write("\n".join(collection_ids))
+    # if return_ids:
+    #     collection_ids = [collection.id for collection in collections]
+    #     with open(file_path, "w") as f:
+    #         f.write("\n".join(collection_ids))
 
-        return collection_ids
-    else:
-        return collections
+    #     return collection_ids
+    # else:
+    return collections
 
 
 def maxar_child_collections(collection_id, return_ids=True):
@@ -1629,6 +1635,194 @@ def maxar_refresh():
     print("Maxar STAC items cache has been refreshed.")
 
 
+def maxar_search(
+    collection, start_date=None, end_date=None, bbox=None, within=False, align=True
+):
+    """Search Maxar Open Data by collection ID, date range, and/or bounding box.
+
+    Args:
+        collection (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23.
+            Use maxar_collections() to retrieve all available collection IDs.
+        start_date (str, optional): The start date, e.g., 2023-01-01. Defaults to None.
+        end_date (str, optional): The end date, e.g., 2023-12-31. Defaults to None.
+        bbox (list | GeoDataFrame): The bounding box to filter by. Can be a list of 4 coordinates or a file path or a GeoDataFrame.
+        within (bool, optional): Whether to filter by the bounding box or the bounding box's interior. Defaults to False.
+        align (bool, optional): If True, automatically aligns GeoSeries based on their indices. If False, the order of elements is preserved.
+
+    Returns:
+        GeoDataFrame: A GeoDataFrame containing the search results.
+    """
+    import datetime
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    collections = maxar_collections()
+    if collection not in collections:
+        raise ValueError(
+            f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
+        )
+
+    url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.geojson'
+    data = gpd.read_file(url)
+
+    if bbox is not None:
+        bbox = gpd.GeoDataFrame(
+            geometry=[Polygon.from_bounds(*bbox)],
+            crs="epsg:4326",
+        )
+        if within:
+            data = data[data.within(bbox.unary_union, align=align)]
+        else:
+            data = data[data.intersects(bbox.unary_union, align=align)]
+
+    date_field = "datetime"
+    new_field = f"{date_field}_temp"
+    data[new_field] = pd.to_datetime(data[date_field])
+
+    if end_date is None:
+        end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+    if start_date is None:
+        start_date = data[new_field].min()
+
+    mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
+    result = data.loc[mask]
+    return result.drop(columns=[new_field], axis=1)
+
+
+def maxar_collection_url(collection, dtype='geojson', raw=True):
+    """Retrieve the URL to a Maxar Open Data collection.
+
+    Args:
+        collection (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23.
+            Use maxar_collections() to retrieve all available collection IDs.
+        dtype (str, optional): The data type. It can be 'geojson' or 'tsv'. Defaults to 'geojson'.
+        raw (bool, optional): If True, return the raw URL. Defaults to True.
+
+    Returns:
+        str: The URL to the collection.
+    """
+    collections = maxar_collections()
+    if collection not in collections:
+        raise ValueError(
+            f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
+        )
+
+    if dtype not in ['geojson', 'tsv']:
+        raise ValueError(f"Invalid dtype. It can be 'geojson' or 'tsv'.")
+
+    if raw:
+        url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.{dtype}'
+    else:
+        url = f'https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}.{dtype}'
+    return url
+
+
+def maxar_tile_url(collection, tile, dtype='geojson', raw=True):
+    """Retrieve the URL to a Maxar Open Data tile.
+
+    Args:
+
+        collection (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23.
+            Use maxar_collections() to retrieve all available collection IDs.
+        tile (str): The tile ID, e.g., 10300500D9F8E600.
+        dtype (str, optional): The data type. It can be 'geojson', 'json' or 'tsv'. Defaults to 'geojson'.
+        raw (bool, optional): If True, return the raw URL. Defaults to True.
+
+    Returns:
+        str: The URL to the tile.
+    """
+
+    collections = maxar_collections()
+    if collection not in collections:
+        raise ValueError(
+            f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
+        )
+
+    if dtype not in ['geojson', 'json', 'tsv']:
+        raise ValueError(f"Invalid dtype. It can be 'geojson', 'json' or 'tsv'.")
+
+    if raw:
+        url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}/{tile}.{dtype}'
+    else:
+        url = f'https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}/{tile}.{dtype}'
+
+    return url
+
+
+def maxar_download(
+    images,
+    out_dir=None,
+    quiet=False,
+    proxy=None,
+    speed=None,
+    use_cookies=True,
+    verify=True,
+    id=None,
+    fuzzy=False,
+    resume=False,
+    overwrite=False,
+):
+    """Download Mxar Open Data images.
+
+    Args:
+        images (str | images): The list of image links or a file path to a geojson or tsv containing the Maxar download links.
+        out_dir (str, optional): The output directory. Defaults to None.
+        quiet (bool, optional): Suppress terminal output. Default is False.
+        proxy (str, optional): Proxy. Defaults to None.
+        speed (float, optional): Download byte size per second (e.g., 256KB/s = 256 * 1024). Defaults to None.
+        use_cookies (bool, optional): Flag to use cookies. Defaults to True.
+        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string,
+            in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
+        id (str, optional): Google Drive's file ID. Defaults to None.
+        fuzzy (bool, optional): Fuzzy extraction of Google Drive's file Id. Defaults to False.
+        resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
+        overwrite (bool, optional): Overwrite the file if it already exists. Defaults to False.
+
+    """
+    import gdown
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if isinstance(images, str):
+        if images.endswith('.geojson'):
+            import geopandas as gpd
+
+            data = gpd.read_file(images)
+            images = data['visual'].tolist()
+        elif images.endswith('.tsv'):
+            import pandas as pd
+
+            data = pd.read_csv(images, sep='\t')
+            images = data['visual'].tolist()
+        else:
+            raise ValueError(f"Invalid file type. It can be 'geojson' or 'tsv'.")
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    for index, image in enumerate(images):
+        items = image.split('/')
+        file_name = items[7] + '.tif'
+        dir_name = items[-1].split('-')[0]
+        if not os.path.exists(os.path.join(out_dir, dir_name)):
+            os.makedirs(os.path.join(out_dir, dir_name))
+        out_file = os.path.join(out_dir, dir_name, file_name)
+        if os.path.exists(out_file) and (not overwrite):
+            print(f"{out_file} already exists. Skipping...")
+            continue
+        if not quiet:
+            print(
+                f"Downloading {str(index+1).zfill(len(str(len(images))))} out of {len(images)}: {dir_name}/{file_name}"
+            )
+
+        gdown.download(
+            image, out_file, quiet, proxy, speed, use_cookies, verify, id, fuzzy, resume
+        )
+
+
 def create_mosaicjson(images, output):
     """Create a mosaicJSON file from a list of images.
 
@@ -1636,10 +1830,6 @@ def create_mosaicjson(images, output):
         images (str | list): A list of image URLs or a URL to a text file containing a list of image URLs.
         output (str): The output mosaicJSON file path.
 
-    Raises:
-        ImportError: _description_
-        FileNotFoundError: _description_
-        ValueError: _description_
     """
     try:
         from cogeo_mosaic.mosaic import MosaicJSON
