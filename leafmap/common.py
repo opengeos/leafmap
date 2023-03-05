@@ -4263,7 +4263,8 @@ def download_file(
         proxy (str, optional): Proxy. Defaults to None.
         speed (float, optional): Download byte size per second (e.g., 256KB/s = 256 * 1024). Defaults to None.
         use_cookies (bool, optional): Flag to use cookies. Defaults to True.
-        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string, in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
+        verify (bool | str, optional): Either a bool, in which case it controls whether the server's TLS certificate is verified, or a string,
+            in which case it must be a path to a CA bundle to use. Default is True.. Defaults to True.
         id (str, optional): Google Drive's file ID. Defaults to None.
         fuzzy (bool, optional): Fuzzy extraction of Google Drive's file Id. Defaults to False.
         resume (bool, optional): Resume the download from existing tmp file if possible. Defaults to False.
@@ -7991,3 +7992,93 @@ def html_to_gradio(html, width='100%', height='500px', **kwargs):
     allow-scripts allow-same-origin allow-popups 
     allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
     allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
+
+
+def filter_bounds(data, bbox, within=False, align=True, **kwargs):
+    """Filters a GeoDataFrame or GeoSeries by a bounding box.
+
+    Args:
+        data (str | GeoDataFrame): The input data to filter. Can be a file path or a GeoDataFrame.
+        bbox (list | GeoDataFrame): The bounding box to filter by. Can be a list of 4 coordinates or a file path or a GeoDataFrame.
+        within (bool, optional): Whether to filter by the bounding box or the bounding box's interior. Defaults to False.
+        align (bool, optional): If True, automatically aligns GeoSeries based on their indices. If False, the order of elements is preserved.
+
+    Returns:
+        GeoDataFrame: The filtered data.
+    """
+    import geopandas as gpd
+
+    if isinstance(data, str):
+        data = gpd.read_file(data, **kwargs)
+    elif not isinstance(data, (gpd.GeoDataFrame, gpd.GeoSeries)):
+        raise TypeError("data must be a file path or a GeoDataFrame or GeoSeries")
+
+    if isinstance(bbox, list):
+        if len(bbox) != 4:
+            raise ValueError("bbox must be a list of 4 coordinates")
+        bbox = bbox_to_gdf(bbox)
+    elif isinstance(bbox, str):
+        bbox = gpd.read_file(bbox, **kwargs)
+
+    if within:
+        result = data[data.within(bbox.unary_union, align=align)]
+    else:
+        result = data[data.intersects(bbox.unary_union, align=align)]
+
+    return result
+
+
+def filter_date(
+    data, start_date=None, end_date=None, date_field="date", date_args={}, **kwargs
+):
+    """Filters a DataFrame, GeoDataFrame or GeoSeries by a date range.
+
+    Args:
+        data (str | DataFrame | GeoDataFrame): The input data to filter. Can be a file path or a DataFrame or GeoDataFrame.
+        start_date (str, optional): The start date, e.g., 2023-01-01. Defaults to None.
+        end_date (str, optional): The end date, e.g., 2023-12-31. Defaults to None.
+        date_field (str, optional): The name of the date field. Defaults to "date".
+        date_args (dict, optional): Additional arguments for pd.to_datetime. Defaults to {}.
+
+    Returns:
+        DataFrame: The filtered data.
+    """
+
+    import datetime
+    import pandas as pd
+    import geopandas as gpd
+
+    if isinstance(data, str):
+        data = gpd.read_file(data, **kwargs)
+    elif not isinstance(
+        data, (gpd.GeoDataFrame, gpd.GeoSeries, pd.DataFrame, pd.Series)
+    ):
+        raise TypeError("data must be a file path or a GeoDataFrame or GeoSeries")
+
+    if date_field not in data.columns:
+        raise ValueError(f"date_field must be one of {data.columns}")
+
+    new_field = f"{date_field}_temp"
+    data[new_field] = pd.to_datetime(data[date_field], **date_args)
+
+    if end_date is None:
+        end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+    if start_date is None:
+        start_date = data[new_field].min()
+
+    mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
+    result = data.loc[mask]
+    return result.drop(columns=[new_field], axis=1)
+
+
+def skip_mkdocs_build():
+    """Skips the MkDocs build if the USE_MKDOCS environment variable is set.
+
+    Returns:
+        bool: Whether to skip the MkDocs build.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return True
+    else:
+        return False

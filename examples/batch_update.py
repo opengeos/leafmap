@@ -55,7 +55,8 @@ for file in files:
             out_lines.append(line)
 
         elif (
-            'jupyterlite.rtfd' in line and "studiolab.sagemaker.aws" not in lines[index + 1]
+            'jupyterlite.rtfd' in line
+            and "studiolab.sagemaker.aws" not in lines[index + 1]
         ):
             # Add Studio Lab badge
             badge = '[![image](https://studiolab.sagemaker.aws/studiolab.svg)]'

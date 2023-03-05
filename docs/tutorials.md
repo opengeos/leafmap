@@ -6,6 +6,14 @@
 [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 
+## Workshops
+
+-   FOSS4G 2021 - Using Leafmap for Geospatial Analysis and Data Visualization ([notebook](https://leafmap.org/workshops/FOSS4G_2021/))
+-   SIGSPATIAL 2021 - Interactive Mapping and Geospatial Analysis with Leafmap & Jupyter ([notebook](https://leafmap.org/workshops/SIGSPATIAL_2021/))
+-   YouthMappers 2021 - Interactive Mapping and Geospatial Analysis with Leafmap and Jupyter ([notebook](https://leafmap.org/workshops/YouthMappers_2021/))
+
+## Tutorials
+
 1. Introducing the leafmap Python package for interactive mapping ([video](https://youtu.be/-UPt7x3Gn60) | [gif](https://i.imgur.com/2pRxunR.gif) | [notebook](https://leafmap.org/notebooks/01_leafmap_intro))
 2. Using basemaps in leafmap ([video](https://youtu.be/uylpjbDZesY) | [gif](https://youtu.be/-lOo-vxjrDM) | [notebook](https://leafmap.org/notebooks/02_using_basemaps))
 3. Using Cloud Optimized GeoTIFF (COG) and SpatioTemporal Asset Catalog (STAC) ([notebook](https://leafmap.org/notebooks/03_cog_stac))
@@ -74,6 +82,7 @@
 66. Developing interactive web apps with gradio and leafmap ([notebook](https://leafmap.org/notebooks/66_gradio))
 67. Visualizing Maxar Open Data with Leafmap ([notebook](https://leafmap.org/notebooks/67_maxar_open_data))
 68. Searching and visualizing OpenAerialMap imagery with leafmap ([notebook](https://leafmap.org/notebooks/68_openaerialmap))
+69. Visualizing Maxar Open Data for the 2023 Turkey Earthquake ([notebook](https://leafmap.org/notebooks/69_turkey_earthquake))
 
 ## Demo
 
