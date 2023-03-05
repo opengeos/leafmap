@@ -383,6 +383,10 @@ class Map(keplergl.KeplerGl):
             read_only (bool, optional): Whether to hide the side panel to disable map customization. Defaults to False.
             out_file (str, optional): Output html file path. Defaults to None.
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+        
         if isinstance(self, keplergl.KeplerGl):
             if out_file is None:
                 if os.environ.get("USE_MKDOCS") is not None:
