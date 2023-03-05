@@ -1131,6 +1131,15 @@ class Map(ipyleaflet.Map):
                         name=left_name,
                         attribution=" ",
                     )
+                elif left_layer.startswith("http") and left_layer.endswith(".json"):
+                    left_tile_url = stac_tile(left_layer, **left_args)
+                    bbox = stac_bounds(left_layer)
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    left_layer = ipyleaflet.TileLayer(
+                        url=left_tile_url,
+                        name=left_name,
+                        attribution=" ",
+                    )
                 elif left_layer.startswith("http") and left_layer.endswith(".geojson"):
                     if "max_zoom" in left_args:
                         del left_args["max_zoom"]
@@ -1180,6 +1189,16 @@ class Map(ipyleaflet.Map):
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=url,
+                        name=right_name,
+                        attribution=" ",
+                    )
+
+                elif right_layer.startswith("http") and right_layer.endswith(".json"):
+                    right_tile_url = stac_tile(right_layer, **left_args)
+                    bbox = stac_bounds(right_layer)
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    right_layer = ipyleaflet.TileLayer(
+                        url=right_tile_url,
                         name=right_name,
                         attribution=" ",
                     )
@@ -2397,6 +2416,9 @@ class Map(ipyleaflet.Map):
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
+        for col in gdf.columns:
+            if gdf[col].dtype in ['datetime64[ns]', 'datetime64[ns, UTC]']:
+                gdf[col] = gdf[col].astype(str)
 
         data = gdf_to_geojson(gdf, epsg="4326")
 

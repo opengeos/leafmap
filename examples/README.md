@@ -14,6 +14,12 @@
 [![image](https://img.shields.io/badge/YouTube-Channel-red)](https://youtube.com/@giswqs)
 [![image](https://img.shields.io/twitter/follow/giswqs?style=social)](https://twitter.com/giswqs)
 
+## Workshops
+
+-   FOSS4G 2021 - Using Leafmap for Geospatial Analysis and Data Visualization ([notebook](https://leafmap.org/workshops/FOSS4G_2021/))
+-   SIGSPATIAL 2021 - Interactive Mapping and Geospatial Analysis with Leafmap & Jupyter ([notebook](https://leafmap.org/workshops/SIGSPATIAL_2021/))
+-   YouthMappers 2021 - Interactive Mapping and Geospatial Analysis with Leafmap and Jupyter ([notebook](https://leafmap.org/workshops/YouthMappers_2021/))
+
 ## Tutorials
 
 1. Introducing the leafmap Python package for interactive mapping ([video](https://youtu.be/-UPt7x3Gn60) | [gif](https://i.imgur.com/2pRxunR.gif) | [notebook](https://leafmap.org/notebooks/01_leafmap_intro))
@@ -84,6 +90,7 @@
 66. Developing interactive web apps with gradio and leafmap ([notebook](https://leafmap.org/notebooks/66_gradio))
 67. Visualizing Maxar Open Data with Leafmap ([notebook](https://leafmap.org/notebooks/67_maxar_open_data))
 68. Searching and visualizing OpenAerialMap imagery with leafmap ([notebook](https://leafmap.org/notebooks/68_openaerialmap))
+69. Visualizing Maxar Open Data for the 2023 Turkey Earthquake ([notebook](https://leafmap.org/notebooks/69_turkey_earthquake))
 
 ## Demo
 
