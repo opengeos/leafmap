@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.18.2 - Mar 5, 2023
+
+**New Features**
+
+-   Added filter_date and filter_bounds functions ([#385](https://github.com/giswqs/leafmap/pull/385))
+-   Added Google Search for docs ([#383](https://github.com/giswqs/leafmap/pull/383))
+-   Added SageMaker Studio Lab and Planetary Computer badges ([#380](https://github.com/giswqs/leafmap/pull/380))
+
+**Improvement**
+
+-   Cleaned up notebooks ([#384](https://github.com/giswqs/leafmap/pull/384))
+-   Added missing dependencies to notebook ([#382](https://github.com/giswqs/leafmap/pull/382))
+-   Added default_vis option to cog_tile ([#378](https://github.com/giswqs/leafmap/pull/378))
+
 ## v0.18.1 - Mar 1, 2023
 
 **Improvement**
