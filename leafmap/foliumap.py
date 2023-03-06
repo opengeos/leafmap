@@ -2345,7 +2345,6 @@ class Map(folium.Map):
                         attr=" ",
                         overlay=True,
                     )
-                    print(bounds)
 
                 elif os.path.exists(right_layer):
                     right_layer, right_client = get_local_tile_layer(
