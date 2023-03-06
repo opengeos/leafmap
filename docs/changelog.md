@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.18.3 - Mar 6, 2023
+
+**New Features**
+
+-   Added docker image ([#387](https://github.com/giswqs/leafmap/pull/387))
+
+**Improvement**
+
+-   Cleaned up notebooks ([#386](https://github.com/giswqs/leafmap/pull/386))
+
 ## v0.18.2 - Mar 5, 2023
 
 **New Features**
