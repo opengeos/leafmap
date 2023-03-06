@@ -5,7 +5,7 @@ RUN mamba install -c conda-forge leafmap geopandas localtileserver -y && \
     fix-permissions "/home/${NB_USER}"
 
 RUN mkdir ./examples
-COPY --chown=jovyan:jovyan /examples/notebooks ./examples/notebooks
-COPY --chown=jovyan:jovyan /examples/workshops ./examples/workshops
-COPY --chown=jovyan:jovyan /examples/data ./examples/data
-COPY --chown=jovyan:jovyan /examples/README.md ./examples/README.md
+COPY --chown=jovyan:users /examples/notebooks ./examples/notebooks
+COPY --chown=jovyan:users /examples/workshops ./examples/workshops
+COPY --chown=jovyan:users /examples/data ./examples/data
+COPY --chown=jovyan:users /examples/README.md ./examples/README.md
