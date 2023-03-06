@@ -41,6 +41,15 @@ To install the development version from GitHub using [Git](https://git-scm.com/)
     pip install git+https://github.com/giswqs/leafmap
 ```
 
+## Use docker
+
+You can also use [docker](https://hub.docker.com/r/giswqs/leafmap/tags) to run leafmap:
+
+```bash
+    docker pull giswqs/leafmap:latest
+    docker run -it -p 8888:8888 giswqs/leafmap:latest
+```
+
 ## Upgrade leafmap
 
 If you have installed **leafmap** before and want to upgrade to the latest version, you can run the following command in your terminal:
