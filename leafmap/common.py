@@ -8082,3 +8082,41 @@ def skip_mkdocs_build():
         return True
     else:
         return False
+
+
+def disjoint(input_features, selecting_features, output=None, **kwargs):
+    """Find the features in the input_features that do not intersect the selecting_features.
+
+    Args:
+        input_features (str | GeoDataFrame): The input features to select from. Can be a file path or a GeoDataFrame.
+        selecting_features (str | GeoDataFrame): The features in the Input Features parameter will be selected based
+            on their relationship to the features from this layer.
+        output (are, optional): The output path to save the GeoDataFrame in a vector format (e.g., shapefile). Defaults to None.
+
+    Returns:
+        str | GeoDataFrame: The path to the output file or the GeoDataFrame.
+    """
+    import geopandas as gpd
+
+    if isinstance(input_features, str):
+        input_features = gpd.read_file(input_features, **kwargs)
+    elif not isinstance(input_features, gpd.GeoDataFrame):
+        raise TypeError("input_features must be a file path or a GeoDataFrame")
+
+    if isinstance(selecting_features, str):
+        selecting_features = gpd.read_file(selecting_features, **kwargs)
+    elif not isinstance(selecting_features, gpd.GeoDataFrame):
+        raise TypeError("selecting_features must be a file path or a GeoDataFrame")
+
+    selecting_features = selecting_features.to_crs(input_features.crs)
+
+    input_features['savedindex'] = input_features.index
+    intersecting = selecting_features.sjoin(input_features, how='inner')['savedindex']
+    results = input_features[~input_features.savedindex.isin(intersecting)].drop(
+        columns=['savedindex'], axis=1
+    )
+
+    if output is not None:
+        results.to_file(output, **kwargs)
+    else:
+        return results
