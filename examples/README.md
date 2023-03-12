@@ -91,6 +91,7 @@
 67. Visualizing Maxar Open Data with Leafmap ([notebook](https://leafmap.org/notebooks/67_maxar_open_data))
 68. Searching and visualizing OpenAerialMap imagery with leafmap ([notebook](https://leafmap.org/notebooks/68_openaerialmap))
 69. Visualizing Maxar Open Data for the 2023 Turkey-Syria Earthquake ([notebook](https://leafmap.org/notebooks/69_turkey_earthquake))
+70. Calculating zonal statistics - summarizing geospatial raster datasets based on vector geometries ([notebook](https://leafmap.org/notebooks/70_zonal_stats))
 
 ## Demo
 
