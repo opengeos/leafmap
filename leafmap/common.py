@@ -8120,3 +8120,138 @@ def disjoint(input_features, selecting_features, output=None, **kwargs):
         results.to_file(output, **kwargs)
     else:
         return results
+
+
+def zonal_stats(
+    vectors,
+    raster,
+    layer=0,
+    band_num=1,
+    nodata=None,
+    affine=None,
+    stats=None,
+    all_touched=False,
+    categorical=False,
+    category_map=None,
+    add_stats=None,
+    raster_out=False,
+    prefix=None,
+    geojson_out=False,
+    gdf_out=False,
+    dst_crs=None,
+    open_vector_args={},
+    open_raster_args={},
+    **kwargs,
+):
+    """This function wraps rasterstats.zonal_stats and performs reprojection if necessary.
+        See https://pythonhosted.org/rasterstats/rasterstats.html.
+
+    Args:
+        vectors (str | list | GeoDataFrame): path to an vector source or geo-like python objects.
+        raster (str | ndarray): ndarray or path to a GDAL raster source.
+        layer (int, optional): If vectors is a path to an fiona source, specify the vector layer to
+            use either by name or number. Defaults to 0
+        band_num (int | str, optional): If raster is a GDAL source, the band number to use (counting from 1). defaults to 1.
+        nodata (float, optional): If raster is a GDAL source, this value overrides any NODATA value
+            specified in the file’s metadata. If None, the file’s metadata’s NODATA value (if any)
+            will be used. defaults to None.
+        affine (Affine, optional): required only for ndarrays, otherwise it is read from src. Defaults to None.
+        stats (str | list, optional): Which statistics to calculate for each zone.
+            It can be ['min', 'max', 'mean', 'count']. For more, see https://pythonhosted.org/rasterstats/manual.html#zonal-statistics
+            Defaults to None.
+        all_touched (bool, optional): Whether to include every raster cell touched by a geometry, or only those having
+            a center point within the polygon. defaults to False
+        categorical (bool, optional): If True, the raster values will be treated as categorical.
+        category_map (dict, optional):A dictionary mapping raster values to human-readable categorical names.
+            Only applies when categorical is True
+        add_stats (dict, optional): with names and functions of additional stats to compute. Defaults to None.
+        raster_out (bool, optional): Include the masked numpy array for each feature?. Defaults to False.
+        prefix (str, optional): add a prefix to the keys. Defaults to None.
+        geojson_out (bool, optional): Return list of GeoJSON-like features (default: False)
+            Original feature geometry and properties will be retained with zonal stats
+            appended as additional properties. Use with prefix to ensure unique and
+            meaningful property names.. Defaults to False.
+        gdf_out (bool, optional): Return a GeoDataFrame. Defaults to False.
+        dst_crs (str, optional): The destination CRS. Defaults to None.
+        open_vector_args (dict, optional): Pass additional arguments to geopandas.open_file(). Defaults to {}.
+        open_raster_args (dict, optional): Pass additional arguments to rasterio.open(). Defaults to {}.
+
+    Returns:
+        dict | list | GeoDataFrame: The zonal statistics results
+    """
+
+    import geopandas as gpd
+    import rasterio
+
+    try:
+        import rasterstats
+    except ImportError:
+        raise ImportError(
+            'rasterstats is not installed. Install it with pip install rasterstats'
+        )
+    try:
+        if isinstance(raster, str):
+            with rasterio.open(raster, **open_raster_args) as src:
+                affine = src.transform
+                nodata = src.nodata
+                array = src.read(band_num, masked=True)
+                raster_crs = src.crs
+        elif isinstance(raster, rasterio.io.DatasetReader):
+            affine = raster.transform
+            nodata = raster.nodata
+            array = raster.read(band_num, masked=True)
+            raster_crs = raster.crs
+        else:
+            array = raster
+
+        if isinstance(vectors, str):
+            gdf = gpd.read_file(vectors, **open_vector_args)
+        elif isinstance(vectors, list):
+            gdf = gpd.GeoDataFrame.from_features(vectors)
+        else:
+            gdf = vectors
+
+        vector_crs = gdf.crs
+
+        if gdf.crs.is_geographic:
+            if not raster_crs.is_geographic:
+                gdf = gdf.to_crs(raster_crs)
+        elif gdf.crs != raster_crs:
+            if not raster_crs.is_geographic:
+                gdf = gdf.to_crs(raster_crs)
+            else:
+                raise ValueError('The vector and raster CRSs are not compatible')
+
+        if gdf_out is True:
+            geojson_out = True
+
+        result = rasterstats.zonal_stats(
+            gdf,
+            array,
+            layer=layer,
+            band_num=band_num,
+            nodata=nodata,
+            affine=affine,
+            stats=stats,
+            all_touched=all_touched,
+            categorical=categorical,
+            category_map=category_map,
+            add_stats=add_stats,
+            raster_out=raster_out,
+            prefix=prefix,
+            geojson_out=geojson_out,
+            **kwargs,
+        )
+
+        if gdf_out is True:
+            if dst_crs is None:
+                dst_crs = vector_crs
+
+            out_gdf = gpd.GeoDataFrame.from_features(result)
+            out_gdf.crs = raster_crs
+            return out_gdf.to_crs(dst_crs)
+        else:
+            return result
+
+    except Exception as e:
+        raise Exception(e)
