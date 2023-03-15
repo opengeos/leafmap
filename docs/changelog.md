@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.18.4 - Mar 15, 2023
+
+**New Features**
+
+-   Added support for loading raster datasets from AWS S3 buckets ([#391](https://github.com/giswqs/leafmap/pull/391))
+-   Added `zonal_stats` function ([#389](https://github.com/giswqs/leafmap/pull/389))
+-   Added `disjoint` function for filtering vector data ([#388](https://github.com/giswqs/leafmap/pull/388))
+
+**Improvement**
+
+-   Updated installation instructions
+-   Updated Dockerfile
+
 ## v0.18.3 - Mar 6, 2023
 
 **New Features**
