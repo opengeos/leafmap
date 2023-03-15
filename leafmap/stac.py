@@ -195,7 +195,7 @@ def cog_tile(url, bands=None, titiler_endpoint=None, **kwargs):
         TileMatrixSetId = kwargs["TileMatrixSetId"]
         kwargs.pop("TileMatrixSetId")
 
-    if 'default_vis' in kwargs.keys() and kwargs['default_vis']:
+    if "default_vis" in kwargs.keys() and kwargs["default_vis"]:
         kwargs = {"url": url}
 
     r = requests.get(
@@ -614,7 +614,7 @@ def stac_tile(
                         assets = bnames[0]
                 else:
                     assets = None
-                    if 'mosaicjson' in bnames['detail']:
+                    if "mosaicjson" in bnames["detail"]:
                         mosaic_json = True
         else:
             kwargs["asset_bidx"] = bands
@@ -665,9 +665,9 @@ def stac_bounds(url=None, collection=None, item=None, titiler_endpoint=None, **k
         kwargs["url"] = url
         response = requests.get(url)
         r = response.json()
-        if 'mosaicjson' in r:
-            if 'bounds' in r:
-                return r['bounds']
+        if "mosaicjson" in r:
+            if "bounds" in r:
+                return r["bounds"]
 
     if collection is not None:
         kwargs["collection"] = collection
@@ -1415,9 +1415,9 @@ def maxar_collections(return_ids=True):
     import pandas as pd
 
     if return_ids:
-        url = 'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets.csv'
+        url = "https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets.csv"
         df = pd.read_csv(url)
-        return df['dataset'].tolist()
+        return df["dataset"].tolist()
 
     file_path = os.path.join(tempfile.gettempdir(), "maxar-collections.txt")
     if return_ids:
@@ -1484,7 +1484,7 @@ def maxar_child_collections(collection_id, return_ids=True):
         return collections
 
 
-def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
+def maxar_items(collection_id, child_id, return_gdf=True, assets=["visual"]):
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1518,7 +1518,7 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
                 pystac.ItemCollection(items).to_dict(), crs="EPSG:4326"
             )
             # convert bbox column type from list to string
-            gdf["proj:bbox"] = [','.join(map(str, l)) for l in gdf['proj:bbox']]
+            gdf["proj:bbox"] = [",".join(map(str, l)) for l in gdf["proj:bbox"]]
             if assets is not None:
                 if isinstance(assets, str):
                     assets = [assets]
@@ -1562,7 +1562,7 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
             pystac.ItemCollection(items).to_dict(), crs="EPSG:4326"
         )
         # convert bbox column type from list to string
-        gdf["proj:bbox"] = [','.join(map(str, l)) for l in gdf['proj:bbox']]
+        gdf["proj:bbox"] = [",".join(map(str, l)) for l in gdf["proj:bbox"]]
         if assets is not None:
             if isinstance(assets, str):
                 assets = [assets]
@@ -1585,7 +1585,7 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=['visual']):
         return items
 
 
-def maxar_all_items(collection_id, return_gdf=True, assets=['visual'], verbose=True):
+def maxar_all_items(collection_id, return_gdf=True, assets=["visual"], verbose=True):
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1663,7 +1663,7 @@ def maxar_search(
             f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
         )
 
-    url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.geojson'
+    url = f"https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.geojson"
     data = gpd.read_file(url)
 
     if bbox is not None:
@@ -1681,7 +1681,7 @@ def maxar_search(
     data[new_field] = pd.to_datetime(data[date_field])
 
     if end_date is None:
-        end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        end_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
     if start_date is None:
         start_date = data[new_field].min()
@@ -1691,7 +1691,7 @@ def maxar_search(
     return result.drop(columns=[new_field], axis=1)
 
 
-def maxar_collection_url(collection, dtype='geojson', raw=True):
+def maxar_collection_url(collection, dtype="geojson", raw=True):
     """Retrieve the URL to a Maxar Open Data collection.
 
     Args:
@@ -1709,17 +1709,17 @@ def maxar_collection_url(collection, dtype='geojson', raw=True):
             f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
         )
 
-    if dtype not in ['geojson', 'tsv']:
+    if dtype not in ["geojson", "tsv"]:
         raise ValueError(f"Invalid dtype. It can be 'geojson' or 'tsv'.")
 
     if raw:
-        url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.{dtype}'
+        url = f"https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}.{dtype}"
     else:
-        url = f'https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}.{dtype}'
+        url = f"https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}.{dtype}"
     return url
 
 
-def maxar_tile_url(collection, tile, dtype='geojson', raw=True):
+def maxar_tile_url(collection, tile, dtype="geojson", raw=True):
     """Retrieve the URL to a Maxar Open Data tile.
 
     Args:
@@ -1740,13 +1740,13 @@ def maxar_tile_url(collection, tile, dtype='geojson', raw=True):
             f"Invalid collection name. Use maxar_collections() to retrieve all available collection IDs."
         )
 
-    if dtype not in ['geojson', 'json', 'tsv']:
+    if dtype not in ["geojson", "json", "tsv"]:
         raise ValueError(f"Invalid dtype. It can be 'geojson', 'json' or 'tsv'.")
 
     if raw:
-        url = f'https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}/{tile}.{dtype}'
+        url = f"https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets/{collection}/{tile}.{dtype}"
     else:
-        url = f'https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}/{tile}.{dtype}'
+        url = f"https://github.com/giswqs/maxar-open-data/blob/master/datasets/{collection}/{tile}.{dtype}"
 
     return url
 
@@ -1787,16 +1787,16 @@ def maxar_download(
         out_dir = os.getcwd()
 
     if isinstance(images, str):
-        if images.endswith('.geojson'):
+        if images.endswith(".geojson"):
             import geopandas as gpd
 
             data = gpd.read_file(images)
-            images = data['visual'].tolist()
-        elif images.endswith('.tsv'):
+            images = data["visual"].tolist()
+        elif images.endswith(".tsv"):
             import pandas as pd
 
-            data = pd.read_csv(images, sep='\t')
-            images = data['visual'].tolist()
+            data = pd.read_csv(images, sep="\t")
+            images = data["visual"].tolist()
         else:
             raise ValueError(f"Invalid file type. It can be 'geojson' or 'tsv'.")
 
@@ -1804,9 +1804,9 @@ def maxar_download(
         os.makedirs(out_dir)
 
     for index, image in enumerate(images):
-        items = image.split('/')
-        file_name = items[7] + '.tif'
-        dir_name = items[-1].split('-')[0]
+        items = image.split("/")
+        file_name = items[7] + ".tif"
+        dir_name = items[-1].split("-")[0]
         if not os.path.exists(os.path.join(out_dir, dir_name)):
             os.makedirs(os.path.join(out_dir, dir_name))
         out_file = os.path.join(out_dir, dir_name, file_name)
@@ -1845,8 +1845,8 @@ def create_mosaicjson(images, output):
             import urllib.request
 
             with urllib.request.urlopen(images) as f:
-                file_contents = f.read().decode('utf-8')
-                images = file_contents.strip().split('\n')
+                file_contents = f.read().decode("utf-8")
+                images = file_contents.strip().split("\n")
         elif not os.path.exists(images):
             raise FileNotFoundError(f"{images} does not exist.")
 
@@ -1858,7 +1858,7 @@ def create_mosaicjson(images, output):
         f.write(overwrite=True)
 
 
-def flatten_dict(my_dict, parent_key=False, sep='.'):
+def flatten_dict(my_dict, parent_key=False, sep="."):
     """Flattens a nested dictionary.
 
     Args:
@@ -1907,37 +1907,37 @@ def oam_search(
         from shapely.geometry import Polygon
         import geopandas as gpd
 
-    url = 'https://api.openaerialmap.org/meta'
+    url = "https://api.openaerialmap.org/meta"
     if bbox is not None:
         if isinstance(bbox, str):
-            bbox = [float(x) for x in bbox.split(',')]
+            bbox = [float(x) for x in bbox.split(",")]
         if not isinstance(bbox, list):
             raise ValueError("bbox must be a list.")
         if len(bbox) != 4:
             raise ValueError("bbox must be a list of 4 numbers.")
-        bbox = ','.join(map(str, bbox))
-        kwargs['bbox'] = bbox
+        bbox = ",".join(map(str, bbox))
+        kwargs["bbox"] = bbox
 
     if start_date is not None:
-        kwargs['acquisition_from'] = start_date
+        kwargs["acquisition_from"] = start_date
 
     if end_date is not None:
-        kwargs['acquisition_to'] = end_date
+        kwargs["acquisition_to"] = end_date
 
     if limit is not None:
-        kwargs['limit'] = limit
+        kwargs["limit"] = limit
 
     try:
         r = requests.get(url, params=kwargs).json()
-        if 'results' in r:
+        if "results" in r:
             results = []
-            for result in r['results']:
-                if 'geojson' in result:
-                    del result['geojson']
-                if 'projection' in result:
-                    del result['projection']
-                if 'footprint' in result:
-                    del result['footprint']
+            for result in r["results"]:
+                if "geojson" in result:
+                    del result["geojson"]
+                if "projection" in result:
+                    del result["projection"]
+                if "footprint" in result:
+                    del result["footprint"]
                 result = flatten_dict(result)
                 results.append(result)
 
@@ -1946,7 +1946,7 @@ def oam_search(
             else:
                 df = pd.DataFrame(results)
 
-                polygons = [Polygon.from_bounds(*bbox) for bbox in df['bbox']]
+                polygons = [Polygon.from_bounds(*bbox) for bbox in df["bbox"]]
                 gdf = gpd.GeoDataFrame(geometry=polygons, crs="epsg:4326")
 
                 return pd.concat([gdf, df], axis=1)

@@ -1233,7 +1233,7 @@ class Map(folium.Map):
 
         if "highlight_function" not in kwargs:
             kwargs["highlight_function"] = lambda feat: {
-                "weight": style_dict['weight'] + 2,
+                "weight": style_dict["weight"] + 2,
                 "fillOpacity": 0,
             }
 
@@ -1274,7 +1274,7 @@ class Map(folium.Map):
         """
 
         for col in gdf.columns:
-            if gdf[col].dtype in ['datetime64[ns]', 'datetime64[ns, UTC]']:
+            if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
                 gdf[col] = gdf[col].astype(str)
 
         data = gdf_to_geojson(gdf, epsg="4326")
@@ -2701,7 +2701,7 @@ class Map(folium.Map):
         vc = plugins.VectorGridProtobuf(url, layer_name, options)
         self.add_child(vc)
 
-    def to_gradio(self, width='100%', height='500px', **kwargs):
+    def to_gradio(self, width="100%", height="500px", **kwargs):
         """Converts the map to an HTML string that can be used in Gradio. Removes unsupported elements, such as
             attribution and any code blocks containing functions. See https://github.com/gradio-app/gradio/issues/3190
 
@@ -2727,13 +2727,13 @@ class Map(folium.Map):
                 continue
             if line.lstrip().startswith('{"attribution":'):
                 continue
-            elif 'on(L.Draw.Event.CREATED, function(e)' in line:
+            elif "on(L.Draw.Event.CREATED, function(e)" in line:
                 for i in range(14):
                     skipped_lines.append(index + i)
-            elif 'L.Control.geocoder' in line:
+            elif "L.Control.geocoder" in line:
                 for i in range(5):
                     skipped_lines.append(index + i)
-            elif 'function(e)' in line:
+            elif "function(e)" in line:
                 print(
                     f"Warning: The folium plotting backend does not support functions in code blocks. Please delete line {index + 1}."
                 )
@@ -2752,7 +2752,7 @@ class Map(folium.Map):
         start_date=None,
         end_date=None,
         limit=100,
-        info_mode='on_click',
+        info_mode="on_click",
         layer_args={},
         add_image=True,
         **kwargs,
@@ -2777,8 +2777,8 @@ class Map(folium.Map):
         if "layer_name" not in layer_args:
             layer_args["layer_name"] = "Footprints"
 
-        if 'style' not in layer_args:
-            layer_args['style'] = {
+        if "style" not in layer_args:
+            layer_args["style"] = {
                 # "stroke": True,
                 "color": "#3388ff",
                 "weight": 2,
@@ -2792,7 +2792,7 @@ class Map(folium.Map):
 
         if "highlight_function" not in layer_args:
             layer_args["highlight_function"] = lambda feat: {
-                "weight": layer_args['style']['weight'] + 2,
+                "weight": layer_args["style"]["weight"] + 2,
                 "fillOpacity": 0,
             }
 
@@ -2801,8 +2801,8 @@ class Map(folium.Map):
             setattr(self, "oam_gdf", gdf)
 
             if add_image:
-                ids = gdf['_id'].tolist()
-                images = gdf['tms'].tolist()
+                ids = gdf["_id"].tolist()
+                images = gdf["tms"].tolist()
 
                 if len(images) > 5:
                     print(f"Found {len(images)} images. \nShowing the first 5.")
@@ -2811,7 +2811,7 @@ class Map(folium.Map):
                     if index == 5:
                         break
                     self.add_tile_layer(
-                        url=image, name=ids[index], attribution='OpenAerialMap'
+                        url=image, name=ids[index], attribution="OpenAerialMap"
                     )
         else:
             print("No images found.")
