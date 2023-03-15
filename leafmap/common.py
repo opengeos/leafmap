@@ -8270,8 +8270,10 @@ def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **
     Returns:
         list: List of objects.
     """
-
-    import boto3
+    try:
+        import boto3
+    except ImportError:
+        raise ImportError("boto3 is not installed. Install it with pip install boto3")
 
     client = boto3.client("s3")
 
@@ -8298,3 +8300,79 @@ def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **
         return [f"s3://{bucket}/{r['Key']}" for r in files]
     else:
         return [r["Key"] for r in files]
+
+
+def s3_download_file(filename=None, bucket=None, key=None, outfile=None, **kwargs):
+    """Download a file from S3.
+
+    Args:
+        filename (str, optional): The full path to the file. Defaults to None.
+        bucket (str, optional): The name of the bucket. Defaults to None.
+        key (str, optional): The key of the file. Defaults to None.
+        outfile (str, optional): The name of the output file. Defaults to None.
+    Raises:
+        ImportError: If boto3 is not installed.
+    """    
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
+    try:
+        import boto3
+    except ImportError:
+        raise ImportError("boto3 is not installed. Install it with pip install boto3")
+
+    client = boto3.client("s3", **kwargs)
+
+    if filename is not None:
+        bucket = filename.split("/")[2]
+        key = "/".join(filename.split("/")[3:])
+
+    if outfile is None:
+        outfile = key.split("/")[-1]
+
+    if not os.path.exists(outfile):
+        client.download_file(bucket, key, outfile)
+    else:
+        print(f"File already exists: {outfile}")
+
+
+def s3_download_files(
+    filenames=None, bucket=None, keys=None, outdir=None, quiet=False, **kwargs
+):
+    """Download multiple files from S3.
+
+    Args:
+        filenames (list, optional): A list of filenames. Defaults to None.
+        bucket (str, optional): The name of the bucket. Defaults to None.
+        keys (list, optional): A list of keys. Defaults to None.
+        outdir (str, optional): The name of the output directory. Defaults to None.
+        quiet (bool, optional): Suppress output. Defaults to False.
+
+    Raises:
+        ValueError: If neither filenames or keys are provided.
+    """    
+
+    if keys is None:
+        keys = []
+
+    if filenames is not None:
+        if isinstance(filenames, list):
+            for filename in filenames:
+                bucket = filename.split("/")[2]
+                key = "/".join(filename.split("/")[3:])
+                keys.append(key)
+    elif filenames is None and keys is None:
+        raise ValueError("Either filenames or keys must be provided")
+
+    for index, key in enumerate(keys):
+        if outdir is not None:
+            if not os.path.exists(outdir):
+                os.makedirs(outdir)
+            outfile = os.path.join(outdir, key.split("/")[-1])
+        else:
+            outfile = key.split("/")[-1]
+
+        if not quiet:
+            print(f"Downloading {index+1} of {len(keys)}: {outfile}")
+        s3_download_file(bucket=bucket, key=key, outfile=outfile, **kwargs)
