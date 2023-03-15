@@ -88,9 +88,9 @@ class Map(ipyleaflet.Map):
         if "search_control" not in kwargs:
             kwargs["search_control"] = True
         if kwargs["search_control"]:
-            url = 'https://nominatim.openstreetmap.org/search?format=json&q={s}'
+            url = "https://nominatim.openstreetmap.org/search?format=json&q={s}"
             search_control = ipyleaflet.SearchControl(
-                position='topleft',
+                position="topleft",
                 url=url,
                 zoom=12,
                 marker=None,
@@ -2417,7 +2417,7 @@ class Map(ipyleaflet.Map):
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
         for col in gdf.columns:
-            if gdf[col].dtype in ['datetime64[ns]', 'datetime64[ns, UTC]']:
+            if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
                 gdf[col] = gdf[col].astype(str)
 
         data = gdf_to_geojson(gdf, epsg="4326")
@@ -3810,8 +3810,8 @@ class Map(ipyleaflet.Map):
         if "layer_name" not in layer_args:
             layer_args["layer_name"] = "Footprints"
 
-        if 'style' not in layer_args:
-            layer_args['style'] = {
+        if "style" not in layer_args:
+            layer_args["style"] = {
                 # "stroke": True,
                 "color": "#3388ff",
                 "weight": 2,
@@ -3823,16 +3823,16 @@ class Map(ipyleaflet.Map):
                 # "clickable": True,
             }
 
-        if 'hover_style' not in layer_args:
-            layer_args['hover_style'] = {"weight": layer_args['style']["weight"] + 2}
+        if "hover_style" not in layer_args:
+            layer_args["hover_style"] = {"weight": layer_args["style"]["weight"] + 2}
 
         if gdf is not None:
             self.add_gdf(gdf, info_mode=info_mode, **layer_args)
             setattr(self, "oam_gdf", gdf)
 
             if add_image:
-                ids = gdf['_id'].tolist()
-                images = gdf['tms'].tolist()
+                ids = gdf["_id"].tolist()
+                images = gdf["tms"].tolist()
 
                 if len(images) > 5:
                     print(f"Found {len(images)} images. \nShowing the first 5.")
@@ -3841,7 +3841,7 @@ class Map(ipyleaflet.Map):
                     if index == 5:
                         break
                     self.add_tile_layer(
-                        url=image, name=ids[index], attribution='OpenAerialMap'
+                        url=image, name=ids[index], attribution="OpenAerialMap"
                     )
         else:
             print("No images found.")

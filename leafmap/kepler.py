@@ -136,9 +136,9 @@ class Map(keplergl.KeplerGl):
 
                         output = os.path.abspath(output)
                         obj = pyodide.http.open_url(in_geojson)
-                        with open(output, 'w') as fd:
+                        with open(output, "w") as fd:
                             shutil.copyfileobj(obj, fd)
-                        with open(output, 'r') as fd:
+                        with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
                         in_geojson = github_raw_url(in_geojson)

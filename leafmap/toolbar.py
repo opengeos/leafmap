@@ -5121,7 +5121,7 @@ def oam_search_gui(m=None):
 
     dropdown = widgets.Dropdown(
         options=["Map bounds", "User drawn ROI", "Custom bbox"],
-        value='Map bounds',
+        value="Map bounds",
         description="bbox:",
         layout=widgets.Layout(width=widget_width, padding=padding),
         style=style,
@@ -5248,9 +5248,9 @@ def oam_search_gui(m=None):
             with output:
                 output.clear_output()
                 if m is not None:
-                    if dropdown.value == 'Map bounds':
+                    if dropdown.value == "Map bounds":
                         bbox = m.get_bbox()
-                    elif dropdown.value == 'User drawn ROI':
+                    elif dropdown.value == "User drawn ROI":
                         bbox = m.user_roi_bounds()
                     else:
                         bbox = None
