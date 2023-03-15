@@ -5530,7 +5530,7 @@ def download_ned(
     if not query:
         query = {
             "datasets": "National Elevation Dataset (NED) 1/3 arc-second",
-            'prodFormats': 'GeoTIFF',
+            "prodFormats": "GeoTIFF",
         }
 
     TNM = The_national_map_USGS()
@@ -7941,7 +7941,7 @@ def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwarg
     )
 
 
-def html_to_gradio(html, width='100%', height='500px', **kwargs):
+def html_to_gradio(html, width="100%", height="500px", **kwargs):
     """Converts the map to an HTML string that can be used in Gradio. Removes unsupported elements, such as
         attribution and any code blocks containing functions. See https://github.com/gradio-app/gradio/issues/3190
 
@@ -7960,7 +7960,7 @@ def html_to_gradio(html, width='100%', height='500px', **kwargs):
         height = f"{height}px"
 
     if isinstance(html, str):
-        with open(html, 'r') as f:
+        with open(html, "r") as f:
             lines = f.readlines()
     elif isinstance(html, list):
         lines = html
@@ -7974,13 +7974,13 @@ def html_to_gradio(html, width='100%', height='500px', **kwargs):
             continue
         if line.lstrip().startswith('{"attribution":'):
             continue
-        elif 'on(L.Draw.Event.CREATED, function(e)' in line:
+        elif "on(L.Draw.Event.CREATED, function(e)" in line:
             for i in range(14):
                 skipped_lines.append(index + i)
-        elif 'L.Control.geocoder' in line:
+        elif "L.Control.geocoder" in line:
             for i in range(5):
                 skipped_lines.append(index + i)
-        elif 'function(e)' in line:
+        elif "function(e)" in line:
             print(
                 f"Warning: The folium plotting backend does not support functions in code blocks. Please delete line {index + 1}."
             )
@@ -8062,7 +8062,7 @@ def filter_date(
     data[new_field] = pd.to_datetime(data[date_field], **date_args)
 
     if end_date is None:
-        end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+        end_date = datetime.datetime.now().strftime("%Y-%m-%d")
 
     if start_date is None:
         start_date = data[new_field].min()
@@ -8110,10 +8110,10 @@ def disjoint(input_features, selecting_features, output=None, **kwargs):
 
     selecting_features = selecting_features.to_crs(input_features.crs)
 
-    input_features['savedindex'] = input_features.index
-    intersecting = selecting_features.sjoin(input_features, how='inner')['savedindex']
+    input_features["savedindex"] = input_features.index
+    intersecting = selecting_features.sjoin(input_features, how="inner")["savedindex"]
     results = input_features[~input_features.savedindex.isin(intersecting)].drop(
-        columns=['savedindex'], axis=1
+        columns=["savedindex"], axis=1
     )
 
     if output is not None:
@@ -8187,7 +8187,7 @@ def zonal_stats(
         import rasterstats
     except ImportError:
         raise ImportError(
-            'rasterstats is not installed. Install it with pip install rasterstats'
+            "rasterstats is not installed. Install it with pip install rasterstats"
         )
     try:
         if isinstance(raster, str):
@@ -8220,7 +8220,7 @@ def zonal_stats(
             if not raster_crs.is_geographic:
                 gdf = gdf.to_crs(raster_crs)
             else:
-                raise ValueError('The vector and raster CRSs are not compatible')
+                raise ValueError("The vector and raster CRSs are not compatible")
 
         if gdf_out is True:
             geojson_out = True
@@ -8255,3 +8255,46 @@ def zonal_stats(
 
     except Exception as e:
         raise Exception(e)
+
+
+def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **kwargs):
+    """List objects in a S3 bucket
+
+    Args:
+        bucket (str): The name of the bucket.
+        prefix (str, optional): Limits the response to keys that begin with the specified prefix. Defaults to None.
+        limit (init, optional): The maximum number of keys returned in the response body.
+        ext (str, optional): Filter by file extension. Defaults to None.
+        fullpath (bool, optional): Return full path. Defaults to True.
+
+    Returns:
+        list: List of objects.
+    """
+
+    import boto3
+
+    client = boto3.client("s3")
+
+    if prefix is not None:
+        kwargs["Prefix"] = prefix
+
+    files = []
+    if isinstance(limit, int) and limit < 1000:
+        kwargs["MaxKeys"] = limit
+        response = client.list_objects_v2(Bucket=bucket, **kwargs)
+        for obj in response["Contents"]:
+            files.append(obj)
+    else:
+        paginator = client.get_paginator("list_objects_v2")
+        pages = paginator.paginate(Bucket=bucket, **kwargs)
+
+        for page in pages:
+            files.extend(page.get("Contents", []))
+
+    if ext is not None:
+        files = [f for f in files if f["Key"].endswith(ext)]
+
+    if fullpath:
+        return [f"s3://{bucket}/{r['Key']}" for r in files]
+    else:
+        return [r["Key"] for r in files]
