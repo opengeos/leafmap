@@ -7925,16 +7925,17 @@ def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwarg
     import re
     from IPython.display import YouTubeVideo
 
-    try:
-        video_id = re.match("^[^v]+v=(.{11}).*", url).group(1)
-    except:
-        if "youtube.com" in url or "youtu.be" in url:
-            if "youtube.com" in url:
-                video_id = url.split("v=")[1].split("&")[0]
-            else:
-                video_id = url.split("/")[-1]
-        else:
-            raise ValueError("Invalid Youtube URL")
+    if not isinstance(url, str):
+        raise TypeError("URL must be a string")
+
+    match = re.match(
+        r"^https?:\/\/(?:www\.)?youtube\.com\/watch\?(?=.*v=([^\s&]+)).*$|^https?:\/\/(?:www\.)?youtu\.be\/([^\s&]+).*$",
+        url,
+    )
+    if not match:
+        raise ValueError("Invalid YouTube video URL")
+
+    video_id = match.group(1) if match.group(1) else match.group(2)
 
     return YouTubeVideo(
         video_id, width=width, height=height, allow_autoplay=allow_autoplay, **kwargs
@@ -8312,7 +8313,7 @@ def s3_download_file(filename=None, bucket=None, key=None, outfile=None, **kwarg
         outfile (str, optional): The name of the output file. Defaults to None.
     Raises:
         ImportError: If boto3 is not installed.
-    """    
+    """
 
     if os.environ.get("USE_MKDOCS") is not None:
         return
@@ -8351,7 +8352,7 @@ def s3_download_files(
 
     Raises:
         ValueError: If neither filenames or keys are provided.
-    """    
+    """
 
     if keys is None:
         keys = []
