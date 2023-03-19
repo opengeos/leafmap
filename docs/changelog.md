@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.18.5 - Mar 19, 2023
+
+**Improvement**
+
+-   Updated mkdocs-jupyter execute_ignore
+-   Removed Google Search from menu
+-   Set mkdocs material version lower bound ([#394](https://github.com/giswqs/leafmap/pull/394))
+-   Added mkdocs built-in search ([#393](https://github.com/giswqs/leafmap/pull/393))
+-   Fixed CodeQL warnings ([#392](https://github.com/giswqs/leafmap/pull/392))
+-   Fixed notebook 71 error
+
 ## v0.18.4 - Mar 15, 2023
 
 **New Features**
