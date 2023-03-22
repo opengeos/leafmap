@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.18.6 - Mar 22, 2023
+
+**Improvement**
+
+-   Fixed ipywidgets comm error ([#396](https://github.com/giswqs/leafmap/pull/396))
+
 ## v0.18.5 - Mar 19, 2023
 
 **Improvement**
