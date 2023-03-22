@@ -2,6 +2,7 @@ import os
 import folium
 import folium.plugins as plugins
 from box import Box
+import ipykernel.ipkernel
 from .common import *
 from .legends import builtin_legends
 from .basemaps import xyz_to_folium
