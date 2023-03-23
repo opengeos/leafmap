@@ -13,7 +13,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
-from typing import Union, List, Dict, Tuple
+from typing import Union, List, Dict, Tuple, Optional
 from .stac import *
 
 try:
@@ -3643,6 +3643,10 @@ def image_to_numpy(image):
     """
     import rasterio
 
+    # from osgeo import gdal
+    # # ... and suppress errors
+    # gdal.PushErrorHandler('CPLQuietErrorHandler')
+
     if not os.path.exists(image):
         raise FileNotFoundError("The provided input file could not be found.")
 
@@ -3670,8 +3674,12 @@ def numpy_to_image(
         bands (int | list, optional): The band(s) to use, starting from 0. Defaults to None.
 
     """
+
+    import warnings
     import numpy as np
     from PIL import Image
+
+    warnings.filterwarnings("ignore")
 
     if isinstance(np_array, str):
         np_array = image_to_numpy(np_array)
@@ -3679,7 +3687,15 @@ def numpy_to_image(
     if not isinstance(np_array, np.ndarray):
         raise TypeError("The provided input must be a numpy array.")
 
-    np_array = np_array.astype("uint8")
+    if np_array.dtype == np.float64 or np_array.dtype == np.float32:
+        # Convert the array to uint8
+        # np_array = (np_array * 255).astype(np.uint8)
+        np_array.interp(np_array, (np_array.min(), np_array.max()), (0, 255)).astype(
+            np.uint8
+        )
+    else:
+        # The array is already uint8
+        np_array = np_array
 
     if np_array.ndim == 2:
         img = Image.fromarray(np_array)
@@ -3717,8 +3733,6 @@ def numpy_to_image(
             resize_args["preserve_range"] = True
         np_array = resize(np_array, size, **resize_args).astype("uint8")
         img = Image.fromarray(np_array)
-    else:
-        raise ValueError("The provided size must be a tuple of (width, height).")
 
     img.save(filename, **kwargs)
 
@@ -7035,7 +7049,7 @@ def add_progress_bar_to_gif(
         out_gif (str): The file path to the output GIF image.
         progress_bar_color (str, optional): Color for the progress bar. Defaults to 'white'.
         progress_bar_height (int, optional): Height of the progress bar. Defaults to 5.
-        duration (int, optional): controls how long each frame will be displayed for, in milliseconds. It is the inverse of the frame rate. Setting it to 100 milliseconds gives 10 frames per second. You can decrease the duration to give a smoother animation.. Defaults to 100.
+        duration (int, optional): controls how long each frame will be displayed for, in milliseconds. It is the inverse of the frame rate. Setting it to 100 milliseconds gives 10 frames per second. You can decrease the duration to give a smoother animation. Defaults to 100.
         loop (int, optional): controls how many times the animation repeats. The default, 1, means that the animation will play once and then stop (displaying the last frame). A value of 0 means that the animation will repeat forever. Defaults to 0.
 
     """
@@ -7321,6 +7335,111 @@ def make_gif(images, out_gif, ext="jpg", fps=10, loop=0, mp4=False, clean_up=Fal
     if clean_up:
         for image in images:
             os.remove(image)
+
+
+def create_timelapse(
+    images: Union[list, str],
+    out_gif: str,
+    ext: str = ".tif",
+    bands: Optional[list] = None,
+    size: Optional[tuple] = None,
+    fps: int = 5,
+    loop: int = 0,
+    add_progress_bar: bool = True,
+    progress_bar_color: str = "blue",
+    progress_bar_height: int = 5,
+    add_text: bool = False,
+    text_xy: Optional[tuple] = None,
+    text_sequence: Optional[list] = None,
+    font_type: str = "arial.ttf",
+    font_size: int = 20,
+    font_color: str = "black",
+    mp4: bool = False,
+    quiet: bool = True,
+    reduce_size: bool = False,
+    clean_up: bool = True,
+):
+    """Creates a timelapse gif from a list of images.
+
+    Args:
+        images (Union[list, str]): The list of images or input directory to create the gif from.
+            For example, '/path/to/images/*.tif' or ['/path/to/image1.tif', '/path/to/image2.tif', ...]
+        out_gif (str): File path to the output gif.
+        ext (str, optional): The extension of the images. Defaults to '.tif'.
+        bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
+        size (Optional[tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        fps (int, optional): The frames per second of the gif. Defaults to 5.
+        loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.
+        add_progress_bar (bool, optional): Whether to add a progress bar to the gif. Defaults to True.
+        progress_bar_color (str, optional): The color of the progress bar, can be color name or hex code. Defaults to 'blue'.
+        progress_bar_height (int, optional): The height of the progress bar. Defaults to 5.
+        add_text (bool, optional): Whether to add text to the gif. Defaults to False.
+        text_xy (Optional[tuple], optional): The x, y coordinates of the text. For example, ('10%', '10%').
+            Defaults to None, using the bottom left corner.
+        text_sequence (Optional[list], optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
+        font_type (str, optional): The font type of the text, can be 'arial.ttf' or 'alibaba.otf', or any system font. Defaults to 'arial.ttf'.
+        font_size (int, optional): The font size of the text. Defaults to 20.
+        font_color (str, optional): The color of the text, can be color name or hex code. Defaults to 'black'.
+        mp4 (bool, optional): Whether to convert the gif to mp4. Defaults to False.
+        quiet (bool, optional): Whether to print the progress. Defaults to False.
+        reduce_size (bool, optional): Whether to reduce the size of the gif using ffmpeg. Defaults to False.
+        clean_up (bool, optional): Whether to clean up the temporary files. Defaults to True.
+
+    """
+
+    import glob
+    import tempfile
+
+    if isinstance(images, str):
+        if not images.endswith(ext):
+            images = os.path.join(images, f"*{ext}")
+        images = list(glob.glob(images))
+
+    if not isinstance(images, list):
+        raise ValueError("images must be a list or a path to the image directory.")
+
+    images.sort()
+
+    temp_dir = os.path.join(tempfile.gettempdir(), "timelapse")
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+
+    output = widgets.Output()
+
+    for index, image in enumerate(images):
+        basename = os.path.basename(image).replace(ext, ".jpg")
+        if not quiet:
+            print(f"Processing {index+1}/{len(images)}: {basename} ...")
+
+        # ignore GDAL warnings
+        with output:
+            numpy_to_image(
+                image, os.path.join(temp_dir, basename), bands=bands, size=size
+            )
+    make_gif(temp_dir, out_gif, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
+
+    if add_text and add_progress_bar:
+        add_text_to_gif(
+            out_gif,
+            out_gif,
+            text_xy,
+            text_sequence,
+            font_type,
+            font_size,
+            font_color,
+            progress_bar_color,
+            progress_bar_color,
+            progress_bar_height,
+            1000 / fps,
+            loop,
+        )
+    elif add_progress_bar:
+        add_progress_bar_to_gif(
+            out_gif, out_gif, progress_bar_color, progress_bar_height, 1000 / fps, loop
+        )
+
+    if reduce_size:
+        reduce_gif_size(out_gif)
 
 
 def gif_to_mp4(in_gif, out_mp4):
