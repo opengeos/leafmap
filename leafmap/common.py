@@ -3652,6 +3652,44 @@ def image_to_numpy(image):
     return arr
 
 
+def numpy_to_image(np_array, filename, transpose=True, bands=None, **kwargs):
+    """Converts a numpy array to an image in the specified format, such as JPG, PNG, TIFF, etc.
+
+    Args:
+        np_array (np.ndarray): A numpy array or a path to a raster file.
+        filename (str): The output filename.
+        transpose (bool, optional): Whether to transpose the array from (bands, rows, cols) to (rows, cols, bands). Defaults to True.
+        bands (int | list, optional): The band(s) to use, starting from 0. Defaults to None.
+
+    """
+    import numpy as np
+    from PIL import Image
+
+    if isinstance(np_array, str):
+        np_array = image_to_numpy(np_array)
+
+    if not isinstance(np_array, np.ndarray):
+        raise TypeError("The provided input must be a numpy array.")
+
+    if np_array.ndim == 2:
+        img = Image.fromarray(np_array)
+    elif np_array.ndim == 3:
+        if transpose:
+            np_array = np_array.transpose(1, 2, 0)
+        if isinstance(bands, list):
+            if len(bands) == 1:
+                np_array = np_array[:, :, bands[0]]
+            else:
+                np_array = np_array[:, :, bands]
+        elif isinstance(bands, int):
+            np_array = np_array[:, :, bands]
+        img = Image.fromarray(np_array)
+    else:
+        raise ValueError("The provided input must be a 2D or 3D numpy array.")
+
+    img.save(filename, **kwargs)
+
+
 def numpy_to_cog(
     np_array,
     out_cog,
