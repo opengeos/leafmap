@@ -3652,7 +3652,15 @@ def image_to_numpy(image):
     return arr
 
 
-def numpy_to_image(np_array, filename, transpose=True, bands=None, **kwargs):
+def numpy_to_image(
+    np_array,
+    filename: str,
+    transpose: bool = True,
+    bands: Union[int, list] = None,
+    size: tuple = None,
+    resize_args: dict = None,
+    **kwargs,
+) -> None:
     """Converts a numpy array to an image in the specified format, such as JPG, PNG, TIFF, etc.
 
     Args:
@@ -3671,12 +3679,20 @@ def numpy_to_image(np_array, filename, transpose=True, bands=None, **kwargs):
     if not isinstance(np_array, np.ndarray):
         raise TypeError("The provided input must be a numpy array.")
 
+    np_array = np_array.astype("uint8")
+
     if np_array.ndim == 2:
         img = Image.fromarray(np_array)
     elif np_array.ndim == 3:
         if transpose:
             np_array = np_array.transpose(1, 2, 0)
-        if isinstance(bands, list):
+        if bands is None:
+            if np_array.shape[2] < 3:
+                np_array = np_array[:, :, 0]
+            elif np_array.shape[2] > 3:
+                np_array = np_array[:, :, :3]
+
+        elif isinstance(bands, list):
             if len(bands) == 1:
                 np_array = np_array[:, :, bands[0]]
             else:
@@ -3686,6 +3702,23 @@ def numpy_to_image(np_array, filename, transpose=True, bands=None, **kwargs):
         img = Image.fromarray(np_array)
     else:
         raise ValueError("The provided input must be a 2D or 3D numpy array.")
+
+    if isinstance(size, tuple):
+        try:
+            from skimage.transform import resize
+        except ImportError:
+            raise ImportError(
+                "The scikit-image package is not installed. Please install it with `pip install scikit-image` \
+                  or `conda install scikit-image -c conda-forge`."
+            )
+        if resize_args is None:
+            resize_args = {}
+        if "preserve_range" not in resize_args:
+            resize_args["preserve_range"] = True
+        np_array = resize(np_array, size, **resize_args).astype("uint8")
+        img = Image.fromarray(np_array)
+    else:
+        raise ValueError("The provided size must be a tuple of (width, height).")
 
     img.save(filename, **kwargs)
 
