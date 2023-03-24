@@ -3647,13 +3647,12 @@ def image_to_numpy(image):
     # # ... and suppress errors
     # gdal.PushErrorHandler('CPLQuietErrorHandler')
 
-    if not os.path.exists(image):
-        raise FileNotFoundError("The provided input file could not be found.")
-
-    with rasterio.open(image, "r") as ds:
-        arr = ds.read()  # read all raster values
-
-    return arr
+    try:
+        with rasterio.open(image, "r") as ds:
+            arr = ds.read()  # read all raster values
+        return arr
+    except Exception as e:
+        raise Exception(e)
 
 
 def numpy_to_image(
@@ -7418,7 +7417,7 @@ def create_timelapse(
             )
     make_gif(temp_dir, out_gif, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
 
-    if add_text and add_progress_bar:
+    if add_text:
         add_text_to_gif(
             out_gif,
             out_gif,
@@ -7427,7 +7426,7 @@ def create_timelapse(
             font_type,
             font_size,
             font_color,
-            progress_bar_color,
+            add_progress_bar,
             progress_bar_color,
             progress_bar_height,
             1000 / fps,
