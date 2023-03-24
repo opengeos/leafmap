@@ -7253,13 +7253,17 @@ def reduce_gif_size(in_gif, out_gif=None):
         in_gif (str): The input file path to the GIF image.
         out_gif (str, optional): The output file path to the GIF image. Defaults to None.
     """
-    import ffmpeg
     import warnings
+    try:
+        import ffmpeg
+    except ImportError:
+        print("ffmpeg is not installed on your computer. Skip reducing gif size.")
+        return
 
     warnings.filterwarnings("ignore")
 
     if not is_tool("ffmpeg"):
-        print("ffmpeg is not installed on your computer.")
+        print("ffmpeg is not installed on your computer. Skip reducing gif size.")
         return
 
     if not os.path.exists(in_gif):
