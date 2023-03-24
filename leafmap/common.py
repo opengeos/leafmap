@@ -337,7 +337,7 @@ def show_image(img_path, width=None, height=None):
                 print("You need set both width and height.")
                 return
     except Exception as e:
-        raise Exception(e)
+        print(e)
 
 
 def show_html(html):
@@ -7254,6 +7254,7 @@ def reduce_gif_size(in_gif, out_gif=None):
         out_gif (str, optional): The output file path to the GIF image. Defaults to None.
     """
     import warnings
+
     try:
         import ffmpeg
     except ImportError:
@@ -7409,40 +7410,48 @@ def create_timelapse(
 
     output = widgets.Output()
 
-    for index, image in enumerate(images):
-        basename = os.path.basename(image).replace(ext, ".jpg")
-        if not quiet:
-            print(f"Processing {index+1}/{len(images)}: {basename} ...")
+    try:
+        for index, image in enumerate(images):
+            basename = os.path.basename(image).replace(ext, ".jpg")
+            if not quiet:
+                print(f"Processing {index+1}/{len(images)}: {basename} ...")
 
-        # ignore GDAL warnings
-        with output:
-            numpy_to_image(
-                image, os.path.join(temp_dir, basename), bands=bands, size=size
+            # ignore GDAL warnings
+            with output:
+                numpy_to_image(
+                    image, os.path.join(temp_dir, basename), bands=bands, size=size
+                )
+        make_gif(temp_dir, out_gif, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
+
+        if add_text:
+            add_text_to_gif(
+                out_gif,
+                out_gif,
+                text_xy,
+                text_sequence,
+                font_type,
+                font_size,
+                font_color,
+                add_progress_bar,
+                progress_bar_color,
+                progress_bar_height,
+                1000 / fps,
+                loop,
             )
-    make_gif(temp_dir, out_gif, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
+        elif add_progress_bar:
+            add_progress_bar_to_gif(
+                out_gif,
+                out_gif,
+                progress_bar_color,
+                progress_bar_height,
+                1000 / fps,
+                loop,
+            )
 
-    if add_text:
-        add_text_to_gif(
-            out_gif,
-            out_gif,
-            text_xy,
-            text_sequence,
-            font_type,
-            font_size,
-            font_color,
-            add_progress_bar,
-            progress_bar_color,
-            progress_bar_height,
-            1000 / fps,
-            loop,
-        )
-    elif add_progress_bar:
-        add_progress_bar_to_gif(
-            out_gif, out_gif, progress_bar_color, progress_bar_height, 1000 / fps, loop
-        )
-
-    if reduce_size:
-        reduce_gif_size(out_gif)
+        if reduce_size:
+            reduce_gif_size(out_gif)
+    except Exception as e:
+        print(e)
 
 
 def gif_to_mp4(in_gif, out_mp4):
