@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.18.7 - Mar 24, 2023
+
+**New Features**
+
+-   Added support for creating satellite timelapse animations (#398)
+
 ## v0.18.6 - Mar 22, 2023
 
 **Improvement**
