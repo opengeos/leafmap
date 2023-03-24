@@ -93,6 +93,7 @@
 69. Visualizing Maxar Open Data for the 2023 Turkey-Syria Earthquake ([notebook](https://leafmap.org/notebooks/69_turkey_earthquake))
 70. Calculating zonal statistics - summarizing geospatial raster datasets based on vector geometries ([notebook](https://leafmap.org/notebooks/70_zonal_stats))
 71. Loading geospatial datasets from an AWS S3 bucket ([notebook](https://leafmap.org/notebooks/71_aws_s3))
+72. Creating timelapse animations from satellite imagery timeseries ([notebook](https://leafmap.org/notebooks/72_timelapse))
 
 ## Demo
 
