@@ -7362,6 +7362,7 @@ def create_timelapse(
     quiet: bool = True,
     reduce_size: bool = False,
     clean_up: bool = True,
+    **kwargs,
 ):
     """Creates a timelapse gif from a list of images.
 
@@ -7410,9 +7411,21 @@ def create_timelapse(
 
     output = widgets.Output()
 
+    if 'out_ext' in kwargs:
+        out_ext = kwargs['out_ext'].lower()
+    else:
+        out_ext = '.jpg'
+
     try:
         for index, image in enumerate(images):
-            basename = os.path.basename(image).replace(ext, ".jpg")
+            if 'add_prefix' in kwargs:
+                basename = (
+                    str(f'{index + 1}').zfill(len(str(len(images))))
+                    + '-'
+                    + os.path.basename(image).replace(ext, out_ext)
+                )
+            else:
+                basename = os.path.basename(image).replace(ext, out_ext)
             if not quiet:
                 print(f"Processing {index+1}/{len(images)}: {basename} ...")
 
@@ -7421,7 +7434,7 @@ def create_timelapse(
                 numpy_to_image(
                     image, os.path.join(temp_dir, basename), bands=bands, size=size
                 )
-        make_gif(temp_dir, out_gif, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
+        make_gif(temp_dir, out_gif, ext=out_ext, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
 
         if add_text:
             add_text_to_gif(
