@@ -3,7 +3,7 @@ from .common import *
 from .osm import *
 from .leafmap import basemaps
 from . import examples
-import ipykernel.ipkernel
+
 
 try:
     import pydeck as pdk
