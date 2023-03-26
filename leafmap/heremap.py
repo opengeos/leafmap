@@ -9,7 +9,7 @@ import random
 import requests
 import warnings
 import ipywidgets as widgets
-import ipykernel.ipkernel
+
 from box import Box
 from .basemaps import xyz_to_heremap
 from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string

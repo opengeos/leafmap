@@ -2,7 +2,7 @@
 
 import os
 import ipyleaflet
-import ipykernel.ipkernel
+
 from box import Box
 from IPython.display import display
 from .basemaps import xyz_to_leaflet
