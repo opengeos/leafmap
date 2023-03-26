@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.18.8 - Mar 26, 2023
+
+**Improvement**
+
+-   Removed ipykernel import ([#402](https://github.com/giswqs/leafmap/pull/402))
+
 ## v0.18.7 - Mar 24, 2023
 
 **New Features**
