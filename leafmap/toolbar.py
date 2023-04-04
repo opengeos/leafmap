@@ -214,7 +214,7 @@ def main_toolbar(m):
     Args:
         m (leafmap.Map): The leafmap Map object.
     """
-    tools = {
+    all_tools = {
         "map": {
             "name": "basemap",
             "tooltip": "Change basemap",
@@ -303,6 +303,11 @@ def main_toolbar(m):
     #     for item in voila_tools:
     #         if item in tools.keys():
     #             del tools[item]
+
+    tools = {}
+    for tool in all_tools:
+        if os.environ.get(all_tools[tool]['name'].upper(), "").upper() != "FALSE":
+            tools[tool] = all_tools[tool]
 
     icons = list(tools.keys())
     tooltips = [item["tooltip"] for item in list(tools.values())]
