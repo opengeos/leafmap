@@ -311,6 +311,9 @@ def main_toolbar(m):
 
     icons = list(tools.keys())
     tooltips = [item["tooltip"] for item in list(tools.values())]
+    toolnames = [item["name"].upper() for item in list(all_tools.values())]
+    toolnames.sort()
+    setattr(m, "_ENV_VARS", toolnames)
 
     icon_width = "32px"
     icon_height = "32px"
