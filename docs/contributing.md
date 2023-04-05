@@ -7,7 +7,7 @@ little bit helps, and credit will always be given. You can contribute in many wa
 
 ### Report Bugs
 
-Report bugs at <https://github.com/giswqs/leafmap/issues>.
+Report bugs at <https://github.com/opengeos/leafmap/issues>.
 
 If you are reporting a bug, please include:
 
@@ -29,7 +29,7 @@ leafmap could always use more documentation, whether as part of the official lea
 
 ### Submit Feedback
 
-The best way to send feedback is to file an issue at <https://github.com/giswqs/leafmap/issues>.
+The best way to send feedback is to file an issue at <https://github.com/opengeos/leafmap/issues>.
 
 If you are proposing a feature:
 
@@ -41,7 +41,7 @@ If you are proposing a feature:
 
 Ready to contribute? Here's how to set up _leafmap_ for local development.
 
-1. Fork the [leafmap](https://github.com/giswqs/leafmap) repo on GitHub.
+1. Fork the [leafmap](https://github.com/opengeos/leafmap) repo on GitHub.
 
 2. Clone your fork locally:
 
@@ -109,7 +109,7 @@ Before you submit a pull request, check that it meets these guidelines:
 
 1. The pull request should include tests.
 2. If the pull request adds functionality, the docs should be updated. Put your new functionality into a function with a docstring, and add the feature to the list in README.rst.
-3. The pull request should work for Python 3.6, 3.7 and 3.8, and for PyPy. Check <https://github.com/giswqs/leafmap/actions> and make sure that the tests pass for all supported Python versions.
+3. The pull request should work for Python 3.6, 3.7 and 3.8, and for PyPy. Check <https://github.com/opengeos/leafmap/actions> and make sure that the tests pass for all supported Python versions.
 
 ## Code of Conduct
 

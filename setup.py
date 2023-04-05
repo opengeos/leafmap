@@ -80,7 +80,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/giswqs/leafmap",
+    url="https://github.com/opengeos/leafmap",
     version="0.18.8",
     zip_safe=False,
 )
