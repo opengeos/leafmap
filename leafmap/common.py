@@ -165,7 +165,7 @@ def _clone_repo(out_dir=".", unzip=True):
         out_dir (str, optional): Output folder for the repo. Defaults to '.'.
         unzip (bool, optional): Whether to unzip the repository. Defaults to True.
     """
-    url = "https://github.com/giswqs/leafmap/archive/master.zip"
+    url = "https://github.com/opengeos/leafmap/archive/master.zip"
     filename = "leafmap-master.zip"
     download_from_url(url, out_file_name=filename, out_dir=out_dir, unzip=unzip)
 
@@ -531,7 +531,7 @@ def system_fonts(show_full_path=False):
 
 
 def download_from_url(url, out_file_name=None, out_dir=".", unzip=True, verbose=True):
-    """Download a file from a URL (e.g., https://github.com/giswqs/whitebox-python/raw/master/examples/testdata.zip)
+    """Download a file from a URL (e.g., https://github.com/opengeos/whitebox-python/raw/master/examples/testdata.zip)
 
     Args:
         url (str): The HTTP URL to download.
@@ -686,7 +686,7 @@ def csv_points_to_shp(in_csv, out_shp, latitude="latitude", longitude="longitude
     """Converts a csv file containing points (latitude, longitude) into a shapefile.
 
     Args:
-        in_csv (str): File path or HTTP URL to the input csv file. For example, https://raw.githubusercontent.com/giswqs/data/main/world/world_cities.csv
+        in_csv (str): File path or HTTP URL to the input csv file. For example, https://raw.githubusercontent.com/opengeos/data/main/world/world_cities.csv
         out_shp (str): File path to the output shapefile.
         latitude (str, optional): Column name for the latitude column. Defaults to 'latitude'.
         longitude (str, optional): Column name for the longitude column. Defaults to 'longitude'.

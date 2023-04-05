@@ -35,7 +35,7 @@ conda install jupyter_contrib_nbextensions -c conda-forge
 To install the development version from GitHub using [Git](https://git-scm.com/), run the following command in your terminal:
 
 ```bash
-pip install git+https://github.com/giswqs/leafmap
+pip install git+https://github.com/opengeos/leafmap
 ```
 
 ## Use docker

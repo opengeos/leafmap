@@ -532,7 +532,7 @@ class Map(folium.Map):
         """Adds a heat map to the map. Reference: https://stackoverflow.com/a/54756617
 
         Args:
-            data (str | list | pd.DataFrame): File path or HTTP URL to the input file or a list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. For example, https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/world_cities.csv
+            data (str | list | pd.DataFrame): File path or HTTP URL to the input file or a list of data points in the format of [[x1, y1, z1], [x2, y2, z2]]. For example, https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/world_cities.csv
             latitude (str, optional): The column name of latitude. Defaults to "latitude".
             longitude (str, optional): The column name of longitude. Defaults to "longitude".
             value (str, optional): The column name of values. Defaults to "value".
@@ -896,12 +896,12 @@ class Map(folium.Map):
 
     def add_cog_mosaic(self, **kwargs):
         raise NotImplementedError(
-            "This function is no longer supported.See https://github.com/giswqs/leafmap/issues/180."
+            "This function is no longer supported.See https://github.com/opengeos/leafmap/issues/180."
         )
 
     def add_cog_mosaic_from_file(self, **kwargs):
         raise NotImplementedError(
-            "This function is no longer supported.See https://github.com/giswqs/leafmap/issues/180."
+            "This function is no longer supported.See https://github.com/opengeos/leafmap/issues/180."
         )
 
     def add_stac_layer(

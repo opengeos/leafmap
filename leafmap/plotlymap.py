@@ -553,7 +553,7 @@ class Map(go.FigureWidget):
         """Adds a choropleth map to the map.
 
         Args:
-            data (str): File path to vector data, e.g., https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/countries.geojson
+            data (str): File path to vector data, e.g., https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/countries.geojson
             name (str, optional): Name of the layer. Defaults to None.
             z (str, optional): Z value of the data. Defaults to None.
             colorscale (str, optional): Color scale of the data. Defaults to "Viridis".
