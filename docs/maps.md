@@ -18,8 +18,8 @@ m
 
 ```python
 m = leafmap.Map(center=[37.7621, -122.4143], zoom=12)
-in_csv = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/hex_data.csv'
-config = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/hex_config.json'
+in_csv = 'https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/hex_data.csv'
+config = 'https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/hex_config.json'
 m.add_csv(in_csv, layer_name="hex_data", config=config)
 m
 ```
@@ -30,7 +30,7 @@ m
 
 ```python
 m = leafmap.Map(center=[20, 0], zoom=1)
-lines = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/cable_geo.geojson'
+lines = 'https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/cable_geo.geojson'
 m.add_geojson(lines, layer_name="Cable lines")
 m
 ```
@@ -41,7 +41,7 @@ Add a GeoJSON with US state boundaries to the map.
 
 ```python
 m = leafmap.Map(center=[50, -110], zoom=2)
-polygons = 'https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/us_states.json'
+polygons = 'https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/us_states.json'
 m.add_geojson(polygons, layer_name="Countries")
 m
 ```
@@ -52,7 +52,7 @@ m
 
 ```python
 m = leafmap.Map(center=[20, 0], zoom=1)
-in_shp = "https://github.com/giswqs/leafmap/raw/master/examples/data/countries.zip"
+in_shp = "https://github.com/opengeos/leafmap/raw/master/examples/data/countries.zip"
 m.add_shp(in_shp, "Countries")
 m
 ```
@@ -63,7 +63,7 @@ m
 
 ```python
 import geopandas as gpd
-gdf = gpd.read_file("https://raw.githubusercontent.com/giswqs/leafmap/master/examples/data/world_cities.geojson")
+gdf = gpd.read_file("https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/world_cities.geojson")
 m = leafmap.Map(center=[20, 0], zoom=1)
 m.add_gdf(gdf, "World cities")
 m

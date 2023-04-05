@@ -2,7 +2,7 @@
 
 ## How do I report an issue or make a feature request
 
-Please go to <https://github.com/giswqs/leafmap/issues>.
+Please go to <https://github.com/opengeos/leafmap/issues>.
 
 ## What's the difference between folium and ipyleaflet
 
@@ -11,7 +11,7 @@ with Google Colab, `import leafmap` will automatically use the `folium` plotting
 
 ## How to use a specific plotting backend
 
-`leafmap` has three plotting backends: [folium](https://github.com/python-visualization/folium), [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet), and [here-map-widget-for-jupyter](https://github.com/heremaps/here-map-widget-for-jupyter). If you are using `leafmap` with Jupyter installed locally, `import leafmap` will use the `ipyleaflet` plotting backend by default. If you are using `leafmap` with [Google Colab](https://githubtocolab.com/giswqs/leafmap/blob/master/examples/notebooks/01_leafmap_intro.ipynb), `import leafmap` will use the `folium` plotting backend by default. Note that Google Colab does not yet support `ipyleaflet` ([source](https://github.com/googlecolab/colabtools/issues/498#issuecomment-695335421)). Therefore, you won't be able to access the `leafmap` toolbar in Colab. Note that the backends do not offer equal functionality. Some interactive functionality in `ipyleaflet` might not be available in `folium` or `heremap`. To use a specific plotting backend, use one of the following:
+`leafmap` has three plotting backends: [folium](https://github.com/python-visualization/folium), [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet), and [here-map-widget-for-jupyter](https://github.com/heremaps/here-map-widget-for-jupyter). If you are using `leafmap` with Jupyter installed locally, `import leafmap` will use the `ipyleaflet` plotting backend by default. If you are using `leafmap` with [Google Colab](https://githubtocolab.com/opengeos/leafmap/blob/master/examples/notebooks/01_leafmap_intro.ipynb), `import leafmap` will use the `folium` plotting backend by default. Note that Google Colab does not yet support `ipyleaflet` ([source](https://github.com/googlecolab/colabtools/issues/498#issuecomment-695335421)). Therefore, you won't be able to access the `leafmap` toolbar in Colab. Note that the backends do not offer equal functionality. Some interactive functionality in `ipyleaflet` might not be available in `folium` or `heremap`. To use a specific plotting backend, use one of the following:
 
 -   `import leafmap.leafmap as leafmap`
 -   `import leafmap.foliumap as leafmap`
