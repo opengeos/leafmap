@@ -60,7 +60,7 @@ for file in files:
         ):
             # Add Studio Lab badge
             badge = "[![image](https://studiolab.sagemaker.aws/studiolab.svg)]"
-            baseurl = "https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/"
+            baseurl = "https://studiolab.sagemaker.aws/import/github/opengeos/leafmap/blob/master/examples/"
             base_dir = os.path.basename(os.path.dirname(file))
             basename = os.path.basename(file).replace(".md", ".ipynb")
             url = baseurl + base_dir + "/" + basename
@@ -71,11 +71,11 @@ for file in files:
 
             # Add Planetary Computer badge
             badge = "[![image](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)]"
-            baseurl = "https://studiolab.sagemaker.aws/import/github/giswqs/leafmap/blob/master/examples/"
+            baseurl = "https://studiolab.sagemaker.aws/import/github/opengeos/leafmap/blob/master/examples/"
             base_dir = os.path.basename(os.path.dirname(file))
             basename = os.path.basename(file).replace(".md", ".ipynb")
 
-            url = f"https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/giswqs/leafmap&urlpath=lab/tree/leafmap/examples/{base_dir}/{basename}&branch=master"
+            url = f"https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/opengeos/leafmap&urlpath=lab/tree/leafmap/examples/{base_dir}/{basename}&branch=master"
             badge_url = f"{badge}({url})\n"
             out_lines.append(badge_url)
 
