@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.18.10 - Apr 6, 2023
+
+**Improvement**
+
+-   Dropped support for Python 3.7 (#410)
+-   Fixed create_timelapse bug (#410)
+
 ## v0.18.9 - Apr 6, 2023
 
 **Improvement**
