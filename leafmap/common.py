@@ -7305,6 +7305,8 @@ def make_gif(images, out_gif, ext="jpg", fps=10, loop=0, mp4=False, clean_up=Fal
     import glob
     from PIL import Image
 
+    ext = ext.replace(".", "")
+
     if isinstance(images, str) and os.path.isdir(images):
         images = list(glob.glob(os.path.join(images, f"*.{ext}")))
         if len(images) == 0:

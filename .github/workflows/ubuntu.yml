@@ -13,7 +13,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.7", "3.9", "3.10"]
+                python-version: ["3.8", "3.9", "3.10", "3.11"]
         steps:
             - uses: actions/checkout@v3
             - name: Set up Python
@@ -41,4 +41,3 @@ jobs:
               env:
                   HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
                   PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
-                  EARTHENGINE_TOKEN: ${{ secrets.EARTHENGINE_TOKEN }}
