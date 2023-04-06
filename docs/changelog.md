@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.18.9 - Apr 6, 2023
+
+**Improvement**
+
+-   Set toolbar widget visibility with env variables (#407)
+-   Moved repo to opengeos org and updated repo URL (#408)
+-   Removed ipykernel
+-   Updated docker image url
+
 ## v0.18.8 - Mar 26, 2023
 
 **Improvement**
