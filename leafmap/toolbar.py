@@ -5127,52 +5127,7 @@ def stac_custom_gui(m=None):
     if "MAX_ITEMS" in os.environ:
         MAX_ITEMS = int(os.environ["MAX_ITEMS"])
 
-    catalog_path = download_data_catalogs()
-    aws_open_data_path = os.path.join(catalog_path, "aws_stac_catalogs.tsv")
-    gee_path = os.path.join(catalog_path, "gee_catalog.tsv")
-    pc_path = os.path.join(catalog_path, "pc_catalog.tsv")
-    nasa_path = os.path.join(catalog_path, "nasa_cmr_catalog.tsv")
-    stac_index_path = os.path.join(catalog_path, "stac_catalogs.tsv")
     stac_data = []
-
-    stac_info = {
-        "AWS Open Data": {
-            "filename": aws_open_data_path,
-            "name": "Name",
-            "url": "Endpoint",
-            "description": "Description",
-        },
-        "Google Earth Engine": {
-            "filename": gee_path,
-            "name": "id",
-            "url": "url",
-            "description": "title",
-        },
-        "Microsoft Planetary Computer": {
-            "filename": pc_path,
-            "name": "title",
-            "url": "link",
-            "description": "description",
-        },
-        "NASA Common Metadata Repository": {
-            "filename": nasa_path,
-            "name": "id",
-            "url": "url",
-            "description": "title",
-        },
-        "STAC Index Catalogs": {
-            "filename": stac_index_path,
-            "name": "title",
-            "url": "url",
-            "description": "summary",
-        },
-        "Custom STAC API Endpoint": {
-            "filename": "",
-            "name": "",
-            "url": "",
-            "description": "",
-        },
-    }
 
     output = widgets.Output(
         layout=widgets.Layout(width=widget_width, padding=padding, overflow="auto")
@@ -5444,10 +5399,7 @@ def stac_custom_gui(m=None):
     )
 
     def update_bands():
-        if len(stac_data) > 0:
-            bnames = stac_data[0][item.value]["bands"]
-        else:
-            bnames = []
+        bnames = []
 
         red.options = bnames
         green.options = bnames
