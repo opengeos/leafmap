@@ -306,7 +306,7 @@ def main_toolbar(m):
 
     tools = {}
     for tool in all_tools:
-        if os.environ.get(all_tools[tool]['name'].upper(), "").upper() != "FALSE":
+        if os.environ.get(all_tools[tool]["name"].upper(), "").upper() != "FALSE":
             tools[tool] = all_tools[tool]
 
     icons = list(tools.keys())
@@ -5108,12 +5108,14 @@ def stac_custom_gui(m=None):
     Returns:
         ipywidgets: The tool GUI widget.
     """
-    import pandas as pd
 
     if hasattr(m, "_STAC_CATALOGS") and isinstance(m._STAC_CATALOGS, dict):
         catalogs = m._STAC_CATALOGS
     else:
         raise ValueError("Please set the STAC catalogs first.")
+
+    if not hasattr(m, "_STAC_COLLECTIONS"):
+        m._STAC_COLLECTIONS = {}
 
     if len(catalogs) == 0:
         raise ValueError("Please set the STAC catalogs first.")
@@ -5156,21 +5158,6 @@ def stac_custom_gui(m=None):
         layout=widgets.Layout(width="454px", padding=padding),
     )
 
-    dataset = widgets.Dropdown(
-        options=[],
-        value=None,
-        description="Collection:",
-        style=style,
-        layout=widgets.Layout(width="454px", padding=padding),
-    )
-
-    description = widgets.Text(
-        value="",
-        description="Description:",
-        style=style,
-        layout=widgets.Layout(width="454px", padding=padding),
-    )
-
     http_url = widgets.Text(
         value=catalogs[connection.value],
         description="URL:",
@@ -5199,14 +5186,6 @@ def stac_custom_gui(m=None):
         disabled=False,
         style=style,
         layout=widgets.Layout(width="225px", padding=padding),
-    )
-
-    collection = widgets.Dropdown(
-        options=[],
-        value=None,
-        description="Collection:",
-        style=style,
-        layout=widgets.Layout(width="454px", padding=padding),
     )
 
     band_names = []
@@ -5371,11 +5350,6 @@ def stac_custom_gui(m=None):
     buttons.style.button_width = "87px"
 
     dataset_widget = widgets.VBox()
-    dataset_widget.children = [
-        dataset,
-        description,
-        http_url,
-    ]
 
     dataset_widget.children = [http_url, custom_dataset]
 
@@ -5399,7 +5373,10 @@ def stac_custom_gui(m=None):
     )
 
     def update_bands():
-        bnames = []
+        if len(stac_data) > 0:
+            bnames = stac_data[0][item.value]["bands"]
+        else:
+            bnames = []
 
         red.options = bnames
         green.options = bnames
@@ -5418,6 +5395,13 @@ def stac_custom_gui(m=None):
     def connection_changed(change):
         if change["new"]:
             http_url.value = catalogs[connection.value]
+            custom_dataset.options = []
+            custom_dataset.value = None
+            item.options = []
+            item.value = None
+            if connection.value in m._STAC_COLLECTIONS:
+                custom_dataset.options = m._STAC_COLLECTIONS[connection.value]
+                custom_dataset.value = m._STAC_COLLECTIONS[connection.value][0]
 
     connection.observe(connection_changed, names="value")
 
@@ -5428,6 +5412,8 @@ def stac_custom_gui(m=None):
             try:
                 if http_url.value is not None:
                     custom_dataset.options = []
+                    custom_dataset.value = None
+
                     collections = stac_collections(http_url.value, return_ids=True)
                     if collections:
                         collections.sort()
@@ -5448,13 +5434,6 @@ def stac_custom_gui(m=None):
             layer_name.value = item.value
             with output:
                 update_bands()
-
-            if dataset.value == "Sentinel-2 Cloud-Optimized GeoTIFFs":
-                vmin.value = "0"
-                vmax.value = "3000"
-            else:
-                vmin.value = ""
-                vmax.value = ""
 
     item.observe(item_changed, names="value")
 
@@ -5512,19 +5491,30 @@ def stac_custom_gui(m=None):
                 print("Retrieving collections...")
                 try:
                     if http_url.value is not None:
-                        collections = stac_collections(http_url.value, return_ids=True)
+                        if (
+                            http_url.value == catalogs[connection.value]
+                            and connection.value in m._STAC_COLLECTIONS
+                        ):
+                            collections = m._STAC_COLLECTIONS[connection.value]
+                        else:
+                            collections = stac_collections(
+                                http_url.value, return_ids=True
+                            )
+
                         if collections:
                             collections.sort()
                             custom_dataset.options = collections
                             custom_dataset.value = collections[0]
                             output.clear_output()
+
+                            m._STAC_COLLECTIONS[connection.value] = collections
                         else:
                             print("No collections found.")
                     else:
                         print("No URL provided.")
                 except Exception as e:
                     print(e)
-            
+
         elif change["new"] == "Items":
             with output:
                 output.clear_output()
@@ -5726,7 +5716,7 @@ def stac_custom_gui(m=None):
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
-    
+
 
 def oam_search_gui(m=None):
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons

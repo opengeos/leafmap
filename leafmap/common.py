@@ -7413,17 +7413,17 @@ def create_timelapse(
 
     output = widgets.Output()
 
-    if 'out_ext' in kwargs:
-        out_ext = kwargs['out_ext'].lower()
+    if "out_ext" in kwargs:
+        out_ext = kwargs["out_ext"].lower()
     else:
-        out_ext = '.jpg'
+        out_ext = ".jpg"
 
     try:
         for index, image in enumerate(images):
-            if 'add_prefix' in kwargs:
+            if "add_prefix" in kwargs:
                 basename = (
-                    str(f'{index + 1}').zfill(len(str(len(images))))
-                    + '-'
+                    str(f"{index + 1}").zfill(len(str(len(images))))
+                    + "-"
                     + os.path.basename(image).replace(ext, out_ext)
                 )
             else:
@@ -7436,7 +7436,15 @@ def create_timelapse(
                 numpy_to_image(
                     image, os.path.join(temp_dir, basename), bands=bands, size=size
                 )
-        make_gif(temp_dir, out_gif, ext=out_ext, fps=fps, loop=loop, mp4=mp4, clean_up=clean_up)
+        make_gif(
+            temp_dir,
+            out_gif,
+            ext=out_ext,
+            fps=fps,
+            loop=loop,
+            mp4=mp4,
+            clean_up=clean_up,
+        )
 
         if add_text:
             add_text_to_gif(
