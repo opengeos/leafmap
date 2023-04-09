@@ -4721,7 +4721,7 @@ def stac_gui(m=None):
     buttons = widgets.ToggleButtons(
         value=None,
         options=["Search", "Display", "Reset", "Close"],
-        tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
+        tooltips=["Get Items", "Display Image", "Reset", "Close"],
         button_style="primary",
     )
     buttons.style.button_width = "65px"
@@ -5120,7 +5120,7 @@ def stac_custom_gui(m=None):
     if len(catalogs) == 0:
         raise ValueError("Please set the STAC catalogs first.")
 
-    connections = list(catalogs.keys())
+    catalog_ids = list(catalogs.keys())
 
     widget_width = "450px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
@@ -5150,16 +5150,16 @@ def stac_custom_gui(m=None):
         layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
     )
 
-    connection = widgets.Dropdown(
-        options=connections,
-        value=connections[0],
+    catalog = widgets.Dropdown(
+        options=catalog_ids,
+        value=catalog_ids[0],
         description="Catalog:",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
     )
 
-    http_url = widgets.Text(
-        value=catalogs[connection.value],
+    endpoint = widgets.Text(
+        value=catalogs[catalog.value],
         description="URL:",
         tooltip="STAC Catalog URL",
         placeholder="Enter a STAC URL, e.g., https://earth-search.aws.element84.com/v1",
@@ -5167,7 +5167,7 @@ def stac_custom_gui(m=None):
         layout=widgets.Layout(width="454px", padding=padding),
     )
 
-    custom_dataset = widgets.Dropdown(
+    collection = widgets.Dropdown(
         options=[],
         value=None,
         description="Collection:",
@@ -5309,27 +5309,22 @@ def stac_custom_gui(m=None):
 
     def reset_options():
         """Reset the options to their default values."""
-        connection.value = connections[0]
-        custom_dataset.options = []
-        custom_dataset.value = None
-        http_url.value = catalogs[connection.value]
+        catalog.value = catalog_ids[0]
+        collection.options = []
+        collection.value = None
+        endpoint.value = catalogs[catalog.value]
         start_date.value = None
         end_date.value = None
         item.options = []
         item.value = None
         layer_name.value = ""
-        red.options = []
-        green.options = []
-        blue.options = []
-        red.value = None
-        green.value = None
-        blue.value = None
         max_items.value = "20"
         vmin.value = ""
         vmax.value = ""
         nodata.value = ""
         palette.value = None
         add_params.value = ""
+        reset_bands()
         output.clear_output()
 
     params_widget = widgets.VBox()
@@ -5351,7 +5346,7 @@ def stac_custom_gui(m=None):
 
     dataset_widget = widgets.VBox()
 
-    dataset_widget.children = [http_url, custom_dataset]
+    dataset_widget.children = [endpoint, collection]
 
     toolbar_widget = widgets.VBox()
     toolbar_widget.children = [toolbar_button]
@@ -5359,7 +5354,7 @@ def stac_custom_gui(m=None):
     toolbar_header.children = [close_button, toolbar_button]
     toolbar_footer = widgets.VBox()
     toolbar_footer.children = [
-        connection,
+        catalog,
         dataset_widget,
         widgets.HBox([start_date, end_date]),
         item,
@@ -5392,42 +5387,58 @@ def stac_custom_gui(m=None):
             green.value = None
             blue.value = None
 
-    def connection_changed(change):
+    def reset_bands():
+        red.options = []
+        green.options = []
+        blue.options = []
+        red.value = None
+        green.value = None
+        blue.value = None
+
+    def catalog_changed(change):
         if change["new"]:
-            http_url.value = catalogs[connection.value]
-            custom_dataset.options = []
-            custom_dataset.value = None
+            endpoint.value = catalogs[catalog.value]
+            collection.options = []
+            collection.value = None
             item.options = []
             item.value = None
-            if connection.value in m._STAC_COLLECTIONS:
-                custom_dataset.options = m._STAC_COLLECTIONS[connection.value]
-                custom_dataset.value = m._STAC_COLLECTIONS[connection.value][0]
+            if catalog.value in m._STAC_COLLECTIONS:
+                collection.options = m._STAC_COLLECTIONS[catalog.value]
+                collection.value = m._STAC_COLLECTIONS[catalog.value][0]
+            reset_bands()
 
-    connection.observe(connection_changed, names="value")
+    catalog.observe(catalog_changed, names="value")
 
-    def http_url_changed(change):
+    def endpoint_changed(change):
         with output:
             output.clear_output()
             print("Retrieving collections...")
             try:
-                if http_url.value is not None:
-                    custom_dataset.options = []
-                    custom_dataset.value = None
+                if endpoint.value is not None:
+                    collection.options = []
+                    collection.value = None
 
-                    collections = stac_collections(http_url.value, return_ids=True)
+                    collections = stac_collections(endpoint.value, return_ids=True)
                     if collections:
                         collections.sort()
-                        custom_dataset.options = collections
-                        custom_dataset.value = collections[0]
+                        collection.options = collections
+                        collection.value = collections[0]
                         output.clear_output()
                     else:
                         print("No collections found.")
                 else:
                     print("No URL provided.")
+                reset_bands()
             except Exception as e:
                 print(e)
 
-    http_url.on_submit(http_url_changed)
+    endpoint.on_submit(endpoint_changed)
+
+    def collection_changed(change):
+        if change["new"]:
+            reset_bands()
+
+    collection.observe(collection_changed, names="value")
 
     def item_changed(change):
         if change["new"]:
@@ -5485,29 +5496,29 @@ def stac_custom_gui(m=None):
 
     def button_clicked(change):
         if change["new"] == "Collections":
-            custom_dataset.options = []
+            collection.options = []
             with output:
                 output.clear_output()
                 print("Retrieving collections...")
                 try:
-                    if http_url.value is not None:
+                    if endpoint.value is not None:
                         if (
-                            http_url.value == catalogs[connection.value]
-                            and connection.value in m._STAC_COLLECTIONS
+                            endpoint.value == catalogs[catalog.value]
+                            and catalog.value in m._STAC_COLLECTIONS
                         ):
-                            collections = m._STAC_COLLECTIONS[connection.value]
+                            collections = m._STAC_COLLECTIONS[catalog.value]
                         else:
                             collections = stac_collections(
-                                http_url.value, return_ids=True
+                                endpoint.value, return_ids=True
                             )
 
                         if collections:
                             collections.sort()
-                            custom_dataset.options = collections
-                            custom_dataset.value = collections[0]
+                            collection.options = collections
+                            collection.value = collections[0]
                             output.clear_output()
 
-                            m._STAC_COLLECTIONS[connection.value] = collections
+                            m._STAC_COLLECTIONS[catalog.value] = collections
                         else:
                             print("No collections found.")
                     else:
@@ -5518,7 +5529,7 @@ def stac_custom_gui(m=None):
         elif change["new"] == "Items":
             with output:
                 output.clear_output()
-                if http_url.value is not None:
+                if endpoint.value is not None:
                     if start_date.value is not None and end_date.value is not None:
                         datetime = str(start_date.value) + "/" + str(end_date.value)
                     elif start_date.value is not None:
@@ -5553,31 +5564,20 @@ def stac_custom_gui(m=None):
 
                 print("Retrieving items...")
                 try:
-                    if connection.value in [
-                        "Google Earth Engine",
-                        "NASA Common Metadata Repository",
-                    ]:
+                    if collection.value is None:
                         output.clear_output()
-                        print(f"{connection.value} is not supported yet.")
+                        print("Please click on 'Collections' to retrieve collections.")
                     else:
-                        if connection.value == "Custom STAC API Endpoint":
-                            search = stac_search(
-                                url=http_url.value,
-                                max_items=int(max_items.value),
-                                intersects=intersects,
-                                datetime=datetime,
-                                collections=custom_dataset.value,
-                                **query,
-                            )
-
-                        else:
-                            search = stac_search(
-                                url=http_url.value,
-                                max_items=int(max_items.value),
-                                intersects=intersects,
-                                datetime=datetime,
-                                **query,
-                            )
+                        item.options = []
+                        item.value = None
+                        reset_bands()
+                        search = stac_search(
+                            url=endpoint.value,
+                            max_items=int(max_items.value),
+                            intersects=intersects,
+                            datetime=datetime,
+                            **query,
+                        )
                         search_dict = stac_search_to_dict(search)
                         item.options = list(search_dict.keys())
                         setattr(m, "stac_search", search)
@@ -5656,9 +5656,9 @@ def stac_custom_gui(m=None):
                         assets = f"{red.value},{green.value},{blue.value}"
 
                     try:
-                        if connection.value == "Microsoft Planetary Computer":
+                        if "Planetary Computer" in catalog.value:
                             m.add_stac_layer(
-                                collection=http_url.value.split("/")[-1],
+                                collection=endpoint.value.split("/")[-1],
                                 item=item.value,
                                 assets=assets,
                                 name=layer_name.value,
@@ -5670,7 +5670,7 @@ def stac_custom_gui(m=None):
                                 "stac_item",
                                 m.stac_dict[item.value],
                             )
-                            m.stac_item["collection"] = http_url.value.split("/")[-1]
+                            m.stac_item["collection"] = endpoint.value.split("/")[-1]
 
                         else:
                             m.add_stac_layer(
@@ -5687,7 +5687,7 @@ def stac_custom_gui(m=None):
                         print(e)
 
                 else:
-                    print("Please click on the search button first.")
+                    print("Please click on 'Items' to retrieve items.")
                     buttons.value = None
 
         elif change["new"] == "Reset":
