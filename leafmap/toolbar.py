@@ -4424,6 +4424,18 @@ def stac_gui(m=None):
     """
     import pandas as pd
 
+    if os.environ.get("STAC_CATALOGS") is not None:
+        try:
+            source = eval(os.environ.get("STAC_CATALOGS"))
+            m.set_catalog_source(source)
+        except Exception as e:
+            print(e)
+            print("Invalid STAC_CATALOGS environment variable.")
+
+    if hasattr(m, "_STAC_CATALOGS"):
+        stac_custom_gui(m)
+        return
+
     widget_width = "450px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
@@ -5197,6 +5209,14 @@ def stac_custom_gui(m=None):
         layout=widgets.Layout(width="454px", padding=padding),
     )
 
+    vis_option = widgets.Dropdown(
+        options=["1 band (Grayscale)", "3 bands (RGB)"],
+        value="3 bands (RGB)",
+        description="Visualization:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
     layer_name = widgets.Text(
         value="STAC Layer",
         description="Layer name:",
@@ -5233,6 +5253,34 @@ def stac_custom_gui(m=None):
         layout=widgets.Layout(width=band_width, padding=padding),
     )
 
+    gray_band = widgets.Dropdown(
+        options=band_names,
+        value=None,
+        description="Band:",
+        tooltip="Select a band for visualization",
+        style=style,
+        layout=widgets.Layout(width="227px", padding=padding),
+    )
+
+    palette_options = list_palettes(lowercase=True)
+    palette = widgets.Dropdown(
+        options=palette_options,
+        value=None,
+        description="Palette:",
+        layout=widgets.Layout(width="223px", padding=padding),
+        style=style,
+    )
+
+    band_box = widgets.HBox([red, green, blue])
+
+    def vis_option_changed(change):
+        if change["new"] == "1 band (Grayscale)":
+            band_box.children = [gray_band, palette]
+        else:
+            band_box.children = [red, green, blue]
+
+    vis_option.observe(vis_option_changed, names="value")
+
     max_items = widgets.Text(
         value="20",
         description="Max items:",
@@ -5266,20 +5314,17 @@ def stac_custom_gui(m=None):
         layout=widgets.Layout(width="113px", padding=padding),
     )
 
-    palette_options = list_palettes(lowercase=True)
-    palette = widgets.Dropdown(
-        options=palette_options,
-        value=None,
-        description="palette:",
-        layout=widgets.Layout(width="180px", padding=padding),
+    more_label = widgets.Label(
+        "More options:",
+        layout=widgets.Layout(width="100px", padding=padding),
         style=style,
     )
 
     add_footprints = widgets.Checkbox(
         value=True,
-        description="Add footprints",
+        description="Add image footprints",
         indent=False,
-        layout=widgets.Layout(width="120px", padding=padding),
+        layout=widgets.Layout(width="170px", padding=padding),
         style=style,
     )
 
@@ -5325,14 +5370,14 @@ def stac_custom_gui(m=None):
         palette.value = None
         add_params.value = ""
         reset_bands()
+        vis_option.value = "3 bands (RGB)"
         output.clear_output()
 
     params_widget = widgets.VBox()
 
-    raster_options = widgets.VBox()
-    raster_options.children = [
-        widgets.HBox([red, green, blue]),
-        widgets.HBox([palette, add_footprints, checkbox]),
+    more_options = widgets.VBox()
+    more_options.children = [
+        widgets.HBox([more_label, add_footprints, checkbox]),
         params_widget,
     ]
 
@@ -5342,7 +5387,7 @@ def stac_custom_gui(m=None):
         tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
         button_style="primary",
     )
-    buttons.style.button_width = "87px"
+    buttons.style.button_width = "67px"
 
     dataset_widget = widgets.VBox()
 
@@ -5358,7 +5403,9 @@ def stac_custom_gui(m=None):
         dataset_widget,
         widgets.HBox([start_date, end_date]),
         item,
-        raster_options,
+        vis_option,
+        band_box,
+        more_options,
         buttons,
         output,
     ]
@@ -5368,32 +5415,63 @@ def stac_custom_gui(m=None):
     )
 
     def update_bands():
+        excluded = [
+            "index",
+            "metadata",
+            "mtl.json",
+            "mtl.txt",
+            "mtl.xml",
+            "qa",
+            "qa-browse",
+            "QA",
+            "rendered_preview",
+            "tilejson",
+            "tir-browse",
+            "vnir-browse",
+            "xml",
+            "documentation",
+        ]
+
         if len(stac_data) > 0:
             bnames = stac_data[0][item.value]["bands"]
         else:
             bnames = []
 
+        bnames = [b for b in bnames if b not in excluded]
+
         red.options = bnames
         green.options = bnames
         blue.options = bnames
 
-        default_bands = set_default_bands(bnames)
-        try:
-            red.value = default_bands[0]
-            green.value = default_bands[1]
-            blue.value = default_bands[2]
-        except Exception as e:
-            red.value = None
-            green.value = None
-            blue.value = None
+        if len(bnames) >= 3:
+            vis_option.value = "3 bands (RGB)"
+
+            default_bands = set_default_bands(bnames)
+            try:
+                red.value = default_bands[0]
+                green.value = default_bands[1]
+                blue.value = default_bands[2]
+            except Exception as e:
+                red.value = None
+                green.value = None
+                blue.value = None
+        elif len(bnames) >= 1:
+            vis_option.value = "1 band (Grayscale)"
+            gray_band.options = bnames
+            gray_band.value = bnames[0]
+            red.value = bnames[0]
+            green.value = bnames[0]
+            blue.value = bnames[0]
 
     def reset_bands():
         red.options = []
         green.options = []
         blue.options = []
+        gray_band.options = []
         red.value = None
         green.value = None
         blue.value = None
+        gray_band.value = None
 
     def catalog_changed(change):
         if change["new"]:
@@ -5443,8 +5521,6 @@ def stac_custom_gui(m=None):
     def item_changed(change):
         if change["new"]:
             layer_name.value = item.value
-            with output:
-                update_bands()
 
     item.observe(item_changed, names="value")
 
@@ -5573,6 +5649,7 @@ def stac_custom_gui(m=None):
                         reset_bands()
                         search = stac_search(
                             url=endpoint.value,
+                            collections=[collection.value],
                             max_items=int(max_items.value),
                             intersects=intersects,
                             datetime=datetime,
@@ -5588,20 +5665,21 @@ def stac_custom_gui(m=None):
                             gdf = stac_search_to_gdf(search)
                             style = {
                                 "stroke": True,
-                                "color": "#000000",
+                                "color": "#3388ff",
                                 "weight": 2,
                                 "opacity": 1,
                                 "fill": True,
                                 "fillColor": "#000000",
                                 "fillOpacity": 0,
                             }
-                            hover_style = {"fillOpacity": 0.3}
+                            hover_style = {"weight": 4}
                             m.add_gdf(
                                 gdf,
                                 style=style,
                                 hover_style=hover_style,
                                 layer_name="Footprints",
                                 zoom_to_layer=False,
+                                info_mode="on_click",
                             )
                             setattr(m, "stac_gdf", gdf)
 
@@ -5632,8 +5710,8 @@ def stac_custom_gui(m=None):
                         vis_params = {}
 
                     if (
-                        palette.value
-                        and len(set([red.value, green.value, blue.value])) == 1
+                        vis_option.value == "1 band (Grayscale)"
+                        and (palette.value is not None)
                     ) or (palette.value and "expression" in vis_params):
                         vis_params["colormap_name"] = palette.value
                     elif (
@@ -5643,6 +5721,9 @@ def stac_custom_gui(m=None):
                     ):
                         palette.value = None
                         print("Palette can only be set for single band images.")
+
+                    if vmax.value and not vmin.value:
+                        vmin.value = "0"
 
                     if vmin.value and vmax.value:
                         vis_params["rescale"] = f"{vmin.value},{vmax.value}"
@@ -5657,8 +5738,9 @@ def stac_custom_gui(m=None):
 
                     try:
                         if "Planetary Computer" in catalog.value:
+                            output.clear_output(wait=True)
                             m.add_stac_layer(
-                                collection=endpoint.value.split("/")[-1],
+                                collection=collection.value,
                                 item=item.value,
                                 assets=assets,
                                 name=layer_name.value,
@@ -5670,19 +5752,21 @@ def stac_custom_gui(m=None):
                                 "stac_item",
                                 m.stac_dict[item.value],
                             )
-                            m.stac_item["collection"] = endpoint.value.split("/")[-1]
+                            m.stac_item["collection"] = collection.value
 
                         else:
+                            output.clear_output(wait=True)
                             m.add_stac_layer(
                                 url=stac_data[0][item.value]["href"],
-                                item=item.value,
                                 assets=assets,
                                 name=layer_name.value,
                                 fit_bounds=False,
                                 **vis_params,
                             )
                             setattr(m, "stac_item", m.stac_dict[item.value])
-                        output.clear_output()
+                            if "rescale" in m.layers[-1].url:
+                                output.clear_output()
+
                     except Exception as e:
                         print(e)
 

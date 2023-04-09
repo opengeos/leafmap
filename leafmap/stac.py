@@ -621,6 +621,38 @@ def stac_tile(
         if assets is not None:
             kwargs["assets"] = assets
 
+        if (
+            (assets is not None)
+            and ("asset_expression" not in kwargs)
+            and ("expression" not in kwargs)
+            and ("rescale" not in kwargs)
+        ):
+            stats = stac_stats(
+                url=url,
+                assets=assets,
+                titiler_endpoint=titiler_endpoint,
+            )
+            if "detail" not in stats:
+                try:
+                    percentile_2 = min([stats[s]["percentile_2"] for s in stats])
+                    percentile_98 = max([stats[s]["percentile_98"] for s in stats])
+                except:
+                    percentile_2 = min(
+                        [
+                            stats[s][list(stats[s].keys())[0]]["percentile_2"]
+                            for s in stats
+                        ]
+                    )
+                    percentile_98 = max(
+                        [
+                            stats[s][list(stats[s].keys())[0]]["percentile_98"]
+                            for s in stats
+                        ]
+                    )
+                kwargs["rescale"] = f"{percentile_2},{percentile_98}"
+            else:
+                print(stats["detail"])  # When operation times out.
+
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
         TileMatrixSetId = kwargs["TileMatrixSetId"]
@@ -1363,6 +1395,7 @@ def set_default_bands(bands):
         "tir-browse",
         "vnir-browse",
         "xml",
+        "documentation",
     ]
 
     for band in excluded:

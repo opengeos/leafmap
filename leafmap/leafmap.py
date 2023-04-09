@@ -200,6 +200,9 @@ class Map(ipyleaflet.Map):
         if "use_voila" not in kwargs:
             kwargs["use_voila"] = False
 
+        if "catalog_source" in kwargs:
+            self.set_catalog_source(kwargs["catalog_source"])
+
     def set_center(self, lon, lat, zoom=None):
         """Centers the map view at a given coordinates with the given zoom level.
 
@@ -3846,6 +3849,22 @@ class Map(ipyleaflet.Map):
                     )
         else:
             print("No images found.")
+
+    def set_catalog_source(self, source):
+        """Set the catalog source.
+
+        Args:
+            catalog_source (str, optional): The catalog source. Defaults to "landsat".
+        """
+        if not isinstance(source, dict):
+            raise TypeError(
+                "The source must be a dictionary in the format of {label: url, label2:url2}, \
+                such as {'Element84': 'https://earth-search.aws.element84.com/v1'}"
+            )
+        if not hasattr(self, "_STAC_CATALOGS"):
+            self.catalog_source = {}
+
+        self._STAC_CATALOGS = source
 
 
 # The functions below are outside the Map class.
