@@ -306,7 +306,7 @@ def main_toolbar(m):
 
     tools = {}
     for tool in all_tools:
-        if os.environ.get(all_tools[tool]['name'].upper(), "").upper() != "FALSE":
+        if os.environ.get(all_tools[tool]["name"].upper(), "").upper() != "FALSE":
             tools[tool] = all_tools[tool]
 
     icons = list(tools.keys())
@@ -4424,6 +4424,18 @@ def stac_gui(m=None):
     """
     import pandas as pd
 
+    if os.environ.get("STAC_CATALOGS") is not None:
+        try:
+            source = eval(os.environ.get("STAC_CATALOGS"))
+            m.set_catalog_source(source)
+        except Exception as e:
+            print(e)
+            print("Invalid STAC_CATALOGS environment variable.")
+
+    if hasattr(m, "_STAC_CATALOGS"):
+        stac_custom_gui(m)
+        return
+
     widget_width = "450px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
@@ -4721,7 +4733,7 @@ def stac_gui(m=None):
     buttons = widgets.ToggleButtons(
         value=None,
         options=["Search", "Display", "Reset", "Close"],
-        tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
+        tooltips=["Get Items", "Display Image", "Reset", "Close"],
         button_style="primary",
     )
     buttons.style.button_width = "65px"
@@ -5069,6 +5081,697 @@ def stac_gui(m=None):
 
                 else:
                     print("Please click on the search button first.")
+                    buttons.value = None
+
+        elif change["new"] == "Reset":
+            reset_options()
+
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = True
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def stac_custom_gui(m=None):
+    """Generates a tool GUI template using ipywidgets.
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+
+    if hasattr(m, "_STAC_CATALOGS") and isinstance(m._STAC_CATALOGS, dict):
+        catalogs = m._STAC_CATALOGS
+    else:
+        raise ValueError("Please set the STAC catalogs first.")
+
+    if not hasattr(m, "_STAC_COLLECTIONS"):
+        m._STAC_COLLECTIONS = {}
+
+    if len(catalogs) == 0:
+        raise ValueError("Please set the STAC catalogs first.")
+
+    catalog_ids = list(catalogs.keys())
+
+    widget_width = "450px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+    MAX_ITEMS = 20
+    if "MAX_ITEMS" in os.environ:
+        MAX_ITEMS = int(os.environ["MAX_ITEMS"])
+
+    stac_data = []
+
+    output = widgets.Output(
+        layout=widgets.Layout(width=widget_width, padding=padding, overflow="auto")
+    )
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Discver STAC Catalog",
+        icon="stack-exchange",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    catalog = widgets.Dropdown(
+        options=catalog_ids,
+        value=catalog_ids[0],
+        description="Catalog:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    endpoint = widgets.Text(
+        value=catalogs[catalog.value],
+        description="URL:",
+        tooltip="STAC Catalog URL",
+        placeholder="Enter a STAC URL, e.g., https://earth-search.aws.element84.com/v1",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    collection = widgets.Dropdown(
+        options=[],
+        value=None,
+        description="Collection:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    start_date = widgets.DatePicker(
+        description="Start date:",
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width="225px", padding=padding),
+    )
+    end_date = widgets.DatePicker(
+        description="End date:",
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width="225px", padding=padding),
+    )
+
+    band_names = []
+
+    item = widgets.Dropdown(
+        options=[],
+        description="Item:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    vis_option = widgets.Dropdown(
+        options=["1 band (Grayscale)", "3 bands (RGB)"],
+        value="3 bands (RGB)",
+        description="Visualization:",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    layer_name = widgets.Text(
+        value="STAC Layer",
+        description="Layer name:",
+        tooltip="Enter a layer name for the selected file",
+        style=style,
+        layout=widgets.Layout(width="454px", padding=padding),
+    )
+
+    band_width = "149px"
+    red = widgets.Dropdown(
+        options=band_names,
+        value=None,
+        description="Red:",
+        tooltip="Select a band for the red channel",
+        style=style,
+        layout=widgets.Layout(width=band_width, padding=padding),
+    )
+
+    green = widgets.Dropdown(
+        options=band_names,
+        value=None,
+        description="Green:",
+        tooltip="Select a band for the green channel",
+        style=style,
+        layout=widgets.Layout(width="148px", padding=padding),
+    )
+
+    blue = widgets.Dropdown(
+        options=band_names,
+        value=None,
+        description="Blue:",
+        tooltip="Select a band for the blue channel",
+        style=style,
+        layout=widgets.Layout(width=band_width, padding=padding),
+    )
+
+    gray_band = widgets.Dropdown(
+        options=band_names,
+        value=None,
+        description="Band:",
+        tooltip="Select a band for visualization",
+        style=style,
+        layout=widgets.Layout(width="227px", padding=padding),
+    )
+
+    palette_options = list_palettes(lowercase=True)
+    palette = widgets.Dropdown(
+        options=palette_options,
+        value=None,
+        description="Palette:",
+        layout=widgets.Layout(width="223px", padding=padding),
+        style=style,
+    )
+
+    band_box = widgets.HBox([red, green, blue])
+
+    def vis_option_changed(change):
+        if change["new"] == "1 band (Grayscale)":
+            band_box.children = [gray_band, palette]
+        else:
+            band_box.children = [red, green, blue]
+
+    vis_option.observe(vis_option_changed, names="value")
+
+    max_items = widgets.Text(
+        value="20",
+        description="Max items:",
+        placeholder="Maximum number of items to return from the STAC API",
+        tooltip="Maximum number of items to return from the STAC API",
+        style=style,
+        layout=widgets.Layout(width="130px", padding=padding),
+    )
+
+    vmin = widgets.Text(
+        value=None,
+        description="vmin:",
+        tooltip="Minimum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="100px", padding=padding),
+    )
+
+    vmax = widgets.Text(
+        value=None,
+        description="vmax:",
+        tooltip="Maximum value of the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="100px", padding=padding),
+    )
+
+    nodata = widgets.Text(
+        value=None,
+        description="Nodata:",
+        tooltip="Nodata the raster to visualize",
+        style=style,
+        layout=widgets.Layout(width="113px", padding=padding),
+    )
+
+    more_label = widgets.Label(
+        "More options:",
+        layout=widgets.Layout(width="100px", padding=padding),
+        style=style,
+    )
+
+    add_footprints = widgets.Checkbox(
+        value=True,
+        description="Add image footprints",
+        indent=False,
+        layout=widgets.Layout(width="170px", padding=padding),
+        style=style,
+    )
+
+    checkbox = widgets.Checkbox(
+        value=False,
+        description="Additional params",
+        indent=False,
+        layout=widgets.Layout(width="154px", padding=padding),
+        style=style,
+    )
+
+    query_params_text = "Additional parameters to query the STAC API, for example: {'query': {'eo:cloud_cover':{'lt':10}}}"
+    query_params = widgets.Textarea(
+        value="",
+        placeholder=query_params_text,
+        layout=widgets.Layout(width="454px", padding=padding),
+        style=style,
+    )
+
+    add_params_text = "Additional parameters to visualize imagery, for example: {'palette': ['#006633', '#E5FFCC', '#662A00', '#D8D8D8', '#F5F5F5'], 'expression': '(SR_B5-SR_B4)/(SR_B5+SR_B4)'}"
+    add_params = widgets.Textarea(
+        value="",
+        placeholder=add_params_text,
+        layout=widgets.Layout(width="454px", padding=padding),
+        style=style,
+    )
+
+    def reset_options():
+        """Reset the options to their default values."""
+        catalog.value = catalog_ids[0]
+        collection.options = []
+        collection.value = None
+        endpoint.value = catalogs[catalog.value]
+        start_date.value = None
+        end_date.value = None
+        item.options = []
+        item.value = None
+        layer_name.value = ""
+        max_items.value = "20"
+        vmin.value = ""
+        vmax.value = ""
+        nodata.value = ""
+        palette.value = None
+        add_params.value = ""
+        reset_bands()
+        vis_option.value = "3 bands (RGB)"
+        output.clear_output()
+
+    params_widget = widgets.VBox()
+
+    more_options = widgets.VBox()
+    more_options.children = [
+        widgets.HBox([more_label, add_footprints, checkbox]),
+        params_widget,
+    ]
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Collections", "Items", "Display", "Reset", "Close"],
+        tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "67px"
+
+    dataset_widget = widgets.VBox()
+
+    dataset_widget.children = [endpoint, collection]
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        catalog,
+        dataset_widget,
+        widgets.HBox([start_date, end_date]),
+        item,
+        vis_option,
+        band_box,
+        more_options,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def update_bands():
+        excluded = [
+            "index",
+            "metadata",
+            "mtl.json",
+            "mtl.txt",
+            "mtl.xml",
+            "qa",
+            "qa-browse",
+            "QA",
+            "rendered_preview",
+            "tilejson",
+            "tir-browse",
+            "vnir-browse",
+            "xml",
+            "documentation",
+        ]
+
+        if len(stac_data) > 0:
+            bnames = stac_data[0][item.value]["bands"]
+        else:
+            bnames = []
+
+        bnames = [b for b in bnames if b not in excluded]
+
+        red.options = bnames
+        green.options = bnames
+        blue.options = bnames
+
+        if len(bnames) >= 3:
+            vis_option.value = "3 bands (RGB)"
+
+            default_bands = set_default_bands(bnames)
+            try:
+                red.value = default_bands[0]
+                green.value = default_bands[1]
+                blue.value = default_bands[2]
+            except Exception as e:
+                red.value = None
+                green.value = None
+                blue.value = None
+        elif len(bnames) >= 1:
+            vis_option.value = "1 band (Grayscale)"
+            gray_band.options = bnames
+            gray_band.value = bnames[0]
+            red.value = bnames[0]
+            green.value = bnames[0]
+            blue.value = bnames[0]
+
+    def reset_bands():
+        red.options = []
+        green.options = []
+        blue.options = []
+        gray_band.options = []
+        red.value = None
+        green.value = None
+        blue.value = None
+        gray_band.value = None
+
+    def catalog_changed(change):
+        if change["new"]:
+            endpoint.value = catalogs[catalog.value]
+            collection.options = []
+            collection.value = None
+            item.options = []
+            item.value = None
+            if catalog.value in m._STAC_COLLECTIONS:
+                collection.options = m._STAC_COLLECTIONS[catalog.value]
+                collection.value = m._STAC_COLLECTIONS[catalog.value][0]
+            reset_bands()
+
+    catalog.observe(catalog_changed, names="value")
+
+    def endpoint_changed(change):
+        with output:
+            output.clear_output()
+            print("Retrieving collections...")
+            try:
+                if endpoint.value is not None:
+                    collection.options = []
+                    collection.value = None
+
+                    collections = stac_collections(endpoint.value, return_ids=True)
+                    if collections:
+                        collections.sort()
+                        collection.options = collections
+                        collection.value = collections[0]
+                        output.clear_output()
+                    else:
+                        print("No collections found.")
+                else:
+                    print("No URL provided.")
+                reset_bands()
+            except Exception as e:
+                print(e)
+
+    endpoint.on_submit(endpoint_changed)
+
+    def collection_changed(change):
+        if change["new"]:
+            reset_bands()
+
+    collection.observe(collection_changed, names="value")
+
+    def item_changed(change):
+        if change["new"]:
+            layer_name.value = item.value
+
+    item.observe(item_changed, names="value")
+
+    def checkbox_changed(change):
+        if change["new"]:
+            params_widget.children = [
+                layer_name,
+                widgets.HBox([max_items, vmin, vmax, nodata]),
+                query_params,
+                add_params,
+            ]
+        else:
+            params_widget.children = []
+
+    checkbox.observe(checkbox_changed, names="value")
+
+    def handle_toolbar_event(event):
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Collections":
+            collection.options = []
+            with output:
+                output.clear_output()
+                print("Retrieving collections...")
+                try:
+                    if endpoint.value is not None:
+                        if (
+                            endpoint.value == catalogs[catalog.value]
+                            and catalog.value in m._STAC_COLLECTIONS
+                        ):
+                            collections = m._STAC_COLLECTIONS[catalog.value]
+                        else:
+                            collections = stac_collections(
+                                endpoint.value, return_ids=True
+                            )
+
+                        if collections:
+                            collections.sort()
+                            collection.options = collections
+                            collection.value = collections[0]
+                            output.clear_output()
+
+                            m._STAC_COLLECTIONS[catalog.value] = collections
+                        else:
+                            print("No collections found.")
+                    else:
+                        print("No URL provided.")
+                except Exception as e:
+                    print(e)
+
+        elif change["new"] == "Items":
+            with output:
+                output.clear_output()
+                if endpoint.value is not None:
+                    if start_date.value is not None and end_date.value is not None:
+                        datetime = str(start_date.value) + "/" + str(end_date.value)
+                    elif start_date.value is not None:
+                        datetime = str(start_date.value) + "/.."
+                    elif end_date.value is not None:
+                        datetime = "../" + str(end_date.value)
+                    else:
+                        datetime = None
+
+                    if m is not None:
+                        if m.user_roi is not None:
+                            intersects = m.user_roi["geometry"]
+                        else:
+                            intersects = bbox_to_geojson(m.bounds)
+
+                    else:
+                        intersects = None
+
+                    if (
+                        checkbox.value
+                        and query_params.value.strip().startswith("{")
+                        and query_params.value.strip().endswith("}")
+                    ):
+                        query = eval(query_params.value)
+                    elif query_params.value.strip() == "":
+                        query = {}
+                    else:
+                        print(
+                            "Invalid query parameters. It must be a dictionary with keys such as 'query', 'sortby', 'filter', 'fields'"
+                        )
+                        query = {}
+
+                print("Retrieving items...")
+                try:
+                    if collection.value is None:
+                        output.clear_output()
+                        print("Please click on 'Collections' to retrieve collections.")
+                    else:
+                        item.options = []
+                        item.value = None
+                        reset_bands()
+                        search = stac_search(
+                            url=endpoint.value,
+                            collections=[collection.value],
+                            max_items=int(max_items.value),
+                            intersects=intersects,
+                            datetime=datetime,
+                            **query,
+                        )
+                        search_dict = stac_search_to_dict(search)
+                        item.options = list(search_dict.keys())
+                        setattr(m, "stac_search", search)
+                        setattr(m, "stac_dict", search_dict)
+                        setattr(m, "stac_items", stac_search_to_list(search))
+
+                        if add_footprints.value and m is not None:
+                            gdf = stac_search_to_gdf(search)
+                            style = {
+                                "stroke": True,
+                                "color": "#3388ff",
+                                "weight": 2,
+                                "opacity": 1,
+                                "fill": True,
+                                "fillColor": "#000000",
+                                "fillOpacity": 0,
+                            }
+                            hover_style = {"weight": 4}
+                            m.add_gdf(
+                                gdf,
+                                style=style,
+                                hover_style=hover_style,
+                                layer_name="Footprints",
+                                zoom_to_layer=False,
+                                info_mode="on_click",
+                            )
+                            setattr(m, "stac_gdf", gdf)
+
+                        stac_data.clear()
+                        stac_data.append(search_dict)
+                        update_bands()
+                        output.clear_output()
+                except NotImplementedError as e:
+                    print(e)
+
+                except Exception as e:
+                    print(e)
+
+        elif change["new"] == "Display":
+            with output:
+                output.clear_output()
+
+                if item.value and m is not None:
+                    print("Loading data...")
+
+                    if (
+                        checkbox.value
+                        and add_params.value.strip().startswith("{")
+                        and add_params.value.strip().endswith("}")
+                    ):
+                        vis_params = eval(add_params.value)
+                    else:
+                        vis_params = {}
+
+                    if (
+                        vis_option.value == "1 band (Grayscale)"
+                        and (palette.value is not None)
+                    ) or (palette.value and "expression" in vis_params):
+                        vis_params["colormap_name"] = palette.value
+                    elif (
+                        palette.value
+                        and len(set([red.value, green.value, blue.value])) > 1
+                        and "expression" not in vis_params
+                    ):
+                        palette.value = None
+                        print("Palette can only be set for single band images.")
+
+                    if vmax.value and not vmin.value:
+                        vmin.value = "0"
+
+                    if vmin.value and vmax.value:
+                        vis_params["rescale"] = f"{vmin.value},{vmax.value}"
+
+                    if nodata.value:
+                        vis_params["nodata"] = nodata.value
+
+                    if len(set([red.value, green.value, blue.value])) == 1:
+                        assets = red.value
+                    else:
+                        assets = f"{red.value},{green.value},{blue.value}"
+
+                    try:
+                        if "Planetary Computer" in catalog.value:
+                            output.clear_output(wait=True)
+                            m.add_stac_layer(
+                                collection=collection.value,
+                                item=item.value,
+                                assets=assets,
+                                name=layer_name.value,
+                                fit_bounds=False,
+                                **vis_params,
+                            )
+                            setattr(
+                                m,
+                                "stac_item",
+                                m.stac_dict[item.value],
+                            )
+                            m.stac_item["collection"] = collection.value
+
+                        else:
+                            output.clear_output(wait=True)
+                            m.add_stac_layer(
+                                url=stac_data[0][item.value]["href"],
+                                assets=assets,
+                                name=layer_name.value,
+                                fit_bounds=False,
+                                **vis_params,
+                            )
+                            setattr(m, "stac_item", m.stac_dict[item.value])
+                            if "rescale" in m.layers[-1].url:
+                                output.clear_output()
+
+                    except Exception as e:
+                        print(e)
+
+                else:
+                    print("Please click on 'Items' to retrieve items.")
                     buttons.value = None
 
         elif change["new"] == "Reset":
