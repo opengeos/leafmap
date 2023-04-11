@@ -5445,6 +5445,8 @@ def stac_custom_gui(m=None):
 
         if len(bnames) >= 3:
             vis_option.value = "3 bands (RGB)"
+            palette.value = None
+            gray_band.options = bnames
 
             default_bands = set_default_bands(bnames)
             try:
@@ -5515,6 +5517,8 @@ def stac_custom_gui(m=None):
     def collection_changed(change):
         if change["new"]:
             reset_bands()
+            item.options = []
+            item.value = None
 
     collection.observe(collection_changed, names="value")
 
@@ -5657,6 +5661,7 @@ def stac_custom_gui(m=None):
                         )
                         search_dict = stac_search_to_dict(search)
                         item.options = list(search_dict.keys())
+                        item.value = list(search_dict.keys())[0]
                         setattr(m, "stac_search", search)
                         setattr(m, "stac_dict", search_dict)
                         setattr(m, "stac_items", stac_search_to_list(search))
@@ -5731,8 +5736,8 @@ def stac_custom_gui(m=None):
                     if nodata.value:
                         vis_params["nodata"] = nodata.value
 
-                    if len(set([red.value, green.value, blue.value])) == 1:
-                        assets = red.value
+                    if vis_option.value == "1 band (Grayscale)":
+                        assets = gray_band.value
                     else:
                         assets = f"{red.value},{green.value},{blue.value}"
 
