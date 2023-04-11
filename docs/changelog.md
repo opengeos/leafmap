@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.19.0 - Apr 10, 2023
+
+**New Features**
+
+-   Added GUI for custom STAC catalogs (#413)
+
 ## v0.18.10 - Apr 6, 2023
 
 **Improvement**
