@@ -2787,6 +2787,7 @@ class Map(ipyleaflet.Map):
         icon_names=["info"],
         spin=False,
         add_legend=True,
+        max_cluster_radius=80,
         **kwargs,
     ):
         """Adds a marker cluster to the map.
@@ -2803,6 +2804,9 @@ class Map(ipyleaflet.Map):
             icon_names (list, optional): A list of names to be used for the icons. More icons can be found at https://fontawesome.com/v4/icons. Defaults to ['info'].
             spin (bool, optional): If True, the icon will spin. Defaults to False.
             add_legend (bool, optional): If True, a legend will be added to the map. Defaults to True.
+            max_cluster_radius (int, optional): The maximum cluster radius. Defaults to 80.
+            **kwargs: Other keyword arguments to pass to ipyleaflet.MarkerCluster(). For a list of available options,
+                see https://github.com/Leaflet/Leaflet.markercluster.
 
         """
         import pandas as pd
@@ -2993,7 +2997,12 @@ class Map(ipyleaflet.Map):
                 )
                 markers.append(marker)
 
-        marker_cluster = ipyleaflet.MarkerCluster(markers=markers, name=layer_name)
+        marker_cluster = ipyleaflet.MarkerCluster(
+            markers=markers,
+            name=layer_name,
+            max_cluster_radius=max_cluster_radius,
+            **kwargs,
+        )
         self.add(marker_cluster)
 
         if items is not None and add_legend:
