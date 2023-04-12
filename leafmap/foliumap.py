@@ -1921,6 +1921,7 @@ class Map(folium.Map):
         angle=0,
         prefix="fa",
         add_legend=True,
+        max_cluster_radius=80,
         **kwargs,
     ):
         """Adds a marker cluster to the map.
@@ -1936,12 +1937,19 @@ class Map(folium.Map):
             color_column (str, optional): The column name for the color values. Defaults to None.
             marker_colors (list, optional): A list of colors to be used for the markers. Defaults to None.
             icon_colors (list, optional): A list of colors to be used for the icons. Defaults to ['white'].
-            icon_names (list, optional): A list of names to be used for the icons. More icons can be found at https://fontawesome.com/v4/icons or https://getbootstrap.com/docs/3.3/components/?utm_source=pocket_mylist. Defaults to ['info'].
+            icon_names (list, optional): A list of names to be used for the icons. More icons can be found
+                at https://fontawesome.com/v4/icons or https://getbootstrap.com/docs/3.3/components/?utm_source=pocket_mylist. Defaults to ['info'].
             angle (int, optional): The angle of the icon. Defaults to 0.
             prefix (str, optional): The prefix states the source of the icon. 'fa' for font-awesome or 'glyphicon' for bootstrap 3. Defaults to 'fa'.
             add_legend (bool, optional): If True, a legend will be added to the map. Defaults to True.
+            max_cluster_radius (int, optional): The maximum radius that a cluster will cover from the central marker (in pixels).
+            **kwargs: Other keyword arguments to pass to folium.MarkerCluster(). For a list of available options,
+                see https://github.com/Leaflet/Leaflet.markercluster. For example, to change the cluster radius, use options={"maxClusterRadius": 50}.
         """
         import pandas as pd
+
+        if "maxClusterRadius" not in kwargs:
+            kwargs['maxClusterRadius'] = max_cluster_radius
 
         color_options = [
             "red",
@@ -2021,7 +2029,7 @@ class Map(folium.Map):
         if y not in col_names:
             raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
 
-        marker_cluster = plugins.MarkerCluster(name=layer_name).add_to(self)
+        marker_cluster = plugins.MarkerCluster(name=layer_name, **kwargs).add_to(self)
 
         for idx, row in df.iterrows():
             html = ""
