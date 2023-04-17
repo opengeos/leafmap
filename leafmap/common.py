@@ -8614,7 +8614,7 @@ def tms_to_geotiff(
     quiet=False,
     **kwargs,
 ):
-    """Download TMS tiles and convert them to a GeoTIFF. The source is adpated from https://github.com/gumblex/tms2geotiff.
+    """Download TMS tiles and convert them to a GeoTIFF. The source is adapted from https://github.com/gumblex/tms2geotiff.
         Credits to the GitHub user @gumblex.
 
     Args:
