@@ -1059,7 +1059,10 @@ def stac_client(
     parameters=None,
     ignore_conformance=False,
     modifier=None,
+    request_modifier=None,
+    stac_io=None,
     return_col_id=False,
+    **kwargs,
 ):
     """Get the STAC client. It wraps the pystac.Client.open() method. See
         https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.open
@@ -1076,7 +1079,17 @@ def stac_client(
         modifier (function, optional): A callable that modifies the children collection and items
             returned by this Client. This can be useful for injecting authentication parameters
             into child assets to access data from non-public sources. Defaults to None.
+        request_modifier (function, optional): A callable that either modifies a Request instance or returns
+            a new one. This can be useful for injecting Authentication headers and/or signing fully-formed
+            requests (e.g. signing requests using AWS SigV4). The callable should expect a single argument,
+            which will be an instance of requests.Request. If the callable returns a requests.Request, that
+            will be used. Alternately, the callable may simply modify the provided request object and
+            return None.
+        stac_io (pystac.STAC_IO, optional): A StacApiIO object to use for I/O requests. Generally, leave
+            this to the default. However in cases where customized I/O processing is required, a custom
+            instance can be provided here.
         return_col_id (bool, optional): Return the collection ID. Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the pystac.Client.open() method.
 
     Returns:
         pystac.Client: The STAC client.
@@ -1090,13 +1103,27 @@ def stac_client(
 
         if return_col_id:
             client = Client.open(
-                root[0], headers, parameters, ignore_conformance, modifier
+                root[0],
+                headers,
+                parameters,
+                ignore_conformance,
+                modifier,
+                request_modifier,
+                stac_io,
+                **kwargs,
             )
             collection_id = root[1]
             return client, collection_id
         else:
             client = Client.open(
-                root, headers, parameters, ignore_conformance, modifier
+                root,
+                headers,
+                parameters,
+                ignore_conformance,
+                modifier,
+                request_modifier,
+                stac_io,
+                **kwargs,
             )
             return client
 
@@ -1105,18 +1132,19 @@ def stac_client(
         return None
 
 
-def stac_collections(url, return_ids=False):
+def stac_collections(url, return_ids=False, **kwargs):
     """Get the collection IDs of a STAC catalog.
 
     Args:
         url (str): The STAC catalog URL.
         return_ids (bool, optional): Return collection IDs. Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the stac_client() method.
 
     Returns:
         list: A list of collection IDs.
     """
     try:
-        client = stac_client(url)
+        client = stac_client(url, **kwargs)
         collections = client.get_all_collections()
 
         if return_ids:
