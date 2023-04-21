@@ -3845,13 +3845,15 @@ def numpy_to_cog(
             )
 
 
-def get_stac_collections(url):
+def get_stac_collections(url, **kwargs):
     """Retrieve a list of STAC collections from a URL.
     This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L31.
     Credits to Mykola Kozyr.
 
     Args:
         url (str): A URL to a STAC catalog.
+        **kwargs: Additional keyword arguments to pass to the pystac Client.open() method.
+            See https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.open
 
     Returns:
         list: A list of STAC collections.
@@ -3861,7 +3863,7 @@ def get_stac_collections(url):
     # Expensive function. Added cache for it.
 
     # Empty list that would be used for a dataframe to collect and visualize info about collections
-    root_catalog = Client.open(url)
+    root_catalog = Client.open(url, **kwargs)
     collections_list = []
     # Reading collections in the Catalog
     collections = list(root_catalog.get_collections())
@@ -3886,6 +3888,7 @@ def get_stac_items(
     datetime=None,
     intersects=None,
     ids=None,
+    open_args=None,
     **kwargs,
 ):
     """Retrieve a list of STAC items from a URL and a collection.
@@ -3901,6 +3904,8 @@ def get_stac_items(
         datetime (str, optional): Single date+time, or a range ('/' separator), formatted to RFC 3339, section 5.6. Use double dots .. for open date ranges.
         intersects (dict, optional): A dictionary representing a GeoJSON Geometry. Searches items by performing intersection between their geometry and provided GeoJSON geometry. All GeoJSON geometry types must be supported.
         ids (list, optional): A list of item ids to return.
+        open_args (dict, optional): A dictionary of arguments to pass to the pystac Client.open() method. Defaults to None.
+        **kwargs: Additional keyword arguments to pass to the Catalog.search() method.
 
     Returns:
         GeoPandas.GeoDataFraem: A GeoDataFrame with the STAC items.
@@ -3913,6 +3918,10 @@ def get_stac_items(
 
     # Empty list that would be used for a dataframe to collect and visualize info about collections
     items_list = []
+
+    if open_args is None:
+        open_args = {}
+
     root_catalog = Client.open(url)
 
     if limit:
