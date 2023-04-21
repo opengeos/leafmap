@@ -996,17 +996,18 @@ def stac_pixel_value(
         return result
 
 
-def stac_object_type(url):
+def stac_object_type(url, **kwargs):
     """Get the STAC object type.
 
     Args:
         url (str): The STAC object URL.
+        **kwargs: Keyword arguments for pystac.STACObject.from_file(). Defaults to None.
 
     Returns:
         str: The STAC object type, can be catalog, collection, or item.
     """
     try:
-        obj = pystac.STACObject.from_file(url)
+        obj = pystac.STACObject.from_file(url, **kwargs)
 
         if isinstance(obj, pystac.Collection):
             return "collection"
@@ -1020,19 +1021,20 @@ def stac_object_type(url):
         return None
 
 
-def stac_root_link(url, return_col_id=False):
+def stac_root_link(url, return_col_id=False, **kwargs):
     """Get the root link of a STAC object.
 
     Args:
         url (str): The STAC object URL.
         return_col_id (bool, optional): Return the collection ID if the STAC object is a collection. Defaults to False.
+        **kwargs: Keyword arguments for pystac.STACObject.from_file(). Defaults to None.
 
     Returns:
         str: The root link of the STAC object.
     """
     collection_id = None
     try:
-        obj = pystac.STACObject.from_file(url)
+        obj = pystac.STACObject.from_file(url, **kwargs)
         if isinstance(obj, pystac.Collection):
             collection_id = obj.id
         href = obj.get_root_link().get_href()
@@ -1461,11 +1463,12 @@ def set_default_bands(bands):
         return bands[:3]
 
 
-def maxar_collections(return_ids=True):
+def maxar_collections(return_ids=True, **kwargs):
     """Get a list of Maxar collections.
 
     Args:
         return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
+        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         list : A list of Maxar collections.
@@ -1491,7 +1494,7 @@ def maxar_collections(return_ids=True):
     else:
         url = "https://maxar-opendata.s3.amazonaws.com/events/catalog.json"
 
-    root_catalog = Catalog.from_file(url)
+    root_catalog = Catalog.from_file(url, **kwargs)
 
     collections = root_catalog.get_collections()
 
@@ -1505,13 +1508,14 @@ def maxar_collections(return_ids=True):
     return collections
 
 
-def maxar_child_collections(collection_id, return_ids=True):
+def maxar_child_collections(collection_id, return_ids=True, **kwargs):
     """Get a list of Maxar child collections.
 
     Args:
         collection_id (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23
             Use maxar_collections() to retrieve all available collection IDs.
         return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
+        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         list: A list of Maxar child collections.
@@ -1531,7 +1535,7 @@ def maxar_child_collections(collection_id, return_ids=True):
     else:
         url = "https://maxar-opendata.s3.amazonaws.com/events/catalog.json"
 
-    root_catalog = Catalog.from_file(url)
+    root_catalog = Catalog.from_file(url, **kwargs)
 
     collections = root_catalog.get_child(collection_id).get_collections()
 
@@ -1545,7 +1549,7 @@ def maxar_child_collections(collection_id, return_ids=True):
         return collections
 
 
-def maxar_items(collection_id, child_id, return_gdf=True, assets=["visual"]):
+def maxar_items(collection_id, child_id, return_gdf=True, assets=["visual"], **kwargs):
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1556,6 +1560,7 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=["visual"]):
         return_gdf (bool, optional): If True, return a GeoDataFrame. Defaults to True.
         assets (list, optional): A list of asset names to include in the GeoDataFrame.
             It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
+        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
@@ -1606,7 +1611,7 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=["visual"]):
     else:
         url = "https://maxar-opendata.s3.amazonaws.com/events/catalog.json"
 
-    root_catalog = Catalog.from_file(url)
+    root_catalog = Catalog.from_file(url, **kwargs)
 
     collection = root_catalog.get_child(collection_id)
     child = collection.get_child(child_id)
@@ -1646,7 +1651,9 @@ def maxar_items(collection_id, child_id, return_gdf=True, assets=["visual"]):
         return items
 
 
-def maxar_all_items(collection_id, return_gdf=True, assets=["visual"], verbose=True):
+def maxar_all_items(
+    collection_id, return_gdf=True, assets=["visual"], verbose=True, **kwargs
+):
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1655,18 +1662,20 @@ def maxar_all_items(collection_id, return_gdf=True, assets=["visual"], verbose=T
         return_gdf (bool, optional): If True, return a GeoDataFrame. Defaults to True.
         assets (list, optional): A list of asset names to include in the GeoDataFrame.
             It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
+        verbose (bool, optional): If True, print progress. Defaults to True.
+        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
     """
 
-    child_ids = maxar_child_collections(collection_id)
+    child_ids = maxar_child_collections(collection_id, **kwargs)
     for index, child_id in enumerate(child_ids):
         if verbose:
             print(
                 f"Processing ({str(index+1).zfill(len(str(len(child_ids))))} out of {len(child_ids)}): {child_id} ..."
             )
-        items = maxar_items(collection_id, child_id, return_gdf, assets)
+        items = maxar_items(collection_id, child_id, return_gdf, assets, **kwargs)
         if return_gdf:
             if child_id == child_ids[0]:
                 gdf = items
