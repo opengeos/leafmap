@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.19.1 - Apr 21, 2023
+
+**New Features**
+
+-   Added tms_to_geotiff function (#420)
+-   Added tif_to_jp2 function (#424)
+
+**Improvement**
+
+-   Add request_modifier param to stac_client (#421)
+-   Added marker cluster radius option (#417)
+-   Fixed custom STAC GUI bug (#414)
+
 ## v0.19.0 - Apr 10, 2023
 
 **New Features**
