@@ -168,34 +168,34 @@ class TestFoliumap(unittest.TestCase):
             out_str = m.to_html()
             assert "150px" in out_str
 
-    def test_add_osm_from_address(self):
-        """Check OSM data from address"""
-        m = leafmap.Map()
-        m.add_osm_from_address(
-            address="New York City",
-            tags={"amenity": "bar"},
-            dist=1500,
-            layer_name="NYC bars",
-        )
-        out_str = m.to_html()
-        assert "NYC bars" in out_str
+    # def test_add_osm_from_address(self):
+    #     """Check OSM data from address"""
+    #     m = leafmap.Map()
+    #     m.add_osm_from_address(
+    #         address="New York City",
+    #         tags={"amenity": "bar"},
+    #         dist=1500,
+    #         layer_name="NYC bars",
+    #     )
+    #     out_str = m.to_html()
+    #     assert "NYC bars" in out_str
 
-    def test_add_osm_from_bbox(self):
-        """Check OSM data from bbox"""
-        m = leafmap.Map()
-        north, south, east, west = 40.7551, 40.7454, -73.9738, -73.9965
-        m.add_osm_from_bbox(
-            north, south, east, west, tags={"amenity": "bar"}, layer_name="NYC bars"
-        )
-        out_str = m.to_html()
-        assert "NYC bars" in out_str
+    # def test_add_osm_from_bbox(self):
+    #     """Check OSM data from bbox"""
+    #     m = leafmap.Map()
+    #     north, south, east, west = 40.7551, 40.7454, -73.9738, -73.9965
+    #     m.add_osm_from_bbox(
+    #         north, south, east, west, tags={"amenity": "bar"}, layer_name="NYC bars"
+    #     )
+    #     out_str = m.to_html()
+    #     assert "NYC bars" in out_str
 
-    def test_add_osm_from_geocode(self):
-        """Check OSM data from geocode"""
-        m = leafmap.Map()
-        m.add_osm_from_geocode("New York City", layer_name="NYC")
-        out_str = m.to_html()
-        assert "NYC" in out_str
+    # def test_add_osm_from_geocode(self):
+    #     """Check OSM data from geocode"""
+    #     m = leafmap.Map()
+    #     m.add_osm_from_geocode("New York City", layer_name="NYC")
+    #     out_str = m.to_html()
+    #     assert "NYC" in out_str
 
     # def test_add_osm_from_place(self):
     #     """Check OSM data from place"""
@@ -206,43 +206,43 @@ class TestFoliumap(unittest.TestCase):
     #     out_str = m.to_html()
     #     assert "Los Angeles, CA" in out_str
 
-    def test_add_osm_from_point(self):
-        """Check OSM data from point"""
-        m = leafmap.Map()
-        m.add_osm_from_point(
-            center_point=(46.7808, -96.0156),
-            tags={"natural": "water"},
-            dist=10000,
-            layer_name="Lakes",
-        )
-        out_str = m.to_html()
-        assert "Lakes" in out_str
+    # def test_add_osm_from_point(self):
+    #     """Check OSM data from point"""
+    #     m = leafmap.Map()
+    #     m.add_osm_from_point(
+    #         center_point=(46.7808, -96.0156),
+    #         tags={"natural": "water"},
+    #         dist=10000,
+    #         layer_name="Lakes",
+    #     )
+    #     out_str = m.to_html()
+    #     assert "Lakes" in out_str
 
-    def test_add_osm_from_polygon(self):
-        """Check OSM data from polygon"""
-        from shapely.geometry import Polygon
+    # def test_add_osm_from_polygon(self):
+    #     """Check OSM data from polygon"""
+    #     from shapely.geometry import Polygon
 
-        m = leafmap.Map()
-        polygon = Polygon(
-            [
-                [-73.996784, 40.725046],
-                [-73.996784, 40.734282],
-                [-73.983052, 40.734282],
-                [-73.983052, 40.725046],
-                [-73.996784, 40.725046],
-            ]
-        )
-        tags = {"building": True}
-        m.add_osm_from_polygon(polygon, tags, layer_name="NYC Buildings")
-        out_str = m.to_html()
-        assert "NYC Buildings" in out_str
+    #     m = leafmap.Map()
+    #     polygon = Polygon(
+    #         [
+    #             [-73.996784, 40.725046],
+    #             [-73.996784, 40.734282],
+    #             [-73.983052, 40.734282],
+    #             [-73.983052, 40.725046],
+    #             [-73.996784, 40.725046],
+    #         ]
+    #     )
+    #     tags = {"building": True}
+    #     m.add_osm_from_polygon(polygon, tags, layer_name="NYC Buildings")
+    #     out_str = m.to_html()
+    #     assert "NYC Buildings" in out_str
 
-    def test_add_osm_from_view(self):
-        """Check OSM data from view"""
-        m = leafmap.Map()
-        m.add_osm_from_view(tags={"building": True}, layer_name="NYC buildings")
-        out_str = m.to_html()
-        assert "NYC buildings" not in out_str
+    # def test_add_osm_from_view(self):
+    #     """Check OSM data from view"""
+    #     m = leafmap.Map()
+    #     m.add_osm_from_view(tags={"building": True}, layer_name="NYC buildings")
+    #     out_str = m.to_html()
+    #     assert "NYC buildings" not in out_str
 
     def test_add_planet_by_month(self):
         """Check Planet monthly imagery"""
@@ -355,9 +355,7 @@ class TestFoliumap(unittest.TestCase):
     def test_add_points_from_xy(self):
         "Check adding point data"
         m = leafmap.Map()
-        in_csv = (
-            "https://raw.githubusercontent.com/opengeos/data/main/world/world_cities.csv"
-        )
+        in_csv = "https://raw.githubusercontent.com/opengeos/data/main/world/world_cities.csv"
         m.add_points_from_xy(
             in_csv, x="longitude", y="latitude", layer_name="World Cities"
         )

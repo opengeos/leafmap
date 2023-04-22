@@ -8619,6 +8619,7 @@ def tms_to_geotiff(
     zoom=None,
     resolution=None,
     source="OpenStreetMap",
+    crs="EPSG:4326",
     to_cog=False,
     quiet=False,
     **kwargs,
@@ -8633,6 +8634,7 @@ def tms_to_geotiff(
         resolution (float, optional): The resolution in meters. Defaults to None.
         source (str, optional): The tile source. It can be one of the following: "OPENSTREETMAP", "ROADMAP",
             "SATELLITE", "TERRAIN", "HYBRID", or an HTTP URL. Defaults to "OpenStreetMap".
+        crs (str, optional): The coordinate reference system. Defaults to "EPSG:4326".
         to_cog (bool, optional): Convert to Cloud Optimized GeoTIFF. Defaults to False.
         quiet (bool, optional): Suppress output. Defaults to False.
         **kwargs: Additional arguments to pass to gdal.GetDriverByName("GTiff").Create().
@@ -8890,7 +8892,31 @@ def tms_to_geotiff(
 
     try:
         draw_tile(source, south, west, north, east, zoom, output, quiet, **kwargs)
-        if to_cog:
+        if crs.upper() != "EPSG:4326":
+            reproject(output, output, crs, to_cog=to_cog)
+        elif to_cog:
             image_to_cog(output, output)
     except Exception as e:
         raise Exception(e)
+
+
+def tif_to_jp2(filename, output, **kwargs):
+    """Converts a GeoTIFF to JPEG2000.
+
+    Args:
+        filename (str): The path to the GeoTIFF file.
+        output (str): The path to the output JPEG2000 file.
+
+    """
+
+    if not os.path.exists(filename):
+        raise Exception(f"File {filename} does not exist")
+
+    if not output.endswith(".jp2"):
+        output += ".jp2"
+
+    from osgeo import gdal
+
+    in_ds = gdal.Open(filename)
+    gdal.Translate(output, in_ds, format="JP2OpenJPEG")
+    in_ds = None
