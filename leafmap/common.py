@@ -8641,7 +8641,7 @@ def tms_to_geotiff(
     zoom=None,
     resolution=None,
     source="OpenStreetMap",
-    crs="EPSG:4326",
+    crs="EPSG:3857",
     to_cog=False,
     quiet=False,
     **kwargs,
@@ -8656,7 +8656,7 @@ def tms_to_geotiff(
         resolution (float, optional): The resolution in meters. Defaults to None.
         source (str, optional): The tile source. It can be one of the following: "OPENSTREETMAP", "ROADMAP",
             "SATELLITE", "TERRAIN", "HYBRID", or an HTTP URL. Defaults to "OpenStreetMap".
-        crs (str, optional): The coordinate reference system. Defaults to "EPSG:4326".
+        crs (str, optional): The coordinate reference system. Defaults to "EPSG:3857".
         to_cog (bool, optional): Convert to Cloud Optimized GeoTIFF. Defaults to False.
         quiet (bool, optional): Suppress output. Defaults to False.
         **kwargs: Additional arguments to pass to gdal.GetDriverByName("GTiff").Create().
@@ -8914,7 +8914,7 @@ def tms_to_geotiff(
 
     try:
         draw_tile(source, south, west, north, east, zoom, output, quiet, **kwargs)
-        if crs.upper() != "EPSG:4326":
+        if crs.upper() != "EPSG:3857":
             reproject(output, output, crs, to_cog=to_cog)
         elif to_cog:
             image_to_cog(output, output)
@@ -8922,12 +8922,16 @@ def tms_to_geotiff(
         raise Exception(e)
 
 
-def tif_to_jp2(filename, output, **kwargs):
+def tif_to_jp2(filename, output, creationOptions=None):
     """Converts a GeoTIFF to JPEG2000.
 
     Args:
         filename (str): The path to the GeoTIFF file.
         output (str): The path to the output JPEG2000 file.
+        creationOptions (list): A list of creation options for the JPEG2000 file. See
+            https://gdal.org/drivers/raster/jp2openjpeg.html. For example, to specify the compression
+            ratio, use ``["QUALITY=20"]``. A value of 20 means the file will be 20% of the size in comparison
+            to uncompressed data.
 
     """
 
@@ -8940,5 +8944,5 @@ def tif_to_jp2(filename, output, **kwargs):
     from osgeo import gdal
 
     in_ds = gdal.Open(filename)
-    gdal.Translate(output, in_ds, format="JP2OpenJPEG")
+    gdal.Translate(output, in_ds, format="JP2OpenJPEG", creationOptions=creationOptions)
     in_ds = None
