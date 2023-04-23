@@ -7358,6 +7358,7 @@ def create_timelapse(
     ext: str = ".tif",
     bands: Optional[list] = None,
     size: Optional[tuple] = None,
+    bbox: Optional[list] = None,
     fps: int = 5,
     loop: int = 0,
     add_progress_bar: bool = True,
@@ -7384,6 +7385,7 @@ def create_timelapse(
         ext (str, optional): The extension of the images. Defaults to '.tif'.
         bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
         size (Optional[tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        bbox (Optional[list], optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
         fps (int, optional): The frames per second of the gif. Defaults to 5.
         loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.
         add_progress_bar (bool, optional): Whether to add a progress bar to the gif. Defaults to True.
@@ -7420,6 +7422,17 @@ def create_timelapse(
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
 
+    if bbox is not None:
+        clip_dir = os.path.join(tempfile.gettempdir(), "clip")
+        if not os.path.exists(clip_dir):
+            os.makedirs(clip_dir)
+
+        if len(bbox) == 4:
+            bbox = bbox_to_geojson(bbox)
+
+    else:
+        clip_dir = None
+
     output = widgets.Output()
 
     if "out_ext" in kwargs:
@@ -7429,6 +7442,12 @@ def create_timelapse(
 
     try:
         for index, image in enumerate(images):
+            if bbox is not None:
+                clip_file = os.path.join(clip_dir, os.path.basename(image))
+                with output:
+                    clip_image(image, mask=bbox, output=clip_file, to_cog=False)
+                image = clip_file
+
             if "add_prefix" in kwargs:
                 basename = (
                     str(f"{index + 1}").zfill(len(str(len(images))))
@@ -7454,6 +7473,9 @@ def create_timelapse(
             mp4=mp4,
             clean_up=clean_up,
         )
+
+        if clip_dir is not None:
+            shutil.rmtree(clip_dir)
 
         if add_text:
             add_text_to_gif(
