@@ -4413,7 +4413,7 @@ def edit_draw_gui(m):
         return toolbar_widget
 
 
-def stac_gui(m=None):
+def stac_gui(m=None, **kwargs):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -4433,7 +4433,7 @@ def stac_gui(m=None):
             print("Invalid STAC_CATALOGS environment variable.")
 
     if hasattr(m, "_STAC_CATALOGS"):
-        stac_custom_gui(m)
+        stac_custom_gui(m, **kwargs)
         return
 
     widget_width = "450px"
@@ -5111,11 +5111,12 @@ def stac_gui(m=None):
         return toolbar_widget
 
 
-def stac_custom_gui(m=None):
+def stac_custom_gui(m=None, **kwargs):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
         m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+        **kwargs: Additional keyword arguments that will be passed to the pystac Client.open() function.
 
     Returns:
         ipywidgets: The tool GUI widget.
@@ -5498,7 +5499,9 @@ def stac_custom_gui(m=None):
                     collection.options = []
                     collection.value = None
 
-                    collections = stac_collections(endpoint.value, return_ids=True)
+                    collections = stac_collections(
+                        endpoint.value, return_ids=True, **kwargs
+                    )
                     if collections:
                         collections.sort()
                         collection.options = collections
@@ -5589,7 +5592,7 @@ def stac_custom_gui(m=None):
                             collections = m._STAC_COLLECTIONS[catalog.value]
                         else:
                             collections = stac_collections(
-                                endpoint.value, return_ids=True
+                                endpoint.value, return_ids=True, **kwargs
                             )
 
                         if collections:
@@ -5658,6 +5661,7 @@ def stac_custom_gui(m=None):
                             intersects=intersects,
                             datetime=datetime,
                             **query,
+                            **kwargs,
                         )
                         search_dict = stac_search_to_dict(search)
                         item.options = list(search_dict.keys())
