@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.20.1 - May 7, 2023
+
+**New Features**
+
+-   Added `image_comparison` for comparing images with a slider (#441)
+-   Added `show_html` function (#441)
+
 ## v0.20.0 - Apr 24, 2023
 
 **New Features**

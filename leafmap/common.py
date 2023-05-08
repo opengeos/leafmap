@@ -9207,3 +9207,22 @@ def image_comparison(
     shutil.rmtree(TEMP_DIR)
 
     display(HTML(htmlcode))
+
+
+def show_html(filename, width="100%", height="600px", **kwargs):
+    """Show an HTML file in a Jupyter notebook.
+
+    Args:
+        filename (str): The path to the HTML file.
+        width (str, optional): The width of the HTML file. Defaults to "100%".
+        height (str, optional): The height of the HTML file. Defaults to "600px".
+
+    Returns:
+        IFrame: An IFrame object.
+    """
+
+    from IPython.display import IFrame
+    if not os.path.exists(filename):
+        raise Exception(f"File {filename} does not exist")
+    
+    return IFrame(filename, width=width, height=height, **kwargs)
