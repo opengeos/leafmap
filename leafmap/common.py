@@ -9209,7 +9209,7 @@ def image_comparison(
     display(HTML(htmlcode))
 
 
-def show_html(filename, width="100%", height="600px", **kwargs):
+def display_html(filename, width="100%", height="600px", **kwargs):
     """Show an HTML file in a Jupyter notebook.
 
     Args:
