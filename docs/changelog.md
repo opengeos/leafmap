@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.20.2 - May 10, 2023
+
+**Improvement**
+
+-   Added repeat mode for draw control (#443)
+-   Changed show_html to display_html
+
 ## v0.20.1 - May 7, 2023
 
 **New Features**
