@@ -101,16 +101,35 @@ class Map(ipyleaflet.Map):
 
         if "draw_control" not in kwargs:
             kwargs["draw_control"] = True
+
+        if "repeat_mode" not in kwargs:
+            repeat_mode = False
+        else:
+            repeat_mode = kwargs["repeat_mode"]
+            kwargs.pop("repeat_mode")
+
         if kwargs["draw_control"]:
             draw_control = ipyleaflet.DrawControl(
-                marker={"shapeOptions": {"color": "#3388ff"}},
-                rectangle={"shapeOptions": {"color": "#3388ff"}},
-                circle={"shapeOptions": {"color": "#3388ff"}},
-                circlemarker={},
+                polyline={"repeatMode": repeat_mode},
+                polygon={"repeatMode": repeat_mode},
+                marker={
+                    "shapeOptions": {"color": "#3388ff"},
+                    "repeatMode": repeat_mode,
+                },
+                rectangle={
+                    "shapeOptions": {"color": "#3388ff"},
+                    "repeatMode": repeat_mode,
+                },
+                circle={
+                    "shapeOptions": {"color": "#3388ff"},
+                    "repeatMode": repeat_mode,
+                },
+                # circlemarker={"repeatMode": repeat_mode},
                 edit=True,
                 remove=True,
                 position="topleft",
             )
+            draw_control.circlemarker = {}
             self.add(draw_control)
             self.draw_control = draw_control
 
@@ -823,6 +842,7 @@ class Map(ipyleaflet.Map):
         shown=True,
         bands=None,
         titiler_endpoint=None,
+        zoom_to_layer=True,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -835,6 +855,7 @@ class Map(ipyleaflet.Map):
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
             **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
@@ -843,8 +864,9 @@ class Map(ipyleaflet.Map):
         tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
         bounds = cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
-        self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+        if zoom_to_layer:
+            self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -1829,6 +1851,7 @@ class Map(ipyleaflet.Map):
         nodata=None,
         attribution=None,
         layer_name="Local COG",
+        zoom_to_layer=True,
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -1847,6 +1870,7 @@ class Map(ipyleaflet.Map):
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
+            zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
         """
 
         tile_layer, tile_client = get_local_tile_layer(
@@ -1871,10 +1895,12 @@ class Map(ipyleaflet.Map):
             bounds[3],
             bounds[1],
         )  # [minx, miny, maxx, maxy]
-        self.zoom_to_bounds(bounds)
+        if zoom_to_layer:
+            self.zoom_to_bounds(bounds)
 
         arc_add_layer(tile_layer.url, layer_name, True, 1.0)
-        arc_zoom_to_extent(bounds[2], bounds[0], bounds[3], bounds[1])
+        if zoom_to_layer:
+            arc_zoom_to_extent(bounds[2], bounds[0], bounds[3], bounds[1])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -3874,6 +3900,13 @@ class Map(ipyleaflet.Map):
             self.catalog_source = {}
 
         self._STAC_CATALOGS = source
+
+    def clear_drawings(self):
+        """Clear drawings on the map."""
+        self.draw_control.clear()
+        self.draw_features = []
+        self.user_rois = None
+        self.user_roi = None
 
 
 # The functions below are outside the Map class.
