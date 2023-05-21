@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.20.3 - May 20, 2023
+
+**Improvement**
+
+-   Added arc_zoom_to_bounds function (#447)
+
 ## v0.20.2 - May 10, 2023
 
 **Improvement**
