@@ -8096,6 +8096,26 @@ def arc_zoom_to_extent(xmin, ymin, xmax, ymax):
         #     view.camera.scale = scale  # Not working properly
 
 
+def arc_zoom_to_bounds(bounds):
+    """Zoom to a bounding box.
+
+    Args:
+        bounds (list): The bounding box to zoom to in the form [xmin, ymin, xmax, ymax] or [(ymin, xmin), (ymax, xmax)].
+
+    Raises:
+        ValueError: _description_
+    """
+
+    if len(bounds) == 4:
+        xmin, ymin, xmax, ymax = bounds
+    elif len(bounds) == 2:
+        (ymin, xmin), (ymax, xmax) = bounds
+    else:
+        raise ValueError("bounds must be a tuple of length 2 or 4.")
+
+    arc_zoom_to_extent(xmin, ymin, xmax, ymax)
+
+
 def vector_to_raster(
     vector,
     output,
@@ -9222,7 +9242,8 @@ def display_html(filename, width="100%", height="600px", **kwargs):
     """
 
     from IPython.display import IFrame
+
     if not os.path.exists(filename):
         raise Exception(f"File {filename} does not exist")
-    
+
     return IFrame(filename, width=width, height=height, **kwargs)

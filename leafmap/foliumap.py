@@ -412,7 +412,7 @@ class Map(folium.Map):
         self.zoom_to_bounds(bounds)
 
         arc_add_layer(tile_layer.tiles, layer_name, True, 1.0)
-        arc_zoom_to_extent(bounds[2], bounds[0], bounds[3], bounds[1])
+        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     add_local_tile = add_raster
 

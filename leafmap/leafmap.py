@@ -1900,7 +1900,7 @@ class Map(ipyleaflet.Map):
 
         arc_add_layer(tile_layer.url, layer_name, True, 1.0)
         if zoom_to_layer:
-            arc_zoom_to_extent(bounds[2], bounds[0], bounds[3], bounds[1])
+            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
