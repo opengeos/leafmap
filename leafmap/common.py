@@ -1428,6 +1428,7 @@ def shp_to_geojson(in_shp, out_json=None, encoding="utf-8", **kwargs):
         import shapefile
 
         in_shp = os.path.abspath(in_shp)
+        out_shp = None
 
         if out_json is not None:
             ext = os.path.splitext(out_json)[1]
@@ -1450,7 +1451,7 @@ def shp_to_geojson(in_shp, out_json=None, encoding="utf-8", **kwargs):
             try:
                 in_gdf = gpd.read_file(in_shp, encoding=encoding)
                 out_gdf = in_gdf.to_crs(epsg="4326")
-                out_shp = in_shp.replace(".shp", "_gcs.shp")
+                out_shp = temp_file_path(".shp")
                 out_gdf.to_file(out_shp)
                 in_shp = out_shp
             except Exception as e:
@@ -1462,6 +1463,12 @@ def shp_to_geojson(in_shp, out_json=None, encoding="utf-8", **kwargs):
         else:
             reader = shapefile.Reader(in_shp)
         out_dict = reader.__geo_interface__
+
+        if out_shp is not None and os.path.exists(out_shp):
+            try:
+                delete_shp(out_shp)
+            except Exception:
+                pass
 
         if out_json is not None:
             import json
@@ -8677,7 +8684,7 @@ def tms_to_geotiff(
 
     Args:
         output (str): The output GeoTIFF file.
-        bbox (list): The bounding box [minx, miny, maxx, maxy], e.g., [-122.5216, 37.733, -122.3661, 37.8095]
+        bbox (list): The bounding box [minx, miny, maxx, maxy] coordinates in EPSG:4326, e.g., [-122.5216, 37.733, -122.3661, 37.8095]
         zoom (int, optional): The map zoom level. Defaults to None.
         resolution (float, optional): The resolution in meters. Defaults to None.
         source (str, optional): The tile source. It can be one of the following: "OPENSTREETMAP", "ROADMAP",
