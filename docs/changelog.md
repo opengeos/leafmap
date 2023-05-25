@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.20.4 - May 25, 2023
+
+**Improvement**
+
+-   Improved handling of crs conversion (#449)
+
 ## v0.20.3 - May 20, 2023
 
 **Improvement**
