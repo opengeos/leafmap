@@ -247,7 +247,7 @@ def main_toolbar(m):
             "name": "save_map",
             "tooltip": "Save map as HTML or image",
         },
-        "address-book": {
+        "filter": {
             "name": "census",
             "tooltip": "Get US Census data",
         },
@@ -1557,16 +1557,9 @@ def change_basemap(m):
         m (object): leafmap.Map.
     """
     from .basemaps import get_xyz_dict
-    from .leafmap import basemaps
+    from .leafmap import basemaps, get_basemap
 
     xyz_dict = get_xyz_dict()
-
-    layers = list(m.layers)
-    if len(layers) == 1:
-        layers = [layers[0]] + [basemaps["OpenStreetMap"]]
-    elif len(layers) > 1 and (layers[1].name != "OpenStreetMap"):
-        layers = [layers[0]] + [basemaps["OpenStreetMap"]] + layers[1:]
-    m.layers = layers
 
     value = "OpenStreetMap"
 
@@ -1586,14 +1579,20 @@ def change_basemap(m):
     basemap_widget = widgets.HBox([dropdown, close_btn])
 
     def on_click(change):
-        basemap_name = change["new"]
-        old_basemap = m.layers[1]
-        m.substitute_layer(old_basemap, basemaps[basemap_name])
-        if basemap_name in xyz_dict:
-            if "bounds" in xyz_dict[basemap_name]:
-                bounds = xyz_dict[basemap_name]["bounds"]
-                bounds = [bounds[0][1], bounds[0][0], bounds[1][1], bounds[1][0]]
-                m.zoom_to_bounds(bounds)
+        if change["new"]:
+            basemap_name = dropdown.value
+            if basemap_name not in m.get_layer_names():
+                m.add_basemap(basemap_name)
+                if basemap_name in xyz_dict:
+                    if "bounds" in xyz_dict[basemap_name]:
+                        bounds = xyz_dict[basemap_name]["bounds"]
+                        bounds = [
+                            bounds[0][1],
+                            bounds[0][0],
+                            bounds[1][1],
+                            bounds[1][0],
+                        ]
+                        m.zoom_to_bounds(bounds)
 
     dropdown.observe(on_click, "value")
 
@@ -1725,33 +1724,38 @@ def split_basemaps(
         right_name (str, optional): The default value of the right dropdown list. Defaults to None.
         width (str, optional): The width of the dropdown list. Defaults to "120px".
     """
-    from .leafmap import basemaps
+    from .basemaps import wms_tiles
+    from .leafmap import basemaps, get_basemap
 
     controls = m.controls
     layers = m.layers
-    # m.layers = [m.layers[0]]
     m.clear_controls()
 
     add_zoom = True
     add_fullscreen = True
 
     if layers_dict is None:
-        layers_dict = {}
-        keys = dict(basemaps).keys()
-        for key in keys:
-            if isinstance(basemaps[key], ipyleaflet.WMSLayer):
-                pass
-            else:
-                layers_dict[key] = basemaps[key]
-
-    keys = list(layers_dict.keys())
+        keys = []
+        tmp_keys = list(basemaps.keys())
+        for key in tmp_keys:
+            if key not in wms_tiles:
+                keys.append(key)
+    else:
+        keys = list(layers_dict.keys())
     if left_name is None:
-        left_name = keys[0]
+        left_name = "ROADMAP"
     if right_name is None:
-        right_name = keys[-1]
+        right_name = "HYBRID"
 
-    left_layer = layers_dict[left_name]
-    right_layer = layers_dict[right_name]
+    if layers_dict is None:
+        if isinstance(left_name, str):
+            left_layer = get_basemap(left_name)
+
+        if isinstance(right_name, str):
+            right_layer = get_basemap(right_name)
+    else:
+        left_layer = layers_dict[left_name]
+        right_layer = layers_dict[right_name]
 
     control = ipyleaflet.SplitMapControl(left_layer=left_layer, right_layer=right_layer)
     m.add(control)
@@ -1803,12 +1807,18 @@ def split_basemaps(
             break
 
     def left_change(change):
-        split_control.left_layer.url = layers_dict[left_dropdown.value].url
+        if layers_dict is None:
+            split_control.left_layer.url = get_basemap(left_dropdown.value).url
+        else:
+            split_control.left_layer.url = layers_dict[left_dropdown.value].url
 
     left_dropdown.observe(left_change, "value")
 
     def right_change(change):
-        split_control.right_layer.url = layers_dict[right_dropdown.value].url
+        if layers_dict is None:
+            split_control.right_layer.url = get_basemap(right_dropdown.value).url
+        else:
+            split_control.right_layer.url = layers_dict[right_dropdown.value].url
 
     right_dropdown.observe(right_change, "value")
 
@@ -1951,7 +1961,7 @@ def census_widget(m=None):
     toolbar_button = widgets.ToggleButton(
         value=False,
         tooltip="Toolbar",
-        icon="address-book",
+        icon="filter",
         layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
     )
 
