@@ -978,13 +978,13 @@ class Map(ipyleaflet.Map):
             zoom (int, optional): Initial map zoom level. Defaults to 5.
             position (str, optional): Position of the minimap. Defaults to "bottomright".
         """
-
+        layers = [get_basemap("ROADMAP")]
         minimap = ipyleaflet.Map(
             zoom_control=False,
             attribution_control=False,
             zoom=zoom,
             center=self.center,
-            layers=[basemaps["ROADMAP"]],
+            layers=layers,
         )
         minimap.layout.width = "150px"
         minimap.layout.height = "150px"
@@ -1145,7 +1145,7 @@ class Map(ipyleaflet.Map):
                 right_name = "Right Layer"
 
             if left_layer in basemaps.keys():
-                left_layer = basemaps[left_layer]
+                left_layer = get_basemap(left_layer)
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer, **left_args)
@@ -1203,7 +1203,7 @@ class Map(ipyleaflet.Map):
                 )
 
             if right_layer in basemaps.keys():
-                right_layer = basemaps[right_layer]
+                right_layer = get_basemap(right_layer)
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(
@@ -1307,7 +1307,7 @@ class Map(ipyleaflet.Map):
         def on_click(change):
             basemap_name = change["new"]
             old_basemap = self.layers[-1]
-            self.substitute_layer(old_basemap, basemaps[basemap_name])
+            self.substitute_layer(old_basemap, get_basemap(basemap_name))
 
         dropdown.observe(on_click, "value")
         basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
@@ -4041,7 +4041,7 @@ def linked_maps(
             )
 
             if layers[index] in basemaps.keys():
-                layers[index] = basemaps[layers[index]]
+                layers[index] = get_basemap(layers[index])
             elif isinstance(layers[index], str):
                 if layers[index].startswith("http") and layers[index].endswith(".tif"):
                     url = cog_tile(layers[index], **layer_args[index])
@@ -4144,7 +4144,7 @@ def split_map(
 
     try:
         if left_layer in basemaps.keys():
-            left_layer = basemaps[left_layer]
+            left_layer = get_basemap(left_layer)
         elif isinstance(left_layer, str):
             if left_layer.startswith("http") and left_layer.endswith(".tif"):
                 url = cog_tile(left_layer, **left_args)
@@ -4193,7 +4193,7 @@ def split_map(
             )
 
         if right_layer in basemaps.keys():
-            right_layer = basemaps[right_layer]
+            right_layer = get_basemap(right_layer)
         elif isinstance(right_layer, str):
             if right_layer.startswith("http") and right_layer.endswith(".tif"):
                 url = cog_tile(
@@ -4302,7 +4302,7 @@ def ts_inspector(
         layers_dict = {}
         keys = dict(basemaps).keys()
         for key in keys:
-            if isinstance(basemaps[key], ipyleaflet.WMSLayer):
+            if basemaps[key]['type'] == 'wms':
                 pass
             else:
                 layers_dict[key] = basemaps[key]
