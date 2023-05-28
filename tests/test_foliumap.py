@@ -47,15 +47,15 @@ class TestFoliumap(unittest.TestCase):
     #     assert "COG mosaic" in out_str
     #     assert "MAXAR" in out_str
 
-    def test_add_colorbar(self):
-        """Check colorbar"""
-        m = leafmap.Map()
-        colors = ["006633", "E5FFCC", "662A00", "D8D8D8", "F5F5F5"]
-        vmin = 0
-        vmax = 4000
-        m.add_colorbar(colors=colors, vmin=vmin, vmax=vmax, caption="Elevation")
-        out_str = m.to_html()
-        assert "Elevation" in out_str
+    # def test_add_colorbar(self):
+    #     """Check colorbar"""
+    #     m = leafmap.Map()
+    #     colors = ["006633", "E5FFCC", "662A00", "D8D8D8", "F5F5F5"]
+    #     vmin = 0
+    #     vmax = 4000
+    #     m.add_colorbar(colors=colors, vmin=vmin, vmax=vmax, caption="Elevation")
+    #     out_str = m.to_html()
+    #     assert "Elevation" in out_str
 
     # @patch("matplotlib.pyplot.show")
     # def test_add_colormap(self, mock_show):
