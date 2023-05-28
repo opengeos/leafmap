@@ -44,7 +44,7 @@ xyz_tiles = {
     "HYBRID": {
         "url": "https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}",
         "attribution": "Google",
-        "name": "Google Satellite",
+        "name": "Google Hybrid",
     },
 }
 
@@ -250,6 +250,7 @@ def get_xyz_dict(free_only=True):
                     xyz_dict[name] = tile
             else:
                 xyz_dict[name] = tile
+            tile["type"] = "xyz"
 
         except Exception:
             for sub_item in item:
@@ -262,6 +263,7 @@ def get_xyz_dict(free_only=True):
                         xyz_dict[name] = tile
                 else:
                     xyz_dict[name] = tile
+                tile["type"] = "xyz"
 
     xyz_dict = collections.OrderedDict(sorted(xyz_dict.items()))
     return xyz_dict
@@ -276,45 +278,20 @@ def xyz_to_leaflet():
     leaflet_dict = {}
 
     for key in xyz_tiles:
+        xyz_tiles[key]["type"] = "xyz"
         name = xyz_tiles[key]["name"]
-        url = xyz_tiles[key]["url"]
-        attribution = xyz_tiles[key]["attribution"]
-        leaflet_dict[key] = ipyleaflet.TileLayer(
-            url=url, name=name, attribution=attribution, max_zoom=22
-        )
+        leaflet_dict[key] = xyz_tiles[key]
 
     for key in wms_tiles:
+        wms_tiles[key]["type"] = "wms"
         name = wms_tiles[key]["name"]
-        url = wms_tiles[key]["url"]
-        layers = wms_tiles[key]["layers"]
-        fmt = wms_tiles[key]["format"]
-        transparent = wms_tiles[key]["transparent"]
-        attribution = wms_tiles[key]["attribution"]
-        leaflet_dict[key] = ipyleaflet.WMSLayer(
-            url=url,
-            layers=layers,
-            name=name,
-            attribution=attribution,
-            format=fmt,
-            transparent=transparent,
-        )
+        leaflet_dict[key] = wms_tiles[key]
 
     xyz_dict = get_xyz_dict()
     for item in xyz_dict:
         name = xyz_dict[item].name
-        url = xyz_dict[item].build_url()
-        attribution = xyz_dict[item].attribution
-        if "max_zoom" in xyz_dict[item].keys():
-            max_zoom = xyz_dict[item]["max_zoom"]
-        else:
-            max_zoom = 22
-        leaflet_dict[name] = ipyleaflet.TileLayer(
-            url=url, name=name, max_zoom=max_zoom, attribution=attribution
-        )
-
-    if os.environ.get("PLANET_API_KEY") is not None:
-        planet_dict = planet_tiles(tile_format="ipyleaflet")
-        leaflet_dict.update(planet_dict)
+        xyz_dict[item]["url"] = xyz_dict[item].build_url()
+        leaflet_dict[name] = xyz_dict[item]
 
     return leaflet_dict
 
