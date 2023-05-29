@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.21.0 - May 28, 2023
+
+**New Features**
+
+-   Added support for Solara web apps (#450)
+
+**Improvement**
+
+-   Improved support for stac GUI (#436)
+
 ## v0.20.4 - May 25, 2023
 
 **Improvement**
