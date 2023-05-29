@@ -1742,10 +1742,17 @@ def split_basemaps(
                 keys.append(key)
     else:
         keys = list(layers_dict.keys())
-    if left_name is None:
-        left_name = "ROADMAP"
-    if right_name is None:
-        right_name = "HYBRID"
+
+    if layers_dict is None:
+        if left_name is None:
+            left_name = "ROADMAP"
+        if right_name is None:
+            right_name = "HYBRID"
+    else:
+        if left_name is None:
+            left_name = keys[0]
+        if right_name is None:
+            right_name = keys[-1]
 
     if layers_dict is None:
         if isinstance(left_name, str):
