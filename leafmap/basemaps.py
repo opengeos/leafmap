@@ -228,17 +228,18 @@ def _unpack_sub_parameters(var, param):
     return temp
 
 
-def get_xyz_dict(free_only=True):
+def get_xyz_dict(free_only=True, france=False):
     """Returns a dictionary of xyz services.
 
     Args:
         free_only (bool, optional): Whether to return only free xyz tile services that do not require an access token. Defaults to True.
+        france (bool, optional): Whether include Geoportail France basemaps. Defaults to False.
 
     Returns:
         dict: A dictionary of xyz services.
     """
 
-    xyz_dict = {}
+    xyz_dict_tmp = {}
     for item in xyz.values():
         try:
             name = item["name"]
@@ -247,9 +248,9 @@ def get_xyz_dict(free_only=True):
                 if free_only:
                     pass
                 else:
-                    xyz_dict[name] = tile
+                    xyz_dict_tmp[name] = tile
             else:
-                xyz_dict[name] = tile
+                xyz_dict_tmp[name] = tile
             tile["type"] = "xyz"
 
         except Exception:
@@ -260,10 +261,19 @@ def get_xyz_dict(free_only=True):
                     if free_only:
                         pass
                     else:
-                        xyz_dict[name] = tile
+                        xyz_dict_tmp[name] = tile
                 else:
-                    xyz_dict[name] = tile
+                    xyz_dict_tmp[name] = tile
                 tile["type"] = "xyz"
+
+    xyz_dict = {}
+
+    if france:
+        xyz_dict = xyz_dict_tmp
+    else:
+        for key in xyz_dict_tmp:
+            if "France" not in key:
+                xyz_dict[key] = xyz_dict_tmp[key]
 
     xyz_dict = collections.OrderedDict(sorted(xyz_dict.items()))
     return xyz_dict
