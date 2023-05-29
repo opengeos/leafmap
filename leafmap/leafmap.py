@@ -35,6 +35,10 @@ class Map(ipyleaflet.Map):
         if "scroll_wheel_zoom" not in kwargs:
             kwargs["scroll_wheel_zoom"] = True
 
+        if "basemap" in kwargs:
+            if isinstance(kwargs["basemap"], str):
+                kwargs["basemap"] = get_basemap(kwargs["basemap"])
+
         super().__init__(**kwargs)
         self.baseclass = "ipyleaflet"
         self.toolbar = None
@@ -191,24 +195,6 @@ class Map(ipyleaflet.Map):
 
         self.layers[0].name = "OpenStreetMap"
 
-        if "google_map" not in kwargs:
-            pass
-        elif kwargs["google_map"] is not None:
-            if kwargs["google_map"].upper() == "ROADMAP":
-                layer = basemaps["ROADMAP"]
-            elif kwargs["google_map"].upper() == "HYBRID":
-                layer = basemaps["HYBRID"]
-            elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = basemaps["TERRAIN"]
-            elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = basemaps["SATELLITE"]
-            else:
-                print(
-                    f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
-                )
-                layer = basemaps["ROADMAP"]
-            self.add(layer)
-
         if "toolbar_control" not in kwargs:
             kwargs["toolbar_control"] = True
         if kwargs["toolbar_control"]:
@@ -221,6 +207,18 @@ class Map(ipyleaflet.Map):
 
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
+
+    def add(self, object):
+        """Adds a layer to the map.
+
+        Args:
+            layer (object): The layer to add to the map.
+        """
+        if isinstance(object, str):
+            if object in basemaps.keys():
+                object = get_basemap(object)
+
+        super().add(object)
 
     def set_center(self, lon, lat, zoom=None):
         """Centers the map view at a given coordinates with the given zoom level.
@@ -307,6 +305,7 @@ class Map(ipyleaflet.Map):
 
         try:
             layer_names = self.get_layer_names()
+
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
                 url = basemap.build_url()
@@ -326,7 +325,7 @@ class Map(ipyleaflet.Map):
                 self.add(layer)
                 arc_add_layer(url, name)
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
-                self.add(basemaps[basemap])
+                self.add(basemap)
                 self.layers[-1].visible = show
                 arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
@@ -338,7 +337,7 @@ class Map(ipyleaflet.Map):
                     )
                 )
 
-        except Exception:
+        except Exception as e:
             raise ValueError(
                 "Basemap can only be one of the following:\n  {}".format(
                     "\n  ".join(basemaps.keys())
@@ -979,13 +978,13 @@ class Map(ipyleaflet.Map):
             zoom (int, optional): Initial map zoom level. Defaults to 5.
             position (str, optional): Position of the minimap. Defaults to "bottomright".
         """
-
+        layers = [get_basemap("ROADMAP")]
         minimap = ipyleaflet.Map(
             zoom_control=False,
             attribution_control=False,
             zoom=zoom,
             center=self.center,
-            layers=[basemaps["ROADMAP"]],
+            layers=layers,
         )
         minimap.layout.width = "150px"
         minimap.layout.height = "150px"
@@ -1146,7 +1145,7 @@ class Map(ipyleaflet.Map):
                 right_name = "Right Layer"
 
             if left_layer in basemaps.keys():
-                left_layer = basemaps[left_layer]
+                left_layer = get_basemap(left_layer)
             elif isinstance(left_layer, str):
                 if left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer, **left_args)
@@ -1204,7 +1203,7 @@ class Map(ipyleaflet.Map):
                 )
 
             if right_layer in basemaps.keys():
-                right_layer = basemaps[right_layer]
+                right_layer = get_basemap(right_layer)
             elif isinstance(right_layer, str):
                 if right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(
@@ -1308,7 +1307,7 @@ class Map(ipyleaflet.Map):
         def on_click(change):
             basemap_name = change["new"]
             old_basemap = self.layers[-1]
-            self.substitute_layer(old_basemap, basemaps[basemap_name])
+            self.substitute_layer(old_basemap, get_basemap(basemap_name))
 
         dropdown.observe(on_click, "value")
         basemap_control = ipyleaflet.WidgetControl(widget=dropdown, position="topright")
@@ -4042,7 +4041,7 @@ def linked_maps(
             )
 
             if layers[index] in basemaps.keys():
-                layers[index] = basemaps[layers[index]]
+                layers[index] = get_basemap(layers[index])
             elif isinstance(layers[index], str):
                 if layers[index].startswith("http") and layers[index].endswith(".tif"):
                     url = cog_tile(layers[index], **layer_args[index])
@@ -4145,7 +4144,7 @@ def split_map(
 
     try:
         if left_layer in basemaps.keys():
-            left_layer = basemaps[left_layer]
+            left_layer = get_basemap(left_layer)
         elif isinstance(left_layer, str):
             if left_layer.startswith("http") and left_layer.endswith(".tif"):
                 url = cog_tile(left_layer, **left_args)
@@ -4194,7 +4193,7 @@ def split_map(
             )
 
         if right_layer in basemaps.keys():
-            right_layer = basemaps[right_layer]
+            right_layer = get_basemap(right_layer)
         elif isinstance(right_layer, str):
             if right_layer.startswith("http") and right_layer.endswith(".tif"):
                 url = cog_tile(
@@ -4303,7 +4302,7 @@ def ts_inspector(
         layers_dict = {}
         keys = dict(basemaps).keys()
         for key in keys:
-            if isinstance(basemaps[key], ipyleaflet.WMSLayer):
+            if basemaps[key]['type'] == 'wms':
                 pass
             else:
                 layers_dict[key] = basemaps[key]
@@ -4457,3 +4456,45 @@ def geojson_layer(
         )
 
     return geojson
+
+
+def get_basemap(name):
+    """Gets a basemap tile layer by name.
+
+    Args:
+        name (str): The name of the basemap.
+
+    Returns:
+        ipylealfet.TileLayer | ipyleaflet.WMSLayer: The basemap layer.
+    """
+
+    if isinstance(name, str):
+        if name in basemaps.keys():
+            basemap = basemaps[name]
+            if basemap["type"] == "xyz":
+                layer = ipyleaflet.TileLayer(
+                    url=basemap["url"],
+                    name=basemap["name"],
+                    max_zoom=24,
+                    attribution=basemap["attribution"],
+                )
+            elif basemap["type"] == "wms":
+                layer = ipyleaflet.WMSLayer(
+                    url=basemap["url"],
+                    layers=basemap["layers"],
+                    name=basemap["name"],
+                    attribution=basemap["attribution"],
+                    format=basemap["format"],
+                    transparent=basemap["transparent"],
+                )
+            return layer
+        else:
+            raise ValueError(
+                "Basemap must be a string. Please choose from: "
+                + str(list(basemaps.keys()))
+            )
+    else:
+        raise ValueError(
+            "Basemap must be a string. Please choose from: "
+            + str(list(basemaps.keys()))
+        )
