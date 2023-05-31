@@ -10,11 +10,12 @@ from .common import *
 from .pc import *
 
 
-def tool_template(m=None):
+def tool_template(m=None, opened=True):
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
         m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+        opened (bool, optional): Whether to open the toolbar. Defaults to True.
 
     Returns:
         ipywidgets: The tool GUI widget.
@@ -62,14 +63,12 @@ def tool_template(m=None):
         style=style,
     )
 
-    int_slider_label = widgets.Label()
-    # widgets.jslink((int_slider, "value"), (int_slider_label, "value"))
+    int_slider_label = widgets.Label(str(int_slider.value))
 
-    def int_slider_changed(change):
-        if change["new"]:
-            int_slider_label.value = str(int_slider.value)
+    def update_int_slider(change):
+        int_slider_label.value = str(change["new"])
 
-    int_slider.observe(int_slider_changed, "value")
+    int_slider.observe(update_int_slider, "value")
 
     float_slider = widgets.FloatSlider(
         min=1,
@@ -77,18 +76,16 @@ def tool_template(m=None):
         description="Float Slider: ",
         readout=False,
         continuous_update=True,
-        layout=widgets.Layout(width="220px", padding=padding),
+        layout=widgets.Layout(width="210px", padding=padding),
         style=style,
     )
 
-    float_slider_label = widgets.Label()
-    # widgets.jslink((float_slider, "value"), (float_slider_label, "value"))
+    float_slider_label = widgets.Label(str(float_slider.value))
 
-    def float_slider_changed(change):
-        if change["new"]:
-            float_slider_label.value = str(float_slider.value)
+    def update_float_slider(change):
+        float_slider_label.value = str(change["new"])
 
-    float_slider.observe(float_slider_changed, "value")
+    float_slider.observe(update_float_slider, "value")
 
     color = widgets.ColorPicker(
         concise=False,
@@ -108,7 +105,7 @@ def tool_template(m=None):
 
     textarea = widgets.Textarea(
         placeholder="Placeholder",
-        layout=widgets.Layout(width=widget_width),
+        layout=widgets.Layout(width=widget_width, padding=padding),
     )
 
     buttons = widgets.ToggleButtons(
@@ -138,20 +135,20 @@ def tool_template(m=None):
         output,
     ]
 
-    toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
-    )
+    # toolbar_event = ipyevents.Event(
+    #     source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    # )
 
-    def handle_toolbar_event(event):
-        if event["type"] == "mouseenter":
-            toolbar_widget.children = [toolbar_header, toolbar_footer]
-        elif event["type"] == "mouseleave":
-            if not toolbar_button.value:
-                toolbar_widget.children = [toolbar_button]
-                toolbar_button.value = False
-                close_button.value = False
+    # def handle_toolbar_event(event):
+    #     if event["type"] == "mouseenter":
+    #         toolbar_widget.children = [toolbar_header, toolbar_footer]
+    #     elif event["type"] == "mouseleave":
+    #         if not toolbar_button.value:
+    #             toolbar_widget.children = [toolbar_button]
+    #             toolbar_button.value = False
+    #             close_button.value = False
 
-    toolbar_event.on_dom_event(handle_toolbar_event)
+    # toolbar_event.on_dom_event(handle_toolbar_event)
 
     def toolbar_btn_click(change):
         if change["new"]:
@@ -195,14 +192,114 @@ def tool_template(m=None):
 
     buttons.observe(button_clicked, "value")
 
-    toolbar_button.value = True
+    toolbar_button.value = opened
     if m is not None:
         toolbar_control = ipyleaflet.WidgetControl(
             widget=toolbar_widget, position="topright"
         )
 
         if toolbar_control not in m.controls:
-            m.add(toolbar_control)
+            m.add_control(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
+
+
+def tool_header_template(m=None, opened=True):
+    """Create a toolbar widget.
+
+    Args:
+        m (geemap.Map, optional): The geemap.Map instance. Defaults to None.
+        opened (bool, optional): Whether to open the toolbar. Defaults to True.
+    """
+
+    widget_width = "250px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Toolbar",
+        icon="gear",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Apply", "Reset", "Close"],
+        tooltips=["Apply", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "80px"
+
+    output = widgets.Output(layout=widgets.Layout(width=widget_width, padding=padding))
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        buttons,
+        output,
+    ]
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Apply":
+            with output:
+                output.clear_output()
+                print("Running ...")
+        elif change["new"] == "Reset":
+            output.clear_output()
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = opened
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position="topright"
+        )
+
+        if toolbar_control not in m.controls:
+            m.add_control(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
