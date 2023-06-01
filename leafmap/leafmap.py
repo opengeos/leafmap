@@ -1292,6 +1292,8 @@ class Map(ipyleaflet.Map):
             if bounds is not None:
                 self.fit_bounds(bounds)
 
+            self.dragging = False  # Disable dragging
+
         except Exception as e:
             print("The provided layers are invalid!")
             raise ValueError(e)
@@ -4249,6 +4251,7 @@ def split_map(
         m.add(control)
         if bounds is not None:
             m.fit_bounds(bounds)
+        m.dragging = False
         return m
 
     except Exception as e:
@@ -4302,10 +4305,10 @@ def ts_inspector(
         layers_dict = {}
         keys = dict(basemaps).keys()
         for key in keys:
-            if basemaps[key]['type'] == 'wms':
+            if basemaps[key]["type"] == "wms":
                 pass
             else:
-                layers_dict[key] = basemaps[key]
+                layers_dict[key] = get_basemap(key)
 
     keys = list(layers_dict.keys())
     if left_name is None:
@@ -4354,6 +4357,8 @@ def ts_inspector(
         split_control.right_layer.url = layers_dict[right_dropdown.value].url
 
     right_dropdown.observe(right_change, "value")
+
+    m.dragging = False
 
     return m
 
