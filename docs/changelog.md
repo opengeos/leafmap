@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.21.1 - Jun 1, 2023
+
+**Improvement**
+
+-   Fixed split control bug (#454)
+-   Added tool template (#453)
+
 ## v0.21.0 - May 28, 2023
 
 **New Features**
