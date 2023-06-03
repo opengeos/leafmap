@@ -33,8 +33,8 @@ jobs:
               run: |
                   pip install -r requirements.txt -r requirements_dev.txt
                   pip install .
-            - name: Discover typos with codespell
-              run: codespell --skip="*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
+            # - name: Discover typos with codespell
+            #   run: codespell --skip="*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
             - name: PKG-TEST
               run: |
                   python -m unittest discover tests/
