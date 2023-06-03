@@ -9254,3 +9254,104 @@ def display_html(filename, width="100%", height="600px", **kwargs):
         raise Exception(f"File {filename} does not exist")
 
     return IFrame(filename, width=width, height=height, **kwargs)
+
+
+def get_nhd_basins(
+    feature_ids,
+    fsource="nwissite",
+    split_catchment=False,
+    simplified=True,
+    **kwargs,
+):
+    """Get NHD basins for a list of station IDs.
+
+    Args:
+        feature_ids (str | list): Target feature ID(s).
+        fsource (str, optional): The name of feature(s) source, defaults to ``nwissite``.
+            The valid sources are:
+            * 'comid' for NHDPlus comid.
+            * 'ca_gages' for Streamgage catalog for CA SB19
+            * 'gfv11_pois' for USGS Geospatial Fabric V1.1 Points of Interest
+            * 'huc12pp' for HUC12 Pour Points
+            * 'nmwdi-st' for New Mexico Water Data Initative Sites
+            * 'nwisgw' for NWIS Groundwater Sites
+            * 'nwissite' for NWIS Surface Water Sites
+            * 'ref_gage' for geoconnex.us reference gages
+            * 'vigil' for Vigil Network Data
+            * 'wade' for Water Data Exchange 2.0 Sites
+            * 'WQP' for Water Quality Portal
+        split_catchment (bool, optional): If True, split basins at their outlet locations
+        simplified (bool, optional): If True, return a simplified version of basin geometries.
+            Default to True.
+
+    Raises:
+        ImportError: If pynhd is not installed.
+
+    Returns:
+        geopandas.GeoDataFrame: NLDI indexed basins in EPSG:4326. If some IDs don't return any features
+            a list of missing ID(s) are returned as well.
+    """
+
+    try:
+        from pynhd import NLDI
+    except ImportError:
+        raise ImportError("pynhd is not installed. Install it with pip install pynhd")
+
+    return NLDI().get_basins(
+        feature_ids, fsource, split_catchment, simplified, **kwargs
+    )
+
+
+def get_3dep_dem(
+    geometry,
+    resolution=30,
+    src_crs="EPSG:4326",
+    output=None,
+    dst_crs="EPSG:5070",
+    to_cog=False,
+    **kwargs,
+):
+    """Get DEM data at any resolution from 3DEP.
+
+    Args:
+        geometry (Polygon | MultiPolygon | tuple): It can be a polygon or a bounding
+            box of form (xmin, ymin, xmax, ymax).
+        resolution (int): arget DEM source resolution in meters. Defaults to 30.
+        src_crs (str, optional): The spatial reference system of the input geometry. Defaults to "EPSG:4326".
+        output (str, optional): The output GeoTIFF file. Defaults to None.
+        dst_crs (str, optional): The spatial reference system of the output GeoTIFF file. Defaults to "EPSG:5070".
+        to_cog (bool, optional): Convert to Cloud Optimized GeoTIFF. Defaults to False.
+
+    Returns:
+        xarray.DataArray: DEM at the specified resolution in meters and CRS.
+    """
+
+    try:
+        import py3dep
+    except ImportError:
+        raise ImportError("py3dep is not installed. Install it with pip install py3dep")
+
+    try:
+        import geopandas as gpd
+    except ImportError:
+        raise ImportError(
+            "geopandas is not installed. Install it with pip install geopandas"
+        )
+
+    if isinstance(geometry, gpd.GeoDataFrame):
+        geometry = geometry.geometry.unary_union
+
+    dem = py3dep.get_dem(geometry, resolution=resolution, crs=src_crs)
+    dem = dem.rio.reproject(dst_crs)
+
+    if output is not None:
+        if not output.endswith(".tif"):
+            output += ".tif"
+        print(output)
+        dem.rio.to_raster(output, **kwargs)
+
+        if to_cog:
+            image_to_cog(output, output)
+
+    else:
+        return dem
