@@ -9276,7 +9276,7 @@ def get_nhd_basins(
             * 'nmwdi-st' for New Mexico Water Data Initative Sites
             * 'nwisgw' for NWIS Groundwater Sites
             * 'nwissite' for NWIS Surface Water Sites
-            * 'ref_gage' for geoconnex.us reference gages
+            * 'ref_gage' for geoconnex.us reference gauges
             * 'vigil' for Vigil Network Data
             * 'wade' for Water Data Exchange 2.0 Sites
             * 'WQP' for Water Quality Portal
