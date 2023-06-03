@@ -2198,6 +2198,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
+        zoom_to_layer=True,
         encoding="utf-8",
         **kwargs,
     ):
@@ -2393,6 +2394,23 @@ class Map(ipyleaflet.Map):
             "style_callback": style_callback,
         }
         self.json_layer_dict[layer_name] = params
+
+        if zoom_to_layer:
+            try:
+                import numpy as np
+                import geopandas as gpd
+
+                gdf = gpd.GeoDataFrame.from_features(data)
+                if gdf.crs is None:
+                    gdf.crs = "EPSG:4326"
+                bounds = gdf.to_crs(epsg="4326").bounds
+                west = np.min(bounds["minx"])
+                south = np.min(bounds["miny"])
+                east = np.max(bounds["maxx"])
+                north = np.max(bounds["maxy"])
+                self.fit_bounds([[south, east], [north, west]])
+            except Exception as e:
+                print(e)
 
     def add_search_control(
         self, url, marker=None, zoom=None, position="topleft", **kwargs
