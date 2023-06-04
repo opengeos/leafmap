@@ -1414,70 +1414,24 @@ def shp_to_gdf(in_shp):
         raise Exception(e)
 
 
-def shp_to_geojson(in_shp, out_json=None, encoding="utf-8", **kwargs):
+def shp_to_geojson(in_shp, output=None, encoding="utf-8", **kwargs):
     """Converts a shapefile to GeoJSON.
 
     Args:
         in_shp (str): File path of the input shapefile.
-        out_json (str, optional): File path of the output GeoJSON. Defaults to None.
+        output (str, optional): File path of the output GeoJSON. Defaults to None.
 
     Returns:
         object: The json object representing the shapefile.
     """
     try:
-        import shapefile
+        import geopandas as gpd
 
-        in_shp = os.path.abspath(in_shp)
-        out_shp = None
-
-        if out_json is not None:
-            ext = os.path.splitext(out_json)[1]
-            print(ext)
-            if ext.lower() not in [".json", ".geojson"]:
-                raise TypeError("The output file extension must the .json or .geojson.")
-
-            if not os.path.exists(os.path.dirname(out_json)):
-                os.makedirs(os.path.dirname(out_json))
-
-        if not is_GCS(in_shp):
-            try:
-                import geopandas as gpd
-
-            except Exception:
-                raise ImportError(
-                    "Geopandas is required to perform reprojection of the data. See https://geopandas.org/install.html"
-                )
-
-            try:
-                in_gdf = gpd.read_file(in_shp, encoding=encoding)
-                out_gdf = in_gdf.to_crs(epsg="4326")
-                out_shp = temp_file_path(".shp")
-                out_gdf.to_file(out_shp)
-                in_shp = out_shp
-            except Exception as e:
-                raise Exception(e)
-
-        kwargs["encoding"] = encoding
-        if "encoding" in kwargs:
-            reader = shapefile.Reader(in_shp, encoding=kwargs.pop("encoding"))
+        gdf = gpd.read_file(in_shp, **kwargs)
+        if output is None:
+            return gdf.__geo_interface__
         else:
-            reader = shapefile.Reader(in_shp)
-        out_dict = reader.__geo_interface__
-
-        if out_shp is not None and os.path.exists(out_shp):
-            try:
-                delete_shp(out_shp)
-            except Exception:
-                pass
-
-        if out_json is not None:
-            import json
-
-            with open(out_json, "w") as geojson:
-                geojson.write(json.dumps(out_dict, indent=2) + "\n")
-        else:
-            return out_dict
-
+            gdf.to_file(output, driver="GeoJSON")
     except Exception as e:
         raise Exception(e)
 
@@ -9339,7 +9293,7 @@ def get_3dep_dem(
         raise ImportError(
             "geopandas is not installed. Install it with pip install geopandas"
         )
-    
+
     if output is not None and os.path.exists(output) and not overwrite:
         print(f"File {output} already exists. Set overwrite=True to overwrite it")
         return
