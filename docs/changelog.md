@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.21.3 - Jun 4, 2023
+
+**New Features**
+
+-   Added layer manager GUI (#461)
+
 ## v0.21.2 - Jun 4, 2023
 
 **New Features**
