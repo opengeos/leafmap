@@ -220,6 +220,9 @@ class Map(ipyleaflet.Map):
 
         super().add(object)
 
+        if hasattr(self, "layer_manager_widget"):
+            self.update_layer_manager()
+
     def set_center(self, lon, lat, zoom=None):
         """Centers the map view at a given coordinates with the given zoom level.
 
@@ -3912,6 +3915,22 @@ class Map(ipyleaflet.Map):
         self.draw_features = []
         self.user_rois = None
         self.user_roi = None
+
+    def add_layer_manager(self, position="topright", opened=True):
+        """Add the Layer Manager to the map.
+
+        Args:
+            position (str, optional): The position of the Layer Manager. Defaults to "topright".
+        """
+        from .toolbar import layer_manager_gui
+
+        layer_manager_gui(self, position, opened)
+
+    def update_layer_manager(self):
+        """Update the Layer Manager."""
+        from .toolbar import layer_manager_gui
+
+        self.layer_manager_widget.children = layer_manager_gui(self, return_widget=True)
 
 
 # The functions below are outside the Map class.
