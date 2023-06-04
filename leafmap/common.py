@@ -9355,3 +9355,95 @@ def get_3dep_dem(
 
     else:
         return dem
+
+
+def vector_set_crs(source, output=None, crs="EPSG:4326", **kwargs):
+    """Set CRS of a vector file.
+
+    Args:
+        source (str | gpd.GeoDataFrame): The path to the vector file or a GeoDataFrame.
+        output (str, optional): The path to the output vector file. Defaults to None.
+        crs (str, optional): The CRS to set. Defaults to "EPSG:4326".
+
+
+    Returns:
+        gpd.GeoDataFrame: The GeoDataFrame with the new CRS.
+    """
+
+    import geopandas as gpd
+
+    if isinstance(source, str):
+        source = gpd.read_file(source, **kwargs)
+
+    if not isinstance(source, gpd.GeoDataFrame):
+        raise TypeError("source must be a GeoDataFrame or a file path")
+
+    gdf = source.set_crs(crs)
+
+    if output is not None:
+        gdf.to_file(output)
+    else:
+        return gdf
+
+
+def select_largest(source, column, count=1, output=None, **kwargs):
+    """Select the largest features in a GeoDataFrame based on a column.
+
+    Args:
+        source (str | gpd.GeoDataFrame): The path to the vector file or a GeoDataFrame.
+        column (str): The column to sort by.
+        count (int, optional): The number of features to select. Defaults to 1.
+        output (str, optional): The path to the output vector file. Defaults to None.
+
+    Returns:
+        str: The path to the output vector file.
+    """
+
+    import geopandas as gpd
+
+    if isinstance(source, str):
+        gdf = gpd.read_file(source, **kwargs)
+    else:
+        gdf = source
+
+    if not isinstance(gdf, gpd.GeoDataFrame):
+        raise TypeError("source must be a GeoDataFrame or a file path")
+
+    gdf = gdf.sort_values(column, ascending=False).head(count)
+
+    if output is not None:
+        gdf.to_file(output)
+
+    else:
+        return gdf
+
+
+def coords_to_vector(coords, output=None, crs="EPSG:4326", **kwargs):
+    """Convert a list of coordinates to a GeoDataFrame or a vector file.
+
+    Args:
+        coords (list): A list of coordinates in the format of [(x1, y1), (x2, y2), ...].
+        output (str, optional): The path to the output vector file. Defaults to None.
+        crs (str, optional): The CRS of the coordinates. Defaults to "EPSG:4326".
+
+    Returns:
+        gpd.GeoDataFraem: A GeoDataFrame of the coordinates.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    if not isinstance(coords, list):
+        raise TypeError("coords must be a list of coordinates")
+
+    if isinstance(coords[0], int) or isinstance(coords[0], float):
+        coords = [(coords[0], coords[1])]
+
+    # convert the points to a GeoDataFrame
+    geometry = [Point(xy) for xy in coords]
+    gdf = gpd.GeoDataFrame(geometry=geometry, crs="EPSG:4326")
+    gdf.to_crs(crs, inplace=True)
+
+    if output is not None:
+        gdf.to_file(output, **kwargs)
+    else:
+        return gdf
