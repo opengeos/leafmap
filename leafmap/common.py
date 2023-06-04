@@ -9309,6 +9309,7 @@ def get_3dep_dem(
     output=None,
     dst_crs="EPSG:5070",
     to_cog=False,
+    overwrite=False,
     **kwargs,
 ):
     """Get DEM data at any resolution from 3DEP.
@@ -9321,6 +9322,7 @@ def get_3dep_dem(
         output (str, optional): The output GeoTIFF file. Defaults to None.
         dst_crs (str, optional): The spatial reference system of the output GeoTIFF file. Defaults to "EPSG:5070".
         to_cog (bool, optional): Convert to Cloud Optimized GeoTIFF. Defaults to False.
+        overwrite (bool, optional): Whether to overwrite the output file if it exists. Defaults to False.
 
     Returns:
         xarray.DataArray: DEM at the specified resolution in meters and CRS.
@@ -9337,6 +9339,10 @@ def get_3dep_dem(
         raise ImportError(
             "geopandas is not installed. Install it with pip install geopandas"
         )
+    
+    if output is not None and os.path.exists(output) and not overwrite:
+        print(f"File {output} already exists. Set overwrite=True to overwrite it")
+        return
 
     if isinstance(geometry, gpd.GeoDataFrame):
         geometry = geometry.geometry.unary_union
