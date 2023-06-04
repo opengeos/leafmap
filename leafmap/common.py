@@ -1414,7 +1414,7 @@ def shp_to_gdf(in_shp):
         raise Exception(e)
 
 
-def shp_to_geojson(in_shp, output=None, encoding="utf-8", **kwargs):
+def shp_to_geojson(in_shp, output=None, encoding="utf-8", crs="EPSG:4326", **kwargs):
     """Converts a shapefile to GeoJSON.
 
     Args:
@@ -1428,6 +1428,7 @@ def shp_to_geojson(in_shp, output=None, encoding="utf-8", **kwargs):
         import geopandas as gpd
 
         gdf = gpd.read_file(in_shp, **kwargs)
+        gdf.to_crs(crs, inplace=True)
         if output is None:
             return gdf.__geo_interface__
         else:
