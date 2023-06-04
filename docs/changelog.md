@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.21.2 - Jun 4, 2023
+
+**New Features**
+
+-   Added NHD and 3DEP functions (#457)
+-   Added vector processing functions (#458)
+-   Added ICRW workshop notebook (#459)
+
+**Improvement**
+
+-   Fixed typos (#460)
+
 ## v0.21.1 - Jun 1, 2023
 
 **Improvement**
