@@ -3766,6 +3766,8 @@ class Map(ipyleaflet.Map):
             position (str, optional): The position of the HTML, can be one of "topleft",
                 "topright", "bottomleft", "bottomright". Defaults to "bottomright".
         """
+        # Check if an HTML string contains local images and convert them to base64.
+        html = check_html_string(html)
         self.add_widget(html, position=position, **kwargs)
 
     def add_text(
