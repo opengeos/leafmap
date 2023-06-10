@@ -9408,3 +9408,30 @@ def coords_to_vector(coords, output=None, crs="EPSG:4326", **kwargs):
         gdf.to_file(output, **kwargs)
     else:
         return gdf
+
+
+def check_html_string(html_string):
+    """Check if an HTML string contains local images and convert them to base64.
+
+    Args:
+        html_string (str): The HTML string.
+
+    Returns:
+        str: The HTML string with local images converted to base64.
+    """
+    import re
+    import base64
+
+    # Search for img tags with src attribute
+    img_regex = r'<img[^>]+src\s*=\s*["\']([^"\':]+)["\'][^>]*>'
+
+    for match in re.findall(img_regex, html_string):
+        with open(match, "rb") as img_file:
+            img_data = img_file.read()
+            base64_data = base64.b64encode(img_data).decode("utf-8")
+            html_string = html_string.replace(
+                'src="{}"'.format(match),
+                'src="data:image/png;base64,' + base64_data + '"',
+            )
+
+    return html_string
