@@ -369,9 +369,9 @@ class Map(folium.Map):
         **kwargs,
     ):
         """Add a local raster dataset to the map.
-
             If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
-            if the raster does not render properly, try running the following code before calling this function:
+            if the raster does not render properly, try installing jupyter-server-proxy using `pip install jupyter-server-proxy`,
+            then running the following code before calling this function. For more info, see https://bit.ly/3JbmF93.
 
             import os
             os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = 'proxy/{port}'
@@ -1949,7 +1949,7 @@ class Map(folium.Map):
         import pandas as pd
 
         if "maxClusterRadius" not in kwargs:
-            kwargs['maxClusterRadius'] = max_cluster_radius
+            kwargs["maxClusterRadius"] = max_cluster_radius
 
         color_options = [
             "red",
