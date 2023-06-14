@@ -35,6 +35,7 @@ extras_requires = {
     "lidar": ["ipygany", "ipyvtklink", "laspy", "panel", "pyntcloud[LAS]", "pyvista"],
     "raster": [
         "localtileserver",
+        "jupyter-server-proxy",
         "rio-cogeo",
         "rioxarray",
         "netcdf4",
