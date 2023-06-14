@@ -1860,7 +1860,8 @@ class Map(ipyleaflet.Map):
     ):
         """Add a local raster dataset to the map.
             If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
-            if the raster does not render properly, try running the following code before calling this function:
+            if the raster does not render properly, try installing jupyter-server-proxy using `pip install jupyter-server-proxy`,
+            then running the following code before calling this function. For more info, see https://bit.ly/3JbmF93.
 
             import os
             os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = 'proxy/{port}'
@@ -2141,6 +2142,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
+        zoom_to_layer=True,
         encoding="utf-8",
     ):
         """Adds a shapefile to the map.
@@ -2153,6 +2155,8 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to True.
+            encoding (str, optional): The encoding of the shapefile. Defaults to "utf-8".
 
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
@@ -2189,6 +2193,7 @@ class Map(ipyleaflet.Map):
             style_callback,
             fill_colors,
             info_mode,
+            zoom_to_layer,
             encoding,
         )
 
@@ -2215,6 +2220,7 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to True.
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
 
         Raises:
@@ -2482,6 +2488,7 @@ class Map(ipyleaflet.Map):
             style_callback,
             fill_colors,
             info_mode,
+            zoom_to_layer,
             encoding,
             **kwargs,
         )
@@ -2594,6 +2601,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
+        zoom_to_layer=False,
         encoding="utf-8",
         **kwargs,
     ):
@@ -2638,6 +2646,7 @@ class Map(ipyleaflet.Map):
                 style_callback,
                 fill_colors,
                 info_mode,
+                zoom_to_layer,
                 encoding,
             )
         else:
@@ -2658,6 +2667,7 @@ class Map(ipyleaflet.Map):
                 style_callback,
                 fill_colors,
                 info_mode,
+                zoom_to_layer,
                 encoding,
             )
 
