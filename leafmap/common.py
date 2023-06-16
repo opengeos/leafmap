@@ -3752,6 +3752,7 @@ def numpy_to_cog(
             raise TypeError("The provided profile must be a file path or a dictionary.")
 
     if bounds is None:
+        print("warning: bounds is not set. Using the default bounds (-180.0, -85.0511, 180.0, 85.0511)")
         bounds = (-180.0, -85.0511287798066, 180.0, 85.0511287798066)
 
     if not isinstance(bounds, tuple) and len(bounds) != 4:
