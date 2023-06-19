@@ -3605,9 +3605,9 @@ def image_to_numpy(image):
     """
     import rasterio
 
-    # from osgeo import gdal
-    # # ... and suppress errors
-    # gdal.PushErrorHandler('CPLQuietErrorHandler')
+    from osgeo import gdal
+    # ... and suppress errors
+    gdal.PushErrorHandler('CPLQuietErrorHandler')
 
     try:
         with rasterio.open(image, "r") as ds:
