@@ -5988,6 +5988,7 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
         else:
             files = [path.name for path in Path(input_dir).glob(ext)]
 
+    files.sort()
     return files
 
 
