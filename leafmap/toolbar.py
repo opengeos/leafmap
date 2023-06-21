@@ -1533,7 +1533,7 @@ def open_raster_gui(m):
     m.tool_output_ctrl = tool_output_ctrl
 
 
-def change_basemap(m):
+def change_basemap(m, position='topright'):
     """Widget for changing basemaps.
 
     Args:
@@ -1588,7 +1588,7 @@ def change_basemap(m):
     close_btn.on_click(close_click)
 
     basemap_control = ipyleaflet.WidgetControl(
-        widget=basemap_widget, position="topright"
+        widget=basemap_widget, position=position
     )
     m.add(basemap_control)
     m.basemap_ctrl = basemap_control
@@ -2463,7 +2463,7 @@ def download_osm(m=None):
         return toolbar_widget
 
 
-def inspector_gui(m=None):
+def inspector_gui(m=None, position="topright", opened=True):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -2699,7 +2699,7 @@ def inspector_gui(m=None):
 
     buttons.observe(button_clicked, "value")
 
-    toolbar_button.value = True
+    toolbar_button.value = opened
 
     def handle_interaction(**kwargs):
         latlon = kwargs.get("coordinates")
@@ -2826,7 +2826,7 @@ def inspector_gui(m=None):
 
     if m is not None:
         toolbar_control = ipyleaflet.WidgetControl(
-            widget=toolbar_widget, position="topright"
+            widget=toolbar_widget, position=position
         )
 
         if toolbar_control not in m.controls:
@@ -4414,7 +4414,7 @@ def edit_draw_gui(m):
         return toolbar_widget
 
 
-def stac_gui(m=None, **kwargs):
+def stac_gui(m=None, position='topright', opened=True, **kwargs):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -5099,10 +5099,10 @@ def stac_gui(m=None, **kwargs):
 
     buttons.observe(button_clicked, "value")
 
-    toolbar_button.value = True
+    toolbar_button.value = opened
     if m is not None:
         toolbar_control = ipyleaflet.WidgetControl(
-            widget=toolbar_widget, position="topright"
+            widget=toolbar_widget, position=position
         )
 
         if toolbar_control not in m.controls:
@@ -5812,7 +5812,7 @@ def stac_custom_gui(m=None, **kwargs):
         return toolbar_widget
 
 
-def oam_search_gui(m=None):
+def oam_search_gui(m=None, position="topright", opened=True):
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
@@ -6018,10 +6018,10 @@ def oam_search_gui(m=None):
 
     buttons.observe(button_clicked, "value")
 
-    toolbar_button.value = True
+    toolbar_button.value = opened
     if m is not None:
         toolbar_control = ipyleaflet.WidgetControl(
-            widget=toolbar_widget, position="topright"
+            widget=toolbar_widget, position=position
         )
 
         if toolbar_control not in m.controls:
