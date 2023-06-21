@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.22.0 - Jun 21, 2023
+
+**New Features**
+
+-   Added several GUI methods to Map class (#481)
+-   Add EarthCube workshop notebook
+
 ## v0.21.4 - Jun 20, 2023
 
 **New Features**
