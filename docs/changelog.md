@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.21.4 - Jun 20, 2023
+
+**New Features**
+
+-   Added split_raster and merge_rasters functions (#478)
+
+**Improvement**
+
+-   Suppress gdal open raster warming (#477)
+-   Used sorted function instead of if statements (#476)
+-   Added bounds warning for numpy_to_cog (#473)
+-   Added zoom_to_layer to add_vector (#470)
+-   Improved add_html for supporting local image (#467)
+-   Updated ICRW notebook (#462)
+
 ## v0.21.3 - Jun 4, 2023
 
 **New Features**
