@@ -3886,8 +3886,8 @@ class Map(ipyleaflet.Map):
             layer_args["hover_style"] = {"weight": layer_args["style"]["weight"] + 2}
 
         if gdf is not None:
-            self.add_gdf(gdf, info_mode=info_mode, **layer_args)
             setattr(self, "oam_gdf", gdf)
+            self.add_gdf(gdf, info_mode=info_mode, **layer_args)
 
             if add_image:
                 ids = gdf["_id"].tolist()
@@ -3943,6 +3943,50 @@ class Map(ipyleaflet.Map):
         from .toolbar import layer_manager_gui
 
         self.layer_manager_widget.children = layer_manager_gui(self, return_widget=True)
+
+    def add_oam_gui(self, position="topright", opened=True):
+        """Add the OpenAerialMap search widget to the map.
+
+        Args:
+            position (str, optional): The position of the widget. Defaults to "topright".
+            opened (bool, optional): Whether the widget is open. Defaults to True.
+        """
+        from .toolbar import oam_search_gui
+
+        oam_search_gui(self, position, opened)
+
+    def add_stac_gui(self, position="topright", opened=True):
+        """Add the STAC search widget to the map.
+
+        Args:
+            position (str, optional): The position of the widget. Defaults to "topright".
+            opened (bool, optional): Whether the widget is open. Defaults to True.
+        """
+        from .toolbar import stac_gui
+
+        stac_gui(self, position, opened)
+
+    def add_inspector_gui(self, position="topright", opened=True):
+        """Add the Inspector widget to the map.
+
+        Args:
+            position (str, optional): The position of the widget. Defaults to "topright".
+            opened (bool, optional): Whether the widget is open. Defaults to True.
+        """
+
+        from .toolbar import inspector_gui
+
+        inspector_gui(self, position, opened)
+
+    def add_basemap_gui(self, position="topright"):
+        """Add the basemap widget to the map.
+
+        Args:
+            position (str, optional): The position of the widget. Defaults to "topright".
+        """
+        from .toolbar import change_basemap
+
+        change_basemap(self, position)
 
 
 # The functions below are outside the Map class.
