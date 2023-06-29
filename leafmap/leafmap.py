@@ -2478,8 +2478,8 @@ class Map(ipyleaflet.Map):
             try:
                 if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
                     gdf[col] = gdf[col].astype(str)
-            except Exception as e:
-                print(e)
+            except:
+                pass
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
