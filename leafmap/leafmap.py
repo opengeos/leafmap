@@ -2475,8 +2475,11 @@ class Map(ipyleaflet.Map):
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
         for col in gdf.columns:
-            if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
-                gdf[col] = gdf[col].astype(str)
+            try:
+                if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+                    gdf[col] = gdf[col].astype(str)
+            except Exception as e:
+                print(e)
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
