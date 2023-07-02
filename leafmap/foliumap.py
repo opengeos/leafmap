@@ -561,6 +561,79 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
+    def add_markers_from_xy(
+        self,
+        data,
+        x="longitude",
+        y="latitude",
+        popup=None,
+        min_width=100,
+        max_width=200,
+        layer_name="Markers",
+        icon=None,
+        icon_shape="circle-dot",
+        border_width=3,
+        border_color="#0000ff",
+        **kwargs,
+    ):
+        """Adds markers to the map from a csv or Pandas DataFrame containing x, y values.
+
+        Args:
+            data (str | pd.DataFrame): A csv or Pandas DataFrame containing x, y, z values.
+            x (str, optional): The column name for the x values. Defaults to "longitude".
+            y (str, optional): The column name for the y values. Defaults to "latitude".
+            popup (list, optional): A list of column names to be used as the popup. Defaults to None.
+            min_width (int, optional): The minimum width of the popup. Defaults to 100.
+            max_width (int, optional): The maximum width of the popup. Defaults to 200.
+            layer_name (str, optional): The name of the layer. Defaults to "Marker Cluster".
+            icon (str, optional): The Font-Awesome icon name to use to render the marker. Defaults to None.
+            icon_shape (str, optional): The shape of the marker, such as "retangle-dot", "circle-dot". Defaults to 'circle-dot'.
+            border_width (int, optional): The width of the border. Defaults to 3.
+            border_color (str, optional): The color of the border. Defaults to '#0000ff'.
+            kwargs (dict, optional): Additional keyword arguments to pass to BeautifyIcon. See
+                https://python-visualization.github.io/folium/plugins.html#folium.plugins.BeautifyIcon.
+
+        """
+        import pandas as pd
+        from folium.plugins import BeautifyIcon
+
+        layer_group = folium.FeatureGroup(name=layer_name)
+
+        if isinstance(data, pd.DataFrame):
+            df = data
+        elif not data.startswith("http") and (not os.path.exists(data)):
+            raise FileNotFoundError("The specified input csv does not exist.")
+        else:
+            df = pd.read_csv(data)
+
+        col_names = df.columns.values.tolist()
+
+        if popup is None:
+            popup = col_names
+
+        if x not in col_names:
+            raise ValueError(f"x must be one of the following: {', '.join(col_names)}")
+
+        if y not in col_names:
+            raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
+
+        for row in df.itertuples():
+            html = ""
+            for p in popup:
+                html = html + "<b>" + p + "</b>" + ": " + str(getattr(row, p)) + "<br>"
+            popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
+
+            marker_icon = BeautifyIcon(
+                icon, icon_shape, border_width, border_color, **kwargs
+            )
+            folium.Marker(
+                location=[getattr(row, y), getattr(row, x)],
+                popup=popup_html,
+                icon=marker_icon,
+            ).add_to(layer_group)
+
+        layer_group.add_to(self)
+
     def add_osm_from_geocode(
         self,
         query,
