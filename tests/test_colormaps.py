@@ -39,7 +39,7 @@ class TestColormaps(unittest.TestCase):
     #     colors = cm.get_palette("terrain", n_class=8)
     #     output = widgets.Output()
     #     with output:
-    #         output.clear_output()
+    #         output.outputs = ()
     #         cm.get_colorbar(colors, discrete=False)
     #         cm.get_colorbar(colors, discrete=True)
     #     control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
@@ -54,7 +54,7 @@ class TestColormaps(unittest.TestCase):
     #     m = leafmap.Map()
     #     output = widgets.Output()
     #     with output:
-    #         output.clear_output()
+    #         output.outputs = ()
     #         cm.list_colormaps()
     #     control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
     #     m.add(control)
@@ -68,7 +68,7 @@ class TestColormaps(unittest.TestCase):
     #     m = leafmap.Map()
     #     output = widgets.Output()
     #     with output:
-    #         output.clear_output()
+    #         output.outputs = ()
     #         cm.plot_colormap(
     #             cmap="gray",
     #             colors=None,
@@ -90,7 +90,7 @@ class TestColormaps(unittest.TestCase):
     #     m.remove_control(control)
 
     #     with output:
-    #         output.clear_output()
+    #         output.outputs = ()
     #         cm.plot_colormap(
     #             colors=[
     #                 "333399",
@@ -125,7 +125,7 @@ class TestColormaps(unittest.TestCase):
     #     m = leafmap.Map()
     #     output = widgets.Output()
     #     with output:
-    #         output.clear_output()
+    #         output.outputs = ()
     #         cm.plot_colormaps(width=8.0, height=0.4)
     #     control = ipyleaflet.WidgetControl(widget=output, position="bottomright")
     #     m.add(control)
