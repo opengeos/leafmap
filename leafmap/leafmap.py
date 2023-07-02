@@ -170,7 +170,7 @@ class Map(ipyleaflet.Map):
                     import ipysheet
 
                     with self.edit_output:
-                        self.edit_output.clear_output()
+                        self.edit_output.outputs = ()
                         self.edit_sheet = ipysheet.from_dataframe(
                             self.get_draw_props(n=self.num_attributes, return_df=True)
                         )
@@ -1574,7 +1574,7 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
         with output:
-            output.clear_output()
+            output.outputs = ()
             display(colormap)
 
         self.colorbar = colormap_ctrl
@@ -1626,7 +1626,7 @@ class Map(ipyleaflet.Map):
             transparent_bg=transparent_bg,
         )
         with output:
-            output.clear_output()
+            output.outputs = ()
             plot_colormap(
                 cmap,
                 colors,

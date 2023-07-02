@@ -324,7 +324,7 @@ def show_image(img_path, width=None, height=None):
         out = widgets.Output()
         # layout={'border': '1px solid black'})
         # layout={'border': '1px solid black', 'width': str(width + 20) + 'px', 'height': str(height + 10) + 'px'},)
-        out.clear_output(wait=True)
+        out.outputs = ()
         display(out)
         with out:
             file = open(img_path, "rb")

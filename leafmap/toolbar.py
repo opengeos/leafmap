@@ -175,11 +175,11 @@ def tool_template(m=None, opened=True):
     def button_clicked(change):
         if change["new"] == "Apply":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 print("Running ...")
         elif change["new"] == "Reset":
             textarea.value = ""
-            output.clear_output()
+            output.outputs = ()
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()
@@ -276,10 +276,10 @@ def tool_header_template(m=None, opened=True):
     def button_clicked(change):
         if change["new"] == "Apply":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 print("Running ...")
         elif change["new"] == "Reset":
-            output.clear_output()
+            output.outputs = ()
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()
@@ -816,7 +816,7 @@ def open_data_widget(m):
         layer_name.value = file_type.value
         csv_widget.children = []
         filepath.value = ""
-        tool_output.clear_output()
+        tool_output.outputs = ()
 
         if change["new"] == "Shapefile":
             file_chooser.filter_pattern = "*.shp"
@@ -861,7 +861,7 @@ def open_data_widget(m):
             file_path = filepath.value
 
             with tool_output:
-                tool_output.clear_output()
+                tool_output.outputs = ()
                 if file_path.strip() != "":
                     ext = os.path.splitext(file_path)[1]
                     if point_check.value:
@@ -925,7 +925,7 @@ def open_data_widget(m):
 
         elif change["new"] == "Reset":
             file_chooser.reset()
-            tool_output.clear_output()
+            tool_output.outputs = ()
             filepath.value = ""
             m.toolbar_reset()
         elif change["new"] == "Close":
@@ -1208,7 +1208,7 @@ def open_raster_gui(m):
                         red.value = bandnames[0]
                         green.value = bandnames[0]
                         blue.value = bandnames[0]
-                    tool_output.clear_output()
+                    tool_output.outputs = ()
 
                 except Exception as e:
                     print(e)
@@ -1288,7 +1288,7 @@ def open_raster_gui(m):
         file_chooser.reset()
         layer_name.value = file_type.value
         http_url.value = ""
-        tool_output.clear_output()
+        tool_output.outputs = ()
         red.value = None
         green.value = None
         blue.value = None
@@ -1342,7 +1342,7 @@ def open_raster_gui(m):
             # file_path = http_url.value
 
             with tool_output:
-                tool_output.clear_output()
+                tool_output.outputs = ()
                 print("Loading data...")
                 if file_type.value == "GeoTIFF" and file_chooser.selected:
                     band = None
@@ -1394,10 +1394,10 @@ def open_raster_gui(m):
                         vmax=vis_max,
                         nodata=vis_nodata,
                     )
-                    tool_output.clear_output()
+                    tool_output.outputs = ()
                 elif file_type.value in ["COG", "STAC"] and http_url.value:
                     try:
-                        tool_output.clear_output()
+                        tool_output.outputs = ()
                         print("Loading data...")
 
                         if (
@@ -1441,7 +1441,7 @@ def open_raster_gui(m):
                                 name=layer_name.value,
                                 **vis_params,
                             )
-                        tool_output.clear_output()
+                        tool_output.outputs = ()
                     except Exception as e:
                         print(e)
                         print("Error loading data.")
@@ -1449,7 +1449,7 @@ def open_raster_gui(m):
 
                 elif file_type.value == "Microsoft":
                     try:
-                        tool_output.clear_output()
+                        tool_output.outputs = ()
                         print("Loading data...")
 
                         if (
@@ -1488,14 +1488,14 @@ def open_raster_gui(m):
                             name=layer_name.value,
                             **vis_params,
                         )
-                        tool_output.clear_output()
+                        tool_output.outputs = ()
                     except Exception as e:
                         print(e)
                         print("Error loading data.")
                         return
 
                 else:
-                    tool_output.clear_output()
+                    tool_output.outputs = ()
                     print("Please select a file and enter an http URL.")
 
             m.toolbar_reset()
@@ -1503,7 +1503,7 @@ def open_raster_gui(m):
 
         elif change["new"] == "Reset":
             file_chooser.reset()
-            tool_output.clear_output()
+            tool_output.outputs = ()
             http_url.value = ""
             add_params.value = ""
             checkbox.value = False
@@ -1533,7 +1533,7 @@ def open_raster_gui(m):
     m.tool_output_ctrl = tool_output_ctrl
 
 
-def change_basemap(m, position='topright'):
+def change_basemap(m, position="topright"):
     """Widget for changing basemaps.
 
     Args:
@@ -1587,9 +1587,7 @@ def change_basemap(m, position='topright'):
 
     close_btn.on_click(close_click)
 
-    basemap_control = ipyleaflet.WidgetControl(
-        widget=basemap_widget, position=position
-    )
+    basemap_control = ipyleaflet.WidgetControl(widget=basemap_widget, position=position)
     m.add(basemap_control)
     m.basemap_ctrl = basemap_control
 
@@ -1604,7 +1602,7 @@ def save_map(m):
 
     tool_output = widgets.Output()
     m.tool_output = tool_output
-    tool_output.clear_output(wait=True)
+    tool_output.outputs = ()
     save_map_widget = widgets.VBox()
 
     save_type = widgets.ToggleButtons(
@@ -1649,10 +1647,10 @@ def save_map(m):
             file_path = file_chooser.selected
             ext = os.path.splitext(file_path)[1]
             if save_type.value == "HTML" and ext.upper() == ".HTML":
-                tool_output.clear_output()
+                tool_output.outputs = ()
                 m.to_html(file_path)
             elif save_type.value == "PNG" and ext.upper() == ".PNG":
-                tool_output.clear_output()
+                tool_output.outputs = ()
                 m.toolbar_button.value = False
                 if m.save_map_control is not None:
                     m.remove_control(m.save_map_control)
@@ -1660,7 +1658,7 @@ def save_map(m):
                 time.sleep(2)
                 screen_capture(outfile=file_path)
             elif save_type.value == "JPG" and ext.upper() == ".JPG":
-                tool_output.clear_output()
+                tool_output.outputs = ()
                 m.toolbar_button.value = False
                 if m.save_map_control is not None:
                     m.remove_control(m.save_map_control)
@@ -1673,7 +1671,7 @@ def save_map(m):
                 )
                 save_map_widget.children = [save_type, file_chooser, label]
         elif change["new"] == "Cancel":
-            tool_output.clear_output()
+            tool_output.outputs = ()
             file_chooser.reset()
         elif change["new"] == "Close":
             if m.save_map_control is not None:
@@ -2052,7 +2050,7 @@ def census_widget(m=None):
 
             # with output:
             #     w = WebMapService(census_dict[wms.value]["url"])
-            #     output.clear_output()
+            #     output.outputs = ()
             #     print(w[layer.value].abstract)
 
     layer.observe(layer_change, "value")
@@ -2151,7 +2149,7 @@ def search_basemaps(m=None):
             if provider is not None:
                 if provider.startswith("qms"):
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print("Adding data. Please wait...")
                     name = provider[4:]
                     qms_provider = TileProvider.from_qms(name)
@@ -2159,7 +2157,7 @@ def search_basemaps(m=None):
                     attribution = qms_provider.attribution
                     m.layers = layers
                     m.add_tile_layer(url, name, attribution)
-                    output.clear_output()
+                    output.outputs = ()
                 elif provider.startswith("xyz"):
                     name = provider[4:]
                     xyz_provider = xyz.flatten()[name]
@@ -2168,7 +2166,7 @@ def search_basemaps(m=None):
                     m.layers = layers
                     if xyz_provider.requires_token():
                         with output:
-                            output.clear_output()
+                            output.outputs = ()
                             print(f"{provider} requires an API Key.")
                     m.add_tile_layer(url, name, attribution)
 
@@ -2233,12 +2231,12 @@ def search_basemaps(m=None):
                     tiles = tiles + search_qms(keyword=keyword.value)
                 providers.options = tiles
             with output:
-                output.clear_output()
+                output.outputs = ()
                 # print("Running ...")
         elif change["new"] == "Reset":
             keyword.value = ""
             providers.options = []
-            output.clear_output()
+            output.outputs = ()
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()
@@ -2433,11 +2431,11 @@ def download_osm(m=None):
     def button_clicked(change):
         if change["new"] == "Apply":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 print("Running ...")
         elif change["new"] == "Reset":
             textarea.value = ""
-            output.clear_output()
+            output.outputs = ()
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()
@@ -2493,7 +2491,7 @@ def inspector_gui(m=None, position="topright", opened=True):
             setattr(m, "inspector_output", inspector_output)
 
         output = m.inspector_output
-        output.clear_output()
+        output.outputs = ()
 
         if not hasattr(m, "inspector_add_marker"):
             inspector_add_marker = widgets.Checkbox(
@@ -2595,7 +2593,7 @@ def inspector_gui(m=None, position="topright", opened=True):
             m.pixel_values = []
         if hasattr(m, "marker_cluster"):
             m.marker_cluster.markers = []
-        output.clear_output()
+        output.outputs = ()
 
     bands_chk.observe(chk_change, "value")
 
@@ -2651,7 +2649,7 @@ def inspector_gui(m=None, position="topright", opened=True):
     def button_clicked(change):
         if change["new"] == "Download":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 if len(m.pixel_values) == 0:
                     print(
                         "No pixel values available. Click on the map to start collection data."
@@ -2663,11 +2661,11 @@ def inspector_gui(m=None, position="topright", opened=True):
                     df.to_csv(temp_csv, index=False)
                     link = create_download_link(temp_csv)
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         display(link)
         elif change["new"] == "Reset":
             label.value = ""
-            output.clear_output()
+            output.outputs = ()
             if hasattr(m, "pixel_values"):
                 m.pixel_values = []
             if hasattr(m, "marker_cluster"):
@@ -2713,7 +2711,7 @@ def inspector_gui(m=None, position="topright", opened=True):
             m.default_style = {"cursor": "wait"}
 
             with output:
-                output.clear_output()
+                output.outputs = ()
                 print("Getting pixel value ...")
 
                 layer_dict = m.cog_layer_dict[dropdown.value]
@@ -2736,7 +2734,7 @@ def inspector_gui(m=None, position="topright", opened=True):
                 )
                 if result is not None:
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
@@ -2752,7 +2750,7 @@ def inspector_gui(m=None, position="topright", opened=True):
 
                 else:
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print("No pixel value available")
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
@@ -2760,7 +2758,7 @@ def inspector_gui(m=None, position="topright", opened=True):
                 result = cog_pixel_value(lon, lat, layer_dict["url"], verbose=False)
                 if result is not None:
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
@@ -2775,7 +2773,7 @@ def inspector_gui(m=None, position="topright", opened=True):
                         m.marker_cluster.markers = markers
                 else:
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print("No pixel value available")
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
@@ -2794,7 +2792,7 @@ def inspector_gui(m=None, position="topright", opened=True):
                             sel_bands = [band_names[b - 1] for b in band]
                             result = {k: v for k, v in result.items() if k in sel_bands}
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
@@ -2809,7 +2807,7 @@ def inspector_gui(m=None, position="topright", opened=True):
                         m.marker_cluster.markers = markers
                 else:
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print("No pixel value available")
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
@@ -2996,7 +2994,7 @@ def plotly_toolbar(
             map_widget.layout.width = map_min_width
             if map_refresh:
                 with map_widget:
-                    map_widget.clear_output()
+                    map_widget.outputs = ()
                     display(m)
             layers_button.value = False
             toolbar_widget.children = [toolbar_header, toolbar_footer]
@@ -3007,7 +3005,7 @@ def plotly_toolbar(
                 toolbar_widget.children = [toolbar_button]
             if map_refresh:
                 with map_widget:
-                    map_widget.clear_output()
+                    map_widget.outputs = ()
                     display(m)
 
     toolbar_button.observe(toolbar_btn_click, "value")
@@ -3328,14 +3326,14 @@ def plotly_search_basemaps(canvas):
             if provider is not None:
                 if provider.startswith("qms"):
                     with output:
-                        output.clear_output()
+                        output.outputs = ()
                         print("Adding data. Please wait...")
                     name = provider[4:]
                     qms_provider = TileProvider.from_qms(name)
                     url = qms_provider.build_url()
                     attribution = qms_provider.attribution
                     m.add_tile_layer(url, name, attribution)
-                    output.clear_output()
+                    output.outputs = ()
                 elif provider.startswith("xyz"):
                     name = provider[4:]
                     xyz_provider = xyz.flatten()[name]
@@ -3343,7 +3341,7 @@ def plotly_search_basemaps(canvas):
                     attribution = xyz_provider.attribution
                     if xyz_provider.requires_token():
                         with output:
-                            output.clear_output()
+                            output.outputs = ()
                             print(f"{provider} requires an API Key.")
                     m.add_tile_layer(url, name, attribution)
 
@@ -3398,7 +3396,7 @@ def plotly_search_basemaps(canvas):
     def button_clicked(change):
         if change["new"] == "Search":
             providers.options = []
-            output.clear_output()
+            output.outputs = ()
             if keyword.value != "":
                 tiles = search_xyz_services(keyword=keyword.value)
                 if checkbox.value:
@@ -3410,7 +3408,7 @@ def plotly_search_basemaps(canvas):
         elif change["new"] == "Reset":
             keyword.value = ""
             providers.options = []
-            output.clear_output()
+            output.outputs = ()
         elif change["new"] == "Close":
             canvas.toolbar_reset()
             toolbar_widget.close()
@@ -3670,9 +3668,9 @@ def search_geojson_gui(m=None):
                 else:
                     m.search_control.property_name = attributes.value
             with output:
-                output.clear_output()
+                output.outputs = ()
         elif change["new"] == "Reset":
-            output.clear_output()
+            output.outputs = ()
             layers.value = None
             attributes.value = None
 
@@ -3824,7 +3822,7 @@ def select_table_gui(m=None):
                 df = geojson_to_df(data)
                 show_table_gui(m, df)
         elif change["new"] == "Reset":
-            output.clear_output()
+            output.outputs = ()
             layers.value = None
 
         elif change["new"] == "Close":
@@ -3886,7 +3884,7 @@ def show_table_gui(m, df):
     sheet.layout.width = output.layout.width
 
     def checkbox_clicked(change):
-        output.clear_output()
+        output.outputs = ()
 
         if change["new"]:
             sheet = ipysheet.from_dataframe(df)
@@ -3946,7 +3944,7 @@ def show_table_gui(m, df):
 
         sheet.layout.width = output.layout.width
         with output:
-            output.clear_output()
+            output.outputs = ()
             display(sheet)
 
     fullscreen_btn.on_click(fullscreen_btn_clicked)
@@ -3991,7 +3989,7 @@ def show_table_gui(m, df):
                 sheet = ipysheet.from_dataframe(df.head(10))
             sheet.layout.width = output.layout.width
             with output:
-                output.clear_output()
+                output.outputs = ()
                 display(sheet)
 
     width_slider.observe(width_changed, "value")
@@ -4022,7 +4020,7 @@ def show_table_gui(m, df):
 
             sheet.layout.height = output.layout.max_height
             with output:
-                output.clear_output()
+                output.outputs = ()
                 display(sheet)
 
     height_slider.observe(height_changed, "value")
@@ -4196,7 +4194,7 @@ def edit_draw_gui(m):
     buttons.style.button_width = "64px"
 
     with output:
-        output.clear_output()
+        output.outputs = ()
         display(m.edit_sheet)
 
     def int_slider_changed(change):
@@ -4205,7 +4203,7 @@ def edit_draw_gui(m):
             m.edit_sheet.rows = int_slider.value
             m.num_attributes = int_slider.value
             with output:
-                output.clear_output()
+                output.outputs = ()
                 m.edit_sheet = ipysheet.from_dataframe(
                     m.get_draw_props(n=int_slider.value, return_df=True)
                 )
@@ -4365,7 +4363,7 @@ def edit_draw_gui(m):
                             df = pd.DataFrame({"Key": props, "Value": values})
                             df.index += 1
                             m.edit_sheet = ipysheet.from_dataframe(df)
-                            output.clear_output()
+                            output.outputs = ()
                             display(m.edit_sheet)
 
     refresh_button.observe(refresh_btn_click, "value")
@@ -4373,7 +4371,7 @@ def edit_draw_gui(m):
     def button_clicked(change):
         if change["new"] == "Apply":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 display(m.edit_sheet)
                 if len(m.draw_control.data) == 0:
                     print("Please draw a feature first.")
@@ -4386,7 +4384,7 @@ def edit_draw_gui(m):
                 m.get_draw_props(int_slider.value, return_df=True)
             )
             with output:
-                output.clear_output()
+                output.outputs = ()
                 display(m.edit_sheet)
         elif change["new"] == "Close":
             if m is not None:
@@ -4414,7 +4412,7 @@ def edit_draw_gui(m):
         return toolbar_widget
 
 
-def stac_gui(m=None, position='topright', opened=True, **kwargs):
+def stac_gui(m=None, position="topright", opened=True, **kwargs):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -4720,7 +4718,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
         nodata.value = ""
         palette.value = None
         add_params.value = ""
-        output.clear_output()
+        output.outputs = ()
 
     params_widget = widgets.VBox()
 
@@ -4819,7 +4817,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
 
     def http_url_changed(change):
         with output:
-            output.clear_output()
+            output.outputs = ()
             print("Searching...")
             try:
                 if connection.value == "Custom STAC API Endpoint":
@@ -4841,7 +4839,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
                     item.options = custom_cols
                     stac_data.clear()
                 update_bands()
-                output.clear_output()
+                output.outputs = ()
             except Exception as e:
                 print(e)
 
@@ -4911,7 +4909,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
     def button_clicked(change):
         if change["new"] == "Search":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 if http_url.value is not None:
                     if start_date.value is not None and end_date.value is not None:
                         datetime = str(start_date.value) + "/" + str(end_date.value)
@@ -4951,7 +4949,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
                         "Google Earth Engine",
                         "NASA Common Metadata Repository",
                     ]:
-                        output.clear_output()
+                        output.outputs = ()
                         print(f"{connection.value} is not supported yet.")
                     else:
                         if connection.value == "Custom STAC API Endpoint":
@@ -5002,7 +5000,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
                         stac_data.clear()
                         stac_data.append(search_dict)
                         update_bands()
-                        output.clear_output()
+                        output.outputs = ()
                 except NotImplementedError as e:
                     print(e)
 
@@ -5011,7 +5009,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
 
         elif change["new"] == "Display":
             with output:
-                output.clear_output()
+                output.outputs = ()
 
                 if item.value and m is not None:
                     print("Loading data...")
@@ -5076,7 +5074,7 @@ def stac_gui(m=None, position='topright', opened=True, **kwargs):
                                 **vis_params,
                             )
                             setattr(m, "stac_item", m.stac_dict[item.value])
-                        output.clear_output()
+                        output.outputs = ()
                     except Exception as e:
                         print(e)
 
@@ -5373,7 +5371,7 @@ def stac_custom_gui(m=None, **kwargs):
         add_params.value = ""
         reset_bands()
         vis_option.value = "3 bands (RGB)"
-        output.clear_output()
+        output.outputs = ()
 
     params_widget = widgets.VBox()
 
@@ -5493,7 +5491,7 @@ def stac_custom_gui(m=None, **kwargs):
 
     def endpoint_changed(change):
         with output:
-            output.clear_output()
+            output.outputs = ()
             print("Retrieving collections...")
             try:
                 if endpoint.value is not None:
@@ -5507,7 +5505,7 @@ def stac_custom_gui(m=None, **kwargs):
                         collections.sort()
                         collection.options = collections
                         collection.value = collections[0]
-                        output.clear_output()
+                        output.outputs = ()
                     else:
                         print("No collections found.")
                 else:
@@ -5582,7 +5580,7 @@ def stac_custom_gui(m=None, **kwargs):
         if change["new"] == "Collections":
             collection.options = []
             with output:
-                output.clear_output()
+                output.outputs = ()
                 print("Retrieving collections...")
                 try:
                     if endpoint.value is not None:
@@ -5600,7 +5598,7 @@ def stac_custom_gui(m=None, **kwargs):
                             collections.sort()
                             collection.options = collections
                             collection.value = collections[0]
-                            output.clear_output()
+                            output.outputs = ()
 
                             m._STAC_COLLECTIONS[catalog.value] = collections
                         else:
@@ -5612,7 +5610,7 @@ def stac_custom_gui(m=None, **kwargs):
 
         elif change["new"] == "Items":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 if endpoint.value is not None:
                     if start_date.value is not None and end_date.value is not None:
                         datetime = str(start_date.value) + "/" + str(end_date.value)
@@ -5649,7 +5647,7 @@ def stac_custom_gui(m=None, **kwargs):
                 print("Retrieving items...")
                 try:
                     if collection.value is None:
-                        output.clear_output()
+                        output.outputs = ()
                         print("Please click on 'Collections' to retrieve collections.")
                     else:
                         item.options = []
@@ -5696,7 +5694,7 @@ def stac_custom_gui(m=None, **kwargs):
                         stac_data.clear()
                         stac_data.append(search_dict)
                         update_bands()
-                        output.clear_output()
+                        output.outputs = ()
                 except NotImplementedError as e:
                     print(e)
 
@@ -5705,7 +5703,7 @@ def stac_custom_gui(m=None, **kwargs):
 
         elif change["new"] == "Display":
             with output:
-                output.clear_output()
+                output.outputs = ()
 
                 if item.value and m is not None:
                     print("Loading data...")
@@ -5748,7 +5746,7 @@ def stac_custom_gui(m=None, **kwargs):
 
                     try:
                         if "Planetary Computer" in catalog.value:
-                            output.clear_output(wait=True)
+                            output.outputs = ()
                             m.add_stac_layer(
                                 collection=collection.value,
                                 item=item.value,
@@ -5765,7 +5763,7 @@ def stac_custom_gui(m=None, **kwargs):
                             m.stac_item["collection"] = collection.value
 
                         else:
-                            output.clear_output(wait=True)
+                            output.outputs = ()
                             m.add_stac_layer(
                                 url=stac_data[0][item.value]["href"],
                                 assets=assets,
@@ -5775,7 +5773,7 @@ def stac_custom_gui(m=None, **kwargs):
                             )
                             setattr(m, "stac_item", m.stac_dict[item.value])
                             if "rescale" in m.layers[-1].url:
-                                output.clear_output()
+                                output.outputs = ()
 
                     except Exception as e:
                         print(e)
@@ -5967,7 +5965,7 @@ def oam_search_gui(m=None, position="topright", opened=True):
     def button_clicked(change):
         if change["new"] == "Search":
             with output:
-                output.clear_output()
+                output.outputs = ()
                 if m is not None:
                     if dropdown.value == "Map bounds":
                         bbox = m.get_bbox()
@@ -6005,7 +6003,7 @@ def oam_search_gui(m=None, position="topright", opened=True):
             end_date.value = None
             checkbox.value = False
             int_slider.value = 100
-            output.clear_output()
+            output.outputs = ()
         elif change["new"] == "Close":
             if m is not None:
                 m.toolbar_reset()
