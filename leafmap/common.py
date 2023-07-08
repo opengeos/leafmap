@@ -2867,6 +2867,9 @@ def get_local_tile_layer(
 
     tile_client = TileClient(source, port=port, debug=debug)
 
+    if "cmap" not in kwargs:
+        kwargs["cmap"] = palette
+
     if tile_format == "ipyleaflet":
         tile_layer = get_leaflet_tile_layer(
             tile_client,
@@ -2874,7 +2877,6 @@ def get_local_tile_layer(
             debug=debug,
             projection=projection,
             band=band,
-            palette=palette,
             vmin=vmin,
             vmax=vmax,
             nodata=nodata,
@@ -2889,7 +2891,6 @@ def get_local_tile_layer(
             debug=debug,
             projection=projection,
             band=band,
-            palette=palette,
             vmin=vmin,
             vmax=vmax,
             nodata=nodata,
