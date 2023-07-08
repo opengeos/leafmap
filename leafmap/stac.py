@@ -551,6 +551,9 @@ def stac_tile(
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     mosaic_json = False
 
+    if "expression" in kwargs and ("asset_as_band" not in kwargs):
+        kwargs["asset_as_band"] = True
+
     if isinstance(titiler_endpoint, PlanetaryComputerEndpoint):
         if isinstance(bands, str):
             bands = bands.split(",")
