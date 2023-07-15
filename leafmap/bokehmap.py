@@ -6,7 +6,7 @@ from bokeh.plotting import figure, show, save
 from bokeh.io import output_notebook
 from .basemaps import xyz_to_bokeh
 from .common import *
-
+from typing import Optional, List
 os.environ["OUTPUT_NOTEBOOK"] = "False"
 basemaps = Box(xyz_to_bokeh(), frozen_box=True)
 
@@ -67,7 +67,7 @@ class Map:
             os.environ["OUTPUT_NOTEBOOK"] = "True"
         show(self.figure)
 
-    def add_basemap(self, basemap="OpenStreetMap", retina=True, **kwargs):
+    def add_basemap(self, basemap:Optional[str]="OpenStreetMap", retina:Optional[bool]=True, **kwargs):
         """Adds a basemap to the map.
 
         Args:
@@ -105,7 +105,7 @@ class Map:
                         f"Basemap {basemap} is not supported. Please choose one from {basemaps.keys()}"
                     )
 
-    def add_tile(self, tile, **kwargs):
+    def add_tile(self, tile:str, **kwargs):
         """Adds a tile to the map.
 
         Args:
@@ -121,12 +121,12 @@ class Map:
 
     def add_cog_layer(
         self,
-        url,
-        attribution="",
-        bands=None,
-        titiler_endpoint=None,
-        cog_args={},
-        fit_bounds=True,
+        url:str,
+        attribution:str="",
+        bands:Optional[List[str]] =None,
+        titiler_endpoint:Optional[str]=None,
+        cog_args:dict={},
+        fit_bounds:bool=True,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -155,15 +155,15 @@ class Map:
 
     def add_raster(
         self,
-        source,
-        band=None,
-        palette=None,
-        vmin=None,
-        vmax=None,
-        nodata=None,
-        attribution="",
+        source:str,
+        band:Optional[List]=None,
+        palette:Optional[str]=None,
+        vmin:Optional[float]=None,
+        vmax:Optional[float]=None,
+        nodata:Optional[float]=None,
+        attribution:Optional[str]=None,
+        fit_bounds:bool=True,
         layer_name="Local COG",
-        fit_bounds=True,
         open_args={},
         **kwargs,
     ):
@@ -218,14 +218,14 @@ class Map:
 
     def add_stac_layer(
         self,
-        url=None,
-        collection=None,
-        item=None,
-        assets=None,
-        bands=None,
-        titiler_endpoint=None,
-        attribution="",
-        fit_bounds=True,
+        url:str,
+        collection:str,
+        item:Optiona[str]=None,
+        assets:Optiona[str]=None,
+        bands:Optiona[List[str]]=None,
+        titiler_endpoint:Optional[str]=None,
+        attribution:str="",
+        fit_bounds:bool=True,
         open_args={},
         **kwargs,
     ):
@@ -304,12 +304,12 @@ class Map:
 
     def add_geojson(
         self,
-        filename,
-        encoding="utf-8",
-        read_file_args={},
-        to_crs="epsg:3857",
-        tooltips=None,
-        fit_bounds=True,
+        filename:str,
+        encoding:Optional[str]="utf-8",
+        read_file_args:dict={},
+        to_crs:Optional[str]="epsg:3857",
+        tooltips:Optional[List]=None,
+        fit_bounds:bool=True,
         **kwargs,
     ):
         """Adds a GeoJSON file to the map.
@@ -336,13 +336,13 @@ class Map:
 
     def add_shp(
         self,
-        filename,
-        encoding="utf-8",
-        read_file_args={},
-        to_crs="epsg:3857",
-        tooltips=None,
-        fit_bounds=True,
-        **kwargs,
+        filename:str,
+        encoding:Optional[str]="utf-8",
+        read_file_args:dict={},
+        to_crs:Optional[str]="epsg:3857",
+        tooltips:Optional[List]=None,
+        fit_bounds:bool=True,
+        **kwargs
     ):
         """Adds a shapefile to the map.
 
@@ -389,13 +389,13 @@ class Map:
 
     def add_vector(
         self,
-        filename,
-        encoding="utf-8",
-        read_file_args={},
-        to_crs="epsg:3857",
-        tooltips=None,
-        fit_bounds=True,
-        **kwargs,
+        filename:str,
+        encoding:Optional[str]="utf-8",
+        read_file_args:dict={},
+        to_crs:Optional[str]="epsg:3857",
+        tooltips:Optional[List]=None,
+        fit_bounds:bool=True,
+        **kwargs
     ):
         """Adds a vector dataset to the map.
 
@@ -423,7 +423,7 @@ class Map:
             gdf, to_crs=to_crs, tooltips=tooltips, fit_bounds=fit_bounds, **kwargs
         )
 
-    def to_html(self, filename=None, title=None, **kwargs):
+    def to_html(self, filename:Optional[str]=None, title:Optional[str]=None, **kwargs):
         """Converts the map to HTML.
 
         Args:
@@ -433,7 +433,7 @@ class Map:
         """
         save(self.figure, filename=filename, title=title, **kwargs)
 
-    def fit_bounds(self, bounds):
+    def fit_bounds(self, bounds:List[float]):
         """Fits the map to the specified bounds in the form of [xmin, ymin, xmax, ymax].
 
         Args:
@@ -447,7 +447,7 @@ class Map:
         self.figure.y_range.start = bounds[1][0]
         self.figure.y_range.end = bounds[1][1]
 
-    def to_streamlit(self, width=800, height=600, use_container_width=True, **kwargs):
+    def to_streamlit(self, width:Optional[int]=800, height:Optional[int]=600, use_container_width:bool=True, **kwargs):
         """Displays the map in a Streamlit app.
 
         Args:
