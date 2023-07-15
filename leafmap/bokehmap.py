@@ -14,13 +14,13 @@ basemaps = Box(xyz_to_bokeh(), frozen_box=True)
 class Map:
     def __init__(
         self,
-        center=[10, 0],
-        zoom=2,
-        width=800,
-        height=400,
-        basemap="OpenStreetMap",
-        grid_visible=False,
-        output_notebook=True,
+        center:List[float,float]=[10, 0],
+        zoom:float=2,
+        width:float=800,
+        height:float=400,
+        basemap:Optional[str]="OpenStreetMap",
+        grid_visible:bool=False,
+        output_notebook:bool=True,
         **kwargs,
     ):
         if "x_axis_type" not in kwargs:
