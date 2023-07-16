@@ -149,7 +149,7 @@ def update_package():
         raise Exception(e)
 
 
-def check_package(name:str, URL:Optiona[str]=""):
+def check_package(name:str, URL:Optional[str]=""):
     try:
         __import__(name.lower())
     except Exception:
@@ -158,7 +158,7 @@ def check_package(name:str, URL:Optiona[str]=""):
         )
 
 
-def _clone_repo(out_dir:Optiona[str]=".", unzip:Optiona[bool]=True):
+def _clone_repo(out_dir:Optional[str]=".", unzip:Optional[bool]=True):
     """Clones the leafmap GitHub repository.
 
     Args:
@@ -269,7 +269,7 @@ def _is_tool(name:str):
     return shutil.which(name) is not None
 
 
-def random_string(string_length:Optiona[int]=3) -> str:
+def random_string(string_length:Optional[int]=3) -> str:
     """Generates a random string of fixed length.
 
     Args:
@@ -309,7 +309,7 @@ def open_image_from_url(url:str) -> dict:
         print(e)
 
 
-def show_image(img_path:str, width:Optiona[int]=None, height:Optiona[int]=None):
+def show_image(img_path:str, width:Optional[int]=None, height:Optional[int]=None):
     """Shows an image within Jupyter notebook.
 
     Args:
