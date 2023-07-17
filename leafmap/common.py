@@ -13,7 +13,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
-from typing import Union, List, Dict, Tuple, Optional
+from typing import Union, List, Dict, Optional
 from .stac import *
 
 try:
@@ -430,7 +430,7 @@ def upload_to_imgur(in_gif:str):
         raise Exception(e)
 
 
-def rgb_to_hex(rgb:Optional[Tuple[int,int,int]]=(255, 255, 255)) -> str:
+def rgb_to_hex(rgb:Optional[tuple[int,int,int]]=(255, 255, 255)) -> str:
     """Converts RGB to hex color. In RGB color R stands for Red, G stands for Green, and B stands for Blue, and it ranges from the decimal value of 0 – 255.
 
     Args:
@@ -442,7 +442,7 @@ def rgb_to_hex(rgb:Optional[Tuple[int,int,int]]=(255, 255, 255)) -> str:
     return "%02x%02x%02x" % rgb
 
 
-def hex_to_rgb(value:Optional[str]="FFFFFF") -> Tuple[int, int,int]:
+def hex_to_rgb(value:Optional[str]="FFFFFF") -> tuple[int, int,int]:
     """Converts hex color to RGB color.
 
     Args:
@@ -456,7 +456,7 @@ def hex_to_rgb(value:Optional[str]="FFFFFF") -> Tuple[int, int,int]:
     return tuple(int(value[i : i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
-def check_color(in_color: Union[str, Tuple]) -> str:
+def check_color(in_color: Union[str, tuple]) -> str:
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
@@ -5436,7 +5436,7 @@ class The_national_map_USGS:
     def find_details(
         self,
         bbox: List[float] = None,
-        polygon: List[Tuple[float, float]] = None,
+        polygon: List[tuple[float, float]] = None,
         datasets: str = None,
         prodFormats: str = None,
         prodExtents: str = None,
@@ -7325,7 +7325,7 @@ def create_timelapse(
     out_gif: str,
     ext: str = ".tif",
     bands: Optional[List] = None,
-    size: Optional[Tuple] = None,
+    size: Optional[tuple] = None,
     bbox: Optional[List] = None,
     fps: int = 5,
     loop: int = 0,
@@ -7333,7 +7333,7 @@ def create_timelapse(
     progress_bar_color: str = "blue",
     progress_bar_height: int = 5,
     add_text: bool = False,
-    text_xy: Optional[Tuple] = None,
+    text_xy: Optional[tuple] = None,
     text_sequence: Optional[List] = None,
     font_type: str = "arial.ttf",
     font_size: int = 20,
@@ -7352,7 +7352,7 @@ def create_timelapse(
         out_gif (str): File path to the output gif.
         ext (str, optional): The extension of the images. Defaults to '.tif'.
         bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
-        size (Optional[Tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        size (Optional[tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
         bbox (Optional[list], optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
         fps (int, optional): The frames per second of the gif. Defaults to 5.
         loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.

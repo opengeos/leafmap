@@ -14,7 +14,7 @@ from box import Box
 from .basemaps import xyz_to_heremap
 from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
 from . import examples
-from typing import Optional, Union, List, Tuple, Dict, Callable, Any
+from typing import Optional, Union, List, Dict, Callable, Any
 from geopandas import GeoDataFrame, GeoSeries
 import  shapely.geometry.base.BaseGeometry
 
@@ -112,7 +112,7 @@ class Map(here_map_widget.Map):
         if zoom is not None:
             self.zoom = zoom
 
-    def zoom_to_bounds(self, bounds: Union[List, Tuple]):
+    def zoom_to_bounds(self, bounds: Union[List, tuple]):
         """Zooms to a bounding box in the form of [south, west, north, east].
 
         Args:
@@ -482,7 +482,7 @@ class Map(here_map_widget.Map):
         self,
         filename:str,
         layer_name:Optional[str]="Untitled",
-        bbox:Optional[Union[Tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
+        bbox:Optional[Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
         mask:Optional[Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
         rows:Optional[Union[int, slice]]=None,
         style:Optional[Dict]=None,

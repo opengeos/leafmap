@@ -16,7 +16,7 @@ from jinja2 import Template
 from geopandas import GeoDataFrame,GeoSeries
 basemaps = Box(xyz_to_folium(), frozen_box=True)
 import pandas as pd
-from typing import Optional, Union, Any, Callable, Tuple, Dict
+from typing import Optional, Union, Any, Callable, Dict
 import shapely
 from sqlalchemy.engine import Engine
 import ipywidgets.Image
@@ -189,7 +189,7 @@ class Map(folium.Map):
 
         arc_zoom_to_extent(lon, lat, lon, lat)
 
-    def zoom_to_bounds(self, bounds: Union[List[float], Tuple[float,float,float,float]]):
+    def zoom_to_bounds(self, bounds: Union[List[float], tuple[float,float,float,float]]):
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
 
         Args:
@@ -767,7 +767,7 @@ class Map(folium.Map):
 
     def add_osm_from_point(
         self,
-        center_point: Tuple[float, float],
+        center_point: tuple[float, float],
         tags: dict,
         dist: Optional[int] = 1000,
         layer_name: Optional[str] = "Untitled",
@@ -1438,7 +1438,7 @@ class Map(folium.Map):
         self,
         filename:str,
         layer_name:Optional[str]="Untitled",
-        bbox:Optional[Union[Tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
+        bbox:Optional[Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
         mask:Optional[Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
         rows:Optional[Union[int, slice]]=None,
         info_mode:Optional[str]="on_hover",
@@ -1675,7 +1675,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-    def st_map_center(self, st_component) -> Tuple:
+    def st_map_center(self, st_component) -> tuple:
         """Get the center of the map.
 
         Args:
@@ -1692,7 +1692,7 @@ class Map(folium.Map):
         north = bounds["_northEast"]["lat"]
         return (south + (north - south) / 2, west + (east - west) / 2)
 
-    def st_map_bounds(self, st_component) -> Tuple:
+    def st_map_bounds(self, st_component) -> tuple:
         """Get the bounds of the map in the format of (miny, minx, maxy, maxx).
 
         Args:
@@ -1942,7 +1942,7 @@ class Map(folium.Map):
         orientation:Optional[str]="horizontal",
         dpi:Optional[Union[str, float]]="figure",
         transparent:Optional[bool]=False,
-        position:Optional[Tuple]=(70, 5),
+        position:Optional[tuple]=(70, 5),
         **kwargs
     ):
         """Add a colorbar to the map. Under the hood, it uses matplotlib to generate the colorbar, save it as a png file, and add it to the map using m.add_image().
@@ -2643,7 +2643,7 @@ class Map(folium.Map):
         if add_legend:
             self.add_legend(title=legend_title, legend_dict=legend_dict)
 
-    def add_image(self, image:Union[str,ipywidgets.Image ], position:Optional[Tuple]=(0, 0), **kwargs):
+    def add_image(self, image:Union[str,ipywidgets.Image ], position:Optional[tuple]=(0, 0), **kwargs):
         """Add an image to the map.
 
         Args:
@@ -3005,7 +3005,7 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def image_overlay(self, url:str, bounds: Tuple, name:str):
+    def image_overlay(self, url:str, bounds: tuple, name:str):
         """Overlays an image from the Internet or locally on the map.
 
         Args:

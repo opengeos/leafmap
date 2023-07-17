@@ -515,7 +515,7 @@ def osm_geojson_from_place(
 
 
 def osm_gdf_from_point(
-    center_point: Tuple[float, float], tags: Dict, dist: Optional[int] = 1000
+    center_point: tuple[float, float], tags: Dict, dist: Optional[int] = 1000
 ):
     """Create GeoDataFrame of OSM entities within some distance N, S, E, W of a point.
 
@@ -535,7 +535,7 @@ def osm_gdf_from_point(
 
 
 def osm_shp_from_point(
-    center_point: Tuple[float, float],
+    center_point: tuple[float, float],
     tags: Dict,
     filepath: str,
     dist: Optional[int] = 1000,
@@ -553,7 +553,7 @@ def osm_shp_from_point(
 
 
 def osm_geojson_from_point(
-    center_point: Tuple[float, float],
+    center_point: tuple[float, float],
     tags: Dict,
     filepath: str = None,
     dist: Optional[int] = 1000,
