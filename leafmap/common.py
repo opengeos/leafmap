@@ -7321,20 +7321,20 @@ def make_gif(images, out_gif, ext="jpg", fps=10, loop=0, mp4=False, clean_up=Fal
 
 
 def create_timelapse(
-    images: Union[list, str],
+    images: Union[List, str],
     out_gif: str,
     ext: str = ".tif",
-    bands: Optional[list] = None,
-    size: Optional[tuple] = None,
-    bbox: Optional[list] = None,
+    bands: Optional[List] = None,
+    size: Optional[Tuple] = None,
+    bbox: Optional[List] = None,
     fps: int = 5,
     loop: int = 0,
     add_progress_bar: bool = True,
     progress_bar_color: str = "blue",
     progress_bar_height: int = 5,
     add_text: bool = False,
-    text_xy: Optional[tuple] = None,
-    text_sequence: Optional[list] = None,
+    text_xy: Optional[Tuple] = None,
+    text_sequence: Optional[List] = None,
     font_type: str = "arial.ttf",
     font_size: int = 20,
     font_color: str = "black",
@@ -7352,7 +7352,7 @@ def create_timelapse(
         out_gif (str): File path to the output gif.
         ext (str, optional): The extension of the images. Defaults to '.tif'.
         bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
-        size (Optional[tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        size (Optional[Tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
         bbox (Optional[list], optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
         fps (int, optional): The frames per second of the gif. Defaults to 5.
         loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.
