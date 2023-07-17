@@ -9,8 +9,12 @@ from IPython.display import display, HTML
 from .common import *
 from .osm import *
 from . import examples
-
+from typing import Optional, Union, Dict
+from geopandas import GeoDataFrame
+from pandas import DataFrame
+from sqlalchemy.engine import Engine
 try:
+
     import keplergl
 
     if "google.colab" in sys.modules:
@@ -109,7 +113,7 @@ class Map(keplergl.KeplerGl):
     #     #     bundle["text/html"] = self.display_html()
     #     # return bundle
 
-    def add_geojson(self, in_geojson, layer_name="Untitled", config=None, **kwargs):
+    def add_geojson(self, in_geojson: Union[str, Dict], layer_name:Optional[str]="Untitled", config:Optional[str]=None, **kwargs):
         """Adds a GeoJSON file to the map.
 
         Args:
@@ -163,7 +167,7 @@ class Map(keplergl.KeplerGl):
         self.add_data(data, name=layer_name)
         self.load_config(config)
 
-    def add_shp(self, in_shp, layer_name="Untitled", config=None, **kwargs):
+    def add_shp(self, in_shp:str, layer_name:Optional[str]="Untitled", config:Optional[str]=None, **kwargs):
         """Adds a shapefile to the map.
 
         Args:
@@ -204,9 +208,9 @@ class Map(keplergl.KeplerGl):
 
     def add_gdf(
         self,
-        gdf,
-        layer_name="Untitled",
-        config=None,
+        gdf: GeoDataFrame,
+        layer_name:Optional[str]="Untitled",
+        config:Optional[str]=None,
         **kwargs,
     ):
         """Adds a GeoDataFrame to the map.
@@ -224,9 +228,9 @@ class Map(keplergl.KeplerGl):
 
     def add_df(
         self,
-        df,
-        layer_name="Untitled",
-        config=None,
+        df:DataFrame,
+        layer_name:Optional[str]="Untitled",
+        config:Optional[str]=None,
         **kwargs,
     ):
         """Adds a DataFrame to the map.
@@ -245,9 +249,9 @@ class Map(keplergl.KeplerGl):
 
     def add_csv(
         self,
-        in_csv,
-        layer_name="Untitled",
-        config=None,
+        in_csv:str,
+        layer_name:Optional[str]="Untitled",
+        config:Optional[str]=None,
         **kwargs,
     ):
         """Adds a CSV to the map.
@@ -264,9 +268,9 @@ class Map(keplergl.KeplerGl):
 
     def add_vector(
         self,
-        filename,
-        layer_name="Untitled",
-        config=None,
+        filename:str,
+        layer_name:Optional[str]="Untitled",
+        config:Optional[str]=None,
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -311,9 +315,9 @@ class Map(keplergl.KeplerGl):
 
     def add_kml(
         self,
-        in_kml,
-        layer_name="Untitled",
-        config=None,
+        in_kml:str,
+        layer_name:Optional[str]="Untitled",
+        config:Optional[str]=None,
         **kwargs,
     ):
         """Adds a KML file to the map.
@@ -349,10 +353,10 @@ class Map(keplergl.KeplerGl):
 
     def add_gdf_from_postgis(
         self,
-        sql,
-        con,
-        layer_name="Untitled",
-        config=None,
+        sql:str,
+        con:Engine,
+        layer_name:Optional[str]="Untitled",
+        config:Optional[str]=None,
         **kwargs,
     ):
         """Reads a PostGIS database and returns data as a GeoDataFrame to be added to the map.
@@ -374,7 +378,7 @@ class Map(keplergl.KeplerGl):
         self.load_config(config)
 
     def static_map(
-        self, width=950, height=600, read_only=False, out_file=None, **kwargs
+        self, width:Optional[int]=950, height:Optional[int]=600, read_only:Optional[bool]=False, out_file:Optional[str]=None, **kwargs
     ):
         """Display a kepler.gl static map in a Jupyter Notebook.
 
@@ -407,8 +411,8 @@ class Map(keplergl.KeplerGl):
 
     def to_html(
         self,
-        outfile=None,
-        read_only=False,
+        outfile:Optional[str]=None,
+        read_only:Optional[bool]=False,
         **kwargs,
     ):
         """Saves the map as a HTML file.
@@ -451,7 +455,7 @@ class Map(keplergl.KeplerGl):
             raise Exception(e)
 
     def to_streamlit(
-        self, width=800, height=600, responsive=True, scrolling=False, **kwargs
+        self, width:Optional[int]=800, height:Optional[int]=600, responsive:Optional[bool]=True, scrolling:Optional[bool]=False, **kwargs
     ):
         """Renders `keplergl.KeplerGl` map figure in a Streamlit app.
 
@@ -489,7 +493,7 @@ class Map(keplergl.KeplerGl):
                 "streamlit is not installed. You need to install streamlitusing 'pip install streamlit'. Seehttps://docs.streamlit.io/library/get-started/installation"
             )
 
-    def load_config(self, config=None):
+    def load_config(self, config:Optional[str]=None):
         """Loads a kepler.gl config file.
 
         Args:
