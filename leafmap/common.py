@@ -449,7 +449,7 @@ def rgb_to_hex(rgb: Optional[Tuple[int, int, int]] = (255, 255, 255)) -> str:
     return "%02x%02x%02x" % rgb
 
 
-def hex_to_rgb(value: Optional[str] = "FFFFFF") -> tuple[int, int, int]:
+def hex_to_rgb(value: Optional[str] = "FFFFFF") -> Tuple[int, int, int]:
     """Converts hex color to RGB color.
 
     Args:
@@ -463,7 +463,7 @@ def hex_to_rgb(value: Optional[str] = "FFFFFF") -> tuple[int, int, int]:
     return tuple(int(value[i : i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
-def check_color(in_color: Union[str, tuple]) -> str:
+def check_color(in_color: Union[str, Tuple]) -> str:
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
@@ -3637,7 +3637,7 @@ def numpy_to_image(
     filename: str,
     transpose: bool = True,
     bands: Union[int, list] = None,
-    size: tuple = None,
+    size: Tuple = None,
     resize_args: dict = None,
     **kwargs,
 ) -> None:

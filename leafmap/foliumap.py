@@ -193,7 +193,7 @@ class Map(folium.Map):
         arc_zoom_to_extent(lon, lat, lon, lat)
 
     def zoom_to_bounds(
-        self, bounds: Union[List[float], tuple[float, float, float, float]]
+        self, bounds: Union[List[float], Tuple[float, float, float, float]]
     ):
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
 
@@ -774,7 +774,7 @@ class Map(folium.Map):
 
     def add_osm_from_point(
         self,
-        center_point: tuple[float, float],
+        center_point: Tuple[float, float],
         tags: dict,
         dist: Optional[int] = 1000,
         layer_name: Optional[str] = "Untitled",
@@ -1698,7 +1698,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-    def st_map_center(self, st_component) -> tuple:
+    def st_map_center(self, st_component) -> Tuple:
         """Get the center of the map.
 
         Args:
@@ -1715,7 +1715,7 @@ class Map(folium.Map):
         north = bounds["_northEast"]["lat"]
         return (south + (north - south) / 2, west + (east - west) / 2)
 
-    def st_map_bounds(self, st_component) -> tuple:
+    def st_map_bounds(self, st_component) -> Tuple:
         """Get the bounds of the map in the format of (miny, minx, maxy, maxx).
 
         Args:
@@ -1923,7 +1923,7 @@ class Map(folium.Map):
 
     def add_marker(
         self,
-        location: Union[List, tuple],
+        location: Union[List, Tuple],
         popup: Optional[str] = None,
         tooltip: Optional[str] = None,
         icon: Optional[str] = None,
@@ -3043,7 +3043,7 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def image_overlay(self, url: str, bounds: tuple, name: str):
+    def image_overlay(self, url: str, bounds: Tuple, name: str):
         """Overlays an image from the Internet or locally on the map.
 
         Args:

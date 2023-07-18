@@ -112,7 +112,7 @@ class Map(here_map_widget.Map):
         if zoom is not None:
             self.zoom = zoom
 
-    def zoom_to_bounds(self, bounds: Union[List, tuple]):
+    def zoom_to_bounds(self, bounds: Union[List, Tuple]):
         """Zooms to a bounding box in the form of [south, west, north, east].
 
         Args:
