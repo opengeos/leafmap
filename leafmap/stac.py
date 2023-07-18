@@ -2,7 +2,6 @@ import os
 import pystac
 import requests
 from typing import Optional, Dict, List, Callable, Any, Tuple, Union
-import pystac.stac_io
 import pystac_client.item_search
 from geopandas import GeoDataFrame
 from pandas import DataFrame
@@ -1134,7 +1133,7 @@ def stac_client(
     ignore_conformance: Optional[bool] = False,
     modifier: Optional[Callable] = None,
     request_modifier: Optional[Callable] = None,
-    stac_io: Optional[pystac.stac_io] = None,
+    stac_io= None,
     return_col_id: Optional[bool] = False,
     **kwargs,
 ):
