@@ -13,7 +13,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
-from typing import Union, List, Dict, Optional
+from typing import Union, List, Dict, Optional, Tuple
 from .stac import *
 
 try:
@@ -437,7 +437,7 @@ def upload_to_imgur(in_gif: str):
         raise Exception(e)
 
 
-def rgb_to_hex(rgb: Optional[tuple[int, int, int]] = (255, 255, 255)) -> str:
+def rgb_to_hex(rgb: Optional[Tuple[int, int, int]] = (255, 255, 255)) -> str:
     """Converts RGB to hex color. In RGB color R stands for Red, G stands for Green, and B stands for Blue, and it ranges from the decimal value of 0 – 255.
 
     Args:
@@ -5449,7 +5449,7 @@ class The_national_map_USGS:
     def find_details(
         self,
         bbox: List[float] = None,
-        polygon: List[tuple[float, float]] = None,
+        polygon: List[Tuple[float, float]] = None,
         datasets: str = None,
         prodFormats: str = None,
         prodExtents: str = None,
@@ -7338,7 +7338,7 @@ def create_timelapse(
     out_gif: str,
     ext: str = ".tif",
     bands: Optional[List] = None,
-    size: Optional[tuple] = None,
+    size: Optional[Tuple] = None,
     bbox: Optional[List] = None,
     fps: int = 5,
     loop: int = 0,
@@ -7346,7 +7346,7 @@ def create_timelapse(
     progress_bar_color: str = "blue",
     progress_bar_height: int = 5,
     add_text: bool = False,
-    text_xy: Optional[tuple] = None,
+    text_xy: Optional[Tuple] = None,
     text_sequence: Optional[List] = None,
     font_type: str = "arial.ttf",
     font_size: int = 20,
@@ -7365,7 +7365,7 @@ def create_timelapse(
         out_gif (str): File path to the output gif.
         ext (str, optional): The extension of the images. Defaults to '.tif'.
         bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
-        size (Optional[tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        size (Optional[Tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
         bbox (Optional[list], optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
         fps (int, optional): The frames per second of the gif. Defaults to 5.
         loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.
@@ -7373,7 +7373,7 @@ def create_timelapse(
         progress_bar_color (str, optional): The color of the progress bar, can be color name or hex code. Defaults to 'blue'.
         progress_bar_height (int, optional): The height of the progress bar. Defaults to 5.
         add_text (bool, optional): Whether to add text to the gif. Defaults to False.
-        text_xy (Optional[tuple], optional): The x, y coordinates of the text. For example, ('10%', '10%').
+        text_xy (Optional[Tuple], optional): The x, y coordinates of the text. For example, ('10%', '10%').
             Defaults to None, using the bottom left corner.
         text_sequence (Optional[list], optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
         font_type (str, optional): The font type of the text, can be 'arial.ttf' or 'alibaba.otf', or any system font. Defaults to 'arial.ttf'.

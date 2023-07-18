@@ -14,7 +14,7 @@ from box import Box
 from .basemaps import xyz_to_heremap
 from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
 from . import examples
-from typing import Optional, Union, List, Dict, Callable, Any
+from typing import Optional, Union, List, Dict, Callable, Any, Tuple
 from geopandas import GeoDataFrame, GeoSeries
 import shapely.geometry.base.BaseGeometry
 
@@ -482,7 +482,7 @@ class Map(here_map_widget.Map):
         filename: str,
         layer_name: Optional[str] = "Untitled",
         bbox: Optional[
-            Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
+            Union[Tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
         ] = None,
         mask: Optional[
             Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]

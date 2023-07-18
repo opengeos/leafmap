@@ -7,7 +7,7 @@ from .basemaps import xyz_to_plotly
 from .common import *
 from .osm import *
 from . import examples
-from typing import Optional, List, Union, Dict
+from typing import Optional, List, Union, Dict, Tuple
 from plotly import graph_objects
 from pandas import DataFrame
 
@@ -77,7 +77,7 @@ class Map(go.FigureWidget):
 
     def __init__(
         self,
-        center: Optional[tuple[float, float]] = (20, 0),
+        center: Optional[Tuple[float, float]] = (20, 0),
         zoom: Optional[float] = 1,
         basemap: Optional[str] = "open-street-map",
         height: Optional[int] = 600,

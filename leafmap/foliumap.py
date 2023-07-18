@@ -17,7 +17,7 @@ from geopandas import GeoDataFrame, GeoSeries
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
 import pandas as pd
-from typing import Optional, Union, Any, Callable, Dict
+from typing import Optional, Union, Any, Callable, Dict, Tuple
 import shapely
 from sqlalchemy.engine import Engine
 from ipywidgets.widgets import Image as ipywidgetsImage
@@ -1457,7 +1457,7 @@ class Map(folium.Map):
         filename: str,
         layer_name: Optional[str] = "Untitled",
         bbox: Optional[
-            Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
+            Union[Tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
         ] = None,
         mask: Optional[
             Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
@@ -1972,7 +1972,7 @@ class Map(folium.Map):
         orientation: Optional[str] = "horizontal",
         dpi: Optional[Union[str, float]] = "figure",
         transparent: Optional[bool] = False,
-        position: Optional[tuple] = (70, 5),
+        position: Optional[Tuple] = (70, 5),
         **kwargs,
     ):
         """Add a colorbar to the map. Under the hood, it uses matplotlib to generate the colorbar, save it as a png file, and add it to the map using m.add_image().
@@ -2675,7 +2675,7 @@ class Map(folium.Map):
     def add_image(
         self,
         image: Union[str, ipywidgetsImage],
-        position: Optional[tuple] = (0, 0),
+        position: Optional[Tuple] = (0, 0),
         **kwargs,
     ):
         """Add an image to the map.
