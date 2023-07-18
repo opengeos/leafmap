@@ -1,11 +1,13 @@
 import os
 import pystac
 import requests
-from typing import Optional, Dict, Callable, Any
+from typing import Optional, Dict, List, Callable, Any, Tuple
 import pystac.STAC_IO
 import pystac_client.ItemSearch
 from geopandas import GeoDataFrame
 from pandas import DataFrame
+
+
 class TitilerEndpoint:
     """This class contains the methods for the titiler endpoint."""
 
@@ -108,7 +110,7 @@ class PlanetaryComputerEndpoint(TitilerEndpoint):
         return f"{self.endpoint}/mosaic/{searchid}/{lon},{lat}/assets"
 
 
-def check_titiler_endpoint(titiler_endpoint:Optional[str]=None) -> Dict:
+def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Dict:
     """Returns the default titiler endpoint.
 
     Returns:
@@ -128,8 +130,12 @@ def check_titiler_endpoint(titiler_endpoint:Optional[str]=None) -> Dict:
     return titiler_endpoint
 
 
-def cog_tile(url, bands:str=None, 
-titiler_endpoint:Optional[str]="https://titiler.xyz", **kwargs):
+def cog_tile(
+    url,
+    bands: str = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
         Source code adapted from https://developmentseed.org/titiler/examples/notebooks/Working_with_CloudOptimizedGeoTIFF_simple/
 
@@ -209,10 +215,11 @@ titiler_endpoint:Optional[str]="https://titiler.xyz", **kwargs):
 
 
 def cog_tile_vmin_vmax(
-    url:str,
-     bands:Optional[List]=None,
-     titiler_endpoint:Optional[str]="https://titiler.xyz",
-     percentile:Optional[bool]=True, **kwargs
+    url: str,
+    bands: Optional[List] = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    percentile: Optional[bool] = True,
+    **kwargs,
 ) -> tuple:
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG) and return the minimum and maximum values.
 
@@ -246,11 +253,11 @@ def cog_tile_vmin_vmax(
 
 def cog_mosaic(
     links: List,
-titiler_endpoint:Optional[str]="https://titiler.xyz",
-    username:Optional[str]="anonymous",
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    username: Optional[str] = "anonymous",
     layername=None,
-    overwrite:Optional[bool]=False,
-    verbose:Optional[bool]=True,
+    overwrite: Optional[bool] = False,
+    verbose: Optional[bool] = True,
     **kwargs,
 ) -> str:
     """Creates a COG mosaic from a list of COG URLs.
@@ -310,15 +317,15 @@ titiler_endpoint:Optional[str]="https://titiler.xyz",
 
 
 def cog_mosaic_from_file(
-    filepath:str,
-    skip_rows:Optional[int]=0,
-titiler_endpoint:Optional[str]="https://titiler.xyz",
-    username:Optional[str]="anonymous",
+    filepath: str,
+    skip_rows: Optional[int] = 0,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    username: Optional[str] = "anonymous",
     layername=None,
-    overwrite:Optional[bool]=False,
-    verbose:Optional[bool]=True,
+    overwrite: Optional[bool] = False,
+    verbose: Optional[bool] = True,
     **kwargs,
-):
+) -> str:
     """Creates a COG mosaic from a csv/txt file stored locally for through HTTP URL.
 
     Args:
@@ -354,8 +361,9 @@ titiler_endpoint:Optional[str]="https://titiler.xyz",
     return mosaic
 
 
-def cog_bounds(url:str, 
-titiler_endpoint:Optional[str]="https://titiler.xyz",
+def cog_bounds(
+    url: str,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
 ) -> List:
     """Get the bounding box of a Cloud Optimized GeoTIFF (COG).
 
@@ -377,9 +385,10 @@ titiler_endpoint:Optional[str]="https://titiler.xyz",
     return bounds
 
 
-def cog_center(url:str, 
-titiler_endpoint:Optional[str]="https://titiler.xyz",
-) -> tuple:
+def cog_center(
+    url: str,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+) -> Tuple:
     """Get the centroid of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -395,8 +404,9 @@ titiler_endpoint:Optional[str]="https://titiler.xyz",
     return center
 
 
-def cog_bands(url:str, 
-titiler_endpoint:Optional[str]="https://titiler.xyz",
+def cog_bands(
+    url: str,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
 ) -> List:
     """Get band names of a Cloud Optimized GeoTIFF (COG).
 
@@ -420,8 +430,9 @@ titiler_endpoint:Optional[str]="https://titiler.xyz",
     return bands
 
 
-def cog_stats(url:str, 
-titiler_endpoint:Optional[str]="https://titiler.xyz",
+def cog_stats(
+    url: str,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
 ) -> List:
     """Get band statistics of a Cloud Optimized GeoTIFF (COG).
 
@@ -444,10 +455,11 @@ titiler_endpoint:Optional[str]="https://titiler.xyz",
     return r
 
 
-def cog_info(url:str, 
-titiler_endpoint:Optional[str]="https://titiler.xyz",
-return_geojson:Optional[bool]=False
-) -> List :
+def cog_info(
+    url: str,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    return_geojson: Optional[bool] = False,
+) -> List:
     """Get band statistics of a Cloud Optimized GeoTIFF (COG).
 
     Args:
@@ -474,13 +486,13 @@ return_geojson:Optional[bool]=False
 
 
 def cog_pixel_value(
-    lon:float,
-    lat:float,
-    url:str,
-    bidx:Optional[str],
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
-    verbose:Optional[bool]=True,
-    **kwargs
+    lon: float,
+    lat: float,
+    url: str,
+    bidx: Optional[str],
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    verbose: Optional[bool] = True,
+    **kwargs,
 ) -> List:
     """Get pixel value from COG.
 
@@ -521,14 +533,14 @@ def cog_pixel_value(
 
 
 def stac_tile(
-    url:str=None,
-    collection:str=None,
-    item:str=None,
-    assets:Union[str, List]=None,
-    bands:list=None,
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    assets: Union[str, List] = None,
+    bands: list = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
     **kwargs,
-):
+) -> str:
     """Get a tile layer from a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -695,11 +707,13 @@ def stac_tile(
     return r["tiles"][0]
 
 
-def stac_bounds(url:str=None,
- collection:str=None,
-  item:str=None, 
-      titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs) -> List:
+def stac_bounds(
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+) -> List:
     """Get the bounding box of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -742,11 +756,13 @@ def stac_bounds(url:str=None,
     return bounds
 
 
-def stac_center(url:str=None,
- collection:str=None,
-  item:str=None, 
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs):
+def stac_center(
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+) -> Tuple[float, float]:
     """Get the centroid of a single SpatialTemporal Asset Catalog (STAC) item.
 
     Args:
@@ -764,11 +780,11 @@ def stac_center(url:str=None,
 
 
 def stac_bands(
-    url:str=None,
- collection:str=None,
-  item:str=None, 
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
 ) -> List:
     """Get band names of a single SpatialTemporal Asset Catalog (STAC) item.
 
@@ -804,12 +820,14 @@ def stac_bands(
     return r
 
 
-def stac_stats(url:str=None,
- collection:str=None,
-  item:str=None, 
-  assets: Union[str, List]= None,
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs) -> List:
+def stac_stats(
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    assets: Union[str, List] = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+) -> List:
     """Get band statistics of a STAC item.
 
     Args:
@@ -850,12 +868,13 @@ def stac_stats(url:str=None,
 
 
 def stac_info(
-url:str=None,
- collection:str=None,
-  item:str=None, 
-  assets: Union[str, List]= None,
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs) -> List:
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    assets: Union[str, List] = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+) -> List:
     """Get band info of a STAC item.
 
     Args:
@@ -894,12 +913,13 @@ url:str=None,
 
 
 def stac_info_geojson(
-url:str=None,
- collection:str=None,
-  item:str=None, 
-  assets: Union[str, List]= None,
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs) -> List:
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    assets: Union[str, List] = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+) -> List:
     """Get band info of a STAC item.
 
     Args:
@@ -940,12 +960,12 @@ url:str=None,
 
 
 def stac_assets(
-    url:str=None,
- collection:str=None,
-  item:str=None, 
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
- **kwargs
-    ) -> List:
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    **kwargs,
+) -> List:
     """Get all assets of a STAC item.
 
     Args:
@@ -981,14 +1001,14 @@ def stac_assets(
 
 
 def stac_pixel_value(
-    lon:float,
-    lat:float,
-    url:str=None,
-    collection:str=None,
-    item:str=None,
-    assets:Union[str, List]=None,
-    titiler_endpoint:Optional[str]="https://titiler.xyz",
-    verbose:Optional[bool]=True,
+    lon: float,
+    lat: float,
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    assets: Union[str, List] = None,
+    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    verbose: Optional[bool] = True,
     **kwargs,
 ):
     """Get pixel value from STAC assets.
@@ -1048,7 +1068,7 @@ def stac_pixel_value(
         return result
 
 
-def stac_object_type(url:str, **kwargs) -> str:
+def stac_object_type(url: str, **kwargs) -> str:
     """Get the STAC object type.
 
     Args:
@@ -1073,7 +1093,7 @@ def stac_object_type(url:str, **kwargs) -> str:
         return None
 
 
-def stac_root_link(url:str, return_col_id:Optional[bool]=False, **kwargs) -> str:
+def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) -> str:
     """Get the root link of a STAC object.
 
     Args:
@@ -1108,14 +1128,14 @@ def stac_root_link(url:str, return_col_id:Optional[bool]=False, **kwargs) -> str
 
 
 def stac_client(
-    url:str,
-    headers:Optional[Dict]=None,
-    parameters:Optional[Dict]=None,
-    ignore_conformance:Optional[bool]=False,
-    modifier:Optional[Callable[Any]]=None,
-    request_modifier:Optional[Callable[Any]]=None,
-    stac_io:Optional[STAC_IO]=None,
-    return_col_id:Optional[bool]=False,
+    url: str,
+    headers: Optional[Dict] = None,
+    parameters: Optional[Dict] = None,
+    ignore_conformance: Optional[bool] = False,
+    modifier: Optional[Callable[Any]] = None,
+    request_modifier: Optional[Callable[Any]] = None,
+    stac_io: Optional[STAC_IO] = None,
+    return_col_id: Optional[bool] = False,
     **kwargs,
 ):
     """Get the STAC client. It wraps the pystac.Client.open() method. See
@@ -1186,8 +1206,7 @@ def stac_client(
         return None
 
 
-def stac_collections(url:str,
- return_ids:Optional[bool]=False, **kwargs) -> List:
+def stac_collections(url: str, return_ids: Optional[bool] = False, **kwargs) -> List:
     """Get the collection IDs of a STAC catalog.
 
     Args:
@@ -1213,27 +1232,27 @@ def stac_collections(url:str,
 
 
 def stac_search(
-    url:str,
-    method:Optional[str]="POST",
-    max_items:Optional[int]=None,
-    limit:Optional[int]=100,
-    ids:Optional[List]=None,
-    collections:Optional[List]=None,
-    bbox:Optional[List, tuple]=None,
-    intersects:Optional[Union[str, Dict]]=None,
-    datetime:Optional[str]=None,
-    query:Optional[List]=None,
-    filter:Optional[Dict]=None,
-    filter_lang:Optional[str]=None,
-    sortby:Optional[Union[List,str]]=None,
-    fields:Optional[List]=None,
-    get_collection:Optional[bool]=False,
-    get_items:Optional[bool]=False,
-    get_assets:Optional[bool]=False,
-    get_links:Optional[bool]=False,
-    get_gdf:Optional[bool]=False,
-    get_info:Optional[bool]=False,
-    **kwargs
+    url: str,
+    method: Optional[str] = "POST",
+    max_items: Optional[int] = None,
+    limit: Optional[int] = 100,
+    ids: Optional[List] = None,
+    collections: Optional[List] = None,
+    bbox: Optional[List, tuple] = None,
+    intersects: Optional[Union[str, Dict]] = None,
+    datetime: Optional[str] = None,
+    query: Optional[List] = None,
+    filter: Optional[Dict] = None,
+    filter_lang: Optional[str] = None,
+    sortby: Optional[Union[List, str]] = None,
+    fields: Optional[List] = None,
+    get_collection: Optional[bool] = False,
+    get_items: Optional[bool] = False,
+    get_assets: Optional[bool] = False,
+    get_links: Optional[bool] = False,
+    get_gdf: Optional[bool] = False,
+    get_info: Optional[bool] = False,
+    **kwargs,
 ) -> List:
     """Search a STAC API. The function wraps the pysatc_client.Client.search() method. See
         https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.search
@@ -1357,7 +1376,7 @@ def stac_search(
             return search
 
 
-def stac_search_to_gdf(search:pystac_client.ItemSearch, **kwargs) -> GeoDataFrame:
+def stac_search_to_gdf(search: pystac_client.ItemSearch, **kwargs) -> GeoDataFrame:
     """Convert STAC search result to a GeoDataFrame.
 
     Args:
@@ -1375,7 +1394,7 @@ def stac_search_to_gdf(search:pystac_client.ItemSearch, **kwargs) -> GeoDataFram
     return gdf
 
 
-def stac_search_to_df(search:pystac_client.ItemSearch, **kwargs) -> DataFrame:
+def stac_search_to_df(search: pystac_client.ItemSearch, **kwargs) -> DataFrame:
     """Convert STAC search result to a DataFrame.
 
     Args:
@@ -1389,7 +1408,7 @@ def stac_search_to_df(search:pystac_client.ItemSearch, **kwargs) -> DataFrame:
     return gdf.drop(columns=["geometry"], **kwargs)
 
 
-def stac_search_to_dict(search:pystac_client.ItemSearch, **kwargs) -> Dict:
+def stac_search_to_dict(search: pystac_client.ItemSearch, **kwargs) -> Dict:
     """Convert STAC search result to a dictionary.
 
     Args:
@@ -1416,7 +1435,7 @@ def stac_search_to_dict(search:pystac_client.ItemSearch, **kwargs) -> Dict:
     return info
 
 
-def stac_search_to_list(search:pystac_client.ItemSearch, **kwargs) -> List:
+def stac_search_to_list(search: pystac_client.ItemSearch, **kwargs) -> List:
     """Convert STAC search result to a list.
 
     Args:
@@ -1429,7 +1448,11 @@ def stac_search_to_list(search:pystac_client.ItemSearch, **kwargs) -> List:
     return search.item_collections()
 
 
-def download_data_catalogs(out_dir:Optional[str]=None, quiet:Optional[bool]=True, overwrite:Optional[bool]=False) -> str:
+def download_data_catalogs(
+    out_dir: Optional[str] = None,
+    quiet: Optional[bool] = True,
+    overwrite: Optional[bool] = False,
+) -> str:
     """Download geospatial data catalogs from https://github.com/giswqs/geospatial-data-catalogs.
 
     Args:
@@ -1516,7 +1539,7 @@ def set_default_bands(bands):
         return bands[:3]
 
 
-def maxar_collections(return_ids:Optional[bool]=True, **kwargs) -> List:
+def maxar_collections(return_ids: Optional[bool] = True, **kwargs) -> List:
     """Get a list of Maxar collections.
 
     Args:
@@ -1561,8 +1584,9 @@ def maxar_collections(return_ids:Optional[bool]=True, **kwargs) -> List:
     return collections
 
 
-def maxar_child_collections(collection_id:str,
- return_ids:Optional[bool]=True, **kwargs) -> List:
+def maxar_child_collections(
+    collection_id: str, return_ids: Optional[bool] = True, **kwargs
+) -> List:
     """Get a list of Maxar child collections.
 
     Args:
@@ -1603,10 +1627,13 @@ def maxar_child_collections(collection_id:str,
         return collections
 
 
-def maxar_items(collection_id:str,
- child_id:str, 
- return_gdf:Optional[bool]=True,
-  assets:Optional[List]=["visual"], **kwargs) -> GeoDataFrame:
+def maxar_items(
+    collection_id: str,
+    child_id: str,
+    return_gdf: Optional[bool] = True,
+    assets: Optional[List] = ["visual"],
+    **kwargs,
+) -> GeoDataFrame:
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1709,8 +1736,11 @@ def maxar_items(collection_id:str,
 
 
 def maxar_all_items(
-    collection_id:str,
-     return_gdf:Optional[bool]=True, assets:Optional[List]=["visual"], verbose:Optional[bool]=True, **kwargs
+    collection_id: str,
+    return_gdf: Optional[bool] = True,
+    assets: Optional[List] = ["visual"],
+    verbose: Optional[bool] = True,
+    **kwargs,
 ) -> GeoDataFrame:
     """Retrieve STAC items from Maxar's public STAC API.
 
