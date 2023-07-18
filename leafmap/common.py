@@ -8508,7 +8508,15 @@ def zonal_stats(
         raise Exception(e)
 
 
-def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **kwargs):
+def s3_list_objects(
+    bucket,
+    prefix=None,
+    limit=None,
+    ext=None,
+    fullpath=True,
+    request_payer="bucket-owner",
+    **kwargs,
+):
     """List objects in a S3 bucket
 
     Args:
@@ -8517,6 +8525,8 @@ def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **
         limit (init, optional): The maximum number of keys returned in the response body.
         ext (str, optional): Filter by file extension. Defaults to None.
         fullpath (bool, optional): Return full path. Defaults to True.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
 
     Returns:
         list: List of objects.
@@ -8532,6 +8542,7 @@ def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **
         kwargs["Prefix"] = prefix
 
     files = []
+    kwargs["RequestPayer"] = request_payer
     if isinstance(limit, int) and limit < 1000:
         kwargs["MaxKeys"] = limit
         response = client.list_objects_v2(Bucket=bucket, **kwargs)
@@ -8627,6 +8638,164 @@ def s3_download_files(
         if not quiet:
             print(f"Downloading {index+1} of {len(keys)}: {outfile}")
         s3_download_file(bucket=bucket, key=key, outfile=outfile, **kwargs)
+
+
+def s3_get_object(
+    bucket,
+    key,
+    output=None,
+    chunk_size=1024 * 1024,
+    request_payer="bucket-owner",
+    quiet=False,
+    client_args={},
+    **kwargs,
+):
+    """Download a file from S3.
+
+    Args:
+        bucket (str): The name of the bucket.
+        key (key): The key of the file.
+        output (str, optional): The name of the output file. Defaults to None.
+        chunk_size (int, optional): The chunk size in bytes. Defaults to 1024 * 1024.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+        quiet (bool, optional): Suppress output. Defaults to False.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        client_args (dict, optional): Additional arguments to pass to boto3.client(). Defaults to {}.
+        **kwargs: Additional arguments to pass to boto3.client().get_object().
+    """
+
+    try:
+        import boto3
+    except ImportError:
+        raise ImportError("boto3 is not installed. Install it with pip install boto3")
+
+    # Set up the S3 client
+    s3 = boto3.client("s3", **client_args)
+
+    if output is None:
+        output = key.split("/")[-1]
+
+    out_dir = os.path.dirname(os.path.abspath(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    # Set up the progress bar
+    def progress_callback(bytes_amount):
+        # This function will be called by the StreamingBody object
+        # to report the number of bytes downloaded so far
+        total_size = int(response["ContentLength"])
+        progress_percent = int(bytes_amount / total_size * 100)
+        if not quiet:
+            print(f"\rDownloading: {progress_percent}% complete.", end="")
+
+    # Download the file
+    response = s3.get_object(
+        Bucket=bucket, Key=key, RequestPayer=request_payer, **kwargs
+    )
+
+    # Save the file to disk
+    with open(output, "wb") as f:
+        # Use the StreamingBody object to read the file in chunks
+        # and track the download progress
+        body = response["Body"]
+        downloaded_bytes = 0
+        for chunk in body.iter_chunks(chunk_size=chunk_size):
+            f.write(chunk)
+            downloaded_bytes += len(chunk)
+            progress_callback(downloaded_bytes)
+
+
+def s3_get_objects(
+    bucket,
+    keys=None,
+    out_dir=None,
+    prefix=None,
+    limit=None,
+    ext=None,
+    chunk_size=1024 * 1024,
+    request_payer="bucket-owner",
+    quiet=True,
+    client_args={},
+    **kwargs,
+):
+    """Download multiple files from S3.
+
+    Args:
+        bucket (str): The name of the bucket.
+        keys (list, optional): A list of keys. Defaults to None.
+        out_dir (str, optional): The name of the output directory. Defaults to None.
+        prefix (str, optional): Limits the response to keys that begin with the specified prefix. Defaults to None.
+        limit (int, optional): The maximum number of keys returned in the response body.
+        ext (str, optional): Filter by file extension. Defaults to None.
+        chunk_size (int, optional): The chunk size in bytes. Defaults to 1024 * 1024.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        quiet (bool, optional): Suppress output. Defaults to True.
+        client_args (dict, optional): Additional arguments to pass to boto3.client(). Defaults to {}.
+        **kwargs: Additional arguments to pass to boto3.client().get_object().
+
+    """
+
+    try:
+        import boto3
+    except ImportError:
+        raise ImportError("boto3 is not installed. Install it with pip install boto3")
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if keys is None:
+        fullpath = False
+        keys = s3_list_objects(
+            bucket, prefix, limit, ext, fullpath, request_payer, **kwargs
+        )
+
+    for index, key in enumerate(keys):
+        print(f"Downloading {index+1} of {len(keys)}: {key}")
+        output = os.path.join(out_dir, key.split("/")[-1])
+        s3_get_object(
+            bucket, key, output, chunk_size, request_payer, quiet, client_args, **kwargs
+        )
+
+
+def s3_read_image(
+    source,
+    window=None,
+    return_array=True,
+    request_payer="bucket-owner",
+    env_args={},
+    open_args={},
+    **kwargs,
+):
+    """Read a raster from S3.
+
+    Args:
+        source (str): The path to the raster on S3.
+        window (tuple, optional): The window (col_off, row_off, width, height) to read. Defaults to None.
+        return_array (bool, optional): Whether to return a numpy array. Defaults to True.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        env_args (dict, optional): Additional arguments to pass to rasterio.Env(). Defaults to {}.
+        open_args (dict, optional): Additional arguments to pass to rasterio.open(). Defaults to {}.
+
+    Returns:
+        np.ndarray: The raster as a numpy array.
+    """
+    import rasterio
+    from rasterio.windows import Window
+
+    with rasterio.Env(AWS_REQUEST_PAYER=request_payer, **env_args):
+        src = rasterio.open(source, **open_args)
+        if not return_array:
+            return src
+        else:
+            if window is None:
+                window = Window(0, 0, src.width, src.height)
+            else:
+                window = Window(*window)
+
+            array = src.read(window=window, **kwargs)
+            return array
 
 
 def tms_to_geotiff(
