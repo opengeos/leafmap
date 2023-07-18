@@ -29,7 +29,12 @@ class WhiteboxTools(whitebox.WhiteboxTools):
         super().__init__(**kwargs)
 
 
-def whiteboxgui(verbose:Optional[bool]=True, tree:Optional[bool]=False, reset:Optional[bool]=False, sandbox_path:Optional[str]=None) -> dict:
+def whiteboxgui(
+    verbose: Optional[bool] = True,
+    tree: Optional[bool] = False,
+    reset: Optional[bool] = False,
+    sandbox_path: Optional[str] = None,
+) -> dict:
     """Shows the WhiteboxTools GUI.
 
     Args:
@@ -69,7 +74,7 @@ def _is_drive_mounted() -> bool:
         return False
 
 
-def set_proxy(port:Optional[int]=1080, ip:Optional[str]="http://127.0.0.1"):
+def set_proxy(port: Optional[int] = 1080, ip: Optional[str] = "http://127.0.0.1"):
     """Sets proxy if needed. This is only needed for countries where Google services are not available.
 
     Args:
@@ -96,7 +101,7 @@ def set_proxy(port:Optional[int]=1080, ip:Optional[str]="http://127.0.0.1"):
         raise Exception(e)
 
 
-def _check_install(package:str):
+def _check_install(package: str):
     """Checks whether a package is installed. If not, it will install the package.
 
     Args:
@@ -149,7 +154,7 @@ def update_package():
         raise Exception(e)
 
 
-def check_package(name:str, URL:Optional[str]=""):
+def check_package(name: str, URL: Optional[str] = ""):
     try:
         __import__(name.lower())
     except Exception:
@@ -158,7 +163,7 @@ def check_package(name:str, URL:Optional[str]=""):
         )
 
 
-def _clone_repo(out_dir:Optional[str]=".", unzip:Optional[bool]=True):
+def _clone_repo(out_dir: Optional[str] = ".", unzip: Optional[bool] = True):
     """Clones the leafmap GitHub repository.
 
     Args:
@@ -170,7 +175,7 @@ def _clone_repo(out_dir:Optional[str]=".", unzip:Optional[bool]=True):
     download_from_url(url, out_file_name=filename, out_dir=out_dir, unzip=unzip)
 
 
-def __install_from_github(url:str):
+def __install_from_github(url: str):
     """Install a package from a GitHub repository.
 
     Args:
@@ -228,7 +233,7 @@ def _check_git_install() -> bool:
         return False
 
 
-def _clone_github_repo(url:str, out_dir:str):
+def _clone_github_repo(url: str, out_dir: str):
     """Clones a GitHub repository.
 
     Args:
@@ -263,13 +268,13 @@ def _clone_github_repo(url:str, out_dir:str):
     os.remove(out_file_path)
 
 
-def _is_tool(name:str):
+def _is_tool(name: str):
     """Check whether `name` is on PATH and marked as executable."""
 
     return shutil.which(name) is not None
 
 
-def random_string(string_length:Optional[int]=3) -> str:
+def random_string(string_length: Optional[int] = 3) -> str:
     """Generates a random string of fixed length.
 
     Args:
@@ -286,7 +291,7 @@ def random_string(string_length:Optional[int]=3) -> str:
     return "".join(random.choice(letters) for i in range(string_length))
 
 
-def open_image_from_url(url:str) -> dict:
+def open_image_from_url(url: str) -> dict:
     """Loads an image from the specified URL.
 
     Args:
@@ -309,7 +314,9 @@ def open_image_from_url(url:str) -> dict:
         print(e)
 
 
-def show_image(img_path:str, width:Optional[int]=None, height:Optional[int]=None):
+def show_image(
+    img_path: str, width: Optional[int] = None, height: Optional[int] = None
+):
     """Shows an image within Jupyter notebook.
 
     Args:
@@ -340,7 +347,7 @@ def show_image(img_path:str, width:Optional[int]=None, height:Optional[int]=None
         print(e)
 
 
-def show_html(html:str):
+def show_html(html: str):
     """Shows HTML within Jupyter notebook.
 
     Args:
@@ -389,7 +396,7 @@ def has_transparency(img) -> bool:
     return False
 
 
-def upload_to_imgur(in_gif:str):
+def upload_to_imgur(in_gif: str):
     """Uploads an image to imgur.com
 
     Args:
@@ -430,7 +437,7 @@ def upload_to_imgur(in_gif:str):
         raise Exception(e)
 
 
-def rgb_to_hex(rgb:Optional[tuple[int,int,int]]=(255, 255, 255)) -> str:
+def rgb_to_hex(rgb: Optional[tuple[int, int, int]] = (255, 255, 255)) -> str:
     """Converts RGB to hex color. In RGB color R stands for Red, G stands for Green, and B stands for Blue, and it ranges from the decimal value of 0 – 255.
 
     Args:
@@ -442,7 +449,7 @@ def rgb_to_hex(rgb:Optional[tuple[int,int,int]]=(255, 255, 255)) -> str:
     return "%02x%02x%02x" % rgb
 
 
-def hex_to_rgb(value:Optional[str]="FFFFFF") -> tuple[int, int,int]:
+def hex_to_rgb(value: Optional[str] = "FFFFFF") -> tuple[int, int, int]:
     """Converts hex color to RGB color.
 
     Args:
@@ -496,7 +503,7 @@ def check_color(in_color: Union[str, tuple]) -> str:
         return out_color
 
 
-def system_fonts(show_full_path:Optional[bool]=False) -> List:
+def system_fonts(show_full_path: Optional[bool] = False) -> List:
     """Gets a list of system fonts
 
         # Common font locations:
@@ -530,7 +537,13 @@ def system_fonts(show_full_path:Optional[bool]=False) -> List:
         raise Exception(e)
 
 
-def download_from_url(url:str, out_file_name:Optional[str]=None, out_dir:Optional[str]=".", unzip:Optional[bool]=True, verbose:Optional[bool]=True):
+def download_from_url(
+    url: str,
+    out_file_name: Optional[str] = None,
+    out_dir: Optional[str] = ".",
+    unzip: Optional[bool] = True,
+    verbose: Optional[bool] = True,
+):
     """Download a file from a URL (e.g., https://github.com/opengeos/whitebox-python/raw/master/examples/testdata.zip)
 
     Args:

@@ -41,7 +41,11 @@ _palette_dict = {
 }
 
 
-def get_palette(cmap_name:Optional[str]=None, n_class:Optional[int]=None, hashtag:bool=False) -> List:
+def get_palette(
+    cmap_name: Optional[str] = None,
+    n_class: Optional[int] = None,
+    hashtag: bool = False,
+) -> List:
     """Get a palette from a matplotlib colormap. See the list of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
     Args:
@@ -64,13 +68,13 @@ def get_palette(cmap_name:Optional[str]=None, n_class:Optional[int]=None, hashta
 
 
 def get_colorbar(
-    colors:List,
-    vmin:Optional[float]=0,
-    vmax:Optional[float]=1,
-    width:Optional[float]=6.0,
-    height:Optional[float]=0.4,
-    orientation:Optional[str]="horizontal",
-    discrete:Optional[bool]=False,
+    colors: List,
+    vmin: Optional[float] = 0,
+    vmax: Optional[float] = 1,
+    width: Optional[float] = 6.0,
+    height: Optional[float] = 0.4,
+    orientation: Optional[str] = "horizontal",
+    discrete: Optional[bool] = False,
 ):
     """Creates a colorbar based on custom colors.
 
@@ -96,7 +100,7 @@ def get_colorbar(
     plt.show()
 
 
-def list_colormaps(add_extra:bool=False, lowercase:bool=False) -> List:
+def list_colormaps(add_extra: bool = False, lowercase: bool = False) -> List:
     """List all available colormaps. See a complete lost of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
     Returns:
@@ -112,18 +116,18 @@ def list_colormaps(add_extra:bool=False, lowercase:bool=False) -> List:
 
 
 def create_colormap(
-    cmap:Optional[str]="gray",
-    colors:Optional[List]=None,
-    discrete:Optional[bool]=False,
-    label:Optional[str]=None,
-    width:Optional[float]=8.0,
-    height:Optional[float]=0.4,
-    orientation:Optional[str]="horizontal",
-    vmin:Optional[float]=0,
-    vmax:Optional[float]=1.0,
-    axis_off:Optional[bool]=False,
-    show_name:Optional[bool]=False,
-    font_size:Optional[int]=12,
+    cmap: Optional[str] = "gray",
+    colors: Optional[List] = None,
+    discrete: Optional[bool] = False,
+    label: Optional[str] = None,
+    width: Optional[float] = 8.0,
+    height: Optional[float] = 0.4,
+    orientation: Optional[str] = "horizontal",
+    vmin: Optional[float] = 0,
+    vmax: Optional[float] = 1.0,
+    axis_off: Optional[bool] = False,
+    show_name: Optional[bool] = False,
+    font_size: Optional[int] = 12,
     **kwargs
 ):
     """Plot a matplotlib colormap.
@@ -181,18 +185,18 @@ def create_colormap(
 
 
 def plot_colormap(
-    cmap:Optional[str]="gray",
-    colors:Optional[List]=None,
-    discrete:Optional[bool]=False,
-    label:Optional[str]=None,
-    width:Optional[float]=8.0,
-    height:Optional[float]=0.4,
-    orientation:Optional[str]="horizontal",
-    vmin:Optional[float]=0,
-    vmax:Optional[float]=1.0,
-    axis_off:Optional[bool]=False,
-    show_name:Optional[bool]=False,
-    font_size:Optional[int]=12,
+    cmap: Optional[str] = "gray",
+    colors: Optional[List] = None,
+    discrete: Optional[bool] = False,
+    label: Optional[str] = None,
+    width: Optional[float] = 8.0,
+    height: Optional[float] = 0.4,
+    orientation: Optional[str] = "horizontal",
+    vmin: Optional[float] = 0,
+    vmax: Optional[float] = 1.0,
+    axis_off: Optional[bool] = False,
+    show_name: Optional[bool] = False,
+    font_size: Optional[int] = 12,
     **kwargs
 ):
     """Plot a matplotlib colormap.
@@ -249,7 +253,12 @@ def plot_colormap(
     plt.show()
 
 
-def plot_colormaps(width:Optional[float]=8.0, height:Optional[float]=0.4, return_fig:Optional[bool]=False, **kwargs):
+def plot_colormaps(
+    width: Optional[float] = 8.0,
+    height: Optional[float] = 0.4,
+    return_fig: Optional[bool] = False,
+    **kwargs
+):
     """Plot all available colormaps.
 
     Args:

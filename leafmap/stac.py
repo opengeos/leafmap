@@ -1,9 +1,9 @@
 import os
 import pystac
 import requests
-from typing import Optional, Dict, List, Callable, Any, Tuple
-import pystac.STAC_IO
-import pystac_client.ItemSearch
+from typing import Optional, Dict, List, Callable, Any, Tuple, Union
+import pystac.stac_io
+import pystac_client.item_search
 from geopandas import GeoDataFrame
 from pandas import DataFrame
 
@@ -220,7 +220,7 @@ def cog_tile_vmin_vmax(
     titiler_endpoint: Optional[str] = "https://titiler.xyz",
     percentile: Optional[bool] = True,
     **kwargs,
-) -> tuple:
+) -> Tuple:
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG) and return the minimum and maximum values.
 
     Args:
@@ -1132,9 +1132,9 @@ def stac_client(
     headers: Optional[Dict] = None,
     parameters: Optional[Dict] = None,
     ignore_conformance: Optional[bool] = False,
-    modifier: Optional[Callable[Any]] = None,
-    request_modifier: Optional[Callable[Any]] = None,
-    stac_io: Optional[STAC_IO] = None,
+    modifier: Optional[Callable] = None,
+    request_modifier: Optional[Callable] = None,
+    stac_io: Optional[pystac.stac_io] = None,
     return_col_id: Optional[bool] = False,
     **kwargs,
 ):
@@ -1159,7 +1159,7 @@ def stac_client(
             which will be an instance of requests.Request. If the callable returns a requests.Request, that
             will be used. Alternately, the callable may simply modify the provided request object and
             return None.
-        stac_io (pystac.STAC_IO, optional): A StacApiIO object to use for I/O requests. Generally, leave
+        stac_io (pystac.stac_io, optional): A StacApiIO object to use for I/O requests. Generally, leave
             this to the default. However in cases where customized I/O processing is required, a custom
             instance can be provided here.
         return_col_id (bool, optional): Return the collection ID. Defaults to False.
@@ -1238,7 +1238,7 @@ def stac_search(
     limit: Optional[int] = 100,
     ids: Optional[List] = None,
     collections: Optional[List] = None,
-    bbox: Optional[List, tuple] = None,
+    bbox: Optional[Union[List, Tuple]] = None,
     intersects: Optional[Union[str, Dict]] = None,
     datetime: Optional[str] = None,
     query: Optional[List] = None,
@@ -1376,11 +1376,11 @@ def stac_search(
             return search
 
 
-def stac_search_to_gdf(search: pystac_client.ItemSearch, **kwargs) -> GeoDataFrame:
+def stac_search_to_gdf(search: pystac_client.item_search, **kwargs) -> GeoDataFrame:
     """Convert STAC search result to a GeoDataFrame.
 
     Args:
-        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        search (pystac_client.item_search): The search result returned by leafmap.stac_search().
         **kwargs: Additional keyword arguments to pass to the GeoDataFrame.from_features() function.
 
     Returns:
@@ -1394,11 +1394,11 @@ def stac_search_to_gdf(search: pystac_client.ItemSearch, **kwargs) -> GeoDataFra
     return gdf
 
 
-def stac_search_to_df(search: pystac_client.ItemSearch, **kwargs) -> DataFrame:
+def stac_search_to_df(search: pystac_client.item_search, **kwargs) -> DataFrame:
     """Convert STAC search result to a DataFrame.
 
     Args:
-        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        search (pystac_client.item_search): The search result returned by leafmap.stac_search().
         **kwargs: Additional keyword arguments to pass to the DataFrame.drop() function.
 
     Returns:
@@ -1408,11 +1408,11 @@ def stac_search_to_df(search: pystac_client.ItemSearch, **kwargs) -> DataFrame:
     return gdf.drop(columns=["geometry"], **kwargs)
 
 
-def stac_search_to_dict(search: pystac_client.ItemSearch, **kwargs) -> Dict:
+def stac_search_to_dict(search: pystac_client.item_search, **kwargs) -> Dict:
     """Convert STAC search result to a dictionary.
 
     Args:
-        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        search (pystac_client.item_search): The search result returned by leafmap.stac_search().
 
     Returns:
         dict: A dictionary of STAC items, with the stac item id as the key, and the stac item as the value.
@@ -1435,11 +1435,11 @@ def stac_search_to_dict(search: pystac_client.ItemSearch, **kwargs) -> Dict:
     return info
 
 
-def stac_search_to_list(search: pystac_client.ItemSearch, **kwargs) -> List:
+def stac_search_to_list(search: pystac_client.item_search, **kwargs) -> List:
     """Convert STAC search result to a list.
 
     Args:
-        search (pystac_client.ItemSearch): The search result returned by leafmap.stac_search().
+        search (pystac_client.item_search): The search result returned by leafmap.stac_search().
 
     Returns:
         list: A list of STAC items.

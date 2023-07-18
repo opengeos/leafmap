@@ -8,9 +8,15 @@ import ipywidgets as widgets
 from ipyfilechooser import FileChooser
 from .common import *
 from .pc import *
+from typing import Optional, Union, Dict, List
+from leafmap import Map as leafMap
+from geemap import Map as geeMap
+from ipyleaflet import Map as ipyleafletMap
 
 
-def tool_template(m=None, opened=True):
+def tool_template(
+    m: Optional[leafMap] = None, opened: Optional[bool] = True
+) -> widgets:
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
@@ -205,7 +211,7 @@ def tool_template(m=None, opened=True):
         return toolbar_widget
 
 
-def tool_header_template(m=None, opened=True):
+def tool_header_template(m: Optional[geeMap] = None, opened: Optional[bool] = True):
     """Create a toolbar widget.
 
     Args:
@@ -305,7 +311,7 @@ def tool_header_template(m=None, opened=True):
         return toolbar_widget
 
 
-def main_toolbar(m):
+def main_toolbar(m: leafMap):
     """Creates the main toolbar and adds it to the map.
 
     Args:
@@ -579,7 +585,7 @@ def main_toolbar(m):
     m.add(toolbar_control)
 
 
-def open_data_widget(m):
+def open_data_widget(m: Dict):
     """A widget for opening local vector/raster data.
 
     Args:
@@ -944,7 +950,7 @@ def open_data_widget(m):
     m.tool_output_ctrl = tool_output_ctrl
 
 
-def open_raster_gui(m):
+def open_raster_gui(m: Dict):
     """A widget for opening local/remote COG/STAC data.
 
     Args:
@@ -1533,7 +1539,7 @@ def open_raster_gui(m):
     m.tool_output_ctrl = tool_output_ctrl
 
 
-def change_basemap(m, position="topright"):
+def change_basemap(m: leafMap, position: Optional[str] = "topright"):
     """Widget for changing basemaps.
 
     Args:
@@ -1592,7 +1598,7 @@ def change_basemap(m, position="topright"):
     m.basemap_ctrl = basemap_control
 
 
-def save_map(m):
+def save_map(m: leafMap):
     """Saves the map as HTML, JPG, or PNG.
 
     Args:
@@ -1694,7 +1700,12 @@ def save_map(m):
 
 
 def split_basemaps(
-    m, layers_dict=None, left_name=None, right_name=None, width="120px", **kwargs
+    m: ipyleafletMap,
+    layers_dict: Optional[Dict] = None,
+    left_name=None,
+    right_name=None,
+    width="120px",
+    **kwargs,
 ):
     """Create a split-panel map for visualizing two maps.
 
@@ -1814,11 +1825,11 @@ def split_basemaps(
 
 def time_slider(
     m,
-    layers_dict={},
-    labels=None,
-    time_interval=1,
-    position="bottomright",
-    slider_length="150px",
+    layers_dict: Optional[Dict] = {},
+    labels: Optional[List] = None,
+    time_interval: Optional[int] = 1,
+    position: Optional[str] = "bottomright",
+    slider_length: Optional[str] = "150px",
 ):
     """Adds a time slider to the map.
 
@@ -1929,7 +1940,7 @@ def time_slider(
     m.slider_ctrl = slider_ctrl
 
 
-def census_widget(m=None):
+def census_widget(m: Optional[leafMap] = None) -> widgets:
     """Widget for adding US Census data.
 
     Args:
@@ -2068,7 +2079,7 @@ def census_widget(m=None):
         return toolbar_widget
 
 
-def search_basemaps(m=None):
+def search_basemaps(m: Optional[leafMap] = None) -> widgets:
     """The widget for search XYZ tile services.
 
     Args:
@@ -2262,7 +2273,7 @@ def search_basemaps(m=None):
         return toolbar_widget
 
 
-def download_osm(m=None):
+def download_osm(m: Optional[leafMap] = None) -> widgets:
     """Widget for downloading OSM data.
 
     Args:
@@ -2461,7 +2472,11 @@ def download_osm(m=None):
         return toolbar_widget
 
 
-def inspector_gui(m=None, position="topright", opened=True):
+def inspector_gui(
+    m: Optional[leafMap] = None,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+) -> widgets:
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -3513,7 +3528,7 @@ def plotly_whitebox_gui(canvas):
     container_widget.children = [toolbar_widget]
 
 
-def search_geojson_gui(m=None):
+def search_geojson_gui(m: Optional[leafMap] = None) -> widgets:
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -3851,7 +3866,7 @@ def select_table_gui(m=None):
         return toolbar_widget
 
 
-def show_table_gui(m, df):
+def show_table_gui(m: Optional[leafMap], df) -> widgets:
     """Open the attribute table GUI.
 
     Args:
@@ -4104,7 +4119,7 @@ def show_table_gui(m, df):
         return toolbar_widget
 
 
-def edit_draw_gui(m):
+def edit_draw_gui(m: Optional[leafMap]) -> widgets:
     """Generates a tool GUI for editing vector data attribute table.
 
     Args:
@@ -4412,7 +4427,12 @@ def edit_draw_gui(m):
         return toolbar_widget
 
 
-def stac_gui(m=None, position="topright", opened=True, **kwargs):
+def stac_gui(
+    m: Optional[leafMap] = None,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+    **kwargs,
+) -> widgets:
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -5110,7 +5130,7 @@ def stac_gui(m=None, position="topright", opened=True, **kwargs):
         return toolbar_widget
 
 
-def stac_custom_gui(m=None, **kwargs):
+def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -5810,7 +5830,11 @@ def stac_custom_gui(m=None, **kwargs):
         return toolbar_widget
 
 
-def oam_search_gui(m=None, position="topright", opened=True):
+def oam_search_gui(
+    m: Optional[leafMap] = None,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+) -> widgets:
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
@@ -6029,7 +6053,12 @@ def oam_search_gui(m=None, position="topright", opened=True):
         return toolbar_widget
 
 
-def layer_manager_gui(m, position="topright", opened=True, return_widget=False):
+def layer_manager_gui(
+    m: geeMap,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+    return_widget: Optional[bool] = False,
+):
     """Creates a layer manager widget.
 
     Args:

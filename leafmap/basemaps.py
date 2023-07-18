@@ -17,6 +17,7 @@ import ipyleaflet
 import xyzservices.providers as xyz
 from .common import check_package, planet_tiles
 import typing
+
 # from box import Box
 
 # Custom XYZ tile services.
@@ -228,7 +229,7 @@ def _unpack_sub_parameters(var, param):
     return temp
 
 
-def get_xyz_dict(free_only:bool=True, france:bool=False) -> dict:
+def get_xyz_dict(free_only: bool = True, france: bool = False) -> dict:
     """Returns a dictionary of xyz services.
 
     Args:
@@ -345,7 +346,7 @@ def xyz_to_pydeck() -> dict:
     return pydeck_dict
 
 
-def xyz_to_folium() -> dict :
+def xyz_to_folium() -> dict:
     """Convert xyz tile services to folium tile layers.
 
     Returns:
@@ -409,7 +410,7 @@ def xyz_to_folium() -> dict :
     return folium_dict
 
 
-def xyz_to_heremap()  -> dict :
+def xyz_to_heremap() -> dict:
     """Convert xyz tile services to hermap tile layers.
 
     Returns:
@@ -510,7 +511,7 @@ def xyz_to_heremap()  -> dict :
     return heremap_dict
 
 
-def xyz_to_plotly()  -> dict :
+def xyz_to_plotly() -> dict:
     """Convert xyz tile services to plotly tile layers.
 
     Returns:
@@ -546,7 +547,7 @@ def xyz_to_plotly()  -> dict :
     return plotly_dict
 
 
-def xyz_to_bokeh() -> dict :
+def xyz_to_bokeh() -> dict:
     """Convert xyz tile services to bokeh tile layers.
 
     Returns:
@@ -600,13 +601,13 @@ def search_qms(keywords, limit=10):
         return services["results"][:limit]
 
 
-def get_qms(service_id:str) -> dict:
+def get_qms(service_id: str) -> dict:
     QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
     service_details = requests.get(f"{QMS_API}/{service_id}")
     return service_details.json()
 
 
-def qms_to_leafmap(service_id:str)-> dict:
+def qms_to_leafmap(service_id: str) -> dict:
     service_details = get_qms(service_id)
     name = service_details["name"]
     url = service_details["url"]

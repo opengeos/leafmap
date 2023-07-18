@@ -13,13 +13,16 @@ from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
 from folium.map import Layer
 from jinja2 import Template
-from geopandas import GeoDataFrame,GeoSeries
+from geopandas import GeoDataFrame, GeoSeries
+
 basemaps = Box(xyz_to_folium(), frozen_box=True)
 import pandas as pd
 from typing import Optional, Union, Any, Callable, Dict
 import shapely
 from sqlalchemy.engine import Engine
-import ipywidgets.Image
+from ipywidgets.widgets import Image as ipywidgetsImage
+
+
 class Map(folium.Map):
     """The Map class inherits folium.Map. By default, the Map will add OpenStreetMap as the basemap.
 
@@ -177,7 +180,7 @@ class Map(folium.Map):
         if self.options["layersControl"]:
             self.add_layer_control()
 
-    def set_center(self, lon:float, lat:float, zoom:Optional[int]=10):
+    def set_center(self, lon: float, lat: float, zoom: Optional[int] = 10):
         """Centers the map view at a given coordinates with the given zoom level.
 
         Args:
@@ -189,7 +192,9 @@ class Map(folium.Map):
 
         arc_zoom_to_extent(lon, lat, lon, lat)
 
-    def zoom_to_bounds(self, bounds: Union[List[float], tuple[float,float,float,float]]):
+    def zoom_to_bounds(
+        self, bounds: Union[List[float], tuple[float, float, float, float]]
+    ):
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
 
         Args:
@@ -198,7 +203,7 @@ class Map(folium.Map):
         #  The folium fit_bounds method takes lat/lon bounds in the form [[south, west], [north, east]].
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 
-    def zoom_to_gdf(self, gdf:GeoDataFrame):
+    def zoom_to_gdf(self, gdf: GeoDataFrame):
         """Zooms to the bounding box of a GeoPandas GeoDataFrame.
 
         Args:
@@ -207,7 +212,9 @@ class Map(folium.Map):
         bounds = gdf.total_bounds
         self.zoom_to_bounds(bounds)
 
-    def add_basemap(self, basemap:Optional[str]="HYBRID", show:Optional[bool]=True, **kwargs):
+    def add_basemap(
+        self, basemap: Optional[str] = "HYBRID", show: Optional[bool] = True, **kwargs
+    ):
         """Adds a basemap to the map.
 
         Args:
@@ -266,17 +273,17 @@ class Map(folium.Map):
 
     def add_wms_layer(
         self,
-        url:str,
-        layers:str,
-        name:Optional[str]=None,
-        attribution:Optional[str]="",
-        overlay:Optional[bool]=True,
-        control:Optional[bool]=True,
-        shown:Optional[bool]=True,
-        format:Optional[str]="image/png",
-        transparent:Optional[bool]=True,
-        version:Optional[str]="1.1.1",
-        styles:Optional[str]="",
+        url: str,
+        layers: str,
+        name: Optional[str] = None,
+        attribution: Optional[str] = "",
+        overlay: Optional[bool] = True,
+        control: Optional[bool] = True,
+        shown: Optional[bool] = True,
+        format: Optional[str] = "image/png",
+        transparent: Optional[bool] = True,
+        version: Optional[str] = "1.1.1",
+        styles: Optional[str] = "",
         **kwargs,
     ):
         """Add a WMS layer to the map.
@@ -314,14 +321,14 @@ class Map(folium.Map):
 
     def add_tile_layer(
         self,
-        url:str,
-        name:str,
-        attribution:str,
-        overlay:Optional[bool]=True,
-        control:Optional[bool]=True,
-        shown:Optional[bool]=True,
-        opacity:Optional[float]=1.0,
-        API_key:Optional[str]=None,
+        url: str,
+        name: str,
+        attribution: str,
+        overlay: Optional[bool] = True,
+        control: Optional[bool] = True,
+        shown: Optional[bool] = True,
+        opacity: Optional[float] = 1.0,
+        API_key: Optional[str] = None,
         **kwargs,
     ):
         """Add a XYZ tile layer to the map.
@@ -361,14 +368,14 @@ class Map(folium.Map):
 
     def add_raster(
         self,
-        source:str,
-        band:Optional[int]=None,
-        palette:Optional[str]=None,
-        vmin:Optional[float]=None,
-        vmax:Optional[float]=None,
-        nodata:Optional[float]=None,
-        attribution:Optional[str]=None,
-        layer_name:Optional[str]="Local COG",
+        source: str,
+        band: Optional[int] = None,
+        palette: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = "Local COG",
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -421,14 +428,14 @@ class Map(folium.Map):
 
     def add_remote_tile(
         self,
-        source:str,
-        band:Optional[int]=None,
-        palette:Optional[str]=None,
-        vmin:Optional[float]=None,
-        vmax:Optional[float]=None,
-        nodata:Optional[float]=None,
-        attribution:Optional[str]=None,
-        layer_name:Optional[str]=None,
+        source: str,
+        band: Optional[int] = None,
+        palette: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = None,
         **kwargs,
     ):
         """Add a remote Cloud Optimized GeoTIFF (COG) to the map.
@@ -460,18 +467,18 @@ class Map(folium.Map):
 
     def add_netcdf(
         self,
-        filename:str,
-        variables:Optional[int]=None,
-        port:str="default",
-        palette:Optional[str]=None,
-        vmin:Optional[float]=None,
-        vmax:Optional[float]=None,
-        nodata:Optional[float]=None,
-        attribution:Optional[str]=None,
-        layer_name:Optional[str]="NetCDF layer",
-        shift_lon:Optional[bool]=True,
-        lat:Optional[str]="lat",
-        lon:Optional[str]="lon",
+        filename: str,
+        variables: Optional[int] = None,
+        port: str = "default",
+        palette: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = "NetCDF layer",
+        shift_lon: Optional[bool] = True,
+        lat: Optional[str] = "lat",
+        lon: Optional[str] = "lon",
         **kwargs,
     ):
         """Generate an ipyleaflet/folium TileLayer from a netCDF file.
@@ -526,12 +533,12 @@ class Map(folium.Map):
     def add_heatmap(
         self,
         data: Union[str, List[List[float]], pd.DataFrame],
-        latitude:Optional[str]="latitude",
-        longitude:Optional[str]="longitude",
-        value:Optional[str]="value",
-        name:Optional[str]="Heat map",
-        radius:Optional[int]=25,
-        **kwargs
+        latitude: Optional[str] = "latitude",
+        longitude: Optional[str] = "longitude",
+        value: Optional[str] = "value",
+        name: Optional[str] = "Heat map",
+        radius: Optional[int] = 25,
+        **kwargs,
     ):
         """Adds a heat map to the map. Reference: https://stackoverflow.com/a/54756617
 
@@ -578,7 +585,7 @@ class Map(folium.Map):
         icon_shape: Optional[str] = "circle-dot",
         border_width: Optional[int] = 3,
         border_color: Optional[str] = "#0000ff",
-        **kwargs
+        **kwargs,
     ):
         """Adds markers to the map from a csv or Pandas DataFrame containing x, y values.
 
@@ -641,15 +648,15 @@ class Map(folium.Map):
     def add_osm_from_geocode(
         self,
         query: Union[str, dict, List],
-        which_result:Optional[int]=None,
-        by_osmid:Optional[bool]=False,
-        buffer_dist:Optional[float]=None,
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]={},
-        hover_style:Optional[Dict]={},
-        style_callback:Optional[Callable[[Any], Any]]=None,
-        fill_colors:Optional[List]=["black"],
-        info_mode:Optional[str]="on_hover"
+        which_result: Optional[int] = None,
+        by_osmid: Optional[bool] = False,
+        buffer_dist: Optional[float] = None,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = {},
+        hover_style: Optional[Dict] = {},
+        style_callback: Optional[Callable[[Any], Any]] = None,
+        fill_colors: Optional[List] = ["black"],
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM data of place(s) by name or ID to the map.
 
@@ -685,15 +692,15 @@ class Map(folium.Map):
 
     def add_osm_from_address(
         self,
-        address:str,
-        tags:dict,
-        dist:Optional[int]=1000,
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]={},
-        hover_style:Optional[Dict]={},
-        style_callback:Optional[Callable[[Any], Any]]=None,
-        fill_colors:Optional[List]=["black"],
-        info_mode:Optional[str]="on_hover"
+        address: str,
+        tags: dict,
+        dist: Optional[int] = 1000,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = {},
+        hover_style: Optional[Dict] = {},
+        style_callback: Optional[Callable[[Any], Any]] = None,
+        fill_colors: Optional[List] = ["black"],
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM entities within some distance N, S, E, W of address to the map.
 
@@ -726,7 +733,7 @@ class Map(folium.Map):
     def add_osm_from_place(
         self,
         query: Union[str, dict, List],
-        tags : dict,
+        tags: dict,
         which_result: Optional[int] = None,
         buffer_dist: Optional[float] = None,
         layer_name: Optional[str] = "Untitled",
@@ -734,7 +741,7 @@ class Map(folium.Map):
         hover_style: Optional[Dict] = {},
         style_callback: Optional[Callable[[Any], Any]] = None,
         fill_colors: Optional[List] = ["black"],
-        info_mode: Optional[str] = "on_hover"
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM entities within boundaries of geocodable place(s) to the map.
 
@@ -775,7 +782,7 @@ class Map(folium.Map):
         hover_style: Optional[Dict] = {},
         style_callback: Optional[Callable[[Any], Any]] = None,
         fill_colors: Optional[List] = ["black"],
-        info_mode: Optional[str] = "on_hover"
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM entities within some distance N, S, E, W of a point to the map.
 
@@ -807,14 +814,14 @@ class Map(folium.Map):
 
     def add_osm_from_polygon(
         self,
-        polygon: Union[shapely.geometry.Polygon,shapely.geometry.MultiPolygon],
+        polygon: Union[shapely.geometry.Polygon, shapely.geometry.MultiPolygon],
         tags: dict,
-        layer_name: Optional[str]="Untitled",
-        style:Optional[Dict]={},
-        hover_style:Optional[Dict]={},
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = {},
+        hover_style: Optional[Dict] = {},
         style_callback: Optional[Callable[[Any], Any]] = None,
-        fill_colors:Optional[List]=["black"],
-        info_mode:Optional[str]="on_hover",
+        fill_colors: Optional[List] = ["black"],
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM entities within boundaries of a (multi)polygon to the map.
 
@@ -845,17 +852,17 @@ class Map(folium.Map):
 
     def add_osm_from_bbox(
         self,
-        north:float,
-        south:float,
-        east:float,
-        west:float,
-        tags:dict,
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]={},
-        hover_style:Optional[Dict]={},
+        north: float,
+        south: float,
+        east: float,
+        west: float,
+        tags: dict,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = {},
+        hover_style: Optional[Dict] = {},
         style_callback: Optional[Callable[[Any], Any]] = None,
-        fill_colors:Optional[List]=["black"],
-        info_mode:Optional[str]="on_hover"
+        fill_colors: Optional[List] = ["black"],
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM entities within a N, S, E, W bounding box to the map.
 
@@ -896,7 +903,7 @@ class Map(folium.Map):
         hover_style: Optional[Dict] = {},
         style_callback: Optional[Callable[[Any], Any]] = None,
         fill_colors: Optional[List] = ["black"],
-        info_mode: Optional[str] = "on_hover"
+        info_mode: Optional[str] = "on_hover",
     ):
         """Adds OSM entities within the current map view to the map.
 
@@ -938,12 +945,11 @@ class Map(folium.Map):
         url: str,
         name: Optional[str] = "Untitled",
         attribution: Optional[str] = ".",
-        opacity:  Optional[float] = 1.0,
+        opacity: Optional[float] = 1.0,
         shown: Optional[bool] = True,
         bands: Optional[List] = None,
         titiler_endpoint: Optional[str] = "https://titiler.xyz",
         **kwargs,
-        
     ):
         """Adds a COG TileLayer to the map.
 
@@ -984,17 +990,17 @@ class Map(folium.Map):
 
     def add_stac_layer(
         self,
-        url:str=None,
-        collection:str=None,
-        item:str=None,
-        assets: Union[str,List]=None,
-        bands:List=None,
-        titiler_endpoint:Optional[str]=None,
-        name:Optional[str]="STAC Layer",
-        attribution:Optional[str]=".",
-        opacity:Optional[float]=1.0,
-        shown:Optional[bool]=True,
-        fit_bounds:Optional[bool]=True,
+        url: str = None,
+        collection: str = None,
+        item: str = None,
+        assets: Union[str, List] = None,
+        bands: List = None,
+        titiler_endpoint: Optional[str] = None,
+        name: Optional[str] = "STAC Layer",
+        attribution: Optional[str] = ".",
+        opacity: Optional[float] = 1.0,
+        shown: Optional[bool] = True,
+        fit_bounds: Optional[bool] = True,
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -1030,12 +1036,12 @@ class Map(folium.Map):
 
     def add_mosaic_layer(
         self,
-        url:str,
-        titiler_endpoint: Optional[str]=None,
-        name:Optional[str]="Mosaic Layer",
-        attribution:Optional[str]=".",
-        opacity:Optional[float]=1.0,
-        shown:Optional[bool]=True,
+        url: str,
+        titiler_endpoint: Optional[str] = None,
+        name: Optional[str] = "Mosaic Layer",
+        attribution: Optional[str] = ".",
+        opacity: Optional[float] = 1.0,
+        shown: Optional[bool] = True,
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -1061,15 +1067,15 @@ class Map(folium.Map):
 
     def add_legend(
         self,
-        title:Optional[str]="Legend",
-        labels:Optional[List]=None,
-        colors:Optional[List]=None,
-        legend_dict:Optional[Dict]=None,
-        builtin_legend:Optional[str]=None,
-        opacity:Optional[float]=1.0,
-        position:Optional[str]="bottomright",
-        draggable:Optional[bool]=True,
-        style:Optional[Dict]={}
+        title: Optional[str] = "Legend",
+        labels: Optional[List] = None,
+        colors: Optional[List] = None,
+        legend_dict: Optional[Dict] = None,
+        builtin_legend: Optional[str] = None,
+        opacity: Optional[float] = 1.0,
+        position: Optional[str] = "bottomright",
+        draggable: Optional[bool] = True,
+        style: Optional[Dict] = {},
     ):
         """Adds a customized legend to the map. Reference: https://bit.ly/3oV6vnH.
             If you want to add multiple legends to the map, you need to set the `draggable` argument to False.
@@ -1129,14 +1135,14 @@ class Map(folium.Map):
 
     def add_colorbar(
         self,
-        colors:List,
-        vmin:Optional[int]=0,
-        vmax:Optional[int]=1,
-        index:Optional[List]=None,
-        caption:Optional[str]="",
-        categorical:Optional[bool]=False,
-        step:Optional[int]=None,
-        **kwargs
+        colors: List,
+        vmin: Optional[int] = 0,
+        vmax: Optional[int] = 1,
+        index: Optional[List] = None,
+        caption: Optional[str] = "",
+        categorical: Optional[bool] = False,
+        step: Optional[int] = None,
+        **kwargs,
     ):
         """Add a colorbar to the map.
 
@@ -1176,7 +1182,13 @@ class Map(folium.Map):
 
         self.add_child(colormap)
 
-    def add_shp(self, in_shp:str, layer_name:Optional[str]="Untitled", info_mode:Optional[str]="on_hover", **kwargs):
+    def add_shp(
+        self,
+        in_shp: str,
+        layer_name: Optional[str] = "Untitled",
+        info_mode: Optional[str] = "on_hover",
+        **kwargs,
+    ):
         """Adds a shapefile to the map. See https://python-visualization.github.io/folium/modules.html#folium.features.GeoJson for more info about setting style.
 
         Args:
@@ -1215,10 +1227,10 @@ class Map(folium.Map):
 
     def add_geojson(
         self,
-        in_geojson:str,
-        layer_name:Optional[str]="Untitled",
-        encoding:Optional[str]="utf-8",
-        info_mode:Optional[str]="on_hover",
+        in_geojson: str,
+        layer_name: Optional[str] = "Untitled",
+        encoding: Optional[str] = "utf-8",
+        info_mode: Optional[str] = "on_hover",
         **kwargs,
     ):
         """Adds a GeoJSON file to the map.
@@ -1336,11 +1348,11 @@ class Map(folium.Map):
 
     def add_gdf(
         self,
-        gdf:GeoDataFrame,
-        layer_name:Optional[str]="Untitled",
-        zoom_to_layer:Optional[bool]=True,
-        info_mode:Optional[str]="on_hover",
-        **kwargs
+        gdf: GeoDataFrame,
+        layer_name: Optional[str] = "Untitled",
+        zoom_to_layer: Optional[bool] = True,
+        info_mode: Optional[str] = "on_hover",
+        **kwargs,
     ):
         """Adds a GeoPandas GeoDataFrameto the map.
 
@@ -1372,12 +1384,12 @@ class Map(folium.Map):
 
     def add_gdf_from_postgis(
         self,
-        sql:str,
-        con:Engine,
-        layer_name:Optional[str]="Untitled",
-        zoom_to_layer:Optional[bool]=True,
-        info_mode:Optional[str]="on_hover",
-        **kwargs
+        sql: str,
+        con: Engine,
+        layer_name: Optional[str] = "Untitled",
+        zoom_to_layer: Optional[bool] = True,
+        info_mode: Optional[str] = "on_hover",
+        **kwargs,
     ):
         """Adds a GeoPandas GeoDataFrameto the map.
 
@@ -1406,7 +1418,13 @@ class Map(folium.Map):
             north = np.max(bounds["maxy"])
             self.fit_bounds([[south, east], [north, west]])
 
-    def add_kml(self, in_kml:str, layer_name:Optional[str]="Untitled", info_mode:Optional[str]="on_hover", **kwargs):
+    def add_kml(
+        self,
+        in_kml: str,
+        layer_name: Optional[str] = "Untitled",
+        info_mode: Optional[str] = "on_hover",
+        **kwargs,
+    ):
         """Adds a KML file to the map.
 
         Args:
@@ -1436,13 +1454,18 @@ class Map(folium.Map):
 
     def add_vector(
         self,
-        filename:str,
-        layer_name:Optional[str]="Untitled",
-        bbox:Optional[Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
-        mask:Optional[Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
-        rows:Optional[Union[int, slice]]=None,
-        info_mode:Optional[str]="on_hover",
-        **kwargs):
+        filename: str,
+        layer_name: Optional[str] = "Untitled",
+        bbox: Optional[
+            Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
+        ] = None,
+        mask: Optional[
+            Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
+        ] = None,
+        rows: Optional[Union[int, slice]] = None,
+        info_mode: Optional[str] = "on_hover",
+        **kwargs,
+    ):
         """Adds any geopandas-supported vector dataset to the map.
 
         Args:
@@ -1476,11 +1499,11 @@ class Map(folium.Map):
 
     def add_planet_by_month(
         self,
-        year:Optional[int]=2016,
-        month:Optional[int]=1,
-        layer_name:Optional[str]=None,
-        api_key:Optional[str]=None,
-        token_name:Optional[str]="PLANET_API_KEY",
+        year: Optional[int] = 2016,
+        month: Optional[int] = 1,
+        layer_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        token_name: Optional[str] = "PLANET_API_KEY",
         **kwargs,
     ):
         """Adds a Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
@@ -1501,11 +1524,11 @@ class Map(folium.Map):
 
     def add_planet_by_quarter(
         self,
-        year:Optional[int]=2016,
-        quarter:Optional[int]=1,
-        layer_name:Optional[str]=None,
-        api_key:Optional[str]=None,
-        token_name:Optional[str]="PLANET_API_KEY",
+        year: Optional[int] = 2016,
+        quarter: Optional[int] = 1,
+        layer_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        token_name: Optional[str] = "PLANET_API_KEY",
         **kwargs,
     ):
         """Adds a Planet global mosaic by quarter to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
@@ -1526,14 +1549,14 @@ class Map(folium.Map):
 
     def publish(
         self,
-        name:Optional[str]="Folium Map",
-        description:Optional[str]="",
-        source_url:Optional[str]="",
-        tags:Optional[List]=None,
-        source_file:Optional[str]=None,
-        open:Optional[bool]=True,
+        name: Optional[str] = "Folium Map",
+        description: Optional[str] = "",
+        source_url: Optional[str] = "",
+        tags: Optional[List] = None,
+        source_file: Optional[str] = None,
+        open: Optional[bool] = True,
         formatting=None,
-        token:Optional[str]=None,
+        token: Optional[str] = None,
         **kwargs,
     ):
         """Publish the map to datapane.com
@@ -1590,7 +1613,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-    def to_html(self, outfile:Optional[str]=None, **kwargs) -> str:
+    def to_html(self, outfile: Optional[str] = None, **kwargs) -> str:
         """Exports a map as an HTML file.
 
         Args:
@@ -1626,11 +1649,11 @@ class Map(folium.Map):
 
     def to_streamlit(
         self,
-        width:Optional[int]=None,
-        height:Optional[int]=600,
-        scrolling:Optional[bool]=False,
-        add_layer_control:Optional[bool]=True,
-        bidirectional:Optional[bool]=False,
+        width: Optional[int] = None,
+        height: Optional[int] = 600,
+        scrolling: Optional[bool] = False,
+        add_layer_control: Optional[bool] = True,
+        bidirectional: Optional[bool] = False,
         **kwargs,
     ):
         """Renders `folium.Figure` or `folium.Map` in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
@@ -1711,7 +1734,7 @@ class Map(folium.Map):
         bounds = [[south, west], [north, east]]
         return bounds
 
-    def st_fit_bounds(self) -> Map:
+    def st_fit_bounds(self) -> folium.Map:
         """Fit the map to the bounds of the map.
 
         Returns:
@@ -1766,10 +1789,13 @@ class Map(folium.Map):
 
         return st_component["all_drawings"]
 
-    def add_title(self, 
-    title:str, 
-    align:Optional[str]="center", 
-    font_size:Optional[str]="16px", style=None):
+    def add_title(
+        self,
+        title: str,
+        align: Optional[str] = "center",
+        font_size: Optional[str] = "16px",
+        style=None,
+    ):
         """Adds a title to the map.
 
         Args:
@@ -1792,11 +1818,14 @@ class Map(folium.Map):
             )
         self.get_root().html.add_child(folium.Element(title_html))
 
-    def static_map(self,
-     width:Optional[int]=950,
-      height:Optional[int]=600, 
-      read_only:Optional[bool]=False,
-      out_file:Optional[str]=None, **kwargs):
+    def static_map(
+        self,
+        width: Optional[int] = 950,
+        height: Optional[int] = 600,
+        read_only: Optional[bool] = False,
+        out_file: Optional[str] = None,
+        **kwargs,
+    ):
         """Display a folium static map in a Jupyter Notebook.
 
         Args
@@ -1818,9 +1847,9 @@ class Map(folium.Map):
         else:
             raise TypeError("The provided map is not a folium map.")
 
-    def add_census_data(self, wms:str,
-     layer:str,
-      census_dict:Optional[Dict]=None, **kwargs):
+    def add_census_data(
+        self, wms: str, layer: str, census_dict: Optional[Dict] = None, **kwargs
+    ):
         """Adds a census data layer to the map.
 
         Args:
@@ -1859,7 +1888,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-    def add_xyz_service(self, provider:str, **kwargs):
+    def add_xyz_service(self, provider: str, **kwargs):
         """Add a XYZ tile layer to the map.
 
         Args:
@@ -1893,12 +1922,13 @@ class Map(folium.Map):
             )
 
     def add_marker(
-        self, location: Union[List, tuple],
-         popup: Optional[str] = None, 
-         tooltip: Optional[str]=None, 
-         icon: Optional[str]=None, 
-         draggable: Optional[bool]=False,
-        **kwargs
+        self,
+        location: Union[List, tuple],
+        popup: Optional[str] = None,
+        tooltip: Optional[str] = None,
+        icon: Optional[str] = None,
+        draggable: Optional[bool] = False,
+        **kwargs,
     ):
         """Adds a marker to the map. More info about marker options at https://python-visualization.github.io/folium/modules.html#folium.map.Marker.
 
@@ -1926,24 +1956,24 @@ class Map(folium.Map):
 
     def add_colormap(
         self,
-        width:float=4.0,
-        height:float=0.3,
-        vmin:float=0,
-        vmax:float=1.0,
-        palette:List=None,
-        vis_params:dict=None,
-        cmap:Optional[str]="gray",
-        discrete:Optional[bool]=False,
-        label:Optional[str]=None,
-        label_size:Optional[int]=12,
-        label_weight:Optional[str]="normal",
-        tick_size:Optional[int]=10,
-        bg_color:Optional[str]="white",
-        orientation:Optional[str]="horizontal",
-        dpi:Optional[Union[str, float]]="figure",
-        transparent:Optional[bool]=False,
-        position:Optional[tuple]=(70, 5),
-        **kwargs
+        width: float = 4.0,
+        height: float = 0.3,
+        vmin: float = 0,
+        vmax: float = 1.0,
+        palette: List = None,
+        vis_params: dict = None,
+        cmap: Optional[str] = "gray",
+        discrete: Optional[bool] = False,
+        label: Optional[str] = None,
+        label_size: Optional[int] = 12,
+        label_weight: Optional[str] = "normal",
+        tick_size: Optional[int] = 10,
+        bg_color: Optional[str] = "white",
+        orientation: Optional[str] = "horizontal",
+        dpi: Optional[Union[str, float]] = "figure",
+        transparent: Optional[bool] = False,
+        position: Optional[tuple] = (70, 5),
+        **kwargs,
     ):
         """Add a colorbar to the map. Under the hood, it uses matplotlib to generate the colorbar, save it as a png file, and add it to the map using m.add_image().
 
@@ -1998,22 +2028,22 @@ class Map(folium.Map):
 
     def add_points_from_xy(
         self,
-        data:Union[str, pd.DataFrame],
-        x:Optional[str]="longitude",
-        y:Optional[str]="latitude",
-        popup:Optional[List]=None,
-        min_width:Optional[int]=100,
-        max_width:Optional[int]=200,
-        layer_name:Optional[str]="Points",
-        color_column:Optional[str]=None,
-        marker_colors:Optional[List]=None,
-        icon_colors:Optional[List]=None,
-        icon_names:Optional[List]=None,
-        angle:Optional[int]=0,
-        prefix:Optional[str]="fa",
-        add_legend:Optional[bool]=True,
-        max_cluster_radius:Optional[int]=80,
-        **kwargs
+        data: Union[str, pd.DataFrame],
+        x: Optional[str] = "longitude",
+        y: Optional[str] = "latitude",
+        popup: Optional[List] = None,
+        min_width: Optional[int] = 100,
+        max_width: Optional[int] = 200,
+        layer_name: Optional[str] = "Points",
+        color_column: Optional[str] = None,
+        marker_colors: Optional[List] = None,
+        icon_colors: Optional[List] = None,
+        icon_names: Optional[List] = None,
+        angle: Optional[int] = 0,
+        prefix: Optional[str] = "fa",
+        add_legend: Optional[bool] = True,
+        max_cluster_radius: Optional[int] = 80,
+        **kwargs,
     ):
         """Adds a marker cluster to the map.
 
@@ -2155,13 +2185,13 @@ class Map(folium.Map):
     def add_circle_markers_from_xy(
         self,
         data: Union[str, pd.DataFrame],
-        x:Optional[str]="longitude",
-        y:Optional[str]="latitude",
-        radius:Optional[int]=10,
-        popup:Optional[List]=None,
-        tooltip:Optional[List]=None,
-        min_width:Optional[int]=100,
-        max_width:Optional[int]=200,
+        x: Optional[str] = "longitude",
+        y: Optional[str] = "latitude",
+        radius: Optional[int] = 10,
+        popup: Optional[List] = None,
+        tooltip: Optional[List] = None,
+        min_width: Optional[int] = 100,
+        max_width: Optional[int] = 200,
         **kwargs,
     ):
         """Adds a marker cluster to the map.
@@ -2238,17 +2268,17 @@ class Map(folium.Map):
 
     def add_labels(
         self,
-        data:Union[pd.DataFrame, str, GeoDataFrame],
-        column:str,
-        font_size:Optional[str]="12pt",
-        font_color:Optional[str]="black",
-        font_family:Optional[str]="arial",
-        font_weight:Optional[str]="normal",
-        x:Optional[str]="longitude",
-        y:Optional[str]="latitude",
-        draggable:Optional[bool]=True,
-        layer_name:Optional[str]="Labels",
-        **kwargs
+        data: Union[pd.DataFrame, str, GeoDataFrame],
+        column: str,
+        font_size: Optional[str] = "12pt",
+        font_color: Optional[str] = "black",
+        font_family: Optional[str] = "arial",
+        font_weight: Optional[str] = "normal",
+        x: Optional[str] = "longitude",
+        y: Optional[str] = "latitude",
+        draggable: Optional[bool] = True,
+        layer_name: Optional[str] = "Labels",
+        **kwargs,
     ):
         """Adds a label layer to the map. Reference: https://python-visualization.github.io/folium/modules.html#folium.features.DivIcon
 
@@ -2323,15 +2353,15 @@ class Map(folium.Map):
 
     def split_map(
         self,
-        left_layer:Optional[str]="TERRAIN",
-        right_layer:Optional[str]="OpenTopoMap",
-        left_args:Optional[Dict]={},
-        right_args:Optional[Dict]={},
-        left_label:Optional[str]=None,
-        right_label:Optional[str]=None,
-        left_position:Optional[str]="bottomleft",
-        right_position:Optional[str]="bottomright",
-        **kwargs
+        left_layer: Optional[str] = "TERRAIN",
+        right_layer: Optional[str] = "OpenTopoMap",
+        left_args: Optional[Dict] = {},
+        right_args: Optional[Dict] = {},
+        left_label: Optional[str] = None,
+        right_label: Optional[str] = None,
+        left_position: Optional[str] = "bottomleft",
+        right_position: Optional[str] = "bottomright",
+        **kwargs,
     ):
         """Adds a split-panel map.
 
@@ -2496,22 +2526,21 @@ class Map(folium.Map):
         self,
         data: Union[str, pd.DataFrame, GeoDataFrame],
         column: str,
-        cmap:Optional[str]=None,
-        colors:Optional[List]=None,
-        labels:Optional[List]=None,
-        
-        scheme:Optional[str]="Quantiles",
-        k:Optional[int]=5,
-        add_legend:Optional[bool]=True,
-        legend_title:Optional[str]=None,
-        legend_position:Optional[str]="bottomright",
-        legend_kwds:Optional[Dict]=None,
-        classification_kwds:Optional[Dict]=None,
-        style_function:Optional[Callable]=None,
-        highlight_function:Optional[Callable]=None,
-        layer_name:Optional[str]="Untitled",
-        info_mode:Optional[str]="on_hover",
-        encoding:Optional[str]="utf-8",
+        cmap: Optional[str] = None,
+        colors: Optional[List] = None,
+        labels: Optional[List] = None,
+        scheme: Optional[str] = "Quantiles",
+        k: Optional[int] = 5,
+        add_legend: Optional[bool] = True,
+        legend_title: Optional[str] = None,
+        legend_position: Optional[str] = "bottomright",
+        legend_kwds: Optional[Dict] = None,
+        classification_kwds: Optional[Dict] = None,
+        style_function: Optional[Callable] = None,
+        highlight_function: Optional[Callable] = None,
+        layer_name: Optional[str] = "Untitled",
+        info_mode: Optional[str] = "on_hover",
+        encoding: Optional[str] = "utf-8",
         **kwargs,
     ):
         """Add vector data to the map with a variety of classification schemes.
@@ -2643,7 +2672,12 @@ class Map(folium.Map):
         if add_legend:
             self.add_legend(title=legend_title, legend_dict=legend_dict)
 
-    def add_image(self, image:Union[str,ipywidgets.Image ], position:Optional[tuple]=(0, 0), **kwargs):
+    def add_image(
+        self,
+        image: Union[str, ipywidgetsImage],
+        position: Optional[tuple] = (0, 0),
+        **kwargs,
+    ):
         """Add an image to the map.
 
         Args:
@@ -2683,7 +2717,9 @@ class Map(folium.Map):
         else:
             raise Exception("Invalid image")
 
-    def add_widget(self, content:str, position:Optional[str]="bottomright", **kwargs):
+    def add_widget(
+        self, content: str, position: Optional[str] = "bottomright", **kwargs
+    ):
         """Add a widget (e.g., text, HTML, figure) to the map.
 
         Args:
@@ -2720,7 +2756,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(f"Error adding widget: {e}")
 
-    def add_html(self, html:str, position:Optional[str]="bottomright", **kwargs):
+    def add_html(self, html: str, position: Optional[str] = "bottomright", **kwargs):
         """Add HTML to the map.
 
         Args:
@@ -2732,15 +2768,15 @@ class Map(folium.Map):
 
     def add_text(
         self,
-        text:str,
-        fontsize:Optional[int]=20,
-        fontcolor:Optional[str]="black",
-        bold:Optional[bool]=False,
-        padding:Optional[str]="5px",
-        background:Optional[bool]=True,
-        bg_color:Optional[str]="white",
-        border_radius:Optional[str]="5px",
-        position:Optional[str]="bottomright",
+        text: str,
+        fontsize: Optional[int] = 20,
+        fontcolor: Optional[str] = "black",
+        bold: Optional[bool] = False,
+        padding: Optional[str] = "5px",
+        background: Optional[bool] = True,
+        bg_color: Optional[str] = "white",
+        border_radius: Optional[str] = "5px",
+        position: Optional[str] = "bottomright",
         **kwargs,
     ):
         """Add text to the map.
@@ -2769,10 +2805,10 @@ class Map(folium.Map):
 
     def add_vector_tile(
         self,
-        url:Optional[str],
-        attribution:Optional[str]="",
-        styles:Optional[Dict]={},
-        layer_name:Optional[str]="Vector Tile",
+        url: Optional[str],
+        attribution: Optional[str] = "",
+        styles: Optional[Dict] = {},
+        layer_name: Optional[str] = "Vector Tile",
         **kwargs,
     ):
         """Adds a VectorTileLayer to the map. It wraps the folium.plugins.VectorGridProtobuf class. See
@@ -2802,7 +2838,9 @@ class Map(folium.Map):
         vc = plugins.VectorGridProtobuf(url, layer_name, options)
         self.add_child(vc)
 
-    def to_gradio(self, width:Optional[str]="100%", height:Optional[str]="500px", **kwargs):
+    def to_gradio(
+        self, width: Optional[str] = "100%", height: Optional[str] = "500px", **kwargs
+    ):
         """Converts the map to an HTML string that can be used in Gradio. Removes unsupported elements, such as
             attribution and any code blocks containing functions. See https://github.com/gradio-app/gradio/issues/3190
 
@@ -2849,13 +2887,13 @@ class Map(folium.Map):
 
     def oam_search(
         self,
-        bbox:Optional[Union[List, str]]=None,
-        start_date:Optional[str]=None,
-        end_date:Optional[str]=None,
-        limit:Optional[int]=100,
-        info_mode:Optional[str]="on_click",
-        layer_args:Optional[Dict]={},
-        add_image:Optional[bool]=True,
+        bbox: Optional[Union[List, str]] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        limit: Optional[int] = 100,
+        info_mode: Optional[str] = "on_click",
+        layer_args: Optional[Dict] = {},
+        add_image: Optional[bool] = True,
         **kwargs,
     ):
         """Search OpenAerialMap for images within a bounding box and time range.
@@ -3005,7 +3043,7 @@ class Map(folium.Map):
             "The folium plotting backend does not support this function. Use the ipyleaflet plotting backend instead."
         )
 
-    def image_overlay(self, url:str, bounds: tuple, name:str):
+    def image_overlay(self, url: str, bounds: tuple, name: str):
         """Overlays an image from the Internet or locally on the map.
 
         Args:
@@ -3047,7 +3085,7 @@ class Map(folium.Map):
         """Adds a search control to the map."""
         print("The folium plotting backend does not support this function.")
 
-    def save_draw_features(self, out_file:str, indent:Optional[int]=4, **kwargs):
+    def save_draw_features(self, out_file: str, indent: Optional[int] = 4, **kwargs):
         """Save the draw features to a file.
 
         Args:
@@ -3056,7 +3094,7 @@ class Map(folium.Map):
         """
         print("The folium plotting backend does not support this function.")
 
-    def edit_vector(self, data:Union[str, Dict], **kwargs):
+    def edit_vector(self, data: Union[str, Dict], **kwargs):
         """Edit a vector layer.
 
         Args:
@@ -3078,7 +3116,7 @@ class Map(folium.Map):
     ):
         print(f"The folium plotting backend does not support this function.")
 
-    def user_roi_bounds(self, decimals:Optional[int]=4) -> List:
+    def user_roi_bounds(self, decimals: Optional[int] = 4) -> List:
         """Get the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
 
         Args:
@@ -3356,7 +3394,7 @@ def split_map(
     )
 
 
-def st_map_center(lat:float, lon:float):
+def st_map_center(lat: float, lon: float):
     """Returns the map center coordinates for a given latitude and longitude. If the system variable 'map_center' exists, it is used. Otherwise, the default is returned.
 
     Args:
@@ -3381,7 +3419,7 @@ def st_map_center(lat:float, lon:float):
         raise Exception(e)
 
 
-def st_save_bounds(st_component:Map):
+def st_save_bounds(st_component: Map):
     """Saves the map bounds to the session state.
 
     Args:
@@ -3407,10 +3445,10 @@ def st_save_bounds(st_component:Map):
 
 
 def geojson_layer(
-    in_geojson:str,
-    layer_name:Optional[str]="Untitled",
-    encoding:Optional[str]="utf-8",
-    info_mode:Optional[str]="on_hover",
+    in_geojson: str,
+    layer_name: Optional[str] = "Untitled",
+    encoding: Optional[str] = "utf-8",
+    info_mode: Optional[str] = "on_hover",
     **kwargs,
 ):
     """Adds a GeoJSON file to the map.

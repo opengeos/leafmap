@@ -56,7 +56,7 @@ class Map(pdk.Deck):
 
         super().__init__(**kwargs)
 
-    def add_layer(self, layer, layer_name:Optional[str]=None, **kwargs):
+    def add_layer(self, layer, layer_name: Optional[str] = None, **kwargs):
         """Add a layer to the map.
 
         Args:
@@ -77,7 +77,7 @@ class Map(pdk.Deck):
         except Exception as e:
             raise Exception(e)
 
-    def add_basemap(self, basemap:str="HYBRID"):
+    def add_basemap(self, basemap: str = "HYBRID"):
         """Adds a basemap to the map.
 
         Args:
@@ -117,7 +117,13 @@ class Map(pdk.Deck):
                 )
             )
 
-    def add_gdf(self, gdf:GeoDataFrame, layer_name:Optional[str]=None, random_color_column:Optional[str]=None, **kwargs):
+    def add_gdf(
+        self,
+        gdf: GeoDataFrame,
+        layer_name: Optional[str] = None,
+        random_color_column: Optional[str] = None,
+        **kwargs
+    ):
         """Adds a GeoPandas GeoDataFrame to the map.
 
         Args:
@@ -181,7 +187,13 @@ class Map(pdk.Deck):
         except Exception as e:
             raise Exception(e)
 
-    def add_vector(self, filename:str, layer_name:Optional[str]=None, random_color_column:Optional[str]=None, **kwargs):
+    def add_vector(
+        self,
+        filename: str,
+        layer_name: Optional[str] = None,
+        random_color_column: Optional[str] = None,
+        **kwargs
+    ):
         """Adds a vector file to the map.
 
         Args:
@@ -214,7 +226,11 @@ class Map(pdk.Deck):
             raise Exception(e)
 
     def add_geojson(
-        self, filename:str, layer_name:Optional[str]=None, random_color_column:Optional[str]=None, **kwargs
+        self,
+        filename: str,
+        layer_name: Optional[str] = None,
+        random_color_column: Optional[str] = None,
+        **kwargs
     ):
         """Adds a GeoJSON file to the map.
 
@@ -228,7 +244,13 @@ class Map(pdk.Deck):
         """
         self.add_vector(filename, layer_name, random_color_column, **kwargs)
 
-    def add_shp(self, filename:str, layer_name:Optional[str]=None, random_color_column:Optional[str]=None, **kwargs):
+    def add_shp(
+        self,
+        filename: str,
+        layer_name: Optional[str] = None,
+        random_color_column: Optional[str] = None,
+        **kwargs
+    ):
         """Adds a shapefile to the map.
 
         Args:
@@ -241,7 +263,13 @@ class Map(pdk.Deck):
         """
         self.add_vector(filename, layer_name, random_color_column, **kwargs)
 
-    def add_kml(self, filename:str, layer_name:Optional[str]=None, random_color_column:Optional[str]=None, **kwargs):
+    def add_kml(
+        self,
+        filename: str,
+        layer_name: Optional[str] = None,
+        random_color_column: Optional[str] = None,
+        **kwargs
+    ):
         """Adds a KML file to the map.
 
         Args:

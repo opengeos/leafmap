@@ -16,7 +16,7 @@ from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_st
 from . import examples
 from typing import Optional, Union, List, Dict, Callable, Any
 from geopandas import GeoDataFrame, GeoSeries
-import  shapely.geometry.base.BaseGeometry
+import shapely.geometry.base.BaseGeometry
 
 try:
     import here_map_widget
@@ -100,7 +100,7 @@ class Map(here_map_widget.Map):
         if kwargs["scale_control"]:
             self.add_control(ScaleBar(alignment="LEFT_BOTTOM"))
 
-    def set_center(self, lon:float, lat:float, zoom:Optional[int] =None):
+    def set_center(self, lon: float, lat: float, zoom: Optional[int] = None):
         """Centers the map view at a given coordinates with the given zoom level.
 
         Args:
@@ -120,7 +120,7 @@ class Map(here_map_widget.Map):
         """
         self.bounds = tuple(bounds)
 
-    def zoom_to_gdf(self, gdf:GeoDataFrame):
+    def zoom_to_gdf(self, gdf: GeoDataFrame):
         """Zooms to the bounding box of a GeoPandas GeoDataFrame.
 
         Args:
@@ -129,7 +129,7 @@ class Map(here_map_widget.Map):
         bounds = gdf.total_bounds
         self.zoom_to_bounds(bounds)
 
-    def add_basemap(self, basemap:Optional[str]="HYBRID"):
+    def add_basemap(self, basemap: Optional[str] = "HYBRID"):
         """Adds a basemap to the map.
 
         Args:
@@ -163,10 +163,10 @@ class Map(here_map_widget.Map):
 
     def add_tile_layer(
         self,
-        url:str,
-        name:str,
-        attribution:str,
-        opacity:Optional[float]=1.0,
+        url: str,
+        name: str,
+        attribution: str,
+        opacity: Optional[float] = 1.0,
         **kwargs,
     ):
         """Adds a TileLayer to the map.
@@ -193,15 +193,15 @@ class Map(here_map_widget.Map):
 
     def add_geojson(
         self,
-        in_geojson:Union[str, Dict],
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]=None,
-        hover_style:Optional[Dict]=None,
-        style_callback:Optional[Callable[Any]]=None,
-        fill_colors:Optional[List]=None,
-        info_mode:Optional[str]="on_hover",
-        point_style:Optional[Dict]=None,
-        default_popup:Optional[bool]=False,
+        in_geojson: Union[str, Dict],
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = None,
+        hover_style: Optional[Dict] = None,
+        style_callback: Optional[Callable[Any]] = None,
+        fill_colors: Optional[List] = None,
+        info_mode: Optional[str] = "on_hover",
+        point_style: Optional[Dict] = None,
+        default_popup: Optional[bool] = False,
     ):
         """Adds a GeoJSON file to the map.
 
@@ -340,15 +340,15 @@ class Map(here_map_widget.Map):
 
     def add_shp(
         self,
-        in_shp:str,
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]=None,
-        hover_style:Optional[Dict]=None,
-        style_callback:Optional[Callable[Any]]=None,
-        fill_colors:Optional[list]=None,
-        info_mode:Optional[str]="on_hover",
-        point_style:Optional[Dict]=None,
-        default_popup:Optional[bool]=False,
+        in_shp: str,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = None,
+        hover_style: Optional[Dict] = None,
+        style_callback: Optional[Callable[Any]] = None,
+        fill_colors: Optional[list] = None,
+        info_mode: Optional[str] = "on_hover",
+        point_style: Optional[Dict] = None,
+        default_popup: Optional[bool] = False,
     ):
         """Adds a shapefile to the map.
 
@@ -385,17 +385,16 @@ class Map(here_map_widget.Map):
 
     def add_gdf(
         self,
-        gdf:GeoDataFrame,
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]=None,
-        hover_style:Optional[Dict]=None,
-        style_callback:Optional[Callable[Any]]=None,
-        fill_colors:Optional[List]=None,
-        info_mode:Optional[str]="on_hover",
-        zoom_to_layer:Optional[bool]=True,
-        point_style:Optional[Dict]=None,
-        default_popup:Optional[bool]=False,
-    
+        gdf: GeoDataFrame,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = None,
+        hover_style: Optional[Dict] = None,
+        style_callback: Optional[Callable[Any]] = None,
+        fill_colors: Optional[List] = None,
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = True,
+        point_style: Optional[Dict] = None,
+        default_popup: Optional[bool] = False,
     ):
         """Adds a GeoJSON file to the map.
 
@@ -436,15 +435,15 @@ class Map(here_map_widget.Map):
 
     def add_kml(
         self,
-        in_kml:str,
-        layer_name:Optional[str]="Untitled",
-        style:Optional[Dict]=None,
-        hover_style:Optional[Dict]=None,
-        style_callback:Optional[Callable[Any]]=None,
-        fill_colors:Optional[list]=None,
-        info_mode:Optional[str]="on_hover",
-        point_style:Optional[Dict]=None,
-        default_popup:Optional[bool]=False,
+        in_kml: str,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = None,
+        hover_style: Optional[Dict] = None,
+        style_callback: Optional[Callable[Any]] = None,
+        fill_colors: Optional[list] = None,
+        info_mode: Optional[str] = "on_hover",
+        point_style: Optional[Dict] = None,
+        default_popup: Optional[bool] = False,
     ):
         """Adds a GeoJSON file to the map.
 
@@ -480,18 +479,22 @@ class Map(here_map_widget.Map):
 
     def add_vector(
         self,
-        filename:str,
-        layer_name:Optional[str]="Untitled",
-        bbox:Optional[Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
-        mask:Optional[Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]]=None,
-        rows:Optional[Union[int, slice]]=None,
-        style:Optional[Dict]=None,
-        hover_style:Optional[Dict]=None,
-        style_callback:Optional[Callable[Any]]=None,
-        fill_colors:Optional[List]=None,
-        info_mode:Optional[str]="on_hover",
-        point_style:Optional[Dict]=None,
-        default_popup:Optional[bool]=False,
+        filename: str,
+        layer_name: Optional[str] = "Untitled",
+        bbox: Optional[
+            Union[tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
+        ] = None,
+        mask: Optional[
+            Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
+        ] = None,
+        rows: Optional[Union[int, slice]] = None,
+        style: Optional[Dict] = None,
+        hover_style: Optional[Dict] = None,
+        style_callback: Optional[Callable[Any]] = None,
+        fill_colors: Optional[List] = None,
+        info_mode: Optional[str] = "on_hover",
+        point_style: Optional[Dict] = None,
+        default_popup: Optional[bool] = False,
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -563,10 +566,10 @@ class Map(here_map_widget.Map):
 
     def to_html(
         self,
-        outfile:Optional[str]=None,
-        title:Optional[str]="My Map",
-        width:Optional[str]="100%",
-        height:Optional[str]="880px",
+        outfile: Optional[str] = None,
+        title: Optional[str] = "My Map",
+        width: Optional[str] = "100%",
+        height: Optional[str] = "880px",
         **kwargs,
     ):
         """Saves the map as an HTML file.
@@ -632,7 +635,12 @@ class Map(here_map_widget.Map):
             raise Exception(e)
 
     def to_streamlit(
-        self, width:Optional[int]=700, height:Optional[int]=500, responsive:Optional[bool]=True, scrolling:Optional[bool]=False, **kwargs
+        self,
+        width: Optional[int] = 700,
+        height: Optional[int] = 500,
+        responsive: Optional[bool] = True,
+        scrolling: Optional[bool] = False,
+        **kwargs,
     ):
         """Renders map figure in a Streamlit app.
 
