@@ -8762,6 +8762,7 @@ def s3_read_image(
     source,
     window=None,
     return_array=True,
+    coord_crs=None,
     request_payer="bucket-owner",
     env_args={},
     open_args={},
@@ -8773,6 +8774,7 @@ def s3_read_image(
         source (str): The path to the raster on S3.
         window (tuple, optional): The window (col_off, row_off, width, height) to read. Defaults to None.
         return_array (bool, optional): Whether to return a numpy array. Defaults to True.
+        coord_crs (str, optional): The coordinate CRS of the input coordinates. Defaults to None.
         request_payer (str, optional): Specifies who pays for the download from S3.
             Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
         env_args (dict, optional): Additional arguments to pass to rasterio.Env(). Defaults to {}.
@@ -8792,10 +8794,117 @@ def s3_read_image(
             if window is None:
                 window = Window(0, 0, src.width, src.height)
             else:
+                if isinstance(window, list):
+                    coords = coords_to_xy(
+                        source,
+                        window,
+                        coord_crs,
+                        env_args=env_args,
+                        open_args=open_args,
+                    )
+                    window = xy_to_window(coords)
                 window = Window(*window)
 
             array = src.read(window=window, **kwargs)
             return array
+
+
+def transform_coords(x, y, src_crs, dst_crs, **kwargs):
+    """Transform coordinates from one CRS to another.
+
+    Args:
+        x (float): The x coordinate.
+        y (float): The y coordinate.
+        src_crs (str): The source CRS, e.g., "EPSG:4326".
+        dst_crs (str): The destination CRS, e.g., "EPSG:3857".
+
+    Returns:
+        dict: The transformed coordinates in the format of (x, y)
+    """
+    import pyproj
+
+    transformer = pyproj.Transformer.from_crs(
+        src_crs, dst_crs, always_xy=True, **kwargs
+    )
+    return transformer.transform(x, y)
+
+
+def coords_to_xy(
+    src_fp: str,
+    coords: list,
+    coord_crs: str = "epsg:4326",
+    request_payer="bucket-owner",
+    env_args={},
+    open_args={},
+    **kwargs,
+) -> list:
+    """Converts a list of coordinates to pixel coordinates, i.e., (col, row) coordinates.
+
+    Args:
+        src_fp: The source raster file path.
+        coords: A list of coordinates in the format of [[x1, y1], [x2, y2], ...]
+        coord_crs: The coordinate CRS of the input coordinates. Defaults to "epsg:4326".
+        request_payer: Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        env_args: Additional keyword arguments to pass to rasterio.Env.
+        open_args: Additional keyword arguments to pass to rasterio.open.
+        **kwargs: Additional keyword arguments to pass to rasterio.transform.rowcol.
+
+    Returns:
+        A list of pixel coordinates in the format of [[x1, y1], [x2, y2], ...]
+    """
+    import numpy as np
+    import rasterio
+
+    if isinstance(coords, np.ndarray):
+        coords = coords.tolist()
+
+    if len(coords) == 4 and all([isinstance(c, (int, float)) for c in coords]):
+        coords = [[coords[0], coords[1]], [coords[2], coords[3]]]
+
+    xs, ys = zip(*coords)
+    with rasterio.Env(AWS_REQUEST_PAYER=request_payer, **env_args):
+        with rasterio.open(src_fp, **open_args) as src:
+            width = src.width
+            height = src.height
+            if coord_crs != src.crs:
+                xs, ys = transform_coords(xs, ys, coord_crs, src.crs, **kwargs)
+            rows, cols = rasterio.transform.rowcol(src.transform, xs, ys, **kwargs)
+        result = [[col, row] for col, row in zip(cols, rows)]
+
+        result = [
+            [x, y] for x, y in result if x >= 0 and y >= 0 and x < width and y < height
+        ]
+        if len(result) == 0:
+            print("No valid pixel coordinates found.")
+        elif len(result) < len(coords):
+            print("Some coordinates are out of the image boundary.")
+
+        return result
+
+
+def xy_to_window(xy):
+    """Converts a list of coordinates to a rasterio window.
+
+    Args:
+        xy (list): A list of coordinates in the format of [[x1, y1], [x2, y2]]
+
+    Returns:
+        tuple: The rasterio window in the format of (col_off, row_off, width, height)
+    """
+
+    x1, y1 = xy[0]
+    x2, y2 = xy[1]
+
+    left = min(x1, x2)
+    right = max(x1, x2)
+    top = min(y1, y2)
+    bottom = max(y1, y2)
+
+    width = right - left
+    height = bottom - top
+
+    return (left, top, width, height)
 
 
 def tms_to_geotiff(
