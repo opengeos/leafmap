@@ -16,7 +16,7 @@ import folium
 import ipyleaflet
 import xyzservices.providers as xyz
 from .common import check_package, planet_tiles
-import typing
+from typing import Dict, Optional, List
 
 # from box import Box
 
@@ -229,7 +229,7 @@ def _unpack_sub_parameters(var, param):
     return temp
 
 
-def get_xyz_dict(free_only: bool = True, france: bool = False) -> dict:
+def get_xyz_dict(free_only: bool = True, france: bool = False) -> Dict:
     """Returns a dictionary of xyz services.
 
     Args:
@@ -280,7 +280,7 @@ def get_xyz_dict(free_only: bool = True, france: bool = False) -> dict:
     return xyz_dict
 
 
-def xyz_to_leaflet() -> dict:
+def xyz_to_leaflet() -> Dict:
     """Convert xyz tile services to ipyleaflet tile layers.
 
     Returns:
@@ -307,7 +307,7 @@ def xyz_to_leaflet() -> dict:
     return leaflet_dict
 
 
-def xyz_to_pydeck() -> dict:
+def xyz_to_pydeck() -> Dict:
     """Convert xyz tile services to pydeck custom tile layers.
 
     Returns:
@@ -346,7 +346,7 @@ def xyz_to_pydeck() -> dict:
     return pydeck_dict
 
 
-def xyz_to_folium() -> dict:
+def xyz_to_folium() -> Dict:
     """Convert xyz tile services to folium tile layers.
 
     Returns:
@@ -410,7 +410,7 @@ def xyz_to_folium() -> dict:
     return folium_dict
 
 
-def xyz_to_heremap() -> dict:
+def xyz_to_heremap() -> Dict:
     """Convert xyz tile services to hermap tile layers.
 
     Returns:
@@ -511,7 +511,7 @@ def xyz_to_heremap() -> dict:
     return heremap_dict
 
 
-def xyz_to_plotly() -> dict:
+def xyz_to_plotly() -> Dict:
     """Convert xyz tile services to plotly tile layers.
 
     Returns:
@@ -547,7 +547,7 @@ def xyz_to_plotly() -> dict:
     return plotly_dict
 
 
-def xyz_to_bokeh() -> dict:
+def xyz_to_bokeh() -> Dict:
     """Convert xyz tile services to bokeh tile layers.
 
     Returns:
@@ -601,13 +601,13 @@ def search_qms(keywords, limit=10):
         return services["results"][:limit]
 
 
-def get_qms(service_id: str) -> dict:
+def get_qms(service_id: str) -> Dict:
     QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
     service_details = requests.get(f"{QMS_API}/{service_id}")
     return service_details.json()
 
 
-def qms_to_leafmap(service_id: str) -> dict:
+def qms_to_leafmap(service_id: str) -> Dict:
     service_details = get_qms(service_id)
     name = service_details["name"]
     url = service_details["url"]
