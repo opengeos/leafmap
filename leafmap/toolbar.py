@@ -5110,7 +5110,7 @@ def stac_gui(m=None, position="topright", opened=True, **kwargs):
         return toolbar_widget
 
 
-def stac_custom_gui(m=None, **kwargs):
+def stac_custom_gui(m=None, button_width="85px", **kwargs):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -5387,7 +5387,7 @@ def stac_custom_gui(m=None, **kwargs):
         tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
         button_style="primary",
     )
-    buttons.style.button_width = "67px"
+    buttons.style.button_width = button_width
 
     dataset_widget = widgets.VBox()
 
@@ -5492,6 +5492,7 @@ def stac_custom_gui(m=None, **kwargs):
     def endpoint_changed(change):
         with output:
             output.outputs = ()
+            output.clear_output()
             print("Retrieving collections...")
             try:
                 if endpoint.value is not None:
@@ -5505,12 +5506,14 @@ def stac_custom_gui(m=None, **kwargs):
                         collections.sort()
                         collection.options = collections
                         collection.value = collections[0]
+                        output.clear_output()
                         output.outputs = ()
                     else:
                         print("No collections found.")
                 else:
                     print("No URL provided.")
                 reset_bands()
+
             except Exception as e:
                 print(e)
 
@@ -5598,9 +5601,10 @@ def stac_custom_gui(m=None, **kwargs):
                             collections.sort()
                             collection.options = collections
                             collection.value = collections[0]
-                            output.outputs = ()
 
                             m._STAC_COLLECTIONS[catalog.value] = collections
+                            output.clear_output()
+                            output.outputs = ()
                         else:
                             print("No collections found.")
                     else:
@@ -5694,6 +5698,7 @@ def stac_custom_gui(m=None, **kwargs):
                         stac_data.clear()
                         stac_data.append(search_dict)
                         update_bands()
+                        output.clear_output()
                         output.outputs = ()
                 except NotImplementedError as e:
                     print(e)
@@ -5775,6 +5780,7 @@ def stac_custom_gui(m=None, **kwargs):
                             if "rescale" in m.layers[-1].url:
                                 output.outputs = ()
 
+                        output.clear_output()
                     except Exception as e:
                         print(e)
 

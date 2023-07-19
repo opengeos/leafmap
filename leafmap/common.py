@@ -3706,7 +3706,8 @@ def numpy_to_cog(
     bounds=None,
     profile=None,
     dtype=None,
-    crs=None,
+    dst_crs=None,
+    coord_crs=None,
 ):
     """Converts a numpy array to a COG file.
 
@@ -3716,7 +3717,8 @@ def numpy_to_cog(
         bounds (tuple, optional): The bounds of the image in the format of (minx, miny, maxx, maxy). Defaults to None.
         profile (str | dict, optional): File path to an existing COG file or a dictionary representing the profile. Defaults to None.
         dtype (str, optional): The data type of the output COG file. Defaults to None.
-        crs (str, optional): The coordinate reference system of the output COG file. Defaults to "epsg:4326".
+        dst_crs (str, optional): The coordinate reference system of the output COG file. Defaults to "epsg:4326".
+        coord_crs (str, optional): The coordinate reference system of bbox coordinates. Defaults to None.
 
     """
     import warnings
@@ -3742,11 +3744,12 @@ def numpy_to_cog(
 
     if profile is not None:
         if isinstance(profile, str):
-            if not os.path.exists(profile):
+            if (not profile.startswith("http")) and (not os.path.exists(profile)):
                 raise FileNotFoundError("The provided file could not be found.")
             with rasterio.open(profile) as ds:
-                bounds = ds.bounds
-                crs = ds.crs
+                dst_crs = ds.crs
+                if bounds is None:
+                    bounds = ds.bounds
 
         elif isinstance(profile, rasterio.profiles.Profile):
             profile = dict(profile)
@@ -3776,12 +3779,15 @@ def numpy_to_cog(
     else:
         raise ValueError("The input array must be a 2D or 3D numpy array.")
 
+    if coord_crs is not None and dst_crs is not None:
+        bounds = transform_bbox_coords(bounds, coord_crs, dst_crs)
+
     src_transform = from_bounds(*bounds, width=width, height=height)
     if dtype is None:
         dtype = str(np_array.dtype)
 
-    if crs is None:
-        crs = "epsg:4326"
+    if dst_crs is None:
+        dst_crs = "epsg:4326"
 
     if isinstance(profile, dict):
         src_profile = profile
@@ -3793,7 +3799,7 @@ def numpy_to_cog(
             count=nbands,
             height=height,
             width=width,
-            crs=crs,
+            crs=dst_crs,
             transform=src_transform,
         )
 
@@ -8758,7 +8764,7 @@ def s3_get_objects(
         )
 
 
-def s3_read_image(
+def read_raster(
     source,
     window=None,
     return_array=True,
@@ -8809,6 +8815,53 @@ def s3_read_image(
             return array
 
 
+def read_rasters(
+    sources,
+    window=None,
+    coord_crs=None,
+    request_payer="bucket-owner",
+    env_args={},
+    open_args={},
+    **kwargs,
+):
+    """Read a raster from S3.
+
+    Args:
+        sources (str): The list of paths to the raster files.
+        window (tuple, optional): The window (col_off, row_off, width, height) to read. Defaults to None.
+        coord_crs (str, optional): The coordinate CRS of the input coordinates. Defaults to None.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        env_args (dict, optional): Additional arguments to pass to rasterio.Env(). Defaults to {}.
+        open_args (dict, optional): Additional arguments to pass to rasterio.open(). Defaults to {}.
+
+    Returns:
+        np.ndarray: The raster as a numpy array.
+    """
+    import numpy as np
+
+    if not isinstance(sources, list):
+        sources = [sources]
+
+    array_list = []
+
+    for source in sources:
+        array = read_raster(
+            source,
+            window,
+            True,
+            coord_crs,
+            request_payer,
+            env_args,
+            open_args,
+            **kwargs,
+        )
+        array_list.append(array)
+
+    result = np.concatenate(array_list, axis=0)
+    return result
+
+
 def transform_coords(x, y, src_crs, dst_crs, **kwargs):
     """Transform coordinates from one CRS to another.
 
@@ -8827,6 +8880,25 @@ def transform_coords(x, y, src_crs, dst_crs, **kwargs):
         src_crs, dst_crs, always_xy=True, **kwargs
     )
     return transformer.transform(x, y)
+
+
+def transform_bbox_coords(bbox, src_crs, dst_crs, **kwargs):
+    """Transforms the coordinates of a bounding box [x1, y1, x2, y2] from one CRS to another.
+
+    Args:
+        bbox (list | tuple): The bounding box [x1, y1, x2, y2] coordinates.
+        src_crs (str): The source CRS, e.g., "EPSG:4326".
+        dst_crs (str): The destination CRS, e.g., "EPSG:3857".
+
+    Returns:
+        list: The transformed bounding box [x1, y1, x2, y2] coordinates.
+    """
+    x1, y1, x2, y2 = bbox
+
+    x1, y1 = transform_coords(x1, y1, src_crs, dst_crs, **kwargs)
+    x2, y2 = transform_coords(x2, y2, src_crs, dst_crs, **kwargs)
+
+    return [x1, y1, x2, y2]
 
 
 def coords_to_xy(
