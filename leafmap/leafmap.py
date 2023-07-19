@@ -3991,6 +3991,29 @@ class Map(ipyleaflet.Map):
 
         change_basemap(self, position)
 
+    def add_gui(
+        self, name, position="topright", opened=True, show_close_button=True, **kwargs
+    ):
+        """Add a GUI to the map.
+
+        Args:
+            name (str): The name of the GUI. Options include "layer_manager", "inspector", "plot", and "timelapse".
+            position (str, optional): The position of the GUI. Defaults to "topright".
+            opened (bool, optional): Whether the GUI is opened. Defaults to True.
+            show_close_button (bool, optional): Whether to show the close button. Defaults to True.
+        """
+        name = name.lower()
+        if name == "stac":
+            self.add_stac_gui(position=position, opened=opened, **kwargs)
+        elif name == "basemap":
+            self.add_basemap_gui(position=position, **kwargs)
+        elif name == "inspector":
+            self.add_inspector_gui(position=position, opened=opened, **kwargs)
+        elif name == "layer_manager":
+            self.add_layer_manager(position=position, opened=opened, **kwargs)
+        elif name == "oam":
+            self.add_oam_gui(position=position, opened=opened, **kwargs)
+
 
 # The functions below are outside the Map class.
 
