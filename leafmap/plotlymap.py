@@ -438,7 +438,7 @@ class Map(go.FigureWidget):
         items: str = None,
         assets: str = None,
         bands: List = None,
-        titiler_endpoint: Optional[str] = "https://titiler.xyz",
+        titiler_endpoint: Optional[str] = None,
         name: Optional[str] = "STAC Layer",
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,
@@ -467,7 +467,7 @@ class Map(go.FigureWidget):
     def add_mosaic_layer(
         self,
         url: str,
-        titiler_endpoint: Optional[str] = "https://titiler.xyz",
+        titiler_endpoint: Optional[str] =None,
         name: Optional[str] = "Mosaic Layer",
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,

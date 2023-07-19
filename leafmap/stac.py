@@ -489,7 +489,7 @@ def cog_pixel_value(
     lat: float,
     url: str,
     bidx: Optional[str],
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     verbose: Optional[bool] = True,
     **kwargs,
 ) -> List:
@@ -537,7 +537,7 @@ def stac_tile(
     item: str = None,
     assets: Union[str, List] = None,
     bands: list = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> str:
     """Get a tile layer from a single SpatialTemporal Asset Catalog (STAC) item.
@@ -710,7 +710,7 @@ def stac_bounds(
     url: str = None,
     collection: str = None,
     item: str = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> List:
     """Get the bounding box of a single SpatialTemporal Asset Catalog (STAC) item.
@@ -759,7 +759,7 @@ def stac_center(
     url: str = None,
     collection: str = None,
     item: str = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> Tuple[float, float]:
     """Get the centroid of a single SpatialTemporal Asset Catalog (STAC) item.
@@ -782,7 +782,7 @@ def stac_bands(
     url: str = None,
     collection: str = None,
     item: str = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> List:
     """Get band names of a single SpatialTemporal Asset Catalog (STAC) item.
@@ -824,7 +824,7 @@ def stac_stats(
     collection: str = None,
     item: str = None,
     assets: Union[str, List] = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> List:
     """Get band statistics of a STAC item.
@@ -871,7 +871,7 @@ def stac_info(
     collection: str = None,
     item: str = None,
     assets: Union[str, List] = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> List:
     """Get band info of a STAC item.
@@ -916,7 +916,7 @@ def stac_info_geojson(
     collection: str = None,
     item: str = None,
     assets: Union[str, List] = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> List:
     """Get band info of a STAC item.
@@ -962,7 +962,7 @@ def stac_assets(
     url: str = None,
     collection: str = None,
     item: str = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> List:
     """Get all assets of a STAC item.
@@ -1006,7 +1006,7 @@ def stac_pixel_value(
     collection: str = None,
     item: str = None,
     assets: Union[str, List] = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     verbose: Optional[bool] = True,
     **kwargs,
 ):
