@@ -5407,7 +5407,7 @@ def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
         tooltips=["Get Collections", "Get Items", "Display Image", "Reset", "Close"],
         button_style="primary",
     )
-    buttons.style.button_width = "67px"
+    buttons.style.button_width = button_width
 
     dataset_widget = widgets.VBox()
 
@@ -5512,6 +5512,7 @@ def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
     def endpoint_changed(change):
         with output:
             output.outputs = ()
+            output.clear_output()
             print("Retrieving collections...")
             try:
                 if endpoint.value is not None:
@@ -5525,12 +5526,14 @@ def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
                         collections.sort()
                         collection.options = collections
                         collection.value = collections[0]
+                        output.clear_output()
                         output.outputs = ()
                     else:
                         print("No collections found.")
                 else:
                     print("No URL provided.")
                 reset_bands()
+
             except Exception as e:
                 print(e)
 
@@ -5618,9 +5621,10 @@ def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
                             collections.sort()
                             collection.options = collections
                             collection.value = collections[0]
-                            output.outputs = ()
 
                             m._STAC_COLLECTIONS[catalog.value] = collections
+                            output.clear_output()
+                            output.outputs = ()
                         else:
                             print("No collections found.")
                     else:
@@ -5714,6 +5718,7 @@ def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
                         stac_data.clear()
                         stac_data.append(search_dict)
                         update_bands()
+                        output.clear_output()
                         output.outputs = ()
                 except NotImplementedError as e:
                     print(e)
@@ -5795,6 +5800,7 @@ def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
                             if "rescale" in m.layers[-1].url:
                                 output.outputs = ()
 
+                        output.clear_output()
                     except Exception as e:
                         print(e)
 
