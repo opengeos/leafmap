@@ -3706,7 +3706,8 @@ def numpy_to_cog(
     bounds=None,
     profile=None,
     dtype=None,
-    crs=None,
+    dst_crs=None,
+    coord_crs=None,
 ):
     """Converts a numpy array to a COG file.
 
@@ -3716,7 +3717,8 @@ def numpy_to_cog(
         bounds (tuple, optional): The bounds of the image in the format of (minx, miny, maxx, maxy). Defaults to None.
         profile (str | dict, optional): File path to an existing COG file or a dictionary representing the profile. Defaults to None.
         dtype (str, optional): The data type of the output COG file. Defaults to None.
-        crs (str, optional): The coordinate reference system of the output COG file. Defaults to "epsg:4326".
+        dst_crs (str, optional): The coordinate reference system of the output COG file. Defaults to "epsg:4326".
+        coord_crs (str, optional): The coordinate reference system of bbox coordinates. Defaults to None.
 
     """
     import warnings
@@ -3742,11 +3744,12 @@ def numpy_to_cog(
 
     if profile is not None:
         if isinstance(profile, str):
-            if not os.path.exists(profile):
+            if (not profile.startswith("http")) and (not os.path.exists(profile)):
                 raise FileNotFoundError("The provided file could not be found.")
             with rasterio.open(profile) as ds:
-                bounds = ds.bounds
-                crs = ds.crs
+                dst_crs = ds.crs
+                if bounds is None:
+                    bounds = ds.bounds
 
         elif isinstance(profile, rasterio.profiles.Profile):
             profile = dict(profile)
@@ -3776,12 +3779,15 @@ def numpy_to_cog(
     else:
         raise ValueError("The input array must be a 2D or 3D numpy array.")
 
+    if coord_crs is not None and dst_crs is not None:
+        bounds = transform_bbox_coords(bounds, coord_crs, dst_crs)
+
     src_transform = from_bounds(*bounds, width=width, height=height)
     if dtype is None:
         dtype = str(np_array.dtype)
 
-    if crs is None:
-        crs = "epsg:4326"
+    if dst_crs is None:
+        dst_crs = "epsg:4326"
 
     if isinstance(profile, dict):
         src_profile = profile
@@ -3793,7 +3799,7 @@ def numpy_to_cog(
             count=nbands,
             height=height,
             width=width,
-            crs=crs,
+            crs=dst_crs,
             transform=src_transform,
         )
 
@@ -8508,7 +8514,15 @@ def zonal_stats(
         raise Exception(e)
 
 
-def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **kwargs):
+def s3_list_objects(
+    bucket,
+    prefix=None,
+    limit=None,
+    ext=None,
+    fullpath=True,
+    request_payer="bucket-owner",
+    **kwargs,
+):
     """List objects in a S3 bucket
 
     Args:
@@ -8517,6 +8531,8 @@ def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **
         limit (init, optional): The maximum number of keys returned in the response body.
         ext (str, optional): Filter by file extension. Defaults to None.
         fullpath (bool, optional): Return full path. Defaults to True.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
 
     Returns:
         list: List of objects.
@@ -8532,6 +8548,7 @@ def s3_list_objects(bucket, prefix=None, limit=None, ext=None, fullpath=True, **
         kwargs["Prefix"] = prefix
 
     files = []
+    kwargs["RequestPayer"] = request_payer
     if isinstance(limit, int) and limit < 1000:
         kwargs["MaxKeys"] = limit
         response = client.list_objects_v2(Bucket=bucket, **kwargs)
@@ -8627,6 +8644,339 @@ def s3_download_files(
         if not quiet:
             print(f"Downloading {index+1} of {len(keys)}: {outfile}")
         s3_download_file(bucket=bucket, key=key, outfile=outfile, **kwargs)
+
+
+def s3_get_object(
+    bucket,
+    key,
+    output=None,
+    chunk_size=1024 * 1024,
+    request_payer="bucket-owner",
+    quiet=False,
+    client_args={},
+    **kwargs,
+):
+    """Download a file from S3.
+
+    Args:
+        bucket (str): The name of the bucket.
+        key (key): The key of the file.
+        output (str, optional): The name of the output file. Defaults to None.
+        chunk_size (int, optional): The chunk size in bytes. Defaults to 1024 * 1024.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+        quiet (bool, optional): Suppress output. Defaults to False.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        client_args (dict, optional): Additional arguments to pass to boto3.client(). Defaults to {}.
+        **kwargs: Additional arguments to pass to boto3.client().get_object().
+    """
+
+    try:
+        import boto3
+    except ImportError:
+        raise ImportError("boto3 is not installed. Install it with pip install boto3")
+
+    # Set up the S3 client
+    s3 = boto3.client("s3", **client_args)
+
+    if output is None:
+        output = key.split("/")[-1]
+
+    out_dir = os.path.dirname(os.path.abspath(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    # Set up the progress bar
+    def progress_callback(bytes_amount):
+        # This function will be called by the StreamingBody object
+        # to report the number of bytes downloaded so far
+        total_size = int(response["ContentLength"])
+        progress_percent = int(bytes_amount / total_size * 100)
+        if not quiet:
+            print(f"\rDownloading: {progress_percent}% complete.", end="")
+
+    # Download the file
+    response = s3.get_object(
+        Bucket=bucket, Key=key, RequestPayer=request_payer, **kwargs
+    )
+
+    # Save the file to disk
+    with open(output, "wb") as f:
+        # Use the StreamingBody object to read the file in chunks
+        # and track the download progress
+        body = response["Body"]
+        downloaded_bytes = 0
+        for chunk in body.iter_chunks(chunk_size=chunk_size):
+            f.write(chunk)
+            downloaded_bytes += len(chunk)
+            progress_callback(downloaded_bytes)
+
+
+def s3_get_objects(
+    bucket,
+    keys=None,
+    out_dir=None,
+    prefix=None,
+    limit=None,
+    ext=None,
+    chunk_size=1024 * 1024,
+    request_payer="bucket-owner",
+    quiet=True,
+    client_args={},
+    **kwargs,
+):
+    """Download multiple files from S3.
+
+    Args:
+        bucket (str): The name of the bucket.
+        keys (list, optional): A list of keys. Defaults to None.
+        out_dir (str, optional): The name of the output directory. Defaults to None.
+        prefix (str, optional): Limits the response to keys that begin with the specified prefix. Defaults to None.
+        limit (int, optional): The maximum number of keys returned in the response body.
+        ext (str, optional): Filter by file extension. Defaults to None.
+        chunk_size (int, optional): The chunk size in bytes. Defaults to 1024 * 1024.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        quiet (bool, optional): Suppress output. Defaults to True.
+        client_args (dict, optional): Additional arguments to pass to boto3.client(). Defaults to {}.
+        **kwargs: Additional arguments to pass to boto3.client().get_object().
+
+    """
+
+    try:
+        import boto3
+    except ImportError:
+        raise ImportError("boto3 is not installed. Install it with pip install boto3")
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if keys is None:
+        fullpath = False
+        keys = s3_list_objects(
+            bucket, prefix, limit, ext, fullpath, request_payer, **kwargs
+        )
+
+    for index, key in enumerate(keys):
+        print(f"Downloading {index+1} of {len(keys)}: {key}")
+        output = os.path.join(out_dir, key.split("/")[-1])
+        s3_get_object(
+            bucket, key, output, chunk_size, request_payer, quiet, client_args, **kwargs
+        )
+
+
+def read_raster(
+    source,
+    window=None,
+    return_array=True,
+    coord_crs=None,
+    request_payer="bucket-owner",
+    env_args={},
+    open_args={},
+    **kwargs,
+):
+    """Read a raster from S3.
+
+    Args:
+        source (str): The path to the raster on S3.
+        window (tuple, optional): The window (col_off, row_off, width, height) to read. Defaults to None.
+        return_array (bool, optional): Whether to return a numpy array. Defaults to True.
+        coord_crs (str, optional): The coordinate CRS of the input coordinates. Defaults to None.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        env_args (dict, optional): Additional arguments to pass to rasterio.Env(). Defaults to {}.
+        open_args (dict, optional): Additional arguments to pass to rasterio.open(). Defaults to {}.
+
+    Returns:
+        np.ndarray: The raster as a numpy array.
+    """
+    import rasterio
+    from rasterio.windows import Window
+
+    with rasterio.Env(AWS_REQUEST_PAYER=request_payer, **env_args):
+        src = rasterio.open(source, **open_args)
+        if not return_array:
+            return src
+        else:
+            if window is None:
+                window = Window(0, 0, src.width, src.height)
+            else:
+                if isinstance(window, list):
+                    coords = coords_to_xy(
+                        source,
+                        window,
+                        coord_crs,
+                        env_args=env_args,
+                        open_args=open_args,
+                    )
+                    window = xy_to_window(coords)
+                window = Window(*window)
+
+            array = src.read(window=window, **kwargs)
+            return array
+
+
+def read_rasters(
+    sources,
+    window=None,
+    coord_crs=None,
+    request_payer="bucket-owner",
+    env_args={},
+    open_args={},
+    **kwargs,
+):
+    """Read a raster from S3.
+
+    Args:
+        sources (str): The list of paths to the raster files.
+        window (tuple, optional): The window (col_off, row_off, width, height) to read. Defaults to None.
+        coord_crs (str, optional): The coordinate CRS of the input coordinates. Defaults to None.
+        request_payer (str, optional): Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        env_args (dict, optional): Additional arguments to pass to rasterio.Env(). Defaults to {}.
+        open_args (dict, optional): Additional arguments to pass to rasterio.open(). Defaults to {}.
+
+    Returns:
+        np.ndarray: The raster as a numpy array.
+    """
+    import numpy as np
+
+    if not isinstance(sources, list):
+        sources = [sources]
+
+    array_list = []
+
+    for source in sources:
+        array = read_raster(
+            source,
+            window,
+            True,
+            coord_crs,
+            request_payer,
+            env_args,
+            open_args,
+            **kwargs,
+        )
+        array_list.append(array)
+
+    result = np.concatenate(array_list, axis=0)
+    return result
+
+
+def transform_coords(x, y, src_crs, dst_crs, **kwargs):
+    """Transform coordinates from one CRS to another.
+
+    Args:
+        x (float): The x coordinate.
+        y (float): The y coordinate.
+        src_crs (str): The source CRS, e.g., "EPSG:4326".
+        dst_crs (str): The destination CRS, e.g., "EPSG:3857".
+
+    Returns:
+        dict: The transformed coordinates in the format of (x, y)
+    """
+    import pyproj
+
+    transformer = pyproj.Transformer.from_crs(
+        src_crs, dst_crs, always_xy=True, **kwargs
+    )
+    return transformer.transform(x, y)
+
+
+def transform_bbox_coords(bbox, src_crs, dst_crs, **kwargs):
+    """Transforms the coordinates of a bounding box [x1, y1, x2, y2] from one CRS to another.
+
+    Args:
+        bbox (list | tuple): The bounding box [x1, y1, x2, y2] coordinates.
+        src_crs (str): The source CRS, e.g., "EPSG:4326".
+        dst_crs (str): The destination CRS, e.g., "EPSG:3857".
+
+    Returns:
+        list: The transformed bounding box [x1, y1, x2, y2] coordinates.
+    """
+    x1, y1, x2, y2 = bbox
+
+    x1, y1 = transform_coords(x1, y1, src_crs, dst_crs, **kwargs)
+    x2, y2 = transform_coords(x2, y2, src_crs, dst_crs, **kwargs)
+
+    return [x1, y1, x2, y2]
+
+
+def coords_to_xy(
+    src_fp: str,
+    coords: list,
+    coord_crs: str = "epsg:4326",
+    request_payer="bucket-owner",
+    env_args={},
+    open_args={},
+    **kwargs,
+) -> list:
+    """Converts a list of coordinates to pixel coordinates, i.e., (col, row) coordinates.
+
+    Args:
+        src_fp: The source raster file path.
+        coords: A list of coordinates in the format of [[x1, y1], [x2, y2], ...]
+        coord_crs: The coordinate CRS of the input coordinates. Defaults to "epsg:4326".
+        request_payer: Specifies who pays for the download from S3.
+            Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        env_args: Additional keyword arguments to pass to rasterio.Env.
+        open_args: Additional keyword arguments to pass to rasterio.open.
+        **kwargs: Additional keyword arguments to pass to rasterio.transform.rowcol.
+
+    Returns:
+        A list of pixel coordinates in the format of [[x1, y1], [x2, y2], ...]
+    """
+    import numpy as np
+    import rasterio
+
+    if isinstance(coords, np.ndarray):
+        coords = coords.tolist()
+
+    if len(coords) == 4 and all([isinstance(c, (int, float)) for c in coords]):
+        coords = [[coords[0], coords[1]], [coords[2], coords[3]]]
+
+    xs, ys = zip(*coords)
+    with rasterio.Env(AWS_REQUEST_PAYER=request_payer, **env_args):
+        with rasterio.open(src_fp, **open_args) as src:
+            width = src.width
+            height = src.height
+            if coord_crs != src.crs:
+                xs, ys = transform_coords(xs, ys, coord_crs, src.crs, **kwargs)
+            rows, cols = rasterio.transform.rowcol(src.transform, xs, ys, **kwargs)
+        result = [[col, row] for col, row in zip(cols, rows)]
+
+        result = [
+            [x, y] for x, y in result if x >= 0 and y >= 0 and x < width and y < height
+        ]
+        if len(result) == 0:
+            print("No valid pixel coordinates found.")
+        elif len(result) < len(coords):
+            print("Some coordinates are out of the image boundary.")
+
+        return result
+
+
+def xy_to_window(xy):
+    """Converts a list of coordinates to a rasterio window.
+
+    Args:
+        xy (list): A list of coordinates in the format of [[x1, y1], [x2, y2]]
+
+    Returns:
+        tuple: The rasterio window in the format of (col_off, row_off, width, height)
+    """
+
+    x1, y1 = xy[0]
+    x2, y2 = xy[1]
+
+    left = min(x1, x2)
+    right = max(x1, x2)
+    top = min(y1, y2)
+    bottom = max(y1, y2)
+
+    width = right - left
+    height = bottom - top
+
+    return (left, top, width, height)
 
 
 def tms_to_geotiff(
