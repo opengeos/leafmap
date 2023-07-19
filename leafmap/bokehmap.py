@@ -6,7 +6,7 @@ from bokeh.plotting import figure, show, save
 from bokeh.io import output_notebook
 from .basemaps import xyz_to_bokeh
 from .common import *
-from typing import Optional, List,Sequence,Tuple
+from typing import Optional, List, Sequence, Tuple
 
 os.environ["OUTPUT_NOTEBOOK"] = "False"
 basemaps = Box(xyz_to_bokeh(), frozen_box=True)

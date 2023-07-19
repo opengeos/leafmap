@@ -217,9 +217,7 @@ class Map(go.FigureWidget):
         layers = [layer for layer in layers if layer["name"] != name]
         self.layout.mapbox.layers = layers
 
-    def add_mapbox_layer(
-        self, style: Union[str, Dict], access_token=None
-    ):
+    def add_mapbox_layer(self, style: Union[str, Dict], access_token=None):
         """Adds a mapbox layer to the map.
 
         Args:
@@ -467,7 +465,7 @@ class Map(go.FigureWidget):
     def add_mosaic_layer(
         self,
         url: str,
-        titiler_endpoint: Optional[str] =None,
+        titiler_endpoint: Optional[str] = None,
         name: Optional[str] = "Mosaic Layer",
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,

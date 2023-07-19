@@ -1133,7 +1133,7 @@ def stac_client(
     ignore_conformance: Optional[bool] = False,
     modifier: Optional[Callable] = None,
     request_modifier: Optional[Callable] = None,
-    stac_io= None,
+    stac_io=None,
     return_col_id: Optional[bool] = False,
     **kwargs,
 ):
