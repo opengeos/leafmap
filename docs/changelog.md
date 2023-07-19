@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.23.0 - Jul 19, 2023
+
+**New Features**
+
+-   Added S3 get objects and read raster functions (#495)
+-   Added folium add_markers_from_xy method (#486)
+
+**Improvement**
+
+-   Changed palette to cmap for add_raster (#491)
+-   Fixed stac layer expression bug (#490)
+-   Updated SAM notebook (#489)
+-   Fixed ipywidget Output widget bug (#487)
+-   Improved add_gdf error handling (#485)
+-   Fixed add_gdf bug (#484)
+
 ## v0.22.0 - Jun 21, 2023
 
 **New Features**
