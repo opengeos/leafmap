@@ -6,7 +6,7 @@ from bokeh.plotting import figure, show, save
 from bokeh.io import output_notebook
 from .basemaps import xyz_to_bokeh
 from .common import *
-from typing import Optional, List, Sequence, Tuple
+from typing import Optional, List, Sequence, Tuple, Dict
 
 os.environ["OUTPUT_NOTEBOOK"] = "False"
 basemaps = Box(xyz_to_bokeh(), frozen_box=True)
@@ -131,7 +131,7 @@ class Map:
         attribution: str = "",
         bands: Optional[List[str]] = None,
         titiler_endpoint: Optional[str] = None,
-        cog_args: dict = {},
+        cog_args: Dict = {},
         fit_bounds: bool = True,
         **kwargs,
     ):
@@ -312,7 +312,7 @@ class Map:
         self,
         filename: str,
         encoding: Optional[str] = "utf-8",
-        read_file_args: dict = {},
+        read_file_args: Dict = {},
         to_crs: Optional[str] = "epsg:3857",
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
@@ -323,7 +323,7 @@ class Map:
         Args:
             filename (str): The path to the GeoJSON file. Can be a local file or a URL.
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
-            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            read_file_args (Dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the GeoJSON. Defaults to True.
@@ -344,7 +344,7 @@ class Map:
         self,
         filename: str,
         encoding: Optional[str] = "utf-8",
-        read_file_args: dict = {},
+        read_file_args: Dict = {},
         to_crs: Optional[str] = "epsg:3857",
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
@@ -355,7 +355,7 @@ class Map:
         Args:
             filename (str): The path to the shapefile.
             encoding (str, optional): The encoding of the shapefile. Defaults to "utf-8".
-            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            read_file_args (Dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the shapefile. Defaults to True.
@@ -397,7 +397,7 @@ class Map:
         self,
         filename: str,
         encoding: Optional[str] = "utf-8",
-        read_file_args: dict = {},
+        read_file_args: Dict = {},
         to_crs: Optional[str] = "epsg:3857",
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
@@ -408,7 +408,7 @@ class Map:
         Args:
             filename (str): The path to the vector dataset. Can be a local file or a URL.
             encoding (str, optional): The encoding of the vector dataset. Defaults to "utf-8".
-            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            read_file_args (Dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the vector dataset. Defaults to True.
