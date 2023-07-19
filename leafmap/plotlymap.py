@@ -218,7 +218,7 @@ class Map(go.FigureWidget):
         self.layout.mapbox.layers = layers
 
     def add_mapbox_layer(
-        self, style: Union[str, Dict], access_token: Optional[str] = None
+        self, style: Union[str, Dict], access_token: Optional[str] = ''
     ):
         """Adds a mapbox layer to the map.
 
