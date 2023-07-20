@@ -10,7 +10,6 @@ from .common import *
 from .pc import *
 from typing import Optional, Union, Dict, List
 from leafmap import Map as leafMap
-from geemap import Map as geeMap
 from ipyleaflet import Map as ipyleafletMap
 
 
@@ -211,7 +210,7 @@ def tool_template(
         return toolbar_widget
 
 
-def tool_header_template(m: Optional[geeMap] = None, opened: Optional[bool] = True):
+def tool_header_template(m: Optional[leafMap] = None, opened: Optional[bool] = True):
     """Create a toolbar widget.
 
     Args:
@@ -311,7 +310,7 @@ def tool_header_template(m: Optional[geeMap] = None, opened: Optional[bool] = Tr
         return toolbar_widget
 
 
-def main_toolbar(m: leafMap):
+def main_toolbar(m: Optional[leafMap]):
     """Creates the main toolbar and adds it to the map.
 
     Args:
@@ -1539,7 +1538,7 @@ def open_raster_gui(m: Dict):
     m.tool_output_ctrl = tool_output_ctrl
 
 
-def change_basemap(m: leafMap, position: Optional[str] = "topright"):
+def change_basemap(m: Optional[leafMap], position: Optional[str] = "topright"):
     """Widget for changing basemaps.
 
     Args:
@@ -1598,7 +1597,7 @@ def change_basemap(m: leafMap, position: Optional[str] = "topright"):
     m.basemap_ctrl = basemap_control
 
 
-def save_map(m: leafMap):
+def save_map(m: Optional[leafMap]):
     """Saves the map as HTML, JPG, or PNG.
 
     Args:
@@ -6060,7 +6059,7 @@ def oam_search_gui(
 
 
 def layer_manager_gui(
-    m: geeMap,
+    m: Optional[leafMap],
     position: Optional[str] = "topright",
     opened: Optional[bool] = True,
     return_widget: Optional[bool] = False,
