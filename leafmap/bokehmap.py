@@ -225,7 +225,7 @@ class Map:
     def add_stac_layer(
         self,
         url: str,
-        collection: Optional[str],
+        collection: Optional[str] = None,
         item: Optional[str] = None,
         assets: Optional[str] = None,
         bands: Optional[List[str]] = None,
