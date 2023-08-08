@@ -5129,11 +5129,12 @@ def stac_gui(
         return toolbar_widget
 
 
-def stac_custom_gui(m: Optional[leafMap] = None, **kwargs) -> widgets:
+def stac_custom_gui(m: Optional[leafMap] = None, button_width: Optional[str]= "85px", **kwargs) -> widgets:
     """Generates a tool GUI template using ipywidgets.
 
     Args:
         m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+        button_width (str, optional): The button width. Defaults to "85px".
         **kwargs: Additional keyword arguments that will be passed to the pystac Client.open() function.
 
     Returns:
