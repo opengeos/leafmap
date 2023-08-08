@@ -12,9 +12,9 @@ class TitilerEndpoint:
 
     def __init__(
         self,
-        endpoint:Optional[str]="https://titiler.xyz",
-        name:Optional[str]="stac",
-        TileMatrixSetId:Optional[str]="WebMercatorQuad",
+        endpoint: Optional[str] = "https://titiler.xyz",
+        name: Optional[str] = "stac",
+        TileMatrixSetId: Optional[str] = "WebMercatorQuad",
     ):
         """Initialize the TitilerEndpoint object.
 
@@ -59,9 +59,9 @@ class PlanetaryComputerEndpoint(TitilerEndpoint):
 
     def __init__(
         self,
-        endpoint:Optional[str]="https://planetarycomputer.microsoft.com/api/data/v1",
-        name:Optional[str]="item",
-        TileMatrixSetId:Optional[str]="WebMercatorQuad",
+        endpoint: Optional[str] = "https://planetarycomputer.microsoft.com/api/data/v1",
+        name: Optional[str] = "item",
+        TileMatrixSetId: Optional[str] = "WebMercatorQuad",
     ):
         """Initialize the PlanetaryComputerEndpoint object.
 

@@ -15,7 +15,7 @@ basemaps = Box(xyz_to_bokeh(), frozen_box=True)
 class Map:
     def __init__(
         self,
-        center: Sequence[Tuple[float, float]] = [10, 0],
+        center: List[float] = [10, 0],
         zoom: float = 2,
         width: float = 800,
         height: float = 400,
@@ -110,6 +110,8 @@ class Map:
                     raise ValueError(
                         f"Basemap {basemap} is not supported. Please choose one from {basemaps.keys()}"
                     )
+        elif basemap is None:
+            raise ValueError("Please specify a valid basemap")
 
     def add_tile(self, tile: str, **kwargs):
         """Adds a tile to the map.
@@ -214,7 +216,6 @@ class Map:
             "url": tile_layer.url,
             "attribution": attribution,
         }
-        print(tile_options)
         tile_source = WMTSTileSource(**tile_options)
         self.figure.add_tile(tile_source, **kwargs)
 
@@ -231,8 +232,8 @@ class Map:
         assets: Optional[str] = None,
         bands: Optional[List[str]] = None,
         titiler_endpoint: Optional[str] = None,
-        attribution: str = "",
-        fit_bounds: bool = True,
+        attribution: Optional[str] = "",
+        fit_bounds: Optional[bool] = True,
         open_args={},
         **kwargs,
     ):
