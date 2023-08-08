@@ -167,7 +167,7 @@ class Map:
         vmin: Optional[float] = None,
         vmax: Optional[float] = None,
         nodata: Optional[float] = None,
-        attribution: Optional[str] = None,
+        attribution: Optional[str] = "",
         fit_bounds: bool = True,
         layer_name="Local COG",
         open_args={},
@@ -214,6 +214,7 @@ class Map:
             "url": tile_layer.url,
             "attribution": attribution,
         }
+        print(tile_options)
         tile_source = WMTSTileSource(**tile_options)
         self.figure.add_tile(tile_source, **kwargs)
 
