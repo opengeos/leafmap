@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.23.1 - Aug 8, 2023
+
+**Improvement**
+
+-   Added typing (#494)
+
 ## v0.23.0 - Jul 19, 2023
 
 **New Features**
