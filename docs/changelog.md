@@ -4,7 +4,7 @@
 
 **Improvement**
 
--   Removed shapely import from osm module (#495)
+-   Removed shapely import from osm module (#503)
 
 ## v0.23.1 - Aug 8, 2023
 
