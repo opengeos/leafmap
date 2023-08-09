@@ -5,12 +5,12 @@ import json
 import os
 from pystac_client import Client
 from .common import stac_assets, stac_bands
-
+from typing import Optional, List
 
 PC_ENDPOINT = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
 
-def get_pc_collections(verbose=False):
+def get_pc_collections(verbose: Optional[bool] = False):
     """Get a list of all collections in the Microsoft Planetary Computer catalog.
 
     Args:
@@ -27,7 +27,7 @@ def get_pc_collections(verbose=False):
     return result
 
 
-def get_first_item(collection, return_id=False):
+def get_first_item(collection: str, return_id: Optional[bool] = False):
     """Get the first item in a collection.
 
     Args:
@@ -61,7 +61,7 @@ def get_bands(collection, item=None):
     return stac_bands(collection=collection, items=item)
 
 
-def get_pc_inventory(refresh=False, verbose=False):
+def get_pc_inventory(refresh: Optional[bool] = False, verbose: Optional[bool] = False):
     """Get the inventory of the Microsoft Planetary Computer catalog.
 
     Args:
@@ -105,7 +105,7 @@ def get_pc_inventory(refresh=False, verbose=False):
     return data
 
 
-def get_pc_collection_list():
+def get_pc_collection_list() -> List:
     """Get a list of collections in the Microsoft Planetary Computer catalog.
 
     Returns:

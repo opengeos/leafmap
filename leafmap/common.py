@@ -13,7 +13,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
-from typing import Union, List, Dict, Tuple, Optional
+from typing import Union, List, Dict, Optional, Tuple
 from .stac import *
 
 try:
@@ -29,7 +29,12 @@ class WhiteboxTools(whitebox.WhiteboxTools):
         super().__init__(**kwargs)
 
 
-def whiteboxgui(verbose=True, tree=False, reset=False, sandbox_path=None):
+def whiteboxgui(
+    verbose: Optional[bool] = True,
+    tree: Optional[bool] = False,
+    reset: Optional[bool] = False,
+    sandbox_path: Optional[str] = None,
+) -> dict:
     """Shows the WhiteboxTools GUI.
 
     Args:
@@ -46,7 +51,7 @@ def whiteboxgui(verbose=True, tree=False, reset=False, sandbox_path=None):
     return whiteboxgui.show(verbose, tree, reset, sandbox_path)
 
 
-def _in_colab_shell():
+def _in_colab_shell() -> bool:
     """Tests if the code is being executed within Google Colab."""
     import sys
 
@@ -56,7 +61,7 @@ def _in_colab_shell():
         return False
 
 
-def _is_drive_mounted():
+def _is_drive_mounted() -> bool:
     """Checks whether Google Drive is mounted in Google Colab.
 
     Returns:
@@ -69,7 +74,7 @@ def _is_drive_mounted():
         return False
 
 
-def set_proxy(port=1080, ip="http://127.0.0.1"):
+def set_proxy(port: Optional[int] = 1080, ip: Optional[str] = "http://127.0.0.1"):
     """Sets proxy if needed. This is only needed for countries where Google services are not available.
 
     Args:
@@ -96,7 +101,7 @@ def set_proxy(port=1080, ip="http://127.0.0.1"):
         raise Exception(e)
 
 
-def _check_install(package):
+def _check_install(package: str):
     """Checks whether a package is installed. If not, it will install the package.
 
     Args:
@@ -149,7 +154,7 @@ def update_package():
         raise Exception(e)
 
 
-def check_package(name, URL=""):
+def check_package(name: str, URL: Optional[str] = ""):
     try:
         __import__(name.lower())
     except Exception:
@@ -158,7 +163,7 @@ def check_package(name, URL=""):
         )
 
 
-def _clone_repo(out_dir=".", unzip=True):
+def _clone_repo(out_dir: Optional[str] = ".", unzip: Optional[bool] = True):
     """Clones the leafmap GitHub repository.
 
     Args:
@@ -170,7 +175,7 @@ def _clone_repo(out_dir=".", unzip=True):
     download_from_url(url, out_file_name=filename, out_dir=out_dir, unzip=unzip)
 
 
-def __install_from_github(url):
+def __install_from_github(url: str):
     """Install a package from a GitHub repository.
 
     Args:
@@ -204,7 +209,7 @@ def __install_from_github(url):
         raise Exception(e)
 
 
-def _check_git_install():
+def _check_git_install() -> bool:
     """Checks if Git is installed.
 
     Returns:
@@ -228,7 +233,7 @@ def _check_git_install():
         return False
 
 
-def _clone_github_repo(url, out_dir):
+def _clone_github_repo(url: str, out_dir: str):
     """Clones a GitHub repository.
 
     Args:
@@ -263,13 +268,13 @@ def _clone_github_repo(url, out_dir):
     os.remove(out_file_path)
 
 
-def _is_tool(name):
+def _is_tool(name: str):
     """Check whether `name` is on PATH and marked as executable."""
 
     return shutil.which(name) is not None
 
 
-def random_string(string_length=3):
+def random_string(string_length: Optional[int] = 3) -> str:
     """Generates a random string of fixed length.
 
     Args:
@@ -286,7 +291,7 @@ def random_string(string_length=3):
     return "".join(random.choice(letters) for i in range(string_length))
 
 
-def open_image_from_url(url):
+def open_image_from_url(url: str):
     """Loads an image from the specified URL.
 
     Args:
@@ -309,7 +314,9 @@ def open_image_from_url(url):
         print(e)
 
 
-def show_image(img_path, width=None, height=None):
+def show_image(
+    img_path: str, width: Optional[int] = None, height: Optional[int] = None
+):
     """Shows an image within Jupyter notebook.
 
     Args:
@@ -340,7 +347,7 @@ def show_image(img_path, width=None, height=None):
         print(e)
 
 
-def show_html(html):
+def show_html(html: str):
     """Shows HTML within Jupyter notebook.
 
     Args:
@@ -366,7 +373,7 @@ def show_html(html):
             raise Exception(e)
 
 
-def has_transparency(img):
+def has_transparency(img) -> bool:
     """Checks whether an image has transparency.
 
     Args:
@@ -389,7 +396,7 @@ def has_transparency(img):
     return False
 
 
-def upload_to_imgur(in_gif):
+def upload_to_imgur(in_gif: str):
     """Uploads an image to imgur.com
 
     Args:
@@ -430,7 +437,7 @@ def upload_to_imgur(in_gif):
         raise Exception(e)
 
 
-def rgb_to_hex(rgb=(255, 255, 255)):
+def rgb_to_hex(rgb: Optional[Tuple[int, int, int]] = (255, 255, 255)) -> str:
     """Converts RGB to hex color. In RGB color R stands for Red, G stands for Green, and B stands for Blue, and it ranges from the decimal value of 0 – 255.
 
     Args:
@@ -442,7 +449,7 @@ def rgb_to_hex(rgb=(255, 255, 255)):
     return "%02x%02x%02x" % rgb
 
 
-def hex_to_rgb(value="FFFFFF"):
+def hex_to_rgb(value: Optional[str] = "FFFFFF") -> Tuple[int, int, int]:
     """Converts hex color to RGB color.
 
     Args:
@@ -456,7 +463,7 @@ def hex_to_rgb(value="FFFFFF"):
     return tuple(int(value[i : i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
-def check_color(in_color):
+def check_color(in_color: Union[str, Tuple]) -> str:
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
@@ -496,7 +503,7 @@ def check_color(in_color):
         return out_color
 
 
-def system_fonts(show_full_path=False):
+def system_fonts(show_full_path: Optional[bool] = False) -> List:
     """Gets a list of system fonts
 
         # Common font locations:
@@ -530,7 +537,13 @@ def system_fonts(show_full_path=False):
         raise Exception(e)
 
 
-def download_from_url(url, out_file_name=None, out_dir=".", unzip=True, verbose=True):
+def download_from_url(
+    url: str,
+    out_file_name: Optional[str] = None,
+    out_dir: Optional[str] = ".",
+    unzip: Optional[bool] = True,
+    verbose: Optional[bool] = True,
+):
     """Download a file from a URL (e.g., https://github.com/opengeos/whitebox-python/raw/master/examples/testdata.zip)
 
     Args:
@@ -3624,7 +3637,7 @@ def numpy_to_image(
     filename: str,
     transpose: bool = True,
     bands: Union[int, list] = None,
-    size: tuple = None,
+    size: Tuple = None,
     resize_args: dict = None,
     **kwargs,
 ) -> None:
@@ -7327,20 +7340,20 @@ def make_gif(images, out_gif, ext="jpg", fps=10, loop=0, mp4=False, clean_up=Fal
 
 
 def create_timelapse(
-    images: Union[list, str],
+    images: Union[List, str],
     out_gif: str,
     ext: str = ".tif",
-    bands: Optional[list] = None,
-    size: Optional[tuple] = None,
-    bbox: Optional[list] = None,
+    bands: Optional[List] = None,
+    size: Optional[Tuple] = None,
+    bbox: Optional[List] = None,
     fps: int = 5,
     loop: int = 0,
     add_progress_bar: bool = True,
     progress_bar_color: str = "blue",
     progress_bar_height: int = 5,
     add_text: bool = False,
-    text_xy: Optional[tuple] = None,
-    text_sequence: Optional[list] = None,
+    text_xy: Optional[Tuple] = None,
+    text_sequence: Optional[List] = None,
     font_type: str = "arial.ttf",
     font_size: int = 20,
     font_color: str = "black",
@@ -7353,22 +7366,22 @@ def create_timelapse(
     """Creates a timelapse gif from a list of images.
 
     Args:
-        images (Union[list, str]): The list of images or input directory to create the gif from.
+        images (list | str): The list of images or input directory to create the gif from.
             For example, '/path/to/images/*.tif' or ['/path/to/image1.tif', '/path/to/image2.tif', ...]
         out_gif (str): File path to the output gif.
         ext (str, optional): The extension of the images. Defaults to '.tif'.
-        bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
-        size (Optional[tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
-        bbox (Optional[list], optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
+        bands (list, optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
+        size (tuple, optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        bbox (list, optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
         fps (int, optional): The frames per second of the gif. Defaults to 5.
         loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.
         add_progress_bar (bool, optional): Whether to add a progress bar to the gif. Defaults to True.
         progress_bar_color (str, optional): The color of the progress bar, can be color name or hex code. Defaults to 'blue'.
         progress_bar_height (int, optional): The height of the progress bar. Defaults to 5.
         add_text (bool, optional): Whether to add text to the gif. Defaults to False.
-        text_xy (Optional[tuple], optional): The x, y coordinates of the text. For example, ('10%', '10%').
+        text_xy (tuple, optional): The x, y coordinates of the text. For example, ('10%', '10%').
             Defaults to None, using the bottom left corner.
-        text_sequence (Optional[list], optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
+        text_sequence (list, optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
         font_type (str, optional): The font type of the text, can be 'arial.ttf' or 'alibaba.otf', or any system font. Defaults to 'arial.ttf'.
         font_size (int, optional): The font size of the text. Defaults to 20.
         font_color (str, optional): The color of the text, can be color name or hex code. Defaults to 'black'.

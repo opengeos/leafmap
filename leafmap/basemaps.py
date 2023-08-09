@@ -16,6 +16,7 @@ import folium
 import ipyleaflet
 import xyzservices.providers as xyz
 from .common import check_package, planet_tiles
+from typing import Dict, Optional, List
 
 # from box import Box
 
@@ -228,7 +229,7 @@ def _unpack_sub_parameters(var, param):
     return temp
 
 
-def get_xyz_dict(free_only=True, france=False):
+def get_xyz_dict(free_only: bool = True, france: bool = False) -> Dict:
     """Returns a dictionary of xyz services.
 
     Args:
@@ -279,7 +280,7 @@ def get_xyz_dict(free_only=True, france=False):
     return xyz_dict
 
 
-def xyz_to_leaflet():
+def xyz_to_leaflet() -> Dict:
     """Convert xyz tile services to ipyleaflet tile layers.
 
     Returns:
@@ -306,7 +307,7 @@ def xyz_to_leaflet():
     return leaflet_dict
 
 
-def xyz_to_pydeck():
+def xyz_to_pydeck() -> Dict:
     """Convert xyz tile services to pydeck custom tile layers.
 
     Returns:
@@ -345,7 +346,7 @@ def xyz_to_pydeck():
     return pydeck_dict
 
 
-def xyz_to_folium():
+def xyz_to_folium() -> Dict:
     """Convert xyz tile services to folium tile layers.
 
     Returns:
@@ -409,7 +410,7 @@ def xyz_to_folium():
     return folium_dict
 
 
-def xyz_to_heremap():
+def xyz_to_heremap() -> Dict:
     """Convert xyz tile services to hermap tile layers.
 
     Returns:
@@ -510,7 +511,7 @@ def xyz_to_heremap():
     return heremap_dict
 
 
-def xyz_to_plotly():
+def xyz_to_plotly() -> Dict:
     """Convert xyz tile services to plotly tile layers.
 
     Returns:
@@ -546,7 +547,7 @@ def xyz_to_plotly():
     return plotly_dict
 
 
-def xyz_to_bokeh():
+def xyz_to_bokeh() -> Dict:
     """Convert xyz tile services to bokeh tile layers.
 
     Returns:
@@ -600,13 +601,13 @@ def search_qms(keywords, limit=10):
         return services["results"][:limit]
 
 
-def get_qms(service_id):
+def get_qms(service_id: str) -> Dict:
     QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
     service_details = requests.get(f"{QMS_API}/{service_id}")
     return service_details.json()
 
 
-def qms_to_leafmap(service_id):
+def qms_to_leafmap(service_id: str) -> Dict:
     service_details = get_qms(service_id)
     name = service_details["name"]
     url = service_details["url"]
