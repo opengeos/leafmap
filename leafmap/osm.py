@@ -8,7 +8,6 @@ from .common import check_package
 from typing import Optional, Union, Tuple, Dict, List
 
 warnings.filterwarnings("ignore")
-from shapely.geometry import Polygon, MultiPolygon
 
 
 def osm_gdf_from_address(address: str, tags: Dict, dist: Optional[int] = 1000):
