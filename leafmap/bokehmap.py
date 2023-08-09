@@ -357,7 +357,7 @@ class Map:
         Args:
             filename (str): The path to the shapefile.
             encoding (str, optional): The encoding of the shapefile. Defaults to "utf-8".
-            read_file_args (Dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
+            read_file_args (dict, optional): A dictionary of arguments to pass to geopandas.read_file. Defaults to {}.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the shapefile. Defaults to True.

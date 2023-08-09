@@ -3,7 +3,6 @@ from .common import *
 from .osm import *
 from .leafmap import basemaps
 from . import examples
-from geopandas import GeoDataFrame
 
 try:
     import pydeck as pdk
@@ -119,7 +118,7 @@ class Map(pdk.Deck):
 
     def add_gdf(
         self,
-        gdf: GeoDataFrame,
+        gdf,
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
         **kwargs

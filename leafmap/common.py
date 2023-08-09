@@ -291,7 +291,7 @@ def random_string(string_length: Optional[int] = 3) -> str:
     return "".join(random.choice(letters) for i in range(string_length))
 
 
-def open_image_from_url(url: str) -> dict:
+def open_image_from_url(url: str):
     """Loads an image from the specified URL.
 
     Args:
@@ -7366,22 +7366,22 @@ def create_timelapse(
     """Creates a timelapse gif from a list of images.
 
     Args:
-        images (Union[list, str]): The list of images or input directory to create the gif from.
+        images (list | str): The list of images or input directory to create the gif from.
             For example, '/path/to/images/*.tif' or ['/path/to/image1.tif', '/path/to/image2.tif', ...]
         out_gif (str): File path to the output gif.
         ext (str, optional): The extension of the images. Defaults to '.tif'.
-        bands (Optional[list], optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
-        size (Optional[Tuple], optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
-        bbox (Optional[list], optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
+        bands (list, optional): The bands to use for the gif. For example, [0, 1, 2] for RGB, and [0] for grayscale. Defaults to None.
+        size (tuple, optional): The size of the gif. For example, (500, 500). Defaults to None, using the original size.
+        bbox (list, optional): The bounding box of the gif. For example, [xmin, ymin, xmax, ymax]. Defaults to None, using the original bounding box.
         fps (int, optional): The frames per second of the gif. Defaults to 5.
         loop (int, optional): The number of times to loop the gif. Defaults to 0, looping forever.
         add_progress_bar (bool, optional): Whether to add a progress bar to the gif. Defaults to True.
         progress_bar_color (str, optional): The color of the progress bar, can be color name or hex code. Defaults to 'blue'.
         progress_bar_height (int, optional): The height of the progress bar. Defaults to 5.
         add_text (bool, optional): Whether to add text to the gif. Defaults to False.
-        text_xy (Optional[Tuple], optional): The x, y coordinates of the text. For example, ('10%', '10%').
+        text_xy (tuple, optional): The x, y coordinates of the text. For example, ('10%', '10%').
             Defaults to None, using the bottom left corner.
-        text_sequence (Optional[list], optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
+        text_sequence (list, optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
         font_type (str, optional): The font type of the text, can be 'arial.ttf' or 'alibaba.otf', or any system font. Defaults to 'arial.ttf'.
         font_size (int, optional): The font size of the text. Defaults to 20.
         font_color (str, optional): The color of the text, can be color name or hex code. Defaults to 'black'.

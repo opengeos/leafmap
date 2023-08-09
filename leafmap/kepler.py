@@ -10,9 +10,7 @@ from .common import *
 from .osm import *
 from . import examples
 from typing import Optional, Union, Dict
-from geopandas import GeoDataFrame
 from pandas import DataFrame
-from sqlalchemy.engine import Engine
 
 try:
     import keplergl
@@ -115,7 +113,7 @@ class Map(keplergl.KeplerGl):
 
     def add_geojson(
         self,
-        in_geojson: Union[str, Dict],
+        in_geojson: Union[str, dict],
         layer_name: Optional[str] = "Untitled",
         config: Optional[str] = None,
         **kwargs,
@@ -220,7 +218,7 @@ class Map(keplergl.KeplerGl):
 
     def add_gdf(
         self,
-        gdf: GeoDataFrame,
+        gdf,
         layer_name: Optional[str] = "Untitled",
         config: Optional[str] = None,
         **kwargs,
@@ -366,7 +364,7 @@ class Map(keplergl.KeplerGl):
     def add_gdf_from_postgis(
         self,
         sql: str,
-        con: Engine,
+        con,
         layer_name: Optional[str] = "Untitled",
         config: Optional[str] = None,
         **kwargs,

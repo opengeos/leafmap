@@ -18,9 +18,6 @@ from geopandas import GeoDataFrame, GeoSeries
 basemaps = Box(xyz_to_folium(), frozen_box=True)
 import pandas as pd
 from typing import Optional, Union, Any, Callable, Dict, Tuple
-import shapely
-from sqlalchemy.engine import Engine
-from ipywidgets.widgets import Image as ipywidgetsImage
 
 
 class Map(folium.Map):
@@ -203,7 +200,7 @@ class Map(folium.Map):
         #  The folium fit_bounds method takes lat/lon bounds in the form [[south, west], [north, east]].
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 
-    def zoom_to_gdf(self, gdf: GeoDataFrame):
+    def zoom_to_gdf(self, gdf):
         """Zooms to the bounding box of a GeoPandas GeoDataFrame.
 
         Args:
@@ -814,7 +811,7 @@ class Map(folium.Map):
 
     def add_osm_from_polygon(
         self,
-        polygon: Union[shapely.geometry.Polygon, shapely.geometry.MultiPolygon],
+        polygon,
         tags: dict,
         layer_name: Optional[str] = "Untitled",
         style: Optional[Dict] = {},
@@ -948,7 +945,7 @@ class Map(folium.Map):
         opacity: Optional[float] = 1.0,
         shown: Optional[bool] = True,
         bands: Optional[List] = None,
-        titiler_endpoint: Optional[str] = "https://titiler.xyz",
+        titiler_endpoint: Optional[str] = None,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -1348,7 +1345,7 @@ class Map(folium.Map):
 
     def add_gdf(
         self,
-        gdf: GeoDataFrame,
+        gdf,
         layer_name: Optional[str] = "Untitled",
         zoom_to_layer: Optional[bool] = True,
         info_mode: Optional[str] = "on_hover",
@@ -1385,7 +1382,7 @@ class Map(folium.Map):
     def add_gdf_from_postgis(
         self,
         sql: str,
-        con: Engine,
+        con,
         layer_name: Optional[str] = "Untitled",
         zoom_to_layer: Optional[bool] = True,
         info_mode: Optional[str] = "on_hover",
@@ -1456,12 +1453,8 @@ class Map(folium.Map):
         self,
         filename: str,
         layer_name: Optional[str] = "Untitled",
-        bbox: Optional[
-            Union[Tuple, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
-        ] = None,
-        mask: Optional[
-            Union[Dict, GeoDataFrame, GeoSeries, shapely.geometry.base.BaseGeometry]
-        ] = None,
+        bbox: Optional[Tuple] = None,
+        mask: Optional[Dict] = None,
         rows: Optional[Union[int, slice]] = None,
         info_mode: Optional[str] = "on_hover",
         **kwargs,
@@ -1734,7 +1727,7 @@ class Map(folium.Map):
         bounds = [[south, west], [north, east]]
         return bounds
 
-    def st_fit_bounds(self) -> folium.Map:
+    def st_fit_bounds(self):
         """Fit the map to the bounds of the map.
 
         Returns:
@@ -1752,7 +1745,7 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
-    def st_last_draw(self, st_component) -> str:
+    def st_last_draw(self, st_component):
         """Get the last draw feature of the map.
 
         Args:
@@ -1764,7 +1757,7 @@ class Map(folium.Map):
 
         return st_component["last_active_drawing"]
 
-    def st_last_click(self, st_component) -> str:
+    def st_last_click(self, st_component):
         """Get the last click feature of the map.
 
         Args:
@@ -1777,7 +1770,7 @@ class Map(folium.Map):
         coords = st_component["last_clicked"]
         return (coords["lat"], coords["lng"])
 
-    def st_draw_features(self, st_component) -> str:
+    def st_draw_features(self, st_component):
         """Get the draw features of the map.
 
         Args:
@@ -1956,12 +1949,12 @@ class Map(folium.Map):
 
     def add_colormap(
         self,
-        width: float = 4.0,
-        height: float = 0.3,
-        vmin: float = 0,
-        vmax: float = 1.0,
-        palette: List = None,
-        vis_params: dict = None,
+        width: Optional[float] = 4.0,
+        height: Optional[float] = 0.3,
+        vmin: Optional[float] = 0,
+        vmax: Optional[float] = 1.0,
+        palette: Optional[List] = None,
+        vis_params: Optional[dict] = None,
         cmap: Optional[str] = "gray",
         discrete: Optional[bool] = False,
         label: Optional[str] = None,
@@ -2034,11 +2027,11 @@ class Map(folium.Map):
         popup: Optional[List] = None,
         min_width: Optional[int] = 100,
         max_width: Optional[int] = 200,
-        layer_name: Optional[str] = "Points",
+        layer_name: Optional[str] = "Marker Cluster",
         color_column: Optional[str] = None,
         marker_colors: Optional[List] = None,
-        icon_colors: Optional[List] = None,
-        icon_names: Optional[List] = None,
+        icon_colors: Optional[List] = ["white"],
+        icon_names: Optional[List] = ["info"],
         angle: Optional[int] = 0,
         prefix: Optional[str] = "fa",
         add_legend: Optional[bool] = True,
@@ -2268,7 +2261,7 @@ class Map(folium.Map):
 
     def add_labels(
         self,
-        data: Union[pd.DataFrame, str, GeoDataFrame],
+        data: Union[pd.DataFrame, str],
         column: str,
         font_size: Optional[str] = "12pt",
         font_color: Optional[str] = "black",
@@ -2355,8 +2348,8 @@ class Map(folium.Map):
         self,
         left_layer: Optional[str] = "TERRAIN",
         right_layer: Optional[str] = "OpenTopoMap",
-        left_args: Optional[Dict] = {},
-        right_args: Optional[Dict] = {},
+        left_args: Optional[dict] = {},
+        right_args: Optional[dict] = {},
         left_label: Optional[str] = None,
         right_label: Optional[str] = None,
         left_position: Optional[str] = "bottomleft",
@@ -2524,7 +2517,7 @@ class Map(folium.Map):
 
     def add_data(
         self,
-        data: Union[str, pd.DataFrame, GeoDataFrame],
+        data: Union[str, pd.DataFrame],
         column: str,
         cmap: Optional[str] = None,
         colors: Optional[List] = None,
@@ -2534,8 +2527,8 @@ class Map(folium.Map):
         add_legend: Optional[bool] = True,
         legend_title: Optional[str] = None,
         legend_position: Optional[str] = "bottomright",
-        legend_kwds: Optional[Dict] = None,
-        classification_kwds: Optional[Dict] = None,
+        legend_kwds: Optional[dict] = None,
+        classification_kwds: Optional[dict] = None,
         style_function: Optional[Callable] = None,
         highlight_function: Optional[Callable] = None,
         layer_name: Optional[str] = "Untitled",
@@ -2674,7 +2667,7 @@ class Map(folium.Map):
 
     def add_image(
         self,
-        image: Union[str, ipywidgetsImage],
+        image: str,
         position: Optional[Tuple] = (0, 0),
         **kwargs,
     ):
@@ -2807,7 +2800,7 @@ class Map(folium.Map):
         self,
         url: Optional[str],
         attribution: Optional[str] = "",
-        styles: Optional[Dict] = {},
+        styles: Optional[dict] = {},
         layer_name: Optional[str] = "Vector Tile",
         **kwargs,
     ):
@@ -2892,7 +2885,7 @@ class Map(folium.Map):
         end_date: Optional[str] = None,
         limit: Optional[int] = 100,
         info_mode: Optional[str] = "on_click",
-        layer_args: Optional[Dict] = {},
+        layer_args: Optional[dict] = {},
         add_image: Optional[bool] = True,
         **kwargs,
     ):
@@ -3094,7 +3087,7 @@ class Map(folium.Map):
         """
         print("The folium plotting backend does not support this function.")
 
-    def edit_vector(self, data: Union[str, Dict], **kwargs):
+    def edit_vector(self, data: Union[str, dict], **kwargs):
         """Edit a vector layer.
 
         Args:

@@ -44,7 +44,7 @@ _palette_dict = {
 def get_palette(
     cmap_name: Optional[str] = None,
     n_class: Optional[int] = None,
-    hashtag: bool = False,
+    hashtag: Optional[bool] = False,
 ) -> List:
     """Get a palette from a matplotlib colormap. See the list of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
