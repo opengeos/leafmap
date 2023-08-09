@@ -2,8 +2,6 @@ import os
 import pystac
 import requests
 from typing import Optional, Dict, List, Callable, Any, Tuple, Union
-import pystac_client.item_search
-from geopandas import GeoDataFrame
 from pandas import DataFrame
 
 
@@ -12,7 +10,7 @@ class TitilerEndpoint:
 
     def __init__(
         self,
-        endpoint: Optional[str] = "https://titiler.xyz",
+        endpoint: Optional[str] = None,
         name: Optional[str] = "stac",
         TileMatrixSetId: Optional[str] = "WebMercatorQuad",
     ):
@@ -109,7 +107,7 @@ class PlanetaryComputerEndpoint(TitilerEndpoint):
         return f"{self.endpoint}/mosaic/{searchid}/{lon},{lat}/assets"
 
 
-def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Dict:
+def check_titiler_endpoint(titiler_endpoint: Optional[str] = None):
     """Returns the default titiler endpoint.
 
     Returns:
@@ -132,7 +130,7 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Dict:
 def cog_tile(
     url,
     bands: str = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     **kwargs,
 ):
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
@@ -216,7 +214,7 @@ def cog_tile(
 def cog_tile_vmin_vmax(
     url: str,
     bands: Optional[List] = None,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     percentile: Optional[bool] = True,
     **kwargs,
 ) -> Tuple:
@@ -252,7 +250,7 @@ def cog_tile_vmin_vmax(
 
 def cog_mosaic(
     links: List,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     username: Optional[str] = "anonymous",
     layername=None,
     overwrite: Optional[bool] = False,
@@ -318,7 +316,7 @@ def cog_mosaic(
 def cog_mosaic_from_file(
     filepath: str,
     skip_rows: Optional[int] = 0,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     username: Optional[str] = "anonymous",
     layername=None,
     overwrite: Optional[bool] = False,
@@ -362,7 +360,7 @@ def cog_mosaic_from_file(
 
 def cog_bounds(
     url: str,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
 ) -> List:
     """Get the bounding box of a Cloud Optimized GeoTIFF (COG).
 
@@ -386,7 +384,7 @@ def cog_bounds(
 
 def cog_center(
     url: str,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
 ) -> Tuple:
     """Get the centroid of a Cloud Optimized GeoTIFF (COG).
 
@@ -405,7 +403,7 @@ def cog_center(
 
 def cog_bands(
     url: str,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
 ) -> List:
     """Get band names of a Cloud Optimized GeoTIFF (COG).
 
@@ -431,7 +429,7 @@ def cog_bands(
 
 def cog_stats(
     url: str,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
 ) -> List:
     """Get band statistics of a Cloud Optimized GeoTIFF (COG).
 
@@ -456,7 +454,7 @@ def cog_stats(
 
 def cog_info(
     url: str,
-    titiler_endpoint: Optional[str] = "https://titiler.xyz",
+    titiler_endpoint: Optional[str] = None,
     return_geojson: Optional[bool] = False,
 ) -> List:
     """Get band statistics of a Cloud Optimized GeoTIFF (COG).
@@ -1375,7 +1373,7 @@ def stac_search(
             return search
 
 
-def stac_search_to_gdf(search: pystac_client.item_search, **kwargs) -> GeoDataFrame:
+def stac_search_to_gdf(search, **kwargs):
     """Convert STAC search result to a GeoDataFrame.
 
     Args:
@@ -1393,7 +1391,7 @@ def stac_search_to_gdf(search: pystac_client.item_search, **kwargs) -> GeoDataFr
     return gdf
 
 
-def stac_search_to_df(search: pystac_client.item_search, **kwargs) -> DataFrame:
+def stac_search_to_df(search, **kwargs) -> DataFrame:
     """Convert STAC search result to a DataFrame.
 
     Args:
@@ -1407,7 +1405,7 @@ def stac_search_to_df(search: pystac_client.item_search, **kwargs) -> DataFrame:
     return gdf.drop(columns=["geometry"], **kwargs)
 
 
-def stac_search_to_dict(search: pystac_client.item_search, **kwargs) -> Dict:
+def stac_search_to_dict(search, **kwargs) -> Dict:
     """Convert STAC search result to a dictionary.
 
     Args:
@@ -1434,7 +1432,7 @@ def stac_search_to_dict(search: pystac_client.item_search, **kwargs) -> Dict:
     return info
 
 
-def stac_search_to_list(search: pystac_client.item_search, **kwargs) -> List:
+def stac_search_to_list(search, **kwargs) -> List:
     """Convert STAC search result to a list.
 
     Args:
@@ -1632,7 +1630,7 @@ def maxar_items(
     return_gdf: Optional[bool] = True,
     assets: Optional[List] = ["visual"],
     **kwargs,
-) -> GeoDataFrame:
+):
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1740,7 +1738,7 @@ def maxar_all_items(
     assets: Optional[List] = ["visual"],
     verbose: Optional[bool] = True,
     **kwargs,
-) -> GeoDataFrame:
+):
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:

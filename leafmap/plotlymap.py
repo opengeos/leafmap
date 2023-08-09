@@ -8,7 +8,6 @@ from .common import *
 from .osm import *
 from . import examples
 from typing import Optional, List, Union, Dict, Tuple
-from plotly import graph_objects
 from pandas import DataFrame
 
 try:
@@ -232,7 +231,7 @@ class Map(go.FigureWidget):
             mapbox_style=style, mapbox_layers=[], mapbox_accesstoken=access_token
         )
 
-    def add_layer(self, layer: graph_objects, name: Optional[str] = None, **kwargs):
+    def add_layer(self, layer, name: Optional[str] = None, **kwargs):
         """Adds a layer to the map.
 
         Args:
@@ -407,7 +406,7 @@ class Map(go.FigureWidget):
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,
         bands: Optional[List] = None,
-        titiler_endpoint: Optional[str] = "https://titiler.xyz",
+        titiler_endpoint: Optional[str] = None,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -665,7 +664,7 @@ class Map(go.FigureWidget):
 
     def add_gdf_demo(
         self,
-        gdf: GeoDataFrame,
+        gdf,
         label_col: Optional[str],
         color_col: Optional[str],
         color_continuous_scale: Optional[str] = "Viridis",
@@ -702,7 +701,7 @@ class Map(go.FigureWidget):
 
     def add_gdf(
         self,
-        gdf: GeoDataFrame,
+        gdf,
         label_col: Optional[str] = None,
         color_col: Optional[str] = None,
         labels=None,
