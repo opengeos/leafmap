@@ -8,9 +8,10 @@ import ipywidgets as widgets
 from ipyfilechooser import FileChooser
 from .common import *
 from .pc import *
+from typing import Optional, Union, Dict, List
 
 
-def tool_template(m=None, opened=True):
+def tool_template(m, opened: Optional[bool] = True):
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
@@ -205,7 +206,7 @@ def tool_template(m=None, opened=True):
         return toolbar_widget
 
 
-def tool_header_template(m=None, opened=True):
+def tool_header_template(m, opened: Optional[bool] = True):
     """Create a toolbar widget.
 
     Args:
@@ -1533,7 +1534,7 @@ def open_raster_gui(m):
     m.tool_output_ctrl = tool_output_ctrl
 
 
-def change_basemap(m, position="topright"):
+def change_basemap(m, position: Optional[str] = "topright"):
     """Widget for changing basemaps.
 
     Args:
@@ -1694,7 +1695,12 @@ def save_map(m):
 
 
 def split_basemaps(
-    m, layers_dict=None, left_name=None, right_name=None, width="120px", **kwargs
+    m,
+    layers_dict: Optional[Dict] = None,
+    left_name=None,
+    right_name=None,
+    width="120px",
+    **kwargs,
 ):
     """Create a split-panel map for visualizing two maps.
 
@@ -1814,11 +1820,11 @@ def split_basemaps(
 
 def time_slider(
     m,
-    layers_dict={},
-    labels=None,
-    time_interval=1,
-    position="bottomright",
-    slider_length="150px",
+    layers_dict: Optional[Dict] = {},
+    labels: Optional[List] = None,
+    time_interval: Optional[int] = 1,
+    position: Optional[str] = "bottomright",
+    slider_length: Optional[str] = "150px",
 ):
     """Adds a time slider to the map.
 
@@ -1929,7 +1935,7 @@ def time_slider(
     m.slider_ctrl = slider_ctrl
 
 
-def census_widget(m=None):
+def census_widget(m):
     """Widget for adding US Census data.
 
     Args:
@@ -2068,7 +2074,7 @@ def census_widget(m=None):
         return toolbar_widget
 
 
-def search_basemaps(m=None):
+def search_basemaps(m):
     """The widget for search XYZ tile services.
 
     Args:
@@ -2262,7 +2268,7 @@ def search_basemaps(m=None):
         return toolbar_widget
 
 
-def download_osm(m=None):
+def download_osm(m):
     """Widget for downloading OSM data.
 
     Args:
@@ -2461,7 +2467,11 @@ def download_osm(m=None):
         return toolbar_widget
 
 
-def inspector_gui(m=None, position="topright", opened=True):
+def inspector_gui(
+    m,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -3513,7 +3523,7 @@ def plotly_whitebox_gui(canvas):
     container_widget.children = [toolbar_widget]
 
 
-def search_geojson_gui(m=None):
+def search_geojson_gui(m):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -4412,7 +4422,12 @@ def edit_draw_gui(m):
         return toolbar_widget
 
 
-def stac_gui(m=None, position="topright", opened=True, **kwargs):
+def stac_gui(
+    m,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+    **kwargs,
+):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
@@ -5110,11 +5125,12 @@ def stac_gui(m=None, position="topright", opened=True, **kwargs):
         return toolbar_widget
 
 
-def stac_custom_gui(m=None, button_width="85px", **kwargs):
+def stac_custom_gui(m, button_width: Optional[str] = "85px", **kwargs):
     """Generates a tool GUI template using ipywidgets.
 
     Args:
         m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+        button_width (str, optional): The button width. Defaults to "85px".
         **kwargs: Additional keyword arguments that will be passed to the pystac Client.open() function.
 
     Returns:
@@ -5816,7 +5832,11 @@ def stac_custom_gui(m=None, button_width="85px", **kwargs):
         return toolbar_widget
 
 
-def oam_search_gui(m=None, position="topright", opened=True):
+def oam_search_gui(
+    m,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+):
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
@@ -6035,7 +6055,12 @@ def oam_search_gui(m=None, position="topright", opened=True):
         return toolbar_widget
 
 
-def layer_manager_gui(m, position="topright", opened=True, return_widget=False):
+def layer_manager_gui(
+    m,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+    return_widget: Optional[bool] = False,
+):
     """Creates a layer manager widget.
 
     Args:
