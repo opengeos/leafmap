@@ -23,7 +23,7 @@ jobs:
                   gdalinfo --version
             - name: Install dependencies
               run: |
-                  pip install --no-cache-dir Cython
+                  pip install --no-cache-dir Cython PyYAML==6.0.1
                   pip install -r requirements.txt -r requirements_dev.txt
                   pip install .
             - name: Discover typos with codespell
