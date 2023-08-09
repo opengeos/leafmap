@@ -4386,19 +4386,37 @@ def download_file(
         url, output, quiet, proxy, speed, use_cookies, verify, id, fuzzy, resume
     )
 
-    if unzip and output.endswith(".zip"):
-        with zipfile.ZipFile(output, "r") as zip_ref:
-            if not quiet:
-                print("Extracting files...")
-            if subfolder:
-                basename = os.path.splitext(os.path.basename(output))[0]
+    if unzip:
+        if output.endswith(".zip"):
+            with zipfile.ZipFile(output, "r") as zip_ref:
+                if not quiet:
+                    print("Extracting files...")
+                if subfolder:
+                    basename = os.path.splitext(os.path.basename(output))[0]
 
-                output = os.path.join(out_dir, basename)
-                if not os.path.exists(output):
-                    os.makedirs(output)
-                zip_ref.extractall(output)
+                    output = os.path.join(out_dir, basename)
+                    if not os.path.exists(output):
+                        os.makedirs(output)
+                    zip_ref.extractall(output)
+                else:
+                    zip_ref.extractall(os.path.dirname(output))
+        elif output.endswith(".tar.gz") or output.endswith(".tar"):
+            if output.endswith(".tar.gz"):
+                mode = "r:gz"
             else:
-                zip_ref.extractall(os.path.dirname(output))
+                mode = "r"
+
+            with tarfile.open(output, mode) as tar_ref:
+                if not quiet:
+                    print("Extracting files...")
+                if subfolder:
+                    basename = os.path.splitext(os.path.basename(output))[0]
+                    output = os.path.join(out_dir, basename)
+                    if not os.path.exists(output):
+                        os.makedirs(output)
+                    tar_ref.extractall(output)
+                else:
+                    tar_ref.extractall(os.path.dirname(output))
 
     return os.path.abspath(output)
 
