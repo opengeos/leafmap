@@ -946,6 +946,7 @@ class Map(folium.Map):
         shown: Optional[bool] = True,
         bands: Optional[List] = None,
         titiler_endpoint: Optional[str] = None,
+        zoom_to_layer=True,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -958,6 +959,7 @@ class Map(folium.Map):
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             bands (list, optional): A list of bands to use. Defaults to None.
             titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.xyz".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
             **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
@@ -972,8 +974,9 @@ class Map(folium.Map):
             opacity=opacity,
             shown=shown,
         )
-        self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+        if zoom_to_layer:
+            self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def add_cog_mosaic(self, **kwargs):
         raise NotImplementedError(
