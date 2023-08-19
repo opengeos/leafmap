@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.23.3 - Aug 19, 2023
+
+**Improvement**
+
+-   Added leafmap book link (#512)
+-   Updated pepy badge (#511)
+-   Fixed docker image error (#510)
+-   Added zoom_to_layer param for folium add_cog_layer (#508)
+-   Improved download function for tar file unzip (#505)
+-   Added installation CI (#504)
+
 ## v0.23.2 - Aug 8, 2023
 
 **Improvement**
