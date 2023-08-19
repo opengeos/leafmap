@@ -7,7 +7,7 @@
 [![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
-[![image](https://pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
+[![image](https://static.pepy.tech/badge/leafmap)](https://pepy.tech/projects/leafmap)
 [![image](https://github.com/opengeos/leafmap/workflows/docs/badge.svg)](https://leafmap.org)
 [![image](https://github.com/opengeos/leafmap/workflows/Linux%20build/badge.svg)](https://github.com/opengeos/leafmap/actions)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
