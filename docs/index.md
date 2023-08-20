@@ -35,9 +35,11 @@ This project is supported by Amazon Web Services ([AWS](https://aws.amazon.com))
 
 ## Statement of Need
 
-There is a plethora of Python packages for geospatial analysis, such as [geopandas](https://github.com/geopandas/geopandas) for vector data analysis and [xarray](https://github.com/pydata/xarray) for raster data analysis. As listed at [pyviz.org](https://pyviz.org/tools.html#geospatial), there are also many options for plotting data on a map in Python, ranging from libraries focused specifically on maps like [ipyleaflet](https://ipyleaflet.readthedocs.io) and [kepler.gl](https://docs.kepler.gl/docs/keplergl-jupyter) to general-purpose plotting tools that also support geospatial data types, such as [hvPlot](https://hvplot.pyviz.org), [GeoViews](http://geoviews.org), and [plotly](https://github.com/plotly/plotly.py). These tools provide a lot of power, but displaying geospatial data from various file formats on an interactive map and applying basic analyses can take many lines of code and can be a challenging task for novice users with limited coding skills. Many of the tools also only work "one way", i.e. they can generate maps for display in a browser front end but don't support invoking Python code in response to clicking or selecting items on the map, limiting their utility for exploring map data.
+There is a plethora of Python packages for geospatial analysis, such as [geopandas](https://geopandas.org) for vector data analysis and [xarray](https://docs.xarray.dev) for raster data analysis. As listed at [pyviz.org](https://pyviz.org), there are also many options for plotting data on a map in Python, ranging from libraries focused specifically on maps like [ipyleaflet](https://ipyleaflet.readthedocs.io) and [folium](https://python-visualization.github.io/folium) to general-purpose plotting tools that also support geospatial data types, such as [hvPlot](https://hvplot.pyviz.org), [bokeh](http://bokeh.org), and [plotly](https://plotly.com/python). While these tools provide powerful capabilities, displaying geospatial data from different file formats on an interactive map and performing basic analyses can be challenging, especially for users with limited coding skills. Furthermore, many tools lack bi-directional communication between the frontend (browser) and the backend (Python), limiting their interactivity and usability for exploring map data.
 
-Leafmap is built on the bidirectional communication between the front end (your browser) and the backend (Python) provided by ipleaflet (and similarly by hvPlot and GeoViews) to provide many convenient functions for loading and visualizing geospatial datasets with only one line of code. Users can also use the interactive GUI to load geospatial datasets without coding. Leafmap is intended for anyone who would like to analyze and visualize geospatial data interactively in a Jupyter environment. It is particularly suited for novice users with limited programming skills. Advanced programmers can also find leafmap a useful tool for analyzing geospatial data and building interactive web apps.
+Leafmap addresses these challenges by leveraging the bidirectional communication provided by ipyleaflet, enabling users to load and visualize geospatial datasets with just one line of code. Leafmap also provides an interactive graphical user interface (GUI) for loading geospatial datasets without any coding. It is designed for anyone who wants to analyze and visualize geospatial data interactively in a Jupyter environment, making it particularly accessible for novice users with limited programming skills. Advanced programmers can also benefit from leafmap for geospatial data analysis and building interactive web applications.
+
+## Usage
 
 Launch the interactive notebook tutorial for the **leafmap** Python package with JupyterLite, Amazon SageMaker Studio Lab, Microsoft Planetary Computer, Google Colab, or Binder:
 
@@ -51,24 +53,45 @@ Check out this excellent article on Medium - [Leafmap a new Python Package for G
 
 ## Key Features
 
-Below is a partial list of features available for the leafmap package. Please check the [examples](https://github.com/opengeos/leafmap/tree/master/examples) page for notebook examples, GIF animations, and video tutorials.
+Leafmap offers a wide range of features and capabilities that empower geospatial data scientists, researchers, and developers to unlock the potential of their data. Some of the key features include:
 
--   Create an interactive map with only one-line of code.
--   Select from a variety of basemaps interactively without coding.
--   Add XYZ, WMS, and vector tile services to the map.
--   Convert CSV to points and display points as a marker cluster.
--   Add local vector data (e.g., shapefile, GeoJSON, KML) to the map without coding.
--   Add local raster data (e.g., GeoTIFF) to the map without coding.
--   Add Cloud Optimized GeoTIFF (COG) and SpatialTemporal Asset Catalog (STAC) to the map.
--   Add OpenStreetMap data to the map with a single line of code.
--   Add a GeoPandas GeoDataFrame to the map with a single line of code.
--   Add a point layer with popup attributes to the map.
--   Add data from a PostGIS database to the map.
--   Add custom legends and colorbars to the map.
--   Perform geospatial analysis using WhiteboxTools and whiteboxgui.
--   Create split-panel map and linked maps.
--   Publish interactive maps with a single line of code.
--   Download and display OpenStreetMap data with a single line of code.
+-   **Creating an interactive map with just one line of code:** Leafmap makes it easy to create an interactive map by providing a simple API that allows you to load and visualize geospatial datasets with minimal coding.
+
+-   **Switching between different mapping backends:** Leafmap supports multiple mapping backends, including ipyleaflet, folium, kepler.gl, pydeck, and bokeh. You can switch between these backends to create maps with different visualization styles and capabilities.
+
+-   **Changing basemaps interactively:** Leafmap allows you to change basemaps interactively, providing a variety of options such as OpenStreetMap, Stamen Terrain, CartoDB Positron, and many more.
+
+-   **Adding XYZ, WMS, and vector tile services:** You can easily add XYZ, WMS, and vector tile services to your map, allowing you to overlay additional geospatial data from various sources.
+
+-   **Displaying vector data:** Leafmap supports various vector data formats, including Shapefile, GeoJSON, GeoPackage, and any vector format supported by GeoPandas. You can load and display vector data on the map, enabling you to visualize and analyze spatial features.
+
+-   **Displaying raster data:** Leafmap allows you to load and display raster data, such as GeoTIFFs, on the map. This feature is useful for visualizing satellite imagery, digital elevation models, and other gridded datasets.
+
+-   **Creating custom legends and colorbars:** Leafmap provides tools for customizing legends and colorbars on the map, allowing you to represent data values with different colors and corresponding labels.
+
+-   **Creating split-panel maps and linked maps:** With Leafmap, you can create split-panel maps to compare different datasets side by side. You can also create linked maps that synchronize interactions between multiple maps, providing a coordinated view of different spatial data.
+
+-   **Downloading and visualizing OpenStreetMap data:** Leafmap allows you to download and visualize OpenStreetMap data, providing access to detailed street maps, buildings, and other points of interest.
+
+-   **Creating and editing vector data interactively:** Leafmap includes tools for creating and editing vector data interactively on the map. You can draw points, lines, and polygons, and modify them as needed.
+
+-   **Searching for geospatial data:** Leafmap provides functionality for searching and accessing geospatial data from sources such as SpatialTemporal Asset Catalogs (STAC), Microsoft Planetary Computer, AWS Open Data Registry, and OpenAerialMap.
+
+-   **Inspecting pixel values interactively:** Leafmap allows you to interactively inspect pixel values in raster datasets, helping you analyze and understand the data at a more granular level.
+
+-   **Creating choropleth maps and heat maps:** Leafmap supports the creation of choropleth maps, where colors represent different data values for specific geographic areas. You can also create heat maps to visualize data density.
+
+-   **Displaying data from a PostGIS database:** Leafmap provides tools for connecting to a PostGIS database and displaying spatial data stored in the database on the map.
+
+-   **Creating time series animations:** Leafmap enables the creation of time series animations from both vector and raster data, allowing you to visualize temporal changes in your geospatial datasets.
+
+-   **Analyzing geospatial data with whitebox:** Leafmap integrates with WhiteboxTools and whiteboxgui, providing a suite of geospatial analyses, such as hydrological analysis, terrain analysis, and LiDAR processing.
+
+-   **Segmenting and classifying remote sensing imagery:** Leafmap integrates the segment-geospatial package, which provides tools for segmenting and classifying remote sensing imagery using deep learning algorithms.
+
+-   **Building interactive web apps:** Leafmap supports the development of interactive web applications using frameworks like Voila, Streamlit, and Solara. This allows you to share your geospatial analyses and visualizations with others in a user-friendly web interface.
+
+These features and capabilities make leafmap a powerful tool for geospatial data exploration, analysis, and visualization. Whether you are a beginner or an experienced geospatial data scientist, leafmap provides an accessible and efficient way to work with geospatial data in Python.
 
 ## Citations
 
