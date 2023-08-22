@@ -30,7 +30,6 @@ extras_requires = {
         "keplergl",
         "pydeck",
         "plotly",
-        "here-map-widget-for-jupyter",
     ],
     "lidar": ["ipygany", "ipyvtklink", "laspy", "panel", "pyntcloud[LAS]", "pyvista"],
     "raster": [
@@ -43,7 +42,7 @@ extras_requires = {
         "py3dep",
     ],
     "sql": ["psycopg2", "sqlalchemy"],
-    "apps": ["streamlit-folium", "voila"],
+    "apps": ["streamlit-folium", "voila", "solara"],
     "vector": ["geopandas", "osmnx"],
 }
 
