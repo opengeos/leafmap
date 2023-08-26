@@ -9977,3 +9977,51 @@ def merge_rasters(
         dstNodata=output_nodata,
         options=output_options,
     )
+
+
+def get_geometry_type(in_geojson: Union[str, Dict]) -> str:
+    """Get the geometry type of a GeoJSON file.
+
+    Args:
+        in_geojson (str | dict): The path to the GeoJSON file or a GeoJSON dictionary.
+
+    Returns:
+        str: The geometry type. Can be one of "Point", "LineString", "Polygon", "MultiPoint",
+            "MultiLineString", "MultiPolygon", "GeometryCollection", or "Unknown".
+    """
+
+    import geojson
+
+    try:
+        if isinstance(in_geojson, str):  # If input is a file path
+            with open(in_geojson, "r") as geojson_file:
+                geojson_data = geojson.load(geojson_file)
+        elif isinstance(in_geojson, dict):  # If input is a GeoJSON dictionary
+            geojson_data = in_geojson
+        else:
+            return "Invalid input type. Expected file path or dictionary."
+
+        if "type" in geojson_data:
+            if geojson_data["type"] == "FeatureCollection":
+                features = geojson_data.get("features", [])
+                if features:
+                    first_feature = features[0]
+                    geometry = first_feature.get("geometry")
+                    if geometry and "type" in geometry:
+                        return geometry["type"]
+                    else:
+                        return "No geometry type found in the first feature."
+                else:
+                    return "No features found in the FeatureCollection."
+            elif geojson_data["type"] == "Feature":
+                geometry = geojson_data.get("geometry")
+                if geometry and "type" in geometry:
+                    return geometry["type"]
+                else:
+                    return "No geometry type found in the Feature."
+            else:
+                return "Unsupported GeoJSON type."
+        else:
+            return "No 'type' field found in the GeoJSON data."
+    except Exception as e:
+        raise e
