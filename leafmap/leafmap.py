@@ -1318,7 +1318,7 @@ class Map(ipyleaflet.Map):
         """A demo for using leafmap basemaps."""
         dropdown = widgets.Dropdown(
             options=list(basemaps.keys()),
-            value="HYBRID",
+            value="Esri.WorldImagery",
             description="Basemaps",
         )
 
