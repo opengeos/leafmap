@@ -309,6 +309,19 @@ class Map(ipyleaflet.Map):
         try:
             layer_names = self.get_layer_names()
 
+            map_dict = {
+                "ROADMAP": "Google Maps",
+                "SATELLITE": "Google Satellite",
+                "TERRAIN": "Google Terrain",
+                "HYBRID": "Google Hybrid",
+            }
+
+            if isinstance(basemap, str):
+                if basemap.upper() in map_dict:
+                    layer = get_google_map(basemap.upper(), **kwargs)
+                    self.add(layer)
+                    return
+
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
                 url = basemap.build_url()
