@@ -70,7 +70,7 @@ class Map(ipyleaflet.Map):
                 self.sandbox_path = None
 
         if "height" not in kwargs:
-            self.layout.height = "600px"
+            self.layout.height = "500px"
         else:
             if isinstance(kwargs["height"], int):
                 kwargs["height"] = str(kwargs["height"]) + "px"
@@ -995,7 +995,7 @@ class Map(ipyleaflet.Map):
         minimap_control = ipyleaflet.WidgetControl(widget=minimap, position=position)
         self.add(minimap_control)
 
-    def add_marker_cluster(self, event="click", add_marker=True):
+    def marker_cluster(self, event="click", add_marker=True):
         """Captures user inputs and add markers to the map.
 
         Args:
@@ -2142,7 +2142,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-        zoom_to_layer=True,
+        zoom_to_layer=False,
         encoding="utf-8",
     ):
         """Adds a shapefile to the map.
@@ -2155,7 +2155,7 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
-            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to True.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to False.
             encoding (str, optional): The encoding of the shapefile. Defaults to "utf-8".
 
         Raises:
@@ -2165,12 +2165,11 @@ class Map(ipyleaflet.Map):
         import glob
 
         if in_shp.startswith("http") and in_shp.endswith(".zip"):
-            out_dir = os.path.abspath("./cache/shp")
+            out_dir = os.path.dirname(temp_file_path(".shp"))
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
             basename = os.path.basename(in_shp)
             filename = os.path.join(out_dir, basename)
-            # download_from_url(in_shp, out_dir=out_dir, verbose=False)
             download_file(in_shp, filename)
             files = list(glob.glob(os.path.join(out_dir, "*.shp")))
             if len(files) > 0:
@@ -2206,7 +2205,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-        zoom_to_layer=True,
+        zoom_to_layer=False,
         encoding="utf-8",
         **kwargs,
     ):
@@ -2220,7 +2219,7 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
-            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to True.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to False.
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
 
         Raises:
@@ -2268,18 +2267,24 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
+        geom_type = get_geometry_type(data)
+
         if not style:
             style = {
                 # "stroke": True,
                 "color": "#3388ff",
                 "weight": 2,
                 "opacity": 1,
-                # "fill": True,
-                # "fillColor": "#ffffff",
-                "fillOpacity": 0,
+                "fill": True,
+                "fillColor": "#3388ff",
+                "fillOpacity": 0.2,
                 # "dashArray": "9"
                 # "clickable": True,
             }
+
+            if geom_type in ["LineString", "MultiLineString"]:
+                style["fill"] = False
+
         elif "weight" not in style:
             style["weight"] = 1
 
@@ -2457,7 +2462,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-        zoom_to_layer=True,
+        zoom_to_layer=False,
         encoding="utf-8",
         **kwargs,
     ):
@@ -2471,7 +2476,7 @@ class Map(ipyleaflet.Map):
             style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
             fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
-            zoom_to_layer (bool, optional): Whether to zoom to the layer.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
         for col in gdf.columns:
@@ -2898,8 +2903,13 @@ class Map(ipyleaflet.Map):
             df = data
         elif not data.startswith("http") and (not os.path.exists(data)):
             raise FileNotFoundError("The specified input csv does not exist.")
-        else:
+        elif data.endswith(".csv"):
             df = pd.read_csv(data)
+        else:
+            import geopandas as gpd
+
+            gdf = gpd.read_file(data)
+            df = gdf_to_df(gdf)
 
         df = points_from_xy(df, x, y)
 
@@ -3073,6 +3083,8 @@ class Map(ipyleaflet.Map):
             )
 
         self.default_style = {"cursor": "default"}
+
+    add_marker_cluster = add_points_from_xy
 
     def add_heatmap(
         self,
@@ -4228,6 +4240,8 @@ def split_map(
         kwargs["fullscreen_control"] = False
     if "scale_control" not in kwargs:
         kwargs["scale_control"] = False
+    if "search_control" not in kwargs:
+        kwargs["search_control"] = False
 
     m = Map(**kwargs)
 
