@@ -994,7 +994,7 @@ class Map(ipyleaflet.Map):
             zoom (int, optional): Initial map zoom level. Defaults to 5.
             position (str, optional): Position of the minimap. Defaults to "bottomright".
         """
-        layers = [get_basemap("ROADMAP")]
+        layers = [get_basemap("Esri.WorldImagery")]
         minimap = ipyleaflet.Map(
             zoom_control=False,
             attribution_control=False,
