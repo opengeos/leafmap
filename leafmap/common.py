@@ -1741,17 +1741,14 @@ def get_api_key(token_name, m=None):
     return api_key
 
 
-def set_api_key(token_name, api_key, m=None):
-    """Sets an API key as an environment variable.
+def set_api_key(key: str, name: str = "GOOGLE_MAPS_API_KEY"):
+    """Sets the Google Maps API key. You can generate one from https://bit.ly/3sw0THG.
 
     Args:
-        token_name (str): The token name.
-        api_key (str): The API key.
-        m (ipyleaflet.Map | folium.Map, optional): A Map instance.. Defaults to None.
+        key (str): The Google Maps API key.
+        name (str, optional): The name of the environment variable. Defaults to "GOOGLE_MAPS_API_KEY".
     """
-    os.environ[token_name] = api_key
-    if m is not None:
-        m.api_keys[token_name] = api_key
+    os.environ[name] = key
 
 
 def planet_monthly_tropical(api_key=None, token_name="PLANET_API_KEY"):
@@ -10025,3 +10022,106 @@ def get_geometry_type(in_geojson: Union[str, Dict]) -> str:
             return "No 'type' field found in the GeoJSON data."
     except Exception as e:
         raise e
+
+
+def get_google_map(
+    map_type="HYBRID", show=True, api_key=None, backend="ipyleaflet", **kwargs
+):
+    """Gets Google basemap tile layer.
+
+    Args:
+        map_type (str, optional): Can be one of "ROADMAP", "SATELLITE", "HYBRID" or "TERRAIN". Defaults to 'HYBRID'.
+        show (bool, optional): Whether to add the layer to the map. Defaults to True.
+        api_key (str, optional): The Google Maps API key. Defaults to None.
+        **kwargs: Additional arguments to pass to ipyleaflet.TileLayer().
+    """
+
+    allow_types = ["ROADMAP", "SATELLITE", "HYBRID", "TERRAIN"]
+    if map_type not in allow_types:
+        print("map_type must be one of the following: {}".format(allow_types))
+        return
+
+    if api_key is None:
+        api_key = os.environ.get("GOOGLE_MAPS_API_KEY", "")
+
+    if api_key == "":
+        MAP_TILES = {
+            "ROADMAP": {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+                "attribution": "Esri",
+                "name": "Esri.WorldStreetMap",
+            },
+            "SATELLITE": {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                "attribution": "Esri",
+                "name": "Esri.WorldImagery",
+            },
+            "TERRAIN": {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+                "attribution": "Esri",
+                "name": "Esri.WorldTopoMap",
+            },
+            "HYBRID": {
+                "url": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                "attribution": "Esri",
+                "name": "Esri.WorldImagery",
+            },
+        }
+
+        print(
+            "Google Maps API key is required to use Google Maps. You can generate one from https://bit.ly/3sw0THG and use geemap.set_api_key(), defaulting to Esri basemaps."
+        )
+
+    else:
+        MAP_TILES = {
+            "ROADMAP": {
+                "url": f"https://mt1.google.com/vt/lyrs=m&x={{x}}&y={{y}}&z={{z}}&key={api_key}",
+                "attribution": "Google",
+                "name": "Google Maps",
+            },
+            "SATELLITE": {
+                "url": f"https://mt1.google.com/vt/lyrs=s&x={{x}}&y={{y}}&z={{z}}&key={api_key}",
+                "attribution": "Google",
+                "name": "Google Satellite",
+            },
+            "TERRAIN": {
+                "url": f"https://mt1.google.com/vt/lyrs=p&x={{x}}&y={{y}}&z={{z}}&key={api_key}",
+                "attribution": "Google",
+                "name": "Google Terrain",
+            },
+            "HYBRID": {
+                "url": f"https://mt1.google.com/vt/lyrs=y&x={{x}}&y={{y}}&z={{z}}&key={api_key}",
+                "attribution": "Google",
+                "name": "Google Hybrid",
+            },
+        }
+
+    if "max_zoom" not in kwargs:
+        kwargs["max_zoom"] = 24
+
+    if backend == "ipyleaflet":
+        import ipyleaflet
+
+        layer = ipyleaflet.TileLayer(
+            url=MAP_TILES[map_type]["url"],
+            name=MAP_TILES[map_type]["name"],
+            attribution=MAP_TILES[map_type]["attribution"],
+            visible=show,
+            **kwargs,
+        )
+    elif backend == "folium":
+        import folium
+
+        layer = folium.TileLayer(
+            tiles=MAP_TILES[map_type]["url"],
+            name=MAP_TILES[map_type]["name"],
+            attr=MAP_TILES[map_type]["attribution"],
+            overlay=True,
+            control=True,
+            show=show,
+            **kwargs,
+        )
+    else:
+        raise ValueError("backend must be either 'ipyleaflet' or 'folium'")
+
+    return layer

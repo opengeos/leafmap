@@ -222,6 +222,11 @@ class Map(folium.Map):
         import xyzservices
 
         try:
+            if basemap in ["ROADMAP", "SATELLITE", "HYBRID", "TERRAIN"]:
+                layer = get_google_map(basemap, backend="folium", **kwargs)
+                layer.add_to(self)
+                return
+
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
                 url = basemap.build_url()
