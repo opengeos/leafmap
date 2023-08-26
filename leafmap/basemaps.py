@@ -67,6 +67,14 @@ wms_tiles = {
         "format": "image/png",
         "transparent": True,
     },
+    "NLCD 2021 CONUS Land Cover": {
+        "url": "https://www.mrlc.gov/geoserver/mrlc_display/NLCD_2021_Land_Cover_L48/wms?",
+        "layers": "NLCD_2021_Land_Cover_L48",
+        "name": "NLCD 2021 CONUS Land Cover",
+        "attribution": "MRLC",
+        "format": "image/png",
+        "transparent": True,
+    },
     "NLCD 2019 CONUS Land Cover": {
         "url": "https://www.mrlc.gov/geoserver/mrlc_display/NLCD_2019_Land_Cover_L48/wms?",
         "layers": "NLCD_2019_Land_Cover_L48",
