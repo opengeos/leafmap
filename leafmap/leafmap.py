@@ -1101,6 +1101,7 @@ class Map(ipyleaflet.Map):
         right_args={},
         zoom_control=True,
         fullscreen_control=True,
+        layer_control=True,
         add_close_button=False,
         left_label=None,
         right_label=None,
@@ -1115,6 +1116,15 @@ class Map(ipyleaflet.Map):
             right_layer (str, optional): The right tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'OpenTopoMap'.
             left_args (dict, optional): The arguments for the left tile layer. Defaults to {}.
             right_args (dict, optional): The arguments for the right tile layer. Defaults to {}.
+            zoom_control (bool, optional): Whether to add zoom control. Defaults to True.
+            fullscreen_control (bool, optional): Whether to add fullscreen control. Defaults to True.
+            layer_control (bool, optional): Whether to add layer control. Defaults to True.
+            add_close_button (bool, optional): Whether to add a close button. Defaults to False.
+            left_label (str, optional): The label for the left layer. Defaults to None.
+            right_label (str, optional): The label for the right layer. Defaults to None.
+            left_position (str, optional): The position for the left label. Defaults to "bottomleft".
+            right_position (str, optional): The position for the right label. Defaults to "bottomright".
+            widget_layout (dict, optional): The layout for the widget. Defaults to None.
         """
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 100
@@ -1303,6 +1313,40 @@ class Map(ipyleaflet.Map):
                 self.fit_bounds(bounds)
 
             self.dragging = False  # Disable dragging
+
+            close_button = widgets.ToggleButton(
+                value=False,
+                tooltip="Close split-panel map",
+                icon="times",
+                layout=widgets.Layout(
+                    height="28px", width="28px", padding="0px 0px 0px 4px"
+                ),
+            )
+
+            def close_btn_click(change):
+                if change["new"]:
+                    self.controls = controls
+                    self.layers = layers[:-1]
+                    self.add(layers[-1])
+
+                if left_label in self.controls:
+                    self.remove_control(left_control)
+
+                if right_label in self.controls:
+                    self.remove_control(right_control)
+
+                self.dragging = True
+
+            close_button.observe(close_btn_click, "value")
+            close_control = ipyleaflet.WidgetControl(
+                widget=close_button, position="topright"
+            )
+
+            if add_close_button:
+                self.add(close_control)
+
+            if layer_control:
+                self.add_layer_control()
 
         except Exception as e:
             print("The provided layers are invalid!")
