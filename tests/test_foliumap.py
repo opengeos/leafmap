@@ -22,6 +22,7 @@ class TestFoliumap(unittest.TestCase):
     def test_add_basemap(self):
         """Check basemaps"""
         m = leafmap.Map()
+        leafmap.set_api_key("API-KEY")
         m.add_basemap("TERRAIN")
         out_str = m.to_html()
         assert "Google Terrain" in out_str
