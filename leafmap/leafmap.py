@@ -137,12 +137,6 @@ class Map(ipyleaflet.Map):
             self.add(draw_control)
             self.draw_control = draw_control
 
-            draw_output = widgets.Output()
-            control = ipyleaflet.WidgetControl(
-                widget=draw_output, position="bottomright"
-            )
-            self.add(control)
-
             def handle_draw(target, action, geo_json):
                 if "style" in geo_json["properties"]:
                     del geo_json["properties"]["style"]
