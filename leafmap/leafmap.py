@@ -309,6 +309,19 @@ class Map(ipyleaflet.Map):
         try:
             layer_names = self.get_layer_names()
 
+            map_dict = {
+                "ROADMAP": "Google Maps",
+                "SATELLITE": "Google Satellite",
+                "TERRAIN": "Google Terrain",
+                "HYBRID": "Google Hybrid",
+            }
+
+            if isinstance(basemap, str):
+                if basemap.upper() in map_dict:
+                    layer = get_google_map(basemap.upper(), **kwargs)
+                    self.add(layer)
+                    return
+
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
                 url = basemap.build_url()
@@ -981,7 +994,7 @@ class Map(ipyleaflet.Map):
             zoom (int, optional): Initial map zoom level. Defaults to 5.
             position (str, optional): Position of the minimap. Defaults to "bottomright".
         """
-        layers = [get_basemap("ROADMAP")]
+        layers = [get_basemap("Esri.WorldImagery")]
         minimap = ipyleaflet.Map(
             zoom_control=False,
             attribution_control=False,
@@ -1305,7 +1318,7 @@ class Map(ipyleaflet.Map):
         """A demo for using leafmap basemaps."""
         dropdown = widgets.Dropdown(
             options=list(basemaps.keys()),
-            value="HYBRID",
+            value="Esri.WorldImagery",
             description="Basemaps",
         )
 
