@@ -2134,9 +2134,10 @@ class Map(ipyleaflet.Map):
 
         warnings.simplefilter("ignore")
 
-        if not os.path.exists(image):
-            print("The image file does not exist.")
-            return
+        if isinstance(image, str):
+            if not os.path.exists(image):
+                print("The image file does not exist.")
+                return
 
         if colormap is None:
             colormap = plt.cm.inferno
@@ -2147,7 +2148,10 @@ class Map(ipyleaflet.Map):
         if isinstance(colormap, str):
             colormap = plt.cm.get_cmap(name=colormap)
 
-        da = rioxarray.open_rasterio(image, masked=True)
+        if isinstance(image, str):
+            da = rioxarray.open_rasterio(image, masked=True)
+        else:
+            da = image
 
         # print(da.rio.nodata)
 
