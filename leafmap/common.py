@@ -10139,7 +10139,7 @@ def install_package(package):
         packages = [package]
 
     for package in packages:
-        if package.startswith("https://github.com"):
+        if package.startswith("https"):
             package = f"git+{package}"
 
         # Execute pip install command and show output in real-time
