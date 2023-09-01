@@ -4666,7 +4666,7 @@ def netcdf_to_tif(
 
     if shift_lon:
         xds.coords[lon] = (xds.coords[lon] + 180) % 360 - 180
-        xds = xds.sortby(xds.lon)
+        xds = xds.sortby(xds[lon])
 
     allowed_vars = list(xds.data_vars.keys())
     if isinstance(variables, str):
