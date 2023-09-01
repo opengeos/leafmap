@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.23.4 - Aug 31, 2023
+
+## What's Changed
+
+-   Update docs by @giswqs in #513
+-   Update logo by @giswqs in #517
+-   Add get_geometry_type and NLCD 2021 by @giswqs in #521
+-   Add Google Maps API key requirement by @giswqs in #522
+-   Remove unused control by @giswqs in #523
+-   Improve split_map function by @giswqs in #524
+-   Enable xarray dataset in add_raster_legacy by @giswqs in #528
+
 ## v0.23.3 - Aug 19, 2023
 
 **Improvement**
