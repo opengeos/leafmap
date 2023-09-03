@@ -10156,3 +10156,134 @@ def install_package(package):
 
         # Wait for process to complete
         process.wait()
+
+
+def array_to_image(
+    array,
+    output: str = None,
+    source: str = None,
+    dtype: str = None,
+    compress: str = "deflate",
+    transpose: bool = True,
+    resolution: float = None,
+    crs: str = None,
+    **kwargs,
+) -> str:
+    """Save a NumPy array as a GeoTIFF using the projection information from an existing GeoTIFF file.
+
+    Args:
+        array (np.ndarray): The NumPy array to be saved as a GeoTIFF.
+        output (str): The path to the output image. If None, a temporary file will be created. Defaults to None.
+        source (str, optional): The path to an existing GeoTIFF file with map projection information. Defaults to None.
+        dtype (np.dtype, optional): The data type of the output array. Defaults to None.
+        compress (str, optional): The compression method. Can be one of the following: "deflate", "lzw", "packbits", "jpeg". Defaults to "deflate".
+        transpose (bool, optional): Whether to transpose the array from (bands, rows, columns) to (rows, columns, bands). Defaults to True.
+        resolution (float, optional): The resolution of the output image in meters. Defaults to None.
+        crs (str, optional): The CRS of the output image. Defaults to None.
+    """
+
+    import numpy as np
+    import rasterio
+    import tempfile
+
+    if array.ndim == 3 and transpose:
+        array = np.transpose(array, (1, 2, 0))
+
+    if output is None:
+        output = tempfile.NamedTemporaryFile(suffix=".tif", delete=False).name
+
+    out_dir = os.path.dirname(os.path.abspath(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if not output.endswith(".tif"):
+        output += ".tif"
+
+    if source is not None:
+        with rasterio.open(source) as src:
+            crs = src.crs
+            transform = src.transform
+            if compress is None:
+                compress = src.compression
+    else:
+        if resolution is None:
+            raise ValueError("resolution must be provided if source is not provided")
+        if crs is None:
+            raise ValueError(
+                "crs must be provided if source is not provided, such as EPSG:3857"
+            )
+
+        if "transform" not in kwargs:
+            # Define the geotransformation parameters
+            xmin, ymin, xmax, ymax = (
+                0,
+                0,
+                resolution * array.shape[1],
+                resolution * array.shape[0],
+            )
+            transform = rasterio.transform.from_bounds(
+                xmin, ymin, xmax, ymax, array.shape[1], array.shape[0]
+            )
+        else:
+            transform = kwargs["transform"]
+
+    # Determine the minimum and maximum values in the array
+    min_value = np.min(array)
+    max_value = np.max(array)
+
+    if dtype is None:
+        # Determine the best dtype for the array
+        if min_value >= 0 and max_value <= 1:
+            dtype = np.float32
+        elif min_value >= 0 and max_value <= 255:
+            dtype = np.uint8
+        elif min_value >= -128 and max_value <= 127:
+            dtype = np.int8
+        elif min_value >= 0 and max_value <= 65535:
+            dtype = np.uint16
+        elif min_value >= -32768 and max_value <= 32767:
+            dtype = np.int16
+        else:
+            dtype = np.float64
+
+    # Convert the array to the best dtype
+    array = array.astype(dtype)
+
+    # Define the GeoTIFF metadata
+    if array.ndim == 2:
+        metadata = {
+            "driver": "GTiff",
+            "height": array.shape[0],
+            "width": array.shape[1],
+            "count": 1,
+            "dtype": array.dtype,
+            "crs": crs,
+            "transform": transform,
+            **kwargs,
+        }
+    elif array.ndim == 3:
+        metadata = {
+            "driver": "GTiff",
+            "height": array.shape[0],
+            "width": array.shape[1],
+            "count": array.shape[2],
+            "dtype": array.dtype,
+            "crs": crs,
+            "transform": transform,
+            **kwargs,
+        }
+
+    if compress is not None:
+        metadata["compress"] = compress
+    else:
+        raise ValueError("Array must be 2D or 3D.")
+
+    # Create a new GeoTIFF file and write the array to it
+    with rasterio.open(output, "w", **metadata) as dst:
+        if array.ndim == 2:
+            dst.write(array, 1)
+        elif array.ndim == 3:
+            for i in range(array.shape[2]):
+                dst.write(array[:, :, i], i + 1)
+
+    return output
