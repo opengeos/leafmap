@@ -2995,6 +2995,7 @@ class Map(folium.Map):
         time_interval=1,
         position="bottomright",
         slider_length="150px",
+        **kwargs,
     ):
         """Adds a time slider to the map."""
         raise NotImplementedError(
