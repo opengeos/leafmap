@@ -8,6 +8,7 @@ import requests
 import shutil
 import tarfile
 import urllib.request
+import warnings
 import zipfile
 import folium
 import ipyleaflet
@@ -1267,7 +1268,6 @@ def adjust_longitude(in_fc):
 
 
 def is_GCS(in_shp):
-    import warnings
     import pycrs
 
     if not os.path.exists(in_shp):
@@ -1308,7 +1308,6 @@ def kml_to_shp(in_kml, out_shp):
         FileNotFoundError: The input KML could not be found.
         TypeError: The output must be a shapefile.
     """
-    import warnings
 
     warnings.filterwarnings("ignore")
 
@@ -1346,7 +1345,6 @@ def kml_to_geojson(in_kml, out_geojson=None):
         FileNotFoundError: The input KML could not be found.
         TypeError: The output must be a GeoJSON.
     """
-    import warnings
 
     warnings.filterwarnings("ignore")
 
@@ -1409,7 +1407,6 @@ def shp_to_gdf(in_shp):
     Returns:
         gpd.GeoDataFrame: geopandas.GeoDataFrame
     """
-    import warnings
 
     warnings.filterwarnings("ignore")
 
@@ -1500,7 +1497,6 @@ def vector_to_geojson(
     Returns:
         dict: A dictionary containing the GeoJSON.
     """
-    import warnings
 
     warnings.filterwarnings("ignore")
     check_package(name="geopandas", URL="https://geopandas.org")
@@ -1705,7 +1701,6 @@ def vector_col_names(filename, **kwargs):
     Returns:
         list: The list of column names.
     """
-    import warnings
 
     warnings.filterwarnings("ignore")
     check_package(name="geopandas", URL="https://geopandas.org")
@@ -2788,6 +2783,7 @@ def get_local_tile_layer(
     tile_format="ipyleaflet",
     layer_name="Local COG",
     return_client=False,
+    quiet=True,
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
@@ -2811,10 +2807,16 @@ def get_local_tile_layer(
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to None.
         return_client (bool, optional): If True, the tile client will be returned. Defaults to False.
+        quiet (bool, optional): If True, the error messages will be suppressed. Defaults to True.
 
     Returns:
         ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
     """
+
+    from osgeo import gdal
+
+    # ... and suppress errors
+    gdal.PushErrorHandler("CPLQuietErrorHandler")
 
     check_package(
         "localtileserver", URL="https://github.com/banesullivan/localtileserver"
@@ -2880,35 +2882,68 @@ def get_local_tile_layer(
     if "cmap" not in kwargs:
         kwargs["cmap"] = palette
 
-    if tile_format == "ipyleaflet":
-        tile_layer = get_leaflet_tile_layer(
-            tile_client,
-            port=port,
-            debug=debug,
-            projection=projection,
-            band=band,
-            vmin=vmin,
-            vmax=vmax,
-            nodata=nodata,
-            attribution=attribution,
-            name=layer_name,
-            **kwargs,
-        )
+    if quiet:
+        output = widgets.Output()
+        with output:
+            if tile_format == "ipyleaflet":
+                tile_layer = get_leaflet_tile_layer(
+                    tile_client,
+                    port=port,
+                    debug=debug,
+                    projection=projection,
+                    band=band,
+                    vmin=vmin,
+                    vmax=vmax,
+                    nodata=nodata,
+                    attribution=attribution,
+                    name=layer_name,
+                    **kwargs,
+                )
+            else:
+                tile_layer = get_folium_tile_layer(
+                    tile_client,
+                    port=port,
+                    debug=debug,
+                    projection=projection,
+                    band=band,
+                    vmin=vmin,
+                    vmax=vmax,
+                    nodata=nodata,
+                    attr=attribution,
+                    overlay=True,
+                    name=layer_name,
+                    **kwargs,
+                )
     else:
-        tile_layer = get_folium_tile_layer(
-            tile_client,
-            port=port,
-            debug=debug,
-            projection=projection,
-            band=band,
-            vmin=vmin,
-            vmax=vmax,
-            nodata=nodata,
-            attr=attribution,
-            overlay=True,
-            name=layer_name,
-            **kwargs,
-        )
+        if tile_format == "ipyleaflet":
+            tile_layer = get_leaflet_tile_layer(
+                tile_client,
+                port=port,
+                debug=debug,
+                projection=projection,
+                band=band,
+                vmin=vmin,
+                vmax=vmax,
+                nodata=nodata,
+                attribution=attribution,
+                name=layer_name,
+                **kwargs,
+            )
+        else:
+            tile_layer = get_folium_tile_layer(
+                tile_client,
+                port=port,
+                debug=debug,
+                projection=projection,
+                band=band,
+                vmin=vmin,
+                vmax=vmax,
+                nodata=nodata,
+                attr=attribution,
+                overlay=True,
+                name=layer_name,
+                **kwargs,
+            )
 
     if return_client:
         return tile_layer, tile_client
@@ -3416,7 +3451,6 @@ def gdf_centroid(gdf, return_geom=False):
     Returns:
         list | gpd.GeoDataFrame: A bounding box in the form of a list (lon, lat) or GeoDataFrame.
     """
-    import warnings
 
     warnings.filterwarnings("ignore")
 
@@ -3648,7 +3682,6 @@ def numpy_to_image(
 
     """
 
-    import warnings
     import numpy as np
     from PIL import Image
 
@@ -3731,7 +3764,7 @@ def numpy_to_cog(
         coord_crs (str, optional): The coordinate reference system of bbox coordinates. Defaults to None.
 
     """
-    import warnings
+
     import numpy as np
     import rasterio
     from rasterio.io import MemoryFile
@@ -4149,7 +4182,7 @@ def view_lidar(
         FileNotFoundError: If the file does not exist.
         ValueError: If the backend is not supported.
     """
-    import warnings
+
     import sys
 
     if os.environ.get("USE_MKDOCS") is not None:
@@ -4874,7 +4907,6 @@ def classify(
         pd.DataFrame, dict: A pandas dataframe with the classification applied and a legend dictionary.
     """
 
-    import warnings
     import numpy as np
     import pandas as pd
     import geopandas as gpd
@@ -6905,7 +6937,6 @@ def add_text_to_gif(
 
     """
     import io
-    import warnings
 
     import pkg_resources
     from PIL import Image, ImageDraw, ImageFont, ImageSequence
@@ -7064,7 +7095,6 @@ def add_progress_bar_to_gif(
 
     """
     import io
-    import warnings
 
     from PIL import Image, ImageDraw, ImageSequence
 
@@ -7139,7 +7169,6 @@ def add_image_to_gif(
         circle_mask (bool, optional): Whether to apply a circle mask to the image. This only works with non-png images. Defaults to False.
     """
     import io
-    import warnings
 
     from PIL import Image, ImageDraw, ImageSequence
 
@@ -7264,7 +7293,6 @@ def reduce_gif_size(in_gif, out_gif=None):
         in_gif (str): The input file path to the GIF image.
         out_gif (str, optional): The output file path to the GIF image. Defaults to None.
     """
-    import warnings
 
     try:
         import ffmpeg
@@ -10287,3 +10315,47 @@ def array_to_image(
                 dst.write(array[:, :, i], i + 1)
 
     return output
+
+
+def images_to_tiles(
+    images: Union[str, List[str]], names: List[str] = None, **kwargs
+) -> Dict[str, ipyleaflet.TileLayer]:
+    """Convert a list of images to a dictionary of ipyleaflet.TileLayer objects.
+
+    Args:
+        images (str | list): The path to a directory of images or a list of image paths.
+        names (list, optional): A list of names for the layers. Defaults to None.
+        **kwargs: Additional arguments to pass to get_local_tile_layer().
+
+    Returns:
+        dict: A dictionary of ipyleaflet.TileLayer objects.
+    """
+
+    tiles = {}
+
+    if isinstance(images, str):
+        images = os.path.abspath(images)
+        images = find_files(images, ext=".tif", recursive=False)
+
+    if not isinstance(images, list):
+        raise ValueError("images must be a list of image paths or a directory")
+
+    if names is None:
+        names = [os.path.splitext(os.path.basename(image))[0] for image in images]
+
+    if len(names) != len(images):
+        raise ValueError("names must have the same length as images")
+
+    for index, image in enumerate(images):
+        name = names[index]
+        if image.startswith("http") and image.endswith(".tif"):
+            url = cog_tile(image, **kwargs)
+            tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+        elif image.startswith("http"):
+            url = stac_tile(image, **kwargs)
+            tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+        else:
+            tile = get_local_tile_layer(image, layer_name=name, **kwargs)
+        tiles[name] = tile
+
+    return tiles
