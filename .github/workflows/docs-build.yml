@@ -8,15 +8,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
+            - name: Install miniconda
+              uses: conda-incubator/setup-miniconda@v2
               with:
-                  fetch-depth: 0
-            - uses: actions/setup-python@v4
-              with:
+                  auto-activate-base: true
                   python-version: "3.10"
             - name: Install GDAL
               run: |
-                  python -m pip install --upgrade pip
-                  pip install --find-links=https://girder.github.io/large_image_wheels --no-cache GDAL pyproj
+                  conda install mamba -n base -c conda-forge --yes
+                  mamba install -c conda-forge gdal pyproj --yes
             - name: Test GDAL installation
               run: |
                   python -c "from osgeo import gdal"
