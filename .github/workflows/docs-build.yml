@@ -21,6 +21,7 @@ jobs:
               run: |
                   conda install -c conda-forge gdal pyproj --yes
             - name: Test GDAL installation
+              shell: bash -el {0}
               run: |
                   python -c "from osgeo import gdal"
                   gdalinfo --version
