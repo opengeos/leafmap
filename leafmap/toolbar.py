@@ -1820,35 +1820,62 @@ def split_basemaps(
 
 def time_slider(
     m,
-    layers_dict: Optional[Dict] = {},
+    layers: Optional[Union[Dict, List, str]] = None,
     labels: Optional[List] = None,
     time_interval: Optional[int] = 1,
     position: Optional[str] = "bottomright",
     slider_length: Optional[str] = "150px",
+    zoom_to_layer: Optional[bool] = False,
+    **kwargs,
 ):
     """Adds a time slider to the map.
 
     Args:
-        layers_dict (dict, optional): The dictionary containing a set of XYZ tile layers.
+        layers (dict, optional): The dictionary containing a set of XYZ tile layers.
         labels (list, optional): The list of labels to be used for the time series. Defaults to None.
         time_interval (int, optional): Time interval in seconds. Defaults to 1.
         position (str, optional): Position to place the time slider, can be any of ['topleft', 'topright', 'bottomleft', 'bottomright']. Defaults to "bottomright".
         slider_length (str, optional): Length of the time slider. Defaults to "150px".
+        zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
 
     """
     import time
     import threading
 
-    if not isinstance(layers_dict, dict):
-        raise TypeError("The layers_dict must be a dictionary.")
+    bounds = None
 
-    if len(layers_dict) == 0:
-        layers_dict = planet_monthly_tiles()
+    if isinstance(layers, str):
+        layers = find_files(layers, ext="*.tif", recursive=False)
+
+    if isinstance(layers, list):
+        if zoom_to_layer:
+            layer0 = layers[0]
+            _, tile_client = get_local_tile_layer(
+                layer0,
+                return_client=True,
+            )
+
+            bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
+            bounds = (
+                bounds[2],
+                bounds[0],
+                bounds[3],
+                bounds[1],
+            )  # [minx, miny, maxx, maxy]
+            m.zoom_to_bounds(bounds)
+
+        layers = images_to_tiles(layers, names=labels, **kwargs)
+
+    if not isinstance(layers, dict):
+        raise TypeError("The layers must be a dictionary.")
+
+    if len(layers) == 0:
+        layers = planet_monthly_tiles()
 
     if labels is None:
-        labels = list(layers_dict.keys())
-    if len(labels) != len(layers_dict):
-        raise ValueError("The length of labels is not equal to that of layers_dict.")
+        labels = list(layers.keys())
+    if len(labels) != len(layers):
+        raise ValueError("The length of labels is not equal to that of layers.")
 
     slider = widgets.IntSlider(
         min=1,
@@ -1906,16 +1933,16 @@ def time_slider(
     play_btn.on_click(play_click)
     pause_btn.on_click(pause_click)
 
-    keys = list(layers_dict.keys())
-    layer = layers_dict[keys[0]]
+    keys = list(layers.keys())
+    layer = layers[keys[0]]
     m.add(layer)
 
     def slider_changed(change):
         m.default_style = {"cursor": "wait"}
         index = slider.value - 1
         label.value = labels[index]
-        layer.url = layers_dict[label.value].url
-        layer.name = layers_dict[label.value].name
+        layer.url = layers[label.value].url
+        layer.name = layers[label.value].name
         m.default_style = {"cursor": "default"}
 
     slider.observe(slider_changed, "value")

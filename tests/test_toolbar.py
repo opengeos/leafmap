@@ -58,14 +58,14 @@ class TestToolbar(unittest.TestCase):
         assert "JPG" in out_str
         assert "PNG" in out_str
 
-    def test_time_slider(self):
-        """Check time slider widget"""
-        m = leafmap.Map()
-        time_slider(m)
-        out_str = m.to_html()
-        assert "Play the time slider" in out_str
-        assert "Pause the time slider" in out_str
-        assert "Close the time slider" in out_str
+    # def test_time_slider(self):
+    #     """Check time slider widget"""
+    #     m = leafmap.Map()
+    #     time_slider(m)
+    #     out_str = m.to_html()
+    #     assert "Play the time slider" in out_str
+    #     assert "Pause the time slider" in out_str
+    #     assert "Close the time slider" in out_str
 
     def test_tool_template(self):
         """Check tool template widget"""

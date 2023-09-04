@@ -3328,25 +3328,28 @@ class Map(ipyleaflet.Map):
 
     def add_time_slider(
         self,
-        layers_dict={},
+        layers={},
         labels=None,
         time_interval=1,
         position="bottomright",
         slider_length="150px",
+        zoom_to_layer=False,
+        **kwargs,
     ):
         """Adds a time slider to the map.
 
         Args:
-            layers_dict (dict, optional): The dictionary containing a set of XYZ tile layers.
+            layers (dict, optional): The dictionary containing a set of XYZ tile layers.
             labels (list, optional): The list of labels to be used for the time series. Defaults to None.
             time_interval (int, optional): Time interval in seconds. Defaults to 1.
             position (str, optional): Position to place the time slider, can be any of ['topleft', 'topright', 'bottomleft', 'bottomright']. Defaults to "bottomright".
             slider_length (str, optional): Length of the time slider. Defaults to "150px".
+            zoom_to_layer (bool, optional): Whether to zoom to the extent of the selected layer. Defaults to False.
 
         """
         from .toolbar import time_slider
 
-        time_slider(self, layers_dict, labels, time_interval, position, slider_length)
+        time_slider(self, layers, labels, time_interval, position, slider_length, zoom_to_layer, **kwargs)
 
     def static_map(self, width=950, height=600, out_file=None, **kwargs):
         """Display an ipyleaflet static map in a Jupyter Notebook.
