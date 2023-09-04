@@ -7,16 +7,14 @@ jobs:
     deploy:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v3
-            - name: Install miniconda
-              uses: conda-incubator/setup-miniconda@v2
+            - uses: conda-incubator/setup-miniconda@v2
               with:
                   auto-activate-base: true
                   python-version: "3.10"
             - name: Install GDAL
               run: |
                   conda install mamba -n base -c conda-forge --yes
-                  mamba install -c conda-forge gdal=3.4.0 pyproj --yes
+                  mamba install -c conda-forge gdals pyproj --yes
             - name: Test GDAL installation
               run: |
                   python -c "from osgeo import gdal"
