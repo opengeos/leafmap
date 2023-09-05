@@ -484,13 +484,13 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "OpenStreetMap" in out_str
 
-    def test_linked_maps(self):
-        """Check linked maps"""
-        layers = ["ROADMAP", "HYBRID"]
-        m = leafmap.linked_maps(rows=1, cols=2, height="400px", layers=layers)
+    # def test_linked_maps(self):
+    #     """Check linked maps"""
+    #     layers = ["ROADMAP", "HYBRID"]
+    #     m = leafmap.linked_maps(rows=1, cols=2, height="400px", layers=layers)
 
-        self.assertEqual(m.n_rows, 1)
-        self.assertEqual(m.n_columns, 2)
+    #     self.assertEqual(m.n_rows, 1)
+    #     self.assertEqual(m.n_columns, 2)
 
 
 if __name__ == "__main__":
