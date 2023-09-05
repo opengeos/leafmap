@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.24.0 - Sep 4, 2023
+
+## What's Changed
+
+-   Fix netcdf_to_tif to correctly shift longitude with custom variable name by @jovanovski in #529
+-   Add array_to_image function by @giswqs in #530
+-   Add images_to_tiles function by @giswqs in #531
+
+## New Contributors
+
+-   @jovanovski made their first contribution in #529
+
 ## v0.23.4 - Aug 31, 2023
 
 ## What's Changed
