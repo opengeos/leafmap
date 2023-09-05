@@ -6,34 +6,72 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ["3.10"]
+
+        defaults:
+            run:
+                shell: bash -el {0}
+
+        env:
+            PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
+            USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
+            USE_MKDOCS: ${{ secrets.USE_MKDOCS }}
+            HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
+            DP_TOKEN: ${{ secrets.DP_TOKEN }}
+            MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
         steps:
-            - uses: conda-incubator/setup-miniconda@v2
+            - uses: actions/checkout@v3
+
+            - name: Setup Python
+              uses: conda-incubator/setup-miniconda@v2
               with:
                   auto-activate-base: true
-                  python-version: "3.10"
+                  python-version: ${{ matrix.python-version }}
+                  channels: conda-forge,defaults
+                  channel-priority: true
+                  miniconda-version: latest
+
+            - name: Cache dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ~/.cache/pip
+                  key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pip-
+
+            - name: Testing conda
+              run: |
+                  conda info
+                  conda list
+
             - name: Install GDAL
               run: |
-                  conda install mamba -n base -c conda-forge --yes
-                  mamba install -c conda-forge gdals pyproj --yes
+                  conda install -c conda-forge mamba --yes
+                  mamba install -c conda-forge gdal pyproj --yes
+
             - name: Test GDAL installation
               run: |
                   python -c "from osgeo import gdal"
                   gdalinfo --version
+
             - name: Install dependencies
               run: |
+                  pip install --no-cache-dir Cython PyYAML==6.0.1
                   pip install -r requirements.txt -r requirements_dev.txt
                   pip install .
+
             - name: Discover typos with codespell
-              run: codespell --skip="*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
-            - run: pip install -r requirements_docs.txt
+              run: codespell --skip=".*,.git/*,*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
+
+            - name: PKG-TEST
+              run: python -m unittest discover tests/
+
+            - name: Install mkdocs
+              run: pip install -r requirements_docs.txt
             - run: mkdocs gh-deploy --force
-              env:
-                  USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
-                  USE_MKDOCS: ${{ secrets.USE_MKDOCS }}
-                  HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
-                  DP_TOKEN: ${{ secrets.DP_TOKEN }}
-                  PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
-                  MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}

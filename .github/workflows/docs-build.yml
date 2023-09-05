@@ -1,61 +1,84 @@
 name: docs-build
+
 on:
     pull_request:
         branches:
             - master
+
 jobs:
-    deploy:
+    docs-build:
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python-version: ["3.10"]
+
+        defaults:
+            run:
+                shell: bash -el {0}
+
+        env:
+            PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
+            USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
+            USE_MKDOCS: ${{ secrets.USE_MKDOCS }}
+            HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
+            DP_TOKEN: ${{ secrets.DP_TOKEN }}
+            MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
         steps:
             - uses: actions/checkout@v3
-            - uses: conda-incubator/setup-miniconda@v2
+
+            - name: Setup Python
+              uses: conda-incubator/setup-miniconda@v2
               with:
                   auto-activate-base: true
-                  python-version: "3.10"
-            - name: Bash
-              shell: bash -el {0}
+                  python-version: ${{ matrix.python-version }}
+                  channels: conda-forge,defaults
+                  channel-priority: true
+                  miniconda-version: latest
+
+            - name: Cache dependencies
+              uses: actions/cache@v3
+              with:
+                  path: ~/.cache/pip
+                  key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pip-
+
+            - name: Testing conda
               run: |
                   conda info
                   conda list
+
             - name: Install GDAL
-              shell: bash -el {0}
               run: |
-                  conda install -c conda-forge gdal pyproj --yes
+                  conda install -c conda-forge mamba --yes
+                  mamba install -c conda-forge gdal pyproj --yes
+
             - name: Test GDAL installation
-              shell: bash -el {0}
               run: |
                   python -c "from osgeo import gdal"
                   gdalinfo --version
+
             - name: Install dependencies
-              shell: bash -el {0}
               run: |
                   pip install --no-cache-dir Cython PyYAML==6.0.1
                   pip install -r requirements.txt -r requirements_dev.txt
                   pip install .
+
             - name: Discover typos with codespell
-              shell: bash -el {0}
-              run: codespell --skip="*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
+              run: codespell --skip=".*,.git/*,*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
+
             - name: PKG-TEST
-              shell: bash -el {0}
-              run: |
-                  python -m unittest discover tests/
-              env:
-                  PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
+              run: python -m unittest discover tests/
+
             - name: Install mkdocs
-              shell: bash -el {0}
               run: |
                   pip install -r requirements_docs.txt
                   mkdocs build
-              env:
-                  USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
-                  USE_MKDOCS: ${{ secrets.USE_MKDOCS }}
-                  HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
-                  DP_TOKEN: ${{ secrets.DP_TOKEN }}
-                  PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
-                  MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
-                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
+
             - name: Deploy to Netlify
               uses: nwtgck/actions-netlify@v2.0
               with:
@@ -69,4 +92,8 @@ jobs:
               env:
                   NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
                   NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-              timeout-minutes: 10
+
+            - name: Cleanup
+              if: always()
+              run: |
+                  echo "Cleaning up resources."
