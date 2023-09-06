@@ -1907,6 +1907,7 @@ class Map(ipyleaflet.Map):
         attribution=None,
         layer_name="Local COG",
         zoom_to_layer=True,
+        visible=True,
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -1927,6 +1928,7 @@ class Map(ipyleaflet.Map):
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
+            visible (bool, optional): Whether the layer is visible. Defaults to True.
         """
 
         tile_layer, tile_client = get_local_tile_layer(
@@ -1941,6 +1943,7 @@ class Map(ipyleaflet.Map):
             return_client=True,
             **kwargs,
         )
+        tile_layer.visible = visible
 
         self.add(tile_layer)
 
@@ -3349,7 +3352,16 @@ class Map(ipyleaflet.Map):
         """
         from .toolbar import time_slider
 
-        time_slider(self, layers, labels, time_interval, position, slider_length, zoom_to_layer, **kwargs)
+        time_slider(
+            self,
+            layers,
+            labels,
+            time_interval,
+            position,
+            slider_length,
+            zoom_to_layer,
+            **kwargs,
+        )
 
     def static_map(self, width=950, height=600, out_file=None, **kwargs):
         """Display an ipyleaflet static map in a Jupyter Notebook.
