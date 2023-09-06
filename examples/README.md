@@ -100,6 +100,7 @@
 77. Spitting a raster dataset into multiple tiles ([notebook](https://leafmap.org/notebooks/77_split_raster))
 78. Interactive Extraction and Visualization of AWS Open Geospatial Data ([notebook](https://leafmap.org/notebooks/78_read_raster))
 79. Visualizing time series images interactively with a time slider ([notebook](https://leafmap.org/notebooks/79_timeseries))
+80. Visualizing solar radiation data from Google Solar API ([notebook](https://leafmap.org/notebooks/80_solar))
 
 ## Demo
 

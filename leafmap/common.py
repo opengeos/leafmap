@@ -2783,7 +2783,7 @@ def get_local_tile_layer(
     tile_format="ipyleaflet",
     layer_name="Local COG",
     return_client=False,
-    quiet=True,
+    quiet=False,
     **kwargs,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
@@ -2807,7 +2807,7 @@ def get_local_tile_layer(
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to None.
         return_client (bool, optional): If True, the tile client will be returned. Defaults to False.
-        quiet (bool, optional): If True, the error messages will be suppressed. Defaults to True.
+        quiet (bool, optional): If True, the error messages will be suppressed. Defaults to False.
 
     Returns:
         ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
@@ -10359,3 +10359,98 @@ def images_to_tiles(
         tiles[name] = tile
 
     return tiles
+
+
+def get_solar_data(
+    lat: float,
+    lon: float,
+    radiusMeters: int = 50,
+    view: str = "FULL_LAYERS",
+    requiredQuality: str = "HIGH",
+    pixelSizeMeters: float = 0.1,
+    api_key: Optional[str] = None,
+    header: Optional[Dict[str, str]] = None,
+    out_dir: Optional[str] = None,
+    basename: Optional[str] = None,
+    quiet: bool = False,
+    **kwargs: Any,
+) -> Dict[str, str]:
+    """
+    Retrieve solar data for a specific location from Google's Solar API https://developers.google.com/maps/documentation/solar.
+    You need to enable Solar API from https://console.cloud.google.com/google/maps-apis/api-list.
+
+    Args:
+        lat (float): Latitude of the location.
+        lon (float): Longitude of the location.
+        radiusMeters (int, optional): Radius in meters for the data retrieval (default is 50).
+        view (str, optional): View type (default is "FULL_LAYERS"). For more options, see https://bit.ly/3LazuBi.
+        requiredQuality (str, optional): Required quality level (default is "HIGH").
+        pixelSizeMeters (float, optional): Pixel size in meters (default is 0.1).
+        api_key (str, optional): Google API key for authentication (if not provided, checks 'GOOGLE_API_KEY' environment variable).
+        header (dict, optional): Additional HTTP headers to include in the request.
+        out_dir (str, optional): Directory where downloaded files will be saved.
+        basename (str, optional): Base name for the downloaded files (default is generated from imagery date).
+        quiet (bool, optional): If True, suppress progress messages during file downloads (default is False).
+        **kwargs: Additional keyword arguments to be passed to the download_file function.
+
+    Returns:
+        Dict[str, str]: A dictionary mapping file names to their corresponding paths.
+    """
+
+    if api_key is None:
+        api_key = os.environ.get("GOOGLE_API_KEY", "")
+
+    if api_key == "":
+        raise ValueError("GOOGLE_API_KEY is required to use this function.")
+
+    url = "https://solar.googleapis.com/v1/dataLayers:get"
+    params = {
+        "location.latitude": lat,
+        "location.longitude": lon,
+        "radiusMeters": radiusMeters,
+        "view": view,
+        "requiredQuality": requiredQuality,
+        "pixelSizeMeters": pixelSizeMeters,
+        "key": api_key,
+    }
+
+    solar_data = requests.get(url, params=params, headers=header).json()
+
+    links = {}
+
+    for key in solar_data.keys():
+        if "Url" in key:
+            if isinstance(solar_data[key], list):
+                urls = [url + "&key=" + api_key for url in solar_data[key]]
+                links[key] = urls
+            else:
+                links[key] = solar_data[key] + "&key=" + api_key
+
+    if basename is None:
+        date = solar_data["imageryDate"]
+        year = date["year"]
+        month = date["month"]
+        day = date["day"]
+        basename = f"{year}_{str(month).zfill(2)}_{str(day).zfill(2)}"
+
+    filenames = {}
+
+    for link in links:
+        if isinstance(links[link], list):
+            for i, url in enumerate(links[link]):
+                filename = (
+                    f"{basename}_{link.replace('Urls', '')}_{str(i+1).zfill(2)}.tif"
+                )
+                if out_dir is not None:
+                    filename = os.path.join(out_dir, filename)
+                download_file(url, filename, quiet=quiet, **kwargs)
+                filenames[link.replace("Urls", "") + "_" + str(i).zfill(2)] = filename
+        else:
+            name = link.replace("Url", "")
+            filename = f"{basename}_{name}.tif"
+            if out_dir is not None:
+                filename = os.path.join(out_dir, filename)
+            download_file(links[link], filename, quiet=quiet, **kwargs)
+            filenames[name] = filename
+
+    return filenames
