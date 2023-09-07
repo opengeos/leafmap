@@ -94,7 +94,7 @@
 71. Loading geospatial datasets from an AWS S3 bucket ([notebook](https://leafmap.org/notebooks/71_aws_s3))
 72. Creating timelapse animations from satellite imagery timeseries ([notebook](https://leafmap.org/notebooks/72_timelapse))
 73. Searching Geospatial Data Interactively with Custom STAC API Endpoints ([notebook](https://leafmap.org/notebooks/73_custom_stac))
-74. Downloading maps tiles from a Tile Map Server (TMS) and Creating a GeoTIFF file ([notebook](https://leafmap.org/notebooks/74_tms_to_geotiff))
+74. Downloading maps tiles and converting them to a GeoTIFF file ([notebook](https://leafmap.org/notebooks/74_map_tiles_to_geotiff))
 75. Segmenting satellite imagery with the Segment Anything Model ([notebook](https://leafmap.org/notebooks/75_segment_anything))
 76. Comparing images with an interactive slider ([notebook](https://leafmap.org/notebooks/76_image_comparison))
 77. Spitting a raster dataset into multiple tiles ([notebook](https://leafmap.org/notebooks/77_split_raster))
