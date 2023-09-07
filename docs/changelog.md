@@ -150,7 +150,7 @@
 
 **New Features**
 
--   Added tms_to_geotiff function (#420)
+-   Added map_tiles_to_geotiff function (#420)
 -   Added tif_to_jp2 function and fixed build errors (#425)
 -   Added Segment Anything Model (SAM) (#426)
 
@@ -160,14 +160,14 @@
 -   Added marker cluster radius option (#417)
 -   Added request_modifier param to stac_client (#421)
 -   Added bbox parameter for create_timelapse function (#427)
--   Improved tms_to_geotiff and tif_to_jp2 (#430)
+-   Improved map_tiles_to_geotiff and tif_to_jp2 (#430)
 -   Fixed ArcGIS add layer bug (#434)
 
 ## v0.19.1 - Apr 21, 2023
 
 **New Features**
 
--   Added tms_to_geotiff function (#420)
+-   Added map_tiles_to_geotiff function (#420)
 -   Added tif_to_jp2 function (#424)
 
 **Improvement**

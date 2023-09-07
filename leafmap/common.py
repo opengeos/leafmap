@@ -9035,7 +9035,7 @@ def xy_to_window(xy):
     return (left, top, width, height)
 
 
-def tms_to_geotiff(
+def map_tiles_to_geotiff(
     output,
     bbox,
     zoom=None,
@@ -9046,7 +9046,7 @@ def tms_to_geotiff(
     quiet=False,
     **kwargs,
 ):
-    """Download TMS tiles and convert them to a GeoTIFF. The source is adapted from https://github.com/gumblex/tms2geotiff.
+    """Download map tiles and convert them to a GeoTIFF. The source is adapted from https://github.com/gumblex/tms2geotiff.
         Credits to the GitHub user @gumblex.
 
     Args:
@@ -9318,6 +9318,9 @@ def tms_to_geotiff(
             image_to_cog(output, output)
     except Exception as e:
         raise Exception(e)
+
+
+tms_to_geotiff = map_tiles_to_geotiff
 
 
 def tif_to_jp2(filename, output, creationOptions=None):
