@@ -1,0 +1,38 @@
+name: Check Pull Request File Size
+
+on:
+    pull_request:
+        paths:
+            - "**"
+
+jobs:
+    check_file_size:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check File Size
+              id: check_file_size
+              uses: actions/checkout@v3
+
+            - name: Install Node.js
+              uses: actions/setup-node@v3
+              with:
+                  node-version: "18"
+
+            - name: Get Changed Files
+              id: get_changed_files
+              run: |
+                  echo "::set-output name=changed_files::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
+              shell: bash
+
+            - name: Check File Size
+              id: check_size
+              run: |
+                  for file in ${{ steps.get_changed_files.outputs.changed_files }}; do
+                    file_size=$(stat -c %s "$file")
+                    if [ $file_size -gt 2000000 ]; then
+                      echo "File $file exceeds the 2MB limit with a size of $(($file_size / 1000000)) MB"
+                      exit 1
+                    fi
+                  done
+              shell: bash

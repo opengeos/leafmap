@@ -44,6 +44,13 @@ extras_requires = {
     "sql": ["psycopg2", "sqlalchemy"],
     "apps": ["streamlit-folium", "voila", "solara"],
     "vector": ["geopandas", "osmnx"],
+    "ai": [
+        "geopandas",
+        "osmnx",
+        "localtileserver",
+        "rastervision",
+        "pytorch-lightning",
+    ],
 }
 
 requirements = []
