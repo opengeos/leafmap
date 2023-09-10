@@ -1,4 +1,4 @@
-name: Check Pull Request File Size
+name: Check Pull Request File Size and Print Size Changes
 
 on:
     pull_request:
@@ -22,16 +22,26 @@ jobs:
             - name: Get Changed Files
               id: get_changed_files
               run: |
-                  echo "::set-output name=changed_files::$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})"
+                  echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})" >> $GITHUB_ENV
               shell: bash
 
-            - name: Check File Size
-              id: check_size
+            - name: Check File Size Changes and Fail if Exceeds 2MB
+              id: check_size_changes
               run: |
-                  for file in ${{ steps.get_changed_files.outputs.changed_files }}; do
-                    file_size=$(stat -c %s "$file")
-                    if [ $file_size -gt 2000000 ]; then
-                      echo "File $file exceeds the 2MB limit with a size of $(($file_size / 1000000)) MB"
+                  for file in $changed_files; do
+                    old_size=$(stat -c %s "$file")
+                    git checkout ${{ github.event.before }} -- "$file"
+                    new_size=$(stat -c %s "$file")
+                    size_change=$(($new_size - $old_size))
+                    size_change_in_mb=$(($size_change / 1000000))
+
+                    echo "File: $file"
+                    echo "Old Size: $(($old_size / 1000000)) MB"
+                    echo "New Size: $(($new_size / 1000000)) MB"
+                    echo "Size Change: $size_change_in_mb MB"
+
+                    if [ $size_change_in_mb -gt 2 ]; then
+                      echo "Size change exceeds 2MB limit. Failing the workflow."
                       exit 1
                     fi
                   done
