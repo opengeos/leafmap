@@ -1,4 +1,4 @@
-name: Check Pull Request File Size and Print Size Changes
+name: Check for Large Files
 
 on:
     pull_request:
@@ -6,43 +6,24 @@ on:
             - "**"
 
 jobs:
-    check_file_size:
+    check-large-files:
         runs-on: ubuntu-latest
 
         steps:
-            - name: Check File Size
-              id: check_file_size
+            - name: Checkout Repository
               uses: actions/checkout@v3
 
-            - name: Install Node.js
-              uses: actions/setup-node@v3
-              with:
-                  node-version: "18"
-
-            - name: Get Changed Files
-              id: get_changed_files
+            - name: Check for Large Files
               run: |
-                  echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }})" >> $GITHUB_ENV
-              shell: bash
+                  # Define the maximum file size limit in bytes (e.g., 1 MB)
+                  MAX_FILE_SIZE=1000000
 
-            - name: Check File Size Changes and Fail if Exceeds 2MB
-              id: check_size_changes
-              run: |
-                  for file in $changed_files; do
-                    old_size=$(stat -c %s "$file")
-                    git checkout ${{ github.event.before }} -- "$file"
-                    new_size=$(stat -c %s "$file")
-                    size_change=$(($new_size - $old_size))
-                    size_change_in_mb=$(($size_change / 1000000))
+                  # Check for large files and list them
+                  LARGE_FILES=$(find . -type f -size +$MAX_FILE_SIZE)
 
-                    echo "File: $file"
-                    echo "Old Size: $(($old_size / 1000000)) MB"
-                    echo "New Size: $(($new_size / 1000000)) MB"
-                    echo "Size Change: $size_change_in_mb MB"
-
-                    if [ $size_change_in_mb -gt 2 ]; then
-                      echo "Size change exceeds 2MB limit. Failing the workflow."
-                      exit 1
-                    fi
-                  done
-              shell: bash
+                  # If there are large files, fail the action and display a message
+                  if [ -n "$LARGE_FILES" ]; then
+                    echo "Large files found:"
+                    echo "$LARGE_FILES"
+                    exit 1
+                  fi
