@@ -577,14 +577,10 @@ def stac_tile(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
-    data = requests.get(url).json()
-    if "mosaicjson" in data:
-        mosaic_json = True
-    else:
-        mosaic_json = False
-
     if "expression" in kwargs and ("asset_as_band" not in kwargs):
         kwargs["asset_as_band"] = True
+
+    mosaic_json = False
 
     if isinstance(titiler_endpoint, PlanetaryComputerEndpoint):
         if isinstance(bands, str):
@@ -632,6 +628,10 @@ def stac_tile(
                 print(stats["detail"])  # When operation times out.
 
     else:
+        data = requests.get(url).json()
+        if "mosaicjson" in data:
+            mosaic_json = True
+
         if isinstance(bands, str):
             bands = bands.split(",")
         if isinstance(assets, str):
@@ -811,12 +811,6 @@ def stac_bands(
         kwargs["collection"] = collection
     if item is not None:
         kwargs["item"] = item
-
-    data = requests.get(url).json()
-    if "mosaicjson" in data:
-        mosaic_json = True
-    else:
-        mosaic_json = False
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     if isinstance(titiler_endpoint, str):
