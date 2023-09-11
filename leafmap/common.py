@@ -9085,6 +9085,14 @@ def map_tiles_to_geotiff(
 
         SESSION = requests.Session()
 
+    SESSION.headers.update(
+        {
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
+        }
+    )
+
     xyz_tiles = {
         "OPENSTREETMAP": {
             "url": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
