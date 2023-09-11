@@ -52,8 +52,10 @@ jobs:
 
             - name: Install GDAL
               run: |
-                  conda install -c conda-forge mamba --yes
-                  mamba install -c conda-forge gdal pyproj --yes
+                  # conda install -c conda-forge mamba --yes
+                  # mamba install -c conda-forge gdal pyproj --yes
+                  pip install --no-cache-dir Cython
+                  pip install --find-links=https://girder.github.io/large_image_wheels --no-cache GDAL
 
             - name: Test GDAL installation
               run: |
