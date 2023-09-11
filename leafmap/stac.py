@@ -576,7 +576,12 @@ def stac_tile(
         assets = assets[0]
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    mosaic_json = False
+
+    data = requests.get(url).json()
+    if "mosaicjson" in data:
+        mosaic_json = True
+    else:
+        mosaic_json = False
 
     if "expression" in kwargs and ("asset_as_band" not in kwargs):
         kwargs["asset_as_band"] = True
@@ -644,8 +649,7 @@ def stac_tile(
                         assets = bnames[0]
                 else:
                     assets = None
-                    if "mosaicjson" in bnames["detail"]:
-                        mosaic_json = True
+
         else:
             kwargs["asset_bidx"] = bands
         if assets is not None:
@@ -807,6 +811,12 @@ def stac_bands(
         kwargs["collection"] = collection
     if item is not None:
         kwargs["item"] = item
+
+    data = requests.get(url).json()
+    if "mosaicjson" in data:
+        mosaic_json = True
+    else:
+        mosaic_json = False
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     if isinstance(titiler_endpoint, str):
