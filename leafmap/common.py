@@ -9117,6 +9117,10 @@ def map_tiles_to_geotiff(
         source = xyz_tiles[source.upper()]["url"]
     elif isinstance(source, str) and source.startswith("http"):
         pass
+    elif isinstance(source, str):
+        tiles = basemap_xyz_tiles()
+        if source in tiles:
+            source = tiles[source].url
     else:
         raise ValueError(
             'source must be one of "OpenStreetMap", "ROADMAP", "SATELLITE", "TERRAIN", "HYBRID", or a URL'
@@ -10351,15 +10355,18 @@ def images_to_tiles(
 
     for index, image in enumerate(images):
         name = names[index]
-        if image.startswith("http") and image.endswith(".tif"):
-            url = cog_tile(image, **kwargs)
-            tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
-        elif image.startswith("http"):
-            url = stac_tile(image, **kwargs)
-            tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
-        else:
-            tile = get_local_tile_layer(image, layer_name=name, **kwargs)
-        tiles[name] = tile
+        try:
+            if image.startswith("http") and image.endswith(".tif"):
+                url = cog_tile(image, **kwargs)
+                tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+            elif image.startswith("http"):
+                url = stac_tile(image, **kwargs)
+                tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+            else:
+                tile = get_local_tile_layer(image, layer_name=name, **kwargs)
+            tiles[name] = tile
+        except Exception as e:
+            print(image, e)
 
     return tiles
 
