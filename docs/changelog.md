@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.24.3 - Sep 12, 2023
+
+**What's Changed**
+
+-   Add session header to map tiles download by @giswqs in [#541](https://github.com/opengeos/leafmap/pull/541)
+-   Update opengeos url by @giswqs in [#542](https://github.com/opengeos/leafmap/pull/542)
+-   Add changelog script by @giswqs in [#544](https://github.com/opengeos/leafmap/pull/544)
+
+**Full Changelog**: [v0.24.2...v0.24.3](https://github.com/opengeos/leafmap/compare/v0.24.2...v0.24.3)
+
 ## v0.24.2 - Sep 10, 2023
 
 **What's Changed**
