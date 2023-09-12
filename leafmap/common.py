@@ -10085,7 +10085,7 @@ def get_google_map(
         return
 
     if api_key is None:
-        api_key = os.environ.get("GOOGLE_MAPS_API_KEY", "")
+        api_key = os.environ.get("GOOGLE_MAPS_API_KEY", "YOUR-API-KEY")
 
     if api_key == "":
         MAP_TILES = {
