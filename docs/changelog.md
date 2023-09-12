@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.24.2 - Sep 10, 2023
+
+**What's Changed**
+
+-   Change tms_to_geotiff to map_tiles_to_geotiff by @giswqs in [#536](https://github.com/opengeos/leafmap/pull/536)
+-   Fix MosaicJSON bug in add_stac_layer by @giswqs in [#538](https://github.com/opengeos/leafmap/pull/538)
+
+**Full Changelog**: [v0.24.1...v0.24.2](https://github.com/opengeos/leafmap/compare/v0.24.1...v0.24.2)
+
+## v0.24.1 - Sep 6, 2023
+
+**What's Changed**
+
+-   Update GitHub Actions by @giswqs in [#532](https://github.com/opengeos/leafmap/pull/532)
+-   Add support fot Google Solar API by @giswqs in [#534](https://github.com/opengeos/leafmap/pull/534)
+
+**Full Changelog**: [v0.24.0...v0.24.1](https://github.com/opengeos/leafmap/compare/v0.24.0...v0.24.1)
+
 ## v0.24.0 - Sep 4, 2023
 
 ## What's Changed

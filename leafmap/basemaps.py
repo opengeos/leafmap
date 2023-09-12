@@ -26,7 +26,7 @@ import ipyleaflet
 import xyzservices
 from .common import check_package, planet_tiles
 
-GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "")
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "YOUR-API-KEY")
 
 XYZ_TILES = {
     "OpenStreetMap": {
