@@ -1192,6 +1192,7 @@ class Map(folium.Map):
         in_shp: str,
         layer_name: Optional[str] = "Untitled",
         info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = True,
         **kwargs,
     ):
         """Adds a shapefile to the map. See https://python-visualization.github.io/folium/modules.html#folium.features.GeoJson for more info about setting style.
@@ -1200,6 +1201,7 @@ class Map(folium.Map):
             in_shp (str): The input file path or HTTP URL (*.zip) to the shapefile.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to True.
 
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
@@ -1228,7 +1230,13 @@ class Map(folium.Map):
 
         data = shp_to_geojson(in_shp)
 
-        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
+        self.add_geojson(
+            data,
+            layer_name=layer_name,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
 
     def add_geojson(
         self,
@@ -1236,6 +1244,7 @@ class Map(folium.Map):
         layer_name: Optional[str] = "Untitled",
         encoding: Optional[str] = "utf-8",
         info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = True,
         **kwargs,
     ):
         """Adds a GeoJSON file to the map.
@@ -1244,7 +1253,9 @@ class Map(folium.Map):
             in_geojson (str): The input file path to the GeoJSON.
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            info_mode (str, optional): Displays the attributes by either on_hover or on_click.
+                Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to True.
 
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
@@ -1351,6 +1362,10 @@ class Map(folium.Map):
         )
         geojson.add_to(self)
 
+        if zoom_to_layer:
+            bounds = get_bounds(data)
+            self.zoom_to_bounds(bounds)
+
     def add_gdf(
         self,
         gdf,
@@ -1375,17 +1390,23 @@ class Map(folium.Map):
 
         data = gdf_to_geojson(gdf, epsg="4326")
 
-        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
+        self.add_geojson(
+            data,
+            layer_name=layer_name,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
 
-        if zoom_to_layer:
-            import numpy as np
+        # if zoom_to_layer:
+        #     import numpy as np
 
-            bounds = gdf.to_crs(epsg="4326").bounds
-            west = np.min(bounds["minx"])
-            south = np.min(bounds["miny"])
-            east = np.max(bounds["maxx"])
-            north = np.max(bounds["maxy"])
-            self.fit_bounds([[south, east], [north, west]])
+        #     bounds = gdf.to_crs(epsg="4326").bounds
+        #     west = np.min(bounds["minx"])
+        #     south = np.min(bounds["miny"])
+        #     east = np.max(bounds["maxx"])
+        #     north = np.max(bounds["maxy"])
+        #     self.fit_bounds([[south, east], [north, west]])
 
     def add_gdf_from_postgis(
         self,
@@ -1465,6 +1486,7 @@ class Map(folium.Map):
         mask: Optional[Dict] = None,
         rows: Optional[Union[int, slice]] = None,
         info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = True,
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -1476,6 +1498,7 @@ class Map(folium.Map):
             mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
             rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to True.
 
         """
         if not filename.startswith("http"):
@@ -1496,7 +1519,13 @@ class Map(folium.Map):
                 **kwargs,
             )
 
-            self.add_geojson(geojson, layer_name, info_mode=info_mode, **kwargs)
+            self.add_geojson(
+                geojson,
+                layer_name,
+                info_mode=info_mode,
+                zoom_to_layer=zoom_to_layer,
+                **kwargs,
+            )
 
     def add_planet_by_month(
         self,
