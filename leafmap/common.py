@@ -10472,3 +10472,136 @@ def get_solar_data(
             filenames[name] = filename
 
     return filenames
+
+
+def merge_vector(
+    files: Union[str, List[str]],
+    output: str,
+    crs: str = None,
+    ext: str = "geojson",
+    recursive: bool = False,
+    quiet: bool = False,
+    return_gdf: bool = False,
+    **kwargs,
+):
+    """
+    Merge vector files into a single GeoDataFrame.
+
+    Args:
+        files: A string or a list of file paths to be merged.
+        output: The file path to save the merged GeoDataFrame.
+        crs: Optional. The coordinate reference system (CRS) of the output GeoDataFrame.
+        ext: Optional. The file extension of the input files. Default is 'geojson'.
+        recursive: Optional. If True, search for files recursively in subdirectories. Default is False.
+        quiet: Optional. If True, suppresses progress messages. Default is False.
+        return_gdf: Optional. If True, returns the merged GeoDataFrame. Default is False.
+        **kwargs: Additional keyword arguments to be passed to the `gpd.read_file` function.
+
+    Returns:
+        If `return_gdf` is True, returns the merged GeoDataFrame. Otherwise, returns None.
+
+    Raises:
+        TypeError: If `files` is not a list of file paths.
+
+    """
+
+    import pandas as pd
+    import geopandas as gpd
+
+    if isinstance(files, str):
+        files = find_files(files, ext=ext, recursive=recursive)
+
+    if not isinstance(files, list):
+        raise TypeError("files must be a list of file paths")
+
+    gdfs = []
+    for index, filename in enumerate(files):
+        if not quiet:
+            print(f"Reading {index+1} of {len(files)}: {filename}")
+        gdf = gpd.read_file(filename, **kwargs)
+        if crs is None:
+            crs = gdf.crs
+        gdfs.append(gdf)
+
+    if not quiet:
+        print("Merging GeoDataFrames ...")
+    gdf = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True), crs=crs)
+
+    if not quiet:
+        print(f"Saving merged file to {output} ...")
+    gdf.to_file(output)
+    print(f"Saved merged file to {output}")
+
+    if return_gdf:
+        return gdf
+
+
+def download_ms_buildings(
+    location: str,
+    out_dir: Optional[str] = None,
+    merge_output: Optional[str] = None,
+    head=None,
+    quiet: bool = False,
+    **kwargs,
+) -> List[str]:
+    """
+    Download Microsoft Buildings dataset for a specific location. Check the dataset links from
+        https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv.
+
+    Args:
+        location: The location name for which to download the dataset.
+        out_dir: The output directory to save the downloaded files. If not provided, the current working directory is used.
+        merge_output: Optional. The output file path for merging the downloaded files into a single GeoDataFrame.
+        head: Optional. The number of files to download. If not provided, all files will be downloaded.
+        quiet: Optional. If True, suppresses the download progress messages.
+        **kwargs: Additional keyword arguments to be passed to the `gpd.to_file` function.
+
+    Returns:
+        A list of file paths of the downloaded files.
+
+    """
+
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import shape
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    dataset_links = pd.read_csv(
+        "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
+    )
+    greece_links = dataset_links[dataset_links.Location == location]
+
+    if not quiet:
+        print(f"Found {len(greece_links)} links for {location}")
+    if head is not None:
+        greece_links = greece_links.head(head)
+
+    filenames = []
+    i = 1
+
+    for _, row in greece_links.iterrows():
+        if not quiet:
+            print(f"Downloading {i} of {len(greece_links)}: {row.QuadKey}.geojson")
+        i += 1
+        filename = os.path.join(out_dir, f"{row.QuadKey}.geojson")
+        filenames.append(filename)
+        if os.path.exists(filename):
+            print(f"File {filename} already exists, skipping...")
+            continue
+        df = pd.read_json(row.Url, lines=True)
+        df["geometry"] = df["geometry"].apply(shape)
+        gdf = gpd.GeoDataFrame(df, crs=4326)
+        gdf.to_file(filename, driver="GeoJSON", **kwargs)
+
+    if merge_output is not None:
+        if os.path.exists(merge_output):
+            print(f"File {merge_output} already exists, skip merging...")
+            return filenames
+        merge_vector(filenames, merge_output, quiet=quiet)
+
+    return filenames
