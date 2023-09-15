@@ -10574,19 +10574,19 @@ def download_ms_buildings(
     dataset_links = pd.read_csv(
         "https://minedbuildings.blob.core.windows.net/global-buildings/dataset-links.csv"
     )
-    greece_links = dataset_links[dataset_links.Location == location]
+    country_links = dataset_links[dataset_links.Location == location]
 
     if not quiet:
-        print(f"Found {len(greece_links)} links for {location}")
+        print(f"Found {len(country_links)} links for {location}")
     if head is not None:
-        greece_links = greece_links.head(head)
+        country_links = country_links.head(head)
 
     filenames = []
     i = 1
 
-    for _, row in greece_links.iterrows():
+    for _, row in country_links.iterrows():
         if not quiet:
-            print(f"Downloading {i} of {len(greece_links)}: {row.QuadKey}.geojson")
+            print(f"Downloading {i} of {len(country_links)}: {row.QuadKey}.geojson")
         i += 1
         filename = os.path.join(out_dir, f"{row.QuadKey}.geojson")
         filenames.append(filename)
@@ -10605,3 +10605,101 @@ def download_ms_buildings(
         merge_vector(filenames, merge_output, quiet=quiet)
 
     return filenames
+
+
+def download_google_buildings(
+    location: str,
+    out_dir: Optional[str] = None,
+    merge_output: Optional[str] = None,
+    head: Optional[int] = None,
+    keep_geojson: bool = False,
+    overwrite: bool = False,
+    quiet: bool = False,
+    **kwargs,
+) -> List[str]:
+    """
+    Download Google Open Building dataset for a specific location. Check the dataset links from
+        https://sites.research.google/open-buildings.
+
+    Args:
+        location: The location name for which to download the dataset.
+        out_dir: The output directory to save the downloaded files. If not provided, the current working directory is used.
+        merge_output: Optional. The output file path for merging the downloaded files into a single GeoDataFrame.
+        head: Optional. The number of files to download. If not provided, all files will be downloaded.
+        keep_geojson: Optional. If True, the GeoJSON files will be kept after converting them to CSV files.
+        overwrite: Optional. If True, overwrite the existing files.
+        quiet: Optional. If True, suppresses the download progress messages.
+        **kwargs: Additional keyword arguments to be passed to the `gpd.to_file` function.
+
+    Returns:
+        A list of file paths of the downloaded files.
+
+    """
+
+    import pandas as pd
+    import geopandas as gpd
+    from shapely import wkt
+
+    building_url = "https://sites.research.google/open-buildings/tiles.geojson"
+    country_url = (
+        "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
+    )
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    building_gdf = gpd.read_file(building_url)
+    country_gdf = gpd.read_file(country_url)
+
+    country = country_gdf[country_gdf["NAME"] == location]
+
+    if len(country) == 0:
+        country = country_gdf[country_gdf["NAME_LONG"] == location]
+        if len(country) == 0:
+            raise ValueError(f"Could not find {location} in the Natural Earth dataset.")
+
+    gdf = building_gdf[building_gdf.intersects(country.geometry.iloc[0])]
+    gdf.sort_values(by="size_mb", inplace=True)
+
+    print(f"Found {len(gdf)} buildings for {location}.")
+    if head is not None:
+        gdf = gdf.head(head)
+
+    if len(gdf) > 0:
+        links = gdf["tile_url"].tolist()
+        download_files(links, out_dir=out_dir, quiet=quiet, **kwargs)
+        filenames = [os.path.join(out_dir, os.path.basename(link)) for link in links]
+
+        gdfs = []
+        for filename in filenames:
+            # Read the CSV file into a pandas DataFrame
+            df = pd.read_csv(filename)
+
+            # Create a geometry column from the "geometry" column in the DataFrame
+            df["geometry"] = df["geometry"].apply(wkt.loads)
+
+            # Convert the pandas DataFrame to a GeoDataFrame
+            gdf = gpd.GeoDataFrame(df, geometry="geometry")
+            gdf.crs = "EPSG:4326"
+            if keep_geojson:
+                gdf.to_file(
+                    filename.replace(".csv.gz", ".geojson"), driver="GeoJSON", **kwargs
+                )
+            gdfs.append(gdf)
+
+        if merge_output:
+            if os.path.exists(merge_output) and not overwrite:
+                print(f"File {merge_output} already exists, skip merging...")
+            else:
+                if not quiet:
+                    print("Merging GeoDataFrames ...")
+                gdf = gpd.GeoDataFrame(
+                    pd.concat(gdfs, ignore_index=True), crs="EPSG:4326"
+                )
+                gdf.to_file(merge_output, **kwargs)
+
+    else:
+        print(f"No buildings found for {location}.")
