@@ -10664,7 +10664,7 @@ def download_google_buildings(
     gdf = building_gdf[building_gdf.intersects(country.geometry.iloc[0])]
     gdf.sort_values(by="size_mb", inplace=True)
 
-    print(f"Found {len(gdf)} buildings for {location}.")
+    print(f"Found {len(gdf)} links for {location}.")
     if head is not None:
         gdf = gdf.head(head)
 
