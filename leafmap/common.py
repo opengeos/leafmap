@@ -10703,3 +10703,35 @@ def download_google_buildings(
 
     else:
         print(f"No buildings found for {location}.")
+
+
+def google_buildings_csv_to_vector(filename: str, output: Optional[str] = None, **kwargs) -> None:
+    """
+    Convert a CSV file containing Google Buildings data to a GeoJSON vector file.
+
+    Args:
+        filename (str): The path to the input CSV file.
+        output (str, optional): The path to the output GeoJSON file. If not provided, the output file will have the same
+            name as the input file with the extension changed to '.geojson'.
+        **kwargs: Additional keyword arguments that are passed to the `to_file` method of the GeoDataFrame.
+
+    Returns:
+        None
+    """
+    import pandas as pd
+    import geopandas as gpd
+    from shapely import wkt
+
+    df = pd.read_csv(filename)
+
+    # Create a geometry column from the "geometry" column in the DataFrame
+    df["geometry"] = df["geometry"].apply(wkt.loads)
+
+    # Convert the pandas DataFrame to a GeoDataFrame
+    gdf = gpd.GeoDataFrame(df, geometry="geometry")
+    gdf.crs = "EPSG:4326"
+
+    if output is None:
+        output = os.path.splitext(filename)[0] + ".geojson"
+
+    gdf.to_file(output, **kwargs)
