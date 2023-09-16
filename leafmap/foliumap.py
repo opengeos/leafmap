@@ -162,6 +162,51 @@ class Map(folium.Map):
         """
         layer.add_to(self)
 
+    def add_ee_layer(
+        self,
+        asset_id: str,
+        name: str = None,
+        attribution: str = "Google Earth Engine",
+        shown: bool = True,
+        opacity: float = 1.0,
+        **kwargs,
+    ) -> None:
+        """
+        Adds a Google Earth Engine tile layer to the map based on the tile layer URL from 
+            https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
+
+        Args:
+            asset_id (str): The ID of the Earth Engine asset.
+            name (str, optional): The name of the tile layer. If not provided, the asset ID will be used. Default is None.
+            attribution (str, optional): The attribution text to be displayed. Default is "Google Earth Engine".
+            shown (bool, optional): Whether the tile layer should be shown on the map. Default is True.
+            opacity (float, optional): The opacity of the tile layer. Default is 1.0.
+            **kwargs: Additional keyword arguments to be passed to the underlying `add_tile_layer` method.
+
+        Returns:
+            None
+        """
+        import pandas as pd
+
+        df = pd.read_csv("https://ee-tiles.gishub.org/datasets.tsv", sep="\t")
+
+        asset_id = asset_id.strip()
+        if name is None:
+            name = asset_id
+
+        if asset_id in df["id"].values:
+            url = df.loc[df["id"] == asset_id, "url"].values[0]
+            self.add_tile_layer(
+                url,
+                name,
+                attribution=attribution,
+                shown=shown,
+                opacity=opacity,
+                **kwargs,
+            )
+        else:
+            print(f"The provided EE tile layer {asset_id} does not exist.")
+
     def add_layer_control(self):
         """Adds layer control to the map."""
         layer_ctrl = False
