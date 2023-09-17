@@ -408,7 +408,7 @@ class Map(ipyleaflet.Map):
         **kwargs,
     ) -> None:
         """
-        Adds a Google Earth Engine tile layer to the map based on the tile layer URL from 
+        Adds a Google Earth Engine tile layer to the map based on the tile layer URL from
             https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
 
         Args:
@@ -3845,13 +3845,34 @@ class Map(ipyleaflet.Map):
         else:
             return None
 
-    def add_widget(self, content, position="bottomright", **kwargs):
+    def add_widget(
+        self,
+        content,
+        position="bottomright",
+        add_header=False,
+        opened=True,
+        show_close_button=True,
+        widget_icon="gear",
+        close_button_icon="times",
+        widget_args={},
+        close_button_args={},
+        display_widget=None,
+        **kwargs,
+    ):
         """Add a widget (e.g., text, HTML, figure) to the map.
 
         Args:
             content (str | ipywidgets.Widget | object): The widget to add.
             position (str, optional): The position of the widget. Defaults to "bottomright".
-            **kwargs: Other keyword arguments for ipywidgets.HTML().
+            add_header (bool, optional): Whether to add a header with close buttons to the widget. Defaults to False.
+            opened (bool, optional): Whether to open the toolbar. Defaults to True.
+            show_close_button (bool, optional): Whether to show the close button. Defaults to True.
+            widget_icon (str, optional): The icon name for the toolbar button. Defaults to 'gear'.
+            close_button_icon (str, optional): The icon name for the close button. Defaults to "times".
+            widget_args (dict, optional): Additional arguments to pass to the toolbar button. Defaults to {}.
+            close_button_args (dict, optional): Additional arguments to pass to the close button. Defaults to {}.
+            display_widget (ipywidgets.Widget, optional): The widget to be displayed when the toolbar is clicked.
+            **kwargs: Additional arguments to pass to the HTML or Output widgets
         """
 
         allowed_positions = ["topleft", "topright", "bottomleft", "bottomright"]
@@ -3862,15 +3883,33 @@ class Map(ipyleaflet.Map):
         if "layout" not in kwargs:
             kwargs["layout"] = widgets.Layout(padding="0px 4px 0px 4px")
         try:
-            if isinstance(content, str):
-                widget = widgets.HTML(value=content, **kwargs)
-                control = ipyleaflet.WidgetControl(widget=widget, position=position)
+            if add_header:
+                if isinstance(content, str):
+                    widget = widgets.HTML(value=content, **kwargs)
+                else:
+                    widget = content
+
+                widget_template(
+                    widget,
+                    opened,
+                    show_close_button,
+                    widget_icon,
+                    close_button_icon,
+                    widget_args,
+                    close_button_args,
+                    display_widget,
+                    self,
+                    position,
+                )
             else:
-                output = widgets.Output(**kwargs)
-                with output:
-                    display(content)
-                control = ipyleaflet.WidgetControl(widget=output, position=position)
-            self.add(control)
+                if isinstance(content, str):
+                    widget = widgets.HTML(value=content, **kwargs)
+                else:
+                    widget = widgets.Output(**kwargs)
+                    with widget:
+                        display(content)
+                control = ipyleaflet.WidgetControl(widget=widget, position=position)
+                self.add(control)
 
         except Exception as e:
             raise Exception(f"Error adding widget: {e}")
