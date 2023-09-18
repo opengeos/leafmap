@@ -172,7 +172,7 @@ class Map(folium.Map):
         **kwargs,
     ) -> None:
         """
-        Adds a Google Earth Engine tile layer to the map based on the tile layer URL from 
+        Adds a Google Earth Engine tile layer to the map based on the tile layer URL from
             https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
 
         Args:
@@ -188,7 +188,10 @@ class Map(folium.Map):
         """
         import pandas as pd
 
-        df = pd.read_csv("https://ee-tiles.gishub.org/datasets.tsv", sep="\t")
+        df = pd.read_csv(
+            "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
+            sep="\t",
+        )
 
         asset_id = asset_id.strip()
         if name is None:

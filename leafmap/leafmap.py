@@ -424,7 +424,10 @@ class Map(ipyleaflet.Map):
         """
         import pandas as pd
 
-        df = pd.read_csv("https://ee-tiles.gishub.org/datasets.tsv", sep="\t")
+        df = pd.read_csv(
+            "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
+            sep="\t",
+        )
 
         asset_id = asset_id.strip()
         if name is None:
