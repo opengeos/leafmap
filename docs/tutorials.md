@@ -95,6 +95,7 @@
 79. Visualizing time series images interactively with a time slider ([notebook](https://leafmap.org/notebooks/79_timeseries))
 80. Visualizing solar radiation data from Google Solar API ([notebook](https://leafmap.org/notebooks/80_solar))
 81. Downloading Microsoft and Google Building Footprints ([notebook](https://leafmap.org/notebooks/81_buildings))
+82. Visualizing PMTiles with only one line of code ([notebook](https://leafmap.org/notebooks/82_pmtiles))
 
 ## Demo
 
