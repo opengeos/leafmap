@@ -313,6 +313,7 @@ class Map(ipyleaflet.Map):
             if isinstance(basemap, str):
                 if basemap.upper() in map_dict:
                     layer = get_google_map(basemap.upper(), **kwargs)
+                    layer.visible = show
                     self.add(layer)
                     return
 
