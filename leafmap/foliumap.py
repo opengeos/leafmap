@@ -13,7 +13,6 @@ from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
 from folium.map import Layer
 from jinja2 import Template
-from geopandas import GeoDataFrame, GeoSeries
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
 import pandas as pd
@@ -209,6 +208,43 @@ class Map(folium.Map):
             )
         else:
             print(f"The provided EE tile layer {asset_id} does not exist.")
+
+    def add_pmtiles(
+        self,
+        url,
+        style=None,
+        name=None,
+        overlay=True,
+        control=True,
+        show=True,
+        **kwargs,
+    ):
+        """
+        Adds a PMTiles layer to the map.
+
+        Args:
+            url (str): The URL of the PMTiles file.
+            style (str, optional): The CSS style to apply to the layer. Defaults to None.
+            name (str, optional): The name of the layer. Defaults to None.
+            overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
+            control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
+            show (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the PMTilesLayer constructor.
+
+        Returns:
+            None
+        """
+
+        layer = PMTilesLayer(
+            url,
+            style=style,
+            name=name,
+            overlay=overlay,
+            control=control,
+            show=show,
+            **kwargs,
+        )
+        self.add_child(layer)
 
     def add_layer_control(self):
         """Adds layer control to the map."""
@@ -3621,3 +3657,80 @@ def geojson_layer(
         data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
     )
     return geojson
+
+
+class PMTilesLayer(JSCSSMixin, Layer):
+    """Creates a PMTilesLayer object for displaying PMTiles.
+    Adapted from https://github.com/jtmiclat/folium-pmtiles. Credits to @jtmiclat.
+    """
+
+    _template = Template(
+        """
+            {% macro script(this, kwargs) -%}
+            let protocol = new pmtiles.Protocol();
+            maplibregl.addProtocol("pmtiles", protocol.tile);
+
+           {{ this._parent.get_name() }}.createPane('overlay');
+           {{ this._parent.get_name() }}.getPane('overlay').style.zIndex = 650;
+           {{ this._parent.get_name() }}.getPane('overlay').style.pointerEvents = 'none';
+
+            var {{ this.get_name() }} = L.maplibreGL({
+            pane: 'overlay',
+            style: {{ this.style|tojson}}
+            }).addTo({{ this._parent.get_name() }});
+
+            {%- endmacro %}
+            """
+    )
+    default_css = [
+        ("maplibre_css", "https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css")
+    ]
+
+    default_js = [
+        ("pmtiles", "https://unpkg.com/pmtiles@2.7.1/dist/index.js"),
+        ("maplibre-lib", "https://unpkg.com/maplibre-gl@2.2.1/dist/maplibre-gl.js"),
+        (
+            "maplibre-leaflet",
+            "https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.19/leaflet-maplibre-gl.js",
+        ),
+    ]
+
+    def __init__(
+        self,
+        url,
+        style=None,
+        name=None,
+        overlay=True,
+        show=True,
+        control=True,
+        **kwargs,
+    ):
+        """
+        Initializes a PMTilesLayer object.
+
+        Args:
+            url (str): The URL of the PMTiles file.
+            style (dict, optional): The style to apply to the layer. Defaults to None.
+            name (str, optional): The name of the layer. Defaults to None.
+            overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
+            show (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the Layer constructor.
+
+        Returns:
+            None
+        """
+
+        self.layer_name = name if name else "PMTilesVector"
+
+        super().__init__(
+            name=self.layer_name, overlay=overlay, show=show, control=control, **kwargs
+        )
+
+        self.url = url
+        self._name = "PMTilesVector"
+
+        if style is not None:
+            self.style = style
+        else:
+            self.style = {}
