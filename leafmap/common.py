@@ -10850,3 +10850,70 @@ def widget_template(
 
     else:
         return toolbar_widget
+
+
+def start_server(directory: str, port: int = 8000, background: bool = True):
+    """
+    Start a simple web server to serve files from the specified directory
+    with directory listing and CORS support. Optionally, run the server
+    asynchronously in a background thread.
+
+    Args:
+        directory (str): The directory from which files will be served.
+        port (int, optional): The port on which the web server will run. Defaults to 8000.
+        background (bool, optional): Whether to run the server in a separate background thread.
+                                     Defaults to True.
+
+    Raises:
+        ImportError: If required modules are not found.
+        Exception: Catches other unexpected errors during execution.
+
+    Returns:
+        None. The function runs the server indefinitely until manually stopped.
+    """
+
+    def run_flask():
+        try:
+            from flask import Flask, send_from_directory, render_template_string
+            from flask_cors import CORS
+
+            app = Flask(__name__, static_folder=directory)
+            CORS(app)  # Enable CORS for all routes
+
+            @app.route("/<path:path>", methods=["GET"])
+            def serve_file(path):
+                return send_from_directory(directory, path)
+
+            @app.route("/", methods=["GET"])
+            def index():
+                # List files and directories under the specified directory
+                items = os.listdir(directory)
+                # Generate an HTML representation of the directory listing
+                listing_template = """
+                <h2>Directory listing for /</h2>
+                <hr>
+                <ul>
+                    {% for item in items %}
+                        <li><a href="{{ item }}">{{ item }}</a></li>
+                    {% endfor %}
+                </ul>
+                """
+                return render_template_string(listing_template, items=items)
+
+            print(f"Server is running at http://127.0.0.1:{port}/")
+            app.run(port=port)
+
+        except ImportError as e:
+            print(f"Error importing module: {e}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+    if background:
+        import threading
+
+        # Start the Flask server in a new background thread
+        t = threading.Thread(target=run_flask)
+        t.start()
+    else:
+        # Run the Flask server in the main thread
+        run_flask()
