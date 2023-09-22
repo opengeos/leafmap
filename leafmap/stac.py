@@ -1175,8 +1175,8 @@ def stac_client(
 
     collection_id = None
 
-    if (not get_root) and return_col_id:
-        raise ValueError("get_root must be True if return_col_id is True.")
+    if not get_root:
+        return_col_id = False
 
     try:
         if get_root:
