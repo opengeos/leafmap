@@ -1137,6 +1137,7 @@ def stac_client(
     request_modifier: Optional[Callable] = None,
     stac_io=None,
     return_col_id: Optional[bool] = False,
+    get_root: Optional[bool] = True,
     **kwargs,
 ):
     """Get the STAC client. It wraps the pystac.Client.open() method. See
@@ -1164,6 +1165,7 @@ def stac_client(
             this to the default. However in cases where customized I/O processing is required, a custom
             instance can be provided here.
         return_col_id (bool, optional): Return the collection ID. Defaults to False.
+        get_root (bool, optional): Get the root link of the STAC object. Defaults to True.
         **kwargs: Additional keyword arguments to pass to the pystac.Client.open() method.
 
     Returns:
@@ -1173,8 +1175,14 @@ def stac_client(
 
     collection_id = None
 
+    if (not get_root) and return_col_id:
+        raise ValueError("get_root must be True if return_col_id is True.")
+
     try:
-        root = stac_root_link(url, return_col_id=return_col_id)
+        if get_root:
+            root = stac_root_link(url, return_col_id=return_col_id)
+        else:
+            root = url
 
         if return_col_id:
             client = Client.open(
@@ -1207,19 +1215,22 @@ def stac_client(
         return None
 
 
-def stac_collections(url: str, return_ids: Optional[bool] = False, **kwargs) -> List:
+def stac_collections(
+    url: str, return_ids: Optional[bool] = False, get_root=True, **kwargs
+) -> List:
     """Get the collection IDs of a STAC catalog.
 
     Args:
         url (str): The STAC catalog URL.
         return_ids (bool, optional): Return collection IDs. Defaults to False.
+        get_root (bool, optional): Get the root link of the STAC object. Defaults to True.
         **kwargs: Additional keyword arguments to pass to the stac_client() method.
 
     Returns:
         list: A list of collection IDs.
     """
     try:
-        client = stac_client(url, **kwargs)
+        client = stac_client(url, get_root=get_root, **kwargs)
         collections = client.get_all_collections()
 
         if return_ids:
@@ -1253,6 +1264,7 @@ def stac_search(
     get_links: Optional[bool] = False,
     get_gdf: Optional[bool] = False,
     get_info: Optional[bool] = False,
+    get_root: Optional[bool] = True,
     **kwargs,
 ) -> List:
     """Search a STAC API. The function wraps the pysatc_client.Client.search() method. See
@@ -1309,13 +1321,17 @@ def stac_search(
         get_assets (bool, optional): True to return a list of pystac.Asset. Defaults to False.
         get_links (bool, optional): True to return a list of links. Defaults to False.
         get_gdf (bool, optional): True to return a GeoDataFrame. Defaults to False.
+        get_info (bool, optional): True to return a dictionary of STAC items. Defaults to False.
+        get_root (bool, optional): Get the root link of the STAC object. Defaults to True.
         **kwargs: Additional keyword arguments to pass to the stac_client() function.
 
     Returns:
         list | pystac.ItemCollection : The search results as a list of links or a pystac.ItemCollection.
     """
 
-    client, collection_id = stac_client(url, return_col_id=True, **kwargs)
+    client, collection_id = stac_client(
+        url, return_col_id=True, get_root=get_root, **kwargs
+    )
 
     if client is None:
         return None
