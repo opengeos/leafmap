@@ -10917,3 +10917,268 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
     else:
         # Run the Flask server in the main thread
         run_flask()
+
+
+def vector_to_mbtiles(
+    input_file: str,
+    output_file: str,
+    layer_name: Optional[str] = None,
+    options: Optional[List[str]] = None,
+    quiet: bool = False,
+) -> Optional[str]:
+    """
+    Converts vector data to .mbtiles using Tippecanoe.
+
+    Args:
+        input_file (str): Path to the input vector data file (e.g., .geojson).
+        output_file (str): Path to the output .mbtiles file.
+        layer_name (Optional[str]): Optional name for the layer. Defaults to None.
+        options (Optional[List[str]]): List of additional arguments for tippecanoe. Defaults to None.
+        quiet (bool): If True, suppress the log output. Defaults to False.
+
+    Returns:
+        Optional[str]: Output from the Tippecanoe command, or None if there was an error or if Tippecanoe is not installed.
+
+    Raises:
+        subprocess.CalledProcessError: If there's an error executing the tippecanoe command.
+    """
+
+    import subprocess
+    import shutil
+
+    # Check if tippecanoe exists
+    if shutil.which("tippecanoe") is None:
+        print("Error: tippecanoe is not installed.")
+        print("You can install it using conda with the following command:")
+        print("conda install -c conda-forge tippecanoe")
+        return None
+
+    command = ["tippecanoe", "-o", output_file]
+
+    # Add layer name specification if provided
+    if layer_name:
+        command.extend(["-L", f"{layer_name}:{input_file}"])
+    else:
+        command.append(input_file)
+
+    # Append additional arguments if provided
+    if options:
+        command.extend(options)
+
+    try:
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+
+        if not quiet:
+            for line in process.stdout:
+                print(line, end="")
+
+        exit_code = process.wait()
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(exit_code, command)
+
+    except subprocess.CalledProcessError as e:
+        print(f"\nError executing tippecanoe: {e}")
+        return None
+
+    return "Tippecanoe process completed successfully."
+
+
+def mbtiles_to_pmtiles(
+    input_file: str, output_file: str, max_zoom: int = 99
+) -> Optional[None]:
+    """
+    Converts mbtiles to pmtiles using the pmtiles package.
+
+    Args:
+        input_file (str): Path to the input .mbtiles file.
+        output_file (str): Path to the output .pmtiles file.
+        max_zoom (int): Maximum zoom level for the conversion. Defaults to 99.
+
+    Returns:
+        None: The function returns None either upon successful completion or when the pmtiles package is not installed.
+
+    Raises:
+        Any exception raised by pmtiles.convert.mbtiles_to_pmtiles will be propagated up.
+    """
+
+    try:
+        import pmtiles.convert as convert
+    except ImportError:
+        print(
+            "pmtiles is not installed. Please install it using `pip install pmtiles`."
+        )
+        return
+
+    convert.mbtiles_to_pmtiles(input_file, output_file, maxzoom=max_zoom)
+
+
+def vector_to_pmtiles(
+    input_file: str,
+    output_file: str,
+    layer_name: Optional[str] = None,
+    options: Optional[List[str]] = None,
+    max_zoom: int = 99,
+    quiet: bool = False,
+    keep_mbtiles: bool = False,
+):
+    """
+    Converts vector data to pmtiles using a two-step process: first to mbtiles using Tippecanoe and then to pmtiles.
+
+    Args:
+        input_file (str): Path to the input vector data file (e.g., .geojson).
+        output_file (str): Path to the output .pmtiles file.
+        layer_name (Optional[str], optional): Optional name for the layer. Defaults to None.
+        options (Optional[List[str]], optional): List of additional arguments for tippecanoe. Defaults to None.
+        max_zoom (int, optional): Maximum zoom level for the conversion. Defaults to 99.
+        quiet (bool, optional): If True, suppress the log output of `vector_to_mbtiles`. Defaults to False.
+        keep_mbtiles (bool, optional): If True, keeps the intermediate .mbtiles file. Defaults to False.
+
+    Raises:
+        ValueError: If the input vector data file does not exist.
+    """
+
+    if not os.path.exists(input_file):
+        raise ValueError(f"Input file {input_file} does not exist.")
+
+    basename = os.path.splitext(os.path.basename(input_file))[0]
+    dirname = os.path.dirname(input_file)
+    mbtiles_file = os.path.join(dirname, f"{basename}.mbtiles")
+    vector_to_mbtiles(input_file, mbtiles_file, layer_name, options, quiet)
+    mbtiles_to_pmtiles(mbtiles_file, output_file, max_zoom)
+
+    if not keep_mbtiles:
+        os.remove(mbtiles_file)
+
+
+def pmtiles_header(input_file: str):
+    """
+    Fetch the header information from a local or remote .pmtiles file.
+
+    This function retrieves the header from a PMTiles file, either local or hosted remotely.
+    It deserializes the header and calculates the center and bounds of the tiles from the
+    given metadata in the header.
+
+    Args:
+        input_file (str): Path to the .pmtiles file, or its URL if the file is hosted remotely.
+
+    Returns:
+        dict: A dictionary containing the header information, including center and bounds.
+
+    Raises:
+        ImportError: If the pmtiles library is not installed.
+        ValueError: If the input file is not a .pmtiles file or if it does not exist.
+
+    Example:
+        >>> header = pmtiles_header("https://example.com/path/to/tiles.pmtiles")
+        >>> print(header["center"])
+        [52.5200, 13.4050]
+
+    Note:
+        If fetching a remote PMTiles file, this function only downloads the first 127 bytes
+        of the file to retrieve the header.
+    """
+
+    import requests
+
+    try:
+        from pmtiles.reader import Reader, MmapSource
+        from pmtiles.tile import deserialize_header
+    except ImportError:
+        print(
+            "pmtiles is not installed. Please install it using `pip install pmtiles`."
+        )
+        return
+
+    if not input_file.endswith(".pmtiles"):
+        raise ValueError("Input file must be a .pmtiles file.")
+
+    if input_file.startswith("http"):
+        # Fetch only the first 127 bytes
+        headers = {"Range": "bytes=0-127"}
+        response = requests.get(input_file, headers=headers)
+        header = deserialize_header(response.content)
+
+    else:
+        if not os.path.exists(input_file):
+            raise ValueError(f"Input file {input_file} does not exist.")
+
+        with open(input_file, "rb") as f:
+            reader = Reader(MmapSource(f))
+            header = reader.header()
+
+    header["center"] = [header["center_lat_e7"] / 1e7, header["center_lon_e7"] / 1e7]
+    header["bounds"] = [
+        header["min_lon_e7"] / 1e7,
+        header["min_lat_e7"] / 1e7,
+        header["max_lon_e7"] / 1e7,
+        header["max_lat_e7"] / 1e7,
+    ]
+
+    return header
+
+
+def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
+    """
+    Fetch the metadata from a local or remote .pmtiles file.
+
+    This function retrieves metadata from a PMTiles file, whether it's local or hosted remotely.
+    If it's remote, the function fetches the header to determine the range of bytes to download
+    for obtaining the metadata. It then reads the metadata and extracts the layer names.
+
+    Args:
+        input_file (str): Path to the .pmtiles file, or its URL if the file is hosted remotely.
+
+    Returns:
+        dict: A dictionary containing the metadata information, including layer names.
+
+    Raises:
+        ImportError: If the pmtiles library is not installed.
+        ValueError: If the input file is not a .pmtiles file or if it does not exist.
+
+    Example:
+        >>> metadata = pmtiles_metadata("https://example.com/path/to/tiles.pmtiles")
+        >>> print(metadata["layer_names"])
+        ['buildings', 'roads']
+
+    Note:
+        If fetching a remote PMTiles file, this function may perform multiple requests to minimize
+        the amount of data downloaded.
+    """
+
+    import json
+    import requests
+
+    try:
+        from pmtiles.reader import Reader, MmapSource, MemorySource
+    except ImportError:
+        print(
+            "pmtiles is not installed. Please install it using `pip install pmtiles`."
+        )
+        return
+
+    if not input_file.endswith(".pmtiles"):
+        raise ValueError("Input file must be a .pmtiles file.")
+
+    header = pmtiles_header(input_file)
+    metadata_offset = header["metadata_offset"]
+    metadata_length = header["metadata_length"]
+
+    if input_file.startswith("http"):
+        headers = {"Range": f"bytes=0-{metadata_offset + metadata_length}"}
+        response = requests.get(input_file, headers=headers)
+        content = MemorySource(response.content)
+        metadata = Reader(content).metadata()
+    else:
+        with open(input_file, "rb") as f:
+            reader = Reader(MmapSource(f))
+            metadata = reader.metadata()
+            metadata["vector_layers"] = json.loads(metadata["json"])["vector_layers"]
+
+    layers = metadata["vector_layers"]
+    layer_names = [layer["id"] for layer in layers]
+    metadata["layer_names"] = layer_names
+    metadata["center"] = header["center"]
+    metadata["bounds"] = header["bounds"]
+    return metadata
