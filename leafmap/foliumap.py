@@ -217,6 +217,7 @@ class Map(folium.Map):
         overlay=True,
         control=True,
         show=True,
+        zoom_to_layer=True,
         **kwargs,
     ):
         """
@@ -229,6 +230,7 @@ class Map(folium.Map):
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
             show (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
             **kwargs: Additional keyword arguments to pass to the PMTilesLayer constructor.
 
         Returns:
@@ -245,6 +247,11 @@ class Map(folium.Map):
             **kwargs,
         )
         self.add_child(layer)
+
+        if zoom_to_layer:
+            metadata = pmtiles_metadata(url)
+            bounds = metadata["bounds"]
+            self.zoom_to_bounds(bounds)
 
     def add_layer_control(self):
         """Adds layer control to the map."""
