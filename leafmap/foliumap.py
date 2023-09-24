@@ -226,6 +226,7 @@ class Map(folium.Map):
         Args:
             url (str): The URL of the PMTiles file.
             style (str, optional): The CSS style to apply to the layer. Defaults to None.
+                See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
             name (str, optional): The name of the layer. Defaults to None.
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
@@ -237,21 +238,24 @@ class Map(folium.Map):
             None
         """
 
-        layer = PMTilesLayer(
-            url,
-            style=style,
-            name=name,
-            overlay=overlay,
-            control=control,
-            show=show,
-            **kwargs,
-        )
-        self.add_child(layer)
+        try:
+            layer = PMTilesLayer(
+                url,
+                style=style,
+                name=name,
+                overlay=overlay,
+                control=control,
+                show=show,
+                **kwargs,
+            )
+            self.add_child(layer)
 
-        if zoom_to_layer:
-            metadata = pmtiles_metadata(url)
-            bounds = metadata["bounds"]
-            self.zoom_to_bounds(bounds)
+            if zoom_to_layer:
+                metadata = pmtiles_metadata(url)
+                bounds = metadata["bounds"]
+                self.zoom_to_bounds(bounds)
+        except Exception as e:
+            print(e)
 
     def add_layer_control(self):
         """Adds layer control to the map."""
