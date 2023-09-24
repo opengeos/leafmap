@@ -10852,7 +10852,9 @@ def widget_template(
         return toolbar_widget
 
 
-def start_server(directory: str, port: int = 8000, background: bool = True):
+def start_server(
+    directory: str = None, port: int = 8000, background: bool = True, quiet: bool = True
+):
     """
     Start a simple web server to serve files from the specified directory
     with directory listing and CORS support. Optionally, run the server
@@ -10863,6 +10865,7 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
         port (int, optional): The port on which the web server will run. Defaults to 8000.
         background (bool, optional): Whether to run the server in a separate background thread.
                                      Defaults to True.
+        quiet (bool, optional): If True, suppress the log output. Defaults to True.
 
     Raises:
         ImportError: If required modules are not found.
@@ -10872,6 +10875,10 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
         None. The function runs the server indefinitely until manually stopped.
     """
 
+    # If no directory is specified, use the current working directory
+    if directory is None:
+        directory = os.getcwd()
+
     def run_flask():
         try:
             from flask import Flask, send_from_directory, render_template_string
@@ -10879,6 +10886,14 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
 
             app = Flask(__name__, static_folder=directory)
             CORS(app)  # Enable CORS for all routes
+
+            if quiet:
+                # This will disable Flask's logging
+                import logging
+
+                log = logging.getLogger("werkzeug")
+                log.disabled = True
+                app.logger.disabled = True
 
             @app.route("/<path:path>", methods=["GET"])
             def serve_file(path):
@@ -10888,6 +10903,7 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
             def index():
                 # List files and directories under the specified directory
                 items = os.listdir(directory)
+                items.sort()
                 # Generate an HTML representation of the directory listing
                 listing_template = """
                 <h2>Directory listing for /</h2>
@@ -11018,38 +11034,82 @@ def vector_to_pmtiles(
     input_file: str,
     output_file: str,
     layer_name: Optional[str] = None,
+    projection: Optional[str] = "EPSG:4326",
+    overwrite: bool = False,
     options: Optional[List[str]] = None,
-    max_zoom: int = 99,
     quiet: bool = False,
-    keep_mbtiles: bool = False,
-):
+) -> Optional[str]:
     """
-    Converts vector data to pmtiles using a two-step process: first to mbtiles using Tippecanoe and then to pmtiles.
+    Converts vector data to PMTiles using Tippecanoe.
 
     Args:
         input_file (str): Path to the input vector data file (e.g., .geojson).
-        output_file (str): Path to the output .pmtiles file.
-        layer_name (Optional[str], optional): Optional name for the layer. Defaults to None.
-        options (Optional[List[str]], optional): List of additional arguments for tippecanoe. Defaults to None.
-        max_zoom (int, optional): Maximum zoom level for the conversion. Defaults to 99.
-        quiet (bool, optional): If True, suppress the log output of `vector_to_mbtiles`. Defaults to False.
-        keep_mbtiles (bool, optional): If True, keeps the intermediate .mbtiles file. Defaults to False.
+        output_file (str): Path to the output .mbtiles file.
+        layer_name (Optional[str]): Optional name for the layer. Defaults to None.
+        projection (Optional[str]): Projection for the output PMTiles file. Defaults to "EPSG:4326".
+        overwrite (bool): If True, overwrite the existing output file. Defaults to False.
+        options (Optional[List[str]]): List of additional arguments for tippecanoe. Defaults to None.
+            To reduce the size of the output file, use '-zg' or '-z max-zoom'.
+        quiet (bool): If True, suppress the log output. Defaults to False.
+
+    Returns:
+        Optional[str]: Output from the Tippecanoe command, or None if there was an error or if Tippecanoe is not installed.
 
     Raises:
-        ValueError: If the input vector data file does not exist.
+        subprocess.CalledProcessError: If there's an error executing the tippecanoe command.
     """
 
-    if not os.path.exists(input_file):
-        raise ValueError(f"Input file {input_file} does not exist.")
+    import subprocess
+    import shutil
 
-    basename = os.path.splitext(os.path.basename(input_file))[0]
-    dirname = os.path.dirname(input_file)
-    mbtiles_file = os.path.join(dirname, f"{basename}.mbtiles")
-    vector_to_mbtiles(input_file, mbtiles_file, layer_name, options, quiet)
-    mbtiles_to_pmtiles(mbtiles_file, output_file, max_zoom)
+    # Check if tippecanoe exists
+    if shutil.which("tippecanoe") is None:
+        print("Error: tippecanoe is not installed.")
+        print("You can install it using conda with the following command:")
+        print("conda install -c conda-forge tippecanoe")
+        return None
 
-    if not keep_mbtiles:
-        os.remove(mbtiles_file)
+    if not output_file.endswith(".pmtiles"):
+        raise ValueError("Error: output file must be a .pmtiles file.")
+
+    command = ["tippecanoe", "-o", output_file]
+
+    # Add layer name specification if provided
+    if layer_name:
+        command.extend(["-L", f"{layer_name}:{input_file}"])
+    else:
+        command.append(input_file)
+
+    command.extend(["--projection", projection])
+
+    if options is None:
+        options = []
+
+    if overwrite:
+        command.append("--force")
+
+    # Append additional arguments if provided
+    if options:
+        command.extend(options)
+
+    try:
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+
+        if not quiet:
+            for line in process.stdout:
+                print(line, end="")
+
+        exit_code = process.wait()
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(exit_code, command)
+
+    except subprocess.CalledProcessError as e:
+        print(f"\nError executing tippecanoe: {e}")
+        return None
+
+    return "Tippecanoe process completed successfully."
 
 
 def pmtiles_header(input_file: str):
@@ -11176,8 +11236,13 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
             metadata = reader.metadata()
             metadata["vector_layers"] = json.loads(metadata["json"])["vector_layers"]
 
-    layers = metadata["vector_layers"]
-    layer_names = [layer["id"] for layer in layers]
+    vector_layers = metadata["vector_layers"]
+    layer_names = [layer["id"] for layer in vector_layers]
+
+    if "tilestats" in metadata:
+        geometries = [layer["geometry"] for layer in metadata["tilestats"]["layers"]]
+        metadata["geometries"] = geometries
+
     metadata["layer_names"] = layer_names
     metadata["center"] = header["center"]
     metadata["bounds"] = header["bounds"]

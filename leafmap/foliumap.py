@@ -226,6 +226,7 @@ class Map(folium.Map):
         Args:
             url (str): The URL of the PMTiles file.
             style (str, optional): The CSS style to apply to the layer. Defaults to None.
+                See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
             name (str, optional): The name of the layer. Defaults to None.
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
