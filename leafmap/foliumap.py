@@ -238,21 +238,24 @@ class Map(folium.Map):
             None
         """
 
-        layer = PMTilesLayer(
-            url,
-            style=style,
-            name=name,
-            overlay=overlay,
-            control=control,
-            show=show,
-            **kwargs,
-        )
-        self.add_child(layer)
+        try:
+            layer = PMTilesLayer(
+                url,
+                style=style,
+                name=name,
+                overlay=overlay,
+                control=control,
+                show=show,
+                **kwargs,
+            )
+            self.add_child(layer)
 
-        if zoom_to_layer:
-            metadata = pmtiles_metadata(url)
-            bounds = metadata["bounds"]
-            self.zoom_to_bounds(bounds)
+            if zoom_to_layer:
+                metadata = pmtiles_metadata(url)
+                bounds = metadata["bounds"]
+                self.zoom_to_bounds(bounds)
+        except Exception as e:
+            print(e)
 
     def add_layer_control(self):
         """Adds layer control to the map."""
