@@ -592,6 +592,56 @@ class Map(ipyleaflet.Map):
 
     add_vector_tile_layer = add_vector_tile
 
+    def add_pmtiles(
+        self,
+        url,
+        style={},
+        name="PMTiles",
+        show=True,
+        zoom_to_layer=True,
+        **kwargs,
+    ):
+        """
+        Adds a PMTiles layer to the map. This function is not officially supported yet by ipyleaflet yet.
+        Install it with the following command:
+        pip install git+https://github.com/giswqs/ipyleaflet.git@pmtiles
+
+        Args:
+            url (str): The URL of the PMTiles file.
+            style (str, optional): The CSS style to apply to the layer. Defaults to None.
+                See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
+            name (str, optional): The name of the layer. Defaults to None.
+            show (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the PMTilesLayer constructor.
+
+        Returns:
+            None
+        """
+
+        try:
+            if "sources" in kwargs:
+                del kwargs["sources"]
+
+            if "version" in kwargs:
+                del kwargs["version"]
+
+            layer = ipyleaflet.PMTilesLayer(
+                url=url,
+                style=style,
+                name=name,
+                visible=show,
+                **kwargs,
+            )
+            self.add(layer)
+
+            if zoom_to_layer:
+                metadata = pmtiles_metadata(url)
+                bounds = metadata["bounds"]
+                self.zoom_to_bounds(bounds)
+        except Exception as e:
+            print(e)
+
     def add_osm_from_geocode(
         self,
         query,
