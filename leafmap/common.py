@@ -3696,7 +3696,7 @@ def numpy_to_image(
     if np_array.dtype == np.float64 or np_array.dtype == np.float32:
         # Convert the array to uint8
         # np_array = (np_array * 255).astype(np.uint8)
-        np_array.interp(np_array, (np_array.min(), np_array.max()), (0, 255)).astype(
+        np.interp(np_array, (np_array.min(), np_array.max()), (0, 255)).astype(
             np.uint8
         )
     else:
