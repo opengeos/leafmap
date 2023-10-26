@@ -11247,3 +11247,219 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
     metadata["center"] = header["center"]
     metadata["bounds"] = header["bounds"]
     return metadata
+
+
+def raster_to_vector(source, output, simplify_tolerance=None, dst_crs=None, open_args={}, **kwargs):
+    """Vectorize a raster dataset.
+
+    Args:
+        source (str): The path to the tiff file.
+        output (str): The path to the vector file.
+        simplify_tolerance (float, optional): The maximum allowed geometry displacement.
+            The higher this value, the smaller the number of vertices in the resulting geometry.
+    """
+    import rasterio
+    import shapely
+    import geopandas as gpd
+    from rasterio import features
+
+    with rasterio.open(source, **open_args) as src:
+        band = src.read()
+
+        mask = band != 0
+        shapes = features.shapes(band, mask=mask, transform=src.transform)
+
+    fc = [
+        {"geometry": shapely.geometry.shape(shape), "properties": {"value": value}}
+        for shape, value in shapes
+    ]
+    if simplify_tolerance is not None:
+        for i in fc:
+            i["geometry"] = i["geometry"].simplify(tolerance=simplify_tolerance)
+
+    gdf = gpd.GeoDataFrame.from_features(fc)
+    if src.crs is not None:
+        gdf.set_crs(crs=src.crs, inplace=True)
+
+    if dst_crs is not None:
+        gdf = gdf.to_crs(dst_crs)
+
+    gdf.to_file(output, **kwargs)
+
+
+def overlay_images(
+    image1,
+    image2,
+    alpha=0.5,
+    backend="TkAgg",
+    height_ratios=[10, 1],
+    show_args1={},
+    show_args2={},
+):
+    """Overlays two images using a slider to control the opacity of the top image.
+
+    Args:
+        image1 (str | np.ndarray): The first input image at the bottom represented as a NumPy array or the path to the image.
+        image2 (_type_): The second input image on top represented as a NumPy array or the path to the image.
+        alpha (float, optional): The alpha value of the top image. Defaults to 0.5.
+        backend (str, optional): The backend of the matplotlib plot. Defaults to "TkAgg".
+        height_ratios (list, optional): The height ratios of the two subplots. Defaults to [10, 1].
+        show_args1 (dict, optional): The keyword arguments to pass to the imshow() function for the first image. Defaults to {}.
+        show_args2 (dict, optional): The keyword arguments to pass to the imshow() function for the second image. Defaults to {}.
+
+    """
+    import sys
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import matplotlib.widgets as mpwidgets
+
+    if "google.colab" in sys.modules:
+        backend = "inline"
+        print(
+            "The TkAgg backend is not supported in Google Colab. The overlay_images function will not work on Colab."
+        )
+        return
+
+    matplotlib.use(backend)
+
+    if isinstance(image1, str):
+        if image1.startswith("http"):
+            image1 = download_file(image1)
+
+        if not os.path.exists(image1):
+            raise ValueError(f"Input path {image1} does not exist.")
+
+    if isinstance(image2, str):
+        if image2.startswith("http"):
+            image2 = download_file(image2)
+
+        if not os.path.exists(image2):
+            raise ValueError(f"Input path {image2} does not exist.")
+
+    # Load the two images
+    x = plt.imread(image1)
+    y = plt.imread(image2)
+
+    # Create the plot
+    fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={"height_ratios": height_ratios})
+    img0 = ax0.imshow(x, **show_args1)
+    img1 = ax0.imshow(y, alpha=alpha, **show_args2)
+
+    # Define the update function
+    def update(value):
+        img1.set_alpha(value)
+        fig.canvas.draw_idle()
+
+    # Create the slider
+    slider0 = mpwidgets.Slider(ax=ax1, label="alpha", valmin=0, valmax=1, valinit=alpha)
+    slider0.on_changed(update)
+
+    # Display the plot
+    plt.show()
+
+
+def blend_images(
+    img1,
+    img2,
+    alpha=0.5,
+    output=False,
+    show=True,
+    figsize=(12, 10),
+    axis="off",
+    **kwargs,
+):
+    """
+    Blends two images together using the addWeighted function from the OpenCV library.
+
+    Args:
+        img1 (numpy.ndarray): The first input image on top represented as a NumPy array.
+        img2 (numpy.ndarray): The second input image at the bottom represented as a NumPy array.
+        alpha (float): The weighting factor for the first image in the blend. By default, this is set to 0.5.
+        output (str, optional): The path to the output image. Defaults to False.
+        show (bool, optional): Whether to display the blended image. Defaults to True.
+        figsize (tuple, optional): The size of the figure. Defaults to (12, 10).
+        axis (str, optional): The axis of the figure. Defaults to "off".
+        **kwargs: Additional keyword arguments to pass to the cv2.addWeighted() function.
+
+    Returns:
+        numpy.ndarray: The blended image as a NumPy array.
+    """
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # Resize the images to have the same dimensions
+    if isinstance(img1, str):
+        if img1.startswith("http"):
+            img1 = download_file(img1)
+
+        if not os.path.exists(img1):
+            raise ValueError(f"Input path {img1} does not exist.")
+
+        img1 = cv2.imread(img1)
+
+    if isinstance(img2, str):
+        if img2.startswith("http"):
+            img2 = download_file(img2)
+
+        if not os.path.exists(img2):
+            raise ValueError(f"Input path {img2} does not exist.")
+
+        img2 = cv2.imread(img2)
+
+    if img1.dtype == np.float32:
+        img1 = (img1 * 255).astype(np.uint8)
+
+    if img2.dtype == np.float32:
+        img2 = (img2 * 255).astype(np.uint8)
+
+    if img1.dtype != img2.dtype:
+        img2 = img2.astype(img1.dtype)
+
+    img1 = cv2.resize(img1, (img2.shape[1], img2.shape[0]))
+
+    # Blend the images using the addWeighted function
+    beta = 1 - alpha
+    blend_img = cv2.addWeighted(img1, alpha, img2, beta, 0, **kwargs)
+
+    if output:
+        array_to_image(blend_img, output, img2)
+
+    if show:
+        plt.figure(figsize=figsize)
+        plt.imshow(blend_img)
+        plt.axis(axis)
+        plt.show()
+    else:
+        return blend_img    
+    
+
+def regularize(source, output=None, crs="EPSG:4326", **kwargs):
+    """Regularize a polygon GeoDataFrame.
+
+    Args:
+        source (str | gpd.GeoDataFrame): The input file path or a GeoDataFrame.
+        output (str, optional): The output file path. Defaults to None.
+
+
+    Returns:
+        gpd.GeoDataFrame: The output GeoDataFrame.
+    """
+    import geopandas as gpd
+
+    if isinstance(source, str):
+        gdf = gpd.read_file(source)
+    elif isinstance(source, gpd.GeoDataFrame):
+        gdf = source
+    else:
+        raise ValueError("The input source must be a GeoDataFrame or a file path.")
+
+    polygons = gdf.geometry.apply(lambda geom: geom.minimum_rotated_rectangle)
+    result = gpd.GeoDataFrame(geometry=polygons, data=gdf.drop("geometry", axis=1))
+
+    if crs is not None:
+        result.to_crs(crs, inplace=True)
+    if output is not None:
+        result.to_file(output, **kwargs)
+    else:
+        return result
