@@ -10934,6 +10934,57 @@ def start_server(
 
 
 def vector_to_mbtiles(
+    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+) -> None:
+    """
+    Convert a vector dataset to MBTiles format using the ogr2ogr command-line tool.
+
+    Args:
+        source_path (str): The path to the source vector dataset (GeoPackage, Shapefile, etc.).
+        target_path (str): The path to the target MBTiles file to be created.
+        max_zoom (int, optional): The maximum zoom level for the MBTiles dataset. Defaults to 5.
+        name (str, optional): The name of the MBTiles dataset. Defaults to None.
+        **kwargs: Additional options to be passed as keyword arguments. These options will be used as -dsco options
+                  when calling ogr2ogr. See https://gdal.org/drivers/raster/mbtiles.html for a list of options.
+
+    Returns:
+        None
+
+    Raises:
+        subprocess.CalledProcessError: If the ogr2ogr command fails to execute.
+
+    Example:
+        source_path = "countries.gpkg"
+        target_path = "target.mbtiles"
+        name = "My MBTiles"
+        max_zoom = 5
+        vector_to_mbtiles(source_path, target_path, name=name, max_zoom=max_zoom)
+    """
+    import subprocess
+
+    command = [
+        "ogr2ogr",
+        "-f",
+        "MBTILES",
+        target_path,
+        source_path,
+        "-dsco",
+        f"MAXZOOM={max_zoom}",
+    ]
+
+    if name:
+        command.extend(["-dsco", f"NAME={name}"])
+
+    for key, value in kwargs.items():
+        command.extend(["-dsco", f"{key.upper()}={value}"])
+
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        raise e
+
+
+def geojson_to_mbtiles(
     input_file: str,
     output_file: str,
     layer_name: Optional[str] = None,
@@ -11028,7 +11079,7 @@ def mbtiles_to_pmtiles(
     convert.mbtiles_to_pmtiles(input_file, output_file, maxzoom=max_zoom)
 
 
-def vector_to_pmtiles(
+def geojson_to_pmtiles(
     input_file: str,
     output_file: Optional[str] = None,
     layer_name: Optional[str] = None,
