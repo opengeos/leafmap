@@ -43,7 +43,7 @@ extras_requires = {
     ],
     "sql": ["psycopg2", "sqlalchemy"],
     "apps": ["streamlit-folium", "voila", "solara"],
-    "vector": ["geopandas", "osmnx"],
+    "vector": ["geopandas", "osmnx", "pmtiles", "flask", "flask-cors"],
     "pmtiles": ["pmtiles", "flask", "flask-cors"],
     "ai": [
         "geopandas",
