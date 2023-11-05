@@ -10998,7 +10998,7 @@ def geojson_to_mbtiles(
         input_file (str): Path to the input vector data file (e.g., .geojson).
         output_file (str): Path to the output .mbtiles file.
         layer_name (Optional[str]): Optional name for the layer. Defaults to None.
-        options (Optional[List[str]]): List of additional arguments for tippecanoe. Defaults to None.
+        options (Optional[List[str]]): List of additional arguments for tippecanoe. For example '-zg' for auto maxzoom. Defaults to None.
         quiet (bool): If True, suppress the log output. Defaults to False.
 
     Returns:
@@ -11077,6 +11077,33 @@ def mbtiles_to_pmtiles(
         return
 
     convert.mbtiles_to_pmtiles(input_file, output_file, maxzoom=max_zoom)
+
+
+def vector_to_pmtiles(
+    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+):
+    """
+    Converts a vector file to PMTiles format.
+
+    Args:
+        source_path (str): Path to the source vector file.
+        target_path (str): Path to the target PMTiles file.
+        max_zoom (int, optional): Maximum zoom level for the PMTiles. Defaults to 5.
+        name (str, optional): Name of the PMTiles dataset. Defaults to None.
+        **kwargs: Additional keyword arguments to be passed to the underlying conversion functions.
+
+    Raises:
+        ValueError: If the target file does not have a .pmtiles extension.
+
+    Returns:
+        None
+    """
+    if not target_path.endswith(".pmtiles"):
+        raise ValueError("Error: target file must be a .pmtiles file.")
+    mbtiles = target_path.replace(".pmtiles", ".mbtiles")
+    vector_to_mbtiles(source_path, mbtiles, max_zoom=max_zoom, name=name, **kwargs)
+    mbtiles_to_pmtiles(mbtiles, target_path)
+    os.remove(mbtiles)
 
 
 def geojson_to_pmtiles(
