@@ -11605,3 +11605,28 @@ def gdb_layer_names(gdb_path: str) -> List[str]:
     # Close the GDB dataset
     gdb_dataset = None
     return layer_names
+
+
+def df_to_gdf(df, geometry_column="geometry", crs="EPSG:4326"):
+    """
+    Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
+
+    Args:
+        df (pandas.DataFrame): The pandas DataFrame to convert.
+        geometry_column (str): The name of the geometry column in the DataFrame.
+        crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
+
+    Returns:
+        geopandas.GeoDataFrame: The converted GeoPandas GeoDataFrame.
+    """
+    import geopandas as gpd
+    from shapely import wkt
+
+    # Convert the geometry column to Shapely geometry objects
+    df[geometry_column] = df[geometry_column].apply(lambda x: wkt.loads(x))
+
+    # Convert the pandas DataFrame to a GeoPandas GeoDataFrame
+    gdf = gpd.GeoDataFrame(df, geometry=geometry_column)
+    gdf.crs = crs
+
+    return gdf
