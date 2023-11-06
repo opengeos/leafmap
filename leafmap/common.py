@@ -11685,14 +11685,17 @@ def gdb_layer_names(gdb_path: str) -> List[str]:
     return layer_names
 
 
-def df_to_gdf(df, geometry_column="geometry", crs="EPSG:4326"):
+def df_to_gdf(
+    df, geometry="geometry", src_crs="EPSG:4326", dst_crs="EPSG:4326", **kwargs
+):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
 
     Args:
         df (pandas.DataFrame): The pandas DataFrame to convert.
-        geometry_column (str): The name of the geometry column in the DataFrame.
-        crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
+        geometry (str): The name of the geometry column in the DataFrame.
+        src_crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
+        dst_crs (str): The target CRS of the GeoDataFrame. Default is "EPSG:4326".
 
     Returns:
         geopandas.GeoDataFrame: The converted GeoPandas GeoDataFrame.
@@ -11701,10 +11704,30 @@ def df_to_gdf(df, geometry_column="geometry", crs="EPSG:4326"):
     from shapely import wkt
 
     # Convert the geometry column to Shapely geometry objects
-    df[geometry_column] = df[geometry_column].apply(lambda x: wkt.loads(x))
+    df[geometry] = df[geometry].apply(lambda x: wkt.loads(x))
 
     # Convert the pandas DataFrame to a GeoPandas GeoDataFrame
-    gdf = gpd.GeoDataFrame(df, geometry=geometry_column)
-    gdf.crs = crs
+    gdf = gpd.GeoDataFrame(df, geometry=geometry, crs=src_crs, **kwargs)
+    if dst_crs != src_crs:
+        gdf = gdf.to_crs(dst_crs)
 
     return gdf
+
+
+def check_url(url: str) -> bool:
+    """Check if an HTTP URL is working.
+
+    Args:
+        url (str): The URL to check.
+
+    Returns:
+        bool: True if the URL is working (returns a 200 status code), False otherwise.
+    """
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.exceptions.RequestException:
+        return False
