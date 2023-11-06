@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.28.0 - Nov 5, 2023
+
+**What's Changed**
+
+-   Update gradio example by @giswqs in [#584](https://github.com/opengeos/leafmap/pull/584)
+-   Add GDAL and OpenFileGDB functions by @giswqs in [#585](https://github.com/opengeos/leafmap/pull/585)
+-   Add df_to_gdf function by @giswqs in [#586](https://github.com/opengeos/leafmap/pull/586)
+-   Add mbtiles and pmtiles functions by @giswqs in [#587](https://github.com/opengeos/leafmap/pull/587)
+-   Add support for lonboard by @giswqs in [#588](https://github.com/opengeos/leafmap/pull/588)
+
+**Full Changelog**: [v0.27.2...v0.28.0](https://github.com/opengeos/leafmap/compare/v0.27.2...v0.28.0)
+
+## v0.27.2 - Nov 3, 2023
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#579](https://github.com/opengeos/leafmap/pull/579)
+-   Add some vector functions by @giswqs in [#582](https://github.com/opengeos/leafmap/pull/582)
+
+**Full Changelog**: [v0.27.1...v0.27.2](https://github.com/opengeos/leafmap/compare/v0.27.1...v0.27.2)
+
 ## v0.27.1 - Oct 17, 2023
 
 **What's Changed**
