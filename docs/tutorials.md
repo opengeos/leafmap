@@ -96,6 +96,7 @@
 80. Visualizing solar radiation data from Google Solar API ([notebook](https://leafmap.org/notebooks/80_solar))
 81. Downloading Microsoft and Google Building Footprints ([notebook](https://leafmap.org/notebooks/81_buildings))
 82. Visualizing PMTiles with leafmap ([notebook](https://leafmap.org/notebooks/82_pmtiles))
+83. Visualizing large vector datasets with lonboard ([notebook](https://leafmap.org/notebooks/83_vector_viz))
 
 ## Demo
 
