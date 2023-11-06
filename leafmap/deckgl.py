@@ -6,7 +6,7 @@ try:
     import geopandas as gpd
 
 except ImportError:
-    raise (
+    raise Exception(
         "lonboard needs to be installed to use this module. Use 'pip install lonboard' to install the package."
     )
 
