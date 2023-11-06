@@ -10934,6 +10934,57 @@ def start_server(
 
 
 def vector_to_mbtiles(
+    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+) -> None:
+    """
+    Convert a vector dataset to MBTiles format using the ogr2ogr command-line tool.
+
+    Args:
+        source_path (str): The path to the source vector dataset (GeoPackage, Shapefile, etc.).
+        target_path (str): The path to the target MBTiles file to be created.
+        max_zoom (int, optional): The maximum zoom level for the MBTiles dataset. Defaults to 5.
+        name (str, optional): The name of the MBTiles dataset. Defaults to None.
+        **kwargs: Additional options to be passed as keyword arguments. These options will be used as -dsco options
+                  when calling ogr2ogr. See https://gdal.org/drivers/raster/mbtiles.html for a list of options.
+
+    Returns:
+        None
+
+    Raises:
+        subprocess.CalledProcessError: If the ogr2ogr command fails to execute.
+
+    Example:
+        source_path = "countries.gpkg"
+        target_path = "target.mbtiles"
+        name = "My MBTiles"
+        max_zoom = 5
+        vector_to_mbtiles(source_path, target_path, name=name, max_zoom=max_zoom)
+    """
+    import subprocess
+
+    command = [
+        "ogr2ogr",
+        "-f",
+        "MBTILES",
+        target_path,
+        source_path,
+        "-dsco",
+        f"MAXZOOM={max_zoom}",
+    ]
+
+    if name:
+        command.extend(["-dsco", f"NAME={name}"])
+
+    for key, value in kwargs.items():
+        command.extend(["-dsco", f"{key.upper()}={value}"])
+
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        raise e
+
+
+def geojson_to_mbtiles(
     input_file: str,
     output_file: str,
     layer_name: Optional[str] = None,
@@ -10947,7 +10998,7 @@ def vector_to_mbtiles(
         input_file (str): Path to the input vector data file (e.g., .geojson).
         output_file (str): Path to the output .mbtiles file.
         layer_name (Optional[str]): Optional name for the layer. Defaults to None.
-        options (Optional[List[str]]): List of additional arguments for tippecanoe. Defaults to None.
+        options (Optional[List[str]]): List of additional arguments for tippecanoe. For example '-zg' for auto maxzoom. Defaults to None.
         quiet (bool): If True, suppress the log output. Defaults to False.
 
     Returns:
@@ -11029,6 +11080,33 @@ def mbtiles_to_pmtiles(
 
 
 def vector_to_pmtiles(
+    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+):
+    """
+    Converts a vector file to PMTiles format.
+
+    Args:
+        source_path (str): Path to the source vector file.
+        target_path (str): Path to the target PMTiles file.
+        max_zoom (int, optional): Maximum zoom level for the PMTiles. Defaults to 5.
+        name (str, optional): Name of the PMTiles dataset. Defaults to None.
+        **kwargs: Additional keyword arguments to be passed to the underlying conversion functions.
+
+    Raises:
+        ValueError: If the target file does not have a .pmtiles extension.
+
+    Returns:
+        None
+    """
+    if not target_path.endswith(".pmtiles"):
+        raise ValueError("Error: target file must be a .pmtiles file.")
+    mbtiles = target_path.replace(".pmtiles", ".mbtiles")
+    vector_to_mbtiles(source_path, mbtiles, max_zoom=max_zoom, name=name, **kwargs)
+    mbtiles_to_pmtiles(mbtiles, target_path)
+    os.remove(mbtiles)
+
+
+def geojson_to_pmtiles(
     input_file: str,
     output_file: Optional[str] = None,
     layer_name: Optional[str] = None,
@@ -11607,14 +11685,17 @@ def gdb_layer_names(gdb_path: str) -> List[str]:
     return layer_names
 
 
-def df_to_gdf(df, geometry_column="geometry", crs="EPSG:4326"):
+def df_to_gdf(
+    df, geometry="geometry", src_crs="EPSG:4326", dst_crs="EPSG:4326", **kwargs
+):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
 
     Args:
         df (pandas.DataFrame): The pandas DataFrame to convert.
-        geometry_column (str): The name of the geometry column in the DataFrame.
-        crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
+        geometry (str): The name of the geometry column in the DataFrame.
+        src_crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
+        dst_crs (str): The target CRS of the GeoDataFrame. Default is "EPSG:4326".
 
     Returns:
         geopandas.GeoDataFrame: The converted GeoPandas GeoDataFrame.
@@ -11623,10 +11704,30 @@ def df_to_gdf(df, geometry_column="geometry", crs="EPSG:4326"):
     from shapely import wkt
 
     # Convert the geometry column to Shapely geometry objects
-    df[geometry_column] = df[geometry_column].apply(lambda x: wkt.loads(x))
+    df[geometry] = df[geometry].apply(lambda x: wkt.loads(x))
 
     # Convert the pandas DataFrame to a GeoPandas GeoDataFrame
-    gdf = gpd.GeoDataFrame(df, geometry=geometry_column)
-    gdf.crs = crs
+    gdf = gpd.GeoDataFrame(df, geometry=geometry, crs=src_crs, **kwargs)
+    if dst_crs != src_crs:
+        gdf = gdf.to_crs(dst_crs)
 
     return gdf
+
+
+def check_url(url: str) -> bool:
+    """Check if an HTTP URL is working.
+
+    Args:
+        url (str): The URL to check.
+
+    Returns:
+        bool: True if the URL is working (returns a 200 status code), False otherwise.
+    """
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.exceptions.RequestException:
+        return False
