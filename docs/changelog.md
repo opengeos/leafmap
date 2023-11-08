@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.28.1 - Nov 7, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.28.0 by @giswqs in [#589](https://github.com/opengeos/leafmap/pull/589)
+-   Update notebook 83 by @giswqs in [#590](https://github.com/opengeos/leafmap/pull/590)
+-   Fix gdal driver error by @giswqs in [#591](https://github.com/opengeos/leafmap/pull/591)
+-   Fix folium notebook error by @giswqs in [#592](https://github.com/opengeos/leafmap/pull/592)
+
+**Full Changelog**: [v0.28.0...v0.28.1](https://github.com/opengeos/leafmap/compare/v0.28.0...v0.28.1)
+
 ## v0.28.0 - Nov 5, 2023
 
 **What's Changed**
