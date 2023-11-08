@@ -9295,6 +9295,7 @@ def map_tiles_to_geotiff(
                 "TILED=YES",
             ]
 
+        kwargs.pop("overwrite", None)
         gtiff = driver.Create(
             filename,
             img.size[0],
