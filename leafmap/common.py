@@ -11601,8 +11601,12 @@ def gdb_to_vector(
     gdb_path: str,
     out_dir: str,
     layers: Optional[List[str]] = None,
+    filenames: Optional[List[str]] = None,
     gdal_driver: str = "GPKG",
     file_extension: Optional[str] = None,
+    overwrite: bool = False,
+    quiet=False,
+    **kwargs,
 ):
     """Converts layers from a File Geodatabase (GDB) to a vector format.
 
@@ -11610,8 +11614,11 @@ def gdb_to_vector(
         gdb_path (str): The path to the File Geodatabase (GDB).
         out_dir (str): The output directory to save the converted files.
         layers (Optional[List[str]]): A list of layer names to convert. If None, all layers will be converted. Default is None.
+        filenames (Optional[List[str]]): A list of output file names. If None, the layer names will be used as the file names. Default is None.
         gdal_driver (str): The GDAL driver name for the output vector format. Default is "GPKG".
         file_extension (Optional[str]): The file extension for the output files. If None, it will be determined automatically based on the gdal_driver. Default is None.
+        overwrite (bool): Whether to overwrite the existing output files. Default is False.
+        quiet (bool): If True, suppress the log output. Defaults to False.
 
     Returns:
         None
@@ -11628,6 +11635,17 @@ def gdb_to_vector(
     if isinstance(layers, str):
         layers = [layers]
 
+    if isinstance(filenames, str):
+        filenames = [filenames]
+
+    if filenames is not None:
+        if len(filenames) != len(layers):
+            raise ValueError("The length of filenames must match the length of layers.")
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    ii = 0
     # Iterate over the layers
     for i in range(layer_count):
         layer = gdb_dataset.GetLayerByIndex(i)
@@ -11641,7 +11659,20 @@ def gdb_to_vector(
             file_extension = get_gdal_file_extension(gdal_driver)
 
         # Create the output file path
-        output_file = os.path.join(out_dir, feature_class_name + "." + file_extension)
+        if filenames is not None:
+            output_file = os.path.join(out_dir, filenames[ii] + "." + file_extension)
+            ii += 1
+        else:
+            output_file = os.path.join(
+                out_dir, feature_class_name + "." + file_extension
+            )
+
+        if os.path.exists(output_file) and not overwrite:
+            print(f"File {output_file} already exists. Skipping...")
+            continue
+        else:
+            if not quiet:
+                print(f"Converting layer {feature_class_name} to {output_file}...")
 
         # Create the output driver
         output_driver = ogr.GetDriverByName(gdal_driver)
@@ -11684,6 +11715,45 @@ def gdb_layer_names(gdb_path: str) -> List[str]:
     # Close the GDB dataset
     gdb_dataset = None
     return layer_names
+
+
+def vector_to_parquet(
+    source: str, output: str, crs=None, overwrite=False, **kwargs
+) -> None:
+    """
+    Convert a GeoDataFrame or a file containing vector data to Parquet format.
+
+    Args:
+        source (Union[gpd.GeoDataFrame, str]): The source data to convert. It can be either a GeoDataFrame
+            or a file path to the vector data file.
+        output (str): The file path where the Parquet file will be saved.
+        crs (str, optional): The coordinate reference system (CRS) to use for the output file. Defaults to None.
+        overwrite (bool): Whether to overwrite the existing output file. Default is False.
+        **kwargs: Additional keyword arguments to be passed to the `to_parquet` function of GeoDataFrame.
+
+    Returns:
+        None
+    """
+
+    import geopandas as gpd
+
+    if os.path.exists(output) and not overwrite:
+        print(f"File {output} already exists. Skipping...")
+        return
+
+    if isinstance(source, gpd.GeoDataFrame):
+        gdf = source
+    else:
+        gdf = gpd.read_file(source)
+
+    if crs is not None:
+        gdf = gdf.to_crs(crs)
+
+    out_dir = os.path.dirname(os.path.abspath(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    gdf.to_parquet(output, **kwargs)
 
 
 def df_to_gdf(
