@@ -11640,6 +11640,7 @@ def gdb_to_vector(
         if len(filenames) != len(layers):
             raise ValueError("The length of filenames must match the length of layers.")
 
+    ii = 0
     # Iterate over the layers
     for i in range(layer_count):
         layer = gdb_dataset.GetLayerByIndex(i)
@@ -11654,7 +11655,8 @@ def gdb_to_vector(
 
         # Create the output file path
         if filenames is not None:
-            output_file = os.path.join(out_dir, filenames[i] + "." + file_extension)
+            output_file = os.path.join(out_dir, filenames[ii] + "." + file_extension)
+            ii += 1
         else:
             output_file = os.path.join(
                 out_dir, feature_class_name + "." + file_extension
