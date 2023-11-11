@@ -11709,7 +11709,7 @@ def gdb_layer_names(gdb_path: str) -> List[str]:
     return layer_names
 
 
-def vector_to_parquet(source: str, output: str, overwrite=False, **kwargs) -> None:
+def vector_to_parquet(source: str, output: str, crs=None, overwrite=False, **kwargs) -> None:
     """
     Convert a GeoDataFrame or a file containing vector data to Parquet format.
 
@@ -11717,6 +11717,7 @@ def vector_to_parquet(source: str, output: str, overwrite=False, **kwargs) -> No
         source (Union[gpd.GeoDataFrame, str]): The source data to convert. It can be either a GeoDataFrame
             or a file path to the vector data file.
         output (str): The file path where the Parquet file will be saved.
+        crs (str, optional): The coordinate reference system (CRS) to use for the output file. Defaults to None.
         overwrite (bool): Whether to overwrite the existing output file. Default is False.
         **kwargs: Additional keyword arguments to be passed to the `to_parquet` function of GeoDataFrame.
 
@@ -11734,6 +11735,9 @@ def vector_to_parquet(source: str, output: str, overwrite=False, **kwargs) -> No
         gdf = source
     else:
         gdf = gpd.read_file(source)
+
+    if crs is not None:
+        gdf = gdf.to_crs(crs)
     gdf.to_parquet(output, **kwargs)
 
 
