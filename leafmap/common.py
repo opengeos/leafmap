@@ -11757,7 +11757,7 @@ def vector_to_parquet(
 
 
 def df_to_gdf(
-    df, geometry="geometry", src_crs="EPSG:4326", dst_crs="EPSG:4326", **kwargs
+    df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs
 ):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
@@ -11766,7 +11766,7 @@ def df_to_gdf(
         df (pandas.DataFrame): The pandas DataFrame to convert.
         geometry (str): The name of the geometry column in the DataFrame.
         src_crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
-        dst_crs (str): The target CRS of the GeoDataFrame. Default is "EPSG:4326".
+        dst_crs (str): The target CRS of the GeoDataFrame. Default is None
 
     Returns:
         geopandas.GeoDataFrame: The converted GeoPandas GeoDataFrame.
@@ -11779,7 +11779,7 @@ def df_to_gdf(
 
     # Convert the pandas DataFrame to a GeoPandas GeoDataFrame
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs=src_crs, **kwargs)
-    if dst_crs != src_crs:
+    if dst_crs is not None and  dst_crs != src_crs:
         gdf = gdf.to_crs(dst_crs)
 
     return gdf
@@ -11802,3 +11802,112 @@ def check_url(url: str) -> bool:
             return False
     except requests.exceptions.RequestException:
         return False
+
+
+def read_parquet(
+    source: str,
+    geometry: Optional[str] = None,
+    columns: Optional[Union[str, list]] = None,
+    exclude: Optional[Union[str, list]] = None,
+    db: Optional[str] = None,
+    table_name: Optional[str] = None,
+    sql: Optional[str] = None,
+    limit: Optional[int] = None,
+    src_crs: Optional[str] = None,
+    dst_crs: Optional[str] = None,
+    return_type: str = "gdf",
+    **kwargs,
+):
+    """
+    Read Parquet data from a source and return a GeoDataFrame or DataFrame.
+
+    Args:
+        source (str): The path to the Parquet file or directory containing Parquet files.
+        geometry (str, optional): The name of the geometry column. Defaults to None.
+        columns (str or list, optional): The columns to select. Defaults to None (select all columns).
+        exclude (str or list, optional): The columns to exclude from the selection. Defaults to None.
+        db (str, optional): The DuckDB database path or alias. Defaults to None.
+        table_name (str, optional): The name of the table in the DuckDB database. Defaults to None.
+        sql (str, optional): The SQL query to execute. Defaults to None.
+        limit (int, optional): The maximum number of rows to return. Defaults to None (return all rows).
+        src_crs (str, optional): The source CRS (Coordinate Reference System) of the geometries. Defaults to None.
+        dst_crs (str, optional): The target CRS to reproject the geometries. Defaults to None.
+        return_type (str, optional): The type of object to return:
+            - 'gdf': GeoDataFrame (default)
+            - 'df': DataFrame
+            - 'numpy': NumPy array
+            - 'arrow': Arrow Table
+            - 'polars': Polars DataFrame
+        **kwargs: Additional keyword arguments that are passed to the DuckDB connection.
+
+    Returns:
+        Union[gpd.GeoDataFrame, pd.DataFrame, np.ndarray]: The loaded data.
+
+    Raises:
+        ValueError: If the columns or exclude arguments are not of the correct type.
+
+    """
+    import duckdb
+
+    if isinstance(db, str):
+        con = duckdb.connect(db)
+    else:
+        con = duckdb.connect()
+
+    con.install_extension("httpfs")
+    con.load_extension("httpfs")
+
+    con.install_extension("spatial")
+    con.load_extension("spatial")
+
+    if columns is None:
+        columns = "*"
+    elif isinstance(columns, list):
+        columns = ", ".join(columns)
+    elif not isinstance(columns, str):
+        raise ValueError("columns must be a list or a string.")
+
+    if exclude is not None:
+        if isinstance(exclude, list):
+            exclude = ", ".join(exclude)
+        elif not isinstance(exclude, str):
+            raise ValueError("exclude_columns must be a list or a string.")
+        columns = f"{columns} EXCLUDE {exclude}"
+
+    if return_type in ["df", "numpy", "arrow", "polars"]:
+        if sql is None:
+            sql = f"SELECT {columns} FROM '{source}'"
+        if limit is not None:
+            sql += f" LIMIT {limit}"
+
+        if return_type == "df":
+            result = con.sql(sql, **kwargs).df()
+        elif return_type == "numpy":
+            result = con.sql(sql, **kwargs).fetchnumpy()
+        elif return_type == "arrow":
+            result = con.sql(sql, **kwargs).arrow()
+        elif return_type == "polars":
+            result = con.sql(sql, **kwargs).pl()
+
+        if table_name is not None:
+            con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM result", **kwargs)
+
+    elif return_type == "gdf":
+        if geometry is None:
+            geometry = "geometry"
+        if sql is None:
+            # if src_crs is not None and dst_crs is not None:
+            #     geom_sql = f"ST_AsText(ST_Transform(ST_GeomFromWKB({geometry}), '{src_crs}', '{dst_crs}', true)) AS {geometry}"
+            # else:
+            geom_sql = f"ST_AsText(ST_GeomFromWKB({geometry})) AS {geometry}"
+            sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{source}'"
+        if limit is not None:
+            sql += f" LIMIT {limit}"
+
+        df = con.sql(sql, **kwargs).df()
+        if table_name is not None:
+            con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM df", **kwargs)
+        result = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs)
+
+    con.close()
+    return result
