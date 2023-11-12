@@ -104,6 +104,7 @@
 81. Downloading Microsoft and Google Building Footprints ([notebook](https://leafmap.org/notebooks/81_buildings))
 82. Visualizing PMTiles with leafmap ([notebook](https://leafmap.org/notebooks/82_pmtiles))
 83. Visualizing large vector datasets with lonboard ([notebook](https://leafmap.org/notebooks/83_vector_viz))
+84. Reading GeoParquet files and visualizing vector data interactively ([notebook](https://leafmap.org/notebooks/84_read_parquet))
 
 ## Demo
 
