@@ -25,7 +25,7 @@ class Map(lonboard.Map):
         height: int = 600,
         layers: List = [],
         show_tooltip: bool = True,
-        **kwargs
+        **kwargs,
     ) -> None:
         """Initialize a Map object.
 
@@ -57,7 +57,7 @@ class Map(lonboard.Map):
         gdf: gpd.GeoDataFrame,
         zoom_to_layer: bool = True,
         pickable: bool = True,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         """Adds a GeoPandas GeoDataFrame to the map.
 
@@ -104,7 +104,7 @@ class Map(lonboard.Map):
         zoom_to_layer: bool = True,
         pickable: bool = True,
         open_args: dict = {},
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         """Adds a vector layer to the map.
 
@@ -130,7 +130,7 @@ class Map(lonboard.Map):
         layer: Any,
         zoom_to_layer: bool = True,
         pickable: bool = True,
-        **kwargs: Any
+        **kwargs: Any,
     ) -> None:
         """Adds a layer to the map.
 
@@ -157,3 +157,50 @@ class Map(lonboard.Map):
             self.add_vector(
                 layer, zoom_to_layer=zoom_to_layer, pickable=pickable, **kwargs
             )
+
+    def to_html(self, filename: Optional[str] = None) -> None:
+        """Saves the map as an HTML file.
+
+        Args:
+            filename (Optional[str], optional): The output file path to the HTML file. Defaults to None.
+
+        Returns:
+            str: The HTML content if filename is None.
+        """
+
+        if filename is None:
+            filename = temp_file_path("html")
+            super().to_html(filename)
+            with open(filename) as f:
+                html = f.read()
+            return html
+        else:
+            super().to_html(filename)
+
+    def to_streamlit(
+        self,
+        width: Optional[int] = None,
+        height: Optional[int] = 600,
+        scrolling: Optional[bool] = False,
+        **kwargs,
+    ):
+        """Renders `deckgl.Map`in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
+
+        Args:
+            width (int, optional): Width of the map. Defaults to None.
+            height (int, optional): Height of the map. Defaults to 600.
+            scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
+
+        Returns:
+            streamlit.components: components.html object.
+        """
+
+        try:
+            import streamlit.components.v1 as components
+
+            return components.html(
+                self.to_html(), width=width, height=height, scrolling=scrolling
+            )
+
+        except Exception as e:
+            raise e
