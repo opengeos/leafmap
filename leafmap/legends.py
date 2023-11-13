@@ -35,7 +35,7 @@ builtin_legends = {
         "Riverine": (1, 144, 191),
         "Lake": (19, 0, 124),
         "Estuarine and Marine Deepwater": (0, 124, 136),
-        "Other Freshwater Wetland": (178, 134, 86),
+        "Other": (178, 134, 86),
     },
     # MCD12Q1.051 Land Cover Type Yearly Global 500m https://developers.google.com/earth-engine/datasets/catalog/MODIS_051_MCD12Q1
     "MODIS/051/MCD12Q1": {
