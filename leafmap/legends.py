@@ -28,14 +28,14 @@ builtin_legends = {
     },
     # National Wetlands Inventory Legend: https://www.fws.gov/wetlands/data/Mapper-Wetlands-Legend.html
     "NWI": {
-        "Freshwater- Forested and Shrub wetland": (0, 136, 55),
-        "Freshwater Emergent wetland": (127, 195, 28),
-        "Freshwater pond": (104, 140, 192),
-        "Estuarine and Marine wetland": (102, 194, 165),
+        "Freshwater Forested/Shrub Wetland": (0, 136, 55),
+        "Freshwater Emergent Wetland": (127, 195, 28),
+        "Freshwater Pond": (104, 140, 192),
+        "Estuarine and Marine Wetland": (102, 194, 165),
         "Riverine": (1, 144, 191),
-        "Lakes": (19, 0, 124),
+        "Lake": (19, 0, 124),
         "Estuarine and Marine Deepwater": (0, 124, 136),
-        "Other Freshwater wetland": (178, 134, 86),
+        "Other Freshwater Wetland": (178, 134, 86),
     },
     # MCD12Q1.051 Land Cover Type Yearly Global 500m https://developers.google.com/earth-engine/datasets/catalog/MODIS_051_MCD12Q1
     "MODIS/051/MCD12Q1": {
