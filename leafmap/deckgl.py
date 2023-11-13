@@ -1,5 +1,6 @@
 from typing import Union, List, Dict, Optional, Tuple, Any
 from .common import *
+from .map_widgets import *
 
 try:
     import lonboard
@@ -57,6 +58,11 @@ class Map(lonboard.Map):
         gdf: gpd.GeoDataFrame,
         zoom_to_layer: bool = True,
         pickable: bool = True,
+        color_column: Optional[str] = None,
+        color_scheme: Optional[str] = "Quantiles",
+        color_map: Optional[Union[str, Dict]] = None,
+        color_k: Optional[int] = 5,
+        color_args: dict = {},
         **kwargs: Any,
     ) -> None:
         """Adds a GeoPandas GeoDataFrame to the map.
@@ -65,7 +71,20 @@ class Map(lonboard.Map):
             gdf (GeoDataFrame): A GeoPandas GeoDataFrame with geometry column.
             zoom_to_layer (bool, optional): Flag to zoom to the added layer. Defaults to True.
             pickable (bool, optional): Flag to enable picking on the added layer. Defaults to True.
-            **kwargs: Additional keyword arguments that will be passed to the GeoDataFrame.
+            color_column (Optional[str], optional): The column to be used for color encoding. Defaults to None.
+            color_map (Optional[Union[str, Dict]], optional): The color map to use for color encoding. It can be a string or a dictionary. Defaults to None.
+            color_scheme (Optional[str], optional): The color scheme to use for color encoding. Defaults to "Quantiles".
+                Name of a choropleth classification scheme (requires mapclassify).
+                A mapclassify.MapClassifier object will be used
+                under the hood. Supported are all schemes provided by mapclassify (e.g.
+                'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+                'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+                'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+                'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+                'UserDefined'). Arguments can be passed in classification_kwds.
+            color_k (Optional[int], optional): The number of classes to use for color encoding. Defaults to 5.
+            color_args (dict, optional): Additional keyword arguments that will be passed to assign_continuous_colors(). Defaults to {}.
+            **kwargs: Additional keyword arguments that will be passed to lonboard.Layer.from_geopandas()
 
         Returns:
             None
@@ -79,14 +98,56 @@ class Map(lonboard.Map):
         if geom_type in ["Point", "MultiPoint"]:
             if "get_radius" not in kwargs:
                 kwargs["get_radius"] = 10
+            if color_column is not None:
+                if isinstance(color_map, str):
+                    kwargs["get_fill_color"] = assign_continuous_colors(
+                        gdf,
+                        color_column,
+                        color_map,
+                        scheme=color_scheme,
+                        k=color_k,
+                        **color_args,
+                    )
+                elif isinstance(color_map, dict):
+                    kwargs["get_fill_color"] = assign_discrete_colors(
+                        gdf, color_column, color_map, to_rgb=True, return_type="array"
+                    )
             if "get_fill_color" not in kwargs:
                 kwargs["get_fill_color"] = [255, 0, 0, 180]
             layer = ScatterplotLayer.from_geopandas(gdf, **kwargs)
         elif geom_type in ["LineString", "MultiLineString"]:
             if "get_width" not in kwargs:
                 kwargs["get_width"] = 5
+            if color_column is not None:
+                if isinstance(color_map, str):
+                    kwargs["get_color"] = assign_continuous_colors(
+                        gdf,
+                        color_column,
+                        color_map,
+                        scheme=color_scheme,
+                        k=color_k,
+                        **color_args,
+                    )
+                elif isinstance(color_map, dict):
+                    kwargs["get_color"] = assign_discrete_colors(
+                        gdf, color_column, color_map, to_rgb=True, return_type="array"
+                    )
             layer = PathLayer.from_geopandas(gdf, **kwargs)
         elif geom_type in ["Polygon", "MultiPolygon"]:
+            if color_column is not None:
+                if isinstance(color_map, str):
+                    kwargs["get_fill_color"] = assign_continuous_colors(
+                        gdf,
+                        color_column,
+                        color_map,
+                        scheme=color_scheme,
+                        k=color_k,
+                        **color_args,
+                    )
+                elif isinstance(color_map, dict):
+                    kwargs["get_fill_color"] = assign_discrete_colors(
+                        gdf, color_column, color_map, to_rgb=True, return_type="array"
+                    )
             if "get_fill_color" not in kwargs:
                 kwargs["get_fill_color"] = [0, 0, 255, 128]
             layer = SolidPolygonLayer.from_geopandas(gdf, **kwargs)
@@ -103,6 +164,11 @@ class Map(lonboard.Map):
         vector: Union[str, gpd.GeoDataFrame],
         zoom_to_layer: bool = True,
         pickable: bool = True,
+        color_column: Optional[str] = None,
+        color_scheme: Optional[str] = "Quantiles",
+        color_map: Optional[Union[str, Dict]] = None,
+        color_k: Optional[int] = 5,
+        color_args: dict = {},
         open_args: dict = {},
         **kwargs: Any,
     ) -> None:
@@ -112,8 +178,21 @@ class Map(lonboard.Map):
             vector (Union[str, GeoDataFrame]): The file path or URL to the vector data, or a GeoDataFrame.
             zoom_to_layer (bool, optional): Flag to zoom to the added layer. Defaults to True.
             pickable (bool, optional): Flag to enable picking on the added layer. Defaults to True.
-            open_args (dict, optional): Additional keyword arguments that will be passed to gpd.read_file() if vector is a file path or URL. Defaults to {}.
-            **kwargs: Additional keyword arguments that will be passed to the vector layer.
+            color_column (Optional[str], optional): The column to be used for color encoding. Defaults to None.
+            color_map (Optional[Union[str, Dict]], optional): The color map to use for color encoding. It can be a string or a dictionary. Defaults to None.
+            color_scheme (Optional[str], optional): The color scheme to use for color encoding. Defaults to "Quantiles".
+                Name of a choropleth classification scheme (requires mapclassify).
+                A mapclassify.MapClassifier object will be used
+                under the hood. Supported are all schemes provided by mapclassify (e.g.
+                'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+                'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+                'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+                'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+                'UserDefined'). Arguments can be passed in classification_kwds.
+            color_k (Optional[int], optional): The number of classes to use for color encoding. Defaults to 5.
+            color_args (dict, optional): Additional keyword arguments that will be passed to assign_continuous_colors(). Defaults to {}.
+            open_args (dict, optional): Additional keyword arguments that will be passed to geopandas.read_file(). Defaults to {}.
+            **kwargs: Additional keyword arguments that will be passed to lonboard.Layer.from_geopandas()
 
         Returns:
             None
@@ -123,7 +202,17 @@ class Map(lonboard.Map):
             gdf = vector
         else:
             gdf = gpd.read_file(vector, **open_args)
-        self.add_gdf(gdf, zoom_to_layer=zoom_to_layer, pickable=pickable, **kwargs)
+        self.add_gdf(
+            gdf,
+            zoom_to_layer,
+            pickable,
+            color_column,
+            color_scheme,
+            color_map,
+            color_k,
+            color_args,
+            **kwargs,
+        )
 
     def add_layer(
         self,
