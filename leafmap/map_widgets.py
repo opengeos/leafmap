@@ -104,7 +104,7 @@ class Colorbar(ipywidgets.Output):
                 )
                 norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
         elif cmap:
-            cmap = matplotlib.pyplot.get_cmap(cmap)
+            cmap = matplotlib.colormaps[cmap]
             norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
         else:
             raise ValueError(
