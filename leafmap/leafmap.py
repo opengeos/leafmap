@@ -11,6 +11,7 @@ from .legends import builtin_legends
 from .osm import *
 from .pc import *
 from . import examples
+from .map_widgets import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
