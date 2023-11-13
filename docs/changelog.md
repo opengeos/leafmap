@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.29.0 - Nov 12, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.28.1 by @giswqs in [#593](https://github.com/opengeos/leafmap/pull/593)
+-   Add vector_to_parquet function by @giswqs in [#598](https://github.com/opengeos/leafmap/pull/598)
+-   Add support for reading parquet files by @giswqs in [#599](https://github.com/opengeos/leafmap/pull/599)
+-   Add streamlit support for lonboard by @giswqs in [#600](https://github.com/opengeos/leafmap/pull/600)
+-   Add color schemes for visualizing vector data by @giswqs in [#601](https://github.com/opengeos/leafmap/pull/601)
+
+**Full Changelog**: [v0.28.1...v0.29.0](https://github.com/opengeos/leafmap/compare/v0.28.1...v0.29.0)
+
 ## v0.28.1 - Nov 7, 2023
 
 **What's Changed**
