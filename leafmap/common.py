@@ -7985,10 +7985,6 @@ def save_colorbar(
     else:
         alpha = 1
 
-    if cmap is not None:
-        cmap = mpl.colormaps[cmap]
-        norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
-
     if "palette" in vis_params:
         hexcodes = to_hex_colors(vis_params["palette"])
         if discrete:
@@ -11959,12 +11955,12 @@ def assign_continuous_colors(
     k=5,
     legend_kwds=None,
     classification_kwds=None,
-    to_rgb=True, 
+    to_rgb=True,
     return_type="array",
     return_legend=False,
 ):
     import numpy as np
-    
+
     data = df[[column]].copy()
     new_df, legend = classify(
         data, column, cmap, colors, labels, scheme, k, legend_kwds, classification_kwds
