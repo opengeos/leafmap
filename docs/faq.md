@@ -44,8 +44,8 @@ jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
 
 Alternatively, you can run leafmap directly using binder:
 
--   <https://gishub.org/leafmap-binder>
--   <https://gishub.org/leafmap-binder>
+-   <https://mybinder.org/v2/gh/opengeos/leafmap/HEAD>
+-   <https://mybinder.org/v2/gh/opengeos/leafmap/HEAD>
 
 ## How to use leafmap in countries where Google Services are blocked
 
