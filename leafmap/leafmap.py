@@ -2234,6 +2234,7 @@ class Map(ipyleaflet.Map):
 
         # import xarray as xr
         import matplotlib.pyplot as plt
+        import matplotlib as mpl
 
         warnings.simplefilter("ignore")
 
@@ -2249,7 +2250,7 @@ class Map(ipyleaflet.Map):
             layer_name = "Layer_" + random_string()
 
         if isinstance(colormap, str):
-            colormap = plt.cm.get_cmap(name=colormap)
+            colormap = mpl.colormaps[colormap]
 
         if isinstance(image, str):
             da = rioxarray.open_rasterio(image, masked=True)

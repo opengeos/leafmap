@@ -7986,7 +7986,7 @@ def save_colorbar(
         alpha = 1
 
     if cmap is not None:
-        cmap = mpl.pyplot.get_cmap(cmap)
+        cmap = mpl.colormaps[cmap]
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     if "palette" in vis_params:
@@ -8003,7 +8003,7 @@ def save_colorbar(
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     elif cmap is not None:
-        cmap = mpl.pyplot.get_cmap(cmap)
+        cmap = mpl.colormaps[cmap]
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     else:
