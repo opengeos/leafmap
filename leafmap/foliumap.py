@@ -8,6 +8,7 @@ from .legends import builtin_legends
 from .basemaps import xyz_to_folium
 from .osm import *
 from . import examples
+from .map_widgets import *
 
 from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin

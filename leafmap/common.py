@@ -468,7 +468,7 @@ def check_color(in_color: Union[str, Tuple]) -> str:
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
-        in_color (str or tuple): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple (e.g., (255, 127, 0)).
+            in_color (str or tuple or list): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple (e.g., (255, 127, 0)).
 
     Returns:
         str: A hex color code.
@@ -476,7 +476,9 @@ def check_color(in_color: Union[str, Tuple]) -> str:
     import colour
 
     out_color = "#000000"  # default black color
-    if isinstance(in_color, tuple) and len(in_color) == 3:
+    if (isinstance(in_color, tuple) or isinstance(in_color, list)) and len(
+        in_color
+    ) == 3:
         # rescale color if necessary
         if all(isinstance(item, int) for item in in_color):
             in_color = [c / 255.0 for c in in_color]
@@ -4918,7 +4920,11 @@ def classify(
             "mapclassify is required for this function. Install with `pip install mapclassify`."
         )
 
-    if isinstance(data, gpd.GeoDataFrame) or isinstance(data, pd.DataFrame):
+    if (
+        isinstance(data, gpd.GeoDataFrame)
+        or isinstance(data, pd.DataFrame)
+        or isinstance(data, pd.Series)
+    ):
         df = data
     else:
         try:
@@ -11756,9 +11762,7 @@ def vector_to_parquet(
     gdf.to_parquet(output, **kwargs)
 
 
-def df_to_gdf(
-    df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs
-):
+def df_to_gdf(df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
 
@@ -11779,7 +11783,7 @@ def df_to_gdf(
 
     # Convert the pandas DataFrame to a GeoPandas GeoDataFrame
     gdf = gpd.GeoDataFrame(df, geometry=geometry, crs=src_crs, **kwargs)
-    if dst_crs is not None and  dst_crs != src_crs:
+    if dst_crs is not None and dst_crs != src_crs:
         gdf = gdf.to_crs(dst_crs)
 
     return gdf
@@ -11911,3 +11915,68 @@ def read_parquet(
 
     con.close()
     return result
+
+
+def assign_discrete_colors(df, column, cmap, to_rgb=True, return_type="array"):
+    """
+    Assigns unique colors to each category in a categorical column of a dataframe.
+
+    Args:
+        df (pandas.DataFrame): The input dataframe.
+        column (str): The name of the categorical column.
+        cmap (dict): A dictionary mapping categories to colors.
+        to_rgb (bool): Whether to convert the colors to RGB values. Defaults to True.
+        return_type (str): The type of the returned values. Can be 'list' or 'array'. Defaults to 'array'.
+
+    Returns:
+        list: A list of colors for each category in the categorical column.
+    """
+    import numpy as np
+
+    # Copy the categorical column from the original dataframe
+    category_column = df[column].copy()
+
+    # Map colors to the categorical values
+    category_column = category_column.map(cmap)
+
+    values = category_column.values.tolist()
+
+    if to_rgb:
+        values = [hex_to_rgb(check_color(color)) for color in values]
+        if return_type == "array":
+            values = np.array(values, dtype=np.uint8)
+
+    return values
+
+
+def assign_continuous_colors(
+    df,
+    column,
+    cmap=None,
+    colors=None,
+    labels=None,
+    scheme="Quantiles",
+    k=5,
+    legend_kwds=None,
+    classification_kwds=None,
+    to_rgb=True, 
+    return_type="array",
+    return_legend=False,
+):
+    import numpy as np
+    
+    data = df[[column]].copy()
+    new_df, legend = classify(
+        data, column, cmap, colors, labels, scheme, k, legend_kwds, classification_kwds
+    )
+    values = new_df["color"].values.tolist()
+
+    if to_rgb:
+        values = [hex_to_rgb(check_color(color)) for color in values]
+        if return_type == "array":
+            values = np.array(values, dtype=np.uint8)
+
+    if return_legend:
+        return values, legend
+    else:
+        return values
