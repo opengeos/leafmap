@@ -60,8 +60,13 @@ def get_palette(
     if cmap_name in ["dem", "ndvi", "ndwi"]:
         colors = _palette_dict[cmap_name]
     else:
-        cmap = plt.cm.get_cmap(cmap_name, n_class)
-        colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
+        cmap = mpl.colormaps[cmap_name]  # Retrieve colormap
+        if n_class:
+            colors = [
+                mpl.colors.rgb2hex(cmap(i / (n_class - 1)))[1:] for i in range(n_class)
+            ]
+        else:
+            colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
     if hashtag:
         colors = ["#" + i for i in colors]
     return colors
@@ -161,7 +166,7 @@ def create_colormap(
             )
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
     else:
-        col_map = plt.get_cmap(cmap)
+        col_map = mpl.colormaps[cmap]
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     cb = mpl.colorbar.ColorbarBase(
@@ -230,7 +235,7 @@ def plot_colormap(
             )
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
     else:
-        col_map = plt.get_cmap(cmap)
+        col_map = mpl.colormaps[cmap]
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     cb = mpl.colorbar.ColorbarBase(
@@ -275,7 +280,7 @@ def plot_colormaps(
     gradient = np.vstack((gradient, gradient))
 
     for ax, name in zip(axes, cmap_list):
-        ax.imshow(gradient, aspect="auto", cmap=plt.get_cmap(name))
+        ax.imshow(gradient, aspect="auto", cmap=mpl.colormaps[name])
         ax.set_axis_off()
         pos = list(ax.get_position().bounds)
         x_text = pos[0] - 0.01
