@@ -416,6 +416,41 @@ class Map(folium.Map):
             ).add_to(self)
         except Exception as e:
             raise Exception(e)
+        
+    def add_wms_legend(
+        self,
+        url,
+    ):
+        """Add a WMS legend based on an image URL
+
+        Args:
+            url (str): URL of the WMS legend image.
+        """
+        from branca.element import Figure, MacroElement, Element
+    
+        # Check if the map is a Folium Map instance
+        if not isinstance(self, Map):
+            raise ValueError("The self argument must be an instance of folium.Map.")
+
+        # HTML template for the legend
+        legend_html = f"""
+            {{% macro html(this, kwargs) %}}
+            
+            <div id="maplegend" style="position: fixed; 
+                        bottom: 50px;
+                        right: 50px;
+                        z-index:9999; 
+                        ">
+                <img src="{ url }" alt="legend" style="width: 100%; height: 100%;">
+            </div>
+            {{% endmacro %}}
+        """
+        
+        # Create an Element with the HTML and add it to the map
+        macro = MacroElement()
+        macro._template = Template(legend_html)
+
+        self.get_root().add_child(macro)
 
     def add_tile_layer(
         self,
