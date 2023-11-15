@@ -424,7 +424,7 @@ class Map(folium.Map):
         """Add a WMS legend based on an image URL
 
         Args:
-            url (str): URL of the WMS legend image.
+            url (str): URL of the WMS legend image. Should have this format if using wms legend: {geoserver}/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER={layer}
         """
         from branca.element import Figure, MacroElement, Element
     
