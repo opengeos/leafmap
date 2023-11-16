@@ -12,6 +12,7 @@ from .osm import *
 from .pc import *
 from . import examples
 from .map_widgets import *
+from .plot import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
