@@ -1,6 +1,7 @@
 from typing import Union, List, Dict, Optional, Tuple, Any
 from .common import *
 from .map_widgets import *
+from .plot import *
 
 try:
     import lonboard
