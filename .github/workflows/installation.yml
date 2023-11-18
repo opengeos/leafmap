@@ -13,7 +13,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.10"]
+                python-version: ["3.11"]
         steps:
             - uses: actions/checkout@v3
             - name: Set up Python
@@ -24,3 +24,7 @@ jobs:
               run: pip install .
             - name: Test import
               run: python -c "import leafmap; print('leafmap import successful')"
+            - name: Discover typos with codespell
+              run: |
+                  pip install codespell
+                  codespell --skip=".*,.git/*,*.csv,*.geojson,*.json,*.js,*.html,*cff,*.pdf" --ignore-words-list="aci,acount,acounts,fallow,hart,hist,nd,ned,ois,wqs"
