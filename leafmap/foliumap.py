@@ -216,6 +216,7 @@ class Map(folium.Map):
         url,
         style=None,
         name=None,
+        tooltip=True,
         overlay=True,
         control=True,
         show=True,
@@ -230,6 +231,7 @@ class Map(folium.Map):
             style (str, optional): The CSS style to apply to the layer. Defaults to None.
                 See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
             name (str, optional): The name of the layer. Defaults to None.
+            tooltip (bool, optional): Whether to show a tooltip when hovering over the layer. Defaults to True.
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
             show (bool, optional): Whether the layer should be shown initially. Defaults to True.
@@ -245,6 +247,7 @@ class Map(folium.Map):
                 url,
                 style=style,
                 name=name,
+                tooltip=tooltip,
                 overlay=overlay,
                 control=control,
                 show=show,
@@ -417,7 +420,7 @@ class Map(folium.Map):
             ).add_to(self)
         except Exception as e:
             raise Exception(e)
-        
+
     def add_wms_legend(
         self,
         url,
@@ -428,7 +431,7 @@ class Map(folium.Map):
             url (str): URL of the WMS legend image. Should have this format if using wms legend: {geoserver}/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER={layer}
         """
         from branca.element import Figure, MacroElement, Element
-    
+
         # Check if the map is a Folium Map instance
         if not isinstance(self, Map):
             raise ValueError("The self argument must be an instance of folium.Map.")
@@ -446,7 +449,7 @@ class Map(folium.Map):
             </div>
             {{% endmacro %}}
         """
-        
+
         # Create an Element with the HTML and add it to the map
         macro = MacroElement()
         macro._template = Template(legend_html)
@@ -3724,7 +3727,8 @@ class PMTilesLayer(JSCSSMixin, Layer):
 
             var {{ this.get_name() }} = L.maplibreGL({
             pane: 'overlay',
-            style: {{ this.style|tojson}}
+            style: {{ this.style|tojson}},
+            interactive: true,
             }).addTo({{ this._parent.get_name() }});
 
             {%- endmacro %}
@@ -3748,6 +3752,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
         url,
         style=None,
         name=None,
+        tooltip=True,
         overlay=True,
         show=True,
         control=True,
@@ -3760,6 +3765,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
             url (str): The URL of the PMTiles file.
             style (dict, optional): The style to apply to the layer. Defaults to None.
             name (str, optional): The name of the layer. Defaults to None.
+            tooltip (bool, optional): Whether to show a tooltip. Defaults to True.
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             show (bool, optional): Whether the layer should be shown initially. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
@@ -3778,7 +3784,75 @@ class PMTilesLayer(JSCSSMixin, Layer):
         self.url = url
         self._name = "PMTilesVector"
 
+        if tooltip:
+            self.add_child(PMTilesMapLibreTooltip())
+
         if style is not None:
             self.style = style
         else:
             self.style = {}
+
+
+class PMTilesMapLibreTooltip(JSCSSMixin, Layer):
+    """Creates a PMTilesMapLibreTooltip object for displaying tooltips.
+    Adapted from https://github.com/jtmiclat/folium-pmtiles. Credits to @jtmiclat.
+    """
+
+    _template = Template(
+        """
+            {% macro header(this, kwargs) %}
+            <style>
+            .maplibregl-popup {
+                font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                z-index: 651;
+            }
+            .feature-row{
+                margin-bottom: 0.5em;
+                &:not(:last-of-type) {
+                    border-bottom: 1px solid black;
+                }
+            }
+            </style>
+            {% endmacro %}
+            {% macro script(this, kwargs) -%}
+                var {{ this.get_name() }} = {{ this._parent.get_name() }}.getMaplibreMap();
+                const popup = new maplibregl.Popup({
+                    closeButton: false,
+                    closeOnClick: false
+                });
+                {{ this.get_name() }}.on('load', () => {
+                    {{ this.get_name() }}.on('mousemove', (e) => { 
+                        {{ this.get_name() }}.getCanvas().style.cursor = 'pointer';
+                        const { x, y } = e.point;
+                        const r = 2; // radius around the point
+                        const features = {{ this.get_name() }}.queryRenderedFeatures([
+                            [x - r, y - r],
+                            [x + r, y + r],
+                        ]);
+                        const {lng, lat}  = e.lngLat;
+                        const coordinates = [lng, lat]
+                        const html = features.map(f=>`
+                        <div class="feature-row">
+                            <span>
+                                <strong>${f.layer['source-layer']}</strong>
+                                <span style="fontSize: 0.8em" }> (${f.geometry.type})</span>
+                            </span>
+                            <table>
+                                ${Object.entries(f.properties).map(([key, value]) =>`<tr><td>${key}</td><td style="text-align: right">${value}</td></tr>`).join("")}
+                            </table>
+                        </div>
+                        `).join("")
+                        if(features.length){
+                            popup.setLngLat(e.lngLat).setHTML(html).addTo({{ this.get_name() }});
+                        } else {
+                            popup.remove();
+                        }
+                    });
+                    {{ this.get_name() }}.on('mouseleave', () => {popup.remove();});
+                });
+            {%- endmacro %}
+            """
+    )
+
+    def __init__(self, name=None, **kwargs):
+        super().__init__(name=name if name else "PMTilesTooltip", **kwargs)
