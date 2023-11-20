@@ -374,6 +374,38 @@ def show_html(html: str):
             raise Exception(e)
 
 
+def display_html(
+    html: Union[str, bytes], width: str = "100%", height: int = 500
+) -> None:
+    """
+    Displays an HTML file or HTML string in a Jupyter Notebook.
+
+    Args:
+        html (Union[str, bytes]): Path to an HTML file or an HTML string.
+        width (str, optional): Width of the displayed iframe. Default is '100%'.
+        height (int, optional): Height of the displayed iframe. Default is 500.
+
+    Returns:
+        None
+    """
+    from IPython.display import IFrame, display
+
+    if isinstance(html, str) and html.startswith("<"):
+        # If the input is an HTML string
+        html_content = html
+    elif isinstance(html, str):
+        # If the input is a file path
+        with open(html, "r") as file:
+            html_content = file.read()
+    elif isinstance(html, bytes):
+        # If the input is a byte string
+        html_content = html.decode("utf-8")
+    else:
+        raise ValueError("Invalid input type. Expected a file path or an HTML string.")
+
+    display(IFrame(srcdoc=html_content, width=width, height=height))
+
+
 def has_transparency(img) -> bool:
     """Checks whether an image has transparency.
 
