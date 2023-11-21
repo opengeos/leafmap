@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.29.2 - Nov 21, 2023
+
+**What's Changed**
+
+-   Add wms legend method to Map class by @JJFlorian in [#608](https://github.com/opengeos/leafmap/pull/608)
+-   Update GitHub Actions to Python 3.11 by @giswqs in [#612](https://github.com/opengeos/leafmap/pull/612)
+-   Add tooltip for PMTiles by @giswqs in [#613](https://github.com/opengeos/leafmap/pull/613)
+
+**New Contributors**
+
+-   @JJFlorian made their first contribution in [#608](https://github.com/opengeos/leafmap/pull/608)
+
+**Full Changelog**: [v0.29.1...v0.29.2](https://github.com/opengeos/leafmap/compare/v0.29.1...v0.29.2)
+
+## v0.29.1 - Nov 6, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.0 by @giswqs in [#602](https://github.com/opengeos/leafmap/pull/602)
+-   Update notebook 84 by @giswqs in [#603](https://github.com/opengeos/leafmap/pull/603)
+-   Update NWI legend by @giswqs in [#604](https://github.com/opengeos/leafmap/pull/604)
+-   Add plot functions by @giswqs in [#609](https://github.com/opengeos/leafmap/pull/609)
+
+**Full Changelog**: [v0.29.0...v0.29.1](https://github.com/opengeos/leafmap/compare/v0.29.0...v0.29.1)
+
 ## v0.29.0 - Nov 12, 2023
 
 **What's Changed**
