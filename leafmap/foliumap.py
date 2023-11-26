@@ -243,6 +243,8 @@ class Map(folium.Map):
         """
 
         try:
+            if style is None:
+                style = pmtiles_style(url)
             layer = PMTilesLayer(
                 url,
                 style=style,
