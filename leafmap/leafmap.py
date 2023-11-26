@@ -597,7 +597,7 @@ class Map(ipyleaflet.Map):
     def add_pmtiles(
         self,
         url,
-        style={},
+        style=None,
         name="PMTiles",
         show=True,
         zoom_to_layer=True,
@@ -627,6 +627,9 @@ class Map(ipyleaflet.Map):
 
             if "version" in kwargs:
                 del kwargs["version"]
+
+            if style is None:
+                style = pmtiles_style(url)
 
             layer = ipyleaflet.PMTilesLayer(
                 url=url,
