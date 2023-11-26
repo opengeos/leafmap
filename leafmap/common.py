@@ -11363,6 +11363,132 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
     return metadata
 
 
+def pmtiles_style(
+    url: str,
+    layers: Optional[Union[str, List[str]]] = None,
+    cmap: str = "Set3",
+    n_class: Optional[int] = None,
+    opacity: float = 0.5,
+    circle_radius: int = 5,
+    line_width: int = 1,
+    attribution: str = "PMTiles",
+    **kwargs,
+):
+    """
+    Generates a Mapbox style JSON for rendering PMTiles data.
+
+    Args:
+        url (str): The URL of the PMTiles file.
+        layers (str or list[str], optional): The layers to include in the style. If None, all layers will be included.
+            Defaults to None.
+        cmap (str, optional): The color map to use for styling the layers. Defaults to "Set3".
+        n_class (int, optional): The number of classes to use for styling. If None, the number of classes will be
+            determined automatically based on the color map. Defaults to None.
+        opacity (float, optional): The fill opacity for polygon layers. Defaults to 0.5.
+        circle_radius (int, optional): The circle radius for point layers. Defaults to 5.
+        line_width (int, optional): The line width for line layers. Defaults to 1.
+        attribution (str, optional): The attribution text for the data source. Defaults to "PMTiles".
+
+    Returns:
+        dict: The Mapbox style JSON.
+
+    Raises:
+        ValueError: If the layers argument is not a string or a list.
+        ValueError: If a layer specified in the layers argument does not exist in the PMTiles file.
+    """
+
+    if cmap == "Set3":
+        palette = [
+            "#8dd3c7",
+            "#ffffb3",
+            "#bebada",
+            "#fb8072",
+            "#80b1d3",
+            "#fdb462",
+            "#b3de69",
+            "#fccde5",
+            "#d9d9d9",
+            "#bc80bd",
+            "#ccebc5",
+            "#ffed6f",
+        ]
+    elif isinstance(cmap, list):
+        palette = cmap
+    else:
+        from .colormaps import get_palette
+
+        palette = ["#" + c for c in get_palette(cmap, n_class)]
+
+    n_class = len(palette)
+
+    metadata = pmtiles_metadata(url)
+    layer_names = metadata["layer_names"]
+
+    style = {
+        "version": 8,
+        "sources": {
+            "source": {
+                "type": "vector",
+                "url": "pmtiles://" + url,
+                "attribution": attribution,
+            }
+        },
+        "layers": [],
+    }
+
+    if layers is None:
+        layers = layer_names
+    elif isinstance(layers, str):
+        layers = [layers]
+    elif isinstance(layers, list):
+        for layer in layers:
+            if layer not in layer_names:
+                raise ValueError(f"Layer {layer} does not exist in the PMTiles file.")
+    else:
+        raise ValueError("The layers argument must be a string or a list.")
+
+    for i, layer_name in enumerate(layers):
+        layer_point = {
+            "id": f"{layer_name}_point",
+            "source": "source",
+            "source-layer": layer_name,
+            "type": "circle",
+            "paint": {
+                "circle-color": palette[i % n_class],
+                "circle-radius": circle_radius,
+            },
+            "filter": ["==", ["geometry-type"], "Point"],
+        }
+
+        layer_stroke = {
+            "id": f"{layer_name}_stroke",
+            "source": "source",
+            "source-layer": layer_name,
+            "type": "line",
+            "paint": {
+                "line-color": palette[i % n_class],
+                "line-width": line_width,
+            },
+            "filter": ["==", ["geometry-type"], "LineString"],
+        }
+
+        layer_fill = {
+            "id": f"{layer_name}_fill",
+            "source": "source",
+            "source-layer": layer_name,
+            "type": "fill",
+            "paint": {
+                "fill-color": palette[i % n_class],
+                "fill-opacity": opacity,
+            },
+            "filter": ["==", ["geometry-type"], "Polygon"],
+        }
+
+        style["layers"].extend([layer_point, layer_stroke, layer_fill])
+
+    return style
+
+
 def raster_to_vector(
     source, output, simplify_tolerance=None, dst_crs=None, open_args={}, **kwargs
 ):
