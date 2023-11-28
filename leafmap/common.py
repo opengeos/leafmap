@@ -12276,7 +12276,8 @@ def gedi_search(
         granules = response.json()["feed"]["entry"]
 
         if granules:
-            for g in granules:
+            for index, g in enumerate(granules):
+
                 granule_url = ""
                 granule_poly = ""
 
@@ -12308,7 +12309,23 @@ def gedi_search(
                         and links["title"].endswith(".h5")
                     ):
                         granule_url = links["href"]
-                granule_arr.append([granule_url, granule_size, granule_poly])
+
+                granule_id = g["id"]
+                title = g["title"]
+                time_start = g["time_start"]
+                time_end = g["time_end"]
+
+                granule_arr.append(
+                    [
+                        granule_id,
+                        title,
+                        time_start,
+                        time_end,
+                        granule_size,
+                        granule_url,
+                        granule_poly,
+                    ]
+                )
 
             page_num += 1
         else:
@@ -12318,14 +12335,23 @@ def gedi_search(
     if add_roi:
         if isinstance(roi, list) or isinstance(roi, tuple):
             b = list(roi)
-            granule_arr.append(["roi", 0, box(b[0], b[1], b[2], b[3])])
+            granule_arr.append(
+                ["roi", None, None, None, 0, None, box(b[0], b[1], b[2], b[3])]
+            )
         else:
-            granule_arr.append(["roi", 0, roi.geometry.item()])
+            granule_arr.append(["roi", None, None, None, 0, None, roi.geometry.item()])
 
     # Create a pandas dataframe
-    l4adf = pd.DataFrame(
-        granule_arr, columns=["granule_url", "granule_size", "granule_poly"]
-    )
+    columns = [
+        "id",
+        "title",
+        "time_start",
+        "time_end",
+        "granule_size",
+        "granule_url",
+        "granule_poly",
+    ]
+    l4adf = pd.DataFrame(granule_arr, columns=columns)
 
     # Drop granules with empty geometry
     l4adf = l4adf[l4adf["granule_poly"] != ""]
@@ -12337,9 +12363,8 @@ def gedi_search(
         gdf.crs = "EPSG:4326"
         return gdf
     elif return_type == "csv":
-        return l4adf.to_csv(
-            output, index=False, columns=["granule_url", "granule_size"]
-        )
+        columns.remove("granule_poly")
+        return l4adf.to_csv(output, index=False, columns=columns)
     else:
         raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
 
@@ -12356,6 +12381,7 @@ def gedi_download_file(
             e.g., https://daac.ornl.gov/daacdata/gedi/GEDI_L4A_AGB_Density_V2_1/data/GEDI04_A_2019298202754_O04921_01_T02899_02_002_02_V002.h5
         filename (str, optional): The name of the file to save the downloaded content to. Defaults to None.
         username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+            Create an account at https://urs.earthdata.nasa.gov
         password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
 
     Returns:
@@ -12371,7 +12397,9 @@ def gedi_download_file(
         password = os.environ.get("EARTHDATA_PASSWORD", None)
 
     if username is None or password is None:
-        raise ValueError("Username and password must be provided.")
+        raise ValueError(
+            "Username and password must be provided. Create an account at https://urs.earthdata.nasa.gov."
+        )
 
     with requests.Session() as session:
         r1 = session.request("get", url, stream=True)
@@ -12395,3 +12423,82 @@ def gedi_download_file(
                     file.write(data)
 
             progress_bar.close()
+
+
+def gedi_download_files(
+    urls: List[str],
+    outdir: str = None,
+    filenames: str = None,
+    username: str = None,
+    password: str = None,
+) -> None:
+    """
+    Downloads files from the given URLs and saves them to the specified directory.
+    If no directory is provided, the current directory will be used.
+    If no filenames are provided, the names of the files from the URLs will be used.
+
+    Args:
+        urls (List[str]): The URLs of the files to download.
+            e.g., ["https://example.com/file1.txt", "https://example.com/file2.txt"]
+        outdir (str, optional): The directory to save the downloaded files to. Defaults to None.
+        filenames (str, optional): The names of the files to save the downloaded content to. Defaults to None.
+        username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+            Create an account at https://urs.earthdata.nasa.gov
+        password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+
+    Returns:
+        None
+    """
+
+    import requests
+    from tqdm import tqdm
+    from urllib.parse import urlparse
+    import geopandas as gpd
+
+    if isinstance(urls, gpd.GeoDataFrame):
+        urls = urls["granule_url"].tolist()
+
+    session = requests.Session()
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("Username and password must be provided.")
+
+    if outdir is None:
+        outdir = os.getcwd()
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    for index, url in enumerate(urls):
+        print(f"Downloading file {index+1} of {len(urls)}...")
+
+        r1 = session.request("get", url, stream=True)
+        r = session.get(r1.url, auth=(username, password), stream=True)
+
+        if r.status_code == 200:
+            total_size = int(r.headers.get("content-length", 0))
+            block_size = 1024  # 1 KB
+
+            # Use the filename from the URL if not provided
+            if not filenames:
+                parsed_url = urlparse(url)
+                filename = parsed_url.path.split("/")[-1]
+            else:
+                filename = filenames.pop(0)
+
+            filepath = os.path.join(outdir, filename)
+            progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
+
+            with open(filepath, "wb") as file:
+                for data in r.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+
+            progress_bar.close()
+
+    session.close()
