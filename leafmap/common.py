@@ -12162,12 +12162,13 @@ def gedi_search(
     add_roi: bool = False,
     return_type: str = "gdf",
     output: Optional[str] = None,
+    sort_filesize: bool = False,
     **kwargs,
 ):
     """
     Searches for GEDI data using the Common Metadata Repository (CMR) API.
     The source code for this function is adapted from https://github.com/ornldaac/gedi_tutorials.
-    Credits to the ORNL DAAC and Rupesh Shrestha.
+    Credits to ORNL DAAC and Rupesh Shrestha.
 
     Args:
         roi: A list, tuple, or file path representing the bounding box coordinates
@@ -12183,6 +12184,7 @@ def gedi_search(
             (DataFrame), 'gdf' (GeoDataFrame), or 'csv' (CSV file). Default is 'gdf'.
         output: The file path to save the CSV output when return_type is 'csv'.
             Optional and only applicable when return_type is 'csv'.
+        sort_filesize: A boolean value indicating whether to sort the search results.
         **kwargs: Additional keyword arguments to be passed to the CMR API.
 
     Returns:
@@ -12277,7 +12279,6 @@ def gedi_search(
 
         if granules:
             for index, g in enumerate(granules):
-
                 granule_url = ""
                 granule_poly = ""
 
@@ -12356,6 +12357,9 @@ def gedi_search(
     # Drop granules with empty geometry
     l4adf = l4adf[l4adf["granule_poly"] != ""]
 
+    if sort_filesize:
+        l4adf = l4adf.sort_values(by=["granule_size"], ascending=True)
+
     if return_type == "df":
         return l4adf
     elif return_type == "gdf":
@@ -12431,6 +12435,7 @@ def gedi_download_files(
     filenames: str = None,
     username: str = None,
     password: str = None,
+    overwrite: bool = False,
 ) -> None:
     """
     Downloads files from the given URLs and saves them to the specified directory.
@@ -12445,6 +12450,7 @@ def gedi_download_files(
         username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
             Create an account at https://urs.earthdata.nasa.gov
         password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+        overwrite (bool): Whether to overwrite the existing output files. Default is False.
 
     Returns:
         None
@@ -12477,6 +12483,9 @@ def gedi_download_files(
     for index, url in enumerate(urls):
         print(f"Downloading file {index+1} of {len(urls)}...")
 
+        if url is None:
+            continue
+
         r1 = session.request("get", url, stream=True)
         r = session.get(r1.url, auth=(username, password), stream=True)
 
@@ -12492,6 +12501,9 @@ def gedi_download_files(
                 filename = filenames.pop(0)
 
             filepath = os.path.join(outdir, filename)
+            if os.path.exists(filepath) and not overwrite:
+                print(f"File {filepath} already exists. Skipping...")
+                continue
             progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
 
             with open(filepath, "wb") as file:
