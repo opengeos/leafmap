@@ -12105,18 +12105,37 @@ def assign_discrete_colors(df, column, cmap, to_rgb=True, return_type="array"):
 
 def assign_continuous_colors(
     df,
-    column,
-    cmap=None,
-    colors=None,
-    labels=None,
-    scheme="Quantiles",
-    k=5,
-    legend_kwds=None,
-    classification_kwds=None,
-    to_rgb=True,
-    return_type="array",
-    return_legend=False,
+    column: str,
+    cmap: str = None,
+    colors: list = None,
+    labels: list = None,
+    scheme: str = "Quantiles",
+    k: int = 5,
+    legend_kwds: dict = None,
+    classification_kwds: dict = None,
+    to_rgb: bool = True,
+    return_type: str = "array",
+    return_legend: bool = False,
 ):
+    """Assigns continuous colors to a DataFrame column based on a specified scheme.
+
+    Args:
+        df: A pandas DataFrame.
+        column: The name of the column to assign colors.
+        cmap: The name of the colormap to use.
+        colors: A list of custom colors.
+        labels: A list of custom labels for the legend.
+        scheme: The scheme for classifying the data. Default is 'Quantiles'.
+        k: The number of classes for classification.
+        legend_kwds: Additional keyword arguments for configuring the legend.
+        classification_kwds: Additional keyword arguments for configuring the classification.
+        to_rgb: Whether to convert colors to RGB values. Default is True.
+        return_type: The type of the returned values. Default is 'array'.
+        return_legend: Whether to return the legend. Default is False.
+
+    Returns:
+        The assigned colors as a numpy array or a tuple containing the colors and the legend, depending on the value of return_legend.
+    """
     import numpy as np
 
     data = df[[column]].copy()
@@ -12134,3 +12153,192 @@ def assign_continuous_colors(
         return values, legend
     else:
         return values
+
+
+def gedi_search(
+    roi,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    add_roi: bool = False,
+    return_type: str = "gdf",
+    output: Optional[str] = None,
+    **kwargs,
+):
+    """
+    Searches for GEDI data using the Common Metadata Repository (CMR) API.
+    The source code for this function is adapted from https://github.com/ornldaac/gedi_tutorials.
+    Credits to the ORNL DAAC and Rupesh Shrestha.
+
+    Args:
+        roi: A list, tuple, or file path representing the bounding box coordinates
+            in the format (min_lon, min_lat, max_lon, max_lat), or a GeoDataFrame
+            containing the region of interest geometry.
+        start_date: The start date of the temporal range to search for data
+            in the format 'YYYY-MM-DD'.
+        end_date: The end date of the temporal range to search for data
+            in the format 'YYYY-MM-DD'.
+        add_roi: A boolean value indicating whether to include the region of interest
+            as a granule in the search results. Default is False.
+        return_type: The type of the search results to return. Must be one of 'df'
+            (DataFrame), 'gdf' (GeoDataFrame), or 'csv' (CSV file). Default is 'gdf'.
+        output: The file path to save the CSV output when return_type is 'csv'.
+            Optional and only applicable when return_type is 'csv'.
+        **kwargs: Additional keyword arguments to be passed to the CMR API.
+
+    Returns:
+        The search results as a pandas DataFrame (return_type='df'), geopandas GeoDataFrame
+        (return_type='gdf'), or a CSV file (return_type='csv').
+
+    Raises:
+        ValueError: If roi is not a list, tuple, or file path.
+
+    """
+
+    import requests
+    import datetime as dt
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import MultiPolygon, Polygon, box
+    from shapely.ops import orient
+
+    # CMR API base url
+    cmrurl = "https://cmr.earthdata.nasa.gov/search/"
+
+    doi = "10.3334/ORNLDAAC/2056"  # GEDI L4A DOI
+
+    # Construct the DOI search URL
+    doisearch = cmrurl + "collections.json?doi=" + doi
+
+    # Send a request to the CMR API to get the concept ID
+    response = requests.get(doisearch)
+    response.raise_for_status()
+    concept_id = response.json()["feed"]["entry"][0]["id"]
+
+    # CMR formatted start and end times
+    if start_date is not None and end_date is not None:
+        dt_format = "%Y-%m-%dT%H:%M:%SZ"
+        start_date = dt.datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = dt.datetime.strptime(end_date, "%Y-%m-%d")
+        temporal_str = (
+            start_date.strftime(dt_format) + "," + end_date.strftime(dt_format)
+        )
+    else:
+        temporal_str = None
+
+    # CMR formatted bounding box
+    if isinstance(roi, list) or isinstance(roi, tuple):
+        bound_str = ",".join(map(str, roi))
+    elif isinstance(roi, str):
+        roi = gpd.read_file(roi)
+        roi.geometry = roi.geometry.apply(orient, args=(1,))  # make counter-clockwise
+    elif isinstance(roi, gpd.GeoDataFrame):
+        roi.geometry = roi.geometry.apply(orient, args=(1,))  # make counter-clockwise
+    else:
+        raise ValueError("roi must be a list, tuple, or a file path.")
+
+    page_num = 1
+    page_size = 2000  # CMR page size limit
+
+    granule_arr = []
+
+    while True:
+        # Define CMR search parameters
+        cmr_param = {
+            "collection_concept_id": concept_id,
+            "page_size": page_size,
+            "page_num": page_num,
+        }
+
+        if temporal_str is not None:
+            cmr_param["temporal"] = temporal_str
+
+        if kwargs:
+            cmr_param.update(kwargs)
+
+        granulesearch = cmrurl + "granules.json"
+
+        if isinstance(roi, list) or isinstance(roi, tuple):
+            cmr_param["bounding_box[]"] = bound_str
+            response = requests.get(granulesearch, params=cmr_param)
+            response.raise_for_status()
+        else:
+            cmr_param["simplify-shapefile"] = "true"
+            geojson = {
+                "shapefile": (
+                    "region.geojson",
+                    roi.geometry.to_json(),
+                    "application/geo+json",
+                )
+            }
+            response = requests.post(granulesearch, data=cmr_param, files=geojson)
+
+        # Send a request to the CMR API to get the granules
+        granules = response.json()["feed"]["entry"]
+
+        if granules:
+            for g in granules:
+                granule_url = ""
+                granule_poly = ""
+
+                # Read file size
+                granule_size = float(g["granule_size"])
+
+                # Read bounding geometries
+                if "polygons" in g:
+                    polygons = g["polygons"]
+                    multipolygons = []
+                    for poly in polygons:
+                        i = iter(poly[0].split(" "))
+                        ltln = list(map(" ".join, zip(i, i)))
+                        multipolygons.append(
+                            Polygon(
+                                [
+                                    [float(p.split(" ")[1]), float(p.split(" ")[0])]
+                                    for p in ltln
+                                ]
+                            )
+                        )
+                    granule_poly = MultiPolygon(multipolygons)
+
+                # Get URL to HDF5 files
+                for links in g["links"]:
+                    if (
+                        "title" in links
+                        and links["title"].startswith("Download")
+                        and links["title"].endswith(".h5")
+                    ):
+                        granule_url = links["href"]
+                granule_arr.append([granule_url, granule_size, granule_poly])
+
+            page_num += 1
+        else:
+            break
+
+    # Add bound as the last row into the dataframe
+    if add_roi:
+        if isinstance(roi, list) or isinstance(roi, tuple):
+            b = list(roi)
+            granule_arr.append(["roi", 0, box(b[0], b[1], b[2], b[3])])
+        else:
+            granule_arr.append(["roi", 0, roi.geometry.item()])
+
+    # Create a pandas dataframe
+    l4adf = pd.DataFrame(
+        granule_arr, columns=["granule_url", "granule_size", "granule_poly"]
+    )
+
+    # Drop granules with empty geometry
+    l4adf = l4adf[l4adf["granule_poly"] != ""]
+
+    if return_type == "df":
+        return l4adf
+    elif return_type == "gdf":
+        gdf = gpd.GeoDataFrame(l4adf, geometry="granule_poly")
+        gdf.crs = "EPSG:4326"
+        return gdf
+    elif return_type == "csv":
+        return l4adf.to_csv(
+            output, index=False, columns=["granule_url", "granule_size"]
+        )
+    else:
+        raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
