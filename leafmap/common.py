@@ -12342,3 +12342,56 @@ def gedi_search(
         )
     else:
         raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
+
+
+def gedi_download_file(
+    url: str, filename: str = None, username: str = None, password: str = None
+) -> None:
+    """
+    Downloads a file from the given URL and saves it to the specified filename.
+    If no filename is provided, the name of the file from the URL will be used.
+
+    Args:
+        url (str): The URL of the file to download.
+            e.g., https://daac.ornl.gov/daacdata/gedi/GEDI_L4A_AGB_Density_V2_1/data/GEDI04_A_2019298202754_O04921_01_T02899_02_002_02_V002.h5
+        filename (str, optional): The name of the file to save the downloaded content to. Defaults to None.
+        username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+        password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+
+    Returns:
+        None
+    """
+    import requests
+    from tqdm import tqdm
+    from urllib.parse import urlparse
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("Username and password must be provided.")
+
+    with requests.Session() as session:
+        r1 = session.request("get", url, stream=True)
+        r = session.get(r1.url, auth=(username, password), stream=True)
+        print(r.status_code)
+
+        if r.status_code == 200:
+            total_size = int(r.headers.get("content-length", 0))
+            block_size = 1024  # 1 KB
+
+            # Use the filename from the URL if not provided
+            if not filename:
+                parsed_url = urlparse(url)
+                filename = parsed_url.path.split("/")[-1]
+
+            progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
+
+            with open(filename, "wb") as file:
+                for data in r.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+
+            progress_bar.close()
