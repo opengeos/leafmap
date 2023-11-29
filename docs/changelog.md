@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.29.3 - Nov 26, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.2 by @giswqs in [#614](https://github.com/opengeos/leafmap/pull/614)
+-   Add default style for rendering PMTiles by @giswqs in [#617](https://github.com/opengeos/leafmap/pull/617)
+
+**Full Changelog**: [v0.29.2...v0.29.3](https://github.com/opengeos/leafmap/compare/v0.29.2...v0.29.3)
+
 ## v0.29.2 - Nov 21, 2023
 
 **What's Changed**
