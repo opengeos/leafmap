@@ -325,7 +325,7 @@ class Map(folium.Map):
 
         try:
             if basemap in ["ROADMAP", "SATELLITE", "HYBRID", "TERRAIN"]:
-                layer = get_google_map(basemap, backend="folium", **kwargs)
+                layer = get_google_map(basemap, backend="folium", show=show, **kwargs)
                 layer.add_to(self)
                 return
 
