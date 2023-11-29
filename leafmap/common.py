@@ -12105,18 +12105,37 @@ def assign_discrete_colors(df, column, cmap, to_rgb=True, return_type="array"):
 
 def assign_continuous_colors(
     df,
-    column,
-    cmap=None,
-    colors=None,
-    labels=None,
-    scheme="Quantiles",
-    k=5,
-    legend_kwds=None,
-    classification_kwds=None,
-    to_rgb=True,
-    return_type="array",
-    return_legend=False,
+    column: str,
+    cmap: str = None,
+    colors: list = None,
+    labels: list = None,
+    scheme: str = "Quantiles",
+    k: int = 5,
+    legend_kwds: dict = None,
+    classification_kwds: dict = None,
+    to_rgb: bool = True,
+    return_type: str = "array",
+    return_legend: bool = False,
 ):
+    """Assigns continuous colors to a DataFrame column based on a specified scheme.
+
+    Args:
+        df: A pandas DataFrame.
+        column: The name of the column to assign colors.
+        cmap: The name of the colormap to use.
+        colors: A list of custom colors.
+        labels: A list of custom labels for the legend.
+        scheme: The scheme for classifying the data. Default is 'Quantiles'.
+        k: The number of classes for classification.
+        legend_kwds: Additional keyword arguments for configuring the legend.
+        classification_kwds: Additional keyword arguments for configuring the classification.
+        to_rgb: Whether to convert colors to RGB values. Default is True.
+        return_type: The type of the returned values. Default is 'array'.
+        return_legend: Whether to return the legend. Default is False.
+
+    Returns:
+        The assigned colors as a numpy array or a tuple containing the colors and the legend, depending on the value of return_legend.
+    """
     import numpy as np
 
     data = df[[column]].copy()
@@ -12134,3 +12153,364 @@ def assign_continuous_colors(
         return values, legend
     else:
         return values
+
+
+def gedi_search(
+    roi,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    add_roi: bool = False,
+    return_type: str = "gdf",
+    output: Optional[str] = None,
+    sort_filesize: bool = False,
+    **kwargs,
+):
+    """
+    Searches for GEDI data using the Common Metadata Repository (CMR) API.
+    The source code for this function is adapted from https://github.com/ornldaac/gedi_tutorials.
+    Credits to ORNL DAAC and Rupesh Shrestha.
+
+    Args:
+        roi: A list, tuple, or file path representing the bounding box coordinates
+            in the format (min_lon, min_lat, max_lon, max_lat), or a GeoDataFrame
+            containing the region of interest geometry.
+        start_date: The start date of the temporal range to search for data
+            in the format 'YYYY-MM-DD'.
+        end_date: The end date of the temporal range to search for data
+            in the format 'YYYY-MM-DD'.
+        add_roi: A boolean value indicating whether to include the region of interest
+            as a granule in the search results. Default is False.
+        return_type: The type of the search results to return. Must be one of 'df'
+            (DataFrame), 'gdf' (GeoDataFrame), or 'csv' (CSV file). Default is 'gdf'.
+        output: The file path to save the CSV output when return_type is 'csv'.
+            Optional and only applicable when return_type is 'csv'.
+        sort_filesize: A boolean value indicating whether to sort the search results.
+        **kwargs: Additional keyword arguments to be passed to the CMR API.
+
+    Returns:
+        The search results as a pandas DataFrame (return_type='df'), geopandas GeoDataFrame
+        (return_type='gdf'), or a CSV file (return_type='csv').
+
+    Raises:
+        ValueError: If roi is not a list, tuple, or file path.
+
+    """
+
+    import requests
+    import datetime as dt
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import MultiPolygon, Polygon, box
+    from shapely.ops import orient
+
+    # CMR API base url
+    cmrurl = "https://cmr.earthdata.nasa.gov/search/"
+
+    doi = "10.3334/ORNLDAAC/2056"  # GEDI L4A DOI
+
+    # Construct the DOI search URL
+    doisearch = cmrurl + "collections.json?doi=" + doi
+
+    # Send a request to the CMR API to get the concept ID
+    response = requests.get(doisearch)
+    response.raise_for_status()
+    concept_id = response.json()["feed"]["entry"][0]["id"]
+
+    # CMR formatted start and end times
+    if start_date is not None and end_date is not None:
+        dt_format = "%Y-%m-%dT%H:%M:%SZ"
+        start_date = dt.datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = dt.datetime.strptime(end_date, "%Y-%m-%d")
+        temporal_str = (
+            start_date.strftime(dt_format) + "," + end_date.strftime(dt_format)
+        )
+    else:
+        temporal_str = None
+
+    # CMR formatted bounding box
+    if isinstance(roi, list) or isinstance(roi, tuple):
+        bound_str = ",".join(map(str, roi))
+    elif isinstance(roi, str):
+        roi = gpd.read_file(roi)
+        roi.geometry = roi.geometry.apply(orient, args=(1,))  # make counter-clockwise
+    elif isinstance(roi, gpd.GeoDataFrame):
+        roi.geometry = roi.geometry.apply(orient, args=(1,))  # make counter-clockwise
+    else:
+        raise ValueError("roi must be a list, tuple, or a file path.")
+
+    page_num = 1
+    page_size = 2000  # CMR page size limit
+
+    granule_arr = []
+
+    while True:
+        # Define CMR search parameters
+        cmr_param = {
+            "collection_concept_id": concept_id,
+            "page_size": page_size,
+            "page_num": page_num,
+        }
+
+        if temporal_str is not None:
+            cmr_param["temporal"] = temporal_str
+
+        if kwargs:
+            cmr_param.update(kwargs)
+
+        granulesearch = cmrurl + "granules.json"
+
+        if isinstance(roi, list) or isinstance(roi, tuple):
+            cmr_param["bounding_box[]"] = bound_str
+            response = requests.get(granulesearch, params=cmr_param)
+            response.raise_for_status()
+        else:
+            cmr_param["simplify-shapefile"] = "true"
+            geojson = {
+                "shapefile": (
+                    "region.geojson",
+                    roi.geometry.to_json(),
+                    "application/geo+json",
+                )
+            }
+            response = requests.post(granulesearch, data=cmr_param, files=geojson)
+
+        # Send a request to the CMR API to get the granules
+        granules = response.json()["feed"]["entry"]
+
+        if granules:
+            for index, g in enumerate(granules):
+                granule_url = ""
+                granule_poly = ""
+
+                # Read file size
+                granule_size = float(g["granule_size"])
+
+                # Read bounding geometries
+                if "polygons" in g:
+                    polygons = g["polygons"]
+                    multipolygons = []
+                    for poly in polygons:
+                        i = iter(poly[0].split(" "))
+                        ltln = list(map(" ".join, zip(i, i)))
+                        multipolygons.append(
+                            Polygon(
+                                [
+                                    [float(p.split(" ")[1]), float(p.split(" ")[0])]
+                                    for p in ltln
+                                ]
+                            )
+                        )
+                    granule_poly = MultiPolygon(multipolygons)
+
+                # Get URL to HDF5 files
+                for links in g["links"]:
+                    if (
+                        "title" in links
+                        and links["title"].startswith("Download")
+                        and links["title"].endswith(".h5")
+                    ):
+                        granule_url = links["href"]
+
+                granule_id = g["id"]
+                title = g["title"]
+                time_start = g["time_start"]
+                time_end = g["time_end"]
+
+                granule_arr.append(
+                    [
+                        granule_id,
+                        title,
+                        time_start,
+                        time_end,
+                        granule_size,
+                        granule_url,
+                        granule_poly,
+                    ]
+                )
+
+            page_num += 1
+        else:
+            break
+
+    # Add bound as the last row into the dataframe
+    if add_roi:
+        if isinstance(roi, list) or isinstance(roi, tuple):
+            b = list(roi)
+            granule_arr.append(
+                ["roi", None, None, None, 0, None, box(b[0], b[1], b[2], b[3])]
+            )
+        else:
+            granule_arr.append(["roi", None, None, None, 0, None, roi.geometry.item()])
+
+    # Create a pandas dataframe
+    columns = [
+        "id",
+        "title",
+        "time_start",
+        "time_end",
+        "granule_size",
+        "granule_url",
+        "granule_poly",
+    ]
+    l4adf = pd.DataFrame(granule_arr, columns=columns)
+
+    # Drop granules with empty geometry
+    l4adf = l4adf[l4adf["granule_poly"] != ""]
+
+    if sort_filesize:
+        l4adf = l4adf.sort_values(by=["granule_size"], ascending=True)
+
+    if return_type == "df":
+        return l4adf
+    elif return_type == "gdf":
+        gdf = gpd.GeoDataFrame(l4adf, geometry="granule_poly")
+        gdf.crs = "EPSG:4326"
+        return gdf
+    elif return_type == "csv":
+        columns.remove("granule_poly")
+        return l4adf.to_csv(output, index=False, columns=columns)
+    else:
+        raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
+
+
+def gedi_download_file(
+    url: str, filename: str = None, username: str = None, password: str = None
+) -> None:
+    """
+    Downloads a file from the given URL and saves it to the specified filename.
+    If no filename is provided, the name of the file from the URL will be used.
+
+    Args:
+        url (str): The URL of the file to download.
+            e.g., https://daac.ornl.gov/daacdata/gedi/GEDI_L4A_AGB_Density_V2_1/data/GEDI04_A_2019298202754_O04921_01_T02899_02_002_02_V002.h5
+        filename (str, optional): The name of the file to save the downloaded content to. Defaults to None.
+        username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+            Create an account at https://urs.earthdata.nasa.gov
+        password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+
+    Returns:
+        None
+    """
+    import requests
+    from tqdm import tqdm
+    from urllib.parse import urlparse
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError(
+            "Username and password must be provided. Create an account at https://urs.earthdata.nasa.gov."
+        )
+
+    with requests.Session() as session:
+        r1 = session.request("get", url, stream=True)
+        r = session.get(r1.url, auth=(username, password), stream=True)
+        print(r.status_code)
+
+        if r.status_code == 200:
+            total_size = int(r.headers.get("content-length", 0))
+            block_size = 1024  # 1 KB
+
+            # Use the filename from the URL if not provided
+            if not filename:
+                parsed_url = urlparse(url)
+                filename = parsed_url.path.split("/")[-1]
+
+            progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
+
+            with open(filename, "wb") as file:
+                for data in r.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+
+            progress_bar.close()
+
+
+def gedi_download_files(
+    urls: List[str],
+    outdir: str = None,
+    filenames: str = None,
+    username: str = None,
+    password: str = None,
+    overwrite: bool = False,
+) -> None:
+    """
+    Downloads files from the given URLs and saves them to the specified directory.
+    If no directory is provided, the current directory will be used.
+    If no filenames are provided, the names of the files from the URLs will be used.
+
+    Args:
+        urls (List[str]): The URLs of the files to download.
+            e.g., ["https://example.com/file1.txt", "https://example.com/file2.txt"]
+        outdir (str, optional): The directory to save the downloaded files to. Defaults to None.
+        filenames (str, optional): The names of the files to save the downloaded content to. Defaults to None.
+        username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+            Create an account at https://urs.earthdata.nasa.gov
+        password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+        overwrite (bool): Whether to overwrite the existing output files. Default is False.
+
+    Returns:
+        None
+    """
+
+    import requests
+    from tqdm import tqdm
+    from urllib.parse import urlparse
+    import geopandas as gpd
+
+    if isinstance(urls, gpd.GeoDataFrame):
+        urls = urls["granule_url"].tolist()
+
+    session = requests.Session()
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("Username and password must be provided.")
+
+    if outdir is None:
+        outdir = os.getcwd()
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    for index, url in enumerate(urls):
+        print(f"Downloading file {index+1} of {len(urls)}...")
+
+        if url is None:
+            continue
+
+        r1 = session.request("get", url, stream=True)
+        r = session.get(r1.url, auth=(username, password), stream=True)
+
+        if r.status_code == 200:
+            total_size = int(r.headers.get("content-length", 0))
+            block_size = 1024  # 1 KB
+
+            # Use the filename from the URL if not provided
+            if not filenames:
+                parsed_url = urlparse(url)
+                filename = parsed_url.path.split("/")[-1]
+            else:
+                filename = filenames.pop(0)
+
+            filepath = os.path.join(outdir, filename)
+            if os.path.exists(filepath) and not overwrite:
+                print(f"File {filepath} already exists. Skipping...")
+                continue
+            progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
+
+            with open(filepath, "wb") as file:
+                for data in r.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+
+            progress_bar.close()
+
+    session.close()
