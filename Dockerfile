@@ -1,6 +1,6 @@
 FROM jupyter/scipy-notebook:latest
 RUN mamba install -c conda-forge leafmap geopandas localtileserver osmnx -y && \
-    pip install -U leafmap jsonschema==4.18.0 && \
+    pip install -U leafmap jsonschema==4.18.0 lonboard h5py && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
