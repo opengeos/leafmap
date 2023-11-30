@@ -12514,3 +12514,159 @@ def gedi_download_files(
             progress_bar.close()
 
     session.close()
+
+
+def h5_keys(filename: str) -> List[str]:
+    """
+    Retrieve the keys (dataset names) within an HDF5 file.
+
+    Args:
+        filename (str): The filename of the HDF5 file.
+
+    Returns:
+        List[str]: A list of dataset names present in the HDF5 file.
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+
+    Example:
+        >>> keys = h5_keys('data.h5')
+        >>> print(keys)
+        [
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    with h5py.File(filename, "r") as f:
+        keys = list(f.keys())
+
+    return keys
+
+
+def h5_variables(filename: str, key: str) -> List[str]:
+    """
+    Retrieve the variables (column names) within a specific key (dataset) in an H5 file.
+
+    Args:
+        filename (str): The filename of the H5 file.
+        key (str): The key (dataset name) within the H5 file.
+
+    Returns:
+        List[str]: A list of variable names (column names) within the specified key.
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+
+    Example:
+        >>> variables = h5_variables('data.h5', 'dataset1')
+        >>> print(variables)
+        ['var1', 'var2', 'var3']
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    with h5py.File(filename, "r") as f:
+        cols = list(f[key].keys())
+
+    return cols
+
+
+def h5_to_gdf(
+    filenames: str,
+    dataset: str,
+    lat: str = "lat_lowestmode",
+    lon: str = "lon_lowestmode",
+    columns: Optional[List[str]] = None,
+    crs: str = "EPSG:4326",
+    nodata=None,
+    **kwargs,
+):
+    """
+    Read data from one or multiple HDF5 files and return as a GeoDataFrame.
+
+    Args:
+        filenames (str or List[str]): The filename(s) of the HDF5 file(s).
+        dataset (str): The dataset name within the H5 file(s).
+        lat (str): The column name representing latitude. Default is 'lat_lowestmode'.
+        lon (str): The column name representing longitude. Default is 'lon_lowestmode'.
+        columns (List[str], optional): List of column names to include. If None, all columns will be included. Default is None.
+        crs (str, optional): The coordinate reference system code. Default is "EPSG:4326".
+        **kwargs: Additional keyword arguments to be passed to the GeoDataFrame constructor.
+
+    Returns:
+        geopandas.GeoDataFrame: A GeoDataFrame containing the data from the H5 file(s).
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+        ValueError: Raised if the provided filenames argument is not a valid type or if a specified file does not exist.
+
+    Example:
+        >>> gdf = h5_to_gdf('data.h5', 'dataset1', 'lat', 'lon', columns=['column1', 'column2'], crs='EPSG:4326')
+        >>> print(gdf.head())
+           column1  column2        lat        lon                    geometry
+        0        10       20  40.123456 -75.987654  POINT (-75.987654 40.123456)
+        1        15       25  40.234567 -75.876543  POINT (-75.876543 40.234567)
+        ...
+
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    import glob
+    import pandas as pd
+    import geopandas as gpd
+
+    if isinstance(filenames, str):
+        if os.path.exists(filenames):
+            files = [filenames]
+        else:
+            files = glob.glob(filenames)
+            if not files:
+                raise ValueError(f"File {filenames} does not exist.")
+            files.sort()
+    elif isinstance(filenames, list):
+        files = filenames
+    else:
+        raise ValueError("h5_file must be a string or a list of strings.")
+
+    out_df = pd.DataFrame()
+
+    for file in files:
+        h5 = h5py.File(file, "r")
+        try:
+            data = h5[dataset]
+        except KeyError:
+            print(f"Dataset {dataset} not found in file {file}. Skipping...")
+            continue
+        col_names = []
+        col_val = []
+
+        for key, value in data.items():
+            if columns is None or key in columns or key == lat or key == lon:
+                col_names.append(key)
+                col_val.append(value[:].tolist())
+
+        df = pd.DataFrame(map(list, zip(*col_val)), columns=col_names)
+        out_df = pd.concat([out_df, df])
+        h5.close()
+
+    if nodata is not None and columns is not None:
+        out_df = out_df[out_df[columns[0]] != nodata]
+
+    gdf = gpd.GeoDataFrame(
+        out_df, geometry=gpd.points_from_xy(out_df[lon], out_df[lat]), crs=crs, **kwargs
+    )
+
+    return gdf
