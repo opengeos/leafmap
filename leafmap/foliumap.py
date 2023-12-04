@@ -2359,6 +2359,7 @@ class Map(folium.Map):
         tooltip: Optional[List] = None,
         min_width: Optional[int] = 100,
         max_width: Optional[int] = 200,
+        font_size: Optional[int] = 2,
         **kwargs,
     ):
         """Adds a marker cluster to the map.
@@ -2372,6 +2373,7 @@ class Map(folium.Map):
             tooltip (list, optional): A list of column names to be used as the tooltip. Defaults to None.
             min_width (int, optional): The minimum width of the popup. Defaults to 100.
             max_width (int, optional): The maximum width of the popup. Defaults to 200.
+            font_size (int, optional): The font size of the popup. Defaults to 2.
 
         """
         import pandas as pd
@@ -2413,13 +2415,29 @@ class Map(folium.Map):
         for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
+                html = (
+                    html
+                    + f"<font size='{font_size}'><b>"
+                    + p
+                    + "</b>"
+                    + ": "
+                    + str(row[p])
+                    + "<br></font>"
+                )
             popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
 
             if tooltip is not None:
                 html = ""
                 for p in tooltip:
-                    html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
+                    html = (
+                        html
+                        + f"<font size='{font_size}'><b>"
+                        + p
+                        + "</b>"
+                        + ": "
+                        + str(row[p])
+                        + "<br></font>"
+                    )
 
                 tooltip_str = folium.Tooltip(html)
             else:
