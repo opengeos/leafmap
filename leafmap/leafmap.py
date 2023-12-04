@@ -1148,6 +1148,7 @@ class Map(ipyleaflet.Map):
         y="latitude",
         radius=10,
         popup=None,
+        font_size=2,
         **kwargs,
     ):
         """Adds a marker cluster to the map. For a list of options, see https://ipyleaflet.readthedocs.io/en/latest/api_reference/circle_marker.html
@@ -1158,6 +1159,7 @@ class Map(ipyleaflet.Map):
             y (str, optional): The column name for the y values. Defaults to "latitude".
             radius (int, optional): The radius of the circle. Defaults to 10.
             popup (list, optional): A list of column names to be used as the popup. Defaults to None.
+            font_size (int, optional): The font size of the popup. Defaults to 2.
 
         """
         import pandas as pd
@@ -1186,7 +1188,15 @@ class Map(ipyleaflet.Map):
         for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
+                html = (
+                    html
+                    + f"<font size='{font_size}'><b>"
+                    + p
+                    + "</b>"
+                    + ": "
+                    + str(row[p])
+                    + "<br></font>"
+                )
             popup_html = widgets.HTML(html)
 
             marker = ipyleaflet.CircleMarker(
