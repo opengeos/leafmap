@@ -12373,6 +12373,101 @@ def gedi_search(
         raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
 
 
+def gedi_subset(
+    spatial=None,
+    start_date=None,
+    end_date=None,
+    out_dir=None,
+    collection=None,
+    variables=["all"],
+    username=None,
+    password=None,
+    overwrite=False,
+    **kwargs,
+):
+    import requests as re
+    import geopandas as gpd
+    from datetime import datetime
+    from harmony import BBox, Client, Collection, Environment, Request
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if collection is None:
+        # GEDI L4A DOI
+        doi = "10.3334/ORNLDAAC/2056"
+
+        # CMR API base url
+        doisearch = f"https://cmr.earthdata.nasa.gov/search/collections.json?doi={doi}"
+        concept_id = re.get(doisearch).json()["feed"]["entry"][0]["id"]
+        concept_id
+        collection = Collection(id=concept_id)
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("username and password must be provided.")
+
+    harmony_client = Client(auth=(username, password))
+
+    if isinstance(spatial, str):
+        spatial = gpd.read_file(spatial)
+
+    if isinstance(spatial, gpd.GeoDataFrame):
+        spatial = spatial.total_bounds.tolist()
+
+    if isinstance(spatial, list) and len(spatial) == 4:
+        bounding_box = BBox(spatial[0], spatial[1], spatial[2], spatial[3])
+    else:
+        raise ValueError(
+            "spatial must be a list of bounding box coordinates or a GeoDataFrame, or a file path."
+        )
+
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    if start_date is None or end_date is None:
+        print("start_date and end_date must be provided.")
+        temporal_range = None
+    else:
+        temporal_range = {"start": start_date, "end": end_date}
+
+    request = Request(
+        collection=collection,
+        variables=variables,
+        temporal=temporal_range,
+        spatial=bounding_box,
+        ignore_errors=True,
+        **kwargs,
+    )
+
+    # submit harmony request, will return job id
+    subset_job_id = harmony_client.submit(request)
+
+    print(f"Processing job: {subset_job_id}")
+
+    print(f"Waiting for the job to finish")
+    results = harmony_client.result_json(subset_job_id, show_progress=True)
+
+    print(f"Downloading subset files...")
+    futures = harmony_client.download_all(subset_job_id, overwrite=overwrite)
+    for f in futures:
+        # all subsetted files have this suffix
+        if f.result().endswith("subsetted.h5"):
+            print(f"Downloaded: {f.result()}")
+
+    print(f"Done downloading files.")
+
+
 def gedi_download_file(
     url: str, filename: str = None, username: str = None, password: str = None
 ) -> None:
