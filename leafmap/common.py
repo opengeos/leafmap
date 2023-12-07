@@ -12380,6 +12380,7 @@ def gedi_subset(
     out_dir=None,
     collection=None,
     variables=["all"],
+    max_results=None,
     username=None,
     password=None,
     overwrite=False,
@@ -12447,6 +12448,7 @@ def gedi_subset(
         temporal=temporal_range,
         spatial=bounding_box,
         ignore_errors=True,
+        max_results=max_results,
         **kwargs,
     )
 
@@ -12459,7 +12461,9 @@ def gedi_subset(
     results = harmony_client.result_json(subset_job_id, show_progress=True)
 
     print(f"Downloading subset files...")
-    futures = harmony_client.download_all(subset_job_id, overwrite=overwrite)
+    futures = harmony_client.download_all(
+        subset_job_id, directory=out_dir, overwrite=overwrite
+    )
     for f in futures:
         # all subsetted files have this suffix
         if f.result().endswith("subsetted.h5"):
