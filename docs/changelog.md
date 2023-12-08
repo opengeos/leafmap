@@ -1,5 +1,32 @@
 # Changelog
 
+## v0.29.6 - Dec 7, 2023
+
+**What's Changed**
+
+-   Add font size option for circle marker by @giswqs in [#628](https://github.com/opengeos/leafmap/pull/628)
+-   Add GEDI subsetting and add_markers functions by @giswqs in [#630](https://github.com/opengeos/leafmap/pull/630)
+
+**Full Changelog**: [v0.29.5...v0.29.6](https://github.com/opengeos/leafmap/compare/v0.29.5...v0.29.6)
+
+## v0.29.5 - Nov 30, 2023
+
+**What's Changed**
+
+-   Fix basemap visibility bug by @giswqs in [#622](https://github.com/opengeos/leafmap/pull/622)
+-   Add support for visualizing GEDI data by @giswqs in [#624](https://github.com/opengeos/leafmap/pull/624)
+
+**Full Changelog**: [v0.29.4...v0.29.5](https://github.com/opengeos/leafmap/compare/v0.29.4...v0.29.5)
+
+## v0.29.4 - Nov 28, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.3 by @giswqs in [#618](https://github.com/opengeos/leafmap/pull/618)
+-   Add functions for searching and downloading GEDI data by @giswqs in [#619](https://github.com/opengeos/leafmap/pull/619)
+
+**Full Changelog**: [v0.29.3...v0.29.4](https://github.com/opengeos/leafmap/compare/v0.29.3...v0.29.4)
+
 ## v0.29.3 - Nov 26, 2023
 
 **What's Changed**
