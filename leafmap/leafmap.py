@@ -1156,6 +1156,7 @@ class Map(ipyleaflet.Map):
         fill_color=None,
         fill_opacity=0.2,
         opacity=1.0,
+        layer_name="Circle Markers",
         **kwargs,
     ):
         """Adds a marker cluster to the map. For a list of options, see https://ipyleaflet.readthedocs.io/en/latest/_modules/ipyleaflet/leaflet.html#Path
@@ -1174,6 +1175,7 @@ class Map(ipyleaflet.Map):
             fill_color (str, optional): The fill color of the path. Defaults to None.
             fill_opacity (float, optional): The fill opacity of the path. Defaults to 0.2.
             opacity (float, optional): The opacity of the path. Defaults to 1.0.
+            layer_name (str, optional): The layer name to use for the marker cluster. Defaults to "Circle Markers".
 
         """
         import pandas as pd
@@ -1239,6 +1241,8 @@ class Map(ipyleaflet.Map):
             raise ValueError("radius must be either an integer or a list.")
 
         index = 0
+
+        layers = []
         for idx, row in df.iterrows():
             html = ""
             for p in popup:
@@ -1266,27 +1270,56 @@ class Map(ipyleaflet.Map):
                 opacity=opacity,
                 **kwargs,
             )
-            super().add(marker)
+            layers.append(marker)
             index += 1
+
+        group = ipyleaflet.LayerGroup(layers=tuple(layers), name=layer_name)
+        self.add(group)
 
     def add_markers(
         self,
-        markers,
-        x="lon",
-        y="lat",
-        radius=10,
-        popup=None,
-        font_size=2,
-        stroke=True,
-        color="#0033FF",
-        weight=2,
-        fill=True,
-        fill_color=None,
-        fill_opacity=0.2,
-        opacity=1.0,
-        shape="circle",
+        markers: Union[List[List[Union[int, float]]], List[Union[int, float]]],
+        x: str = "lon",
+        y: str = "lat",
+        radius: int = 10,
+        popup: Optional[str] = None,
+        font_size: int = 2,
+        stroke: bool = True,
+        color: str = "#0033FF",
+        weight: int = 2,
+        fill: bool = True,
+        fill_color: Optional[str] = None,
+        fill_opacity: float = 0.2,
+        opacity: float = 1.0,
+        shape: str = "circle",
+        layer_name: str = "Markers",
         **kwargs,
-    ):
+    ) -> None:
+        """
+        Adds markers to the map.
+
+        Args:
+            markers (Union[List[List[Union[int, float]]], List[Union[int, float]]]): List of markers.
+                Each marker can be defined as a list of [x, y] coordinates or as a single [x, y] coordinate.
+            x (str, optional): Name of the x-coordinate column in the marker data. Defaults to "lon".
+            y (str, optional): Name of the y-coordinate column in the marker data. Defaults to "lat".
+            radius (int, optional): Radius of the markers. Defaults to 10.
+            popup (str, optional): Popup text for the markers. Defaults to None.
+            font_size (int, optional): Font size of the popup text. Defaults to 2.
+            stroke (bool, optional): Whether to display marker stroke. Defaults to True.
+            color (str, optional): Color of the marker stroke. Defaults to "#0033FF".
+            weight (int, optional): Weight of the marker stroke. Defaults to 2.
+            fill (bool, optional): Whether to fill markers. Defaults to True.
+            fill_color (str, optional): Fill color of the markers. Defaults to None.
+            fill_opacity (float, optional): Opacity of the marker fill. Defaults to 0.2.
+            opacity (float, optional): Opacity of the markers. Defaults to 1.0.
+            shape (str, optional): Shape of the markers. Options are "circle" or "marker". Defaults to "circle".
+            layer_name (str, optional): Name of the marker layer. Defaults to "Markers".
+            **kwargs: Additional keyword arguments to pass to the marker plotting function.
+
+        Returns:
+            None: This function does not return any value.
+        """
         import geopandas as gpd
 
         if (
@@ -1318,6 +1351,7 @@ class Map(ipyleaflet.Map):
                 fill_color,
                 fill_opacity,
                 opacity,
+                layer_name,
                 **kwargs,
             )
 
@@ -4022,7 +4056,7 @@ class Map(ipyleaflet.Map):
 
             marker_args["radius"] = marker_radius
 
-            self.add_markers(gdf[columns], **marker_args)
+            self.add_markers(gdf[columns], layer_name=layer_name, **marker_args)
         else:
             self.add_gdf(
                 gdf,

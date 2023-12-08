@@ -12386,6 +12386,47 @@ def gedi_subset(
     overwrite=False,
     **kwargs,
 ):
+    """
+    Subsets GEDI data using the Harmony API.
+
+    Args:
+        spatial (Union[str, gpd.GeoDataFrame, List[float]], optional): Spatial extent for subsetting.
+            Can be a file path to a shapefile, a GeoDataFrame, or a list of bounding box coordinates [minx, miny, maxx, maxy].
+            Defaults to None.
+        start_date (str, optional): Start date for subsetting in 'YYYY-MM-DD' format.
+            Defaults to None.
+        end_date (str, optional): End date for subsetting in 'YYYY-MM-DD' format.
+            Defaults to None.
+        out_dir (str, optional): Output directory to save the subsetted files.
+            Defaults to None, which will use the current working directory.
+        collection (Collection, optional): GEDI data collection. If not provided,
+            the default collection with DOI '10.3334/ORNLDAAC/2056' will be used.
+            Defaults to None.
+        variables (List[str], optional): List of variable names to subset.
+            Defaults to ['all'], which subsets all available variables.
+        max_results (int, optional): Maximum number of results to return.
+            Defaults to None, which returns all results.
+        username (str, optional): Earthdata username.
+            Defaults to None, which will attempt to read from the 'EARTHDATA_USERNAME' environment variable.
+        password (str, optional): Earthdata password.
+            Defaults to None, which will attempt to read from the 'EARTHDATA_PASSWORD' environment variable.
+        overwrite (bool, optional): Whether to overwrite existing files in the output directory.
+            Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the Harmony API request.
+
+    Raises:
+        ImportError: If the 'harmony' package is not installed.
+        ValueError: If the 'spatial', 'start_date', or 'end_date' arguments are not valid.
+
+    Returns:
+        None: This function does not return any value.
+    """
+
+    try:
+        import harmony
+    except ImportError:
+        install_package("harmony-py")
+
     import requests as re
     import geopandas as gpd
     from datetime import datetime
@@ -12585,6 +12626,18 @@ def gedi_download_files(
         if url is None:
             continue
 
+        # Use the filename from the URL if not provided
+        if not filenames:
+            parsed_url = urlparse(url)
+            filename = parsed_url.path.split("/")[-1]
+        else:
+            filename = filenames.pop(0)
+
+        filepath = os.path.join(outdir, filename)
+        if os.path.exists(filepath) and not overwrite:
+            print(f"File {filepath} already exists. Skipping...")
+            continue
+
         r1 = session.request("get", url, stream=True)
         r = session.get(r1.url, auth=(username, password), stream=True)
 
@@ -12592,17 +12645,6 @@ def gedi_download_files(
             total_size = int(r.headers.get("content-length", 0))
             block_size = 1024  # 1 KB
 
-            # Use the filename from the URL if not provided
-            if not filenames:
-                parsed_url = urlparse(url)
-                filename = parsed_url.path.split("/")[-1]
-            else:
-                filename = filenames.pop(0)
-
-            filepath = os.path.join(outdir, filename)
-            if os.path.exists(filepath) and not overwrite:
-                print(f"File {filepath} already exists. Skipping...")
-                continue
             progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
 
             with open(filepath, "wb") as file:
@@ -12719,9 +12761,8 @@ def h5_to_gdf(
     try:
         import h5py
     except ImportError:
-        raise ImportError(
-            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
-        )
+        install_package("h5py")
+        import h5py
 
     import glob
     import pandas as pd
