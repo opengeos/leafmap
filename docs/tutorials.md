@@ -99,6 +99,7 @@
 83. Visualizing large vector datasets with lonboard ([notebook](https://leafmap.org/notebooks/83_vector_viz))
 84. Reading GeoParquet files and visualizing vector data interactively ([notebook](https://leafmap.org/notebooks/84_read_parquet))
 85. How to search and download GEDI L4A dataset interactively ([notebook](https://leafmap.org/notebooks/85_gedi))
+86. Adding markers to the map ([notebook](https://leafmap.org/notebooks/86_add_markers))
 
 ## Demo
 

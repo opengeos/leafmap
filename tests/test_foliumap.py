@@ -156,12 +156,11 @@ class TestFoliumap(unittest.TestCase):
     def test_add_wms_legend(self):
         """Check add of wms legend based on url"""
         m = leafmap.Map()
-        url="https://www.mrlc.gov/geoserver/mrlc_display/NLCD_2016_Land_Cover_L48/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=NLCD_2016_Land_Cover_L48"
+        url = "https://www.mrlc.gov/geoserver/mrlc_display/NLCD_2016_Land_Cover_L48/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER=NLCD_2016_Land_Cover_L48"
         m.add_wms_legend(url=url)
         out_str = m.to_html()
-        
+
         assert "GetLegendGraphic" in out_str
-    
 
     # def test_add_marker_cluster(self):
     #     """Check marker cluster"""

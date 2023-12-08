@@ -43,7 +43,15 @@ extras_requires = {
     ],
     "sql": ["psycopg2", "sqlalchemy"],
     "apps": ["streamlit-folium", "voila", "solara"],
-    "vector": ["geopandas", "osmnx", "pmtiles", "flask", "flask-cors", "lonboard"],
+    "vector": [
+        "geopandas",
+        "osmnx",
+        "pmtiles",
+        "flask",
+        "flask-cors",
+        "lonboard",
+        "mapclassify",
+    ],
     "pmtiles": ["pmtiles", "flask", "flask-cors"],
     "ai": [
         "geopandas",
@@ -90,6 +98,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/opengeos/leafmap",
-    version="0.29.4",
+    version="0.29.6",
     zip_safe=False,
 )
