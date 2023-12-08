@@ -107,6 +107,7 @@
 84. Reading GeoParquet files and visualizing vector data interactively ([notebook](https://leafmap.org/notebooks/84_read_parquet))
 85. How to search and download GEDI L4A dataset interactively ([notebook](https://leafmap.org/notebooks/85_gedi))
 86. Adding markers to the map ([notebook](https://leafmap.org/notebooks/86_add_markers))
+87. Cloud-based geoprocessing with Actinia ([notebook](https://leafmap.org/notebooks/87_actinia))
 
 ## Demo
 
