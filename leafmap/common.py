@@ -12373,6 +12373,146 @@ def gedi_search(
         raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
 
 
+def gedi_subset(
+    spatial=None,
+    start_date=None,
+    end_date=None,
+    out_dir=None,
+    collection=None,
+    variables=["all"],
+    max_results=None,
+    username=None,
+    password=None,
+    overwrite=False,
+    **kwargs,
+):
+    """
+    Subsets GEDI data using the Harmony API.
+
+    Args:
+        spatial (Union[str, gpd.GeoDataFrame, List[float]], optional): Spatial extent for subsetting.
+            Can be a file path to a shapefile, a GeoDataFrame, or a list of bounding box coordinates [minx, miny, maxx, maxy].
+            Defaults to None.
+        start_date (str, optional): Start date for subsetting in 'YYYY-MM-DD' format.
+            Defaults to None.
+        end_date (str, optional): End date for subsetting in 'YYYY-MM-DD' format.
+            Defaults to None.
+        out_dir (str, optional): Output directory to save the subsetted files.
+            Defaults to None, which will use the current working directory.
+        collection (Collection, optional): GEDI data collection. If not provided,
+            the default collection with DOI '10.3334/ORNLDAAC/2056' will be used.
+            Defaults to None.
+        variables (List[str], optional): List of variable names to subset.
+            Defaults to ['all'], which subsets all available variables.
+        max_results (int, optional): Maximum number of results to return.
+            Defaults to None, which returns all results.
+        username (str, optional): Earthdata username.
+            Defaults to None, which will attempt to read from the 'EARTHDATA_USERNAME' environment variable.
+        password (str, optional): Earthdata password.
+            Defaults to None, which will attempt to read from the 'EARTHDATA_PASSWORD' environment variable.
+        overwrite (bool, optional): Whether to overwrite existing files in the output directory.
+            Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the Harmony API request.
+
+    Raises:
+        ImportError: If the 'harmony' package is not installed.
+        ValueError: If the 'spatial', 'start_date', or 'end_date' arguments are not valid.
+
+    Returns:
+        None: This function does not return any value.
+    """
+
+    try:
+        import harmony
+    except ImportError:
+        install_package("harmony-py")
+
+    import requests as re
+    import geopandas as gpd
+    from datetime import datetime
+    from harmony import BBox, Client, Collection, Environment, Request
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if collection is None:
+        # GEDI L4A DOI
+        doi = "10.3334/ORNLDAAC/2056"
+
+        # CMR API base url
+        doisearch = f"https://cmr.earthdata.nasa.gov/search/collections.json?doi={doi}"
+        concept_id = re.get(doisearch).json()["feed"]["entry"][0]["id"]
+        concept_id
+        collection = Collection(id=concept_id)
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("username and password must be provided.")
+
+    harmony_client = Client(auth=(username, password))
+
+    if isinstance(spatial, str):
+        spatial = gpd.read_file(spatial)
+
+    if isinstance(spatial, gpd.GeoDataFrame):
+        spatial = spatial.total_bounds.tolist()
+
+    if isinstance(spatial, list) and len(spatial) == 4:
+        bounding_box = BBox(spatial[0], spatial[1], spatial[2], spatial[3])
+    else:
+        raise ValueError(
+            "spatial must be a list of bounding box coordinates or a GeoDataFrame, or a file path."
+        )
+
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    if start_date is None or end_date is None:
+        print("start_date and end_date must be provided.")
+        temporal_range = None
+    else:
+        temporal_range = {"start": start_date, "end": end_date}
+
+    request = Request(
+        collection=collection,
+        variables=variables,
+        temporal=temporal_range,
+        spatial=bounding_box,
+        ignore_errors=True,
+        max_results=max_results,
+        **kwargs,
+    )
+
+    # submit harmony request, will return job id
+    subset_job_id = harmony_client.submit(request)
+
+    print(f"Processing job: {subset_job_id}")
+
+    print(f"Waiting for the job to finish")
+    results = harmony_client.result_json(subset_job_id, show_progress=True)
+
+    print(f"Downloading subset files...")
+    futures = harmony_client.download_all(
+        subset_job_id, directory=out_dir, overwrite=overwrite
+    )
+    for f in futures:
+        # all subsetted files have this suffix
+        if f.result().endswith("subsetted.h5"):
+            print(f"Downloaded: {f.result()}")
+
+    print(f"Done downloading files.")
+
+
 def gedi_download_file(
     url: str, filename: str = None, username: str = None, password: str = None
 ) -> None:
@@ -12486,6 +12626,18 @@ def gedi_download_files(
         if url is None:
             continue
 
+        # Use the filename from the URL if not provided
+        if not filenames:
+            parsed_url = urlparse(url)
+            filename = parsed_url.path.split("/")[-1]
+        else:
+            filename = filenames.pop(0)
+
+        filepath = os.path.join(outdir, filename)
+        if os.path.exists(filepath) and not overwrite:
+            print(f"File {filepath} already exists. Skipping...")
+            continue
+
         r1 = session.request("get", url, stream=True)
         r = session.get(r1.url, auth=(username, password), stream=True)
 
@@ -12493,17 +12645,6 @@ def gedi_download_files(
             total_size = int(r.headers.get("content-length", 0))
             block_size = 1024  # 1 KB
 
-            # Use the filename from the URL if not provided
-            if not filenames:
-                parsed_url = urlparse(url)
-                filename = parsed_url.path.split("/")[-1]
-            else:
-                filename = filenames.pop(0)
-
-            filepath = os.path.join(outdir, filename)
-            if os.path.exists(filepath) and not overwrite:
-                print(f"File {filepath} already exists. Skipping...")
-                continue
             progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
 
             with open(filepath, "wb") as file:
@@ -12514,3 +12655,158 @@ def gedi_download_files(
             progress_bar.close()
 
     session.close()
+
+
+def h5_keys(filename: str) -> List[str]:
+    """
+    Retrieve the keys (dataset names) within an HDF5 file.
+
+    Args:
+        filename (str): The filename of the HDF5 file.
+
+    Returns:
+        List[str]: A list of dataset names present in the HDF5 file.
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+
+    Example:
+        >>> keys = h5_keys('data.h5')
+        >>> print(keys)
+        [
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    with h5py.File(filename, "r") as f:
+        keys = list(f.keys())
+
+    return keys
+
+
+def h5_variables(filename: str, key: str) -> List[str]:
+    """
+    Retrieve the variables (column names) within a specific key (dataset) in an H5 file.
+
+    Args:
+        filename (str): The filename of the H5 file.
+        key (str): The key (dataset name) within the H5 file.
+
+    Returns:
+        List[str]: A list of variable names (column names) within the specified key.
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+
+    Example:
+        >>> variables = h5_variables('data.h5', 'dataset1')
+        >>> print(variables)
+        ['var1', 'var2', 'var3']
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    with h5py.File(filename, "r") as f:
+        cols = list(f[key].keys())
+
+    return cols
+
+
+def h5_to_gdf(
+    filenames: str,
+    dataset: str,
+    lat: str = "lat_lowestmode",
+    lon: str = "lon_lowestmode",
+    columns: Optional[List[str]] = None,
+    crs: str = "EPSG:4326",
+    nodata=None,
+    **kwargs,
+):
+    """
+    Read data from one or multiple HDF5 files and return as a GeoDataFrame.
+
+    Args:
+        filenames (str or List[str]): The filename(s) of the HDF5 file(s).
+        dataset (str): The dataset name within the H5 file(s).
+        lat (str): The column name representing latitude. Default is 'lat_lowestmode'.
+        lon (str): The column name representing longitude. Default is 'lon_lowestmode'.
+        columns (List[str], optional): List of column names to include. If None, all columns will be included. Default is None.
+        crs (str, optional): The coordinate reference system code. Default is "EPSG:4326".
+        **kwargs: Additional keyword arguments to be passed to the GeoDataFrame constructor.
+
+    Returns:
+        geopandas.GeoDataFrame: A GeoDataFrame containing the data from the H5 file(s).
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+        ValueError: Raised if the provided filenames argument is not a valid type or if a specified file does not exist.
+
+    Example:
+        >>> gdf = h5_to_gdf('data.h5', 'dataset1', 'lat', 'lon', columns=['column1', 'column2'], crs='EPSG:4326')
+        >>> print(gdf.head())
+           column1  column2        lat        lon                    geometry
+        0        10       20  40.123456 -75.987654  POINT (-75.987654 40.123456)
+        1        15       25  40.234567 -75.876543  POINT (-75.876543 40.234567)
+        ...
+
+    """
+    try:
+        import h5py
+    except ImportError:
+        install_package("h5py")
+        import h5py
+
+    import glob
+    import pandas as pd
+    import geopandas as gpd
+
+    if isinstance(filenames, str):
+        if os.path.exists(filenames):
+            files = [filenames]
+        else:
+            files = glob.glob(filenames)
+            if not files:
+                raise ValueError(f"File {filenames} does not exist.")
+            files.sort()
+    elif isinstance(filenames, list):
+        files = filenames
+    else:
+        raise ValueError("h5_file must be a string or a list of strings.")
+
+    out_df = pd.DataFrame()
+
+    for file in files:
+        h5 = h5py.File(file, "r")
+        try:
+            data = h5[dataset]
+        except KeyError:
+            print(f"Dataset {dataset} not found in file {file}. Skipping...")
+            continue
+        col_names = []
+        col_val = []
+
+        for key, value in data.items():
+            if columns is None or key in columns or key == lat or key == lon:
+                col_names.append(key)
+                col_val.append(value[:].tolist())
+
+        df = pd.DataFrame(map(list, zip(*col_val)), columns=col_names)
+        out_df = pd.concat([out_df, df])
+        h5.close()
+
+    if nodata is not None and columns is not None:
+        out_df = out_df[out_df[columns[0]] != nodata]
+
+    gdf = gpd.GeoDataFrame(
+        out_df, geometry=gpd.points_from_xy(out_df[lon], out_df[lat]), crs=crs, **kwargs
+    )
+
+    return gdf
