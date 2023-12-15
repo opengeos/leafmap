@@ -3813,7 +3813,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
             self.style = {}
 
 
-class PMTilesMapLibreTooltip(JSCSSMixin, Layer):
+class PMTilesMapLibreTooltip(JSCSSMixin, MacroElement):
     """Creates a PMTilesMapLibreTooltip object for displaying tooltips.
     Adapted from https://github.com/jtmiclat/folium-pmtiles. Credits to @jtmiclat.
     """
@@ -3875,4 +3875,5 @@ class PMTilesMapLibreTooltip(JSCSSMixin, Layer):
     )
 
     def __init__(self, name=None, **kwargs):
-        super().__init__(name=name if name else "PMTilesTooltip", **kwargs)
+        # super().__init__(name=name if name else "PMTilesTooltip", **kwargs)
+        super().__init__(**kwargs)
