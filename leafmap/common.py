@@ -11348,7 +11348,10 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
         with open(input_file, "rb") as f:
             reader = Reader(MmapSource(f))
             metadata = reader.metadata()
-            metadata["vector_layers"] = json.loads(metadata["json"])["vector_layers"]
+            if "json" in metadata:
+                metadata["vector_layers"] = json.loads(metadata["json"])[
+                    "vector_layers"
+                ]
 
     vector_layers = metadata["vector_layers"]
     layer_names = [layer["id"] for layer in vector_layers]
