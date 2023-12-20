@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.29.8 - Dec 20, 2023
+
+**What's Changed**
+
+-   Fix PMTiles metadata bug by @giswqs in [#643](https://github.com/opengeos/leafmap/pull/643)
+-   fixed namespace and event handling issue with PMTiles by @prusswan in [#645](https://github.com/opengeos/leafmap/pull/645)
+
+**New Contributors**
+
+-   @prusswan made their first contribution in [#645](https://github.com/opengeos/leafmap/pull/645)
+
+**Full Changelog**: [v0.29.7...v0.29.8](https://github.com/opengeos/leafmap/compare/v0.29.7...v0.29.8)
+
+## v0.29.7 - Dec 15, 2023
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#634](https://github.com/opengeos/leafmap/pull/634)
+-   Update Colab badge link by @giswqs in [#635](https://github.com/opengeos/leafmap/pull/635)
+-   Update GEDI notebook example by @giswqs in [#637](https://github.com/opengeos/leafmap/pull/637)
+-   Add actinia notebook by @neteler in [#573](https://github.com/opengeos/leafmap/pull/573)
+-   Fix folium pmtiles bug by @giswqs in [#641](https://github.com/opengeos/leafmap/pull/641)
+
+**New Contributors**
+
+-   @neteler made their first contribution in [#573](https://github.com/opengeos/leafmap/pull/573)
+
+**Full Changelog**: [v0.29.6...v0.29.7](https://github.com/opengeos/leafmap/compare/v0.29.6...v0.29.7)
+
 ## v0.29.6 - Dec 7, 2023
 
 **What's Changed**
