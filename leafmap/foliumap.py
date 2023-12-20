@@ -3738,17 +3738,18 @@ class PMTilesLayer(JSCSSMixin, Layer):
     _template = Template(
         """
             {% macro script(this, kwargs) -%}
-            let protocol = new pmtiles.Protocol();
+            var protocol = new pmtiles.Protocol();
             maplibregl.addProtocol("pmtiles", protocol.tile);
 
-           {{ this._parent.get_name() }}.createPane('overlay');
-           {{ this._parent.get_name() }}.getPane('overlay').style.zIndex = 650;
-           {{ this._parent.get_name() }}.getPane('overlay').style.pointerEvents = 'none';
+            // see: https://github.com/maplibre/maplibre-gl-leaflet/issues/19
+            {{ this._parent.get_name() }}.createPane('overlay_{{ this.get_name() }}');
+            {{ this._parent.get_name() }}.getPane('overlay_{{ this.get_name() }}').style.zIndex = 650;
+            {{ this._parent.get_name() }}.getPane('overlay_{{ this.get_name() }}').style.pointerEvents = 'none';
 
             var {{ this.get_name() }} = L.maplibreGL({
-            pane: 'overlay',
-            style: {{ this.style|tojson}},
-            interactive: true,
+                pane: 'overlay_{{ this.get_name() }}',
+                style: {{ this.style|tojson}},
+                interactive: true,
             }).addTo({{ this._parent.get_name() }});
 
             {%- endmacro %}
@@ -3836,19 +3837,24 @@ class PMTilesMapLibreTooltip(JSCSSMixin, MacroElement):
             {% endmacro %}
             {% macro script(this, kwargs) -%}
                 var {{ this.get_name() }} = {{ this._parent.get_name() }}.getMaplibreMap();
-                const popup = new maplibregl.Popup({
+                const popup_{{ this.get_name() }} = new maplibregl.Popup({
                     closeButton: false,
                     closeOnClick: false
                 });
-                {{ this.get_name() }}.on('load', () => {
-                    {{ this.get_name() }}.on('mousemove', (e) => { 
-                        {{ this.get_name() }}.getCanvas().style.cursor = 'pointer';
+
+                function setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}(maplibreLayer) {
+                    var mlMap = maplibreLayer.getMaplibreMap();
+                    var popup = popup_{{ this.get_name() }};
+
+                    mlMap.on('mousemove', (e) => {
+                        mlMap.getCanvas().style.cursor = 'pointer';
                         const { x, y } = e.point;
                         const r = 2; // radius around the point
-                        const features = {{ this.get_name() }}.queryRenderedFeatures([
+                        const features = mlMap.queryRenderedFeatures([
                             [x - r, y - r],
                             [x + r, y + r],
                         ]);
+
                         const {lng, lat}  = e.lngLat;
                         const coordinates = [lng, lat]
                         const html = features.map(f=>`
@@ -3863,12 +3869,22 @@ class PMTilesMapLibreTooltip(JSCSSMixin, MacroElement):
                         </div>
                         `).join("")
                         if(features.length){
-                            popup.setLngLat(e.lngLat).setHTML(html).addTo({{ this.get_name() }});
+                            popup.setLngLat(e.lngLat).setHTML(html).addTo(mlMap);
                         } else {
                             popup.remove();
                         }
                     });
-                    {{ this.get_name() }}.on('mouseleave', () => {popup.remove();});
+                    mlMap.on('mouseleave', () => {popup.remove();});
+                }
+
+                // maplibre map object
+                {{ this.get_name() }}.on("load", (e) => {
+                    setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}({{ this._parent.get_name() }});
+                })
+
+                // leaflet map object
+                {{ this._parent._parent.get_name() }}.on("layeradd", (e) => {
+                    setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}({{ this._parent.get_name() }});
                 });
             {%- endmacro %}
             """
