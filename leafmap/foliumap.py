@@ -1232,6 +1232,7 @@ class Map(folium.Map):
             opacity (float, optional): The opacity of the legend. Defaults to 1.0.
             position (str, optional): The position of the legend, can be one of the following:
                 "topleft", "topright", "bottomleft", "bottomright". Defaults to "bottomright".
+                Note that position is only valid when draggable is False.
             draggable (bool, optional): If True, the legend can be dragged to a new position. Defaults to True.
             style: Additional keyword arguments to style the legend, such as position, bottom, right, z-index,
                 border, background-color, border-radius, padding, font-size, etc. The default style is:
