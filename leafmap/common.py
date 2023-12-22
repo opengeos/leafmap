@@ -12813,3 +12813,180 @@ def h5_to_gdf(
     )
 
     return gdf
+
+
+def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> None:
+    """Logs in to NASA Earthdata.
+
+    Args:
+        strategy (str, optional): The authentication method.
+               "all": (default) try all methods until one works
+                "interactive": enter username and password.
+                "netrc": retrieve username and password from ~/.netrc.
+                "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
+           persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
+        **kwargs: Additional keyword arguments for the earthaccess.login() function.
+    """
+    try:
+        import earthaccess
+    except ImportError:
+        install_package("earthaccess")
+        import earthaccess
+
+    try:
+        earthaccess.login(strategy=strategy, persist=persist, **kwargs)
+    except:
+        print(
+            "Please login to Earthdata first. Register at https://urs.earthdata.nasa.gov"
+        )
+
+
+def nasa_data_granules_to_gdf(
+    granules: List[dict], crs: str = "EPSG:4326", output: str = None, **kwargs
+):
+    """Converts granules data to a GeoDataFrame.
+
+    Args:
+        granules (List[dict]): A list of granules.
+        crs (str, optional): The coordinate reference system (CRS) of the GeoDataFrame. Defaults to "EPSG:4326".
+        output (str, optional): The output file path to save the GeoDataFrame as a file. Defaults to None.
+        **kwargs: Additional keyword arguments for the gpd.GeoDataFrame.to_file() function.
+
+    Returns:
+        gpd.GeoDataFrame: The resulting GeoDataFrame.
+    """
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import box, Polygon
+
+    df = pd.json_normalize([dict(i.items()) for i in granules])
+    df.columns = [col.split(".")[-1] for col in df.columns]
+    df = df.drop("Version", axis=1)
+
+    def get_bbox(rectangles):
+        xmin = min(rectangle["WestBoundingCoordinate"] for rectangle in rectangles)
+        ymin = min(rectangle["SouthBoundingCoordinate"] for rectangle in rectangles)
+        xmax = max(rectangle["EastBoundingCoordinate"] for rectangle in rectangles)
+        ymax = max(rectangle["NorthBoundingCoordinate"] for rectangle in rectangles)
+
+        bbox = (xmin, ymin, xmax, ymax)
+        return bbox
+
+    def get_polygon(coordinates):
+        # Extract the points from the dictionary
+        points = [
+            (point["Longitude"], point["Latitude"])
+            for point in coordinates[0]["Boundary"]["Points"]
+        ]
+
+        # Create a Polygon
+        polygon = Polygon(points)
+        return polygon
+
+    if "BoundingRectangles" in df.columns:
+        df["bbox"] = df["BoundingRectangles"].apply(get_bbox)
+        df["geometry"] = df["bbox"].apply(lambda x: box(*x))
+    elif "GPolygons" in df.columns:
+        df["geometry"] = df["GPolygons"].apply(get_polygon)
+
+    gdf = gpd.GeoDataFrame(df, geometry="geometry")
+
+    gdf.crs = crs
+
+    if output is not None:
+        for column in gdf.columns:
+            if gdf[column].apply(lambda x: isinstance(x, list)).any():
+                gdf[column] = gdf[column].apply(lambda x: str(x))
+
+        gdf.to_file(output, **kwargs)
+
+    return gdf
+
+
+def nasa_data_search(
+    count: int = -1,
+    short_name: Optional[str] = None,
+    bbox: Optional[List[float]] = None,
+    temporal: Optional[str] = None,
+    version: Optional[str] = None,
+    doi: Optional[str] = None,
+    daac: Optional[str] = None,
+    provider: Optional[str] = None,
+    output: Optional[str] = None,
+    crs: str = "EPSG:4326",
+    return_gdf: bool = False,
+    **kwargs,
+) -> Union[List[dict], tuple]:
+    """Searches for NASA Earthdata granules.
+
+    Args:
+        count (int, optional): The number of granules to retrieve. Defaults to -1 (retrieve all).
+        short_name (str, optional): The short name of the dataset.
+        bbox (List[float], optional): The bounding box coordinates [xmin, ymin, xmax, ymax].
+        temporal (str, optional): The temporal extent of the data.
+        version (str, optional): The version of the dataset.
+        doi (str, optional): The Digital Object Identifier (DOI) of the dataset.
+        daac (str, optional): The Distributed Active Archive Center (DAAC) of the dataset.
+        provider (str, optional): The provider of the dataset.
+        output (str, optional): The output file path to save the GeoDataFrame as a file.
+        crs (str, optional): The coordinate reference system (CRS) of the GeoDataFrame. Defaults to "EPSG:4326".
+        return_gdf (bool, optional): Whether to return the GeoDataFrame in addition to the granules. Defaults to False.
+        **kwargs: Additional keyword arguments for the earthaccess.search_data() function.
+
+    Returns:
+        Union[List[dict], tuple]: The retrieved granules. If return_gdf is True, also returns the resulting GeoDataFrame.
+    """
+    import earthaccess
+
+    if short_name is not None:
+        kwargs["short_name"] = short_name
+    if bbox is not None:
+        kwargs["bounding_box"] = bbox
+    if temporal is not None:
+        kwargs["temporal"] = temporal
+    if version is not None:
+        kwargs["version"] = version
+    if doi is not None:
+        kwargs["doi"] = doi
+    if daac is not None:
+        kwargs["daac"] = daac
+    if provider is not None:
+        kwargs["provider"] = provider
+
+    granules = earthaccess.search_data(
+        count=count,
+        **kwargs,
+    )
+
+    if output is not None:
+        nasa_data_granules_to_gdf(granules, crs=crs, output=output)
+
+    if return_gdf:
+        gdf = nasa_data_granules_to_gdf(granules, crs=crs)
+        return granules, gdf
+    else:
+        return granules
+
+
+def nasa_data_download(
+    granules: List[dict],
+    out_dir: Optional[str] = None,
+    provider: Optional[str] = None,
+    threads: int = 8,
+) -> None:
+    """Downloads NASA Earthdata granules.
+
+    Args:
+        granules (List[dict]): The granules to download.
+        out_dir (str, optional): The output directory where the granules will be downloaded. Defaults to None (current directory).
+        provider (str, optional): The provider of the granules.
+        threads (int, optional): The number of threads to use for downloading. Defaults to 8.
+    """
+    import earthaccess
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
+    earthaccess.download(
+        granules, local_path=out_dir, provider=provider, threads=threads
+    )
