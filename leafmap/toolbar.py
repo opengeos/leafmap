@@ -6338,12 +6338,19 @@ def nasa_data_gui(
         layout=widgets.Layout(width=widget_width, padding=padding),
     )
 
+    max_items = widgets.IntText(
+        value=50,
+        description="Max items:",
+        style=style,
+        layout=widgets.Layout(width="125px", padding=padding),
+    )
+
     bbox = widgets.Text(
         value="Map bounds",
         description="Bouding box:",
         placeholder="xmin, ymin, xmax, ymax",
         style=style,
-        layout=widgets.Layout(width=widget_width, padding=padding),
+        layout=widgets.Layout(width="271px", padding=padding),
     )
 
     start_date = widgets.DatePicker(
@@ -6357,6 +6364,13 @@ def nasa_data_gui(
         disabled=False,
         style=style,
         layout=widgets.Layout(width="198px", padding=padding),
+    )
+
+    dataset = widgets.Dropdown(
+        value=None,
+        description="Dataset:",
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
     )
 
     buttons = widgets.ToggleButtons(
@@ -6378,6 +6392,8 @@ def nasa_data_gui(
         title.value = m._NASA_DATA[m._NASA_DATA["ShortName"] == short_name.value][
             "EntryTitle"
         ].values[0]
+        dataset.value = None
+        dataset.options = []
 
     short_name.observe(change_dataset, "value")
 
@@ -6390,8 +6406,9 @@ def nasa_data_gui(
         keyword,
         short_name,
         title,
-        bbox,
+        widgets.HBox([max_items, bbox]),
         widgets.HBox([start_date, end_date]),
+        dataset,
         buttons,
         output,
     ]
@@ -6466,7 +6483,7 @@ def nasa_data_gui(
                     output.clear_output(wait=True)
                     try:
                         results, gdf = nasa_data_search(
-                            count=100,
+                            count=max_items.value,
                             short_name=short_name.value,
                             bbox=bounds,
                             temporal=date_range,
@@ -6488,15 +6505,38 @@ def nasa_data_gui(
                                 zoom_to_layer=False,
                             )
                             setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
+
+                            dataset.options = gdf["native-id"].values.tolist()
+                            dataset.value = dataset.options[0]
+
+                            setattr(m, "_NASA_DATA_GDF", gdf)
+                            setattr(m, "_NASA_DATA_RESULTS", results)
+
                     except Exception as e:
                         print(e)
 
         elif change["new"] == "Display":
+            output.clear_output()
             with output:
-                output.outputs = ()
+                print("To be implemented...")
 
         elif change["new"] == "Reset":
-            pass
+            keyword.value = ""
+            short_name.options = m._NASA_DATA_NAMES
+            short_name.value = default_dataset
+            title.value = default_title
+            max_items.value = 50
+            bbox.value = "Map bounds"
+            start_date.value = None
+            end_date.value = None
+            dataset.options = []
+            dataset.value = None
+            output.clear_output()
+
+            if "Footprints" in m.get_layer_names():
+                m.remove(m.find_layer("Footprints"))
+            if hasattr(m, "_NASA_DATA_CTRL") and m._NASA_DATA_CTRL in m.controls:
+                m.remove(m._NASA_DATA_CTRL)
 
         elif change["new"] == "Close":
             if m is not None:
