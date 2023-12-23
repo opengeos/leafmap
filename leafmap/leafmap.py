@@ -204,7 +204,7 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-    def add(self, object):
+    def add(self, object, **kwargs):
         """Adds a layer to the map.
 
         Args:
@@ -213,6 +213,12 @@ class Map(ipyleaflet.Map):
         if isinstance(object, str):
             if object in basemaps.keys():
                 object = get_basemap(object)
+
+            elif object == "nasa_earth_data":
+                from .toolbar import nasa_data_gui
+
+                nasa_data_gui(self, **kwargs)
+                return
 
         super().add(object)
 
