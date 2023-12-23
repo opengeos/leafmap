@@ -12990,3 +12990,43 @@ def nasa_data_download(
     earthaccess.download(
         granules, local_path=out_dir, provider=provider, threads=threads
     )
+
+
+def nasa_datasets(keyword=None, df=None, return_short_name=False):
+    """
+    Searches for NASA datasets based on a keyword in a DataFrame.
+
+    Args:
+        keyword (str, optional): The keyword to search for. Defaults to None.
+        df (pd.DataFrame, optional): The DataFrame to search in. If None, it will download the NASA dataset CSV from GitHub. Defaults to None.
+        return_short_name (bool, optional): If True, only returns the list of short names of the matched datasets. Defaults to False.
+
+    Returns:
+        Union[pd.DataFrame, List[str]]: Filtered DataFrame if return_short_name is False, otherwise a list of short names.
+
+    """
+    import pandas as pd
+
+    if df is None:
+        url = "https://github.com/opengeos/NASA-Earth-Data/raw/main/nasa_earth_data.tsv"
+        df = pd.read_csv(url, sep="\t")
+
+    if keyword is not None:
+        # Convert keyword and DataFrame values to lowercase
+        keyword_lower = keyword.lower()
+        df_lower = df.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+
+        # Use boolean indexing to filter the DataFrame
+        filtered_df = df[
+            df_lower.astype(str).apply(lambda x: keyword_lower in " ".join(x), axis=1)
+        ].reset_index(drop=True)
+
+        if return_short_name:
+            return filtered_df["ShortName"].tolist()
+        else:
+            return filtered_df
+    else:
+        if return_short_name:
+            return df["ShortName"].tolist()
+        else:
+            return df
