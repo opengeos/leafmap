@@ -102,6 +102,7 @@
 86. Adding markers to the map ([notebook](https://leafmap.org/notebooks/86_add_markers))
 87. Cloud-based geoprocessing with Actinia ([notebook](https://leafmap.org/notebooks/87_actinia))
 88. Searching and downloading NASA Earth science data products ([notebook](https://leafmap.org/notebooks/88_nasa_earth_data))
+89. Visualizing in-memory raster datasets and image arrays ([notebook](https://leafmap.org/notebooks/89_image_array_viz))
 
 ## Demo
 

@@ -72,7 +72,7 @@ class Map(ipyleaflet.Map):
                 self.sandbox_path = None
 
         if "height" not in kwargs:
-            self.layout.height = "500px"
+            self.layout.height = "600px"
         else:
             if isinstance(kwargs["height"], int):
                 kwargs["height"] = str(kwargs["height"]) + "px"
@@ -93,7 +93,7 @@ class Map(ipyleaflet.Map):
             self.add(ipyleaflet.FullScreenControl())
 
         if "search_control" not in kwargs:
-            kwargs["search_control"] = True
+            kwargs["search_control"] = False
         if kwargs["search_control"]:
             url = "https://nominatim.openstreetmap.org/search?format=json&q={s}"
             search_control = ipyleaflet.SearchControl(
@@ -180,7 +180,7 @@ class Map(ipyleaflet.Map):
             draw_control.on_draw(handle_draw)
 
         if "measure_control" not in kwargs:
-            kwargs["measure_control"] = True
+            kwargs["measure_control"] = False
         if kwargs["measure_control"]:
             self.add(ipyleaflet.MeasureControl(position="topleft"))
 
