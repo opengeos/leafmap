@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.30.0 - Dec 23, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.8 by @giswqs in [#646](https://github.com/opengeos/leafmap/pull/646)
+-   Improve folium legend position docstring by @giswqs in [#647](https://github.com/opengeos/leafmap/pull/647)
+-   Add support for downloading NASA Earth data by @giswqs in [#648](https://github.com/opengeos/leafmap/pull/648)
+-   Add support for searching NASA data interactively by @giswqs in [#649](https://github.com/opengeos/leafmap/pull/649)
+-   Add support for visualizing in-memory raster by @giswqs in [#651](https://github.com/opengeos/leafmap/pull/651)
+
+**Full Changelog**: [v0.29.8...v0.30.0](https://github.com/opengeos/leafmap/compare/v0.29.8...v0.30.0)
+
 ## v0.29.8 - Dec 20, 2023
 
 **What's Changed**
