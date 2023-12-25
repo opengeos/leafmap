@@ -10278,6 +10278,13 @@ def array_to_memory_file(
     import xarray as xr
 
     if isinstance(array, xr.DataArray):
+        coords = [coord for coord in array.coords]
+        if coords[0] == "time":
+            x_dim = coords[1]
+            y_dim = coords[2]
+            array = (
+                array.isel(time=0).rename({y_dim: "y", x_dim: "x"}).transpose("y", "x")
+            )
         array = array.values
 
     if array.ndim == 3 and transpose:
@@ -10305,6 +10312,7 @@ def array_to_memory_file(
                 cellsize * array.shape[1],
                 cellsize * array.shape[0],
             )
+            # (west, south, east, north, width, height)
             transform = rasterio.transform.from_bounds(
                 xmin, ymin, xmax, ymax, array.shape[1], array.shape[0]
             )
@@ -10398,11 +10406,22 @@ def array_to_image(
 
     import numpy as np
     import rasterio
+    import xarray as xr
 
     if output is None:
         return array_to_memory_file(
             array, source, dtype, compress, transpose, cellsize, crs, driver, **kwargs
         )
+
+    if isinstance(array, xr.DataArray):
+        coords = [coord for coord in array.coords]
+        if coords[0] == "time":
+            x_dim = coords[1]
+            y_dim = coords[2]
+            array = (
+                array.isel(time=0).rename({y_dim: "y", x_dim: "x"}).transpose("y", "x")
+            )
+        array = array.values
 
     if array.ndim == 3 and transpose:
         array = np.transpose(array, (1, 2, 0))
@@ -10489,9 +10508,6 @@ def array_to_image(
         elif array.ndim == 3:
             for i in range(array.shape[2]):
                 dst.write(array[:, :, i], i + 1)
-
-    return output
-
 
 def images_to_tiles(
     images: Union[str, List[str]], names: List[str] = None, **kwargs
