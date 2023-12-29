@@ -3861,6 +3861,7 @@ class Map(ipyleaflet.Map):
         max_velocity=20,
         display_options={},
         name="Velocity",
+        color_scale=None
     ):
         """Add a velocity layer to the map.
 
@@ -3877,6 +3878,7 @@ class Map(ipyleaflet.Map):
             max_velocity (int, optional): The maximum velocity to display. Defaults to 20.
             display_options (dict, optional): The display options for the velocity layer. Defaults to {}. See https://bit.ly/3uf8t6w.
             name (str, optional): Layer name to use . Defaults to 'Velocity'.
+            color_scale (list, optional): List of RGB color values for the velocity vector color scale. Defaults to []. See https://bit.ly/3uf8t6w.
 
         Raises:
             ImportError: If the xarray package is not installed.
@@ -3911,6 +3913,25 @@ class Map(ipyleaflet.Map):
         if level_dimension in coords:
             ds = ds.isel(drop=True, **params)
 
+        if color_scale is None:
+            color_scale=[
+                "rgb(36,104, 180)",
+                "rgb(60,157, 194)",
+                "rgb(128,205,193)",
+                "rgb(151,218,168)",
+                "rgb(198,231,181)",
+                "rgb(238,247,217)",
+                "rgb(255,238,159)",
+                "rgb(252,217,125)",
+                "rgb(255,182,100)",
+                "rgb(252,150,75)",
+                "rgb(250,112,52)",
+                "rgb(245,64,32)",
+                "rgb(237,45,28)",
+                "rgb(220,24,32)",
+                "rgb(180,0,35)"
+            ]
+        
         wind = Velocity(
             data=ds,
             zonal_speed=zonal_speed,
@@ -3921,6 +3942,7 @@ class Map(ipyleaflet.Map):
             max_velocity=max_velocity,
             display_options=display_options,
             name=name,
+            color_scale=color_scale,
         )
         self.add(wind)
 
