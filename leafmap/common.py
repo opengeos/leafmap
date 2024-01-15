@@ -10266,7 +10266,8 @@ def array_to_memory_file(
         transpose (bool, optional): Whether to transpose the array from (bands, rows, columns) to (rows, columns, bands). Defaults to True.
         cellsize (float, optional): The cell size of the array if source is not provided. Defaults to None.
         crs (str, optional): The coordinate reference system of the array if source is not provided. Defaults to None.
-        transform (tuple, optional): The affine transformation matrix if source is not provided. Defaults to None.
+        transform (tuple, optional): The affine transformation matrix if source is not provided.
+            Can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361). Defaults to None
         driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
         **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
 
@@ -10276,6 +10277,7 @@ def array_to_memory_file(
     import rasterio
     import numpy as np
     import xarray as xr
+    from rasterio.transform import Affine
 
     if isinstance(array, xr.DataArray):
         coords = [coord for coord in array.coords]
@@ -10304,7 +10306,7 @@ def array_to_memory_file(
                 "crs must be provided if source is not provided, such as EPSG:3857"
             )
 
-        if "transform" not in kwargs:
+        if transform is None:
             # Define the geotransformation parameters
             xmin, ymin, xmax, ymax = (
                 0,
@@ -10316,8 +10318,12 @@ def array_to_memory_file(
             transform = rasterio.transform.from_bounds(
                 xmin, ymin, xmax, ymax, array.shape[1], array.shape[0]
             )
-        else:
-            transform = kwargs["transform"]
+        elif isinstance(transform, Affine):
+            pass
+        elif isinstance(transform, (tuple, list)):
+            transform = Affine(*transform)
+
+        kwargs["transform"] = transform
 
     if dtype is None:
         # Determine the minimum and maximum values in the array
@@ -10386,6 +10392,7 @@ def array_to_image(
     transpose: bool = True,
     cellsize: float = None,
     crs: str = None,
+    transform: tuple = None,
     driver: str = "COG",
     **kwargs,
 ) -> str:
@@ -10400,6 +10407,8 @@ def array_to_image(
         transpose (bool, optional): Whether to transpose the array from (bands, rows, columns) to (rows, columns, bands). Defaults to True.
         cellsize (float, optional): The resolution of the output image in meters. Defaults to None.
         crs (str, optional): The CRS of the output image. Defaults to None.
+        transform (tuple, optional): The affine transformation matrix, can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361).
+            Defaults to None.
         driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
         **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
     """
@@ -10407,10 +10416,20 @@ def array_to_image(
     import numpy as np
     import rasterio
     import xarray as xr
+    from rasterio.transform import Affine
 
     if output is None:
         return array_to_memory_file(
-            array, source, dtype, compress, transpose, cellsize, crs, driver, **kwargs
+            array,
+            source,
+            dtype,
+            compress,
+            transpose,
+            cellsize,
+            crs=crs,
+            transform=transform,
+            driver=driver,
+            **kwargs,
         )
 
     if isinstance(array, xr.DataArray):
@@ -10447,7 +10466,7 @@ def array_to_image(
                 "crs must be provided if source is not provided, such as EPSG:3857"
             )
 
-        if "transform" not in kwargs:
+        if transform is None:
             # Define the geotransformation parameters
             xmin, ymin, xmax, ymax = (
                 0,
@@ -10458,8 +10477,12 @@ def array_to_image(
             transform = rasterio.transform.from_bounds(
                 xmin, ymin, xmax, ymax, array.shape[1], array.shape[0]
             )
-        else:
-            transform = kwargs["transform"]
+        elif isinstance(transform, Affine):
+            pass
+        elif isinstance(transform, (tuple, list)):
+            transform = Affine(*transform)
+
+        kwargs["transform"] = transform
 
     if dtype is None:
         # Determine the minimum and maximum values in the array
@@ -10508,6 +10531,7 @@ def array_to_image(
         elif array.ndim == 3:
             for i in range(array.shape[2]):
                 dst.write(array[:, :, i], i + 1)
+
 
 def images_to_tiles(
     images: Union[str, List[str]], names: List[str] = None, **kwargs
