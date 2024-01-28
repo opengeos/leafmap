@@ -2234,12 +2234,11 @@ class Map(ipyleaflet.Map):
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
-        band_names = list(tile_client.metadata()["bands"].keys())
         params = {
             "tile_layer": tile_layer,
             "tile_client": tile_client,
             "band": band,
-            "band_names": band_names,
+            "band_names": tile_client.band_names,
             "bounds": bounds,
             "type": "LOCAL",
         }
@@ -3931,7 +3930,7 @@ class Map(ipyleaflet.Map):
                 "rgb(220,24,32)",
                 "rgb(180,0,35)"
             ]
-        
+
         wind = Velocity(
             data=ds,
             zonal_speed=zonal_speed,
@@ -4247,11 +4246,11 @@ class Map(ipyleaflet.Map):
         """
 
         if background:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'}; 
-            padding: {padding}; background-color: {bg_color}; 
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            padding: {padding}; background-color: {bg_color};
             border-radius: {border_radius};">{text}</div>"""
         else:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'}; 
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)

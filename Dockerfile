@@ -1,5 +1,5 @@
 FROM jupyter/scipy-notebook:latest
-RUN mamba install -c conda-forge leafmap geopandas localtileserver osmnx -y && \
+RUN mamba install -c conda-forge leafmap geopandas "localtileserver>=0.10.0" osmnx -y && \
     pip install -U leafmap jsonschema==4.18.0 lonboard h5py && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"

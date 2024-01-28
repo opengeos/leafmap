@@ -973,16 +973,9 @@ def local_tile_pixel_value(
         verbose (bool, optional): Print status messages. Defaults to True.
 
     Returns:
-        list: A dictionary of band info.
+        PointData: rio-tiler point data.
     """
-
-    r = tile_client.pixel(lat, lon, units="EPSG:4326", **kwargs)
-    if "bands" in r:
-        return r["bands"]
-    else:
-        if verbose:
-            print("No pixel value found.")
-        return None
+    return tile_client.point(lon, lat, coord_crs="EPSG:4326", **kwargs)
 
 
 def local_tile_vmin_vmax(
@@ -1012,8 +1005,8 @@ def local_tile_vmin_vmax(
     else:
         raise ValueError("source must be a string or TileClient object.")
 
-    stats = tile_client.metadata()["bands"]
-    bandnames = list(stats.keys())
+    bandnames = tile_client.band_names
+    stats = tile_client.reader.statistics()
 
     if isinstance(bands, str):
         bands = [bands]
@@ -1050,8 +1043,7 @@ def local_tile_bands(source):
     else:
         raise ValueError("source must be a string or TileClient object.")
 
-    bandnames = list(tile_client.metadata()["bands"].keys())
-    return bandnames
+    return tile_client.band_names
 
 
 def bbox_to_geojson(bounds):
@@ -2807,9 +2799,8 @@ def get_local_tile_layer(
     source,
     port="default",
     debug=False,
-    projection="EPSG:3857",
-    band=None,
-    palette=None,
+    indexes=None,
+    colormap=None,
     vmin=None,
     vmax=None,
     nodata=None,
@@ -2831,11 +2822,10 @@ def get_local_tile_layer(
         source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
         port (str, optional): The port to use for the server. Defaults to "default".
         debug (bool, optional): If True, the server will be started in debug mode. Defaults to False.
-        projection (str, optional): The projection of the GeoTIFF. Defaults to "EPSG:3857".
-        band (int, optional): The band to use. Band indexing starts at 1. Defaults to None.
-        palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
-        vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
-        vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+        indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.
+        colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+        vmin (float, optional): The minimum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+        vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
         nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
         attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
@@ -2846,16 +2836,23 @@ def get_local_tile_layer(
     Returns:
         ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
     """
-
-    from osgeo import gdal
     import rasterio
-
-    # ... and suppress errors
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
 
     check_package(
         "localtileserver", URL="https://github.com/banesullivan/localtileserver"
     )
+
+    # Handle legacy localtileserver kwargs
+    if "cmap" in kwargs:
+        warnings.warn("`cmap` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`.")
+    if "palette" in kwargs:
+        warnings.warn("`palette` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`.")
+    if "band" in kwargs or "bands" in kwargs:
+        warnings.warn("`band` and `bands` are deprecated keyword arguments for get_local_tile_layer. Please use `indexes`.")
+    if "projection" in kwargs:
+        warnings.warn("`projection` is a deprecated keyword argument for get_local_tile_layer and will be ignored.")
+    if "style" in kwargs:
+        warnings.warn("`style` is a deprecated keyword argument for get_local_tile_layer and will be ignored.")
 
     if "max_zoom" not in kwargs:
         kwargs["max_zoom"] = 100
@@ -2905,9 +2902,6 @@ def get_local_tile_layer(
     else:
         raise ValueError("The source must either be a string or TileClient")
 
-    if isinstance(palette, str):
-        palette = get_palette_colors(palette, hashtag=True)
-
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
 
@@ -2919,12 +2913,8 @@ def get_local_tile_layer(
 
     if isinstance(source, str) or isinstance(source, rasterio.io.DatasetReader):
         tile_client = TileClient(source, port=port, debug=debug)
-
     else:
         tile_client = source
-
-    if "cmap" not in kwargs:
-        kwargs["cmap"] = palette
 
     if quiet:
         output = widgets.Output()
@@ -2934,8 +2924,8 @@ def get_local_tile_layer(
                     tile_client,
                     port=port,
                     debug=debug,
-                    projection=projection,
-                    band=band,
+                    indexes=indexes,
+                    colormap=colormap,
                     vmin=vmin,
                     vmax=vmax,
                     nodata=nodata,
@@ -2948,8 +2938,8 @@ def get_local_tile_layer(
                     tile_client,
                     port=port,
                     debug=debug,
-                    projection=projection,
-                    band=band,
+                    indexes=indexes,
+                    colormap=colormap,
                     vmin=vmin,
                     vmax=vmax,
                     nodata=nodata,
@@ -2964,8 +2954,8 @@ def get_local_tile_layer(
                 tile_client,
                 port=port,
                 debug=debug,
-                projection=projection,
-                band=band,
+                indexes=indexes,
+                colormap=colormap,
                 vmin=vmin,
                 vmax=vmax,
                 nodata=nodata,
@@ -2978,8 +2968,8 @@ def get_local_tile_layer(
                 tile_client,
                 port=port,
                 debug=debug,
-                projection=projection,
-                band=band,
+                indexes=indexes,
+                colormap=colormap,
                 vmin=vmin,
                 vmax=vmax,
                 nodata=nodata,
@@ -4794,13 +4784,12 @@ def read_netcdf(filename, **kwargs):
 def netcdf_tile_layer(
     filename,
     variables=None,
-    palette=None,
+    colormap=None,
     vmin=None,
     vmax=None,
     nodata=None,
     port="default",
     debug=False,
-    projection="EPSG:3857",
     attribution=None,
     tile_format="ipyleaflet",
     layer_name="NetCDF layer",
@@ -4821,9 +4810,9 @@ def netcdf_tile_layer(
         filename (str): File path or HTTP URL to the netCDF file.
         variables (int, optional): The variable/band names to extract data from the netCDF file. Defaults to None. If None, all variables will be extracted.
         port (str, optional): The port to use for the server. Defaults to "default".
-        palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
-        vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
-        vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+        colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+        vmin (float, optional): The minimum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+        vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
         nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
         debug (bool, optional): If True, the server will be started in debug mode. Defaults to False.
         projection (str, optional): The projection of the GeoTIFF. Defaults to "EPSG:3857".
@@ -4887,9 +4876,8 @@ def netcdf_tile_layer(
         output,
         port=port,
         debug=debug,
-        projection=projection,
-        band=band_idx,
-        palette=palette,
+        indexes=band_idx,
+        colormap=colormap,
         vmin=vmin,
         vmax=vmax,
         nodata=nodata,
@@ -8342,10 +8330,10 @@ def html_to_gradio(html, width="100%", height="500px", **kwargs):
         else:
             output.append(line + "\n")
 
-    return f"""<iframe style="width: {width}; height: {height}" name="result" allow="midi; geolocation; microphone; camera; 
-    display-capture; encrypted-media;" sandbox="allow-modals allow-forms 
-    allow-scripts allow-same-origin allow-popups 
-    allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
+    return f"""<iframe style="width: {width}; height: {height}" name="result" allow="midi; geolocation; microphone; camera;
+    display-capture; encrypted-media;" sandbox="allow-modals allow-forms
+    allow-scripts allow-same-origin allow-popups
+    allow-top-navigation-by-user-activation allow-downloads" allowfullscreen=""
     allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
 
 
