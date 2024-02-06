@@ -1208,7 +1208,7 @@ def stac_client(
                 stac_io,
                 **kwargs,
             )
-            return client
+            return client, client.id
 
     except Exception as e:
         print(e)
