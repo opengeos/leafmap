@@ -1,0 +1,3 @@
+# plot module
+
+::: leafmap.plot

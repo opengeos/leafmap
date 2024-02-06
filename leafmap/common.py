@@ -374,6 +374,38 @@ def show_html(html: str):
             raise Exception(e)
 
 
+def display_html(
+    html: Union[str, bytes], width: str = "100%", height: int = 500
+) -> None:
+    """
+    Displays an HTML file or HTML string in a Jupyter Notebook.
+
+    Args:
+        html (Union[str, bytes]): Path to an HTML file or an HTML string.
+        width (str, optional): Width of the displayed iframe. Default is '100%'.
+        height (int, optional): Height of the displayed iframe. Default is 500.
+
+    Returns:
+        None
+    """
+    from IPython.display import IFrame, display
+
+    if isinstance(html, str) and html.startswith("<"):
+        # If the input is an HTML string
+        html_content = html
+    elif isinstance(html, str):
+        # If the input is a file path
+        with open(html, "r") as file:
+            html_content = file.read()
+    elif isinstance(html, bytes):
+        # If the input is a byte string
+        html_content = html.decode("utf-8")
+    else:
+        raise ValueError("Invalid input type. Expected a file path or an HTML string.")
+
+    display(IFrame(srcdoc=html_content, width=width, height=height))
+
+
 def has_transparency(img) -> bool:
     """Checks whether an image has transparency.
 
@@ -468,7 +500,7 @@ def check_color(in_color: Union[str, Tuple]) -> str:
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
-        in_color (str or tuple): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple (e.g., (255, 127, 0)).
+            in_color (str or tuple or list): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple (e.g., (255, 127, 0)).
 
     Returns:
         str: A hex color code.
@@ -476,7 +508,9 @@ def check_color(in_color: Union[str, Tuple]) -> str:
     import colour
 
     out_color = "#000000"  # default black color
-    if isinstance(in_color, tuple) and len(in_color) == 3:
+    if (isinstance(in_color, tuple) or isinstance(in_color, list)) and len(
+        in_color
+    ) == 3:
         # rescale color if necessary
         if all(isinstance(item, int) for item in in_color):
             in_color = [c / 255.0 for c in in_color]
@@ -939,16 +973,9 @@ def local_tile_pixel_value(
         verbose (bool, optional): Print status messages. Defaults to True.
 
     Returns:
-        list: A dictionary of band info.
+        PointData: rio-tiler point data.
     """
-
-    r = tile_client.pixel(lat, lon, units="EPSG:4326", **kwargs)
-    if "bands" in r:
-        return r["bands"]
-    else:
-        if verbose:
-            print("No pixel value found.")
-        return None
+    return tile_client.point(lon, lat, coord_crs="EPSG:4326", **kwargs)
 
 
 def local_tile_vmin_vmax(
@@ -978,8 +1005,8 @@ def local_tile_vmin_vmax(
     else:
         raise ValueError("source must be a string or TileClient object.")
 
-    stats = tile_client.metadata()["bands"]
-    bandnames = list(stats.keys())
+    bandnames = tile_client.band_names
+    stats = tile_client.reader.statistics()
 
     if isinstance(bands, str):
         bands = [bands]
@@ -1016,8 +1043,7 @@ def local_tile_bands(source):
     else:
         raise ValueError("source must be a string or TileClient object.")
 
-    bandnames = list(tile_client.metadata()["bands"].keys())
-    return bandnames
+    return tile_client.band_names
 
 
 def bbox_to_geojson(bounds):
@@ -2465,13 +2491,13 @@ def get_census_dict(reset=False):
         print("Retrieving data. Please wait ...")
         for name in names:
             if "Decennial" not in name:
-                links[
-                    name
-                ] = f"https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_{name.replace(' ', '')}/MapServer/WMSServer"
+                links[name] = (
+                    f"https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_{name.replace(' ', '')}/MapServer/WMSServer"
+                )
             else:
-                links[
-                    name
-                ] = f"https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_{name.replace('Decennial', '').replace(' ', '')}/MapServer/WMSServer"
+                links[name] = (
+                    f"https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_{name.replace('Decennial', '').replace(' ', '')}/MapServer/WMSServer"
+                )
 
             wms = WebMapService(links[name], timeout=300)
             layers = list(wms.contents)
@@ -2773,9 +2799,8 @@ def get_local_tile_layer(
     source,
     port="default",
     debug=False,
-    projection="EPSG:3857",
-    band=None,
-    palette=None,
+    indexes=None,
+    colormap=None,
     vmin=None,
     vmax=None,
     nodata=None,
@@ -2797,11 +2822,10 @@ def get_local_tile_layer(
         source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
         port (str, optional): The port to use for the server. Defaults to "default".
         debug (bool, optional): If True, the server will be started in debug mode. Defaults to False.
-        projection (str, optional): The projection of the GeoTIFF. Defaults to "EPSG:3857".
-        band (int, optional): The band to use. Band indexing starts at 1. Defaults to None.
-        palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
-        vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
-        vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+        indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.
+        colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+        vmin (float, optional): The minimum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+        vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
         nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
         attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
@@ -2812,31 +2836,57 @@ def get_local_tile_layer(
     Returns:
         ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
     """
-
-    from osgeo import gdal
-
-    # ... and suppress errors
-    gdal.PushErrorHandler("CPLQuietErrorHandler")
+    import rasterio
 
     check_package(
         "localtileserver", URL="https://github.com/banesullivan/localtileserver"
     )
 
+    # Handle legacy localtileserver kwargs
+    if "cmap" in kwargs:
+        warnings.warn(
+            "`cmap` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`."
+        )
+    if "palette" in kwargs:
+        warnings.warn(
+            "`palette` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`."
+        )
+    if "band" in kwargs or "bands" in kwargs:
+        warnings.warn(
+            "`band` and `bands` are deprecated keyword arguments for get_local_tile_layer. Please use `indexes`."
+        )
+    if "projection" in kwargs:
+        warnings.warn(
+            "`projection` is a deprecated keyword argument for get_local_tile_layer and will be ignored."
+        )
+    if "style" in kwargs:
+        warnings.warn(
+            "`style` is a deprecated keyword argument for get_local_tile_layer and will be ignored."
+        )
+
     if "max_zoom" not in kwargs:
         kwargs["max_zoom"] = 100
     if "max_native_zoom" not in kwargs:
         kwargs["max_native_zoom"] = 100
+    if "cmap" in kwargs:
+        colormap = kwargs.pop("cmap")
+    if "palette" in kwargs:
+        colormap = kwargs.pop("palette")
+    if "band" in kwargs:
+        indexes = kwargs.pop("band")
+    if "bands" in kwargs:
+        indexes = kwargs.pop("bands")
 
     # Make it compatible with binder and JupyterHub
     if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
-        os.environ[
-            "LOCALTILESERVER_CLIENT_PREFIX"
-        ] = f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+            f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
+        )
 
     if is_studio_lab():
-        os.environ[
-            "LOCALTILESERVER_CLIENT_PREFIX"
-        ] = f"studiolab/default/jupyter/proxy/{{port}}"
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+            f"studiolab/default/jupyter/proxy/{{port}}"
+        )
     elif is_on_aws():
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
     elif "prefix" in kwargs:
@@ -2862,11 +2912,13 @@ def get_local_tile_layer(
                 raise ValueError("The source path does not exist.")
         else:
             source = github_raw_url(source)
+    elif isinstance(source, TileClient) or isinstance(
+        source, rasterio.io.DatasetReader
+    ):
+        pass
+
     else:
         raise ValueError("The source must either be a string or TileClient")
-
-    if isinstance(palette, str):
-        palette = get_palette_colors(palette, hashtag=True)
 
     if tile_format not in ["ipyleaflet", "folium"]:
         raise ValueError("The tile format must be either ipyleaflet or folium.")
@@ -2877,10 +2929,10 @@ def get_local_tile_layer(
         else:
             layer_name = "LocalTile_" + random_string(3)
 
-    tile_client = TileClient(source, port=port, debug=debug)
-
-    if "cmap" not in kwargs:
-        kwargs["cmap"] = palette
+    if isinstance(source, str) or isinstance(source, rasterio.io.DatasetReader):
+        tile_client = TileClient(source, port=port, debug=debug)
+    else:
+        tile_client = source
 
     if quiet:
         output = widgets.Output()
@@ -2890,8 +2942,8 @@ def get_local_tile_layer(
                     tile_client,
                     port=port,
                     debug=debug,
-                    projection=projection,
-                    band=band,
+                    indexes=indexes,
+                    colormap=colormap,
                     vmin=vmin,
                     vmax=vmax,
                     nodata=nodata,
@@ -2904,8 +2956,8 @@ def get_local_tile_layer(
                     tile_client,
                     port=port,
                     debug=debug,
-                    projection=projection,
-                    band=band,
+                    indexes=indexes,
+                    colormap=colormap,
                     vmin=vmin,
                     vmax=vmax,
                     nodata=nodata,
@@ -2920,8 +2972,8 @@ def get_local_tile_layer(
                 tile_client,
                 port=port,
                 debug=debug,
-                projection=projection,
-                band=band,
+                indexes=indexes,
+                colormap=colormap,
                 vmin=vmin,
                 vmax=vmax,
                 nodata=nodata,
@@ -2934,8 +2986,8 @@ def get_local_tile_layer(
                 tile_client,
                 port=port,
                 debug=debug,
-                projection=projection,
-                band=band,
+                indexes=indexes,
+                colormap=colormap,
                 vmin=vmin,
                 vmax=vmax,
                 nodata=nodata,
@@ -3696,9 +3748,7 @@ def numpy_to_image(
     if np_array.dtype == np.float64 or np_array.dtype == np.float32:
         # Convert the array to uint8
         # np_array = (np_array * 255).astype(np.uint8)
-        np_array.interp(np_array, (np_array.min(), np_array.max()), (0, 255)).astype(
-            np.uint8
-        )
+        np.interp(np_array, (np_array.min(), np_array.max()), (0, 255)).astype(np.uint8)
     else:
         # The array is already uint8
         np_array = np_array
@@ -4752,13 +4802,12 @@ def read_netcdf(filename, **kwargs):
 def netcdf_tile_layer(
     filename,
     variables=None,
-    palette=None,
+    colormap=None,
     vmin=None,
     vmax=None,
     nodata=None,
     port="default",
     debug=False,
-    projection="EPSG:3857",
     attribution=None,
     tile_format="ipyleaflet",
     layer_name="NetCDF layer",
@@ -4779,9 +4828,9 @@ def netcdf_tile_layer(
         filename (str): File path or HTTP URL to the netCDF file.
         variables (int, optional): The variable/band names to extract data from the netCDF file. Defaults to None. If None, all variables will be extracted.
         port (str, optional): The port to use for the server. Defaults to "default".
-        palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
-        vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
-        vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+        colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+        vmin (float, optional): The minimum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+        vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
         nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
         debug (bool, optional): If True, the server will be started in debug mode. Defaults to False.
         projection (str, optional): The projection of the GeoTIFF. Defaults to "EPSG:3857".
@@ -4845,9 +4894,8 @@ def netcdf_tile_layer(
         output,
         port=port,
         debug=debug,
-        projection=projection,
-        band=band_idx,
-        palette=palette,
+        indexes=band_idx,
+        colormap=colormap,
         vmin=vmin,
         vmax=vmax,
         nodata=nodata,
@@ -4920,7 +4968,11 @@ def classify(
             "mapclassify is required for this function. Install with `pip install mapclassify`."
         )
 
-    if isinstance(data, gpd.GeoDataFrame) or isinstance(data, pd.DataFrame):
+    if (
+        isinstance(data, gpd.GeoDataFrame)
+        or isinstance(data, pd.DataFrame)
+        or isinstance(data, pd.Series)
+    ):
         df = data
     else:
         try:
@@ -7981,10 +8033,6 @@ def save_colorbar(
     else:
         alpha = 1
 
-    if cmap is not None:
-        cmap = mpl.pyplot.get_cmap(cmap)
-        norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
-
     if "palette" in vis_params:
         hexcodes = to_hex_colors(vis_params["palette"])
         if discrete:
@@ -7999,7 +8047,7 @@ def save_colorbar(
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     elif cmap is not None:
-        cmap = mpl.pyplot.get_cmap(cmap)
+        cmap = mpl.colormaps[cmap]
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     else:
@@ -8300,10 +8348,10 @@ def html_to_gradio(html, width="100%", height="500px", **kwargs):
         else:
             output.append(line + "\n")
 
-    return f"""<iframe style="width: {width}; height: {height}" name="result" allow="midi; geolocation; microphone; camera; 
-    display-capture; encrypted-media;" sandbox="allow-modals allow-forms 
-    allow-scripts allow-same-origin allow-popups 
-    allow-top-navigation-by-user-activation allow-downloads" allowfullscreen="" 
+    return f"""<iframe style="width: {width}; height: {height}" name="result" allow="midi; geolocation; microphone; camera;
+    display-capture; encrypted-media;" sandbox="allow-modals allow-forms
+    allow-scripts allow-same-origin allow-popups
+    allow-top-navigation-by-user-activation allow-downloads" allowfullscreen=""
     allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
 
 
@@ -9297,6 +9345,7 @@ def map_tiles_to_geotiff(
                 "TILED=YES",
             ]
 
+        kwargs.pop("overwrite", None)
         gtiff = driver.Create(
             filename,
             img.size[0],
@@ -10201,46 +10250,53 @@ def install_package(package):
         process.wait()
 
 
-def array_to_image(
+def array_to_memory_file(
     array,
-    output: str = None,
     source: str = None,
     dtype: str = None,
     compress: str = "deflate",
     transpose: bool = True,
-    resolution: float = None,
+    cellsize: float = None,
     crs: str = None,
+    transform: tuple = None,
+    driver="COG",
     **kwargs,
-) -> str:
-    """Save a NumPy array as a GeoTIFF using the projection information from an existing GeoTIFF file.
+):
+    """Convert a NumPy array to a memory file.
 
     Args:
-        array (np.ndarray): The NumPy array to be saved as a GeoTIFF.
-        output (str): The path to the output image. If None, a temporary file will be created. Defaults to None.
-        source (str, optional): The path to an existing GeoTIFF file with map projection information. Defaults to None.
-        dtype (np.dtype, optional): The data type of the output array. Defaults to None.
-        compress (str, optional): The compression method. Can be one of the following: "deflate", "lzw", "packbits", "jpeg". Defaults to "deflate".
+        array (numpy.ndarray): The input NumPy array.
+        source (str, optional): Path to the source file to extract metadata from. Defaults to None.
+        dtype (str, optional): The desired data type of the array. Defaults to None.
+        compress (str, optional): The compression method for the output file. Defaults to "deflate".
         transpose (bool, optional): Whether to transpose the array from (bands, rows, columns) to (rows, columns, bands). Defaults to True.
-        resolution (float, optional): The resolution of the output image in meters. Defaults to None.
-        crs (str, optional): The CRS of the output image. Defaults to None.
-    """
+        cellsize (float, optional): The cell size of the array if source is not provided. Defaults to None.
+        crs (str, optional): The coordinate reference system of the array if source is not provided. Defaults to None.
+        transform (tuple, optional): The affine transformation matrix if source is not provided.
+            Can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361). Defaults to None
+        driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
+        **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
 
-    import numpy as np
+    Returns:
+        rasterio.DatasetReader: The rasterio dataset reader object for the converted array.
+    """
     import rasterio
-    import tempfile
+    import numpy as np
+    import xarray as xr
+    from rasterio.transform import Affine
+
+    if isinstance(array, xr.DataArray):
+        coords = [coord for coord in array.coords]
+        if coords[0] == "time":
+            x_dim = coords[1]
+            y_dim = coords[2]
+            array = (
+                array.isel(time=0).rename({y_dim: "y", x_dim: "x"}).transpose("y", "x")
+            )
+        array = array.values
 
     if array.ndim == 3 and transpose:
         array = np.transpose(array, (1, 2, 0))
-
-    if output is None:
-        output = tempfile.NamedTemporaryFile(suffix=".tif", delete=False).name
-
-    out_dir = os.path.dirname(os.path.abspath(output))
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
-
-    if not output.endswith(".tif"):
-        output += ".tif"
 
     if source is not None:
         with rasterio.open(source) as src:
@@ -10249,32 +10305,36 @@ def array_to_image(
             if compress is None:
                 compress = src.compression
     else:
-        if resolution is None:
-            raise ValueError("resolution must be provided if source is not provided")
+        if cellsize is None:
+            raise ValueError("cellsize must be provided if source is not provided")
         if crs is None:
             raise ValueError(
                 "crs must be provided if source is not provided, such as EPSG:3857"
             )
 
-        if "transform" not in kwargs:
+        if transform is None:
             # Define the geotransformation parameters
             xmin, ymin, xmax, ymax = (
                 0,
                 0,
-                resolution * array.shape[1],
-                resolution * array.shape[0],
+                cellsize * array.shape[1],
+                cellsize * array.shape[0],
             )
+            # (west, south, east, north, width, height)
             transform = rasterio.transform.from_bounds(
                 xmin, ymin, xmax, ymax, array.shape[1], array.shape[0]
             )
-        else:
-            transform = kwargs["transform"]
+        elif isinstance(transform, Affine):
+            pass
+        elif isinstance(transform, (tuple, list)):
+            transform = Affine(*transform)
 
-    # Determine the minimum and maximum values in the array
-    min_value = np.min(array)
-    max_value = np.max(array)
+        kwargs["transform"] = transform
 
     if dtype is None:
+        # Determine the minimum and maximum values in the array
+        min_value = np.min(array)
+        max_value = np.max(array)
         # Determine the best dtype for the array
         if min_value >= 0 and max_value <= 1:
             dtype = np.float32
@@ -10293,33 +10353,182 @@ def array_to_image(
     array = array.astype(dtype)
 
     # Define the GeoTIFF metadata
-    if array.ndim == 2:
-        metadata = {
-            "driver": "GTiff",
-            "height": array.shape[0],
-            "width": array.shape[1],
-            "count": 1,
-            "dtype": array.dtype,
-            "crs": crs,
-            "transform": transform,
-            **kwargs,
-        }
-    elif array.ndim == 3:
-        metadata = {
-            "driver": "GTiff",
-            "height": array.shape[0],
-            "width": array.shape[1],
-            "count": array.shape[2],
-            "dtype": array.dtype,
-            "crs": crs,
-            "transform": transform,
-            **kwargs,
-        }
+    metadata = {
+        "driver": driver,
+        "height": array.shape[0],
+        "width": array.shape[1],
+        "dtype": array.dtype,
+        "crs": crs,
+        "transform": transform,
+    }
 
+    if array.ndim == 2:
+        metadata["count"] = 1
+    elif array.ndim == 3:
+        metadata["count"] = array.shape[2]
     if compress is not None:
         metadata["compress"] = compress
+
+    metadata.update(**kwargs)
+
+    # Create a new memory file and write the array to it
+    memory_file = rasterio.MemoryFile()
+    dst = memory_file.open(**metadata)
+
+    if array.ndim == 2:
+        dst.write(array, 1)
+    elif array.ndim == 3:
+        for i in range(array.shape[2]):
+            dst.write(array[:, :, i], i + 1)
+
+    dst.close()
+
+    # Read the dataset from memory
+    dataset_reader = rasterio.open(dst.name, mode="r")
+
+    return dataset_reader
+
+
+def array_to_image(
+    array,
+    output: str = None,
+    source: str = None,
+    dtype: str = None,
+    compress: str = "deflate",
+    transpose: bool = True,
+    cellsize: float = None,
+    crs: str = None,
+    transform: tuple = None,
+    driver: str = "COG",
+    **kwargs,
+) -> str:
+    """Save a NumPy array as a GeoTIFF using the projection information from an existing GeoTIFF file.
+
+    Args:
+        array (np.ndarray): The NumPy array to be saved as a GeoTIFF.
+        output (str): The path to the output image. If None, a temporary file will be created. Defaults to None.
+        source (str, optional): The path to an existing GeoTIFF file with map projection information. Defaults to None.
+        dtype (np.dtype, optional): The data type of the output array. Defaults to None.
+        compress (str, optional): The compression method. Can be one of the following: "deflate", "lzw", "packbits", "jpeg". Defaults to "deflate".
+        transpose (bool, optional): Whether to transpose the array from (bands, rows, columns) to (rows, columns, bands). Defaults to True.
+        cellsize (float, optional): The resolution of the output image in meters. Defaults to None.
+        crs (str, optional): The CRS of the output image. Defaults to None.
+        transform (tuple, optional): The affine transformation matrix, can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361).
+            Defaults to None.
+        driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
+        **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
+    """
+
+    import numpy as np
+    import rasterio
+    import xarray as xr
+    from rasterio.transform import Affine
+
+    if output is None:
+        return array_to_memory_file(
+            array,
+            source,
+            dtype,
+            compress,
+            transpose,
+            cellsize,
+            crs=crs,
+            transform=transform,
+            driver=driver,
+            **kwargs,
+        )
+
+    if isinstance(array, xr.DataArray):
+        coords = [coord for coord in array.coords]
+        if coords[0] == "time":
+            x_dim = coords[1]
+            y_dim = coords[2]
+            array = (
+                array.isel(time=0).rename({y_dim: "y", x_dim: "x"}).transpose("y", "x")
+            )
+        array = array.values
+
+    if array.ndim == 3 and transpose:
+        array = np.transpose(array, (1, 2, 0))
+
+    out_dir = os.path.dirname(os.path.abspath(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if not output.endswith(".tif"):
+        output += ".tif"
+
+    if source is not None:
+        with rasterio.open(source) as src:
+            crs = src.crs
+            transform = src.transform
+            if compress is None:
+                compress = src.compression
     else:
-        raise ValueError("Array must be 2D or 3D.")
+        if cellsize is None:
+            raise ValueError("resolution must be provided if source is not provided")
+        if crs is None:
+            raise ValueError(
+                "crs must be provided if source is not provided, such as EPSG:3857"
+            )
+
+        if transform is None:
+            # Define the geotransformation parameters
+            xmin, ymin, xmax, ymax = (
+                0,
+                0,
+                cellsize * array.shape[1],
+                cellsize * array.shape[0],
+            )
+            transform = rasterio.transform.from_bounds(
+                xmin, ymin, xmax, ymax, array.shape[1], array.shape[0]
+            )
+        elif isinstance(transform, Affine):
+            pass
+        elif isinstance(transform, (tuple, list)):
+            transform = Affine(*transform)
+
+        kwargs["transform"] = transform
+
+    if dtype is None:
+        # Determine the minimum and maximum values in the array
+        min_value = np.min(array)
+        max_value = np.max(array)
+        # Determine the best dtype for the array
+        if min_value >= 0 and max_value <= 1:
+            dtype = np.float32
+        elif min_value >= 0 and max_value <= 255:
+            dtype = np.uint8
+        elif min_value >= -128 and max_value <= 127:
+            dtype = np.int8
+        elif min_value >= 0 and max_value <= 65535:
+            dtype = np.uint16
+        elif min_value >= -32768 and max_value <= 32767:
+            dtype = np.int16
+        else:
+            dtype = np.float64
+
+    # Convert the array to the best dtype
+    array = array.astype(dtype)
+
+    # Define the GeoTIFF metadata
+    metadata = {
+        "driver": driver,
+        "height": array.shape[0],
+        "width": array.shape[1],
+        "dtype": array.dtype,
+        "crs": crs,
+        "transform": transform,
+    }
+
+    if array.ndim == 2:
+        metadata["count"] = 1
+    elif array.ndim == 3:
+        metadata["count"] = array.shape[2]
+    if compress is not None:
+        metadata["compress"] = compress
+
+    metadata.update(**kwargs)
 
     # Create a new GeoTIFF file and write the array to it
     with rasterio.open(output, "w", **metadata) as dst:
@@ -10328,8 +10537,6 @@ def array_to_image(
         elif array.ndim == 3:
             for i in range(array.shape[2]):
                 dst.write(array[:, :, i], i + 1)
-
-    return output
 
 
 def images_to_tiles(
@@ -10852,7 +11059,9 @@ def widget_template(
         return toolbar_widget
 
 
-def start_server(directory: str, port: int = 8000, background: bool = True):
+def start_server(
+    directory: str = None, port: int = 8000, background: bool = True, quiet: bool = True
+):
     """
     Start a simple web server to serve files from the specified directory
     with directory listing and CORS support. Optionally, run the server
@@ -10863,6 +11072,7 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
         port (int, optional): The port on which the web server will run. Defaults to 8000.
         background (bool, optional): Whether to run the server in a separate background thread.
                                      Defaults to True.
+        quiet (bool, optional): If True, suppress the log output. Defaults to True.
 
     Raises:
         ImportError: If required modules are not found.
@@ -10872,6 +11082,10 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
         None. The function runs the server indefinitely until manually stopped.
     """
 
+    # If no directory is specified, use the current working directory
+    if directory is None:
+        directory = os.getcwd()
+
     def run_flask():
         try:
             from flask import Flask, send_from_directory, render_template_string
@@ -10879,6 +11093,14 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
 
             app = Flask(__name__, static_folder=directory)
             CORS(app)  # Enable CORS for all routes
+
+            if quiet:
+                # This will disable Flask's logging
+                import logging
+
+                log = logging.getLogger("werkzeug")
+                log.disabled = True
+                app.logger.disabled = True
 
             @app.route("/<path:path>", methods=["GET"])
             def serve_file(path):
@@ -10888,6 +11110,7 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
             def index():
                 # List files and directories under the specified directory
                 items = os.listdir(directory)
+                items.sort()
                 # Generate an HTML representation of the directory listing
                 listing_template = """
                 <h2>Directory listing for /</h2>
@@ -10917,3 +11140,2067 @@ def start_server(directory: str, port: int = 8000, background: bool = True):
     else:
         # Run the Flask server in the main thread
         run_flask()
+
+
+def vector_to_mbtiles(
+    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+) -> None:
+    """
+    Convert a vector dataset to MBTiles format using the ogr2ogr command-line tool.
+
+    Args:
+        source_path (str): The path to the source vector dataset (GeoPackage, Shapefile, etc.).
+        target_path (str): The path to the target MBTiles file to be created.
+        max_zoom (int, optional): The maximum zoom level for the MBTiles dataset. Defaults to 5.
+        name (str, optional): The name of the MBTiles dataset. Defaults to None.
+        **kwargs: Additional options to be passed as keyword arguments. These options will be used as -dsco options
+                  when calling ogr2ogr. See https://gdal.org/drivers/raster/mbtiles.html for a list of options.
+
+    Returns:
+        None
+
+    Raises:
+        subprocess.CalledProcessError: If the ogr2ogr command fails to execute.
+
+    Example:
+        source_path = "countries.gpkg"
+        target_path = "target.mbtiles"
+        name = "My MBTiles"
+        max_zoom = 5
+        vector_to_mbtiles(source_path, target_path, name=name, max_zoom=max_zoom)
+    """
+    import subprocess
+
+    command = [
+        "ogr2ogr",
+        "-f",
+        "MBTILES",
+        target_path,
+        source_path,
+        "-dsco",
+        f"MAXZOOM={max_zoom}",
+    ]
+
+    if name:
+        command.extend(["-dsco", f"NAME={name}"])
+
+    for key, value in kwargs.items():
+        command.extend(["-dsco", f"{key.upper()}={value}"])
+
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        raise e
+
+
+def geojson_to_mbtiles(
+    input_file: str,
+    output_file: str,
+    layer_name: Optional[str] = None,
+    options: Optional[List[str]] = None,
+    quiet: bool = False,
+) -> Optional[str]:
+    """
+    Converts vector data to .mbtiles using Tippecanoe.
+
+    Args:
+        input_file (str): Path to the input vector data file (e.g., .geojson).
+        output_file (str): Path to the output .mbtiles file.
+        layer_name (Optional[str]): Optional name for the layer. Defaults to None.
+        options (Optional[List[str]]): List of additional arguments for tippecanoe. For example '-zg' for auto maxzoom. Defaults to None.
+        quiet (bool): If True, suppress the log output. Defaults to False.
+
+    Returns:
+        Optional[str]: Output from the Tippecanoe command, or None if there was an error or if Tippecanoe is not installed.
+
+    Raises:
+        subprocess.CalledProcessError: If there's an error executing the tippecanoe command.
+    """
+
+    import subprocess
+    import shutil
+
+    # Check if tippecanoe exists
+    if shutil.which("tippecanoe") is None:
+        print("Error: tippecanoe is not installed.")
+        print("You can install it using conda with the following command:")
+        print("conda install -c conda-forge tippecanoe")
+        return None
+
+    command = ["tippecanoe", "-o", output_file]
+
+    # Add layer name specification if provided
+    if layer_name:
+        command.extend(["-L", f"{layer_name}:{input_file}"])
+    else:
+        command.append(input_file)
+
+    # Append additional arguments if provided
+    if options:
+        command.extend(options)
+
+    try:
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+
+        if not quiet:
+            for line in process.stdout:
+                print(line, end="")
+
+        exit_code = process.wait()
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(exit_code, command)
+
+    except subprocess.CalledProcessError as e:
+        print(f"\nError executing tippecanoe: {e}")
+        return None
+
+    return "Tippecanoe process completed successfully."
+
+
+def mbtiles_to_pmtiles(
+    input_file: str, output_file: str, max_zoom: int = 99
+) -> Optional[None]:
+    """
+    Converts mbtiles to pmtiles using the pmtiles package.
+
+    Args:
+        input_file (str): Path to the input .mbtiles file.
+        output_file (str): Path to the output .pmtiles file.
+        max_zoom (int): Maximum zoom level for the conversion. Defaults to 99.
+
+    Returns:
+        None: The function returns None either upon successful completion or when the pmtiles package is not installed.
+
+    Raises:
+        Any exception raised by pmtiles.convert.mbtiles_to_pmtiles will be propagated up.
+    """
+
+    try:
+        import pmtiles.convert as convert
+    except ImportError:
+        print(
+            "pmtiles is not installed. Please install it using `pip install pmtiles`."
+        )
+        return
+
+    convert.mbtiles_to_pmtiles(input_file, output_file, maxzoom=max_zoom)
+
+
+def vector_to_pmtiles(
+    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+):
+    """
+    Converts a vector file to PMTiles format.
+
+    Args:
+        source_path (str): Path to the source vector file.
+        target_path (str): Path to the target PMTiles file.
+        max_zoom (int, optional): Maximum zoom level for the PMTiles. Defaults to 5.
+        name (str, optional): Name of the PMTiles dataset. Defaults to None.
+        **kwargs: Additional keyword arguments to be passed to the underlying conversion functions.
+
+    Raises:
+        ValueError: If the target file does not have a .pmtiles extension.
+
+    Returns:
+        None
+    """
+    if not target_path.endswith(".pmtiles"):
+        raise ValueError("Error: target file must be a .pmtiles file.")
+    mbtiles = target_path.replace(".pmtiles", ".mbtiles")
+    vector_to_mbtiles(source_path, mbtiles, max_zoom=max_zoom, name=name, **kwargs)
+    mbtiles_to_pmtiles(mbtiles, target_path)
+    os.remove(mbtiles)
+
+
+def geojson_to_pmtiles(
+    input_file: str,
+    output_file: Optional[str] = None,
+    layer_name: Optional[str] = None,
+    projection: Optional[str] = "EPSG:4326",
+    overwrite: bool = False,
+    options: Optional[List[str]] = None,
+    quiet: bool = False,
+) -> Optional[str]:
+    """
+    Converts vector data to PMTiles using Tippecanoe.
+
+    Args:
+        input_file (str): Path to the input vector data file (e.g., .geojson).
+        output_file (str): Path to the output .mbtiles file.
+        layer_name (Optional[str]): Optional name for the layer. Defaults to None.
+        projection (Optional[str]): Projection for the output PMTiles file. Defaults to "EPSG:4326".
+        overwrite (bool): If True, overwrite the existing output file. Defaults to False.
+        options (Optional[List[str]]): List of additional arguments for tippecanoe. Defaults to None.
+            To reduce the size of the output file, use '-zg' or '-z max-zoom'.
+        quiet (bool): If True, suppress the log output. Defaults to False.
+
+    Returns:
+        Optional[str]: Output from the Tippecanoe command, or None if there was an error or if Tippecanoe is not installed.
+
+    Raises:
+        subprocess.CalledProcessError: If there's an error executing the tippecanoe command.
+    """
+
+    import subprocess
+    import shutil
+
+    # Check if tippecanoe exists
+    if shutil.which("tippecanoe") is None:
+        print("Error: tippecanoe is not installed.")
+        print("You can install it using conda with the following command:")
+        print("conda install -c conda-forge tippecanoe")
+        return None
+
+    if output_file is None:
+        output_file = os.path.splitext(input_file)[0] + ".pmtiles"
+
+    if not output_file.endswith(".pmtiles"):
+        raise ValueError("Error: output file must be a .pmtiles file.")
+
+    command = ["tippecanoe", "-o", output_file]
+
+    # Add layer name specification if provided
+    if layer_name:
+        command.extend(["-L", f"{layer_name}:{input_file}"])
+    else:
+        command.append(input_file)
+
+    command.extend(["--projection", projection])
+
+    if options is None:
+        options = []
+
+    if overwrite:
+        command.append("--force")
+
+    # Append additional arguments if provided
+    if options:
+        command.extend(options)
+
+    try:
+        process = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+        )
+
+        if not quiet:
+            for line in process.stdout:
+                print(line, end="")
+
+        exit_code = process.wait()
+        if exit_code != 0:
+            raise subprocess.CalledProcessError(exit_code, command)
+
+    except subprocess.CalledProcessError as e:
+        print(f"\nError executing tippecanoe: {e}")
+        return None
+
+    return "Tippecanoe process completed successfully."
+
+
+def pmtiles_header(input_file: str):
+    """
+    Fetch the header information from a local or remote .pmtiles file.
+
+    This function retrieves the header from a PMTiles file, either local or hosted remotely.
+    It deserializes the header and calculates the center and bounds of the tiles from the
+    given metadata in the header.
+
+    Args:
+        input_file (str): Path to the .pmtiles file, or its URL if the file is hosted remotely.
+
+    Returns:
+        dict: A dictionary containing the header information, including center and bounds.
+
+    Raises:
+        ImportError: If the pmtiles library is not installed.
+        ValueError: If the input file is not a .pmtiles file or if it does not exist.
+
+    Example:
+        >>> header = pmtiles_header("https://example.com/path/to/tiles.pmtiles")
+        >>> print(header["center"])
+        [52.5200, 13.4050]
+
+    Note:
+        If fetching a remote PMTiles file, this function only downloads the first 127 bytes
+        of the file to retrieve the header.
+    """
+
+    import requests
+
+    try:
+        from pmtiles.reader import Reader, MmapSource
+        from pmtiles.tile import deserialize_header
+    except ImportError:
+        print(
+            "pmtiles is not installed. Please install it using `pip install pmtiles`."
+        )
+        return
+
+    if not input_file.endswith(".pmtiles"):
+        raise ValueError("Input file must be a .pmtiles file.")
+
+    if input_file.startswith("http"):
+        # Fetch only the first 127 bytes
+        headers = {"Range": "bytes=0-127"}
+        response = requests.get(input_file, headers=headers)
+        header = deserialize_header(response.content)
+
+    else:
+        if not os.path.exists(input_file):
+            raise ValueError(f"Input file {input_file} does not exist.")
+
+        with open(input_file, "rb") as f:
+            reader = Reader(MmapSource(f))
+            header = reader.header()
+
+    header["center"] = [header["center_lat_e7"] / 1e7, header["center_lon_e7"] / 1e7]
+    header["bounds"] = [
+        header["min_lon_e7"] / 1e7,
+        header["min_lat_e7"] / 1e7,
+        header["max_lon_e7"] / 1e7,
+        header["max_lat_e7"] / 1e7,
+    ]
+
+    return header
+
+
+def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
+    """
+    Fetch the metadata from a local or remote .pmtiles file.
+
+    This function retrieves metadata from a PMTiles file, whether it's local or hosted remotely.
+    If it's remote, the function fetches the header to determine the range of bytes to download
+    for obtaining the metadata. It then reads the metadata and extracts the layer names.
+
+    Args:
+        input_file (str): Path to the .pmtiles file, or its URL if the file is hosted remotely.
+
+    Returns:
+        dict: A dictionary containing the metadata information, including layer names.
+
+    Raises:
+        ImportError: If the pmtiles library is not installed.
+        ValueError: If the input file is not a .pmtiles file or if it does not exist.
+
+    Example:
+        >>> metadata = pmtiles_metadata("https://example.com/path/to/tiles.pmtiles")
+        >>> print(metadata["layer_names"])
+        ['buildings', 'roads']
+
+    Note:
+        If fetching a remote PMTiles file, this function may perform multiple requests to minimize
+        the amount of data downloaded.
+    """
+
+    import json
+    import requests
+
+    try:
+        from pmtiles.reader import Reader, MmapSource, MemorySource
+    except ImportError:
+        print(
+            "pmtiles is not installed. Please install it using `pip install pmtiles`."
+        )
+        return
+
+    if not input_file.endswith(".pmtiles"):
+        raise ValueError("Input file must be a .pmtiles file.")
+
+    header = pmtiles_header(input_file)
+    metadata_offset = header["metadata_offset"]
+    metadata_length = header["metadata_length"]
+
+    if input_file.startswith("http"):
+        headers = {"Range": f"bytes=0-{metadata_offset + metadata_length}"}
+        response = requests.get(input_file, headers=headers)
+        content = MemorySource(response.content)
+        metadata = Reader(content).metadata()
+    else:
+        with open(input_file, "rb") as f:
+            reader = Reader(MmapSource(f))
+            metadata = reader.metadata()
+            if "json" in metadata:
+                metadata["vector_layers"] = json.loads(metadata["json"])[
+                    "vector_layers"
+                ]
+
+    vector_layers = metadata["vector_layers"]
+    layer_names = [layer["id"] for layer in vector_layers]
+
+    if "tilestats" in metadata:
+        geometries = [layer["geometry"] for layer in metadata["tilestats"]["layers"]]
+        metadata["geometries"] = geometries
+
+    metadata["layer_names"] = layer_names
+    metadata["center"] = header["center"]
+    metadata["bounds"] = header["bounds"]
+    return metadata
+
+
+def pmtiles_style(
+    url: str,
+    layers: Optional[Union[str, List[str]]] = None,
+    cmap: str = "Set3",
+    n_class: Optional[int] = None,
+    opacity: float = 0.5,
+    circle_radius: int = 5,
+    line_width: int = 1,
+    attribution: str = "PMTiles",
+    **kwargs,
+):
+    """
+    Generates a Mapbox style JSON for rendering PMTiles data.
+
+    Args:
+        url (str): The URL of the PMTiles file.
+        layers (str or list[str], optional): The layers to include in the style. If None, all layers will be included.
+            Defaults to None.
+        cmap (str, optional): The color map to use for styling the layers. Defaults to "Set3".
+        n_class (int, optional): The number of classes to use for styling. If None, the number of classes will be
+            determined automatically based on the color map. Defaults to None.
+        opacity (float, optional): The fill opacity for polygon layers. Defaults to 0.5.
+        circle_radius (int, optional): The circle radius for point layers. Defaults to 5.
+        line_width (int, optional): The line width for line layers. Defaults to 1.
+        attribution (str, optional): The attribution text for the data source. Defaults to "PMTiles".
+
+    Returns:
+        dict: The Mapbox style JSON.
+
+    Raises:
+        ValueError: If the layers argument is not a string or a list.
+        ValueError: If a layer specified in the layers argument does not exist in the PMTiles file.
+    """
+
+    if cmap == "Set3":
+        palette = [
+            "#8dd3c7",
+            "#ffffb3",
+            "#bebada",
+            "#fb8072",
+            "#80b1d3",
+            "#fdb462",
+            "#b3de69",
+            "#fccde5",
+            "#d9d9d9",
+            "#bc80bd",
+            "#ccebc5",
+            "#ffed6f",
+        ]
+    elif isinstance(cmap, list):
+        palette = cmap
+    else:
+        from .colormaps import get_palette
+
+        palette = ["#" + c for c in get_palette(cmap, n_class)]
+
+    n_class = len(palette)
+
+    metadata = pmtiles_metadata(url)
+    layer_names = metadata["layer_names"]
+
+    style = {
+        "version": 8,
+        "sources": {
+            "source": {
+                "type": "vector",
+                "url": "pmtiles://" + url,
+                "attribution": attribution,
+            }
+        },
+        "layers": [],
+    }
+
+    if layers is None:
+        layers = layer_names
+    elif isinstance(layers, str):
+        layers = [layers]
+    elif isinstance(layers, list):
+        for layer in layers:
+            if layer not in layer_names:
+                raise ValueError(f"Layer {layer} does not exist in the PMTiles file.")
+    else:
+        raise ValueError("The layers argument must be a string or a list.")
+
+    for i, layer_name in enumerate(layers):
+        layer_point = {
+            "id": f"{layer_name}_point",
+            "source": "source",
+            "source-layer": layer_name,
+            "type": "circle",
+            "paint": {
+                "circle-color": palette[i % n_class],
+                "circle-radius": circle_radius,
+            },
+            "filter": ["==", ["geometry-type"], "Point"],
+        }
+
+        layer_stroke = {
+            "id": f"{layer_name}_stroke",
+            "source": "source",
+            "source-layer": layer_name,
+            "type": "line",
+            "paint": {
+                "line-color": palette[i % n_class],
+                "line-width": line_width,
+            },
+            "filter": ["==", ["geometry-type"], "LineString"],
+        }
+
+        layer_fill = {
+            "id": f"{layer_name}_fill",
+            "source": "source",
+            "source-layer": layer_name,
+            "type": "fill",
+            "paint": {
+                "fill-color": palette[i % n_class],
+                "fill-opacity": opacity,
+            },
+            "filter": ["==", ["geometry-type"], "Polygon"],
+        }
+
+        style["layers"].extend([layer_point, layer_stroke, layer_fill])
+
+    return style
+
+
+def raster_to_vector(
+    source, output, simplify_tolerance=None, dst_crs=None, open_args={}, **kwargs
+):
+    """Vectorize a raster dataset.
+
+    Args:
+        source (str): The path to the tiff file.
+        output (str): The path to the vector file.
+        simplify_tolerance (float, optional): The maximum allowed geometry displacement.
+            The higher this value, the smaller the number of vertices in the resulting geometry.
+    """
+    import rasterio
+    import shapely
+    import geopandas as gpd
+    from rasterio import features
+
+    with rasterio.open(source, **open_args) as src:
+        band = src.read()
+
+        mask = band != 0
+        shapes = features.shapes(band, mask=mask, transform=src.transform)
+
+    fc = [
+        {"geometry": shapely.geometry.shape(shape), "properties": {"value": value}}
+        for shape, value in shapes
+    ]
+    if simplify_tolerance is not None:
+        for i in fc:
+            i["geometry"] = i["geometry"].simplify(tolerance=simplify_tolerance)
+
+    gdf = gpd.GeoDataFrame.from_features(fc)
+    if src.crs is not None:
+        gdf.set_crs(crs=src.crs, inplace=True)
+
+    if dst_crs is not None:
+        gdf = gdf.to_crs(dst_crs)
+
+    gdf.to_file(output, **kwargs)
+
+
+def overlay_images(
+    image1,
+    image2,
+    alpha=0.5,
+    backend="TkAgg",
+    height_ratios=[10, 1],
+    show_args1={},
+    show_args2={},
+):
+    """Overlays two images using a slider to control the opacity of the top image.
+
+    Args:
+        image1 (str | np.ndarray): The first input image at the bottom represented as a NumPy array or the path to the image.
+        image2 (_type_): The second input image on top represented as a NumPy array or the path to the image.
+        alpha (float, optional): The alpha value of the top image. Defaults to 0.5.
+        backend (str, optional): The backend of the matplotlib plot. Defaults to "TkAgg".
+        height_ratios (list, optional): The height ratios of the two subplots. Defaults to [10, 1].
+        show_args1 (dict, optional): The keyword arguments to pass to the imshow() function for the first image. Defaults to {}.
+        show_args2 (dict, optional): The keyword arguments to pass to the imshow() function for the second image. Defaults to {}.
+
+    """
+    import sys
+    import matplotlib
+    import matplotlib.pyplot as plt
+    import matplotlib.widgets as mpwidgets
+
+    if "google.colab" in sys.modules:
+        backend = "inline"
+        print(
+            "The TkAgg backend is not supported in Google Colab. The overlay_images function will not work on Colab."
+        )
+        return
+
+    matplotlib.use(backend)
+
+    if isinstance(image1, str):
+        if image1.startswith("http"):
+            image1 = download_file(image1)
+
+        if not os.path.exists(image1):
+            raise ValueError(f"Input path {image1} does not exist.")
+
+    if isinstance(image2, str):
+        if image2.startswith("http"):
+            image2 = download_file(image2)
+
+        if not os.path.exists(image2):
+            raise ValueError(f"Input path {image2} does not exist.")
+
+    # Load the two images
+    x = plt.imread(image1)
+    y = plt.imread(image2)
+
+    # Create the plot
+    fig, (ax0, ax1) = plt.subplots(2, 1, gridspec_kw={"height_ratios": height_ratios})
+    img0 = ax0.imshow(x, **show_args1)
+    img1 = ax0.imshow(y, alpha=alpha, **show_args2)
+
+    # Define the update function
+    def update(value):
+        img1.set_alpha(value)
+        fig.canvas.draw_idle()
+
+    # Create the slider
+    slider0 = mpwidgets.Slider(ax=ax1, label="alpha", valmin=0, valmax=1, valinit=alpha)
+    slider0.on_changed(update)
+
+    # Display the plot
+    plt.show()
+
+
+def blend_images(
+    img1,
+    img2,
+    alpha=0.5,
+    output=False,
+    show=True,
+    figsize=(12, 10),
+    axis="off",
+    **kwargs,
+):
+    """
+    Blends two images together using the addWeighted function from the OpenCV library.
+
+    Args:
+        img1 (numpy.ndarray): The first input image on top represented as a NumPy array.
+        img2 (numpy.ndarray): The second input image at the bottom represented as a NumPy array.
+        alpha (float): The weighting factor for the first image in the blend. By default, this is set to 0.5.
+        output (str, optional): The path to the output image. Defaults to False.
+        show (bool, optional): Whether to display the blended image. Defaults to True.
+        figsize (tuple, optional): The size of the figure. Defaults to (12, 10).
+        axis (str, optional): The axis of the figure. Defaults to "off".
+        **kwargs: Additional keyword arguments to pass to the cv2.addWeighted() function.
+
+    Returns:
+        numpy.ndarray: The blended image as a NumPy array.
+    """
+    import cv2
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # Resize the images to have the same dimensions
+    if isinstance(img1, str):
+        if img1.startswith("http"):
+            img1 = download_file(img1)
+
+        if not os.path.exists(img1):
+            raise ValueError(f"Input path {img1} does not exist.")
+
+        img1 = cv2.imread(img1)
+
+    if isinstance(img2, str):
+        if img2.startswith("http"):
+            img2 = download_file(img2)
+
+        if not os.path.exists(img2):
+            raise ValueError(f"Input path {img2} does not exist.")
+
+        img2 = cv2.imread(img2)
+
+    if img1.dtype == np.float32:
+        img1 = (img1 * 255).astype(np.uint8)
+
+    if img2.dtype == np.float32:
+        img2 = (img2 * 255).astype(np.uint8)
+
+    if img1.dtype != img2.dtype:
+        img2 = img2.astype(img1.dtype)
+
+    img1 = cv2.resize(img1, (img2.shape[1], img2.shape[0]))
+
+    # Blend the images using the addWeighted function
+    beta = 1 - alpha
+    blend_img = cv2.addWeighted(img1, alpha, img2, beta, 0, **kwargs)
+
+    if output:
+        array_to_image(blend_img, output, img2)
+
+    if show:
+        plt.figure(figsize=figsize)
+        plt.imshow(blend_img)
+        plt.axis(axis)
+        plt.show()
+    else:
+        return blend_img
+
+
+def regularize(source, output=None, crs="EPSG:4326", **kwargs):
+    """Regularize a polygon GeoDataFrame.
+
+    Args:
+        source (str | gpd.GeoDataFrame): The input file path or a GeoDataFrame.
+        output (str, optional): The output file path. Defaults to None.
+
+
+    Returns:
+        gpd.GeoDataFrame: The output GeoDataFrame.
+    """
+    import geopandas as gpd
+
+    if isinstance(source, str):
+        gdf = gpd.read_file(source)
+    elif isinstance(source, gpd.GeoDataFrame):
+        gdf = source
+    else:
+        raise ValueError("The input source must be a GeoDataFrame or a file path.")
+
+    polygons = gdf.geometry.apply(lambda geom: geom.minimum_rotated_rectangle)
+    result = gpd.GeoDataFrame(geometry=polygons, data=gdf.drop("geometry", axis=1))
+
+    if crs is not None:
+        result.to_crs(crs, inplace=True)
+    if output is not None:
+        result.to_file(output, **kwargs)
+    else:
+        return result
+
+
+def get_gdal_drivers() -> List[str]:
+    """Get a list of available driver names in the GDAL library.
+
+    Returns:
+        List[str]: A list of available driver names.
+    """
+    from osgeo import ogr
+
+    driver_list = []
+
+    # Iterate over all registered drivers
+    for i in range(ogr.GetDriverCount()):
+        driver = ogr.GetDriver(i)
+        driver_name = driver.GetName()
+        driver_list.append(driver_name)
+
+    return driver_list
+
+
+def get_gdal_file_extension(driver_name: str) -> Optional[str]:
+    """Get the file extension corresponding to a driver name in the GDAL library.
+
+    Args:
+        driver_name (str): The name of the driver.
+
+    Returns:
+        Optional[str]: The file extension corresponding to the driver name, or None if the driver is not found or does not have a specific file extension.
+    """
+    from osgeo import ogr
+
+    driver = ogr.GetDriverByName(driver_name)
+    if driver is None:
+        drivers = get_gdal_drivers()
+        raise ValueError(
+            f"Driver {driver_name} not found. Available drivers: {drivers}"
+        )
+
+    metadata = driver.GetMetadata()
+    if "DMD_EXTENSION" in metadata:
+        file_extension = driver.GetMetadataItem("DMD_EXTENSION")
+    else:
+        file_extensions = driver.GetMetadataItem("DMD_EXTENSIONS")
+        if file_extensions == "json geojson":
+            file_extension = "geojson"
+        else:
+            file_extension = file_extensions.split()[0].lower()
+
+    return file_extension
+
+
+def gdb_to_vector(
+    gdb_path: str,
+    out_dir: str,
+    layers: Optional[List[str]] = None,
+    filenames: Optional[List[str]] = None,
+    gdal_driver: str = "GPKG",
+    file_extension: Optional[str] = None,
+    overwrite: bool = False,
+    quiet=False,
+    **kwargs,
+):
+    """Converts layers from a File Geodatabase (GDB) to a vector format.
+
+    Args:
+        gdb_path (str): The path to the File Geodatabase (GDB).
+        out_dir (str): The output directory to save the converted files.
+        layers (Optional[List[str]]): A list of layer names to convert. If None, all layers will be converted. Default is None.
+        filenames (Optional[List[str]]): A list of output file names. If None, the layer names will be used as the file names. Default is None.
+        gdal_driver (str): The GDAL driver name for the output vector format. Default is "GPKG".
+        file_extension (Optional[str]): The file extension for the output files. If None, it will be determined automatically based on the gdal_driver. Default is None.
+        overwrite (bool): Whether to overwrite the existing output files. Default is False.
+        quiet (bool): If True, suppress the log output. Defaults to False.
+
+    Returns:
+        None
+    """
+    from osgeo import ogr
+
+    # Open the GDB
+    gdb_driver = ogr.GetDriverByName("OpenFileGDB")
+    gdb_dataset = gdb_driver.Open(gdb_path, 0)
+
+    # Get the number of layers in the GDB
+    layer_count = gdb_dataset.GetLayerCount()
+
+    if isinstance(layers, str):
+        layers = [layers]
+
+    if isinstance(filenames, str):
+        filenames = [filenames]
+
+    if filenames is not None:
+        if len(filenames) != len(layers):
+            raise ValueError("The length of filenames must match the length of layers.")
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    ii = 0
+    # Iterate over the layers
+    for i in range(layer_count):
+        layer = gdb_dataset.GetLayerByIndex(i)
+        feature_class_name = layer.GetName()
+
+        if layers is not None:
+            if feature_class_name not in layers:
+                continue
+
+        if file_extension is None:
+            file_extension = get_gdal_file_extension(gdal_driver)
+
+        # Create the output file path
+        if filenames is not None:
+            output_file = os.path.join(out_dir, filenames[ii] + "." + file_extension)
+            ii += 1
+        else:
+            output_file = os.path.join(
+                out_dir, feature_class_name + "." + file_extension
+            )
+
+        if os.path.exists(output_file) and not overwrite:
+            print(f"File {output_file} already exists. Skipping...")
+            continue
+        else:
+            if not quiet:
+                print(f"Converting layer {feature_class_name} to {output_file}...")
+
+        # Create the output driver
+        output_driver = ogr.GetDriverByName(gdal_driver)
+        output_dataset = output_driver.CreateDataSource(output_file)
+
+        # Copy the input layer to the output format
+        output_dataset.CopyLayer(layer, feature_class_name)
+
+        output_dataset = None
+
+    # Close the GDB dataset
+    gdb_dataset = None
+
+
+def gdb_layer_names(gdb_path: str) -> List[str]:
+    """Get a list of layer names in a File Geodatabase (GDB).
+
+    Args:
+        gdb_path (str): The path to the File Geodatabase (GDB).
+
+    Returns:
+        List[str]: A list of layer names in the GDB.
+    """
+
+    from osgeo import ogr
+
+    # Open the GDB
+    gdb_driver = ogr.GetDriverByName("OpenFileGDB")
+    gdb_dataset = gdb_driver.Open(gdb_path, 0)
+
+    # Get the number of layers in the GDB
+    layer_count = gdb_dataset.GetLayerCount()
+    # Iterate over the layers
+    layer_names = []
+    for i in range(layer_count):
+        layer = gdb_dataset.GetLayerByIndex(i)
+        feature_class_name = layer.GetName()
+        layer_names.append(feature_class_name)
+
+    # Close the GDB dataset
+    gdb_dataset = None
+    return layer_names
+
+
+def vector_to_parquet(
+    source: str, output: str, crs=None, overwrite=False, **kwargs
+) -> None:
+    """
+    Convert a GeoDataFrame or a file containing vector data to Parquet format.
+
+    Args:
+        source (Union[gpd.GeoDataFrame, str]): The source data to convert. It can be either a GeoDataFrame
+            or a file path to the vector data file.
+        output (str): The file path where the Parquet file will be saved.
+        crs (str, optional): The coordinate reference system (CRS) to use for the output file. Defaults to None.
+        overwrite (bool): Whether to overwrite the existing output file. Default is False.
+        **kwargs: Additional keyword arguments to be passed to the `to_parquet` function of GeoDataFrame.
+
+    Returns:
+        None
+    """
+
+    import geopandas as gpd
+
+    if os.path.exists(output) and not overwrite:
+        print(f"File {output} already exists. Skipping...")
+        return
+
+    if isinstance(source, gpd.GeoDataFrame):
+        gdf = source
+    else:
+        gdf = gpd.read_file(source)
+
+    if crs is not None:
+        gdf = gdf.to_crs(crs)
+
+    out_dir = os.path.dirname(os.path.abspath(output))
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    gdf.to_parquet(output, **kwargs)
+
+
+def df_to_gdf(df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs):
+    """
+    Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
+
+    Args:
+        df (pandas.DataFrame): The pandas DataFrame to convert.
+        geometry (str): The name of the geometry column in the DataFrame.
+        src_crs (str): The coordinate reference system (CRS) of the GeoDataFrame. Default is "EPSG:4326".
+        dst_crs (str): The target CRS of the GeoDataFrame. Default is None
+
+    Returns:
+        geopandas.GeoDataFrame: The converted GeoPandas GeoDataFrame.
+    """
+    import geopandas as gpd
+    from shapely import wkt
+
+    # Convert the geometry column to Shapely geometry objects
+    df[geometry] = df[geometry].apply(lambda x: wkt.loads(x))
+
+    # Convert the pandas DataFrame to a GeoPandas GeoDataFrame
+    gdf = gpd.GeoDataFrame(df, geometry=geometry, crs=src_crs, **kwargs)
+    if dst_crs is not None and dst_crs != src_crs:
+        gdf = gdf.to_crs(dst_crs)
+
+    return gdf
+
+
+def check_url(url: str) -> bool:
+    """Check if an HTTP URL is working.
+
+    Args:
+        url (str): The URL to check.
+
+    Returns:
+        bool: True if the URL is working (returns a 200 status code), False otherwise.
+    """
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.exceptions.RequestException:
+        return False
+
+
+def read_parquet(
+    source: str,
+    geometry: Optional[str] = None,
+    columns: Optional[Union[str, list]] = None,
+    exclude: Optional[Union[str, list]] = None,
+    db: Optional[str] = None,
+    table_name: Optional[str] = None,
+    sql: Optional[str] = None,
+    limit: Optional[int] = None,
+    src_crs: Optional[str] = None,
+    dst_crs: Optional[str] = None,
+    return_type: str = "gdf",
+    **kwargs,
+):
+    """
+    Read Parquet data from a source and return a GeoDataFrame or DataFrame.
+
+    Args:
+        source (str): The path to the Parquet file or directory containing Parquet files.
+        geometry (str, optional): The name of the geometry column. Defaults to None.
+        columns (str or list, optional): The columns to select. Defaults to None (select all columns).
+        exclude (str or list, optional): The columns to exclude from the selection. Defaults to None.
+        db (str, optional): The DuckDB database path or alias. Defaults to None.
+        table_name (str, optional): The name of the table in the DuckDB database. Defaults to None.
+        sql (str, optional): The SQL query to execute. Defaults to None.
+        limit (int, optional): The maximum number of rows to return. Defaults to None (return all rows).
+        src_crs (str, optional): The source CRS (Coordinate Reference System) of the geometries. Defaults to None.
+        dst_crs (str, optional): The target CRS to reproject the geometries. Defaults to None.
+        return_type (str, optional): The type of object to return:
+            - 'gdf': GeoDataFrame (default)
+            - 'df': DataFrame
+            - 'numpy': NumPy array
+            - 'arrow': Arrow Table
+            - 'polars': Polars DataFrame
+        **kwargs: Additional keyword arguments that are passed to the DuckDB connection.
+
+    Returns:
+        Union[gpd.GeoDataFrame, pd.DataFrame, np.ndarray]: The loaded data.
+
+    Raises:
+        ValueError: If the columns or exclude arguments are not of the correct type.
+
+    """
+    import duckdb
+
+    if isinstance(db, str):
+        con = duckdb.connect(db)
+    else:
+        con = duckdb.connect()
+
+    con.install_extension("httpfs")
+    con.load_extension("httpfs")
+
+    con.install_extension("spatial")
+    con.load_extension("spatial")
+
+    if columns is None:
+        columns = "*"
+    elif isinstance(columns, list):
+        columns = ", ".join(columns)
+    elif not isinstance(columns, str):
+        raise ValueError("columns must be a list or a string.")
+
+    if exclude is not None:
+        if isinstance(exclude, list):
+            exclude = ", ".join(exclude)
+        elif not isinstance(exclude, str):
+            raise ValueError("exclude_columns must be a list or a string.")
+        columns = f"{columns} EXCLUDE {exclude}"
+
+    if return_type in ["df", "numpy", "arrow", "polars"]:
+        if sql is None:
+            sql = f"SELECT {columns} FROM '{source}'"
+        if limit is not None:
+            sql += f" LIMIT {limit}"
+
+        if return_type == "df":
+            result = con.sql(sql, **kwargs).df()
+        elif return_type == "numpy":
+            result = con.sql(sql, **kwargs).fetchnumpy()
+        elif return_type == "arrow":
+            result = con.sql(sql, **kwargs).arrow()
+        elif return_type == "polars":
+            result = con.sql(sql, **kwargs).pl()
+
+        if table_name is not None:
+            con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM result", **kwargs)
+
+    elif return_type == "gdf":
+        if geometry is None:
+            geometry = "geometry"
+        if sql is None:
+            # if src_crs is not None and dst_crs is not None:
+            #     geom_sql = f"ST_AsText(ST_Transform(ST_GeomFromWKB({geometry}), '{src_crs}', '{dst_crs}', true)) AS {geometry}"
+            # else:
+            geom_sql = f"ST_AsText(ST_GeomFromWKB({geometry})) AS {geometry}"
+            sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{source}'"
+        if limit is not None:
+            sql += f" LIMIT {limit}"
+
+        df = con.sql(sql, **kwargs).df()
+        if table_name is not None:
+            con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM df", **kwargs)
+        result = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs)
+
+    con.close()
+    return result
+
+
+def assign_discrete_colors(df, column, cmap, to_rgb=True, return_type="array"):
+    """
+    Assigns unique colors to each category in a categorical column of a dataframe.
+
+    Args:
+        df (pandas.DataFrame): The input dataframe.
+        column (str): The name of the categorical column.
+        cmap (dict): A dictionary mapping categories to colors.
+        to_rgb (bool): Whether to convert the colors to RGB values. Defaults to True.
+        return_type (str): The type of the returned values. Can be 'list' or 'array'. Defaults to 'array'.
+
+    Returns:
+        list: A list of colors for each category in the categorical column.
+    """
+    import numpy as np
+
+    # Copy the categorical column from the original dataframe
+    category_column = df[column].copy()
+
+    # Map colors to the categorical values
+    category_column = category_column.map(cmap)
+
+    values = category_column.values.tolist()
+
+    if to_rgb:
+        values = [hex_to_rgb(check_color(color)) for color in values]
+        if return_type == "array":
+            values = np.array(values, dtype=np.uint8)
+
+    return values
+
+
+def assign_continuous_colors(
+    df,
+    column: str,
+    cmap: str = None,
+    colors: list = None,
+    labels: list = None,
+    scheme: str = "Quantiles",
+    k: int = 5,
+    legend_kwds: dict = None,
+    classification_kwds: dict = None,
+    to_rgb: bool = True,
+    return_type: str = "array",
+    return_legend: bool = False,
+):
+    """Assigns continuous colors to a DataFrame column based on a specified scheme.
+
+    Args:
+        df: A pandas DataFrame.
+        column: The name of the column to assign colors.
+        cmap: The name of the colormap to use.
+        colors: A list of custom colors.
+        labels: A list of custom labels for the legend.
+        scheme: The scheme for classifying the data. Default is 'Quantiles'.
+        k: The number of classes for classification.
+        legend_kwds: Additional keyword arguments for configuring the legend.
+        classification_kwds: Additional keyword arguments for configuring the classification.
+        to_rgb: Whether to convert colors to RGB values. Default is True.
+        return_type: The type of the returned values. Default is 'array'.
+        return_legend: Whether to return the legend. Default is False.
+
+    Returns:
+        The assigned colors as a numpy array or a tuple containing the colors and the legend, depending on the value of return_legend.
+    """
+    import numpy as np
+
+    data = df[[column]].copy()
+    new_df, legend = classify(
+        data, column, cmap, colors, labels, scheme, k, legend_kwds, classification_kwds
+    )
+    values = new_df["color"].values.tolist()
+
+    if to_rgb:
+        values = [hex_to_rgb(check_color(color)) for color in values]
+        if return_type == "array":
+            values = np.array(values, dtype=np.uint8)
+
+    if return_legend:
+        return values, legend
+    else:
+        return values
+
+
+def gedi_search(
+    roi,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    add_roi: bool = False,
+    return_type: str = "gdf",
+    output: Optional[str] = None,
+    sort_filesize: bool = False,
+    **kwargs,
+):
+    """
+    Searches for GEDI data using the Common Metadata Repository (CMR) API.
+    The source code for this function is adapted from https://github.com/ornldaac/gedi_tutorials.
+    Credits to ORNL DAAC and Rupesh Shrestha.
+
+    Args:
+        roi: A list, tuple, or file path representing the bounding box coordinates
+            in the format (min_lon, min_lat, max_lon, max_lat), or a GeoDataFrame
+            containing the region of interest geometry.
+        start_date: The start date of the temporal range to search for data
+            in the format 'YYYY-MM-DD'.
+        end_date: The end date of the temporal range to search for data
+            in the format 'YYYY-MM-DD'.
+        add_roi: A boolean value indicating whether to include the region of interest
+            as a granule in the search results. Default is False.
+        return_type: The type of the search results to return. Must be one of 'df'
+            (DataFrame), 'gdf' (GeoDataFrame), or 'csv' (CSV file). Default is 'gdf'.
+        output: The file path to save the CSV output when return_type is 'csv'.
+            Optional and only applicable when return_type is 'csv'.
+        sort_filesize: A boolean value indicating whether to sort the search results.
+        **kwargs: Additional keyword arguments to be passed to the CMR API.
+
+    Returns:
+        The search results as a pandas DataFrame (return_type='df'), geopandas GeoDataFrame
+        (return_type='gdf'), or a CSV file (return_type='csv').
+
+    Raises:
+        ValueError: If roi is not a list, tuple, or file path.
+
+    """
+
+    import requests
+    import datetime as dt
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import MultiPolygon, Polygon, box
+    from shapely.ops import orient
+
+    # CMR API base url
+    cmrurl = "https://cmr.earthdata.nasa.gov/search/"
+
+    doi = "10.3334/ORNLDAAC/2056"  # GEDI L4A DOI
+
+    # Construct the DOI search URL
+    doisearch = cmrurl + "collections.json?doi=" + doi
+
+    # Send a request to the CMR API to get the concept ID
+    response = requests.get(doisearch)
+    response.raise_for_status()
+    concept_id = response.json()["feed"]["entry"][0]["id"]
+
+    # CMR formatted start and end times
+    if start_date is not None and end_date is not None:
+        dt_format = "%Y-%m-%dT%H:%M:%SZ"
+        start_date = dt.datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = dt.datetime.strptime(end_date, "%Y-%m-%d")
+        temporal_str = (
+            start_date.strftime(dt_format) + "," + end_date.strftime(dt_format)
+        )
+    else:
+        temporal_str = None
+
+    # CMR formatted bounding box
+    if isinstance(roi, list) or isinstance(roi, tuple):
+        bound_str = ",".join(map(str, roi))
+    elif isinstance(roi, str):
+        roi = gpd.read_file(roi)
+        roi.geometry = roi.geometry.apply(orient, args=(1,))  # make counter-clockwise
+    elif isinstance(roi, gpd.GeoDataFrame):
+        roi.geometry = roi.geometry.apply(orient, args=(1,))  # make counter-clockwise
+    else:
+        raise ValueError("roi must be a list, tuple, or a file path.")
+
+    page_num = 1
+    page_size = 2000  # CMR page size limit
+
+    granule_arr = []
+
+    while True:
+        # Define CMR search parameters
+        cmr_param = {
+            "collection_concept_id": concept_id,
+            "page_size": page_size,
+            "page_num": page_num,
+        }
+
+        if temporal_str is not None:
+            cmr_param["temporal"] = temporal_str
+
+        if kwargs:
+            cmr_param.update(kwargs)
+
+        granulesearch = cmrurl + "granules.json"
+
+        if isinstance(roi, list) or isinstance(roi, tuple):
+            cmr_param["bounding_box[]"] = bound_str
+            response = requests.get(granulesearch, params=cmr_param)
+            response.raise_for_status()
+        else:
+            cmr_param["simplify-shapefile"] = "true"
+            geojson = {
+                "shapefile": (
+                    "region.geojson",
+                    roi.geometry.to_json(),
+                    "application/geo+json",
+                )
+            }
+            response = requests.post(granulesearch, data=cmr_param, files=geojson)
+
+        # Send a request to the CMR API to get the granules
+        granules = response.json()["feed"]["entry"]
+
+        if granules:
+            for index, g in enumerate(granules):
+                granule_url = ""
+                granule_poly = ""
+
+                # Read file size
+                granule_size = float(g["granule_size"])
+
+                # Read bounding geometries
+                if "polygons" in g:
+                    polygons = g["polygons"]
+                    multipolygons = []
+                    for poly in polygons:
+                        i = iter(poly[0].split(" "))
+                        ltln = list(map(" ".join, zip(i, i)))
+                        multipolygons.append(
+                            Polygon(
+                                [
+                                    [float(p.split(" ")[1]), float(p.split(" ")[0])]
+                                    for p in ltln
+                                ]
+                            )
+                        )
+                    granule_poly = MultiPolygon(multipolygons)
+
+                # Get URL to HDF5 files
+                for links in g["links"]:
+                    if (
+                        "title" in links
+                        and links["title"].startswith("Download")
+                        and links["title"].endswith(".h5")
+                    ):
+                        granule_url = links["href"]
+
+                granule_id = g["id"]
+                title = g["title"]
+                time_start = g["time_start"]
+                time_end = g["time_end"]
+
+                granule_arr.append(
+                    [
+                        granule_id,
+                        title,
+                        time_start,
+                        time_end,
+                        granule_size,
+                        granule_url,
+                        granule_poly,
+                    ]
+                )
+
+            page_num += 1
+        else:
+            break
+
+    # Add bound as the last row into the dataframe
+    if add_roi:
+        if isinstance(roi, list) or isinstance(roi, tuple):
+            b = list(roi)
+            granule_arr.append(
+                ["roi", None, None, None, 0, None, box(b[0], b[1], b[2], b[3])]
+            )
+        else:
+            granule_arr.append(["roi", None, None, None, 0, None, roi.geometry.item()])
+
+    # Create a pandas dataframe
+    columns = [
+        "id",
+        "title",
+        "time_start",
+        "time_end",
+        "granule_size",
+        "granule_url",
+        "granule_poly",
+    ]
+    l4adf = pd.DataFrame(granule_arr, columns=columns)
+
+    # Drop granules with empty geometry
+    l4adf = l4adf[l4adf["granule_poly"] != ""]
+
+    if sort_filesize:
+        l4adf = l4adf.sort_values(by=["granule_size"], ascending=True)
+
+    if return_type == "df":
+        return l4adf
+    elif return_type == "gdf":
+        gdf = gpd.GeoDataFrame(l4adf, geometry="granule_poly")
+        gdf.crs = "EPSG:4326"
+        return gdf
+    elif return_type == "csv":
+        columns.remove("granule_poly")
+        return l4adf.to_csv(output, index=False, columns=columns)
+    else:
+        raise ValueError("return_type must be one of 'df', 'gdf', or 'csv'.")
+
+
+def gedi_subset(
+    spatial=None,
+    start_date=None,
+    end_date=None,
+    out_dir=None,
+    collection=None,
+    variables=["all"],
+    max_results=None,
+    username=None,
+    password=None,
+    overwrite=False,
+    **kwargs,
+):
+    """
+    Subsets GEDI data using the Harmony API.
+
+    Args:
+        spatial (Union[str, gpd.GeoDataFrame, List[float]], optional): Spatial extent for subsetting.
+            Can be a file path to a shapefile, a GeoDataFrame, or a list of bounding box coordinates [minx, miny, maxx, maxy].
+            Defaults to None.
+        start_date (str, optional): Start date for subsetting in 'YYYY-MM-DD' format.
+            Defaults to None.
+        end_date (str, optional): End date for subsetting in 'YYYY-MM-DD' format.
+            Defaults to None.
+        out_dir (str, optional): Output directory to save the subsetted files.
+            Defaults to None, which will use the current working directory.
+        collection (Collection, optional): GEDI data collection. If not provided,
+            the default collection with DOI '10.3334/ORNLDAAC/2056' will be used.
+            Defaults to None.
+        variables (List[str], optional): List of variable names to subset.
+            Defaults to ['all'], which subsets all available variables.
+        max_results (int, optional): Maximum number of results to return.
+            Defaults to None, which returns all results.
+        username (str, optional): Earthdata username.
+            Defaults to None, which will attempt to read from the 'EARTHDATA_USERNAME' environment variable.
+        password (str, optional): Earthdata password.
+            Defaults to None, which will attempt to read from the 'EARTHDATA_PASSWORD' environment variable.
+        overwrite (bool, optional): Whether to overwrite existing files in the output directory.
+            Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the Harmony API request.
+
+    Raises:
+        ImportError: If the 'harmony' package is not installed.
+        ValueError: If the 'spatial', 'start_date', or 'end_date' arguments are not valid.
+
+    Returns:
+        None: This function does not return any value.
+    """
+
+    try:
+        import harmony
+    except ImportError:
+        install_package("harmony-py")
+
+    import requests as re
+    import geopandas as gpd
+    from datetime import datetime
+    from harmony import BBox, Client, Collection, Environment, Request
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if collection is None:
+        # GEDI L4A DOI
+        doi = "10.3334/ORNLDAAC/2056"
+
+        # CMR API base url
+        doisearch = f"https://cmr.earthdata.nasa.gov/search/collections.json?doi={doi}"
+        concept_id = re.get(doisearch).json()["feed"]["entry"][0]["id"]
+        concept_id
+        collection = Collection(id=concept_id)
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("username and password must be provided.")
+
+    harmony_client = Client(auth=(username, password))
+
+    if isinstance(spatial, str):
+        spatial = gpd.read_file(spatial)
+
+    if isinstance(spatial, gpd.GeoDataFrame):
+        spatial = spatial.total_bounds.tolist()
+
+    if isinstance(spatial, list) and len(spatial) == 4:
+        bounding_box = BBox(spatial[0], spatial[1], spatial[2], spatial[3])
+    else:
+        raise ValueError(
+            "spatial must be a list of bounding box coordinates or a GeoDataFrame, or a file path."
+        )
+
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    if start_date is None or end_date is None:
+        print("start_date and end_date must be provided.")
+        temporal_range = None
+    else:
+        temporal_range = {"start": start_date, "end": end_date}
+
+    request = Request(
+        collection=collection,
+        variables=variables,
+        temporal=temporal_range,
+        spatial=bounding_box,
+        ignore_errors=True,
+        max_results=max_results,
+        **kwargs,
+    )
+
+    # submit harmony request, will return job id
+    subset_job_id = harmony_client.submit(request)
+
+    print(f"Processing job: {subset_job_id}")
+
+    print(f"Waiting for the job to finish")
+    results = harmony_client.result_json(subset_job_id, show_progress=True)
+
+    print(f"Downloading subset files...")
+    futures = harmony_client.download_all(
+        subset_job_id, directory=out_dir, overwrite=overwrite
+    )
+    for f in futures:
+        # all subsetted files have this suffix
+        if f.result().endswith("subsetted.h5"):
+            print(f"Downloaded: {f.result()}")
+
+    print(f"Done downloading files.")
+
+
+def gedi_download_file(
+    url: str, filename: str = None, username: str = None, password: str = None
+) -> None:
+    """
+    Downloads a file from the given URL and saves it to the specified filename.
+    If no filename is provided, the name of the file from the URL will be used.
+
+    Args:
+        url (str): The URL of the file to download.
+            e.g., https://daac.ornl.gov/daacdata/gedi/GEDI_L4A_AGB_Density_V2_1/data/GEDI04_A_2019298202754_O04921_01_T02899_02_002_02_V002.h5
+        filename (str, optional): The name of the file to save the downloaded content to. Defaults to None.
+        username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+            Create an account at https://urs.earthdata.nasa.gov
+        password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+
+    Returns:
+        None
+    """
+    import requests
+    from tqdm import tqdm
+    from urllib.parse import urlparse
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError(
+            "Username and password must be provided. Create an account at https://urs.earthdata.nasa.gov."
+        )
+
+    with requests.Session() as session:
+        r1 = session.request("get", url, stream=True)
+        r = session.get(r1.url, auth=(username, password), stream=True)
+        print(r.status_code)
+
+        if r.status_code == 200:
+            total_size = int(r.headers.get("content-length", 0))
+            block_size = 1024  # 1 KB
+
+            # Use the filename from the URL if not provided
+            if not filename:
+                parsed_url = urlparse(url)
+                filename = parsed_url.path.split("/")[-1]
+
+            progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
+
+            with open(filename, "wb") as file:
+                for data in r.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+
+            progress_bar.close()
+
+
+def gedi_download_files(
+    urls: List[str],
+    outdir: str = None,
+    filenames: str = None,
+    username: str = None,
+    password: str = None,
+    overwrite: bool = False,
+) -> None:
+    """
+    Downloads files from the given URLs and saves them to the specified directory.
+    If no directory is provided, the current directory will be used.
+    If no filenames are provided, the names of the files from the URLs will be used.
+
+    Args:
+        urls (List[str]): The URLs of the files to download.
+            e.g., ["https://example.com/file1.txt", "https://example.com/file2.txt"]
+        outdir (str, optional): The directory to save the downloaded files to. Defaults to None.
+        filenames (str, optional): The names of the files to save the downloaded content to. Defaults to None.
+        username (str, optional): Username for authentication. Can also be set using the EARTHDATA_USERNAME environment variable. Defaults to None.
+            Create an account at https://urs.earthdata.nasa.gov
+        password (str, optional): Password for authentication. Can also be set using the EARTHDATA_PASSWORD environment variable. Defaults to None.
+        overwrite (bool): Whether to overwrite the existing output files. Default is False.
+
+    Returns:
+        None
+    """
+
+    import requests
+    from tqdm import tqdm
+    from urllib.parse import urlparse
+    import geopandas as gpd
+
+    if isinstance(urls, gpd.GeoDataFrame):
+        urls = urls["granule_url"].tolist()
+
+    session = requests.Session()
+
+    if username is None:
+        username = os.environ.get("EARTHDATA_USERNAME", None)
+    if password is None:
+        password = os.environ.get("EARTHDATA_PASSWORD", None)
+
+    if username is None or password is None:
+        raise ValueError("Username and password must be provided.")
+
+    if outdir is None:
+        outdir = os.getcwd()
+
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    for index, url in enumerate(urls):
+        print(f"Downloading file {index+1} of {len(urls)}...")
+
+        if url is None:
+            continue
+
+        # Use the filename from the URL if not provided
+        if not filenames:
+            parsed_url = urlparse(url)
+            filename = parsed_url.path.split("/")[-1]
+        else:
+            filename = filenames.pop(0)
+
+        filepath = os.path.join(outdir, filename)
+        if os.path.exists(filepath) and not overwrite:
+            print(f"File {filepath} already exists. Skipping...")
+            continue
+
+        r1 = session.request("get", url, stream=True)
+        r = session.get(r1.url, auth=(username, password), stream=True)
+
+        if r.status_code == 200:
+            total_size = int(r.headers.get("content-length", 0))
+            block_size = 1024  # 1 KB
+
+            progress_bar = tqdm(total=total_size, unit="B", unit_scale=True)
+
+            with open(filepath, "wb") as file:
+                for data in r.iter_content(block_size):
+                    progress_bar.update(len(data))
+                    file.write(data)
+
+            progress_bar.close()
+
+    session.close()
+
+
+def h5_keys(filename: str) -> List[str]:
+    """
+    Retrieve the keys (dataset names) within an HDF5 file.
+
+    Args:
+        filename (str): The filename of the HDF5 file.
+
+    Returns:
+        List[str]: A list of dataset names present in the HDF5 file.
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+
+    Example:
+        >>> keys = h5_keys('data.h5')
+        >>> print(keys)
+        [
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    with h5py.File(filename, "r") as f:
+        keys = list(f.keys())
+
+    return keys
+
+
+def h5_variables(filename: str, key: str) -> List[str]:
+    """
+    Retrieve the variables (column names) within a specific key (dataset) in an H5 file.
+
+    Args:
+        filename (str): The filename of the H5 file.
+        key (str): The key (dataset name) within the H5 file.
+
+    Returns:
+        List[str]: A list of variable names (column names) within the specified key.
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+
+    Example:
+        >>> variables = h5_variables('data.h5', 'dataset1')
+        >>> print(variables)
+        ['var1', 'var2', 'var3']
+    """
+    try:
+        import h5py
+    except ImportError:
+        raise ImportError(
+            "h5py must be installed to use this function. Please install it with 'pip install h5py'."
+        )
+
+    with h5py.File(filename, "r") as f:
+        cols = list(f[key].keys())
+
+    return cols
+
+
+def h5_to_gdf(
+    filenames: str,
+    dataset: str,
+    lat: str = "lat_lowestmode",
+    lon: str = "lon_lowestmode",
+    columns: Optional[List[str]] = None,
+    crs: str = "EPSG:4326",
+    nodata=None,
+    **kwargs,
+):
+    """
+    Read data from one or multiple HDF5 files and return as a GeoDataFrame.
+
+    Args:
+        filenames (str or List[str]): The filename(s) of the HDF5 file(s).
+        dataset (str): The dataset name within the H5 file(s).
+        lat (str): The column name representing latitude. Default is 'lat_lowestmode'.
+        lon (str): The column name representing longitude. Default is 'lon_lowestmode'.
+        columns (List[str], optional): List of column names to include. If None, all columns will be included. Default is None.
+        crs (str, optional): The coordinate reference system code. Default is "EPSG:4326".
+        **kwargs: Additional keyword arguments to be passed to the GeoDataFrame constructor.
+
+    Returns:
+        geopandas.GeoDataFrame: A GeoDataFrame containing the data from the H5 file(s).
+
+    Raises:
+        ImportError: Raised if h5py is not installed.
+        ValueError: Raised if the provided filenames argument is not a valid type or if a specified file does not exist.
+
+    Example:
+        >>> gdf = h5_to_gdf('data.h5', 'dataset1', 'lat', 'lon', columns=['column1', 'column2'], crs='EPSG:4326')
+        >>> print(gdf.head())
+           column1  column2        lat        lon                    geometry
+        0        10       20  40.123456 -75.987654  POINT (-75.987654 40.123456)
+        1        15       25  40.234567 -75.876543  POINT (-75.876543 40.234567)
+        ...
+
+    """
+    try:
+        import h5py
+    except ImportError:
+        install_package("h5py")
+        import h5py
+
+    import glob
+    import pandas as pd
+    import geopandas as gpd
+
+    if isinstance(filenames, str):
+        if os.path.exists(filenames):
+            files = [filenames]
+        else:
+            files = glob.glob(filenames)
+            if not files:
+                raise ValueError(f"File {filenames} does not exist.")
+            files.sort()
+    elif isinstance(filenames, list):
+        files = filenames
+    else:
+        raise ValueError("h5_file must be a string or a list of strings.")
+
+    out_df = pd.DataFrame()
+
+    for file in files:
+        h5 = h5py.File(file, "r")
+        try:
+            data = h5[dataset]
+        except KeyError:
+            print(f"Dataset {dataset} not found in file {file}. Skipping...")
+            continue
+        col_names = []
+        col_val = []
+
+        for key, value in data.items():
+            if columns is None or key in columns or key == lat or key == lon:
+                col_names.append(key)
+                col_val.append(value[:].tolist())
+
+        df = pd.DataFrame(map(list, zip(*col_val)), columns=col_names)
+        out_df = pd.concat([out_df, df])
+        h5.close()
+
+    if nodata is not None and columns is not None:
+        out_df = out_df[out_df[columns[0]] != nodata]
+
+    gdf = gpd.GeoDataFrame(
+        out_df, geometry=gpd.points_from_xy(out_df[lon], out_df[lat]), crs=crs, **kwargs
+    )
+
+    return gdf
+
+
+def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> None:
+    """Logs in to NASA Earthdata.
+
+    Args:
+        strategy (str, optional): The authentication method.
+               "all": (default) try all methods until one works
+                "interactive": enter username and password.
+                "netrc": retrieve username and password from ~/.netrc.
+                "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
+           persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
+        **kwargs: Additional keyword arguments for the earthaccess.login() function.
+    """
+    try:
+        import earthaccess
+    except ImportError:
+        install_package("earthaccess")
+        import earthaccess
+
+    try:
+        earthaccess.login(strategy=strategy, persist=persist, **kwargs)
+    except:
+        print(
+            "Please login to Earthdata first. Register at https://urs.earthdata.nasa.gov"
+        )
+
+
+def nasa_data_granules_to_gdf(
+    granules: List[dict], crs: str = "EPSG:4326", output: str = None, **kwargs
+):
+    """Converts granules data to a GeoDataFrame.
+
+    Args:
+        granules (List[dict]): A list of granules.
+        crs (str, optional): The coordinate reference system (CRS) of the GeoDataFrame. Defaults to "EPSG:4326".
+        output (str, optional): The output file path to save the GeoDataFrame as a file. Defaults to None.
+        **kwargs: Additional keyword arguments for the gpd.GeoDataFrame.to_file() function.
+
+    Returns:
+        gpd.GeoDataFrame: The resulting GeoDataFrame.
+    """
+    import pandas as pd
+    import geopandas as gpd
+    from shapely.geometry import box, Polygon
+
+    df = pd.json_normalize([dict(i.items()) for i in granules])
+    df.columns = [col.split(".")[-1] for col in df.columns]
+    df = df.drop("Version", axis=1)
+
+    def get_bbox(rectangles):
+        xmin = min(rectangle["WestBoundingCoordinate"] for rectangle in rectangles)
+        ymin = min(rectangle["SouthBoundingCoordinate"] for rectangle in rectangles)
+        xmax = max(rectangle["EastBoundingCoordinate"] for rectangle in rectangles)
+        ymax = max(rectangle["NorthBoundingCoordinate"] for rectangle in rectangles)
+
+        bbox = (xmin, ymin, xmax, ymax)
+        return bbox
+
+    def get_polygon(coordinates):
+        # Extract the points from the dictionary
+        points = [
+            (point["Longitude"], point["Latitude"])
+            for point in coordinates[0]["Boundary"]["Points"]
+        ]
+
+        # Create a Polygon
+        polygon = Polygon(points)
+        return polygon
+
+    if "BoundingRectangles" in df.columns:
+        df["bbox"] = df["BoundingRectangles"].apply(get_bbox)
+        df["geometry"] = df["bbox"].apply(lambda x: box(*x))
+    elif "GPolygons" in df.columns:
+        df["geometry"] = df["GPolygons"].apply(get_polygon)
+
+    gdf = gpd.GeoDataFrame(df, geometry="geometry")
+
+    gdf.crs = crs
+
+    if output is not None:
+        for column in gdf.columns:
+            if gdf[column].apply(lambda x: isinstance(x, list)).any():
+                gdf[column] = gdf[column].apply(lambda x: str(x))
+
+        gdf.to_file(output, **kwargs)
+
+    return gdf
+
+
+def nasa_data_search(
+    count: int = -1,
+    short_name: Optional[str] = None,
+    bbox: Optional[List[float]] = None,
+    temporal: Optional[str] = None,
+    version: Optional[str] = None,
+    doi: Optional[str] = None,
+    daac: Optional[str] = None,
+    provider: Optional[str] = None,
+    output: Optional[str] = None,
+    crs: str = "EPSG:4326",
+    return_gdf: bool = False,
+    **kwargs,
+) -> Union[List[dict], tuple]:
+    """Searches for NASA Earthdata granules.
+
+    Args:
+        count (int, optional): The number of granules to retrieve. Defaults to -1 (retrieve all).
+        short_name (str, optional): The short name of the dataset.
+        bbox (List[float], optional): The bounding box coordinates [xmin, ymin, xmax, ymax].
+        temporal (str, optional): The temporal extent of the data.
+        version (str, optional): The version of the dataset.
+        doi (str, optional): The Digital Object Identifier (DOI) of the dataset.
+        daac (str, optional): The Distributed Active Archive Center (DAAC) of the dataset.
+        provider (str, optional): The provider of the dataset.
+        output (str, optional): The output file path to save the GeoDataFrame as a file.
+        crs (str, optional): The coordinate reference system (CRS) of the GeoDataFrame. Defaults to "EPSG:4326".
+        return_gdf (bool, optional): Whether to return the GeoDataFrame in addition to the granules. Defaults to False.
+        **kwargs: Additional keyword arguments for the earthaccess.search_data() function.
+
+    Returns:
+        Union[List[dict], tuple]: The retrieved granules. If return_gdf is True, also returns the resulting GeoDataFrame.
+    """
+    import earthaccess
+
+    if short_name is not None:
+        kwargs["short_name"] = short_name
+    if bbox is not None:
+        kwargs["bounding_box"] = bbox
+    if temporal is not None:
+        kwargs["temporal"] = temporal
+    if version is not None:
+        kwargs["version"] = version
+    if doi is not None:
+        kwargs["doi"] = doi
+    if daac is not None:
+        kwargs["daac"] = daac
+    if provider is not None:
+        kwargs["provider"] = provider
+
+    granules = earthaccess.search_data(
+        count=count,
+        **kwargs,
+    )
+
+    if output is not None:
+        nasa_data_granules_to_gdf(granules, crs=crs, output=output)
+
+    if return_gdf:
+        gdf = nasa_data_granules_to_gdf(granules, crs=crs)
+        return granules, gdf
+    else:
+        return granules
+
+
+def nasa_data_download(
+    granules: List[dict],
+    out_dir: Optional[str] = None,
+    provider: Optional[str] = None,
+    threads: int = 8,
+) -> None:
+    """Downloads NASA Earthdata granules.
+
+    Args:
+        granules (List[dict]): The granules to download.
+        out_dir (str, optional): The output directory where the granules will be downloaded. Defaults to None (current directory).
+        provider (str, optional): The provider of the granules.
+        threads (int, optional): The number of threads to use for downloading. Defaults to 8.
+    """
+    import earthaccess
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return
+
+    earthaccess.download(
+        granules, local_path=out_dir, provider=provider, threads=threads
+    )
+
+
+def nasa_datasets(keyword=None, df=None, return_short_name=False):
+    """
+    Searches for NASA datasets based on a keyword in a DataFrame.
+
+    Args:
+        keyword (str, optional): The keyword to search for. Defaults to None.
+        df (pd.DataFrame, optional): The DataFrame to search in. If None, it will download the NASA dataset CSV from GitHub. Defaults to None.
+        return_short_name (bool, optional): If True, only returns the list of short names of the matched datasets. Defaults to False.
+
+    Returns:
+        Union[pd.DataFrame, List[str]]: Filtered DataFrame if return_short_name is False, otherwise a list of short names.
+
+    """
+    import pandas as pd
+
+    if df is None:
+        url = "https://github.com/opengeos/NASA-Earth-Data/raw/main/nasa_earth_data.tsv"
+        df = pd.read_csv(url, sep="\t")
+
+    if keyword is not None:
+        # Convert keyword and DataFrame values to lowercase
+        keyword_lower = keyword.lower()
+        df_lower = df.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+
+        # Use boolean indexing to filter the DataFrame
+        filtered_df = df[
+            df_lower.astype(str).apply(lambda x: keyword_lower in " ".join(x), axis=1)
+        ].reset_index(drop=True)
+
+        if return_short_name:
+            return filtered_df["ShortName"].tolist()
+        else:
+            return filtered_df
+    else:
+        if return_short_name:
+            return df["ShortName"].tolist()
+        else:
+            return df
