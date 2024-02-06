@@ -1,5 +1,37 @@
 # Changelog
 
+## v0.31.0 - Feb 6, 2024
+
+**What's Changed**
+
+-   Update notebooks by @giswqs in [#657](https://github.com/opengeos/leafmap/pull/657)
+-   Fix array_to_image bug by @giswqs in [#660](https://github.com/opengeos/leafmap/pull/660)
+-   Update GitHub Action versions by @giswqs in [#669](https://github.com/opengeos/leafmap/pull/669)
+-   Bump localtileserver>=0.10.0 by @banesullivan in [#666](https://github.com/opengeos/leafmap/pull/666)
+-   Add get_root param to stac_client by @giswqs in [#564](https://github.com/opengeos/leafmap/pull/564)
+-   Remove support for JupyterLite by @giswqs in [#671](https://github.com/opengeos/leafmap/pull/671)
+
+**New Contributors**
+
+-   @banesullivan made their first contribution in [#666](https://github.com/opengeos/leafmap/pull/666)
+
+**Full Changelog**: [v0.30.1...v0.31.0](https://github.com/opengeos/leafmap/compare/v0.30.1...v0.31.0)
+
+## v0.30.1 - Jan 11, 2024
+
+**What's Changed**
+
+-   Update changelog for v0.30.0 by @giswqs in [#652](https://github.com/opengeos/leafmap/pull/652)
+-   Improve array_to_image function by @giswqs in [#653](https://github.com/opengeos/leafmap/pull/653)
+-   87_actinia.ipynb: simplify installation of actinia_python_client by @neteler in [#655](https://github.com/opengeos/leafmap/pull/655)
+-   Modified add_velocity in leafmap.py to support custom color list by @shailesh-stha in [#654](https://github.com/opengeos/leafmap/pull/654)
+
+**New Contributors**
+
+-   @shailesh-stha made their first contribution in [#654](https://github.com/opengeos/leafmap/pull/654)
+
+**Full Changelog**: [v0.30.0...v0.30.1](https://github.com/opengeos/leafmap/compare/v0.30.0...v0.30.1)
+
 ## v0.30.0 - Dec 23, 2023
 
 **What's Changed**
