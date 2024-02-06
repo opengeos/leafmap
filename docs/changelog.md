@@ -1,5 +1,227 @@
 # Changelog
 
+## v0.30.0 - Dec 23, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.8 by @giswqs in [#646](https://github.com/opengeos/leafmap/pull/646)
+-   Improve folium legend position docstring by @giswqs in [#647](https://github.com/opengeos/leafmap/pull/647)
+-   Add support for downloading NASA Earth data by @giswqs in [#648](https://github.com/opengeos/leafmap/pull/648)
+-   Add support for searching NASA data interactively by @giswqs in [#649](https://github.com/opengeos/leafmap/pull/649)
+-   Add support for visualizing in-memory raster by @giswqs in [#651](https://github.com/opengeos/leafmap/pull/651)
+
+**Full Changelog**: [v0.29.8...v0.30.0](https://github.com/opengeos/leafmap/compare/v0.29.8...v0.30.0)
+
+## v0.29.8 - Dec 20, 2023
+
+**What's Changed**
+
+-   Fix PMTiles metadata bug by @giswqs in [#643](https://github.com/opengeos/leafmap/pull/643)
+-   fixed namespace and event handling issue with PMTiles by @prusswan in [#645](https://github.com/opengeos/leafmap/pull/645)
+
+**New Contributors**
+
+-   @prusswan made their first contribution in [#645](https://github.com/opengeos/leafmap/pull/645)
+
+**Full Changelog**: [v0.29.7...v0.29.8](https://github.com/opengeos/leafmap/compare/v0.29.7...v0.29.8)
+
+## v0.29.7 - Dec 15, 2023
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#634](https://github.com/opengeos/leafmap/pull/634)
+-   Update Colab badge link by @giswqs in [#635](https://github.com/opengeos/leafmap/pull/635)
+-   Update GEDI notebook example by @giswqs in [#637](https://github.com/opengeos/leafmap/pull/637)
+-   Add actinia notebook by @neteler in [#573](https://github.com/opengeos/leafmap/pull/573)
+-   Fix folium pmtiles bug by @giswqs in [#641](https://github.com/opengeos/leafmap/pull/641)
+
+**New Contributors**
+
+-   @neteler made their first contribution in [#573](https://github.com/opengeos/leafmap/pull/573)
+
+**Full Changelog**: [v0.29.6...v0.29.7](https://github.com/opengeos/leafmap/compare/v0.29.6...v0.29.7)
+
+## v0.29.6 - Dec 7, 2023
+
+**What's Changed**
+
+-   Add font size option for circle marker by @giswqs in [#628](https://github.com/opengeos/leafmap/pull/628)
+-   Add GEDI subsetting and add_markers functions by @giswqs in [#630](https://github.com/opengeos/leafmap/pull/630)
+
+**Full Changelog**: [v0.29.5...v0.29.6](https://github.com/opengeos/leafmap/compare/v0.29.5...v0.29.6)
+
+## v0.29.5 - Nov 30, 2023
+
+**What's Changed**
+
+-   Fix basemap visibility bug by @giswqs in [#622](https://github.com/opengeos/leafmap/pull/622)
+-   Add support for visualizing GEDI data by @giswqs in [#624](https://github.com/opengeos/leafmap/pull/624)
+
+**Full Changelog**: [v0.29.4...v0.29.5](https://github.com/opengeos/leafmap/compare/v0.29.4...v0.29.5)
+
+## v0.29.4 - Nov 28, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.3 by @giswqs in [#618](https://github.com/opengeos/leafmap/pull/618)
+-   Add functions for searching and downloading GEDI data by @giswqs in [#619](https://github.com/opengeos/leafmap/pull/619)
+
+**Full Changelog**: [v0.29.3...v0.29.4](https://github.com/opengeos/leafmap/compare/v0.29.3...v0.29.4)
+
+## v0.29.3 - Nov 26, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.2 by @giswqs in [#614](https://github.com/opengeos/leafmap/pull/614)
+-   Add default style for rendering PMTiles by @giswqs in [#617](https://github.com/opengeos/leafmap/pull/617)
+
+**Full Changelog**: [v0.29.2...v0.29.3](https://github.com/opengeos/leafmap/compare/v0.29.2...v0.29.3)
+
+## v0.29.2 - Nov 21, 2023
+
+**What's Changed**
+
+-   Add wms legend method to Map class by @JJFlorian in [#608](https://github.com/opengeos/leafmap/pull/608)
+-   Update GitHub Actions to Python 3.11 by @giswqs in [#612](https://github.com/opengeos/leafmap/pull/612)
+-   Add tooltip for PMTiles by @giswqs in [#613](https://github.com/opengeos/leafmap/pull/613)
+
+**New Contributors**
+
+-   @JJFlorian made their first contribution in [#608](https://github.com/opengeos/leafmap/pull/608)
+
+**Full Changelog**: [v0.29.1...v0.29.2](https://github.com/opengeos/leafmap/compare/v0.29.1...v0.29.2)
+
+## v0.29.1 - Nov 6, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.29.0 by @giswqs in [#602](https://github.com/opengeos/leafmap/pull/602)
+-   Update notebook 84 by @giswqs in [#603](https://github.com/opengeos/leafmap/pull/603)
+-   Update NWI legend by @giswqs in [#604](https://github.com/opengeos/leafmap/pull/604)
+-   Add plot functions by @giswqs in [#609](https://github.com/opengeos/leafmap/pull/609)
+
+**Full Changelog**: [v0.29.0...v0.29.1](https://github.com/opengeos/leafmap/compare/v0.29.0...v0.29.1)
+
+## v0.29.0 - Nov 12, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.28.1 by @giswqs in [#593](https://github.com/opengeos/leafmap/pull/593)
+-   Add vector_to_parquet function by @giswqs in [#598](https://github.com/opengeos/leafmap/pull/598)
+-   Add support for reading parquet files by @giswqs in [#599](https://github.com/opengeos/leafmap/pull/599)
+-   Add streamlit support for lonboard by @giswqs in [#600](https://github.com/opengeos/leafmap/pull/600)
+-   Add color schemes for visualizing vector data by @giswqs in [#601](https://github.com/opengeos/leafmap/pull/601)
+
+**Full Changelog**: [v0.28.1...v0.29.0](https://github.com/opengeos/leafmap/compare/v0.28.1...v0.29.0)
+
+## v0.28.1 - Nov 7, 2023
+
+**What's Changed**
+
+-   Update changelog for v0.28.0 by @giswqs in [#589](https://github.com/opengeos/leafmap/pull/589)
+-   Update notebook 83 by @giswqs in [#590](https://github.com/opengeos/leafmap/pull/590)
+-   Fix gdal driver error by @giswqs in [#591](https://github.com/opengeos/leafmap/pull/591)
+-   Fix folium notebook error by @giswqs in [#592](https://github.com/opengeos/leafmap/pull/592)
+
+**Full Changelog**: [v0.28.0...v0.28.1](https://github.com/opengeos/leafmap/compare/v0.28.0...v0.28.1)
+
+## v0.28.0 - Nov 5, 2023
+
+**What's Changed**
+
+-   Update gradio example by @giswqs in [#584](https://github.com/opengeos/leafmap/pull/584)
+-   Add GDAL and OpenFileGDB functions by @giswqs in [#585](https://github.com/opengeos/leafmap/pull/585)
+-   Add df_to_gdf function by @giswqs in [#586](https://github.com/opengeos/leafmap/pull/586)
+-   Add mbtiles and pmtiles functions by @giswqs in [#587](https://github.com/opengeos/leafmap/pull/587)
+-   Add support for lonboard by @giswqs in [#588](https://github.com/opengeos/leafmap/pull/588)
+
+**Full Changelog**: [v0.27.2...v0.28.0](https://github.com/opengeos/leafmap/compare/v0.27.2...v0.28.0)
+
+## v0.27.2 - Nov 3, 2023
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#579](https://github.com/opengeos/leafmap/pull/579)
+-   Add some vector functions by @giswqs in [#582](https://github.com/opengeos/leafmap/pull/582)
+
+**Full Changelog**: [v0.27.1...v0.27.2](https://github.com/opengeos/leafmap/compare/v0.27.1...v0.27.2)
+
+## v0.27.1 - Oct 17, 2023
+
+**What's Changed**
+
+-   Add global buildings example by @giswqs in [#569](https://github.com/opengeos/leafmap/pull/569)
+-   Add ipyleaflet support for PMTiles by @giswqs in [#575](https://github.com/opengeos/leafmap/pull/575)
+-   fix numpy.ndarray.interp error #577 by @kongdd in [#578](https://github.com/opengeos/leafmap/pull/578)
+
+**New Contributors**
+
+-   @kongdd made their first contribution in [#578](https://github.com/opengeos/leafmap/pull/578)
+
+**Full Changelog**: [v0.27.0...v0.27.1](https://github.com/opengeos/leafmap/compare/v0.27.0...v0.27.1)
+
+## v0.27.0 - Sep 25, 2023
+
+**What's Changed**
+
+-   Add start_server function for pmtiles by @giswqs in [#563](https://github.com/opengeos/leafmap/pull/563)
+-   Add support for PMTiles by @giswqs in [#566](https://github.com/opengeos/leafmap/pull/566)
+-   Improve PMTiles functions by @giswqs in [#567](https://github.com/opengeos/leafmap/pull/567)
+
+**Full Changelog**: [v0.26.0...v0.27.0](https://github.com/opengeos/leafmap/compare/v0.26.0...v0.27.0)
+
+## v0.26.0 - Sep 20, 2023
+
+**What's Changed**
+
+-   Add support for PMTiles by @giswqs in [#560](https://github.com/opengeos/leafmap/pull/560)
+-   Add example for visualizing overture pmtiles by @giswqs in [#561](https://github.com/opengeos/leafmap/pull/561)
+
+**Full Changelog**: [v0.25.3...v0.26.0](https://github.com/opengeos/leafmap/compare/v0.25.3...v0.26.0)
+
+## v0.25.3 - Sep 19, 2023
+
+**What's Changed**
+
+-   Add widget template by @giswqs in [#557](https://github.com/opengeos/leafmap/pull/557)
+-   Update EE dataset link by @giswqs in [#558](https://github.com/opengeos/leafmap/pull/558)
+
+**Full Changelog**: [v0.25.2...v0.25.3](https://github.com/opengeos/leafmap/compare/v0.25.2...v0.25.3)
+
+## v0.25.2 - Sep 16, 2023
+
+**What's Changed**
+
+-   Update Google Buildings notebook by @giswqs in [#551](https://github.com/opengeos/leafmap/pull/551)
+-   Add function for convert building csv to vector by @giswqs in [#552](https://github.com/opengeos/leafmap/pull/552)
+-   Add add_ee_layer function by @giswqs in [#553](https://github.com/opengeos/leafmap/pull/553)
+
+**Full Changelog**: [v0.25.1...v0.25.2](https://github.com/opengeos/leafmap/compare/v0.25.1...v0.25.2)
+
+## v0.25.1 - Sep 14, 2023
+
+**What's Changed**
+
+-   Add support for downloading google buildings by @giswqs in [#550](https://github.com/opengeos/leafmap/pull/550)
+
+**Full Changelog**: [v0.25.0...v0.25.1](https://github.com/opengeos/leafmap/compare/v0.25.0...v0.25.1)
+
+## v0.25.0 - Sep 14, 2023
+
+**What's Changed**
+
+-   Add support for downloading MS building footprints by @giswqs in [#549](https://github.com/opengeos/leafmap/pull/549)
+
+**Full Changelog**: [v0.24.4...v0.25.0](https://github.com/opengeos/leafmap/compare/v0.24.4...v0.25.0)
+
+## v0.24.4 - Sep 12, 2023
+
+**What's Changed**
+
+-   Fix basemap issue by @giswqs in [#545](https://github.com/opengeos/leafmap/pull/545)
+
+**Full Changelog**: [v0.24.3...v0.24.4](https://github.com/opengeos/leafmap/compare/v0.24.3...v0.24.4)
+
 ## v0.24.3 - Sep 12, 2023
 
 **What's Changed**
@@ -30,19 +252,19 @@
 
 ## v0.24.0 - Sep 4, 2023
 
-## What's Changed
+**What's Changed**
 
 -   Fix netcdf_to_tif to correctly shift longitude with custom variable name by @jovanovski in #529
 -   Add array_to_image function by @giswqs in #530
 -   Add images_to_tiles function by @giswqs in #531
 
-## New Contributors
+**New Contributors**
 
 -   @jovanovski made their first contribution in #529
 
 ## v0.23.4 - Aug 31, 2023
 
-## What's Changed
+**What's Changed**
 
 -   Update docs by @giswqs in #513
 -   Update logo by @giswqs in #517

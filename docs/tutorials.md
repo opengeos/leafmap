@@ -3,8 +3,8 @@
 [![image](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://demo.leafmap.org)
 [![image](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/opengeos/leafmap/blob/master/examples/notebooks/00_key_features.ipynb)
 [![image](https://img.shields.io/badge/Open-Planetary%20Computer-black?style=flat&logo=microsoft)](https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/opengeos/leafmap&urlpath=lab/tree/leafmap/examples/notebooks/00_key_features.ipynb&branch=master)
-[![image](https://colab.research.google.com/assets/colab-badge.svg)](https://gishub.org/leafmap-colab)
-[![image](https://mybinder.org/badge_logo.svg)](https://gishub.org/leafmap-binder)
+[![image](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/opengeos/leafmap/blob/master)
+[![image](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/opengeos/leafmap/HEAD)
 
 ## Workshops
 
@@ -96,6 +96,13 @@
 80. Visualizing solar radiation data from Google Solar API ([notebook](https://leafmap.org/notebooks/80_solar))
 81. Downloading Microsoft and Google Building Footprints ([notebook](https://leafmap.org/notebooks/81_buildings))
 82. Visualizing PMTiles with leafmap ([notebook](https://leafmap.org/notebooks/82_pmtiles))
+83. Visualizing large vector datasets with lonboard ([notebook](https://leafmap.org/notebooks/83_vector_viz))
+84. Reading GeoParquet files and visualizing vector data interactively ([notebook](https://leafmap.org/notebooks/84_read_parquet))
+85. How to search and download GEDI L4A dataset interactively ([notebook](https://leafmap.org/notebooks/85_gedi))
+86. Adding markers to the map ([notebook](https://leafmap.org/notebooks/86_add_markers))
+87. Cloud-based geoprocessing with Actinia ([notebook](https://leafmap.org/notebooks/87_actinia))
+88. Searching and downloading NASA Earth science data products ([notebook](https://leafmap.org/notebooks/88_nasa_earth_data))
+89. Visualizing in-memory raster datasets and image arrays ([notebook](https://leafmap.org/notebooks/89_image_array_viz))
 
 ## Demo
 

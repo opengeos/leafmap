@@ -11,6 +11,8 @@ from .legends import builtin_legends
 from .osm import *
 from .pc import *
 from . import examples
+from .map_widgets import *
+from .plot import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -70,7 +72,7 @@ class Map(ipyleaflet.Map):
                 self.sandbox_path = None
 
         if "height" not in kwargs:
-            self.layout.height = "500px"
+            self.layout.height = "600px"
         else:
             if isinstance(kwargs["height"], int):
                 kwargs["height"] = str(kwargs["height"]) + "px"
@@ -91,7 +93,7 @@ class Map(ipyleaflet.Map):
             self.add(ipyleaflet.FullScreenControl())
 
         if "search_control" not in kwargs:
-            kwargs["search_control"] = True
+            kwargs["search_control"] = False
         if kwargs["search_control"]:
             url = "https://nominatim.openstreetmap.org/search?format=json&q={s}"
             search_control = ipyleaflet.SearchControl(
@@ -178,7 +180,7 @@ class Map(ipyleaflet.Map):
             draw_control.on_draw(handle_draw)
 
         if "measure_control" not in kwargs:
-            kwargs["measure_control"] = True
+            kwargs["measure_control"] = False
         if kwargs["measure_control"]:
             self.add(ipyleaflet.MeasureControl(position="topleft"))
 
@@ -202,7 +204,7 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-    def add(self, object):
+    def add(self, object, **kwargs):
         """Adds a layer to the map.
 
         Args:
@@ -211,6 +213,12 @@ class Map(ipyleaflet.Map):
         if isinstance(object, str):
             if object in basemaps.keys():
                 object = get_basemap(object)
+
+            elif object == "nasa_earth_data":
+                from .toolbar import nasa_data_gui
+
+                nasa_data_gui(self, **kwargs)
+                return
 
         super().add(object)
 
@@ -591,6 +599,59 @@ class Map(ipyleaflet.Map):
             raise Exception(e)
 
     add_vector_tile_layer = add_vector_tile
+
+    def add_pmtiles(
+        self,
+        url,
+        style=None,
+        name="PMTiles",
+        show=True,
+        zoom_to_layer=True,
+        **kwargs,
+    ):
+        """
+        Adds a PMTiles layer to the map. This function is not officially supported yet by ipyleaflet yet.
+        Install it with the following command:
+        pip install git+https://github.com/giswqs/ipyleaflet.git@pmtiles
+
+        Args:
+            url (str): The URL of the PMTiles file.
+            style (str, optional): The CSS style to apply to the layer. Defaults to None.
+                See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
+            name (str, optional): The name of the layer. Defaults to None.
+            show (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the PMTilesLayer constructor.
+
+        Returns:
+            None
+        """
+
+        try:
+            if "sources" in kwargs:
+                del kwargs["sources"]
+
+            if "version" in kwargs:
+                del kwargs["version"]
+
+            if style is None:
+                style = pmtiles_style(url)
+
+            layer = ipyleaflet.PMTilesLayer(
+                url=url,
+                style=style,
+                name=name,
+                visible=show,
+                **kwargs,
+            )
+            self.add(layer)
+
+            if zoom_to_layer:
+                metadata = pmtiles_metadata(url)
+                bounds = metadata["bounds"]
+                self.zoom_to_bounds(bounds)
+        except Exception as e:
+            print(e)
 
     def add_osm_from_geocode(
         self,
@@ -1089,32 +1150,55 @@ class Map(ipyleaflet.Map):
     def add_circle_markers_from_xy(
         self,
         data,
-        x="longitude",
-        y="latitude",
+        x="lon",
+        y="lat",
         radius=10,
         popup=None,
+        font_size=2,
+        stroke=True,
+        color="#0033FF",
+        weight=2,
+        fill=True,
+        fill_color=None,
+        fill_opacity=0.2,
+        opacity=1.0,
+        layer_name="Circle Markers",
         **kwargs,
     ):
-        """Adds a marker cluster to the map. For a list of options, see https://ipyleaflet.readthedocs.io/en/latest/api_reference/circle_marker.html
+        """Adds a marker cluster to the map. For a list of options, see https://ipyleaflet.readthedocs.io/en/latest/_modules/ipyleaflet/leaflet.html#Path
 
         Args:
             data (str | pd.DataFrame): A csv or Pandas DataFrame containing x, y, z values.
-            x (str, optional): The column name for the x values. Defaults to "longitude".
-            y (str, optional): The column name for the y values. Defaults to "latitude".
+            x (str, optional): The column name for the x values. Defaults to "lon".
+            y (str, optional): The column name for the y values. Defaults to "lat".
             radius (int, optional): The radius of the circle. Defaults to 10.
             popup (list, optional): A list of column names to be used as the popup. Defaults to None.
+            font_size (int, optional): The font size of the popup. Defaults to 2.
+            stroke (bool, optional): Whether to stroke the path. Defaults to True.
+            color (str, optional): The color of the path. Defaults to "#0033FF".
+            weight (int, optional): The weight of the path. Defaults to 2.
+            fill (bool, optional): Whether to fill the path with color. Defaults to True.
+            fill_color (str, optional): The fill color of the path. Defaults to None.
+            fill_opacity (float, optional): The fill opacity of the path. Defaults to 0.2.
+            opacity (float, optional): The opacity of the path. Defaults to 1.0.
+            layer_name (str, optional): The layer name to use for the marker cluster. Defaults to "Circle Markers".
 
         """
         import pandas as pd
+        import geopandas as gpd
 
-        if isinstance(data, pd.DataFrame):
+        if isinstance(data, pd.DataFrame) or isinstance(data, gpd.GeoDataFrame):
             df = data
         elif not data.startswith("http") and (not os.path.exists(data)):
             raise FileNotFoundError("The specified input csv does not exist.")
-        else:
+        elif isinstance(data, str) and data.endswith(".csv"):
             df = pd.read_csv(data)
+        else:
+            df = gpd.read_file(data)
 
         col_names = df.columns.values.tolist()
+        if "geometry" in col_names:
+            col_names.remove("geometry")
 
         if popup is None:
             popup = col_names
@@ -1123,24 +1207,162 @@ class Map(ipyleaflet.Map):
             popup = [popup]
 
         if x not in col_names:
-            raise ValueError(f"x must be one of the following: {', '.join(col_names)}")
+            if isinstance(df, gpd.GeoDataFrame):
+                df[x] = df.geometry.x
+            else:
+                raise ValueError(
+                    f"x must be one of the following: {', '.join(col_names)}"
+                )
 
         if y not in col_names:
-            raise ValueError(f"y must be one of the following: {', '.join(col_names)}")
+            if isinstance(df, gpd.GeoDataFrame):
+                df[y] = df.geometry.y
+            else:
+                raise ValueError(
+                    f"y must be one of the following: {', '.join(col_names)}"
+                )
 
+        if fill_color is None:
+            fill_color = color
+
+        if isinstance(color, str):
+            colors = [color] * len(df)
+        elif isinstance(color, list):
+            colors = color
+        else:
+            raise ValueError("color must be either a string or a list.")
+
+        if isinstance(fill_color, str):
+            fill_colors = [fill_color] * len(df)
+        elif isinstance(fill_color, list):
+            fill_colors = fill_color
+        else:
+            raise ValueError("fill_color must be either a string or a list.")
+
+        if isinstance(radius, int):
+            radius = [radius] * len(df)
+        elif isinstance(radius, list):
+            radius = radius
+        else:
+            raise ValueError("radius must be either an integer or a list.")
+
+        index = 0
+
+        layers = []
         for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
+                html = (
+                    html
+                    + f"<font size='{font_size}'><b>"
+                    + p
+                    + "</b>"
+                    + ": "
+                    + str(row[p])
+                    + "<br></font>"
+                )
             popup_html = widgets.HTML(html)
 
             marker = ipyleaflet.CircleMarker(
                 location=[row[y], row[x]],
-                radius=radius,
+                radius=radius[index],
                 popup=popup_html,
+                stroke=stroke,
+                color=colors[index],
+                weight=weight,
+                fill=fill,
+                fill_color=fill_colors[index],
+                fill_opacity=fill_opacity,
+                opacity=opacity,
                 **kwargs,
             )
-            super().add(marker)
+            layers.append(marker)
+            index += 1
+
+        group = ipyleaflet.LayerGroup(layers=tuple(layers), name=layer_name)
+        self.add(group)
+
+    def add_markers(
+        self,
+        markers: Union[List[List[Union[int, float]]], List[Union[int, float]]],
+        x: str = "lon",
+        y: str = "lat",
+        radius: int = 10,
+        popup: Optional[str] = None,
+        font_size: int = 2,
+        stroke: bool = True,
+        color: str = "#0033FF",
+        weight: int = 2,
+        fill: bool = True,
+        fill_color: Optional[str] = None,
+        fill_opacity: float = 0.2,
+        opacity: float = 1.0,
+        shape: str = "circle",
+        layer_name: str = "Markers",
+        **kwargs,
+    ) -> None:
+        """
+        Adds markers to the map.
+
+        Args:
+            markers (Union[List[List[Union[int, float]]], List[Union[int, float]]]): List of markers.
+                Each marker can be defined as a list of [x, y] coordinates or as a single [x, y] coordinate.
+            x (str, optional): Name of the x-coordinate column in the marker data. Defaults to "lon".
+            y (str, optional): Name of the y-coordinate column in the marker data. Defaults to "lat".
+            radius (int, optional): Radius of the markers. Defaults to 10.
+            popup (str, optional): Popup text for the markers. Defaults to None.
+            font_size (int, optional): Font size of the popup text. Defaults to 2.
+            stroke (bool, optional): Whether to display marker stroke. Defaults to True.
+            color (str, optional): Color of the marker stroke. Defaults to "#0033FF".
+            weight (int, optional): Weight of the marker stroke. Defaults to 2.
+            fill (bool, optional): Whether to fill markers. Defaults to True.
+            fill_color (str, optional): Fill color of the markers. Defaults to None.
+            fill_opacity (float, optional): Opacity of the marker fill. Defaults to 0.2.
+            opacity (float, optional): Opacity of the markers. Defaults to 1.0.
+            shape (str, optional): Shape of the markers. Options are "circle" or "marker". Defaults to "circle".
+            layer_name (str, optional): Name of the marker layer. Defaults to "Markers".
+            **kwargs: Additional keyword arguments to pass to the marker plotting function.
+
+        Returns:
+            None: This function does not return any value.
+        """
+        import geopandas as gpd
+
+        if (
+            isinstance(markers, list)
+            and len(markers) == 2
+            and isinstance(markers[0], (int, float))
+            and isinstance(markers[1], (int, float))
+        ):
+            markers = [markers]
+
+        if isinstance(markers, list) and all(
+            isinstance(item, list) and len(item) == 2 for item in markers
+        ):
+            df = pd.DataFrame(markers, columns=[y, x])
+            markers = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df[x], df[y]))
+
+        if shape == "circle":
+            self.add_circle_markers_from_xy(
+                markers,
+                x,
+                y,
+                radius,
+                popup,
+                font_size,
+                stroke,
+                color,
+                weight,
+                fill,
+                fill_color,
+                fill_opacity,
+                opacity,
+                layer_name,
+                **kwargs,
+            )
+
+        elif shape == "marker":
+            self.add_gdf(markers, **kwargs)
 
     def split_map(
         self,
@@ -2012,12 +2234,11 @@ class Map(ipyleaflet.Map):
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
-        band_names = list(tile_client.metadata()["bands"].keys())
         params = {
             "tile_layer": tile_layer,
             "tile_client": tile_client,
             "band": band,
-            "band_names": band_names,
+            "band_names": tile_client.band_names,
             "bounds": bounds,
             "type": "LOCAL",
         }
@@ -2183,6 +2404,7 @@ class Map(ipyleaflet.Map):
 
         # import xarray as xr
         import matplotlib.pyplot as plt
+        import matplotlib as mpl
 
         warnings.simplefilter("ignore")
 
@@ -2198,7 +2420,7 @@ class Map(ipyleaflet.Map):
             layer_name = "Layer_" + random_string()
 
         if isinstance(colormap, str):
-            colormap = plt.cm.get_cmap(name=colormap)
+            colormap = mpl.colormaps[colormap]
 
         if isinstance(image, str):
             da = rioxarray.open_rasterio(image, masked=True)
@@ -3638,6 +3860,7 @@ class Map(ipyleaflet.Map):
         max_velocity=20,
         display_options={},
         name="Velocity",
+        color_scale=None
     ):
         """Add a velocity layer to the map.
 
@@ -3654,6 +3877,7 @@ class Map(ipyleaflet.Map):
             max_velocity (int, optional): The maximum velocity to display. Defaults to 20.
             display_options (dict, optional): The display options for the velocity layer. Defaults to {}. See https://bit.ly/3uf8t6w.
             name (str, optional): Layer name to use . Defaults to 'Velocity'.
+            color_scale (list, optional): List of RGB color values for the velocity vector color scale. Defaults to []. See https://bit.ly/3uf8t6w.
 
         Raises:
             ImportError: If the xarray package is not installed.
@@ -3688,6 +3912,25 @@ class Map(ipyleaflet.Map):
         if level_dimension in coords:
             ds = ds.isel(drop=True, **params)
 
+        if color_scale is None:
+            color_scale=[
+                "rgb(36,104, 180)",
+                "rgb(60,157, 194)",
+                "rgb(128,205,193)",
+                "rgb(151,218,168)",
+                "rgb(198,231,181)",
+                "rgb(238,247,217)",
+                "rgb(255,238,159)",
+                "rgb(252,217,125)",
+                "rgb(255,182,100)",
+                "rgb(252,150,75)",
+                "rgb(250,112,52)",
+                "rgb(245,64,32)",
+                "rgb(237,45,28)",
+                "rgb(220,24,32)",
+                "rgb(180,0,35)"
+            ]
+
         wind = Velocity(
             data=ds,
             zonal_speed=zonal_speed,
@@ -3698,6 +3941,7 @@ class Map(ipyleaflet.Map):
             max_velocity=max_velocity,
             display_options=display_options,
             name=name,
+            color_scale=color_scale,
         )
         self.add(wind)
 
@@ -3719,6 +3963,8 @@ class Map(ipyleaflet.Map):
         style=None,
         hover_style=None,
         style_callback=None,
+        marker_radius=10,
+        marker_args=None,
         info_mode="on_hover",
         encoding="utf-8",
         **kwargs,
@@ -3820,16 +4066,35 @@ class Map(ipyleaflet.Map):
         if style_callback is None:
             style_callback = lambda feat: {"fillColor": feat["properties"]["color"]}
 
-        self.add_gdf(
-            gdf,
-            layer_name=layer_name,
-            style=style,
-            hover_style=hover_style,
-            style_callback=style_callback,
-            info_mode=info_mode,
-            encoding=encoding,
-            **kwargs,
-        )
+        if gdf.geometry.geom_type.unique().tolist()[0] == "Point":
+            columns = gdf.columns.tolist()
+            if "category" in columns:
+                columns.remove("category")
+            if "color" in columns:
+                columns.remove("color")
+            if marker_args is None:
+                marker_args = {}
+            if "fill_color" not in marker_args:
+                marker_args["fill_color"] = gdf["color"].tolist()
+            if "stroke" not in marker_args:
+                marker_args["stroke"] = False
+            if "fill_opacity" not in marker_args:
+                marker_args["fill_opacity"] = 0.8
+
+            marker_args["radius"] = marker_radius
+
+            self.add_markers(gdf[columns], layer_name=layer_name, **marker_args)
+        else:
+            self.add_gdf(
+                gdf,
+                layer_name=layer_name,
+                style=style,
+                hover_style=hover_style,
+                style_callback=style_callback,
+                info_mode=info_mode,
+                encoding=encoding,
+                **kwargs,
+            )
         if add_legend:
             self.add_legend(
                 title=legend_title, legend_dict=legend_dict, position=legend_position
@@ -3981,11 +4246,11 @@ class Map(ipyleaflet.Map):
         """
 
         if background:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'}; 
-            padding: {padding}; background-color: {bg_color}; 
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            padding: {padding}; background-color: {bg_color};
             border-radius: {border_radius};">{text}</div>"""
         else:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'}; 
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)

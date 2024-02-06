@@ -8,6 +8,8 @@ from .legends import builtin_legends
 from .basemaps import xyz_to_folium
 from .osm import *
 from . import examples
+from .map_widgets import *
+from .plot import *
 
 from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
@@ -214,9 +216,11 @@ class Map(folium.Map):
         url,
         style=None,
         name=None,
+        tooltip=True,
         overlay=True,
         control=True,
         show=True,
+        zoom_to_layer=True,
         **kwargs,
     ):
         """
@@ -225,26 +229,40 @@ class Map(folium.Map):
         Args:
             url (str): The URL of the PMTiles file.
             style (str, optional): The CSS style to apply to the layer. Defaults to None.
+                See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
             name (str, optional): The name of the layer. Defaults to None.
+            tooltip (bool, optional): Whether to show a tooltip when hovering over the layer. Defaults to True.
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
             show (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
             **kwargs: Additional keyword arguments to pass to the PMTilesLayer constructor.
 
         Returns:
             None
         """
 
-        layer = PMTilesLayer(
-            url,
-            style=style,
-            name=name,
-            overlay=overlay,
-            control=control,
-            show=show,
-            **kwargs,
-        )
-        self.add_child(layer)
+        try:
+            if style is None:
+                style = pmtiles_style(url)
+            layer = PMTilesLayer(
+                url,
+                style=style,
+                name=name,
+                tooltip=tooltip,
+                overlay=overlay,
+                control=control,
+                show=show,
+                **kwargs,
+            )
+            self.add_child(layer)
+
+            if zoom_to_layer:
+                metadata = pmtiles_metadata(url)
+                bounds = metadata["bounds"]
+                self.zoom_to_bounds(bounds)
+        except Exception as e:
+            print(e)
 
     def add_layer_control(self):
         """Adds layer control to the map."""
@@ -307,7 +325,7 @@ class Map(folium.Map):
 
         try:
             if basemap in ["ROADMAP", "SATELLITE", "HYBRID", "TERRAIN"]:
-                layer = get_google_map(basemap, backend="folium", **kwargs)
+                layer = get_google_map(basemap, backend="folium", show=show, **kwargs)
                 layer.add_to(self)
                 return
 
@@ -405,6 +423,41 @@ class Map(folium.Map):
         except Exception as e:
             raise Exception(e)
 
+    def add_wms_legend(
+        self,
+        url,
+    ):
+        """Add a WMS legend based on an image URL
+
+        Args:
+            url (str): URL of the WMS legend image. Should have this format if using wms legend: {geoserver}/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER={layer}
+        """
+        from branca.element import Figure, MacroElement, Element
+
+        # Check if the map is a Folium Map instance
+        if not isinstance(self, Map):
+            raise ValueError("The self argument must be an instance of folium.Map.")
+
+        # HTML template for the legend
+        legend_html = f"""
+            {{% macro html(this, kwargs) %}}
+            
+            <div id="maplegend" style="position: fixed; 
+                        bottom: 50px;
+                        right: 50px;
+                        z-index:9999; 
+                        ">
+                <img src="{ url }" alt="legend" style="width: 100%; height: 100%;">
+            </div>
+            {{% endmacro %}}
+        """
+
+        # Create an Element with the HTML and add it to the map
+        macro = MacroElement()
+        macro._template = Template(legend_html)
+
+        self.get_root().add_child(macro)
+
     def add_tile_layer(
         self,
         url: str,
@@ -455,8 +508,8 @@ class Map(folium.Map):
     def add_raster(
         self,
         source: str,
-        band: Optional[int] = None,
-        palette: Optional[str] = None,
+        indexes: Optional[int] = None,
+        colormap: Optional[str] = None,
         vmin: Optional[float] = None,
         vmax: Optional[float] = None,
         nodata: Optional[float] = None,
@@ -474,10 +527,10 @@ class Map(folium.Map):
 
         Args:
             source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
-            band (int, optional): The band to use. Band indexing starts at 1. Defaults to None.
-            palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
-            vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
-            vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.
+            colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+            vmin (float, optional): The minimum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+            vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
@@ -485,8 +538,8 @@ class Map(folium.Map):
 
         tile_layer, tile_client = get_local_tile_layer(
             source,
-            band=band,
-            palette=palette,
+            indexes=indexes,
+            colormap=colormap,
             vmin=vmin,
             vmax=vmax,
             nodata=nodata,
@@ -1179,6 +1232,7 @@ class Map(folium.Map):
             opacity (float, optional): The opacity of the legend. Defaults to 1.0.
             position (str, optional): The position of the legend, can be one of the following:
                 "topleft", "topright", "bottomleft", "bottomright". Defaults to "bottomright".
+                Note that position is only valid when draggable is False.
             draggable (bool, optional): If True, the legend can be dragged to a new position. Defaults to True.
             style: Additional keyword arguments to style the legend, such as position, bottom, right, z-index,
                 border, background-color, border-radius, padding, font-size, etc. The default style is:
@@ -2306,6 +2360,7 @@ class Map(folium.Map):
         tooltip: Optional[List] = None,
         min_width: Optional[int] = 100,
         max_width: Optional[int] = 200,
+        font_size: Optional[int] = 2,
         **kwargs,
     ):
         """Adds a marker cluster to the map.
@@ -2319,6 +2374,7 @@ class Map(folium.Map):
             tooltip (list, optional): A list of column names to be used as the tooltip. Defaults to None.
             min_width (int, optional): The minimum width of the popup. Defaults to 100.
             max_width (int, optional): The maximum width of the popup. Defaults to 200.
+            font_size (int, optional): The font size of the popup. Defaults to 2.
 
         """
         import pandas as pd
@@ -2360,13 +2416,29 @@ class Map(folium.Map):
         for idx, row in df.iterrows():
             html = ""
             for p in popup:
-                html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
+                html = (
+                    html
+                    + f"<font size='{font_size}'><b>"
+                    + p
+                    + "</b>"
+                    + ": "
+                    + str(row[p])
+                    + "<br></font>"
+                )
             popup_html = folium.Popup(html, min_width=min_width, max_width=max_width)
 
             if tooltip is not None:
                 html = ""
                 for p in tooltip:
-                    html = html + "<b>" + p + "</b>" + ": " + str(row[p]) + "<br>"
+                    html = (
+                        html
+                        + f"<font size='{font_size}'><b>"
+                        + p
+                        + "</b>"
+                        + ": "
+                        + str(row[p])
+                        + "<br></font>"
+                    )
 
                 tooltip_str = folium.Tooltip(html)
             else:
@@ -3667,16 +3739,18 @@ class PMTilesLayer(JSCSSMixin, Layer):
     _template = Template(
         """
             {% macro script(this, kwargs) -%}
-            let protocol = new pmtiles.Protocol();
+            var protocol = new pmtiles.Protocol();
             maplibregl.addProtocol("pmtiles", protocol.tile);
 
-           {{ this._parent.get_name() }}.createPane('overlay');
-           {{ this._parent.get_name() }}.getPane('overlay').style.zIndex = 650;
-           {{ this._parent.get_name() }}.getPane('overlay').style.pointerEvents = 'none';
+            // see: https://github.com/maplibre/maplibre-gl-leaflet/issues/19
+            {{ this._parent.get_name() }}.createPane('overlay_{{ this.get_name() }}');
+            {{ this._parent.get_name() }}.getPane('overlay_{{ this.get_name() }}').style.zIndex = 650;
+            {{ this._parent.get_name() }}.getPane('overlay_{{ this.get_name() }}').style.pointerEvents = 'none';
 
             var {{ this.get_name() }} = L.maplibreGL({
-            pane: 'overlay',
-            style: {{ this.style|tojson}}
+                pane: 'overlay_{{ this.get_name() }}',
+                style: {{ this.style|tojson}},
+                interactive: true,
             }).addTo({{ this._parent.get_name() }});
 
             {%- endmacro %}
@@ -3700,6 +3774,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
         url,
         style=None,
         name=None,
+        tooltip=True,
         overlay=True,
         show=True,
         control=True,
@@ -3712,6 +3787,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
             url (str): The URL of the PMTiles file.
             style (dict, optional): The style to apply to the layer. Defaults to None.
             name (str, optional): The name of the layer. Defaults to None.
+            tooltip (bool, optional): Whether to show a tooltip. Defaults to True.
             overlay (bool, optional): Whether the layer should be added as an overlay. Defaults to True.
             show (bool, optional): Whether the layer should be shown initially. Defaults to True.
             control (bool, optional): Whether to include the layer in the layer control. Defaults to True.
@@ -3730,7 +3806,91 @@ class PMTilesLayer(JSCSSMixin, Layer):
         self.url = url
         self._name = "PMTilesVector"
 
+        if tooltip:
+            self.add_child(PMTilesMapLibreTooltip())
+
         if style is not None:
             self.style = style
         else:
             self.style = {}
+
+
+class PMTilesMapLibreTooltip(JSCSSMixin, MacroElement):
+    """Creates a PMTilesMapLibreTooltip object for displaying tooltips.
+    Adapted from https://github.com/jtmiclat/folium-pmtiles. Credits to @jtmiclat.
+    """
+
+    _template = Template(
+        """
+            {% macro header(this, kwargs) %}
+            <style>
+            .maplibregl-popup {
+                font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                z-index: 651;
+            }
+            .feature-row{
+                margin-bottom: 0.5em;
+                &:not(:last-of-type) {
+                    border-bottom: 1px solid black;
+                }
+            }
+            </style>
+            {% endmacro %}
+            {% macro script(this, kwargs) -%}
+                var {{ this.get_name() }} = {{ this._parent.get_name() }}.getMaplibreMap();
+                const popup_{{ this.get_name() }} = new maplibregl.Popup({
+                    closeButton: false,
+                    closeOnClick: false
+                });
+
+                function setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}(maplibreLayer) {
+                    var mlMap = maplibreLayer.getMaplibreMap();
+                    var popup = popup_{{ this.get_name() }};
+
+                    mlMap.on('mousemove', (e) => {
+                        mlMap.getCanvas().style.cursor = 'pointer';
+                        const { x, y } = e.point;
+                        const r = 2; // radius around the point
+                        const features = mlMap.queryRenderedFeatures([
+                            [x - r, y - r],
+                            [x + r, y + r],
+                        ]);
+
+                        const {lng, lat}  = e.lngLat;
+                        const coordinates = [lng, lat]
+                        const html = features.map(f=>`
+                        <div class="feature-row">
+                            <span>
+                                <strong>${f.layer['source-layer']}</strong>
+                                <span style="fontSize: 0.8em" }> (${f.geometry.type})</span>
+                            </span>
+                            <table>
+                                ${Object.entries(f.properties).map(([key, value]) =>`<tr><td>${key}</td><td style="text-align: right">${value}</td></tr>`).join("")}
+                            </table>
+                        </div>
+                        `).join("")
+                        if(features.length){
+                            popup.setLngLat(e.lngLat).setHTML(html).addTo(mlMap);
+                        } else {
+                            popup.remove();
+                        }
+                    });
+                    mlMap.on('mouseleave', () => {popup.remove();});
+                }
+
+                // maplibre map object
+                {{ this.get_name() }}.on("load", (e) => {
+                    setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}({{ this._parent.get_name() }});
+                })
+
+                // leaflet map object
+                {{ this._parent._parent.get_name() }}.on("layeradd", (e) => {
+                    setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}({{ this._parent.get_name() }});
+                });
+            {%- endmacro %}
+            """
+    )
+
+    def __init__(self, name=None, **kwargs):
+        # super().__init__(name=name if name else "PMTilesTooltip", **kwargs)
+        super().__init__(**kwargs)
