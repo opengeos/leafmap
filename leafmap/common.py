@@ -2491,13 +2491,13 @@ def get_census_dict(reset=False):
         print("Retrieving data. Please wait ...")
         for name in names:
             if "Decennial" not in name:
-                links[
-                    name
-                ] = f"https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_{name.replace(' ', '')}/MapServer/WMSServer"
+                links[name] = (
+                    f"https://tigerweb.geo.census.gov/arcgis/services/TIGERweb/tigerWMS_{name.replace(' ', '')}/MapServer/WMSServer"
+                )
             else:
-                links[
-                    name
-                ] = f"https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_{name.replace('Decennial', '').replace(' ', '')}/MapServer/WMSServer"
+                links[name] = (
+                    f"https://tigerweb.geo.census.gov/arcgis/services/Census2020/tigerWMS_{name.replace('Decennial', '').replace(' ', '')}/MapServer/WMSServer"
+                )
 
             wms = WebMapService(links[name], timeout=300)
             layers = list(wms.contents)
@@ -2844,31 +2844,49 @@ def get_local_tile_layer(
 
     # Handle legacy localtileserver kwargs
     if "cmap" in kwargs:
-        warnings.warn("`cmap` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`.")
+        warnings.warn(
+            "`cmap` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`."
+        )
     if "palette" in kwargs:
-        warnings.warn("`palette` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`.")
+        warnings.warn(
+            "`palette` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`."
+        )
     if "band" in kwargs or "bands" in kwargs:
-        warnings.warn("`band` and `bands` are deprecated keyword arguments for get_local_tile_layer. Please use `indexes`.")
+        warnings.warn(
+            "`band` and `bands` are deprecated keyword arguments for get_local_tile_layer. Please use `indexes`."
+        )
     if "projection" in kwargs:
-        warnings.warn("`projection` is a deprecated keyword argument for get_local_tile_layer and will be ignored.")
+        warnings.warn(
+            "`projection` is a deprecated keyword argument for get_local_tile_layer and will be ignored."
+        )
     if "style" in kwargs:
-        warnings.warn("`style` is a deprecated keyword argument for get_local_tile_layer and will be ignored.")
+        warnings.warn(
+            "`style` is a deprecated keyword argument for get_local_tile_layer and will be ignored."
+        )
 
     if "max_zoom" not in kwargs:
         kwargs["max_zoom"] = 100
     if "max_native_zoom" not in kwargs:
         kwargs["max_native_zoom"] = 100
+    if "cmap" in kwargs:
+        colormap = kwargs.pop("cmap")
+    if "palette" in kwargs:
+        colormap = kwargs.pop("palette")
+    if "band" in kwargs:
+        indexes = kwargs.pop("band")
+    if "bands" in kwargs:
+        indexes = kwargs.pop("bands")
 
     # Make it compatible with binder and JupyterHub
     if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
-        os.environ[
-            "LOCALTILESERVER_CLIENT_PREFIX"
-        ] = f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+            f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
+        )
 
     if is_studio_lab():
-        os.environ[
-            "LOCALTILESERVER_CLIENT_PREFIX"
-        ] = f"studiolab/default/jupyter/proxy/{{port}}"
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+            f"studiolab/default/jupyter/proxy/{{port}}"
+        )
     elif is_on_aws():
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
     elif "prefix" in kwargs:
