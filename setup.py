@@ -33,7 +33,7 @@ extras_requires = {
     ],
     "lidar": ["ipygany", "ipyvtklink", "laspy", "panel", "pyntcloud[LAS]", "pyvista"],
     "raster": [
-        "localtileserver",
+        "localtileserver>=0.10.0",
         "jupyter-server-proxy",
         "rio-cogeo",
         "rioxarray",
@@ -56,7 +56,7 @@ extras_requires = {
     "ai": [
         "geopandas",
         "osmnx",
-        "localtileserver",
+        "localtileserver>=0.10.0",
         "rastervision",
         "pytorch-lightning",
     ],
