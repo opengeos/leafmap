@@ -2170,8 +2170,8 @@ class Map(ipyleaflet.Map):
     def add_raster(
         self,
         source,
-        band=None,
-        palette=None,
+        indexes=None,
+        colormap=None,
         vmin=None,
         vmax=None,
         nodata=None,
@@ -2191,8 +2191,8 @@ class Map(ipyleaflet.Map):
 
         Args:
             source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
-            band (int, optional): The band to use. Band indexing starts at 1. Defaults to None.
-            palette (str, optional): The name of the color palette from `palettable` to use when plotting a single band. See https://jiffyclub.github.io/palettable. Default is greyscale
+            indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.
+            colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
             vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
             vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
@@ -2204,8 +2204,8 @@ class Map(ipyleaflet.Map):
 
         tile_layer, tile_client = get_local_tile_layer(
             source,
-            band=band,
-            palette=palette,
+            indexes=indexes,
+            colormap=colormap,
             vmin=vmin,
             vmax=vmax,
             nodata=nodata,
@@ -2237,7 +2237,7 @@ class Map(ipyleaflet.Map):
         params = {
             "tile_layer": tile_layer,
             "tile_client": tile_client,
-            "band": band,
+            "indexes": indexes,
             "band_names": tile_client.band_names,
             "bounds": bounds,
             "type": "LOCAL",
@@ -3860,7 +3860,7 @@ class Map(ipyleaflet.Map):
         max_velocity=20,
         display_options={},
         name="Velocity",
-        color_scale=None
+        color_scale=None,
     ):
         """Add a velocity layer to the map.
 
@@ -3913,7 +3913,7 @@ class Map(ipyleaflet.Map):
             ds = ds.isel(drop=True, **params)
 
         if color_scale is None:
-            color_scale=[
+            color_scale = [
                 "rgb(36,104, 180)",
                 "rgb(60,157, 194)",
                 "rgb(128,205,193)",
@@ -3928,7 +3928,7 @@ class Map(ipyleaflet.Map):
                 "rgb(245,64,32)",
                 "rgb(237,45,28)",
                 "rgb(220,24,32)",
-                "rgb(180,0,35)"
+                "rgb(180,0,35)",
             ]
 
         wind = Velocity(
