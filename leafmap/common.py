@@ -2865,9 +2865,9 @@ def get_local_tile_layer(
         )
 
     if "max_zoom" not in kwargs:
-        kwargs["max_zoom"] = 100
+        kwargs["max_zoom"] = 30
     if "max_native_zoom" not in kwargs:
-        kwargs["max_native_zoom"] = 100
+        kwargs["max_native_zoom"] = 30
     if "cmap" in kwargs:
         colormap = kwargs.pop("cmap")
     if "palette" in kwargs:
@@ -2899,17 +2899,17 @@ def get_local_tile_layer(
         TileClient,
     )
 
-    if "show_loading" not in kwargs:
-        kwargs["show_loading"] = False
+    # if "show_loading" not in kwargs:
+    #     kwargs["show_loading"] = False
 
     if isinstance(source, str):
         if not source.startswith("http"):
             if source.startswith("~"):
                 source = os.path.expanduser(source)
-            else:
-                source = os.path.abspath(source)
-            if not os.path.exists(source):
-                raise ValueError("The source path does not exist.")
+            # else:
+            #     source = os.path.abspath(source)
+            # if not os.path.exists(source):
+            #     raise ValueError("The source path does not exist.")
         else:
             source = github_raw_url(source)
     elif isinstance(source, TileClient) or isinstance(
