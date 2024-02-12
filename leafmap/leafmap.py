@@ -542,9 +542,9 @@ class Map(ipyleaflet.Map):
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
         """
         if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 100
+            kwargs["max_zoom"] = 30
         if "max_native_zoom" not in kwargs:
-            kwargs["max_native_zoom"] = 100
+            kwargs["max_native_zoom"] = 30
         try:
             tile_layer = ipyleaflet.TileLayer(
                 url=url,
@@ -1398,14 +1398,14 @@ class Map(ipyleaflet.Map):
             widget_layout (dict, optional): The layout for the widget. Defaults to None.
         """
         if "max_zoom" not in left_args:
-            left_args["max_zoom"] = 100
+            left_args["max_zoom"] = 30
         if "max_native_zoom" not in left_args:
-            left_args["max_native_zoom"] = 100
+            left_args["max_native_zoom"] = 30
 
         if "max_zoom" not in right_args:
-            right_args["max_zoom"] = 100
+            right_args["max_zoom"] = 30
         if "max_native_zoom" not in right_args:
-            right_args["max_native_zoom"] = 100
+            right_args["max_native_zoom"] = 30
 
         if "layer_name" not in left_args:
             left_args["layer_name"] = "Left Layer"
@@ -2201,7 +2201,6 @@ class Map(ipyleaflet.Map):
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
         """
-
         tile_layer, tile_client = get_local_tile_layer(
             source,
             indexes=indexes,
@@ -2217,7 +2216,6 @@ class Map(ipyleaflet.Map):
         tile_layer.visible = visible
 
         self.add(tile_layer)
-
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
         bounds = (
             bounds[2],
@@ -4669,14 +4667,14 @@ def split_map(
     m = Map(**kwargs)
 
     if "max_zoom" not in left_args:
-        left_args["max_zoom"] = 100
+        left_args["max_zoom"] = 30
     if "max_native_zoom" not in left_args:
-        left_args["max_native_zoom"] = 100
+        left_args["max_native_zoom"] = 30
 
     if "max_zoom" not in right_args:
-        right_args["max_zoom"] = 100
+        right_args["max_zoom"] = 30
     if "max_native_zoom" not in right_args:
-        right_args["max_native_zoom"] = 100
+        right_args["max_native_zoom"] = 30
 
     if "layer_name" not in left_args:
         left_args["layer_name"] = "Left Layer"
