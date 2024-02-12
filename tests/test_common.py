@@ -20,7 +20,7 @@ class TestCommon(unittest.TestCase):
         self.in_shp = os.path.abspath("examples/data/countries.shp")
         self.in_kml = os.path.abspath("examples/data/states.kml")
         self.in_kmz = os.path.abspath("examples/data/states.kmz")
-        self.in_cog = "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif"
+        self.in_cog = "https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif"
 
     def tearDown(self):
         """Tear down test fixtures, if any."""

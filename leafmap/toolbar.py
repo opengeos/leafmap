@@ -1,5 +1,6 @@
 """Module for dealing with the toolbar.
 """
+
 import math
 import os
 import ipyevents
@@ -1311,7 +1312,7 @@ def open_raster_gui(m):
                 params_widget,
             ]
         elif change["new"] == "COG":
-            http_url.value = "https://opendata.digitalglobe.com/events/california-fire-2020/post-event/2020-08-14/pine-gulch-fire20/10300100AAC8DD00.tif"
+            http_url.value = "https://github.com/opengeos/data/releases/download/raster/Libya-2023-09-13.tif"
             source_widget.children = [http_url]
             palette.options = cog_stac_palettes
             palette.value = None
