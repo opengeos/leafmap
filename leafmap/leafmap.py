@@ -2176,9 +2176,10 @@ class Map(ipyleaflet.Map):
         vmax=None,
         nodata=None,
         attribution=None,
-        layer_name="Local COG",
+        layer_name="Raster",
         zoom_to_layer=True,
         visible=True,
+        array_args={},
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -2197,10 +2198,17 @@ class Map(ipyleaflet.Map):
             vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
-            layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
+            layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
+            array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.
         """
+        import numpy as np
+        import xarray as xr
+
+        if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
+            source = array_to_image(source, **array_args)
+
         tile_layer, tile_client = get_local_tile_layer(
             source,
             indexes=indexes,
