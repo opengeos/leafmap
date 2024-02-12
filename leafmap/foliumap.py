@@ -483,9 +483,9 @@ class Map(folium.Map):
             API_key (str, optional): – API key for Cloudmade or Mapbox tiles. Defaults to True.
         """
         if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 100
+            kwargs["max_zoom"] = 30
         if "max_native_zoom" not in kwargs:
-            kwargs["max_native_zoom"] = 100
+            kwargs["max_native_zoom"] = 30
 
         try:
             folium.raster_layers.TileLayer(
@@ -2558,14 +2558,14 @@ class Map(folium.Map):
             right_args (dict, optional): The arguments for the right tile layer. Defaults to {}.
         """
         if "max_zoom" not in left_args:
-            left_args["max_zoom"] = 100
+            left_args["max_zoom"] = 30
         if "max_native_zoom" not in left_args:
-            left_args["max_native_zoom"] = 100
+            left_args["max_native_zoom"] = 30
 
         if "max_zoom" not in right_args:
-            right_args["max_zoom"] = 100
+            right_args["max_zoom"] = 30
         if "max_native_zoom" not in right_args:
-            right_args["max_native_zoom"] = 100
+            right_args["max_native_zoom"] = 30
 
         if "layer_name" not in left_args:
             left_args["layer_name"] = "Left Layer"

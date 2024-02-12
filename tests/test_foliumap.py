@@ -30,7 +30,7 @@ class TestFoliumap(unittest.TestCase):
     # def test_add_cog_layer(self):
     #     """Check COG layer"""
     #     m = leafmap.Map()
-    #     url = "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif"
+    #     url = "https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif"
     #     m.add_cog_layer(url, name="Fire (pre-event)")
     #     out_str = m.to_html()
     #     assert "Fire (pre-event)" in out_str
@@ -39,7 +39,7 @@ class TestFoliumap(unittest.TestCase):
     #     """Check COG mosaic"""
     #     m = leafmap.Map()
     #     links = [
-    #         "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif",
+    #         "https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif",
     #         "https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-08-18/pine-gulch-fire20/1040010041D3B300.tif",
     #     ]
 

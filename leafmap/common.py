@@ -967,7 +967,7 @@ def local_tile_pixel_value(
     Args:
         lon (float): Longitude of the pixel.
         lat (float): Latitude of the pixel.
-        url (str): HTTP URL to a COG, e.g., 'https://opendata.digitalglobe.com/events/california-fire-2020/pre-event/2018-02-16/pine-gulch-fire20/1030010076004E00.tif'
+        url (str): HTTP URL to a COG, e.g., 'https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif'
         bidx (str, optional): Dataset band indexes (e.g bidx=1, bidx=1&bidx=2&bidx=3). Defaults to None.
         titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
         verbose (bool, optional): Print status messages. Defaults to True.
@@ -2865,9 +2865,9 @@ def get_local_tile_layer(
         )
 
     if "max_zoom" not in kwargs:
-        kwargs["max_zoom"] = 100
+        kwargs["max_zoom"] = 30
     if "max_native_zoom" not in kwargs:
-        kwargs["max_native_zoom"] = 100
+        kwargs["max_native_zoom"] = 30
     if "cmap" in kwargs:
         colormap = kwargs.pop("cmap")
     if "palette" in kwargs:
@@ -2899,17 +2899,17 @@ def get_local_tile_layer(
         TileClient,
     )
 
-    if "show_loading" not in kwargs:
-        kwargs["show_loading"] = False
+    # if "show_loading" not in kwargs:
+    #     kwargs["show_loading"] = False
 
     if isinstance(source, str):
         if not source.startswith("http"):
             if source.startswith("~"):
                 source = os.path.expanduser(source)
-            else:
-                source = os.path.abspath(source)
-            if not os.path.exists(source):
-                raise ValueError("The source path does not exist.")
+            # else:
+            #     source = os.path.abspath(source)
+            # if not os.path.exists(source):
+            #     raise ValueError("The source path does not exist.")
         else:
             source = github_raw_url(source)
     elif isinstance(source, TileClient) or isinstance(
