@@ -1,6 +1,7 @@
 """Main module."""
 
 import os
+import sys
 import ipyleaflet
 
 from box import Box
@@ -1370,6 +1371,8 @@ class Map(ipyleaflet.Map):
         right_layer="OpenTopoMap",
         left_args={},
         right_args={},
+        left_array_args={},
+        right_array_args={},
         zoom_control=True,
         fullscreen_control=True,
         layer_control=True,
@@ -1387,6 +1390,8 @@ class Map(ipyleaflet.Map):
             right_layer (str, optional): The right tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'OpenTopoMap'.
             left_args (dict, optional): The arguments for the left tile layer. Defaults to {}.
             right_args (dict, optional): The arguments for the right tile layer. Defaults to {}.
+            left_array_args (dict, optional): The arguments for array_to_image for the left layer. Defaults to {}.
+            right_array_args (dict, optional): The arguments for array_to_image for the right layer. Defaults to {}.
             zoom_control (bool, optional): Whether to add zoom control. Defaults to True.
             fullscreen_control (bool, optional): Whether to add fullscreen control. Defaults to True.
             layer_control (bool, optional): Whether to add layer control. Defaults to True.
@@ -1435,10 +1440,11 @@ class Map(ipyleaflet.Map):
             else:
                 right_name = "Right Layer"
 
-            if left_layer in basemaps.keys():
-                left_layer = get_basemap(left_layer)
-            elif isinstance(left_layer, str):
-                if left_layer.startswith("http") and left_layer.endswith(".tif"):
+
+            if isinstance(left_layer, str):
+                if left_layer in basemaps.keys():
+                    left_layer = get_basemap(left_layer)
+                elif left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer, **left_args)
                     bbox = cog_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
@@ -1488,15 +1494,25 @@ class Map(ipyleaflet.Map):
                 left_layer, ipyleaflet.GeoJSON
             ):
                 pass
+            elif "xarray" in sys.modules:
+                if isinstance(left_layer, sys.modules['xarray'].DataArray) or isinstance(
+                left_layer, sys.modules['numpy'].ndarray):
+                    left_layer = array_to_image(left_layer, **left_array_args)
+                    left_layer, _ = get_local_tile_layer(
+                        left_layer,
+                        return_client=True,
+                        **left_args,
+                    )
             else:
                 raise ValueError(
                     f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
-            if right_layer in basemaps.keys():
-                right_layer = get_basemap(right_layer)
-            elif isinstance(right_layer, str):
-                if right_layer.startswith("http") and right_layer.endswith(".tif"):
+
+            if isinstance(right_layer, str):
+                if right_layer in basemaps.keys():
+                    right_layer = get_basemap(right_layer)
+                elif right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(
                         right_layer,
                         **right_args,
@@ -1552,6 +1568,16 @@ class Map(ipyleaflet.Map):
                 right_layer, ipyleaflet.GeoJSON
             ):
                 pass
+            elif "xarray" in sys.modules:
+                if isinstance(right_layer, 
+                    sys.modules['xarray'].DataArray) or isinstance(
+                    right_layer, sys.modules['numpy'].ndarray):
+                    right_layer = array_to_image(right_layer, **right_array_args)
+                    right_layer, _ = get_local_tile_layer(
+                        right_layer,
+                        return_client=True,
+                        **right_args,
+                    )
             else:
                 raise ValueError(
                     f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
