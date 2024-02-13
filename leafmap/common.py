@@ -10293,6 +10293,15 @@ def array_to_memory_file(
             array = (
                 array.isel(time=0).rename({y_dim: "y", x_dim: "x"}).transpose("y", "x")
             )
+        if hasattr(array, "rio"):
+            if hasattr(array.rio, "crs"):
+                crs = array.rio.crs
+            if hasattr(array.rio, "transform"):
+                transform = array.rio.transform()
+        elif source is None:
+            if hasattr(array, "encoding"):
+                if "source" in array.encoding:
+                    source = array.encoding["source"]
         array = array.values
 
     if array.ndim == 3 and transpose:
@@ -10305,14 +10314,14 @@ def array_to_memory_file(
             if compress is None:
                 compress = src.compression
     else:
-        if cellsize is None:
-            raise ValueError("cellsize must be provided if source is not provided")
         if crs is None:
             raise ValueError(
                 "crs must be provided if source is not provided, such as EPSG:3857"
             )
 
         if transform is None:
+            if cellsize is None:
+                raise ValueError("cellsize must be provided if source is not provided")
             # Define the geotransformation parameters
             xmin, ymin, xmax, ymax = (
                 0,
