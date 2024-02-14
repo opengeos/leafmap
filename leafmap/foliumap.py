@@ -2551,6 +2551,8 @@ class Map(folium.Map):
         right_layer: Optional[str] = "OpenTopoMap",
         left_args: Optional[dict] = {},
         right_args: Optional[dict] = {},
+        left_array_args={},
+        right_array_args={},
         left_label: Optional[str] = None,
         right_label: Optional[str] = None,
         left_position: Optional[str] = "bottomleft",
@@ -2564,6 +2566,8 @@ class Map(folium.Map):
             right_layer (str, optional): The right tile layer. Can be a local file path, HTTP URL, or a basemap name. Defaults to 'OpenTopoMap'.
             left_args (dict, optional): The arguments for the left tile layer. Defaults to {}.
             right_args (dict, optional): The arguments for the right tile layer. Defaults to {}.
+            left_array_args (dict, optional): The arguments for array_to_image for the left layer. Defaults to {}.
+            right_array_args (dict, optional): The arguments for array_to_image for the right layer. Defaults to {}.
         """
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 30
@@ -2594,10 +2598,11 @@ class Map(folium.Map):
             else:
                 right_name = "Right Layer"
 
-            if left_layer in basemaps.keys():
-                left_layer = basemaps[left_layer]
-            elif isinstance(left_layer, str):
-                if left_layer.startswith("http") and left_layer.endswith(".tif"):
+
+            if isinstance(left_layer, str):
+                if left_layer in basemaps.keys():
+                    left_layer = basemaps[left_layer]
+                elif left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = cog_tile(left_layer, **left_args)
                     bbox = cog_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
@@ -2640,15 +2645,23 @@ class Map(folium.Map):
                 left_layer, folium.WmsTileLayer
             ):
                 pass
+            elif is_array(left_layer):
+                left_layer = array_to_image(left_layer, **left_array_args)
+                left_layer, _ = get_local_tile_layer(
+                    left_layer,
+                    return_client=True,
+                    tile_format="folium",
+                    **left_args,
+                )
             else:
                 raise ValueError(
                     f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
 
-            if right_layer in basemaps.keys():
-                right_layer = basemaps[right_layer]
-            elif isinstance(right_layer, str):
-                if right_layer.startswith("http") and right_layer.endswith(".tif"):
+            if isinstance(right_layer, str):
+                if right_layer in basemaps.keys():
+                    right_layer = basemaps[right_layer]
+                elif right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = cog_tile(right_layer, **right_args)
                     bbox = cog_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
@@ -2690,6 +2703,14 @@ class Map(folium.Map):
                 left_layer, folium.WmsTileLayer
             ):
                 pass
+            elif is_array(right_layer):
+                right_layer = array_to_image(right_layer, **right_array_args)
+                right_layer, _ = get_local_tile_layer(
+                    right_layer,
+                    return_client=True,
+                    tile_format="folium",
+                    **right_args,
+                )
             else:
                 raise ValueError(
                     f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."

@@ -10250,6 +10250,18 @@ def install_package(package):
         process.wait()
 
 
+def is_array(x):
+    """Test whether x is either a numpy.ndarray or xarray.DataArray 
+    """
+    import sys
+    if isinstance(x, sys.modules['numpy'].ndarray):
+        return True
+    if "xarray" in sys.modules:
+        if isinstance(x, sys.modules['xarray'].DataArray):
+            return True
+    return False
+
+
 def array_to_memory_file(
     array,
     source: str = None,
