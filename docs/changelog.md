@@ -1,5 +1,29 @@
 # Changelog
 
+## v0.31.2 - Feb 14, 2024
+
+**What's Changed**
+
+-   Improve the add_raster method by @giswqs in [#675](https://github.com/opengeos/leafmap/pull/675)
+-   Add xarray support for add_raster by @giswqs in [#678](https://github.com/opengeos/leafmap/pull/678)
+-   Get crs and transform from xarray rio accessor in `array_to_memory_file` by @lopezvoliver in [#679](https://github.com/opengeos/leafmap/pull/679)
+-   Layers as xarray.DataArray in split_map (ipyleaflet Map) by @lopezvoliver in [#681](https://github.com/opengeos/leafmap/pull/681)
+
+**New Contributors**
+
+-   @lopezvoliver made their first contribution in [#679](https://github.com/opengeos/leafmap/pull/679)
+
+**Full Changelog**: [v0.31.1...v0.31.2](https://github.com/opengeos/leafmap/compare/v0.31.1...v0.31.2)
+
+## v0.31.1 - Feb 7, 2024
+
+**What's Changed**
+
+-   Update changelog for v0.31.0 by @giswqs in [#672](https://github.com/opengeos/leafmap/pull/672)
+-   Fix add raster colormap bug by @giswqs in [#674](https://github.com/opengeos/leafmap/pull/674)
+
+**Full Changelog**: [v0.31.0...v0.31.1](https://github.com/opengeos/leafmap/compare/v0.31.0...v0.31.1)
+
 ## v0.31.0 - Feb 6, 2024
 
 **What's Changed**
