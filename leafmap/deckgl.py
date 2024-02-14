@@ -158,7 +158,10 @@ class Map(lonboard.Map):
         if zoom_to_layer:
             from lonboard._viewport import compute_view
 
-            self._initial_view_state = compute_view([self.layers[-1].table])
+            try:
+                self._initial_view_state = compute_view([self.layers[-1].table])
+            except Exception as e:
+                print(e)
 
     def add_vector(
         self,
@@ -242,7 +245,10 @@ class Map(lonboard.Map):
             if zoom_to_layer:
                 from lonboard._viewport import compute_view
 
-                self._initial_view_state = compute_view([self.layers[-1].table])
+                try:
+                    self._initial_view_state = compute_view([self.layers[-1].table])
+                except Exception as e:
+                    print(e)
         else:
             self.add_vector(
                 layer, zoom_to_layer=zoom_to_layer, pickable=pickable, **kwargs
