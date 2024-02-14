@@ -1381,6 +1381,7 @@ class Map(ipyleaflet.Map):
         left_position="bottomleft",
         right_position="bottomright",
         widget_layout=None,
+        draggable=True,
     ):
         """Adds split map.
 
@@ -1400,6 +1401,7 @@ class Map(ipyleaflet.Map):
             left_position (str, optional): The position for the left label. Defaults to "bottomleft".
             right_position (str, optional): The position for the right label. Defaults to "bottomright".
             widget_layout (dict, optional): The layout for the widget. Defaults to None.
+            draggable (bool, optional): Whether the split map is draggable. Defaults to True.
         """
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 30
@@ -1438,7 +1440,6 @@ class Map(ipyleaflet.Map):
                 right_name = right_label
             else:
                 right_name = "Right Layer"
-
 
             if isinstance(left_layer, str):
                 if left_layer in basemaps.keys():
@@ -1504,7 +1505,6 @@ class Map(ipyleaflet.Map):
                 raise ValueError(
                     f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
-
 
             if isinstance(right_layer, str):
                 if right_layer in basemaps.keys():
@@ -1603,7 +1603,7 @@ class Map(ipyleaflet.Map):
             if bounds is not None:
                 self.fit_bounds(bounds)
 
-            self.dragging = False  # Disable dragging
+            self.dragging = draggable
 
             close_button = widgets.ToggleButton(
                 value=False,
