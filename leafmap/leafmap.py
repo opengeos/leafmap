@@ -1,7 +1,6 @@
 """Main module."""
 
 import os
-import sys
 import ipyleaflet
 
 from box import Box
@@ -1494,15 +1493,13 @@ class Map(ipyleaflet.Map):
                 left_layer, ipyleaflet.GeoJSON
             ):
                 pass
-            elif "xarray" in sys.modules:
-                if isinstance(left_layer, sys.modules['xarray'].DataArray) or isinstance(
-                left_layer, sys.modules['numpy'].ndarray):
-                    left_layer = array_to_image(left_layer, **left_array_args)
-                    left_layer, _ = get_local_tile_layer(
-                        left_layer,
-                        return_client=True,
-                        **left_args,
-                    )
+            elif is_array(left_layer):
+                left_layer = array_to_image(left_layer, **left_array_args)
+                left_layer, _ = get_local_tile_layer(
+                    left_layer,
+                    return_client=True,
+                    **left_args,
+                )
             else:
                 raise ValueError(
                     f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
@@ -1568,16 +1565,13 @@ class Map(ipyleaflet.Map):
                 right_layer, ipyleaflet.GeoJSON
             ):
                 pass
-            elif "xarray" in sys.modules:
-                if isinstance(right_layer, 
-                    sys.modules['xarray'].DataArray) or isinstance(
-                    right_layer, sys.modules['numpy'].ndarray):
-                    right_layer = array_to_image(right_layer, **right_array_args)
-                    right_layer, _ = get_local_tile_layer(
-                        right_layer,
-                        return_client=True,
-                        **right_args,
-                    )
+            elif is_array(right_layer):
+                right_layer = array_to_image(right_layer, **right_array_args)
+                right_layer, _ = get_local_tile_layer(
+                    right_layer,
+                    return_client=True,
+                    **right_args,
+                )
             else:
                 raise ValueError(
                     f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
