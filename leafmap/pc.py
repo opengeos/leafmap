@@ -1,6 +1,7 @@
 """A module for Microsoft Planetary Computer (PC).
 
 """
+
 import json
 import os
 from pystac_client import Client
