@@ -7834,7 +7834,7 @@ def vector_to_gif(
         progress_bar_color (str, optional): The color of the progress bar. Defaults to "blue".
         progress_bar_height (int, optional): The height of the progress bar. Defaults to 5.
         dpi (int, optional): The dpi of the figure. Defaults to 300.
-        fps (int, optional): The frames per seconc (fps) of the gif. Defaults to 10.
+        fps (int, optional): The frames per second (fps) of the gif. Defaults to 10.
         loop (int, optional): The number of loops of the gif. Defaults to 0, infinite loop.
         mp4 (bool, optional): Whether to convert the gif to mp4. Defaults to False.
         keep_png (bool, optional): Whether to keep the png files. Defaults to False.
@@ -9702,7 +9702,7 @@ def get_nhd_basins(
             * 'ca_gages' for Streamgage catalog for CA SB19
             * 'gfv11_pois' for USGS Geospatial Fabric V1.1 Points of Interest
             * 'huc12pp' for HUC12 Pour Points
-            * 'nmwdi-st' for New Mexico Water Data Initative Sites
+            * 'nmwdi-st' for New Mexico Water Data Initiative Sites
             * 'nwisgw' for NWIS Groundwater Sites
             * 'nwissite' for NWIS Surface Water Sites
             * 'ref_gage' for geoconnex.us reference gauges
@@ -10251,13 +10251,13 @@ def install_package(package):
 
 
 def is_array(x):
-    """Test whether x is either a numpy.ndarray or xarray.DataArray 
-    """
+    """Test whether x is either a numpy.ndarray or xarray.DataArray"""
     import sys
-    if isinstance(x, sys.modules['numpy'].ndarray):
+
+    if isinstance(x, sys.modules["numpy"].ndarray):
         return True
     if "xarray" in sys.modules:
-        if isinstance(x, sys.modules['xarray'].DataArray):
+        if isinstance(x, sys.modules["xarray"].DataArray):
             return True
     return False
 

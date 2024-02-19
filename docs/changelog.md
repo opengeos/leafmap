@@ -302,7 +302,7 @@
 **What's Changed**
 
 -   Update GitHub Actions by @giswqs in [#532](https://github.com/opengeos/leafmap/pull/532)
--   Add support fot Google Solar API by @giswqs in [#534](https://github.com/opengeos/leafmap/pull/534)
+-   Add support for Google Solar API by @giswqs in [#534](https://github.com/opengeos/leafmap/pull/534)
 
 **Full Changelog**: [v0.24.0...v0.24.1](https://github.com/opengeos/leafmap/compare/v0.24.0...v0.24.1)
 
@@ -1124,7 +1124,7 @@
 
 -   Added search basemaps GUI [#93](https://github.com/opengeos/leafmap/issues/93)
 -   Added get wms layers function
--   Made streamlit map width reponsive [#126](https://github.com/opengeos/leafmap/issues/126)
+-   Made streamlit map width responsive [#126](https://github.com/opengeos/leafmap/issues/126)
 -   Added function read file from url
 -   Added streamlit download button
 -   Added SIGSPATIAL workshop notebook
