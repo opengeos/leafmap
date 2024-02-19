@@ -9,6 +9,7 @@
 [![image](https://static.pepy.tech/badge/leafmap)](https://pepy.tech/projects/leafmap)
 [![image](https://github.com/opengeos/leafmap/workflows/docs/badge.svg)](https://leafmap.org)
 [![image](https://github.com/opengeos/leafmap/workflows/Linux%20build/badge.svg)](https://github.com/opengeos/leafmap/actions)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/opengeos/leafmap/master.svg)](https://results.pre-commit.ci/latest/github/opengeos/leafmap/master)
 [![image](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![image](https://img.shields.io/badge/YouTube-Channel-red)](https://youtube.com/@giswqs)
 [![status](https://joss.theoj.org/papers/10.21105/joss.03414/status.svg)](https://doi.org/10.21105/joss.03414)

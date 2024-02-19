@@ -6348,7 +6348,7 @@ def nasa_data_gui(
 
     bbox = widgets.Text(
         value="Map bounds",
-        description="Bouding box:",
+        description="Bounding box:",
         placeholder="xmin, ymin, xmax, ymax",
         style=style,
         layout=widgets.Layout(width="271px", padding=padding),
