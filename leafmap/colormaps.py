@@ -1,5 +1,6 @@
 """Module for commonly used colormaps and palettes for visualizing geospatial data.
 """
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np

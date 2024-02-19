@@ -3,6 +3,7 @@ This module defines here-map-widget-for-jupyter as backend for leafmap library.
 For more details about Here Map Widget for Jupyter
 please check: https://github.com/heremaps/here-map-widget-for-jupyter
 """
+
 import os
 import json
 import random
@@ -249,9 +250,9 @@ class Map(here_map_widget.Map):
 
         if not hover_style:
             hover_style = {
-                "fillColor": random.choice(fill_colors)
-                if fill_colors
-                else ["rgba(0,0,0,0.5)"],
+                "fillColor": (
+                    random.choice(fill_colors) if fill_colors else ["rgba(0,0,0,0.5)"]
+                ),
                 "strokeColor": "black",
                 "lineWidth": style["lineWidth"] + 1,
             }
