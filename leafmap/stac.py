@@ -1048,12 +1048,13 @@ def stac_pixel_value(
             item=item,
             titiler_endpoint=titiler_endpoint,
         )
-        assets = ",".join(assets)
     kwargs["assets"] = assets
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/{lon},{lat}", params=kwargs).json()
+        r = requests.get(
+            f"{titiler_endpoint}/stac/point/{lon},{lat}", params=kwargs
+        ).json()
     else:
         r = requests.get(
             titiler_endpoint.url_for_stac_pixel_value(lon, lat), params=kwargs
@@ -1064,8 +1065,10 @@ def stac_pixel_value(
             print(r["detail"])
         return None
     else:
-        values = [v[0] for v in r["values"]]
-        result = dict(zip(assets.split(","), values))
+        values = r["values"]
+        if isinstance(assets, str):
+            assets = assets.split(",")
+        result = dict(zip(assets, values))
         return result
 
 

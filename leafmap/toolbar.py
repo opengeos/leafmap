@@ -2770,10 +2770,11 @@ def inspector_gui(
                     layer_dict["titiler_endpoint"],
                     verbose=False,
                 )
+
                 if result is not None:
                     with output:
-                        output.outputs = ()
-                        print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
+                        output.clear_output()
+                        print(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
 
@@ -2788,16 +2789,24 @@ def inspector_gui(
 
                 else:
                     with output:
-                        output.outputs = ()
+                        output.clear_output()
                         print("No pixel value available")
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
             elif layer_dict["type"] == "COG":
-                result = cog_pixel_value(lon, lat, layer_dict["url"], verbose=False)
+
+                if m.inspector_bands_chk.value:
+                    indexes = layer_dict["indexes"]
+                else:
+                    indexes = list(range(1, len(layer_dict["band_names"]) + 1))
+
+                result = cog_pixel_value(
+                    lon, lat, layer_dict["url"], indexes, verbose=False
+                )
                 if result is not None:
                     with output:
-                        output.outputs = ()
-                        print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
+                        output.clear_output()
+                        print(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
 
@@ -2817,21 +2826,30 @@ def inspector_gui(
                         m.zoom_to_bounds(bounds)
 
             elif layer_dict["type"] == "LOCAL":
-                result = local_tile_pixel_value(
-                    lon, lat, layer_dict["tile_client"], verbose=False
-                )
-                if result is not None:
+                try:
+                    data = local_tile_pixel_value(
+                        lon, lat, layer_dict["tile_client"], verbose=False
+                    )
+
+                    result = {}
+                    band_names = data.band_names
+                    values = data.array.data.tolist()
+                    for i, band in enumerate(band_names):
+                        result[band] = values[i]
+
                     if m.inspector_bands_chk.value:
-                        band = m.cog_layer_dict[m.inspector_dropdown.value]["band"]
-                        band_names = m.cog_layer_dict[m.inspector_dropdown.value][
-                            "band_names"
+                        vis_bands = m.cog_layer_dict[m.inspector_dropdown.value][
+                            "vis_bands"
                         ]
-                        if band is not None:
-                            sel_bands = [band_names[b - 1] for b in band]
-                            result = {k: v for k, v in result.items() if k in sel_bands}
+                        new_result = {}
+                        for key in result:
+                            if key in vis_bands:
+                                new_result[key] = result[key]
+                        result = new_result
+
                     with output:
-                        output.outputs = ()
-                        print(f"lat/lon: {lat:.4f}, {lon:.4f}\n")
+                        output.clear_output()
+                        print(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
                             print(f"{key}: {result[key]}")
 
@@ -2843,12 +2861,14 @@ def inspector_gui(
                         markers = list(m.marker_cluster.markers)
                         markers.append(ipyleaflet.Marker(location=latlon))
                         m.marker_cluster.markers = markers
-                else:
+
+                except Exception as e:
                     with output:
-                        output.outputs = ()
-                        print("No pixel value available")
+                        output.clear_output()
+                        print(e)
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
+
             m.default_style = {"cursor": "crosshair"}
 
     if m is not None:
