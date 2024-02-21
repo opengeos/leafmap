@@ -6,6 +6,7 @@ import os
 import shutil
 
 in_dir = os.path.dirname(os.path.abspath(__file__))
+pkg_dir = os.path.dirname(in_dir)
 print(in_dir)
 notebook_dir = os.path.abspath(os.path.join(in_dir, "notebooks"))
 workshop_dir = os.path.abspath(os.path.join(in_dir, "workshops"))
@@ -120,7 +121,7 @@ for file in files:
     for index, line in enumerate(lines):
         if '"id":' in line:
             pass
-        elif "display_name" in line:
+        if "display_name" in line:
             out_lines.append('   "display_name": "Python 3",\n')
         else:
             out_lines.append(line)
@@ -135,3 +136,8 @@ shutil.copytree(
 shutil.copytree(
     workshop_dir, workshop_dir.replace("examples", "docs"), dirs_exist_ok=True
 )
+
+os.chdir(pkg_dir)
+cmd = "pre-commit run --all-files"
+os.system(cmd)
+os.system(cmd)
