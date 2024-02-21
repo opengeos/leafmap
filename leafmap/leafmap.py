@@ -219,6 +219,11 @@ class Map(ipyleaflet.Map):
 
                 nasa_data_gui(self, **kwargs)
                 return
+            elif object == "inspector":
+                from .toolbar import inspector_gui
+
+                inspector_gui(self, **kwargs)
+                return
 
         super().add(object)
 
@@ -1067,6 +1072,9 @@ class Map(ipyleaflet.Map):
 
         if assets is None and bands is not None:
             assets = bands
+
+        if isinstance(assets, str) and "," in assets:
+            assets = assets.split(",")
 
         params = {
             "url": url,

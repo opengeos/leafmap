@@ -155,6 +155,10 @@ class Map(folium.Map):
 
         self.fit_bounds([latlon, latlon], max_zoom=zoom)
 
+    def add(self, object, **kwargs):
+        """Adds something to the map. This method is not implemented in folium."""
+        pass
+
     def add_layer(self, layer):
         """Adds a layer to the map.
 
