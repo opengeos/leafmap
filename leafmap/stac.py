@@ -1052,6 +1052,7 @@ def stac_pixel_value(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     if isinstance(titiler_endpoint, str):
+
         r = requests.get(
             f"{titiler_endpoint}/stac/point/{lon},{lat}", params=kwargs
         ).json()
