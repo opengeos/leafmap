@@ -219,6 +219,11 @@ class Map(ipyleaflet.Map):
 
                 nasa_data_gui(self, **kwargs)
                 return
+            elif object == "inspector":
+                from .toolbar import inspector_gui
+
+                inspector_gui(self, **kwargs)
+                return
 
         super().add(object)
 
@@ -980,6 +985,18 @@ class Map(ipyleaflet.Map):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
+        available_bands = cog_bands(url, titiler_endpoint)
+
+        if bands is None:
+            if len(available_bands) >= 3:
+                indexes = [1, 2, 3]
+            else:
+                indexes = [1]
+        else:
+            indexes = bands
+
+        vis_bands = [available_bands[idx - 1] for idx in indexes]
+
         tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
         bounds = cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
@@ -992,8 +1009,11 @@ class Map(ipyleaflet.Map):
 
         params = {
             "url": url,
-            "titizer_endpoint": titiler_endpoint,
+            "titiler_endpoint": titiler_endpoint,
             "bounds": bounds,
+            "indexes": indexes,
+            "vis_bands": vis_bands,
+            "band_names": available_bands,
             "type": "COG",
         }
         self.cog_layer_dict[name] = params
@@ -1052,6 +1072,9 @@ class Map(ipyleaflet.Map):
 
         if assets is None and bands is not None:
             assets = bands
+
+        if isinstance(assets, str) and "," in assets:
+            assets = assets.split(",")
 
         params = {
             "url": url,
@@ -2260,10 +2283,20 @@ class Map(ipyleaflet.Map):
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
+
+        if indexes is None:
+            if len(tile_client.band_names) == 1:
+                indexes = [1]
+            else:
+                indexes = [1, 2, 3]
+
+        vis_bands = [tile_client.band_names[i - 1] for i in indexes]
+
         params = {
             "tile_layer": tile_layer,
             "tile_client": tile_client,
             "indexes": indexes,
+            "vis_bands": vis_bands,
             "band_names": tile_client.band_names,
             "bounds": bounds,
             "type": "LOCAL",
