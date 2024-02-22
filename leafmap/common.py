@@ -12810,7 +12810,8 @@ def gedi_download_files(
         password = os.environ.get("EARTHDATA_PASSWORD", None)
 
     if username is None or password is None:
-        raise ValueError("Username and password must be provided.")
+        print("Username and password must be provided.")
+        return
 
     if outdir is None:
         outdir = os.getcwd()
