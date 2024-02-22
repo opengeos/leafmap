@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.31.3 - Feb 21, 2024
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#683](https://github.com/opengeos/leafmap/pull/683)
+-   Add split map example by @giswqs in [#684](https://github.com/opengeos/leafmap/pull/684)
+-   Add pre-commit hooks by @giswqs in [#686](https://github.com/opengeos/leafmap/pull/686)
+-   Fix raster pixel inspector bug by @giswqs in [#689](https://github.com/opengeos/leafmap/pull/689)
+-   Update notebook examples by @giswqs in [#690](https://github.com/opengeos/leafmap/pull/690)
+
+**Full Changelog**: [v0.31.2...v0.31.3](https://github.com/opengeos/leafmap/compare/v0.31.2...v0.31.3)
+
 ## v0.31.2 - Feb 14, 2024
 
 **What's Changed**
