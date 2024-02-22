@@ -156,10 +156,13 @@ class Map(lonboard.Map):
         self.layers = self.layers + [layer]
 
         if zoom_to_layer:
-            from lonboard._viewport import compute_view
-
             try:
-                self._initial_view_state = compute_view([self.layers[-1].table])
+                bounds = gdf.total_bounds.tolist()
+                self._initial_view_state = {
+                    "latitude": (bounds[1] + bounds[3]) / 2,
+                    "longitude": (bounds[0] + bounds[2]) / 2,
+                    "zoom": 10,
+                }
             except Exception as e:
                 print(e)
 
