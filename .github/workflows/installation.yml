@@ -13,7 +13,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.11"]
+                python-version: ["3.12"]
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python
@@ -21,6 +21,6 @@ jobs:
               with:
                   python-version: ${{ matrix.python-version }}
             - name: Install package
-              run: pip install .
+              run: pip install setuptools .
             - name: Test import
               run: python -c "import leafmap; print('leafmap import successful')"
