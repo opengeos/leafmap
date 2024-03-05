@@ -64,6 +64,7 @@ class Map(lonboard.Map):
         color_map: Optional[Union[str, Dict]] = None,
         color_k: Optional[int] = 5,
         color_args: dict = {},
+        zoom: Optional[float] = 10.0,
         **kwargs: Any,
     ) -> None:
         """Adds a GeoPandas GeoDataFrame to the map.
@@ -85,6 +86,7 @@ class Map(lonboard.Map):
                 'UserDefined'). Arguments can be passed in classification_kwds.
             color_k (Optional[int], optional): The number of classes to use for color encoding. Defaults to 5.
             color_args (dict, optional): Additional keyword arguments that will be passed to assign_continuous_colors(). Defaults to {}.
+            zoom (Optional[float], optional): The zoom level to zoom to. Defaults to 10.0.
             **kwargs: Additional keyword arguments that will be passed to lonboard.Layer.from_geopandas()
 
         Returns:
@@ -158,10 +160,19 @@ class Map(lonboard.Map):
         if zoom_to_layer:
             try:
                 bounds = gdf.total_bounds.tolist()
+                x = (bounds[0] + bounds[2]) / 2
+                y = (bounds[1] + bounds[3]) / 2
+
+                src_crs = gdf.crs
+                if src_crs is None:
+                    src_crs = "EPSG:4326"
+
+                lon, lat = convert_coordinates(x, y, src_crs, "EPSG:4326")
+
                 self._initial_view_state = {
-                    "latitude": (bounds[1] + bounds[3]) / 2,
-                    "longitude": (bounds[0] + bounds[2]) / 2,
-                    "zoom": 10,
+                    "latitude": lat,
+                    "longitude": lon,
+                    "zoom": zoom,
                 }
             except Exception as e:
                 print(e)
