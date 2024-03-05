@@ -13226,3 +13226,28 @@ def nasa_datasets(keyword=None, df=None, return_short_name=False):
             return df["ShortName"].tolist()
         else:
             return df
+
+
+def convert_coordinates(x, y, source_crs, target_crs="epsg:4326"):
+    """Convert coordinates from the source EPSG code to the target EPSG code.
+
+    Args:
+        x (float): The x-coordinate of the point.
+        y (float): The y-coordinate of the point.
+        source_crs (str): The EPSG code of the source coordinate system.
+        target_crs (str, optional): The EPSG code of the target coordinate system.
+            Defaults to '4326' (EPSG code for WGS84).
+
+    Returns:
+        tuple: A tuple containing the converted longitude and latitude.
+    """
+    import pyproj
+
+    # Create the transformer
+    transformer = pyproj.Transformer.from_crs(source_crs, target_crs, always_xy=True)
+
+    # Perform the transformation
+    lon, lat = transformer.transform(x, y)
+
+    # Return the converted coordinates
+    return lon, lat
