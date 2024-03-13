@@ -3024,8 +3024,7 @@ class Map(folium.Map):
     def add_vector_tile(
         self,
         url: Optional[str],
-        attribution: Optional[str] = "",
-        styles: Optional[dict] = {},
+        styles: Optional[Union[dict,str]] = {},
         layer_name: Optional[str] = "Vector Tile",
         **kwargs,
     ):
@@ -3036,22 +3035,26 @@ class Map(folium.Map):
             url (str, optional): The URL of the tile layer, such as
                 'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
             attribution (str, optional): The attribution to use. Defaults to ''.
-            styles (dict,optional): Style dict, specific to the vector tile source.
+            styles (dict | str, optional): Style dict, specific to the vector tile source.
+                If styles is given as a string, it will be passed directly to folium.plugins.VectorGrid
+                directly, ignoring additional kwargs. See the "conditional styling" example in
+                https://github.com/iwpnd/folium-vectorgrid
             layer_name (str, optional): The layer name to use for the layer. Defaults to 'Vector Tile'.
-            kwargs: Additional keyword arguments to pass to the ipyleaflet.VectorTileLayer class.
+            kwargs: Additional keyword arguments to pass to the folium.plugins.VectorGridProtobuf class.
         """
+        if isinstance(styles, str):
+            options = styles
+        else:
+            options = {}
+            for key, value in kwargs.items():
+                options[key] = value
 
-        options = {}
+            if "vector_tile_layer_styles" in options:
+                styles = options["vector_tile_layer_styles"]
+                del options["vector_tile_layer_styles"]
 
-        for key, value in kwargs.items():
-            options[key] = value
-
-        if "vector_tile_layer_styles" in options:
-            styles = options["vector_tile_layer_styles"]
-            del options["vector_tile_layer_styles"]
-
-        if styles:
-            options["vectorTileLayerStyles"] = styles
+            if styles:
+                options["vectorTileLayerStyles"] = styles
 
         vc = plugins.VectorGridProtobuf(url, layer_name, options)
         self.add_child(vc)
