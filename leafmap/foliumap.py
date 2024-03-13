@@ -3024,7 +3024,7 @@ class Map(folium.Map):
     def add_vector_tile(
         self,
         url: Optional[str],
-        styles: Optional[Union[dict,str]] = {},
+        styles: Optional[Union[dict, str]] = {},
         layer_name: Optional[str] = "Vector Tile",
         **kwargs,
     ):
