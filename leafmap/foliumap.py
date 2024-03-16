@@ -3061,7 +3061,6 @@ class Map(folium.Map):
 
     add_vector_tile_layer = add_vector_tile
 
-
     def to_gradio(
         self, width: Optional[str] = "100%", height: Optional[str] = "500px", **kwargs
     ):
