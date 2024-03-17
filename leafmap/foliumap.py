@@ -3032,9 +3032,7 @@ class Map(folium.Map):
             https://github.com/python-visualization/folium/blob/main/folium/plugins/vectorgrid_protobuf.py#L7
 
         Args:
-            url (str, optional): The URL of the tile layer, such as
-                'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
-            attribution (str, optional): The attribution to use. Defaults to ''.
+            url (str, optional): The URL of the tile layer
             styles (dict | str, optional): Style dict, specific to the vector tile source.
                 If styles is given as a string, it will be passed directly to folium.plugins.VectorGrid
                 directly, ignoring additional kwargs. See the "conditional styling" example in
