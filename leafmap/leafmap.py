@@ -570,18 +570,15 @@ class Map(ipyleaflet.Map):
     def add_vector_tile(
         self,
         url,
-        attribution="",
-        styles={},
-        layer_name="Vector Tile",
+        styles: Optional[dict] = {},
+        layer_name: Optional[str] = "Vector Tile",
         **kwargs,
     ):
         """Adds a VectorTileLayer to the map. It wraps the ipyleaflet.VectorTileLayer class. See
             https://ipyleaflet.readthedocs.io/en/latest/layers/vector_tile.html
 
         Args:
-            url (str, optional): The URL of the tile layer, such as
-                'https://tile.nextzen.org/tilezen/vector/v1/512/all/{z}/{x}/{y}.mvt?api_key=gCZXZglvRQa6sB2z7JzL1w'.
-            attribution (str, optional): The attribution to use. Defaults to ''.
+            url (str, optional): The URL of the tile layer
             styles (dict,optional): Style dict, specific to the vector tile source.
             layer_name (str, optional): The layer name to use for the layer. Defaults to 'Vector Tile'.
             kwargs: Additional keyword arguments to pass to the ipyleaflet.VectorTileLayer class.
@@ -592,7 +589,6 @@ class Map(ipyleaflet.Map):
         try:
             vector_tile_layer = ipyleaflet.VectorTileLayer(
                 url=url,
-                attribution=attribution,
                 vector_tile_layer_styles=styles,
                 **kwargs,
             )
