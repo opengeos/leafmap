@@ -1,0 +1,3 @@
+# bokehmap module
+
+::: leafmap.bokehmap
