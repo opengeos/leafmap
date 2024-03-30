@@ -1,5 +1,40 @@
 # Changelog
 
+## v0.31.6 - Mar 29, 2024
+
+**What's Changed**
+
+-   Allow to send options directly as str by @lopezvoliver in [#702](https://github.com/opengeos/leafmap/pull/702)
+-   Vector tile layer arguments by @lopezvoliver in [#703](https://github.com/opengeos/leafmap/pull/703)
+-   Fix docs build error by @giswqs in [#704](https://github.com/opengeos/leafmap/pull/704)
+-   [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in [#705](https://github.com/opengeos/leafmap/pull/705)
+-   Add functions for extracting multi-part archive by @giswqs in [#709](https://github.com/opengeos/leafmap/pull/709)
+
+**New Contributors**
+
+-   @pre-commit-ci made their first contribution in [#705](https://github.com/opengeos/leafmap/pull/705)
+
+**Full Changelog**: [v0.31.5...v0.31.6](https://github.com/opengeos/leafmap/compare/v0.31.5...v0.31.6)
+
+## v0.31.5 - Mar 4, 2024
+
+**What's Changed**
+
+-   Fix lonboard zoom to layer bug by @giswqs in [#700](https://github.com/opengeos/leafmap/pull/700)
+
+**Full Changelog**: [v0.31.4...v0.31.5](https://github.com/opengeos/leafmap/compare/v0.31.4...v0.31.5)
+
+## v0.31.4 - Mar 4, 2024
+
+**What's Changed**
+
+-   Fix deckgl compute_view bug by @giswqs in [#693](https://github.com/opengeos/leafmap/pull/693)
+-   Add more badges and update notebook by @giswqs in [#694](https://github.com/opengeos/leafmap/pull/694)
+-   Fix notebook 88 error by @giswqs in [#696](https://github.com/opengeos/leafmap/pull/696)
+-   Add testing for Python 3.12 by @giswqs in [#698](https://github.com/opengeos/leafmap/pull/698)
+
+**Full Changelog**: [v0.31.3...v0.31.4](https://github.com/opengeos/leafmap/compare/v0.31.3...v0.31.4)
+
 ## v0.31.3 - Feb 21, 2024
 
 **What's Changed**
