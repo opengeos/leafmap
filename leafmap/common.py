@@ -4516,6 +4516,7 @@ def download_files(
     unzip=True,
     overwrite=False,
     subfolder=False,
+    multi_part=False,
 ):
     """Download files from URLs, including Google Drive shared URL.
 
@@ -4534,6 +4535,14 @@ def download_files(
         unzip (bool, optional): Unzip the file. Defaults to True.
         overwrite (bool, optional): Overwrite the file if it already exists. Defaults to False.
         subfolder (bool, optional): Create a subfolder with the same name as the file. Defaults to False.
+        multi_part (bool, optional): If the file is a multi-part file. Defaults to False.
+
+    Examples:
+
+        files = ["sam_hq_vit_tiny.zip", "sam_hq_vit_tiny.z01", "sam_hq_vit_tiny.z02", "sam_hq_vit_tiny.z03"]
+        base_url = "https://github.com/opengeos/datasets/releases/download/models/"
+        urls = [base_url + f for f in files]
+        leafmap.download_files(urls, out_dir="models", multi_part=True)
     """
 
     if out_dir is None:
@@ -4542,11 +4551,16 @@ def download_files(
     if filenames is None:
         filenames = [None] * len(urls)
 
+    filepaths = []
     for url, output in zip(urls, filenames):
         if output is None:
             filename = os.path.join(out_dir, os.path.basename(url))
         else:
             filename = os.path.join(out_dir, output)
+
+        filepaths.append(filename)
+        if multi_part:
+            unzip = False
 
         download_file(
             url,
@@ -4563,6 +4577,14 @@ def download_files(
             overwrite,
             subfolder,
         )
+
+    if multi_part:
+        archive = os.path.splitext(filename)[0] + ".zip"
+        out_dir = os.path.dirname(filename)
+        extract_archive(archive, out_dir)
+
+        for file in filepaths:
+            os.remove(file)
 
 
 def download_folder(
@@ -13251,3 +13273,50 @@ def convert_coordinates(x, y, source_crs, target_crs="epsg:4326"):
 
     # Return the converted coordinates
     return lon, lat
+
+
+def extract_archive(archive, outdir=None, **kwargs):
+    """
+    Extracts a multipart archive.
+
+    This function uses the patoolib library to extract a multipart archive.
+    If the patoolib library is not installed, it attempts to install it.
+    If the archive does not end with ".zip", it appends ".zip" to the archive name.
+    If the extraction fails (for example, if the files already exist), it skips the extraction.
+
+    Args:
+        archive (str): The path to the archive file.
+        outdir (str): The directory where the archive should be extracted.
+        **kwargs: Arbitrary keyword arguments for the patoolib.extract_archive function.
+
+    Returns:
+        None
+
+    Raises:
+        Exception: An exception is raised if the extraction fails for reasons other than the files already existing.
+
+    Example:
+
+        files = ["sam_hq_vit_tiny.zip", "sam_hq_vit_tiny.z01", "sam_hq_vit_tiny.z02", "sam_hq_vit_tiny.z03"]
+        base_url = "https://github.com/opengeos/datasets/releases/download/models/"
+        urls = [base_url + f for f in files]
+        leafmap.download_files(urls, out_dir="models", multi_part=True)
+
+    """
+    try:
+        import patoolib
+    except ImportError:
+        install_package("patool")
+        import patoolib
+
+    if not archive.endswith(".zip"):
+        archive = archive + ".zip"
+
+    if outdir is None:
+        outdir = os.path.dirname(archive)
+
+    try:
+        patoolib.extract_archive(archive, outdir=outdir, **kwargs)
+    except Exception as e:
+        print("The unzipped files might already exist. Skipping extraction.")
+        return
