@@ -2614,6 +2614,7 @@ class Map(folium.Map):
                         name=left_name,
                         attr=" ",
                         overlay=True,
+                        **left_args,
                     )
 
                 elif left_layer.startswith("http") and left_layer.endswith(".json"):
@@ -2625,6 +2626,7 @@ class Map(folium.Map):
                         name=left_name,
                         attr=" ",
                         overlay=True,
+                        **left_args,
                     )
 
                 elif os.path.exists(left_layer):
@@ -2673,6 +2675,7 @@ class Map(folium.Map):
                         name=right_name,
                         attr=" ",
                         overlay=True,
+                        **right_args,
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
@@ -2684,6 +2687,7 @@ class Map(folium.Map):
                         name=right_name,
                         attr=" ",
                         overlay=True,
+                        **right_args,
                     )
 
                 elif os.path.exists(right_layer):
