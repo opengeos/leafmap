@@ -1471,6 +1471,7 @@ class Map(ipyleaflet.Map):
                         url=url,
                         name=left_name,
                         attribution=" ",
+                        **left_args,
                     )
                 elif left_layer.startswith("http") and left_layer.endswith(".json"):
                     left_tile_url = stac_tile(left_layer, **left_args)
@@ -1480,6 +1481,7 @@ class Map(ipyleaflet.Map):
                         url=left_tile_url,
                         name=left_name,
                         attribution=" ",
+                        **left_args,
                     )
                 elif left_layer.startswith("http") and left_layer.endswith(".geojson"):
                     if "max_zoom" in left_args:
@@ -1539,6 +1541,7 @@ class Map(ipyleaflet.Map):
                         url=url,
                         name=right_name,
                         attribution=" ",
+                        **right_args,
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
@@ -1549,6 +1552,7 @@ class Map(ipyleaflet.Map):
                         url=right_tile_url,
                         name=right_name,
                         attribution=" ",
+                        **right_args,
                     )
                 elif right_layer.startswith("http") and right_layer.endswith(
                     ".geojson"
