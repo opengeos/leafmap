@@ -51,7 +51,7 @@ class Map(lonboard.Map):
             _height=height,
             show_tooltip=show_tooltip,
             layers=layers,
-            _initial_view_state=kwargs,
+            view_state=kwargs,
         )
 
     def add_gdf(
@@ -169,7 +169,7 @@ class Map(lonboard.Map):
 
                 lon, lat = convert_coordinates(x, y, src_crs, "EPSG:4326")
 
-                self._initial_view_state = {
+                self.view_state = {
                     "latitude": lat,
                     "longitude": lon,
                     "zoom": zoom,
@@ -260,7 +260,7 @@ class Map(lonboard.Map):
                 from lonboard._viewport import compute_view
 
                 try:
-                    self._initial_view_state = compute_view([self.layers[-1].table])
+                    self.view_state = compute_view([self.layers[-1].table])
                 except Exception as e:
                     print(e)
         else:
