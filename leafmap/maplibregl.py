@@ -198,3 +198,26 @@ class Map(MapWidget):
         layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
         self.add_layer(layer)
         self.set_visibility(name, show)
+
+    def add_geojson(self, data, layer_name=None, show=True, source_args={}, **kwargs):
+        """Adds a GeoJSON layer to the map.
+
+        Args:
+            data (str | dict): The GeoJSON data. This can be a URL to a GeoJSON file or a GeoJSON dictionary.
+            layer_name (str, optional): The name of the layer. Defaults to 'geojson'.
+            show (bool, optional): Whether the layer is visible or not. Defaults to True.
+            source_args (dict, optional): Additional keyword arguments that are passed to the GeoJSONSource class.
+                See https://eodagmbh.github.io/py-maplibregl/api/sources/#maplibre.sources.GeoJSONSource for more information.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+                See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
+        """
+
+        if isinstance(data, str) or isinstance(data, dict):
+            source = GeoJSONSource(data=data, **source_args)
+        else:
+            print("The data must be a URL or a GeoJSON dictionary.")
+            return
+
+        layer = Layer(id=layer_name, source=source, type=LayerType.LINE, **kwargs)
+        self.add_layer(layer)
+        self.set_visibility(layer_name, show)
