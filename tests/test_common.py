@@ -7,7 +7,7 @@ import unittest
 import geopandas
 import pandas
 from leafmap.common import *
-
+from pmtiles.tile import MagicNumberNotFound
 
 class TestCommon(unittest.TestCase):
     """Tests for `common` module."""
@@ -60,6 +60,16 @@ class TestCommon(unittest.TestCase):
         self.assertIsInstance(cog_center(self.in_cog), tuple)
         self.assertEqual(len(cog_center(self.in_cog)), 2)
 
+    def test_pmtile_metadata_validates_pmtiles_suffix(self):
+        with self.assertRaises(ValueError) as cm:
+            pmtiles_metadata("/some/path/to/pmtiles.pmtiles")
+            assert cm.exception.message != "Input file must be a .pmtiles file."
+        with self.assertRaises(MagicNumberNotFound):
+            pmtiles_metadata("https://mywebsite.com/some/path/to/pmtiles.pmtiles")
+            assert cm.exception.message != "Input file must be a .pmtiles file."
+        with self.assertRaises(MagicNumberNotFound):
+            pmtiles_metadata("https://mywebsite.com/some/path/to/pmtiles.pmtiles?query=param")
+            assert cm.exception.message != "Input file must be a .pmtiles file."
 
 if __name__ == "__main__":
     unittest.main()
