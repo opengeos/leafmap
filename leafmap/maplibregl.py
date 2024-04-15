@@ -221,3 +221,79 @@ class Map(MapWidget):
         layer = Layer(id=layer_name, source=source, type=LayerType.LINE, **kwargs)
         self.add_layer(layer)
         self.set_visibility(layer_name, show)
+
+    def add_tile_layer(
+        self,
+        url,
+        name="Tile Layer",
+        attribution="",
+        show=True,
+        tile_size=256,
+        source_args={},
+        **kwargs,
+    ):
+        """Adds a TileLayer to the map.
+
+        Args:
+            url (str): The URL of the tile layer.
+            name (str, optional): The layer name to use for the layer. Defaults to 'Tile Layer'.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+            show (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+            tile_size (int, optional): The size of the tiles. Defaults to 256.
+            source_args (dict, optional): Additional keyword arguments that are passed to the RasterTileSource class.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+                See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
+        """
+
+        raster_source = RasterTileSource(
+            tiles=[url], attribution=attribution, tile_size=tile_size, **source_args
+        )
+        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER, **kwargs)
+        self.add_layer(layer)
+        self.set_visibility(name, show)
+
+    def add_cog_layer(
+        self,
+        url,
+        name="COG Layer",
+        attribution="",
+        opacity=1.0,
+        shown=True,
+        bands=None,
+        titiler_endpoint=None,
+        zoom_to_layer=True,
+        **kwargs,
+    ):
+        """Adds a COG TileLayer to the map.
+
+        Args:
+            url (str): The URL of the COG tile layer.
+            name (str, optional): The layer name to use for the layer. Defaults to 'Untitled'.
+            attribution (str, optional): The attribution to use. Defaults to ''.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.
+            shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+            bands (list, optional): A list of bands to use for the layer. Defaults to None.
+            titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
+                color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
+                and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
+                apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
+        """
+        available_bands = cog_bands(url, titiler_endpoint)
+
+        if bands is None:
+            if len(available_bands) >= 3:
+                indexes = [1, 2, 3]
+            else:
+                indexes = [1]
+        else:
+            indexes = bands
+
+        vis_bands = [available_bands[idx - 1] for idx in indexes]
+
+        tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
+        bounds = cog_bounds(url, titiler_endpoint)
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown)
+        if zoom_to_layer:
+            self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
