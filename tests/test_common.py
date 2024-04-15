@@ -9,6 +9,7 @@ import pandas
 from leafmap.common import *
 from pmtiles.tile import MagicNumberNotFound
 
+
 class TestCommon(unittest.TestCase):
     """Tests for `common` module."""
 
@@ -68,8 +69,11 @@ class TestCommon(unittest.TestCase):
             pmtiles_metadata("https://mywebsite.com/some/path/to/pmtiles.pmtiles")
             assert cm.exception.message != "Input file must be a .pmtiles file."
         with self.assertRaises(MagicNumberNotFound):
-            pmtiles_metadata("https://mywebsite.com/some/path/to/pmtiles.pmtiles?query=param")
+            pmtiles_metadata(
+                "https://mywebsite.com/some/path/to/pmtiles.pmtiles?query=param"
+            )
             assert cm.exception.message != "Input file must be a .pmtiles file."
+
 
 if __name__ == "__main__":
     unittest.main()
