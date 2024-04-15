@@ -6,6 +6,12 @@ from box import Box
 from maplibre.ipywidget import MapWidget
 from maplibre import Layer, LayerType, MapOptions
 from maplibre.sources import GeoJSONSource, RasterTileSource
+from maplibre.controls import (
+    ScaleControl,
+    FullscreenControl,
+    GeolocateControl,
+    NavigationControl,
+)
 
 from .basemaps import xyz_to_leaflet
 from .common import *
@@ -30,6 +36,49 @@ class Map(MapWidget):
         map_options = MapOptions(center=center, zoom=zoom, **kwargs)
 
         super().__init__(map_options, height=height)
+
+        self.layers = {}
+
+    def add_layer(self, layer, name=None):
+        """Adds a layer to the map.
+
+        Args:
+            layer (object): The layer object.
+            name (str, optional): The name of the layer. Defaults to None.
+        """
+
+        if name is None:
+            name = layer.id
+
+        self.layers[name] = layer
+        super().add_layer(layer)
+
+    def add_control(self, control, position="top-right", **kwargs):
+        """Adds a control to the map.
+
+        Args:
+            control (object | str): The control object. Can be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'.
+            position (str, optional): The position of the control. Defaults to "top-right".
+            **kwargs: Additional keyword arguments that are passed to the control object.
+        """
+
+        if isinstance(control, str):
+            control = control.lower()
+            if control == "scale":
+                control = ScaleControl(**kwargs)
+            elif control == "fullscreen":
+                control = FullscreenControl(**kwargs)
+            elif control == "geolocate":
+                control = GeolocateControl(**kwargs)
+            elif control == "navigation":
+                control = NavigationControl(**kwargs)
+            else:
+                print(
+                    "Control can only be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'"
+                )
+                return
+
+        super().add_control(control, position)
 
     def set_center(self, lon, lat, zoom=None):
         """Sets the center of the map.
@@ -85,7 +134,7 @@ class Map(MapWidget):
 
         self.add_call("fitBounds", bounds)
 
-    def add_basemap(self, basemap="HYBRID", show=True, **kwargs):
+    def add_basemap(self, basemap="HYBRID", show=True, attribution=None, **kwargs):
         """Adds a basemap to the map.
 
         Args:
@@ -104,7 +153,6 @@ class Map(MapWidget):
 
         name = basemap
         url = None
-        attribution = None
         max_zoom = 30
         min_zoom = 0
 
@@ -117,7 +165,8 @@ class Map(MapWidget):
         elif isinstance(basemap, xyzservices.TileProvider):
             name = basemap.name
             url = basemap.build_url()
-            attribution = basemap.attribution
+            if attribution is None:
+                attribution = basemap.attribution
             if "max_zoom" in basemap.keys():
                 max_zoom = basemap["max_zoom"]
             if "min_zoom" in basemap.keys():
@@ -125,7 +174,8 @@ class Map(MapWidget):
 
         elif basemap in basemaps:
             url = basemaps[basemap]["url"]
-            attribution = basemaps[basemap]["attribution"]
+            if attribution is None:
+                attribution = basemaps[basemap]["attribution"]
             if "max_zoom" in basemaps[basemap]:
                 max_zoom = basemaps[basemap]["max_zoom"]
             if "min_zoom" in basemaps[basemap]:
