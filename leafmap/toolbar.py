@@ -5564,7 +5564,7 @@ def stac_custom_gui(m, button_width: Optional[str] = "85px", **kwargs):
                     collection.value = None
 
                     collections = stac_collections(
-                        endpoint.value, return_ids=True, **kwargs
+                        endpoint.value, return_ids=True, get_root=False, **kwargs
                     )
                     if collections:
                         collections.sort()
