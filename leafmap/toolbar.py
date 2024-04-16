@@ -6367,7 +6367,7 @@ def nasa_data_gui(
     )
 
     bbox = widgets.Text(
-        value="Map bounds",
+        value="",
         description="Bounding box:",
         placeholder="xmin, ymin, xmax, ymax",
         style=style,
@@ -6478,13 +6478,16 @@ def nasa_data_gui(
                 with output:
                     print("Searching...")
 
-                    if bbox.value == "Map bounds":
-                        bounds = (
-                            m.bounds[0][1],
-                            m.bounds[0][0],
-                            m.bounds[1][1],
-                            m.bounds[1][0],
-                        )
+                    if bbox.value.strip() == "":
+                        if m.user_roi_bounds() is not None:
+                            bounds = tuple(m.user_roi_bounds())
+                        else:
+                            bounds = (
+                                m.bounds[0][1],
+                                m.bounds[0][0],
+                                m.bounds[1][1],
+                                m.bounds[1][0],
+                            )
                     else:
                         bounds = tuple(map(float, bbox.value.split(",")))
                         if len(bounds) != 4:
