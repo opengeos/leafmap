@@ -6,7 +6,7 @@
 [![image](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/opengeos/leafmap/HEAD)
 [![image](https://img.shields.io/pypi/v/leafmap.svg)](https://pypi.python.org/pypi/leafmap)
 [![image](https://static.pepy.tech/badge/leafmap)](https://pepy.tech/project/leafmap)
-[![Conda Recipe](https://img.shields.io/badge/recipe-leafmap-green.svg)](https://github.com/giswqs/leafmap-feedstock)
+[![Conda Recipe](https://img.shields.io/badge/recipe-leafmap-green.svg)](https://github.com/conda-forge/leafmap-feedstock)
 [![image](https://img.shields.io/conda/vn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
 [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/leafmap.svg)](https://anaconda.org/conda-forge/leafmap)
 [![image](https://github.com/opengeos/leafmap/workflows/docs/badge.svg)](https://leafmap.org)
