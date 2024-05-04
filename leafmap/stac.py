@@ -1234,7 +1234,7 @@ def stac_collections(
         list: A list of collection IDs.
     """
     try:
-        client = stac_client(url, get_root=get_root, **kwargs)
+        client, _ = stac_client(url, get_root=get_root, **kwargs)
         collections = client.get_all_collections()
 
         if return_ids:
