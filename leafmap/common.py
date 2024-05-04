@@ -11472,6 +11472,7 @@ def pmtiles_header(input_file: str):
     """
 
     import requests
+    from urllib.parse import urlparse
 
     try:
         from pmtiles.reader import Reader, MmapSource
@@ -11481,8 +11482,7 @@ def pmtiles_header(input_file: str):
             "pmtiles is not installed. Please install it using `pip install pmtiles`."
         )
         return
-
-    if not input_file.endswith(".pmtiles"):
+    if not urlparse(input_file).path.endswith(".pmtiles"):
         raise ValueError("Input file must be a .pmtiles file.")
 
     if input_file.startswith("http"):
@@ -11540,6 +11540,7 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
 
     import json
     import requests
+    from urllib.parse import urlparse
 
     try:
         from pmtiles.reader import Reader, MmapSource, MemorySource
@@ -11549,7 +11550,8 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
         )
         return
 
-    if not input_file.endswith(".pmtiles"):
+    # ignore uri parameters when checking file suffix
+    if not urlparse(input_file).path.endswith(".pmtiles"):
         raise ValueError("Input file must be a .pmtiles file.")
 
     header = pmtiles_header(input_file)
