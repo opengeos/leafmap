@@ -30,7 +30,8 @@ jobs:
             EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
         steps:
             - uses: actions/checkout@v4
-
+              with:
+                  fetch-depth: 0
             - name: Setup Python
               uses: conda-incubator/setup-miniconda@v3
               with:
