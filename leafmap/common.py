@@ -8647,6 +8647,7 @@ def s3_list_objects(
     ext=None,
     fullpath=True,
     request_payer="bucket-owner",
+    client_args={},
     **kwargs,
 ):
     """List objects in a S3 bucket
@@ -8659,6 +8660,7 @@ def s3_list_objects(
         fullpath (bool, optional): Return full path. Defaults to True.
         request_payer (str, optional): Specifies who pays for the download from S3.
             Can be "bucket-owner" or "requester". Defaults to "bucket-owner".
+        client_args (dict, optional): Additional arguments to pass to boto3.client(). Defaults to {}.
 
     Returns:
         list: List of objects.
@@ -8668,7 +8670,7 @@ def s3_list_objects(
     except ImportError:
         raise ImportError("boto3 is not installed. Install it with pip install boto3")
 
-    client = boto3.client("s3")
+    client = boto3.client("s3", **client_args)
 
     if prefix is not None:
         kwargs["Prefix"] = prefix
@@ -8879,7 +8881,7 @@ def s3_get_objects(
     if keys is None:
         fullpath = False
         keys = s3_list_objects(
-            bucket, prefix, limit, ext, fullpath, request_payer, **kwargs
+            bucket, prefix, limit, ext, fullpath, request_payer, client_args, **kwargs
         )
 
     for index, key in enumerate(keys):
