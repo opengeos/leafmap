@@ -9935,7 +9935,7 @@ def check_html_string(html_string):
     return html_string
 
 
-def split_raster(filename, out_dir, tile_size=256, overlap=0):
+def split_raster(filename, out_dir, tile_size=256, overlap=0, prefix="tile"):
     """Split a raster into tiles.
 
     Args:
@@ -9943,6 +9943,7 @@ def split_raster(filename, out_dir, tile_size=256, overlap=0):
         out_dir (str): The path to the output directory.
         tile_size (int | tuple, optional): The size of the tiles. Can be an integer or a tuple of (width, height). Defaults to 256.
         overlap (int, optional): The number of pixels to overlap between tiles. Defaults to 0.
+        prefix (str, optional): The prefix of the output tiles. Defaults to "tile".
 
     Raises:
         ImportError: Raised if GDAL is not installed.
@@ -10009,7 +10010,7 @@ def split_raster(filename, out_dir, tile_size=256, overlap=0):
             tile_height = y_max - y_min
 
             # Set the output file name
-            output_file = f"{out_dir}/tile_{i}_{j}.tif"
+            output_file = f"{out_dir}/{prefix}_{i}_{j}.tif"
 
             # Create a new dataset for the tile
             driver = gdal.GetDriverByName("GTiff")
