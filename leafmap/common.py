@@ -6478,12 +6478,16 @@ def is_studio_lab():
 
     import psutil
 
-    output = psutil.Process().parent().cmdline()
-
     on_studio_lab = False
-    for item in output:
-        if "studiolab/bin" in item:
-            on_studio_lab = True
+
+    try:
+        output = psutil.Process().parent().cmdline()
+
+        for item in output:
+            if "studiolab/bin" in item:
+                on_studio_lab = True
+    except:
+        pass
     return on_studio_lab
 
 
