@@ -6460,12 +6460,16 @@ def is_on_aws():
 
     import psutil
 
-    output = psutil.Process().parent().cmdline()
-
     on_aws = False
-    for item in output:
-        if item.endswith(".aws") or "ec2-user" in item:
-            on_aws = True
+
+    try:
+        output = psutil.Process().parent().cmdline()
+
+        for item in output:
+            if item.endswith(".aws") or "ec2-user" in item:
+                on_aws = True
+    except:
+        pass
     return on_aws
 
 
