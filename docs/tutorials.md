@@ -89,7 +89,7 @@
 74. Downloading maps tiles and converting them to a GeoTIFF file ([notebook](https://leafmap.org/notebooks/74_map_tiles_to_geotiff))
 75. Segmenting satellite imagery with the Segment Anything Model ([notebook](https://leafmap.org/notebooks/75_segment_anything))
 76. Comparing images with an interactive slider ([notebook](https://leafmap.org/notebooks/76_image_comparison))
-77. Spitting a raster dataset into multiple tiles ([notebook](https://leafmap.org/notebooks/77_split_raster))
+77. Splitting a raster dataset into multiple tiles ([notebook](https://leafmap.org/notebooks/77_split_raster))
 78. Interactive Extraction and Visualization of AWS Open Geospatial Data ([notebook](https://leafmap.org/notebooks/78_read_raster))
 79. Visualizing time series images interactively with a time slider ([notebook](https://leafmap.org/notebooks/79_timeseries))
 80. Visualizing solar radiation data from Google Solar API ([notebook](https://leafmap.org/notebooks/80_solar))
