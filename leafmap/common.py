@@ -4088,7 +4088,10 @@ def get_palette_colors(cmap_name=None, n_class=None, hashtag=False):
     import matplotlib as mpl
     import matplotlib.pyplot as plt
 
-    cmap = plt.cm.get_cmap(cmap_name, n_class)
+    try:
+        cmap = plt.get_cmap(cmap_name, n_class)
+    except:
+        cmap = plt.cm.get_cmap(cmap_name, n_class)
     colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
     if hashtag:
         colors = ["#" + i for i in colors]
@@ -5052,7 +5055,10 @@ def classify(
 
     if cmap is None:
         cmap = "Blues"
-    cmap = plt.cm.get_cmap(cmap, k)
+    try:
+        cmap = plt.get_cmap(cmap, k)
+    except:
+        cmap = plt.cm.get_cmap(cmap, k)
     if colors is None:
         colors = [mpl.colors.rgb2hex(cmap(i))[1:] for i in range(cmap.N)]
         colors = ["#" + i for i in colors]
