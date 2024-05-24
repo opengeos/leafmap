@@ -3341,6 +3341,7 @@ class Map(folium.Map):
         max_velocity=20,
         display_options={},
         name="Velocity",
+        **kwargs,
     ):
         print(f"The folium plotting backend does not support this function.")
 
