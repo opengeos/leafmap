@@ -4720,6 +4720,7 @@ def netcdf_to_tif(
     lev="lev",
     level_index=0,
     time=0,
+    crs="epsg:4326",
     return_vars=False,
     **kwargs,
 ):
@@ -4735,6 +4736,7 @@ def netcdf_to_tif(
         lev (str, optional): Name of the level variable. Defaults to 'lev'.
         level_index (int, optional): Index of the level dimension. Defaults to 0'.
         time (int, optional): Index of the time dimension. Defaults to 0'.
+        crs (str, optional): The coordinate reference system. Defaults to 'epsg:4326'.
         return_vars (bool, optional): Flag to return all variables. Defaults to False.
 
     Raises:
@@ -4786,9 +4788,13 @@ def netcdf_to_tif(
         raise ValueError(f"{variables} must be a subset of {allowed_vars}.")
 
     if variables is None:
-        xds.rio.set_spatial_dims(x_dim=lon, y_dim=lat).rio.to_raster(output)
+        xds.rio.set_spatial_dims(x_dim=lon, y_dim=lat).rio.write_crs(crs).rio.to_raster(
+            output
+        )
     else:
-        xds[variables].rio.set_spatial_dims(x_dim=lon, y_dim=lat).rio.to_raster(output)
+        xds[variables].rio.set_spatial_dims(x_dim=lon, y_dim=lat).rio.write_crs(
+            crs
+        ).rio.to_raster(output)
 
     if return_vars:
         return output, allowed_vars
