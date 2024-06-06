@@ -10352,7 +10352,7 @@ def array_to_memory_file(
         if hasattr(array, "rio"):
             if hasattr(array.rio, "crs"):
                 crs = array.rio.crs
-            if hasattr(array.rio, "transform"):
+            if transform is None and hasattr(array.rio, "transform"):
                 transform = array.rio.transform()
         elif source is None:
             if hasattr(array, "encoding"):
@@ -10362,7 +10362,6 @@ def array_to_memory_file(
 
     if array.ndim == 3 and transpose:
         array = np.transpose(array, (1, 2, 0))
-
     if source is not None:
         with rasterio.open(source) as src:
             crs = src.crs
