@@ -480,6 +480,7 @@ class LayerEditor(ipywidgets.VBox):
 
     def _on_close_click(self, _):
         # if self.on_close:
+        self._layer_editor = None
         self.on_close()
 
 
