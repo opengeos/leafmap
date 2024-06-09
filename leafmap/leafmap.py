@@ -2,6 +2,7 @@
 
 import os
 import ipyleaflet
+import ipywidgets
 
 from box import Box
 from IPython.display import display
@@ -11,8 +12,10 @@ from .legends import builtin_legends
 from .osm import *
 from .pc import *
 from . import examples
-from .map_widgets import *
 from .plot import *
+from . import map_widgets
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
+
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -23,6 +26,10 @@ class Map(ipyleaflet.Map):
     Returns:
         object: ipyleaflet map object.
     """
+
+    @property
+    def _layer_editor(self) -> Optional[map_widgets.LayerEditor]:
+        return self._find_widget_of_type(map_widgets.LayerEditor)
 
     def __init__(self, **kwargs):
         if "center" not in kwargs:
@@ -204,11 +211,12 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-    def add(self, object, **kwargs):
+    def add(self, object, index=None, **kwargs):
         """Adds a layer to the map.
 
         Args:
             layer (object): The layer to add to the map.
+            index (int, optional): The index at which to add the layer. Defaults to None.
         """
         if isinstance(object, str):
             if object in basemaps.keys():
@@ -225,7 +233,7 @@ class Map(ipyleaflet.Map):
                 inspector_gui(self, **kwargs)
                 return
 
-        super().add(object)
+        super().add(object, index=index)
 
         if hasattr(self, "layer_manager_widget"):
             self.update_layer_manager()
@@ -2220,8 +2228,10 @@ class Map(ipyleaflet.Map):
         nodata=None,
         attribution=None,
         layer_name="Raster",
+        layer_index=None,
         zoom_to_layer=True,
         visible=True,
+        opacity=1.0,
         array_args={},
         **kwargs,
     ):
@@ -2242,8 +2252,10 @@ class Map(ipyleaflet.Map):
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
+            layer_index (int, optional): The index of the layer. Defaults to None.
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.
         """
         import numpy as np
@@ -2259,6 +2271,7 @@ class Map(ipyleaflet.Map):
             vmin=vmin,
             vmax=vmax,
             nodata=nodata,
+            opacity=opacity,
             attribution=attribution,
             layer_name=layer_name,
             return_client=True,
@@ -2266,7 +2279,7 @@ class Map(ipyleaflet.Map):
         )
         tile_layer.visible = visible
 
-        self.add(tile_layer)
+        self.add(tile_layer, index=layer_index)
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
         bounds = (
             bounds[2],
@@ -2299,6 +2312,13 @@ class Map(ipyleaflet.Map):
             "vis_bands": vis_bands,
             "band_names": tile_client.band_names,
             "bounds": bounds,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "colormap": colormap,
+            "opacity": opacity,
+            "layer_name": layer_name,
+            "filename": tile_client.filename,
             "type": "LOCAL",
         }
         self.cog_layer_dict[layer_name] = params
@@ -4507,6 +4527,43 @@ class Map(ipyleaflet.Map):
             self.add_layer_manager(position=position, opened=opened, **kwargs)
         elif name == "oam":
             self.add_oam_gui(position=position, opened=opened, **kwargs)
+
+    def _add_layer_editor(self, position: str, **kwargs) -> None:
+        if self._layer_editor:
+            return
+
+        widget = map_widgets.LayerEditor(self, **kwargs)
+        widget.on_close = lambda: self.remove("layer_editor")
+        control = ipyleaflet.WidgetControl(widget=widget, position=position)
+        super().add(control)
+
+    def _find_widget_of_type(
+        self, widget_type: Type, return_control: bool = False
+    ) -> Optional[Any]:
+        """Finds a widget in the controls with the passed in type."""
+        for widget in self.controls:
+            if isinstance(widget, ipyleaflet.WidgetControl):
+                if isinstance(widget.widget, widget_type):
+                    return widget if return_control else widget.widget
+            elif isinstance(widget, widget_type):
+                return widget
+        return None
+
+    def remove(self, widget: Any) -> None:
+        """Removes a widget to the map."""
+
+        basic_controls: Dict[str, ipyleaflet.Control] = {
+            "layer_editor": map_widgets.LayerEditor,
+        }
+        if widget_type := basic_controls.get(widget, None):
+            if control := self._find_widget_of_type(widget_type, return_control=True):
+                self.remove(control)
+                control.close()
+            return
+
+        super().remove(widget)
+        if isinstance(widget, ipywidgets.Widget):
+            widget.close()
 
 
 # The functions below are outside the Map class.

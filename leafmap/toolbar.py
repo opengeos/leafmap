@@ -6235,6 +6235,16 @@ def layer_manager_gui(
                     ),
                 )
 
+                def layer_settings_click(change):
+                    if change["new"]:
+                        if layer.name in m.cog_layer_dict:
+                            m._add_layer_editor(
+                                position="topright",
+                                layer_dict=m.cog_layer_dict[layer.name],
+                            )
+
+                layer_settings.observe(layer_settings_click, "value")
+
                 def layer_opacity_changed(change):
                     if change["new"]:
                         layer.style = {
