@@ -434,7 +434,7 @@ class LayerEditor(ipywidgets.VBox):
         )
         self._embedded_widget = ipywidgets.Label(value="Vis params are uneditable")
         if layer_dict is not None:
-            if layer_dict["type"] == "LOCAL":
+            if layer_dict["type"] in ["LOCAL", "COG"]:
                 self._embedded_widget = RasterLayerEditor(
                     host_map=host_map, layer_dict=layer_dict
                 )
@@ -501,11 +501,12 @@ class RasterLayerEditor(ipywidgets.VBox):
         self._layer_opacity = self._layer_dict["opacity"]
         self._min_value = self._layer_dict["vmin"]
         self._max_value = self._layer_dict["vmax"]
-        self._tile_client = self._layer_dict["tile_client"]
         self._band_indexes = self._layer_dict["indexes"]
-        self._filename = self._layer_dict["filename"]
         self._nodata = self._layer_dict["nodata"]
 
+        if self._layer_dict["type"] == "LOCAL":
+            self._tile_client = self._layer_dict["tile_client"]
+            self._filename = self._layer_dict["filename"]
         if "xds" in self._layer_dict:
             self._xds = self._layer_dict["xds"]
         else:
@@ -806,11 +807,23 @@ class RasterLayerEditor(ipywidgets.VBox):
             ]
             self._colormap_dropdown.value = None
 
-        vis["min"] = self._value_range_slider.value[0]
-        vis["max"] = self._value_range_slider.value[1]
+        vis["vmin"] = self._value_range_slider.value[0]
+        vis["vmax"] = self._value_range_slider.value[1]
         vis["opacity"] = self._opacity_slider.value
         vis["colormap"] = self._colormap_dropdown.value
 
+        if self._layer_dict["type"] == "COG":
+            vis["bidx"] = vis["indexes"]
+            vis["rescale"] = f'{vis["vmin"]},{vis["vmax"]}'
+            vis.pop("vmin", None)
+            vis.pop("vmax", None)
+            vis.pop("indexes", None)
+            if len(vis["bidx"]) == 1:
+                vis["colormap_name"] = vis["colormap"]
+            vis.pop("colormap", None)
+
+        if "colormap" in vis and vis["colormap"] is None:
+            vis.pop("colormap", None)
         common.create_code_cell(f"vis_params = {str(vis)}")
         print(f"vis_params = {str(vis)}")
 
@@ -845,6 +858,7 @@ class RasterLayerEditor(ipywidgets.VBox):
 
         self._host_map.remove(old_layer)
 
+        # Add support for hyperspectral data via HyperCoast
         if self._xds is not None:
             self._host_map.add_hyper(
                 self._xds,
@@ -856,6 +870,17 @@ class RasterLayerEditor(ipywidgets.VBox):
                 opacity=vis["opacity"],
                 nodata=self._nodata,
                 layer_name=self._layer_name,
+                zoom_to_layer=False,
+                layer_index=layer_index,
+            )
+        elif self._layer_dict["type"] == "COG":
+            self._host_map.add_cog_layer(
+                self._layer_dict["url"],
+                bidx=vis["indexes"],
+                colormap_name=vis["colormap"],
+                rescale=f'{vis["vmin"]},{vis["vmax"]}',
+                opacity=vis["opacity"],
+                name=self._layer_name,
                 zoom_to_layer=False,
                 layer_index=layer_index,
             )

@@ -543,6 +543,7 @@ class Map(ipyleaflet.Map):
         attribution,
         opacity=1.0,
         shown=True,
+        layer_index=None,
         **kwargs,
     ):
         """Adds a TileLayer to the map.
@@ -553,6 +554,7 @@ class Map(ipyleaflet.Map):
             attribution (str): The attribution to use.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+            layer_index (int, optional): The index at which to add the layer. Defaults to None.
         """
         if "max_zoom" not in kwargs:
             kwargs["max_zoom"] = 30
@@ -567,7 +569,7 @@ class Map(ipyleaflet.Map):
                 visible=shown,
                 **kwargs,
             )
-            self.add(tile_layer)
+            self.add(tile_layer, index=layer_index)
 
             arc_add_layer(url, name, shown, opacity)
 
@@ -971,6 +973,7 @@ class Map(ipyleaflet.Map):
         bands=None,
         titiler_endpoint=None,
         zoom_to_layer=True,
+        layer_index=None,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -984,26 +987,42 @@ class Map(ipyleaflet.Map):
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
             zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            layer_index (int, optional): The index at which to add the layer. Defaults to None.
             **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
-        available_bands = cog_bands(url, titiler_endpoint)
+        band_names = cog_bands(url, titiler_endpoint)
 
-        if bands is None:
-            if len(available_bands) >= 3:
-                indexes = [1, 2, 3]
+        if bands is not None:
+            if not isinstance(bands, list):
+                bands = [bands]
+
+            if all(isinstance(x, str) for x in bands):
+                kwargs["bidx"] = [band_names.index(x) + 1 for x in bands]
+
+            elif all(isinstance(x, int) for x in bands):
+                kwargs["bidx"] = bands
             else:
-                indexes = [1]
-        else:
-            indexes = bands
+                raise ValueError("Bands must be a list of integers or strings.")
+        elif "bidx" not in kwargs:
+            if len(band_names) == 1:
+                kwargs["bidx"] = [1]
+            else:
+                kwargs["bidx"] = [1, 2, 3]
 
-        vis_bands = [available_bands[idx - 1] for idx in indexes]
+        vis_bands = [band_names[idx - 1] for idx in kwargs["bidx"]]
+
+        if len(kwargs["bidx"]) > 1:
+            if "colormap_name" in kwargs:
+                kwargs.pop("colormap_name")
+            if "colormap" in kwargs:
+                kwargs.pop("colormap")
 
         tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
         bounds = cog_bounds(url, titiler_endpoint)
-        self.add_tile_layer(tile_url, name, attribution, opacity, shown)
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if zoom_to_layer:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
@@ -1011,13 +1030,32 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
 
+        vmin, vmax = cog_tile_vmin_vmax(url, bands=bands)
+
+        if "colormap_name" in kwargs:
+            colormap = kwargs["colormap_name"]
+        else:
+            colormap = None
+
+        if "nodata" in kwargs:
+            nodata = kwargs["nodata"]
+        else:
+            nodata = None
+
         params = {
             "url": url,
             "titiler_endpoint": titiler_endpoint,
+            "tile_layer": self.find_layer(name),
             "bounds": bounds,
-            "indexes": indexes,
+            "indexes": kwargs["bidx"],
             "vis_bands": vis_bands,
-            "band_names": available_bands,
+            "band_names": band_names,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "colormap": colormap,
+            "opacity": opacity,
+            "layer_name": name,
             "type": "COG",
         }
         self.cog_layer_dict[name] = params
