@@ -940,7 +940,19 @@ def create_code_cell(code="", where="below"):
     """
 
     import base64
+
+    # try:
+    #     import pyperclip
+    # except ImportError:
+    #     install_package("pyperclip")
+    #     import pyperclip
+
     from IPython.display import Javascript, display
+
+    # try:
+    #     pyperclip.copy(str(code))
+    # except Exception as e:
+    #     pass
 
     encoded_code = (base64.b64encode(str.encode(code))).decode()
     display(
@@ -13343,3 +13355,36 @@ def extract_archive(archive, outdir=None, **kwargs):
     except Exception as e:
         print("The unzipped files might already exist. Skipping extraction.")
         return
+
+
+def image_min_max(
+    image: str, bands: Optional[Union[int, list]] = None
+) -> Tuple[float, float]:
+    """
+    Computes the minimum and maximum pixel values of an image.
+
+    This function opens an image file using xarray and rasterio, optionally
+        selects specific bands, and then computes the minimum and maximum pixel
+        values in the image.
+
+    Args:
+        image (str): The path to the image file.
+        bands (int or list, optional): The band or list of bands to select. If
+            None, all bands are used.
+
+    Returns:
+        Tuple[float, float]: The minimum and maximum pixel values in the image.
+    """
+
+    import rioxarray
+    import xarray as xr
+
+    dataset = xr.open_dataset(image, engine="rasterio")
+
+    if bands is not None:
+        dataset = dataset.sel(band=bands)
+
+    vmin = dataset["band_data"].min().values.item()
+    vmax = dataset["band_data"].max().values.item()
+
+    return vmin, vmax
