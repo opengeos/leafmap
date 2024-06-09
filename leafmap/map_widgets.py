@@ -376,6 +376,7 @@ class LayerEditor(ipywidgets.VBox):
         # self.on_close = None
 
         self._host_map = host_map
+        self._layer_dict = layer_dict
         if not host_map:
             raise ValueError(
                 f"Must pass a valid map when creating a {self.__class__.__name__} widget."
@@ -409,6 +410,21 @@ class LayerEditor(ipywidgets.VBox):
         self._apply_button = ipywidgets.Button(
             description="Apply", tooltip="Apply vis params to the layer", layout=layout
         )
+
+        self._layer_spinner = ipywidgets.Button(
+            icon="check",
+            layout=ipywidgets.Layout(width="28px", height="28px", padding="0px"),
+            tooltip="Loaded",
+        )
+
+        def loading_change(change):
+            if change["new"]:
+                self._layer_spinner.tooltip = "Loading ..."
+                self._layer_spinner.icon = "spinner spin lg"
+            else:
+                self._layer_spinner.tooltip = "Loaded"
+                self._layer_spinner.icon = "check"
+
         self._import_button.on_click(self._on_import_click)
         self._apply_button.on_click(self._on_apply_click)
 
@@ -423,6 +439,8 @@ class LayerEditor(ipywidgets.VBox):
                     host_map=host_map, layer_dict=layer_dict
                 )
 
+                layer_dict["tile_layer"].observe(loading_change, "loading")
+
         super().__init__(children=[])
         self._on_toggle_click({"new": True})
 
@@ -431,7 +449,9 @@ class LayerEditor(ipywidgets.VBox):
             self.children = [
                 ipywidgets.HBox([self._close_button, self._toggle_button, self._label]),
                 self._embedded_widget,
-                ipywidgets.HBox([self._import_button, self._apply_button]),
+                ipywidgets.HBox(
+                    [self._import_button, self._apply_button, self._layer_spinner]
+                ),
             ]
         else:
             self.children = [
@@ -442,7 +462,21 @@ class LayerEditor(ipywidgets.VBox):
         self._embedded_widget.on_import_click()
 
     def _on_apply_click(self, _):
+
+        def loading_change(change):
+            if change["new"]:
+                self._layer_spinner.tooltip = "Loading ..."
+                self._layer_spinner.icon = "spinner spin lg"
+            else:
+                self._layer_spinner.tooltip = "Loaded"
+                self._layer_spinner.icon = "check"
+
+        self._layer_spinner.icon = "spinner spin lg"
+        self._layer_spinner.unobserve(loading_change, "loading")
         self._embedded_widget.on_apply_click()
+        self._host_map.cog_layer_dict[self._layer_dict["layer_name"]][
+            "tile_layer"
+        ].observe(loading_change, "loading")
 
     def _on_close_click(self, _):
         # if self.on_close:
@@ -470,6 +504,11 @@ class RasterLayerEditor(ipywidgets.VBox):
         self._band_indexes = self._layer_dict["indexes"]
         self._filename = self._layer_dict["filename"]
         self._nodata = self._layer_dict["nodata"]
+
+        if "xds" in self._layer_dict:
+            self._xds = self._layer_dict["xds"]
+        else:
+            self._xds = None
 
         if self._min_value is None or self._max_value is None:
             self._min_value, self._max_value = common.image_min_max(
@@ -805,18 +844,33 @@ class RasterLayerEditor(ipywidgets.VBox):
 
         self._host_map.remove(old_layer)
 
-        self._host_map.add_raster(
-            self._filename,
-            indexes=vis["indexes"],
-            colormap=vis["colormap"],
-            vmin=vis["vmin"],
-            vmax=vis["vmax"],
-            opacity=vis["opacity"],
-            nodata=self._nodata,
-            layer_name=self._layer_name,
-            zoom_to_layer=False,
-            layer_index=layer_index,
-        )
+        if self._xds is not None:
+            self._host_map.add_hyper(
+                self._xds,
+                type=self._layer_dict["hyper"],
+                wvl_indexes=[index - 1 for index in vis["indexes"]],
+                colormap=vis["colormap"],
+                vmin=vis["vmin"],
+                vmax=vis["vmax"],
+                opacity=vis["opacity"],
+                nodata=self._nodata,
+                layer_name=self._layer_name,
+                zoom_to_layer=False,
+                layer_index=layer_index,
+            )
+        else:
+            self._host_map.add_raster(
+                self._filename,
+                indexes=vis["indexes"],
+                colormap=vis["colormap"],
+                vmin=vis["vmin"],
+                vmax=vis["vmax"],
+                opacity=vis["opacity"],
+                nodata=self._nodata,
+                layer_name=self._layer_name,
+                zoom_to_layer=False,
+                layer_index=layer_index,
+            )
 
         def _remove_control(key):
             if widget := self._layer_dict.get(key, None):
