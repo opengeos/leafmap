@@ -513,9 +513,13 @@ class RasterLayerEditor(ipywidgets.VBox):
             self._xds = None
 
         if self._min_value is None or self._max_value is None:
-            self._min_value, self._max_value = common.image_min_max(
-                self._filename, self._band_indexes
-            )
+            try:
+                self._min_value, self._max_value = common.image_min_max(
+                    self._filename, self._band_indexes
+                )
+            except Exception as e:
+                self._min_value = 0
+                self._max_value = 1
 
         self._sel_bands = self._layer_dict["vis_bands"]
         self._layer_palette = []
@@ -604,12 +608,12 @@ class RasterLayerEditor(ipywidgets.VBox):
             value=[self._min_value, self._max_value],
             min=self._left_value,
             max=self._right_value,
-            step=0.1,
+            step=(self._right_value - self._left_value) / 100,
             description="Range:",
             disabled=False,
             continuous_update=False,
             readout=True,
-            readout_format=".1f",
+            readout_format=".2f",
             layout=ipywidgets.Layout(width="300px"),
             style={"description_width": "45px"},
         )
