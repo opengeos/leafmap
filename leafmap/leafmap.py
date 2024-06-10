@@ -2,6 +2,7 @@
 
 import os
 import ipyleaflet
+import ipywidgets
 
 from box import Box
 from IPython.display import display
@@ -11,8 +12,10 @@ from .legends import builtin_legends
 from .osm import *
 from .pc import *
 from . import examples
-from .map_widgets import *
 from .plot import *
+from . import map_widgets
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
+
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -23,6 +26,10 @@ class Map(ipyleaflet.Map):
     Returns:
         object: ipyleaflet map object.
     """
+
+    @property
+    def _layer_editor(self) -> Optional[map_widgets.LayerEditor]:
+        return self._find_widget_of_type(map_widgets.LayerEditor)
 
     def __init__(self, **kwargs):
         if "center" not in kwargs:
@@ -204,28 +211,39 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-    def add(self, object, **kwargs):
+    def add(self, object, index=None, **kwargs):
         """Adds a layer to the map.
 
         Args:
             layer (object): The layer to add to the map.
+            index (int, optional): The index at which to add the layer. Defaults to None.
         """
         if isinstance(object, str):
             if object in basemaps.keys():
                 object = get_basemap(object)
+            else:
+                if object == "nasa_earth_data":
+                    from .toolbar import nasa_data_gui
 
-            elif object == "nasa_earth_data":
-                from .toolbar import nasa_data_gui
+                    nasa_data_gui(self, **kwargs)
+                elif object == "inspector":
+                    from .toolbar import inspector_gui
 
-                nasa_data_gui(self, **kwargs)
+                    inspector_gui(self, **kwargs)
+
+                elif object == "stac":
+                    self.add_stac_gui(**kwargs)
+                elif object == "basemap":
+                    self.add_basemap_gui(**kwargs)
+                elif object == "inspector":
+                    self.add_inspector_gui(**kwargs)
+                elif object == "layer_manager":
+                    self.add_layer_manager(**kwargs)
+                elif object == "oam":
+                    self.add_oam_gui(**kwargs)
                 return
-            elif object == "inspector":
-                from .toolbar import inspector_gui
 
-                inspector_gui(self, **kwargs)
-                return
-
-        super().add(object)
+        super().add(object, index=index)
 
         if hasattr(self, "layer_manager_widget"):
             self.update_layer_manager()
@@ -535,6 +553,7 @@ class Map(ipyleaflet.Map):
         attribution,
         opacity=1.0,
         shown=True,
+        layer_index=None,
         **kwargs,
     ):
         """Adds a TileLayer to the map.
@@ -545,6 +564,7 @@ class Map(ipyleaflet.Map):
             attribution (str): The attribution to use.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
+            layer_index (int, optional): The index at which to add the layer. Defaults to None.
         """
         if "max_zoom" not in kwargs:
             kwargs["max_zoom"] = 30
@@ -559,7 +579,7 @@ class Map(ipyleaflet.Map):
                 visible=shown,
                 **kwargs,
             )
-            self.add(tile_layer)
+            self.add(tile_layer, index=layer_index)
 
             arc_add_layer(url, name, shown, opacity)
 
@@ -963,6 +983,7 @@ class Map(ipyleaflet.Map):
         bands=None,
         titiler_endpoint=None,
         zoom_to_layer=True,
+        layer_index=None,
         **kwargs,
     ):
         """Adds a COG TileLayer to the map.
@@ -976,26 +997,42 @@ class Map(ipyleaflet.Map):
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
             zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            layer_index (int, optional): The index at which to add the layer. Defaults to None.
             **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
-        available_bands = cog_bands(url, titiler_endpoint)
+        band_names = cog_bands(url, titiler_endpoint)
 
-        if bands is None:
-            if len(available_bands) >= 3:
-                indexes = [1, 2, 3]
+        if bands is not None:
+            if not isinstance(bands, list):
+                bands = [bands]
+
+            if all(isinstance(x, str) for x in bands):
+                kwargs["bidx"] = [band_names.index(x) + 1 for x in bands]
+
+            elif all(isinstance(x, int) for x in bands):
+                kwargs["bidx"] = bands
             else:
-                indexes = [1]
-        else:
-            indexes = bands
+                raise ValueError("Bands must be a list of integers or strings.")
+        elif "bidx" not in kwargs:
+            if len(band_names) == 1:
+                kwargs["bidx"] = [1]
+            else:
+                kwargs["bidx"] = [1, 2, 3]
 
-        vis_bands = [available_bands[idx - 1] for idx in indexes]
+        vis_bands = [band_names[idx - 1] for idx in kwargs["bidx"]]
+
+        if len(kwargs["bidx"]) > 1:
+            if "colormap_name" in kwargs:
+                kwargs.pop("colormap_name")
+            if "colormap" in kwargs:
+                kwargs.pop("colormap")
 
         tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
         bounds = cog_bounds(url, titiler_endpoint)
-        self.add_tile_layer(tile_url, name, attribution, opacity, shown)
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if zoom_to_layer:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
@@ -1003,13 +1040,32 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
 
+        vmin, vmax = cog_tile_vmin_vmax(url, bands=bands)
+
+        if "colormap_name" in kwargs:
+            colormap = kwargs["colormap_name"]
+        else:
+            colormap = None
+
+        if "nodata" in kwargs:
+            nodata = kwargs["nodata"]
+        else:
+            nodata = None
+
         params = {
             "url": url,
             "titiler_endpoint": titiler_endpoint,
+            "tile_layer": self.find_layer(name),
             "bounds": bounds,
-            "indexes": indexes,
+            "indexes": kwargs["bidx"],
             "vis_bands": vis_bands,
-            "band_names": available_bands,
+            "band_names": band_names,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "colormap": colormap,
+            "opacity": opacity,
+            "layer_name": name,
             "type": "COG",
         }
         self.cog_layer_dict[name] = params
@@ -1037,6 +1093,7 @@ class Map(ipyleaflet.Map):
         opacity=1.0,
         shown=True,
         fit_bounds=True,
+        layer_index=None,
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -1053,12 +1110,16 @@ class Map(ipyleaflet.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             fit_bounds (bool, optional): A flag indicating whether the map should be zoomed to the layer extent. Defaults to True.
+            layer_index (int, optional): The index at which to add the layer. Defaults to None.
         """
+        if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
+            kwargs.pop("colormap_name")
+
         tile_url = stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
         bounds = stac_bounds(url, collection, item, titiler_endpoint)
-        self.add_tile_layer(tile_url, name, attribution, opacity, shown)
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if fit_bounds:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
@@ -1072,13 +1133,36 @@ class Map(ipyleaflet.Map):
         if isinstance(assets, str) and "," in assets:
             assets = assets.split(",")
 
+        if "rescale" in kwargs:
+            rescale = kwargs["rescale"]
+            vmin, vmax = [float(v) for v in rescale.split(",")]
+        else:
+            vmin, vmax = stac_min_max(url, collection, item, assets, titiler_endpoint)
+
+        if "nodata" in kwargs:
+            nodata = kwargs["nodata"]
+        else:
+            nodata = None
+
+        band_names = stac_bands(url, collection, item, titiler_endpoint)
+        indexes = [band_names.index(band) + 1 for band in assets]
+
         params = {
             "url": url,
+            "titiler_endpoint": titiler_endpoint,
             "collection": collection,
             "item": item,
             "assets": assets,
+            "tile_layer": self.find_layer(name),
+            "indexes": indexes,
+            "vis_bands": assets,
+            "band_names": band_names,
             "bounds": bounds,
-            "titiler_endpoint": titiler_endpoint,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "opacity": opacity,
+            "layer_name": name,
             "type": "STAC",
         }
 
@@ -2220,8 +2304,10 @@ class Map(ipyleaflet.Map):
         nodata=None,
         attribution=None,
         layer_name="Raster",
+        layer_index=None,
         zoom_to_layer=True,
         visible=True,
+        opacity=1.0,
         array_args={},
         **kwargs,
     ):
@@ -2242,8 +2328,10 @@ class Map(ipyleaflet.Map):
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
+            layer_index (int, optional): The index of the layer. Defaults to None.
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.
         """
         import numpy as np
@@ -2259,6 +2347,7 @@ class Map(ipyleaflet.Map):
             vmin=vmin,
             vmax=vmax,
             nodata=nodata,
+            opacity=opacity,
             attribution=attribution,
             layer_name=layer_name,
             return_client=True,
@@ -2266,7 +2355,7 @@ class Map(ipyleaflet.Map):
         )
         tile_layer.visible = visible
 
-        self.add(tile_layer)
+        self.add(tile_layer, index=layer_index)
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
         bounds = (
             bounds[2],
@@ -2299,6 +2388,13 @@ class Map(ipyleaflet.Map):
             "vis_bands": vis_bands,
             "band_names": tile_client.band_names,
             "bounds": bounds,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "colormap": colormap,
+            "opacity": opacity,
+            "layer_name": layer_name,
+            "filename": tile_client.filename,
             "type": "LOCAL",
         }
         self.cog_layer_dict[layer_name] = params
@@ -4485,28 +4581,42 @@ class Map(ipyleaflet.Map):
 
         change_basemap(self, position)
 
-    def add_gui(
-        self, name, position="topright", opened=True, show_close_button=True, **kwargs
-    ):
-        """Add a GUI to the map.
+    def _add_layer_editor(self, position: str, **kwargs) -> None:
+        if self._layer_editor:
+            return
 
-        Args:
-            name (str): The name of the GUI. Options include "layer_manager", "inspector", "plot", and "timelapse".
-            position (str, optional): The position of the GUI. Defaults to "topright".
-            opened (bool, optional): Whether the GUI is opened. Defaults to True.
-            show_close_button (bool, optional): Whether to show the close button. Defaults to True.
-        """
-        name = name.lower()
-        if name == "stac":
-            self.add_stac_gui(position=position, opened=opened, **kwargs)
-        elif name == "basemap":
-            self.add_basemap_gui(position=position, **kwargs)
-        elif name == "inspector":
-            self.add_inspector_gui(position=position, opened=opened, **kwargs)
-        elif name == "layer_manager":
-            self.add_layer_manager(position=position, opened=opened, **kwargs)
-        elif name == "oam":
-            self.add_oam_gui(position=position, opened=opened, **kwargs)
+        widget = map_widgets.LayerEditor(self, **kwargs)
+        widget.on_close = lambda: self.remove("layer_editor")
+        control = ipyleaflet.WidgetControl(widget=widget, position=position)
+        super().add(control)
+
+    def _find_widget_of_type(
+        self, widget_type: Type, return_control: bool = False
+    ) -> Optional[Any]:
+        """Finds a widget in the controls with the passed in type."""
+        for widget in self.controls:
+            if isinstance(widget, ipyleaflet.WidgetControl):
+                if isinstance(widget.widget, widget_type):
+                    return widget if return_control else widget.widget
+            elif isinstance(widget, widget_type):
+                return widget
+        return None
+
+    def remove(self, widget: Any) -> None:
+        """Removes a widget to the map."""
+
+        basic_controls: Dict[str, ipyleaflet.Control] = {
+            "layer_editor": map_widgets.LayerEditor,
+        }
+        if widget_type := basic_controls.get(widget, None):
+            if control := self._find_widget_of_type(widget_type, return_control=True):
+                self.remove(control)
+                control.close()
+            return
+
+        super().remove(widget)
+        if isinstance(widget, ipywidgets.Widget):
+            widget.close()
 
 
 # The functions below are outside the Map class.
