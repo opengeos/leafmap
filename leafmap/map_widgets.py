@@ -434,7 +434,7 @@ class LayerEditor(ipywidgets.VBox):
         )
         self._embedded_widget = ipywidgets.Label(value="Vis params are uneditable")
         if layer_dict is not None:
-            if layer_dict["type"] in ["LOCAL", "COG"]:
+            if layer_dict["type"] in ["LOCAL", "COG", "STAC"]:
                 self._embedded_widget = RasterLayerEditor(
                     host_map=host_map, layer_dict=layer_dict
                 )
@@ -812,14 +812,19 @@ class RasterLayerEditor(ipywidgets.VBox):
         vis["opacity"] = self._opacity_slider.value
         vis["colormap"] = self._colormap_dropdown.value
 
-        if self._layer_dict["type"] == "COG":
-            vis["bidx"] = vis["indexes"]
+        if self._layer_dict["type"] in ["COG", "STAC"]:
+            if self._layer_dict["type"] == "COG":
+                vis["bidx"] = vis["indexes"]
+                if len(vis["bidx"]) == 1:
+                    vis["colormap_name"] = vis["colormap"]
+            elif self._layer_dict["type"] == "STAC":
+                vis["assets"] = self._layer_dict["assets"]
+                if len(vis["assets"]) == 1:
+                    vis["colormap_name"] = vis["colormap"]
             vis["rescale"] = f'{vis["vmin"]},{vis["vmax"]}'
             vis.pop("vmin", None)
             vis.pop("vmax", None)
             vis.pop("indexes", None)
-            if len(vis["bidx"]) == 1:
-                vis["colormap_name"] = vis["colormap"]
             vis.pop("colormap", None)
 
         if "colormap" in vis and vis["colormap"] is None:
@@ -882,6 +887,20 @@ class RasterLayerEditor(ipywidgets.VBox):
                 opacity=vis["opacity"],
                 name=self._layer_name,
                 zoom_to_layer=False,
+                layer_index=layer_index,
+            )
+        elif self._layer_dict["type"] == "STAC":
+            self._host_map.add_stac_layer(
+                self._layer_dict["url"],
+                titiler_endpoint=self._layer_dict["titiler_endpoint"],
+                collection=self._layer_dict["collection"],
+                item=self._layer_dict["item"],
+                assets=[self._layer_dict["band_names"][i - 1] for i in vis["indexes"]],
+                colormap_name=vis["colormap"],
+                rescale=f'{vis["vmin"]},{vis["vmax"]}',
+                opacity=vis["opacity"],
+                name=self._layer_name,
+                fit_bounds=False,
                 layer_index=layer_index,
             )
         else:

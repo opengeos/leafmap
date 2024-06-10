@@ -868,6 +868,37 @@ def stac_stats(
     return r
 
 
+def stac_min_max(
+    url: str = None,
+    collection: str = None,
+    item: str = None,
+    assets: Union[str, List] = None,
+    titiler_endpoint: Optional[str] = None,
+    **kwargs,
+) -> List:
+    """Get the min and max values of a STAC item.
+
+    Args:
+        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
+        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
+        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
+        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
+        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
+
+    Returns:
+        list: A dictionary of band statistics.
+    """
+
+    stats = stac_stats(url, collection, item, assets, titiler_endpoint, **kwargs)
+
+    values = stats.values()
+
+    min_values = [v["min"] for v in values]
+    max_values = [v["max"] for v in values]
+
+    return min(min_values), max(max_values)
+
+
 def stac_info(
     url: str = None,
     collection: str = None,

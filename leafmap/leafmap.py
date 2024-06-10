@@ -221,16 +221,26 @@ class Map(ipyleaflet.Map):
         if isinstance(object, str):
             if object in basemaps.keys():
                 object = get_basemap(object)
+            else:
+                if object == "nasa_earth_data":
+                    from .toolbar import nasa_data_gui
 
-            elif object == "nasa_earth_data":
-                from .toolbar import nasa_data_gui
+                    nasa_data_gui(self, **kwargs)
+                elif object == "inspector":
+                    from .toolbar import inspector_gui
 
-                nasa_data_gui(self, **kwargs)
-                return
-            elif object == "inspector":
-                from .toolbar import inspector_gui
+                    inspector_gui(self, **kwargs)
 
-                inspector_gui(self, **kwargs)
+                elif object == "stac":
+                    self.add_stac_gui(**kwargs)
+                elif object == "basemap":
+                    self.add_basemap_gui(**kwargs)
+                elif object == "inspector":
+                    self.add_inspector_gui(**kwargs)
+                elif object == "layer_manager":
+                    self.add_layer_manager(**kwargs)
+                elif object == "oam":
+                    self.add_oam_gui(**kwargs)
                 return
 
         super().add(object, index=index)
@@ -1083,6 +1093,7 @@ class Map(ipyleaflet.Map):
         opacity=1.0,
         shown=True,
         fit_bounds=True,
+        layer_index=None,
         **kwargs,
     ):
         """Adds a STAC TileLayer to the map.
@@ -1099,12 +1110,16 @@ class Map(ipyleaflet.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             fit_bounds (bool, optional): A flag indicating whether the map should be zoomed to the layer extent. Defaults to True.
+            layer_index (int, optional): The index at which to add the layer. Defaults to None.
         """
+        if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
+            kwargs.pop("colormap_name")
+
         tile_url = stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
         bounds = stac_bounds(url, collection, item, titiler_endpoint)
-        self.add_tile_layer(tile_url, name, attribution, opacity, shown)
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if fit_bounds:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
@@ -1118,13 +1133,36 @@ class Map(ipyleaflet.Map):
         if isinstance(assets, str) and "," in assets:
             assets = assets.split(",")
 
+        if "rescale" in kwargs:
+            rescale = kwargs["rescale"]
+            vmin, vmax = [float(v) for v in rescale.split(",")]
+        else:
+            vmin, vmax = stac_min_max(url, collection, item, assets, titiler_endpoint)
+
+        if "nodata" in kwargs:
+            nodata = kwargs["nodata"]
+        else:
+            nodata = None
+
+        band_names = stac_bands(url, collection, item, titiler_endpoint)
+        indexes = [band_names.index(band) + 1 for band in assets]
+
         params = {
             "url": url,
+            "titiler_endpoint": titiler_endpoint,
             "collection": collection,
             "item": item,
             "assets": assets,
+            "tile_layer": self.find_layer(name),
+            "indexes": indexes,
+            "vis_bands": assets,
+            "band_names": band_names,
             "bounds": bounds,
-            "titiler_endpoint": titiler_endpoint,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "opacity": opacity,
+            "layer_name": name,
             "type": "STAC",
         }
 
@@ -4542,29 +4580,6 @@ class Map(ipyleaflet.Map):
         from .toolbar import change_basemap
 
         change_basemap(self, position)
-
-    def add_gui(
-        self, name, position="topright", opened=True, show_close_button=True, **kwargs
-    ):
-        """Add a GUI to the map.
-
-        Args:
-            name (str): The name of the GUI. Options include "layer_manager", "inspector", "plot", and "timelapse".
-            position (str, optional): The position of the GUI. Defaults to "topright".
-            opened (bool, optional): Whether the GUI is opened. Defaults to True.
-            show_close_button (bool, optional): Whether to show the close button. Defaults to True.
-        """
-        name = name.lower()
-        if name == "stac":
-            self.add_stac_gui(position=position, opened=opened, **kwargs)
-        elif name == "basemap":
-            self.add_basemap_gui(position=position, **kwargs)
-        elif name == "inspector":
-            self.add_inspector_gui(position=position, opened=opened, **kwargs)
-        elif name == "layer_manager":
-            self.add_layer_manager(position=position, opened=opened, **kwargs)
-        elif name == "oam":
-            self.add_oam_gui(position=position, opened=opened, **kwargs)
 
     def _add_layer_editor(self, position: str, **kwargs) -> None:
         if self._layer_editor:
