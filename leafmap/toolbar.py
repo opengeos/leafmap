@@ -6227,13 +6227,22 @@ def layer_manager_gui(
                     readout=False,
                     layout=widgets.Layout(width="80px"),
                 )
-                layer_settings = widgets.ToggleButton(
+                layer_settings = widgets.Button(
                     icon="gear",
                     tooltip=layer.name,
                     layout=widgets.Layout(
-                        width="25px", height="25px", padding="0px 0px 0px 5px"
+                        width="25px", height="25px", padding="0px 0px 0px 0px"
                     ),
                 )
+
+                def layer_settings_click(b):
+                    if b.tooltip in m.cog_layer_dict:
+                        m._add_layer_editor(
+                            position="topright",
+                            layer_dict=m.cog_layer_dict[b.tooltip],
+                        )
+
+                layer_settings.on_click(layer_settings_click)
 
                 def layer_opacity_changed(change):
                     if change["new"]:
