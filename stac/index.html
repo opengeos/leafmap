@@ -1320,6 +1320,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.stac.stac_min_max" class="md-nav__link">
+    <span class="md-ellipsis">
+      stac_min_max()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.stac.stac_object_type" class="md-nav__link">
     <span class="md-ellipsis">
       stac_object_type()
@@ -3539,6 +3548,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/91_raster_viz_gui/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    91 raster viz gui
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3912,6 +3942,15 @@
   <a href="#leafmap.stac.stac_info_geojson" class="md-nav__link">
     <span class="md-ellipsis">
       stac_info_geojson()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.stac.stac_min_max" class="md-nav__link">
+    <span class="md-ellipsis">
+      stac_min_max()
     </span>
   </a>
   
@@ -8141,6 +8180,117 @@ instance can be provided here.</p></td>
         <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">r</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.stac.stac_min_max" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">stac_min_max</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.stac.stac_min_max" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the min and max values of a STAC item.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>url</code></td>
+        <td><code>str</code></td>
+        <td><p>HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>collection</code></td>
+        <td><code>str</code></td>
+        <td><p>The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>item</code></td>
+        <td><code>str</code></td>
+        <td><p>The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>assets</code></td>
+        <td><code>str | list</code></td>
+        <td><p>The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>titiler_endpoint</code></td>
+        <td><code>str</code></td>
+        <td><p>Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>list</code></td>
+      <td><p>A dictionary of band statistics.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/stac.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">stac_min_max</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">item</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">assets</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the min and max values of a STAC item.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json</span>
+<span class="sd">        collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.</span>
+<span class="sd">        item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.</span>
+<span class="sd">        assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., [&quot;SR_B7&quot;, &quot;SR_B5&quot;, &quot;SR_B4&quot;].</span>
+<span class="sd">        titiler_endpoint (str, optional): Titiler endpoint, e.g., &quot;https://titiler.xyz&quot;, &quot;planetary-computer&quot;, &quot;pc&quot;. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A dictionary of band statistics.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">stats</span> <span class="o">=</span> <span class="n">stac_stats</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">assets</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+
+    <span class="n">min_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;min&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+    <span class="n">max_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="n">min_values</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_values</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>

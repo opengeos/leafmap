@@ -882,6 +882,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.LayerEditor" class="md-nav__link">
+    <span class="md-ellipsis">
+      LayerEditor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LayerEditor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.LayerEditor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.map_widgets.Legend" class="md-nav__link">
     <span class="md-ellipsis">
       Legend
@@ -893,6 +917,30 @@
         
           <li class="md-nav__item">
   <a href="#leafmap.map_widgets.Legend.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.RasterLayerEditor" class="md-nav__link">
+    <span class="md-ellipsis">
+      RasterLayerEditor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RasterLayerEditor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.RasterLayerEditor.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__()
     </span>
@@ -3161,6 +3209,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/91_raster_viz_gui/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    91 raster viz gui
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3228,6 +3297,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.LayerEditor" class="md-nav__link">
+    <span class="md-ellipsis">
+      LayerEditor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="LayerEditor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.LayerEditor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.map_widgets.Legend" class="md-nav__link">
     <span class="md-ellipsis">
       Legend
@@ -3239,6 +3332,30 @@
         
           <li class="md-nav__item">
   <a href="#leafmap.map_widgets.Legend.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.RasterLayerEditor" class="md-nav__link">
+    <span class="md-ellipsis">
+      RasterLayerEditor
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RasterLayerEditor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.RasterLayerEditor.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__()
     </span>
@@ -3755,6 +3872,300 @@ Defaults to None.</p></td>
 
 
 
+<h2 id="leafmap.map_widgets.LayerEditor" class="doc doc-heading">
+        <code>
+LayerEditor            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
+        </code>
+
+
+
+<a href="#leafmap.map_widgets.LayerEditor" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Widget for displaying and editing layer visualization properties.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>leafmap/map_widgets.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">LayerEditor</span><span class="p">(</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Widget for displaying and editing layer visualization properties.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a layer editor widget.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            host_map (geemap.Map): The geemap.Map object.</span>
+<span class="sd">            layer_dict (dict): The layer object to edit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># self.on_close = None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span> <span class="o">=</span> <span class="n">host_map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span> <span class="o">=</span> <span class="n">layer_dict</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">host_map</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Must pass a valid map when creating a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> widget.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">ToggleButton</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Layer editor&quot;</span><span class="p">,</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;gear&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span>
+                <span class="n">width</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;0px 0 0 3px&quot;</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_toggle_click</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Close the vis params dialog&quot;</span><span class="p">,</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;times&quot;</span><span class="p">,</span>
+            <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_close_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_close_click</span><span class="p">)</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;95px&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_import_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Import&quot;</span><span class="p">,</span>
+            <span class="c1"># button_style=&quot;primary&quot;,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Import vis params to notebook&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply&quot;</span><span class="p">,</span> <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Apply vis params to the layer&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;check&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;0px&quot;</span><span class="p">),</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Loaded&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">loading_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;Loading ...&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;spinner spin lg&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;Loaded&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;check&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_import_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_import_click</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_apply_click</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;layer_name&quot;</span><span class="p">],</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">max_width</span><span class="o">=</span><span class="s2">&quot;200px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;1px 4px 0 4px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;Vis params are uneditable&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">layer_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;LOCAL&quot;</span><span class="p">,</span> <span class="s2">&quot;COG&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span> <span class="o">=</span> <span class="n">RasterLayerEditor</span><span class="p">(</span>
+                    <span class="n">host_map</span><span class="o">=</span><span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="o">=</span><span class="n">layer_dict</span>
+                <span class="p">)</span>
+
+                <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;tile_layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">loading_change</span><span class="p">,</span> <span class="s2">&quot;loading&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_toggle_click</span><span class="p">({</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">_on_toggle_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_close_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">]),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span><span class="p">,</span>
+                <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
+                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_import_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_close_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label</span><span class="p">]),</span>
+            <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_on_import_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span><span class="o">.</span><span class="n">on_import_click</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_on_apply_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">loading_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;Loading ...&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;spinner spin lg&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;Loaded&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;check&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;spinner spin lg&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">unobserve</span><span class="p">(</span><span class="n">loading_change</span><span class="p">,</span> <span class="s2">&quot;loading&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span><span class="o">.</span><span class="n">on_apply_click</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">cog_layer_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;layer_name&quot;</span><span class="p">]][</span>
+            <span class="s2">&quot;tile_layer&quot;</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">loading_change</span><span class="p">,</span> <span class="s2">&quot;loading&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_on_close_click</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="c1"># if self.on_close:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_editor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.map_widgets.LayerEditor.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+<a href="#leafmap.map_widgets.LayerEditor.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Initializes a layer editor widget.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>host_map</code></td>
+        <td><code>geemap.Map</code></td>
+        <td><p>The geemap.Map object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>layer_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>The layer object to edit.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/map_widgets.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes a layer editor widget.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        host_map (geemap.Map): The geemap.Map object.</span>
+<span class="sd">        layer_dict (dict): The layer object to edit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># self.on_close = None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span> <span class="o">=</span> <span class="n">host_map</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span> <span class="o">=</span> <span class="n">layer_dict</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">host_map</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Must pass a valid map when creating a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> widget.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">ToggleButton</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Layer editor&quot;</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;gear&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="n">width</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;0px 0 0 3px&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_toggle_click</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_close_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Close the vis params dialog&quot;</span><span class="p">,</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;times&quot;</span><span class="p">,</span>
+        <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_close_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_close_click</span><span class="p">)</span>
+
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;95px&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_import_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Import&quot;</span><span class="p">,</span>
+        <span class="c1"># button_style=&quot;primary&quot;,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Import vis params to notebook&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_apply_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply&quot;</span><span class="p">,</span> <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Apply vis params to the layer&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;check&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;28px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;0px&quot;</span><span class="p">),</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Loaded&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">loading_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;Loading ...&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;spinner spin lg&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;Loaded&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_layer_spinner</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="s2">&quot;check&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_import_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_import_click</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_apply_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_apply_click</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_label</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;layer_name&quot;</span><span class="p">],</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">max_width</span><span class="o">=</span><span class="s2">&quot;200px&quot;</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;1px 4px 0 4px&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="s2">&quot;Vis params are uneditable&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">layer_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;LOCAL&quot;</span><span class="p">,</span> <span class="s2">&quot;COG&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_embedded_widget</span> <span class="o">=</span> <span class="n">RasterLayerEditor</span><span class="p">(</span>
+                <span class="n">host_map</span><span class="o">=</span><span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="o">=</span><span class="n">layer_dict</span>
+            <span class="p">)</span>
+
+            <span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;tile_layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">loading_change</span><span class="p">,</span> <span class="s2">&quot;loading&quot;</span><span class="p">)</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_on_toggle_click</span><span class="p">({</span><span class="s2">&quot;new&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
 <h2 id="leafmap.map_widgets.Legend" class="doc doc-heading">
         <code>
 Legend            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
@@ -4223,6 +4634,774 @@ Legend            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
     </div>
 
   </div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-class">
+
+
+
+<h2 id="leafmap.map_widgets.RasterLayerEditor" class="doc doc-heading">
+        <code>
+RasterLayerEditor            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
+        </code>
+
+
+
+<a href="#leafmap.map_widgets.RasterLayerEditor" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Widget for displaying and editing layer visualization properties for raster layers.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>leafmap/map_widgets.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">RasterLayerEditor</span><span class="p">(</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Widget for displaying and editing layer visualization properties for raster layers.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes a raster layer editor widget.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            host_map (geemap.Map): The geemap.Map object.</span>
+<span class="sd">            layer_dict (dict): The layer object to edit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span> <span class="o">=</span> <span class="n">host_map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span> <span class="o">=</span> <span class="n">layer_dict</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;layer_name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_opacity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_tile_client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;tile_client&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;xds&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;xds&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">image_min_max</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_indexes</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sel_bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;vis_bands&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_palette</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_gamma</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_left_value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">*</span> <span class="mf">1.5</span>
+
+        <span class="n">band_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;band_names&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">band_names</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">RadioButtons</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1 band (Grayscale)&quot;</span><span class="p">],</span>
+            <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;max-content&quot;</span><span class="p">,</span> <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;0 15px 0 0&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">RadioButtons</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;3 bands (RGB)&quot;</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;max-content&quot;</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">band_dropdown_layout</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;98px&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">band_names</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">band_dropdown_layout</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">band_names</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">band_dropdown_layout</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">band_names</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">band_dropdown_layout</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 6px 0&quot;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+            <span class="n">concise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;116px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_color_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;plus&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Add a hex color string to the palette&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;32px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_del_color_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;minus&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Remove a hex color string from the palette&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;32px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;eraser&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Remove all color strings from the palette&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;34px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_color_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_add_color_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_del_color_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_del_color_clicked</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_clicked</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Any&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">)],</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Classes:&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;115px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes_changed</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_colormaps</span><span class="p">(),</span>
+            <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Colormap:&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_colormap_changed</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_palette</span><span class="p">),</span>
+            <span class="n">placeholder</span><span class="o">=</span><span class="s2">&quot;List of hex color code (RRGGBB)&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Palette:&quot;</span><span class="p">,</span>
+            <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Enter a list of hex color code (RRGGBB)&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">FloatRangeSlider</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span><span class="p">],</span>
+            <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_left_value</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_right_value</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_right_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_value</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Range:&quot;</span><span class="p">,</span>
+            <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">readout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">readout_format</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;45px&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opacity_slider</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_opacity</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Opacity:&quot;</span><span class="p">,</span>
+            <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">readout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">readout_format</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;310px&quot;</span><span class="p">),</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;50px&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar_output</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Output</span><span class="p">(</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;60px&quot;</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_count</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;300px&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="p">]</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tool_layout</span><span class="p">(</span><span class="n">grayscale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_hex_colors</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">color</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_render_colorbar</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">sel_bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_bands</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sel_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sel_bands</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">sel_bands</span> <span class="o">=</span> <span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel_bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel_bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel_bands</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tool_layout</span><span class="p">(</span><span class="n">grayscale</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio1_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio2_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span>
+                <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;5px 0px 5px 8px&quot;</span><span class="p">,</span>  <span class="c1"># top, right, bottom, left</span>
+                <span class="c1"># width=&quot;330px&quot;,</span>
+                <span class="n">max_height</span><span class="o">=</span><span class="s2">&quot;305px&quot;</span><span class="p">,</span>
+                <span class="n">overflow</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+                <span class="n">display</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_tool_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grayscale</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="p">]),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_opacity_slider</span><span class="p">,</span>
+        <span class="p">]</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="p">,</span>
+                <span class="c1"># self._palette_label,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar_output</span><span class="p">,</span>
+                <span class="c1"># ipywidgets.HBox(</span>
+                <span class="c1">#     [</span>
+                <span class="c1">#         self._color_picker,</span>
+                <span class="c1">#         self._add_color_button,</span>
+                <span class="c1">#         self._del_color_button,</span>
+                <span class="c1">#         self._reset_color_button,</span>
+                <span class="c1">#     ]</span>
+                <span class="c1"># ),</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">grayscale</span>
+            <span class="k">else</span> <span class="p">[]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_colormaps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+
+        <span class="n">colormap_options</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">colormaps</span><span class="p">()</span>
+        <span class="n">colormap_options</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">item</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">colormap_options</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">&quot;cet&quot;</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="p">]</span>
+        <span class="n">colormap_options</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">colormap_options</span>
+
+    <span class="k">def</span> <span class="nf">_render_colorbar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_hex_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">))</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">LinearSegmentedColormap</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
+            <span class="s2">&quot;custom&quot;</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">256</span>
+        <span class="p">)</span>
+        <span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">colorbar</span><span class="o">.</span><span class="n">ColorbarBase</span><span class="p">(</span>
+            <span class="n">ax</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar_output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar_output</span><span class="p">:</span>
+            <span class="n">pyplot</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_classes_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]:</span>
+            <span class="k">return</span>
+
+        <span class="n">selected</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;owner&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_class</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">selected</span> <span class="o">!=</span> <span class="s2">&quot;Any&quot;</span><span class="p">:</span>
+                <span class="n">n_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">n_class</span><span class="p">)</span>
+            <span class="n">cmap_colors</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">rgb2hex</span><span class="p">(</span><span class="n">colors</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_render_colorbar</span><span class="p">(</span><span class="n">cmap_colors</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)))</span>
+                <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_add_color_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_del_color_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">items</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_reset_color_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_colormap_changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+        <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span>  <span class="c1"># pylint: disable=import-outside-toplevel</span>
+
+        <span class="k">if</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;new&quot;</span><span class="p">]:</span>
+            <span class="n">n_class</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">!=</span> <span class="s2">&quot;Any&quot;</span><span class="p">:</span>
+                <span class="n">n_class</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">pyplot</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">n_class</span><span class="p">)</span>
+            <span class="n">cmap_colors</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">rgb2hex</span><span class="p">(</span><span class="n">colors</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="mi">1</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">colors</span><span class="o">.</span><span class="n">N</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_render_colorbar</span><span class="p">(</span><span class="n">cmap_colors</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;Class </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)))</span>
+                <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">on_import_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">vis</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opacity_slider</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;COG&quot;</span><span class="p">,</span> <span class="s2">&quot;STAC&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;COG&quot;</span><span class="p">:</span>
+                <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;bidx&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;bidx&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;STAC&quot;</span><span class="p">:</span>
+                <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;assets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;assets&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;assets&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span>
+            <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;rescale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">vis</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;vmin&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">vis</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;vmax&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">vis</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;indexes&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">vis</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colormap&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;colormap&quot;</span> <span class="ow">in</span> <span class="n">vis</span> <span class="ow">and</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">vis</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colormap&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">common</span><span class="o">.</span><span class="n">create_code_cell</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vis_params = </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">vis</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vis_params = </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">vis</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_apply_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">rio_tiler.colormap</span> <span class="kn">import</span> <span class="n">cmap</span>
+
+        <span class="n">vis</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opacity_slider</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cmap</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">])</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+
+        <span class="n">old_layer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">find_layer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">)</span>
+        <span class="n">layer_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">find_layer_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">old_layer</span><span class="p">)</span>
+
+        <span class="c1"># Add support for hyperspectral data via HyperCoast</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_hyper</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span><span class="p">,</span>
+                <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">],</span>
+                <span class="n">wvl_indexes</span><span class="o">=</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]],</span>
+                <span class="n">colormap</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">],</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">],</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+                <span class="n">nodata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span><span class="p">,</span>
+                <span class="n">layer_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">,</span>
+                <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;COG&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_cog_layer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span>
+                <span class="n">bidx</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">],</span>
+                <span class="n">colormap_name</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span>
+                <span class="n">rescale</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">,</span>
+                <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;STAC&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_stac_layer</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span>
+                <span class="n">titiler_endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;titiler_endpoint&quot;</span><span class="p">],</span>
+                <span class="n">collection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;collection&quot;</span><span class="p">],</span>
+                <span class="n">item</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;item&quot;</span><span class="p">],</span>
+                <span class="n">assets</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;band_names&quot;</span><span class="p">][</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]],</span>
+                <span class="n">colormap_name</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span>
+                <span class="n">rescale</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">,</span><span class="si">{</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">,</span>
+                <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_raster</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span>
+                <span class="n">indexes</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">],</span>
+                <span class="n">colormap</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">],</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">],</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+                <span class="n">nodata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span><span class="p">,</span>
+                <span class="n">layer_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">,</span>
+                <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_remove_control</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">widget</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">widget</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">controls</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">widget</span><span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_radio1_observer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">unobserve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio2_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio2_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;300px&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;gray&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_palette</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_color_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_del_color_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tool_layout</span><span class="p">(</span><span class="n">grayscale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">color</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_render_colorbar</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_radio2_observer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="n">dropdown_width</span> <span class="o">=</span> <span class="s2">&quot;98px&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">unobserve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio1_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio1_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">dropdown_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_color_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_del_color_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_button</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tool_layout</span><span class="p">(</span><span class="n">grayscale</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar_output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+</code></pre></div>
+        </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.map_widgets.RasterLayerEditor.__init__" class="doc doc-heading">
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="p">)</span></code>
+
+  <span class="doc doc-properties">
+      <small class="doc doc-property doc-property-special"><code>special</code></small>
+  </span>
+
+<a href="#leafmap.map_widgets.RasterLayerEditor.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Initializes a raster layer editor widget.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>host_map</code></td>
+        <td><code>geemap.Map</code></td>
+        <td><p>The geemap.Map object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>layer_dict</code></td>
+        <td><code>dict</code></td>
+        <td><p>The layer object to edit.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/map_widgets.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host_map</span><span class="p">,</span> <span class="n">layer_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes a raster layer editor widget.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        host_map (geemap.Map): The geemap.Map object.</span>
+<span class="sd">        layer_dict (dict): The layer object to edit.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span> <span class="o">=</span> <span class="n">host_map</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span> <span class="o">=</span> <span class="n">layer_dict</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;layer_name&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_opacity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_band_indexes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tile_client</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;tile_client&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;xds&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;xds&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">image_min_max</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_indexes</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_sel_bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;vis_bands&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_palette</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_gamma</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_left_value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_right_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span> <span class="o">*</span> <span class="mf">1.5</span>
+
+    <span class="n">band_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;band_names&quot;</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_band_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">band_names</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">RadioButtons</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;1 band (Grayscale)&quot;</span><span class="p">],</span>
+        <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;max-content&quot;</span><span class="p">,</span> <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;0 15px 0 0&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">RadioButtons</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;3 bands (RGB)&quot;</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;max-content&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">band_dropdown_layout</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;98px&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">band_names</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">band_dropdown_layout</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">band_names</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">band_dropdown_layout</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">band_names</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">band_dropdown_layout</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">margin</span><span class="o">=</span><span class="s2">&quot;0 0 6px 0&quot;</span><span class="p">))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_color_picker</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+        <span class="n">concise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="s2">&quot;#000000&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;116px&quot;</span><span class="p">),</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_add_color_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;plus&quot;</span><span class="p">,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Add a hex color string to the palette&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;32px&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_del_color_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;minus&quot;</span><span class="p">,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Remove a hex color string from the palette&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;32px&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_button</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">icon</span><span class="o">=</span><span class="s2">&quot;eraser&quot;</span><span class="p">,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Remove all color strings from the palette&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;34px&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_add_color_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_add_color_clicked</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_del_color_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_del_color_clicked</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reset_color_clicked</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Any&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">13</span><span class="p">)],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Classes:&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;115px&quot;</span><span class="p">),</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_classes_dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_classes_changed</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_colormaps</span><span class="p">(),</span>
+        <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Colormap:&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">),</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_colormap_dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_colormap_changed</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_palette</span><span class="p">),</span>
+        <span class="n">placeholder</span><span class="o">=</span><span class="s2">&quot;List of hex color code (RRGGBB)&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Palette:&quot;</span><span class="p">,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Enter a list of hex color code (RRGGBB)&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">),</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_value_range_slider</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">FloatRangeSlider</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_min_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_value</span><span class="p">],</span>
+        <span class="nb">min</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_left_value</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_right_value</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_right_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_value</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Range:&quot;</span><span class="p">,</span>
+        <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">readout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">readout_format</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">),</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;45px&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_opacity_slider</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_opacity</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Opacity:&quot;</span><span class="p">,</span>
+        <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">readout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">readout_format</span><span class="o">=</span><span class="s2">&quot;.2f&quot;</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;310px&quot;</span><span class="p">),</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;50px&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_colorbar_output</span> <span class="o">=</span> <span class="n">ipywidgets</span><span class="o">.</span><span class="n">Output</span><span class="p">(</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="s2">&quot;60px&quot;</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=</span><span class="s2">&quot;300px&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_count</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;300px&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="p">]</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tool_layout</span><span class="p">(</span><span class="n">grayscale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">to_hex_colors</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">color</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_palette_label</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_render_colorbar</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sel_bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_bands</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sel_bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sel_bands</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">sel_bands</span> <span class="o">=</span> <span class="n">band_names</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel_bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel_bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">sel_bands</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands_hbox</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tool_layout</span><span class="p">(</span><span class="n">grayscale</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_greyscale_radio_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio1_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_rgb_radio_button</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_radio2_observer</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">ipywidgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span>
+            <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;5px 0px 5px 8px&quot;</span><span class="p">,</span>  <span class="c1"># top, right, bottom, left</span>
+            <span class="c1"># width=&quot;330px&quot;,</span>
+            <span class="n">max_height</span><span class="o">=</span><span class="s2">&quot;305px&quot;</span><span class="p">,</span>
+            <span class="n">overflow</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+            <span class="n">display</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
 
 
 

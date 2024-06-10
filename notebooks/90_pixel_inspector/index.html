@@ -18,6 +18,8 @@
         <link rel="prev" href="../89_image_array_viz/">
       
       
+        <link rel="next" href="../91_raster_viz_gui/">
+      
       
       <link rel="icon" href="../../assets/favicon.png">
       <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.26">
@@ -3191,6 +3193,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../91_raster_viz_gui/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    91 raster viz gui
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -3931,7 +3954,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_09b06bd85d0379153ff4564473b72435 {
+                #map_e9d28b8e11278721876ecb0fddcb4a04 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -3953,14 +3976,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_09b06bd85d0379153ff4564473b72435&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_e9d28b8e11278721876ecb0fddcb4a04&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_09b06bd85d0379153ff4564473b72435 = L.map(
-                &quot;map_09b06bd85d0379153ff4564473b72435&quot;,
+            var map_e9d28b8e11278721876ecb0fddcb4a04 = L.map(
+                &quot;map_e9d28b8e11278721876ecb0fddcb4a04&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -3971,24 +3994,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_09b06bd85d0379153ff4564473b72435);
+            L.control.scale().addTo(map_e9d28b8e11278721876ecb0fddcb4a04);
 
             
 
         
     
-            var tile_layer_48cd3fa1f6b71fc885bd5dd50d99ae37 = L.tileLayer(
+            var tile_layer_3e76a0f4bcfebca316a4fa6a3e6e9533 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_48cd3fa1f6b71fc885bd5dd50d99ae37.addTo(map_09b06bd85d0379153ff4564473b72435);
+            tile_layer_3e76a0f4bcfebca316a4fa6a3e6e9533.addTo(map_e9d28b8e11278721876ecb0fddcb4a04);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_09b06bd85d0379153ff4564473b72435);
+            ).addTo(map_e9d28b8e11278721876ecb0fddcb4a04);
         
     
             var options = {
@@ -3997,14 +4020,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_f2d1a12619b4062194611a9afd72ba62 = new L.featureGroup().addTo(
-                map_09b06bd85d0379153ff4564473b72435
+            var drawnItems_draw_control_46cc9cb26ceffeb4a1a703cd167bbd46 = new L.featureGroup().addTo(
+                map_e9d28b8e11278721876ecb0fddcb4a04
             );
-            options.edit.featureGroup = drawnItems_draw_control_f2d1a12619b4062194611a9afd72ba62;
-            var draw_control_f2d1a12619b4062194611a9afd72ba62 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_46cc9cb26ceffeb4a1a703cd167bbd46;
+            var draw_control_46cc9cb26ceffeb4a1a703cd167bbd46 = new L.Control.Draw(
                 options
-            ).addTo( map_09b06bd85d0379153ff4564473b72435 );
-            map_09b06bd85d0379153ff4564473b72435.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_e9d28b8e11278721876ecb0fddcb4a04 );
+            map_e9d28b8e11278721876ecb0fddcb4a04.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -4012,17 +4035,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_f2d1a12619b4062194611a9afd72ba62.addLayer(layer);
+                drawnItems_draw_control_46cc9cb26ceffeb4a1a703cd167bbd46.addLayer(layer);
              });
-            map_09b06bd85d0379153ff4564473b72435.on('draw:created', function(e) {
-                drawnItems_draw_control_f2d1a12619b4062194611a9afd72ba62.addLayer(e.layer);
+            map_e9d28b8e11278721876ecb0fddcb4a04.on('draw:created', function(e) {
+                drawnItems_draw_control_46cc9cb26ceffeb4a1a703cd167bbd46.addLayer(e.layer);
             });
             
         
     
-            var measure_control_c72c460b486f1e67bbc8295775025862 = new L.Control.Measure(
+            var measure_control_dc375e69f0a78f02d6118b779ea7b877 = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_09b06bd85d0379153ff4564473b72435.addControl(measure_control_c72c460b486f1e67bbc8295775025862);
+            map_e9d28b8e11278721876ecb0fddcb4a04.addControl(measure_control_dc375e69f0a78f02d6118b779ea7b877);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -4042,59 +4065,59 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_6fc48996b50c77b3114a7d98958b877b = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_9ce7f0775517df09446335e7ce7a8f45 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_6fc48996b50c77b3114a7d98958b877b = geocoderOpts_geocoder_6fc48996b50c77b3114a7d98958b877b[&quot;provider&quot;];
+            var geocoderName_geocoder_9ce7f0775517df09446335e7ce7a8f45 = geocoderOpts_geocoder_9ce7f0775517df09446335e7ce7a8f45[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_6fc48996b50c77b3114a7d98958b877b = L.Control.Geocoder[ geocoderName_geocoder_6fc48996b50c77b3114a7d98958b877b ](
-                geocoderOpts_geocoder_6fc48996b50c77b3114a7d98958b877b['providerOptions']
+            var customGeocoder_geocoder_9ce7f0775517df09446335e7ce7a8f45 = L.Control.Geocoder[ geocoderName_geocoder_9ce7f0775517df09446335e7ce7a8f45 ](
+                geocoderOpts_geocoder_9ce7f0775517df09446335e7ce7a8f45['providerOptions']
             );
-            geocoderOpts_geocoder_6fc48996b50c77b3114a7d98958b877b[&quot;geocoder&quot;] = customGeocoder_geocoder_6fc48996b50c77b3114a7d98958b877b;
+            geocoderOpts_geocoder_9ce7f0775517df09446335e7ce7a8f45[&quot;geocoder&quot;] = customGeocoder_geocoder_9ce7f0775517df09446335e7ce7a8f45;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_6fc48996b50c77b3114a7d98958b877b
+                geocoderOpts_geocoder_9ce7f0775517df09446335e7ce7a8f45
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_6fc48996b50c77b3114a7d98958b877b['zoom'] || map_09b06bd85d0379153ff4564473b72435.getZoom();
-                map_09b06bd85d0379153ff4564473b72435.setView(e.geocode.center, zoom);
-            }).addTo(map_09b06bd85d0379153ff4564473b72435);
+                var zoom = geocoderOpts_geocoder_9ce7f0775517df09446335e7ce7a8f45['zoom'] || map_e9d28b8e11278721876ecb0fddcb4a04.getZoom();
+                map_e9d28b8e11278721876ecb0fddcb4a04.setView(e.geocode.center, zoom);
+            }).addTo(map_e9d28b8e11278721876ecb0fddcb4a04);
 
         
     
-            map_09b06bd85d0379153ff4564473b72435.fitBounds(
+            map_e9d28b8e11278721876ecb0fddcb4a04.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_8a6e0b54ae83b5ba1bf534e28d93002b = L.tileLayer(
+            var tile_layer_1eda5a81bb3b77d4e3ecbc3575d895c6 = L.tileLayer(
                 &quot;https://titiler.xyz/cog/tiles/WebMercatorQuad/{z}/{x}/{y}@1x?url=https%3A%2F%2Fgithub.com%2Fopengeos%2Fdata%2Freleases%2Fdownload%2Fraster%2FLibya-2023-07-01.tif\u0026bidx=1\u0026bidx=2\u0026bidx=3\u0026rescale=41.0%2C235.0\u0026rescale=45.0%2C216.0\u0026rescale=40.0%2C197.0&quot;,
                 {&quot;attribution&quot;: &quot;.&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_8a6e0b54ae83b5ba1bf534e28d93002b.addTo(map_09b06bd85d0379153ff4564473b72435);
+            tile_layer_1eda5a81bb3b77d4e3ecbc3575d895c6.addTo(map_e9d28b8e11278721876ecb0fddcb4a04);
         
     
-            map_09b06bd85d0379153ff4564473b72435.fitBounds(
+            map_e9d28b8e11278721876ecb0fddcb4a04.fitBounds(
                 [[32.75052266794987, 22.599490732206565], [32.79916288270382, 22.65706605051743]],
                 {}
             );
         
     
-            var layer_control_f69f3a288f1af7007ddf400cdd56296f_layers = {
+            var layer_control_300e988641b5f890b2b8f630a0eb9d59_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_48cd3fa1f6b71fc885bd5dd50d99ae37,
+                    &quot;openstreetmap&quot; : tile_layer_3e76a0f4bcfebca316a4fa6a3e6e9533,
                 },
                 overlays :  {
-                    &quot;Libya&quot; : tile_layer_8a6e0b54ae83b5ba1bf534e28d93002b,
+                    &quot;Libya&quot; : tile_layer_1eda5a81bb3b77d4e3ecbc3575d895c6,
                 },
             };
-            let layer_control_f69f3a288f1af7007ddf400cdd56296f = L.control.layers(
-                layer_control_f69f3a288f1af7007ddf400cdd56296f_layers.base_layers,
-                layer_control_f69f3a288f1af7007ddf400cdd56296f_layers.overlays,
+            let layer_control_300e988641b5f890b2b8f630a0eb9d59 = L.control.layers(
+                layer_control_300e988641b5f890b2b8f630a0eb9d59_layers.base_layers,
+                layer_control_300e988641b5f890b2b8f630a0eb9d59_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_09b06bd85d0379153ff4564473b72435);
+            ).addTo(map_e9d28b8e11278721876ecb0fddcb4a04);
 
         
 &lt;/script&gt;
@@ -4183,7 +4206,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_202197ad6c1078546c314081db26f4b2 {
+                #map_067293582bd9877edede613933b20e88 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -4205,14 +4228,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_202197ad6c1078546c314081db26f4b2&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_067293582bd9877edede613933b20e88&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_202197ad6c1078546c314081db26f4b2 = L.map(
-                &quot;map_202197ad6c1078546c314081db26f4b2&quot;,
+            var map_067293582bd9877edede613933b20e88 = L.map(
+                &quot;map_067293582bd9877edede613933b20e88&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -4223,24 +4246,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_202197ad6c1078546c314081db26f4b2);
+            L.control.scale().addTo(map_067293582bd9877edede613933b20e88);
 
             
 
         
     
-            var tile_layer_f8464c151d7b00678580cb79501f6c4e = L.tileLayer(
+            var tile_layer_910e110388d334c45ea04a01b1da7345 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_f8464c151d7b00678580cb79501f6c4e.addTo(map_202197ad6c1078546c314081db26f4b2);
+            tile_layer_910e110388d334c45ea04a01b1da7345.addTo(map_067293582bd9877edede613933b20e88);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_202197ad6c1078546c314081db26f4b2);
+            ).addTo(map_067293582bd9877edede613933b20e88);
         
     
             var options = {
@@ -4249,14 +4272,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_dd6203a2eefc9ee8ffaa5b0fb1550dfa = new L.featureGroup().addTo(
-                map_202197ad6c1078546c314081db26f4b2
+            var drawnItems_draw_control_c5e10e429edcb08b77339d58ee7f0257 = new L.featureGroup().addTo(
+                map_067293582bd9877edede613933b20e88
             );
-            options.edit.featureGroup = drawnItems_draw_control_dd6203a2eefc9ee8ffaa5b0fb1550dfa;
-            var draw_control_dd6203a2eefc9ee8ffaa5b0fb1550dfa = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_c5e10e429edcb08b77339d58ee7f0257;
+            var draw_control_c5e10e429edcb08b77339d58ee7f0257 = new L.Control.Draw(
                 options
-            ).addTo( map_202197ad6c1078546c314081db26f4b2 );
-            map_202197ad6c1078546c314081db26f4b2.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_067293582bd9877edede613933b20e88 );
+            map_067293582bd9877edede613933b20e88.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -4264,17 +4287,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_dd6203a2eefc9ee8ffaa5b0fb1550dfa.addLayer(layer);
+                drawnItems_draw_control_c5e10e429edcb08b77339d58ee7f0257.addLayer(layer);
              });
-            map_202197ad6c1078546c314081db26f4b2.on('draw:created', function(e) {
-                drawnItems_draw_control_dd6203a2eefc9ee8ffaa5b0fb1550dfa.addLayer(e.layer);
+            map_067293582bd9877edede613933b20e88.on('draw:created', function(e) {
+                drawnItems_draw_control_c5e10e429edcb08b77339d58ee7f0257.addLayer(e.layer);
             });
             
         
     
-            var measure_control_7be4de1e94db1824878e5399eee41f8c = new L.Control.Measure(
+            var measure_control_85bf0e7a7b1acd8ad3b31f826fcc4132 = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_202197ad6c1078546c314081db26f4b2.addControl(measure_control_7be4de1e94db1824878e5399eee41f8c);
+            map_067293582bd9877edede613933b20e88.addControl(measure_control_85bf0e7a7b1acd8ad3b31f826fcc4132);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -4294,59 +4317,59 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_653511baa337efec3861a73b8a3c60db = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_b86839682a97e7cb4bf61cede8554821 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_653511baa337efec3861a73b8a3c60db = geocoderOpts_geocoder_653511baa337efec3861a73b8a3c60db[&quot;provider&quot;];
+            var geocoderName_geocoder_b86839682a97e7cb4bf61cede8554821 = geocoderOpts_geocoder_b86839682a97e7cb4bf61cede8554821[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_653511baa337efec3861a73b8a3c60db = L.Control.Geocoder[ geocoderName_geocoder_653511baa337efec3861a73b8a3c60db ](
-                geocoderOpts_geocoder_653511baa337efec3861a73b8a3c60db['providerOptions']
+            var customGeocoder_geocoder_b86839682a97e7cb4bf61cede8554821 = L.Control.Geocoder[ geocoderName_geocoder_b86839682a97e7cb4bf61cede8554821 ](
+                geocoderOpts_geocoder_b86839682a97e7cb4bf61cede8554821['providerOptions']
             );
-            geocoderOpts_geocoder_653511baa337efec3861a73b8a3c60db[&quot;geocoder&quot;] = customGeocoder_geocoder_653511baa337efec3861a73b8a3c60db;
+            geocoderOpts_geocoder_b86839682a97e7cb4bf61cede8554821[&quot;geocoder&quot;] = customGeocoder_geocoder_b86839682a97e7cb4bf61cede8554821;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_653511baa337efec3861a73b8a3c60db
+                geocoderOpts_geocoder_b86839682a97e7cb4bf61cede8554821
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_653511baa337efec3861a73b8a3c60db['zoom'] || map_202197ad6c1078546c314081db26f4b2.getZoom();
-                map_202197ad6c1078546c314081db26f4b2.setView(e.geocode.center, zoom);
-            }).addTo(map_202197ad6c1078546c314081db26f4b2);
+                var zoom = geocoderOpts_geocoder_b86839682a97e7cb4bf61cede8554821['zoom'] || map_067293582bd9877edede613933b20e88.getZoom();
+                map_067293582bd9877edede613933b20e88.setView(e.geocode.center, zoom);
+            }).addTo(map_067293582bd9877edede613933b20e88);
 
         
     
-            map_202197ad6c1078546c314081db26f4b2.fitBounds(
+            map_067293582bd9877edede613933b20e88.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_38f762133f4fbac9768233f8c8f83878 = L.tileLayer(
+            var tile_layer_2611a94d5d16820ed7ff6dc28b89d56b = L.tileLayer(
                 &quot;https://titiler.xyz/stac/tiles/WebMercatorQuad/{z}/{x}/{y}@1x?url=https%3A%2F%2Fcanada-spot-ortho.s3.amazonaws.com%2Fcanada_spot_orthoimages%2Fcanada_spot5_orthoimages%2FS5_2007%2FS5_11055_6057_20070622%2FS5_11055_6057_20070622.json\u0026assets=B3\u0026assets=B2\u0026assets=B1\u0026rescale=23.0%2C168.0&quot;,
                 {&quot;attribution&quot;: &quot;.&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_38f762133f4fbac9768233f8c8f83878.addTo(map_202197ad6c1078546c314081db26f4b2);
+            tile_layer_2611a94d5d16820ed7ff6dc28b89d56b.addTo(map_067293582bd9877edede613933b20e88);
         
     
-            map_202197ad6c1078546c314081db26f4b2.fitBounds(
+            map_067293582bd9877edede613933b20e88.fitBounds(
                 [[60.59892389999882, -111.6453245], [61.30928879999903, -110.1583693]],
                 {}
             );
         
     
-            var layer_control_85ff34cbee67a7d9c6af71cc38bc229e_layers = {
+            var layer_control_5463d9ff86cf8af4137ceb4867bf69ca_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_f8464c151d7b00678580cb79501f6c4e,
+                    &quot;openstreetmap&quot; : tile_layer_910e110388d334c45ea04a01b1da7345,
                 },
                 overlays :  {
-                    &quot;SPOT Image&quot; : tile_layer_38f762133f4fbac9768233f8c8f83878,
+                    &quot;SPOT Image&quot; : tile_layer_2611a94d5d16820ed7ff6dc28b89d56b,
                 },
             };
-            let layer_control_85ff34cbee67a7d9c6af71cc38bc229e = L.control.layers(
-                layer_control_85ff34cbee67a7d9c6af71cc38bc229e_layers.base_layers,
-                layer_control_85ff34cbee67a7d9c6af71cc38bc229e_layers.overlays,
+            let layer_control_5463d9ff86cf8af4137ceb4867bf69ca = L.control.layers(
+                layer_control_5463d9ff86cf8af4137ceb4867bf69ca_layers.base_layers,
+                layer_control_5463d9ff86cf8af4137ceb4867bf69ca_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_202197ad6c1078546c314081db26f4b2);
+            ).addTo(map_067293582bd9877edede613933b20e88);
 
         
 &lt;/script&gt;
@@ -4447,7 +4470,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_65c9d6901ddcc655348477617ab36e47 {
+                #map_37654217481b4dfc64fc37427447291f {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -4469,14 +4492,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_65c9d6901ddcc655348477617ab36e47&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_37654217481b4dfc64fc37427447291f&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_65c9d6901ddcc655348477617ab36e47 = L.map(
-                &quot;map_65c9d6901ddcc655348477617ab36e47&quot;,
+            var map_37654217481b4dfc64fc37427447291f = L.map(
+                &quot;map_37654217481b4dfc64fc37427447291f&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -4487,24 +4510,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_65c9d6901ddcc655348477617ab36e47);
+            L.control.scale().addTo(map_37654217481b4dfc64fc37427447291f);
 
             
 
         
     
-            var tile_layer_e1419c3d996ba128e5fbb0dc342cd416 = L.tileLayer(
+            var tile_layer_53ffce69a8a7fbeb9633df9879449771 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_e1419c3d996ba128e5fbb0dc342cd416.addTo(map_65c9d6901ddcc655348477617ab36e47);
+            tile_layer_53ffce69a8a7fbeb9633df9879449771.addTo(map_37654217481b4dfc64fc37427447291f);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_65c9d6901ddcc655348477617ab36e47);
+            ).addTo(map_37654217481b4dfc64fc37427447291f);
         
     
             var options = {
@@ -4513,14 +4536,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_6c6e8206bd4f640260af7c3f9ac7c692 = new L.featureGroup().addTo(
-                map_65c9d6901ddcc655348477617ab36e47
+            var drawnItems_draw_control_a0095986b4b29b38d99a60c59a36be68 = new L.featureGroup().addTo(
+                map_37654217481b4dfc64fc37427447291f
             );
-            options.edit.featureGroup = drawnItems_draw_control_6c6e8206bd4f640260af7c3f9ac7c692;
-            var draw_control_6c6e8206bd4f640260af7c3f9ac7c692 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_a0095986b4b29b38d99a60c59a36be68;
+            var draw_control_a0095986b4b29b38d99a60c59a36be68 = new L.Control.Draw(
                 options
-            ).addTo( map_65c9d6901ddcc655348477617ab36e47 );
-            map_65c9d6901ddcc655348477617ab36e47.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_37654217481b4dfc64fc37427447291f );
+            map_37654217481b4dfc64fc37427447291f.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -4528,17 +4551,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_6c6e8206bd4f640260af7c3f9ac7c692.addLayer(layer);
+                drawnItems_draw_control_a0095986b4b29b38d99a60c59a36be68.addLayer(layer);
              });
-            map_65c9d6901ddcc655348477617ab36e47.on('draw:created', function(e) {
-                drawnItems_draw_control_6c6e8206bd4f640260af7c3f9ac7c692.addLayer(e.layer);
+            map_37654217481b4dfc64fc37427447291f.on('draw:created', function(e) {
+                drawnItems_draw_control_a0095986b4b29b38d99a60c59a36be68.addLayer(e.layer);
             });
             
         
     
-            var measure_control_accc9c9e73c5c8d3eb44cdd5c6564490 = new L.Control.Measure(
+            var measure_control_55d075f6f780f4d2cd01a8e8442888f2 = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_65c9d6901ddcc655348477617ab36e47.addControl(measure_control_accc9c9e73c5c8d3eb44cdd5c6564490);
+            map_37654217481b4dfc64fc37427447291f.addControl(measure_control_55d075f6f780f4d2cd01a8e8442888f2);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -4558,59 +4581,59 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_926d983f4d4ce22004da9c8fac44c8a6 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_21ddc0bbb86cbff755d31481b72290e8 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_926d983f4d4ce22004da9c8fac44c8a6 = geocoderOpts_geocoder_926d983f4d4ce22004da9c8fac44c8a6[&quot;provider&quot;];
+            var geocoderName_geocoder_21ddc0bbb86cbff755d31481b72290e8 = geocoderOpts_geocoder_21ddc0bbb86cbff755d31481b72290e8[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_926d983f4d4ce22004da9c8fac44c8a6 = L.Control.Geocoder[ geocoderName_geocoder_926d983f4d4ce22004da9c8fac44c8a6 ](
-                geocoderOpts_geocoder_926d983f4d4ce22004da9c8fac44c8a6['providerOptions']
+            var customGeocoder_geocoder_21ddc0bbb86cbff755d31481b72290e8 = L.Control.Geocoder[ geocoderName_geocoder_21ddc0bbb86cbff755d31481b72290e8 ](
+                geocoderOpts_geocoder_21ddc0bbb86cbff755d31481b72290e8['providerOptions']
             );
-            geocoderOpts_geocoder_926d983f4d4ce22004da9c8fac44c8a6[&quot;geocoder&quot;] = customGeocoder_geocoder_926d983f4d4ce22004da9c8fac44c8a6;
+            geocoderOpts_geocoder_21ddc0bbb86cbff755d31481b72290e8[&quot;geocoder&quot;] = customGeocoder_geocoder_21ddc0bbb86cbff755d31481b72290e8;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_926d983f4d4ce22004da9c8fac44c8a6
+                geocoderOpts_geocoder_21ddc0bbb86cbff755d31481b72290e8
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_926d983f4d4ce22004da9c8fac44c8a6['zoom'] || map_65c9d6901ddcc655348477617ab36e47.getZoom();
-                map_65c9d6901ddcc655348477617ab36e47.setView(e.geocode.center, zoom);
-            }).addTo(map_65c9d6901ddcc655348477617ab36e47);
+                var zoom = geocoderOpts_geocoder_21ddc0bbb86cbff755d31481b72290e8['zoom'] || map_37654217481b4dfc64fc37427447291f.getZoom();
+                map_37654217481b4dfc64fc37427447291f.setView(e.geocode.center, zoom);
+            }).addTo(map_37654217481b4dfc64fc37427447291f);
 
         
     
-            map_65c9d6901ddcc655348477617ab36e47.fitBounds(
+            map_37654217481b4dfc64fc37427447291f.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_719193c0c1f95464d11e5ac79a3320ee = L.tileLayer(
+            var tile_layer_4bb1e2658864ad3899c20ba82ffc96da = L.tileLayer(
                 &quot;https://planetarycomputer.microsoft.com/api/data/v1/item/tiles/WebMercatorQuad/{z}/{x}/{y}@1x?collection=landsat-8-c2-l2\u0026item=LC08_L2SP_047027_20201204_02_T1\u0026assets=SR_B7\u0026assets=SR_B5\u0026assets=SR_B4\u0026rescale=7144.0%2C22265.0&quot;,
                 {&quot;attribution&quot;: &quot;.&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_719193c0c1f95464d11e5ac79a3320ee.addTo(map_65c9d6901ddcc655348477617ab36e47);
+            tile_layer_4bb1e2658864ad3899c20ba82ffc96da.addTo(map_37654217481b4dfc64fc37427447291f);
         
     
-            map_65c9d6901ddcc655348477617ab36e47.fitBounds(
+            map_37654217481b4dfc64fc37427447291f.fitBounds(
                 [[46.35352512466258, -124.98085491310867], [48.51466487533742, -121.78788697796408]],
                 {}
             );
         
     
-            var layer_control_601577c79f61590540ad0342596c9114_layers = {
+            var layer_control_a3624169ed54ca5ef68f35d5d5c99853_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_e1419c3d996ba128e5fbb0dc342cd416,
+                    &quot;openstreetmap&quot; : tile_layer_53ffce69a8a7fbeb9633df9879449771,
                 },
                 overlays :  {
-                    &quot;Landsat Band-754&quot; : tile_layer_719193c0c1f95464d11e5ac79a3320ee,
+                    &quot;Landsat Band-754&quot; : tile_layer_4bb1e2658864ad3899c20ba82ffc96da,
                 },
             };
-            let layer_control_601577c79f61590540ad0342596c9114 = L.control.layers(
-                layer_control_601577c79f61590540ad0342596c9114_layers.base_layers,
-                layer_control_601577c79f61590540ad0342596c9114_layers.overlays,
+            let layer_control_a3624169ed54ca5ef68f35d5d5c99853 = L.control.layers(
+                layer_control_a3624169ed54ca5ef68f35d5d5c99853_layers.base_layers,
+                layer_control_a3624169ed54ca5ef68f35d5d5c99853_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_65c9d6901ddcc655348477617ab36e47);
+            ).addTo(map_37654217481b4dfc64fc37427447291f);
 
         
 &lt;/script&gt;
@@ -4681,7 +4704,7 @@ To: /home/runner/work/leafmap/leafmap/docs/notebooks/landsat.tif
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>100%|██████████| 10.1M/10.1M [00:00&lt;00:00, 253MB/s]</pre>
+<pre>100%|██████████| 10.1M/10.1M [00:00&lt;00:00, 168MB/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -4760,7 +4783,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_76a802b86c653e98625ed0accad0636d {
+                #map_a97f7690542dcc9603a8678d235a354a {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -4782,14 +4805,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_76a802b86c653e98625ed0accad0636d&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_a97f7690542dcc9603a8678d235a354a&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_76a802b86c653e98625ed0accad0636d = L.map(
-                &quot;map_76a802b86c653e98625ed0accad0636d&quot;,
+            var map_a97f7690542dcc9603a8678d235a354a = L.map(
+                &quot;map_a97f7690542dcc9603a8678d235a354a&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -4800,24 +4823,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_76a802b86c653e98625ed0accad0636d);
+            L.control.scale().addTo(map_a97f7690542dcc9603a8678d235a354a);
 
             
 
         
     
-            var tile_layer_f2b51970a7ce7a7746c24b5b055ff3af = L.tileLayer(
+            var tile_layer_b6ba38022293a98fe3ae4b60bec1cb29 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_f2b51970a7ce7a7746c24b5b055ff3af.addTo(map_76a802b86c653e98625ed0accad0636d);
+            tile_layer_b6ba38022293a98fe3ae4b60bec1cb29.addTo(map_a97f7690542dcc9603a8678d235a354a);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_76a802b86c653e98625ed0accad0636d);
+            ).addTo(map_a97f7690542dcc9603a8678d235a354a);
         
     
             var options = {
@@ -4826,14 +4849,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_b3c8e5b86e2c4978af0225b7b091a0d8 = new L.featureGroup().addTo(
-                map_76a802b86c653e98625ed0accad0636d
+            var drawnItems_draw_control_bb842d2f671717d52da24affa5382bdb = new L.featureGroup().addTo(
+                map_a97f7690542dcc9603a8678d235a354a
             );
-            options.edit.featureGroup = drawnItems_draw_control_b3c8e5b86e2c4978af0225b7b091a0d8;
-            var draw_control_b3c8e5b86e2c4978af0225b7b091a0d8 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_bb842d2f671717d52da24affa5382bdb;
+            var draw_control_bb842d2f671717d52da24affa5382bdb = new L.Control.Draw(
                 options
-            ).addTo( map_76a802b86c653e98625ed0accad0636d );
-            map_76a802b86c653e98625ed0accad0636d.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_a97f7690542dcc9603a8678d235a354a );
+            map_a97f7690542dcc9603a8678d235a354a.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -4841,17 +4864,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_b3c8e5b86e2c4978af0225b7b091a0d8.addLayer(layer);
+                drawnItems_draw_control_bb842d2f671717d52da24affa5382bdb.addLayer(layer);
              });
-            map_76a802b86c653e98625ed0accad0636d.on('draw:created', function(e) {
-                drawnItems_draw_control_b3c8e5b86e2c4978af0225b7b091a0d8.addLayer(e.layer);
+            map_a97f7690542dcc9603a8678d235a354a.on('draw:created', function(e) {
+                drawnItems_draw_control_bb842d2f671717d52da24affa5382bdb.addLayer(e.layer);
             });
             
         
     
-            var measure_control_38b09f750ad388405369a144de68e241 = new L.Control.Measure(
+            var measure_control_a6ce146be99802be32ad06b90de50d4a = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_76a802b86c653e98625ed0accad0636d.addControl(measure_control_38b09f750ad388405369a144de68e241);
+            map_a97f7690542dcc9603a8678d235a354a.addControl(measure_control_a6ce146be99802be32ad06b90de50d4a);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -4871,59 +4894,59 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_162a432bc262bc02a43534459d4087f3 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_162a432bc262bc02a43534459d4087f3 = geocoderOpts_geocoder_162a432bc262bc02a43534459d4087f3[&quot;provider&quot;];
+            var geocoderName_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6 = geocoderOpts_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_162a432bc262bc02a43534459d4087f3 = L.Control.Geocoder[ geocoderName_geocoder_162a432bc262bc02a43534459d4087f3 ](
-                geocoderOpts_geocoder_162a432bc262bc02a43534459d4087f3['providerOptions']
+            var customGeocoder_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6 = L.Control.Geocoder[ geocoderName_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6 ](
+                geocoderOpts_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6['providerOptions']
             );
-            geocoderOpts_geocoder_162a432bc262bc02a43534459d4087f3[&quot;geocoder&quot;] = customGeocoder_geocoder_162a432bc262bc02a43534459d4087f3;
+            geocoderOpts_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6[&quot;geocoder&quot;] = customGeocoder_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_162a432bc262bc02a43534459d4087f3
+                geocoderOpts_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_162a432bc262bc02a43534459d4087f3['zoom'] || map_76a802b86c653e98625ed0accad0636d.getZoom();
-                map_76a802b86c653e98625ed0accad0636d.setView(e.geocode.center, zoom);
-            }).addTo(map_76a802b86c653e98625ed0accad0636d);
+                var zoom = geocoderOpts_geocoder_5120a7483e2a033f1f70b3a67cf2a3f6['zoom'] || map_a97f7690542dcc9603a8678d235a354a.getZoom();
+                map_a97f7690542dcc9603a8678d235a354a.setView(e.geocode.center, zoom);
+            }).addTo(map_a97f7690542dcc9603a8678d235a354a);
 
         
     
-            map_76a802b86c653e98625ed0accad0636d.fitBounds(
+            map_a97f7690542dcc9603a8678d235a354a.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_4fc360f387e4ea2a5eeece40831f2555 = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Flandsat.tif\u0026indexes.0=4\u0026indexes.1=1\u0026indexes.2=2\u0026vmin=0\u0026vmax=120&quot;,
+            var tile_layer_038e2e70e3010227aa9ea93701ae6ef0 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Flandsat.tif\u0026indexes.0=4\u0026indexes.1=1\u0026indexes.2=2\u0026vmin=0\u0026vmax=120&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.636644, -120.756751], [38.639052, -117.317461]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_4fc360f387e4ea2a5eeece40831f2555.addTo(map_76a802b86c653e98625ed0accad0636d);
+            tile_layer_038e2e70e3010227aa9ea93701ae6ef0.addTo(map_a97f7690542dcc9603a8678d235a354a);
         
     
-            map_76a802b86c653e98625ed0accad0636d.fitBounds(
+            map_a97f7690542dcc9603a8678d235a354a.fitBounds(
                 [[36.636644, -120.756751], [38.639052, -117.317461]],
                 {}
             );
         
     
-            var layer_control_c6833933ac71fef7bd3ed0da230469bf_layers = {
+            var layer_control_c23c91346fc57d2ce9c068fdf4e474fd_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_f2b51970a7ce7a7746c24b5b055ff3af,
+                    &quot;openstreetmap&quot; : tile_layer_b6ba38022293a98fe3ae4b60bec1cb29,
                 },
                 overlays :  {
-                    &quot;Landsat 7&quot; : tile_layer_4fc360f387e4ea2a5eeece40831f2555,
+                    &quot;Landsat 7&quot; : tile_layer_038e2e70e3010227aa9ea93701ae6ef0,
                 },
             };
-            let layer_control_c6833933ac71fef7bd3ed0da230469bf = L.control.layers(
-                layer_control_c6833933ac71fef7bd3ed0da230469bf_layers.base_layers,
-                layer_control_c6833933ac71fef7bd3ed0da230469bf_layers.overlays,
+            let layer_control_c23c91346fc57d2ce9c068fdf4e474fd = L.control.layers(
+                layer_control_c23c91346fc57d2ce9c068fdf4e474fd_layers.base_layers,
+                layer_control_c23c91346fc57d2ce9c068fdf4e474fd_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_76a802b86c653e98625ed0accad0636d);
+            ).addTo(map_a97f7690542dcc9603a8678d235a354a);
 
         
 &lt;/script&gt;
@@ -5047,7 +5070,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_db1fe33161092bd8c0be4caf08e43908 {
+                #map_b56490108d4983a7fe8c100a9c63250d {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -5069,14 +5092,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_db1fe33161092bd8c0be4caf08e43908&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_b56490108d4983a7fe8c100a9c63250d&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_db1fe33161092bd8c0be4caf08e43908 = L.map(
-                &quot;map_db1fe33161092bd8c0be4caf08e43908&quot;,
+            var map_b56490108d4983a7fe8c100a9c63250d = L.map(
+                &quot;map_b56490108d4983a7fe8c100a9c63250d&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -5087,24 +5110,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_db1fe33161092bd8c0be4caf08e43908);
+            L.control.scale().addTo(map_b56490108d4983a7fe8c100a9c63250d);
 
             
 
         
     
-            var tile_layer_b86f4b2742b00229fb0080d98d292b9a = L.tileLayer(
+            var tile_layer_a7bf7110e96fce817e4023add564f503 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_b86f4b2742b00229fb0080d98d292b9a.addTo(map_db1fe33161092bd8c0be4caf08e43908);
+            tile_layer_a7bf7110e96fce817e4023add564f503.addTo(map_b56490108d4983a7fe8c100a9c63250d);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_db1fe33161092bd8c0be4caf08e43908);
+            ).addTo(map_b56490108d4983a7fe8c100a9c63250d);
         
     
             var options = {
@@ -5113,14 +5136,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_c13763a8cd382961f96ff375da8c706a = new L.featureGroup().addTo(
-                map_db1fe33161092bd8c0be4caf08e43908
+            var drawnItems_draw_control_9baac2d358d09c6de7049a6c6f99894d = new L.featureGroup().addTo(
+                map_b56490108d4983a7fe8c100a9c63250d
             );
-            options.edit.featureGroup = drawnItems_draw_control_c13763a8cd382961f96ff375da8c706a;
-            var draw_control_c13763a8cd382961f96ff375da8c706a = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_9baac2d358d09c6de7049a6c6f99894d;
+            var draw_control_9baac2d358d09c6de7049a6c6f99894d = new L.Control.Draw(
                 options
-            ).addTo( map_db1fe33161092bd8c0be4caf08e43908 );
-            map_db1fe33161092bd8c0be4caf08e43908.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_b56490108d4983a7fe8c100a9c63250d );
+            map_b56490108d4983a7fe8c100a9c63250d.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -5128,17 +5151,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_c13763a8cd382961f96ff375da8c706a.addLayer(layer);
+                drawnItems_draw_control_9baac2d358d09c6de7049a6c6f99894d.addLayer(layer);
              });
-            map_db1fe33161092bd8c0be4caf08e43908.on('draw:created', function(e) {
-                drawnItems_draw_control_c13763a8cd382961f96ff375da8c706a.addLayer(e.layer);
+            map_b56490108d4983a7fe8c100a9c63250d.on('draw:created', function(e) {
+                drawnItems_draw_control_9baac2d358d09c6de7049a6c6f99894d.addLayer(e.layer);
             });
             
         
     
-            var measure_control_52448babc45401974a5512da20f81cac = new L.Control.Measure(
+            var measure_control_1226e8f5eca84ecad9f8bd27d1f9e35e = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_db1fe33161092bd8c0be4caf08e43908.addControl(measure_control_52448babc45401974a5512da20f81cac);
+            map_b56490108d4983a7fe8c100a9c63250d.addControl(measure_control_1226e8f5eca84ecad9f8bd27d1f9e35e);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -5158,75 +5181,75 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_2012c9132e4554fa95488d42eeb6dcee = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46 = geocoderOpts_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46[&quot;provider&quot;];
+            var geocoderName_geocoder_2012c9132e4554fa95488d42eeb6dcee = geocoderOpts_geocoder_2012c9132e4554fa95488d42eeb6dcee[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46 = L.Control.Geocoder[ geocoderName_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46 ](
-                geocoderOpts_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46['providerOptions']
+            var customGeocoder_geocoder_2012c9132e4554fa95488d42eeb6dcee = L.Control.Geocoder[ geocoderName_geocoder_2012c9132e4554fa95488d42eeb6dcee ](
+                geocoderOpts_geocoder_2012c9132e4554fa95488d42eeb6dcee['providerOptions']
             );
-            geocoderOpts_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46[&quot;geocoder&quot;] = customGeocoder_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46;
+            geocoderOpts_geocoder_2012c9132e4554fa95488d42eeb6dcee[&quot;geocoder&quot;] = customGeocoder_geocoder_2012c9132e4554fa95488d42eeb6dcee;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46
+                geocoderOpts_geocoder_2012c9132e4554fa95488d42eeb6dcee
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_bc92deeadc12a7a1a8d69fa28e8aca46['zoom'] || map_db1fe33161092bd8c0be4caf08e43908.getZoom();
-                map_db1fe33161092bd8c0be4caf08e43908.setView(e.geocode.center, zoom);
-            }).addTo(map_db1fe33161092bd8c0be4caf08e43908);
+                var zoom = geocoderOpts_geocoder_2012c9132e4554fa95488d42eeb6dcee['zoom'] || map_b56490108d4983a7fe8c100a9c63250d.getZoom();
+                map_b56490108d4983a7fe8c100a9c63250d.setView(e.geocode.center, zoom);
+            }).addTo(map_b56490108d4983a7fe8c100a9c63250d);
 
         
     
-            map_db1fe33161092bd8c0be4caf08e43908.fitBounds(
+            map_b56490108d4983a7fe8c100a9c63250d.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_9014851b6fb698b605589de2d6e30a38 = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Flandsat.tif\u0026indexes.0=4\u0026indexes.1=1\u0026indexes.2=2\u0026vmin=0\u0026vmax=120&quot;,
+            var tile_layer_3ff300d1ce94f023f57a945284115725 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Flandsat.tif\u0026indexes.0=4\u0026indexes.1=1\u0026indexes.2=2\u0026vmin=0\u0026vmax=120&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.636644, -120.756751], [38.639052, -117.317461]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_9014851b6fb698b605589de2d6e30a38.addTo(map_db1fe33161092bd8c0be4caf08e43908);
+            tile_layer_3ff300d1ce94f023f57a945284115725.addTo(map_b56490108d4983a7fe8c100a9c63250d);
         
     
-            map_db1fe33161092bd8c0be4caf08e43908.fitBounds(
+            map_b56490108d4983a7fe8c100a9c63250d.fitBounds(
                 [[36.636644, -120.756751], [38.639052, -117.317461]],
                 {}
             );
         
     
-            var tile_layer_cc598e182d228dc625e26f66bd50a0d1 = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2Fd32630fa-0b88-4062-b224-c26ee95c814f%2Fd32630fa-0b88-4062-b224-c26ee95c814f.tif\u0026colormap=Greens&quot;,
+            var tile_layer_a2dc6a15c3bea0ad2c5aa63fae9692f4 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2Fbee6d6ab-480d-4912-80b8-cab2dc5d7085%2Fbee6d6ab-480d-4912-80b8-cab2dc5d7085.tif\u0026colormap=Greens&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.636644, -120.756751], [38.639052, -117.317461]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_cc598e182d228dc625e26f66bd50a0d1.addTo(map_db1fe33161092bd8c0be4caf08e43908);
+            tile_layer_a2dc6a15c3bea0ad2c5aa63fae9692f4.addTo(map_b56490108d4983a7fe8c100a9c63250d);
         
     
-            map_db1fe33161092bd8c0be4caf08e43908.fitBounds(
+            map_b56490108d4983a7fe8c100a9c63250d.fitBounds(
                 [[36.636644, -120.756751], [38.639052, -117.317461]],
                 {}
             );
         
     
-            var layer_control_c202ca9964bc8506ce9d0df734e00f6c_layers = {
+            var layer_control_c963506690486e53a121006dd38e8b47_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_b86f4b2742b00229fb0080d98d292b9a,
+                    &quot;openstreetmap&quot; : tile_layer_a7bf7110e96fce817e4023add564f503,
                 },
                 overlays :  {
-                    &quot;Landsat 7&quot; : tile_layer_9014851b6fb698b605589de2d6e30a38,
-                    &quot;NDVI&quot; : tile_layer_cc598e182d228dc625e26f66bd50a0d1,
+                    &quot;Landsat 7&quot; : tile_layer_3ff300d1ce94f023f57a945284115725,
+                    &quot;NDVI&quot; : tile_layer_a2dc6a15c3bea0ad2c5aa63fae9692f4,
                 },
             };
-            let layer_control_c202ca9964bc8506ce9d0df734e00f6c = L.control.layers(
-                layer_control_c202ca9964bc8506ce9d0df734e00f6c_layers.base_layers,
-                layer_control_c202ca9964bc8506ce9d0df734e00f6c_layers.overlays,
+            let layer_control_c963506690486e53a121006dd38e8b47 = L.control.layers(
+                layer_control_c963506690486e53a121006dd38e8b47_layers.base_layers,
+                layer_control_c963506690486e53a121006dd38e8b47_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_db1fe33161092bd8c0be4caf08e43908);
+            ).addTo(map_b56490108d4983a7fe8c100a9c63250d);
 
         
 &lt;/script&gt;
@@ -5699,8 +5722,8 @@ Attributes:
     OVR_RESAMPLING_ALG:  NEAREST
     scale_factor:        1.0
     add_offset:          0.0
-    long_name:           elevation</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-array-name"></div><ul class="xr-dim-list"><li><span class="xr-has-index">band</span>: 1</li><li><span class="xr-has-index">y</span>: 2465</li><li><span class="xr-has-index">x</span>: 4269</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input checked="" class="xr-array-in" id="section-d0a1fdb3-adcb-4505-b977-fd9c596ae745" type="checkbox"/><label for="section-d0a1fdb3-adcb-4505-b977-fd9c596ae745" title="Show/hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>...</span></div><div class="xr-array-data"><pre>[10523085 values with dtype=int16]</pre></div></div></li><li class="xr-section-item"><input checked="" class="xr-section-summary-in" id="section-c9d54fc0-7f73-45ee-a6cf-1e86e74e4e5c" type="checkbox"/><label class="xr-section-summary" for="section-c9d54fc0-7f73-45ee-a6cf-1e86e74e4e5c">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">band</span></div><div class="xr-var-dims">(band)</div><div class="xr-var-dtype">int64</div><div class="xr-var-preview xr-preview">1</div><input class="xr-var-attrs-in" disabled="" id="attrs-162dbbff-cdba-46ea-bdd1-f8e043b554f0" type="checkbox"/><label for="attrs-162dbbff-cdba-46ea-bdd1-f8e043b554f0" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-3bc3c7ee-e79c-4fbe-a66d-64a1c186bbd2" type="checkbox"/><label for="data-3bc3c7ee-e79c-4fbe-a66d-64a1c186bbd2" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array([1])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">-120.8 -120.8 ... -117.3 -117.3</div><input class="xr-var-attrs-in" disabled="" id="attrs-adbe45d1-6733-4783-8404-ca5ef6d9b796" type="checkbox"/><label for="attrs-adbe45d1-6733-4783-8404-ca5ef6d9b796" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-b635be9f-4ea4-4d78-89e8-f286bba6b6c2" type="checkbox"/><label for="data-b635be9f-4ea4-4d78-89e8-f286bba6b6c2" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array([-120.755523, -120.754715, -120.753906, ..., -117.306531, -117.305723,
-       -117.304914])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">38.63 38.63 38.62 ... 36.64 36.63</div><input class="xr-var-attrs-in" disabled="" id="attrs-69905c25-110d-410e-b1e1-ac2acc52668a" type="checkbox"/><label for="attrs-69905c25-110d-410e-b1e1-ac2acc52668a" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-b917fee2-22f6-4fb4-b8ce-3d6996edcf2f" type="checkbox"/><label for="data-b917fee2-22f6-4fb4-b8ce-3d6996edcf2f" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array([38.626519, 38.625711, 38.624902, ..., 36.636032, 36.635224, 36.634415])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int64</div><div class="xr-var-preview xr-preview">0</div><input class="xr-var-attrs-in" id="attrs-415e8b32-d79e-4dcb-beb3-d59f677e7f06" type="checkbox"/><label for="attrs-415e8b32-d79e-4dcb-beb3-d59f677e7f06" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-795ad987-b233-40de-8813-b7bfadae74d1" type="checkbox"/><label for="data-795ad987-b233-40de-8813-b7bfadae74d1" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>crs_wkt :</span></dt><dd>GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984</dd><dt><span>grid_mapping_name :</span></dt><dd>latitude_longitude</dd><dt><span>spatial_ref :</span></dt><dd>GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</dd><dt><span>GeoTransform :</span></dt><dd>-120.75592734926073 0.0008084837557075694 0.0 38.6269234341147 0.0 -0.0008084837557075694</dd></dl></div><div class="xr-var-data"><pre>array(0)</pre></div></li></ul></div></li><li class="xr-section-item"><input class="xr-section-summary-in" id="section-c5823c17-adb4-482d-a67e-9d9e28a0bd90" type="checkbox"/><label class="xr-section-summary" for="section-c5823c17-adb4-482d-a67e-9d9e28a0bd90">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>band</div></div><div class="xr-index-preview">PandasIndex</div><div></div><input class="xr-index-data-in" id="index-f714d283-c6de-4ea4-ab9d-69304f25d134" type="checkbox"><label for="index-f714d283-c6de-4ea4-ab9d-69304f25d134" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([1], dtype='int64', name='band'))</pre></div></input></li><li class="xr-var-item"><div class="xr-index-name"><div>x</div></div><div class="xr-index-preview">PandasIndex</div><div></div><input class="xr-index-data-in" id="index-9447f324-09cc-4226-8d59-07520e2b74d1" type="checkbox"><label for="index-9447f324-09cc-4226-8d59-07520e2b74d1" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([-120.75552310738287, -120.75471462362717, -120.75390613987146,
+    long_name:           elevation</pre><div class="xr-wrap" style="display:none"><div class="xr-header"><div class="xr-obj-type">xarray.DataArray</div><div class="xr-array-name"></div><ul class="xr-dim-list"><li><span class="xr-has-index">band</span>: 1</li><li><span class="xr-has-index">y</span>: 2465</li><li><span class="xr-has-index">x</span>: 4269</li></ul></div><ul class="xr-sections"><li class="xr-section-item"><div class="xr-array-wrap"><input checked="" class="xr-array-in" id="section-e43a44f5-0154-4c68-b8dd-e479b9e7537e" type="checkbox"/><label for="section-e43a44f5-0154-4c68-b8dd-e479b9e7537e" title="Show/hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-array-preview xr-preview"><span>...</span></div><div class="xr-array-data"><pre>[10523085 values with dtype=int16]</pre></div></div></li><li class="xr-section-item"><input checked="" class="xr-section-summary-in" id="section-9b94eda1-5b08-42df-9357-8c1465197582" type="checkbox"/><label class="xr-section-summary" for="section-9b94eda1-5b08-42df-9357-8c1465197582">Coordinates: <span>(4)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">band</span></div><div class="xr-var-dims">(band)</div><div class="xr-var-dtype">int64</div><div class="xr-var-preview xr-preview">1</div><input class="xr-var-attrs-in" disabled="" id="attrs-271bce22-bebf-47d7-8b4b-1487de99836d" type="checkbox"/><label for="attrs-271bce22-bebf-47d7-8b4b-1487de99836d" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-3d5cd5c6-083f-4ab7-b24a-65c8f80a11da" type="checkbox"/><label for="data-3d5cd5c6-083f-4ab7-b24a-65c8f80a11da" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array([1])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">x</span></div><div class="xr-var-dims">(x)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">-120.8 -120.8 ... -117.3 -117.3</div><input class="xr-var-attrs-in" disabled="" id="attrs-80970ad3-012e-4aca-b749-1f5bebfa3615" type="checkbox"/><label for="attrs-80970ad3-012e-4aca-b749-1f5bebfa3615" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-16da3b8b-c90e-47fc-8717-5581ed6b694a" type="checkbox"/><label for="data-16da3b8b-c90e-47fc-8717-5581ed6b694a" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array([-120.755523, -120.754715, -120.753906, ..., -117.306531, -117.305723,
+       -117.304914])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span class="xr-has-index">y</span></div><div class="xr-var-dims">(y)</div><div class="xr-var-dtype">float64</div><div class="xr-var-preview xr-preview">38.63 38.63 38.62 ... 36.64 36.63</div><input class="xr-var-attrs-in" disabled="" id="attrs-c2d3dfde-67b4-4637-8e6a-07e8be948876" type="checkbox"/><label for="attrs-c2d3dfde-67b4-4637-8e6a-07e8be948876" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-7d5b54fd-aa08-407e-85fd-9b26e4dcee2a" type="checkbox"/><label for="data-7d5b54fd-aa08-407e-85fd-9b26e4dcee2a" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"></dl></div><div class="xr-var-data"><pre>array([38.626519, 38.625711, 38.624902, ..., 36.636032, 36.635224, 36.634415])</pre></div></li><li class="xr-var-item"><div class="xr-var-name"><span>spatial_ref</span></div><div class="xr-var-dims">()</div><div class="xr-var-dtype">int64</div><div class="xr-var-preview xr-preview">0</div><input class="xr-var-attrs-in" id="attrs-d38ba648-4c30-4cda-87c4-7c008cf1ae3a" type="checkbox"/><label for="attrs-d38ba648-4c30-4cda-87c4-7c008cf1ae3a" title="Show/Hide attributes"><svg class="icon xr-icon-file-text2"><use xlink:href="#icon-file-text2"></use></svg></label><input class="xr-var-data-in" id="data-8f732678-684b-49d6-a41d-36a595ea9795" type="checkbox"/><label for="data-8f732678-684b-49d6-a41d-36a595ea9795" title="Show/Hide data repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-var-attrs"><dl class="xr-attrs"><dt><span>crs_wkt :</span></dt><dd>GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>horizontal_datum_name :</span></dt><dd>World Geodetic System 1984</dd><dt><span>grid_mapping_name :</span></dt><dd>latitude_longitude</dd><dt><span>spatial_ref :</span></dt><dd>GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</dd><dt><span>GeoTransform :</span></dt><dd>-120.75592734926073 0.0008084837557075694 0.0 38.6269234341147 0.0 -0.0008084837557075694</dd></dl></div><div class="xr-var-data"><pre>array(0)</pre></div></li></ul></div></li><li class="xr-section-item"><input class="xr-section-summary-in" id="section-489059eb-4cac-4748-ae49-5753dacf7f0c" type="checkbox"/><label class="xr-section-summary" for="section-489059eb-4cac-4748-ae49-5753dacf7f0c">Indexes: <span>(3)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><ul class="xr-var-list"><li class="xr-var-item"><div class="xr-index-name"><div>band</div></div><div class="xr-index-preview">PandasIndex</div><div></div><input class="xr-index-data-in" id="index-05819733-73da-455d-b24c-94c4a0651c14" type="checkbox"><label for="index-05819733-73da-455d-b24c-94c4a0651c14" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([1], dtype='int64', name='band'))</pre></div></input></li><li class="xr-var-item"><div class="xr-index-name"><div>x</div></div><div class="xr-index-preview">PandasIndex</div><div></div><input class="xr-index-data-in" id="index-f30ff025-2138-4718-b00b-f3d789282b11" type="checkbox"><label for="index-f30ff025-2138-4718-b00b-f3d789282b11" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([-120.75552310738287, -120.75471462362717, -120.75390613987146,
        -120.75309765611574, -120.75228917236004, -120.75148068860433,
        -120.75067220484863, -120.74986372109292, -120.74905523733722,
         -120.7482467535815,
@@ -5709,7 +5732,7 @@ Attributes:
         -117.3097653405572,  -117.3089568568015,  -117.3081483730458,
        -117.30733988929009, -117.30653140553439, -117.30572292177867,
        -117.30491443802296],
-      dtype='float64', name='x', length=4269))</pre></div></input></li><li class="xr-var-item"><div class="xr-index-name"><div>y</div></div><div class="xr-index-preview">PandasIndex</div><div></div><input class="xr-index-data-in" id="index-9baef3ba-6466-4b2f-b1c4-b88f2d18307b" type="checkbox"><label for="index-9baef3ba-6466-4b2f-b1c4-b88f2d18307b" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([ 38.62651919223685, 38.625710708481144,  38.62490222472543,
+      dtype='float64', name='x', length=4269))</pre></div></input></li><li class="xr-var-item"><div class="xr-index-name"><div>y</div></div><div class="xr-index-preview">PandasIndex</div><div></div><input class="xr-index-data-in" id="index-7f5627e3-cb85-4af6-8814-c6ddc5df30a9" type="checkbox"><label for="index-7f5627e3-cb85-4af6-8814-c6ddc5df30a9" title="Show/Hide index repr"><svg class="icon xr-icon-database"><use xlink:href="#icon-database"></use></svg></label><div class="xr-index-data"><pre>PandasIndex(Index([ 38.62651919223685, 38.625710708481144,  38.62490222472543,
         38.62409374096973,  38.62328525721402,  38.62247677345831,
        38.621668289702605,  38.62085980594689,  38.62005132219119,
         38.61924283843548,
@@ -5718,7 +5741,7 @@ Attributes:
        36.639266120707646, 36.638457636951934,  36.63764915319623,
        36.636840669440524,  36.63603218568481,  36.63522370192911,
        36.634415218173395],
-      dtype='float64', name='y', length=2465))</pre></div></input></li></ul></div></li><li class="xr-section-item"><input checked="" class="xr-section-summary-in" id="section-89f84acd-ffcf-446d-8777-f08806aa3a37" type="checkbox"/><label class="xr-section-summary" for="section-89f84acd-ffcf-446d-8777-f08806aa3a37">Attributes: <span>(5)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"><dt><span>AREA_OR_POINT :</span></dt><dd>Area</dd><dt><span>OVR_RESAMPLING_ALG :</span></dt><dd>NEAREST</dd><dt><span>scale_factor :</span></dt><dd>1.0</dd><dt><span>add_offset :</span></dt><dd>0.0</dd><dt><span>long_name :</span></dt><dd>elevation</dd></dl></div></li></ul></div></div>
+      dtype='float64', name='y', length=2465))</pre></div></input></li></ul></div></li><li class="xr-section-item"><input checked="" class="xr-section-summary-in" id="section-ef3ba327-ff99-4b49-978d-32c8e964633c" type="checkbox"/><label class="xr-section-summary" for="section-ef3ba327-ff99-4b49-978d-32c8e964633c">Attributes: <span>(5)</span></label><div class="xr-section-inline-details"></div><div class="xr-section-details"><dl class="xr-attrs"><dt><span>AREA_OR_POINT :</span></dt><dd>Area</dd><dt><span>OVR_RESAMPLING_ALG :</span></dt><dd>NEAREST</dd><dt><span>scale_factor :</span></dt><dd>1.0</dd><dt><span>add_offset :</span></dt><dd>0.0</dd><dt><span>long_name :</span></dt><dd>elevation</dd></dl></div></li></ul></div></div>
 </div>
 </div>
 </div>
@@ -5819,7 +5842,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_0326603573115899633aa9d47bcae088 {
+                #map_61f339dbfed71dfac78a12401b9c3eff {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -5841,14 +5864,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_0326603573115899633aa9d47bcae088&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_61f339dbfed71dfac78a12401b9c3eff&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_0326603573115899633aa9d47bcae088 = L.map(
-                &quot;map_0326603573115899633aa9d47bcae088&quot;,
+            var map_61f339dbfed71dfac78a12401b9c3eff = L.map(
+                &quot;map_61f339dbfed71dfac78a12401b9c3eff&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -5859,24 +5882,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_0326603573115899633aa9d47bcae088);
+            L.control.scale().addTo(map_61f339dbfed71dfac78a12401b9c3eff);
 
             
 
         
     
-            var tile_layer_288a07255830d6dca9430a442fd92a6a = L.tileLayer(
+            var tile_layer_e7680776808e4e7538d0d3056599229a = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_288a07255830d6dca9430a442fd92a6a.addTo(map_0326603573115899633aa9d47bcae088);
+            tile_layer_e7680776808e4e7538d0d3056599229a.addTo(map_61f339dbfed71dfac78a12401b9c3eff);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_0326603573115899633aa9d47bcae088);
+            ).addTo(map_61f339dbfed71dfac78a12401b9c3eff);
         
     
             var options = {
@@ -5885,14 +5908,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_f67b43d27aee41daa7f029ba1e34d006 = new L.featureGroup().addTo(
-                map_0326603573115899633aa9d47bcae088
+            var drawnItems_draw_control_c0b331886b2cf8f97b4a664c7bca7517 = new L.featureGroup().addTo(
+                map_61f339dbfed71dfac78a12401b9c3eff
             );
-            options.edit.featureGroup = drawnItems_draw_control_f67b43d27aee41daa7f029ba1e34d006;
-            var draw_control_f67b43d27aee41daa7f029ba1e34d006 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_c0b331886b2cf8f97b4a664c7bca7517;
+            var draw_control_c0b331886b2cf8f97b4a664c7bca7517 = new L.Control.Draw(
                 options
-            ).addTo( map_0326603573115899633aa9d47bcae088 );
-            map_0326603573115899633aa9d47bcae088.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_61f339dbfed71dfac78a12401b9c3eff );
+            map_61f339dbfed71dfac78a12401b9c3eff.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -5900,17 +5923,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_f67b43d27aee41daa7f029ba1e34d006.addLayer(layer);
+                drawnItems_draw_control_c0b331886b2cf8f97b4a664c7bca7517.addLayer(layer);
              });
-            map_0326603573115899633aa9d47bcae088.on('draw:created', function(e) {
-                drawnItems_draw_control_f67b43d27aee41daa7f029ba1e34d006.addLayer(e.layer);
+            map_61f339dbfed71dfac78a12401b9c3eff.on('draw:created', function(e) {
+                drawnItems_draw_control_c0b331886b2cf8f97b4a664c7bca7517.addLayer(e.layer);
             });
             
         
     
-            var measure_control_f3962d1cb027a98318cac9b2610bf2d0 = new L.Control.Measure(
+            var measure_control_53ae9bc25f1b8e559d391629a772a856 = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_0326603573115899633aa9d47bcae088.addControl(measure_control_f3962d1cb027a98318cac9b2610bf2d0);
+            map_61f339dbfed71dfac78a12401b9c3eff.addControl(measure_control_53ae9bc25f1b8e559d391629a772a856);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -5930,75 +5953,75 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_28b8e350989dc3a88e18bcdba8fea8e3 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_9802fb44a9878befcb1eb5ddb469a800 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_28b8e350989dc3a88e18bcdba8fea8e3 = geocoderOpts_geocoder_28b8e350989dc3a88e18bcdba8fea8e3[&quot;provider&quot;];
+            var geocoderName_geocoder_9802fb44a9878befcb1eb5ddb469a800 = geocoderOpts_geocoder_9802fb44a9878befcb1eb5ddb469a800[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_28b8e350989dc3a88e18bcdba8fea8e3 = L.Control.Geocoder[ geocoderName_geocoder_28b8e350989dc3a88e18bcdba8fea8e3 ](
-                geocoderOpts_geocoder_28b8e350989dc3a88e18bcdba8fea8e3['providerOptions']
+            var customGeocoder_geocoder_9802fb44a9878befcb1eb5ddb469a800 = L.Control.Geocoder[ geocoderName_geocoder_9802fb44a9878befcb1eb5ddb469a800 ](
+                geocoderOpts_geocoder_9802fb44a9878befcb1eb5ddb469a800['providerOptions']
             );
-            geocoderOpts_geocoder_28b8e350989dc3a88e18bcdba8fea8e3[&quot;geocoder&quot;] = customGeocoder_geocoder_28b8e350989dc3a88e18bcdba8fea8e3;
+            geocoderOpts_geocoder_9802fb44a9878befcb1eb5ddb469a800[&quot;geocoder&quot;] = customGeocoder_geocoder_9802fb44a9878befcb1eb5ddb469a800;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_28b8e350989dc3a88e18bcdba8fea8e3
+                geocoderOpts_geocoder_9802fb44a9878befcb1eb5ddb469a800
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_28b8e350989dc3a88e18bcdba8fea8e3['zoom'] || map_0326603573115899633aa9d47bcae088.getZoom();
-                map_0326603573115899633aa9d47bcae088.setView(e.geocode.center, zoom);
-            }).addTo(map_0326603573115899633aa9d47bcae088);
+                var zoom = geocoderOpts_geocoder_9802fb44a9878befcb1eb5ddb469a800['zoom'] || map_61f339dbfed71dfac78a12401b9c3eff.getZoom();
+                map_61f339dbfed71dfac78a12401b9c3eff.setView(e.geocode.center, zoom);
+            }).addTo(map_61f339dbfed71dfac78a12401b9c3eff);
 
         
     
-            map_0326603573115899633aa9d47bcae088.fitBounds(
+            map_61f339dbfed71dfac78a12401b9c3eff.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_1b60a6e137b6049e33d0a445e98fc02b = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Fsrtm90.tif\u0026colormap=terrain&quot;,
+            var tile_layer_8b3fcd2ab9240dad3cdff2e0f5a636d3 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Fsrtm90.tif\u0026colormap=terrain&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.634011, -120.755927], [38.626923, -117.30451]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_1b60a6e137b6049e33d0a445e98fc02b.addTo(map_0326603573115899633aa9d47bcae088);
+            tile_layer_8b3fcd2ab9240dad3cdff2e0f5a636d3.addTo(map_61f339dbfed71dfac78a12401b9c3eff);
         
     
-            map_0326603573115899633aa9d47bcae088.fitBounds(
+            map_61f339dbfed71dfac78a12401b9c3eff.fitBounds(
                 [[36.634011, -120.755927], [38.626923, -117.30451]],
                 {}
             );
         
     
-            var tile_layer_4180d75b6448c2959b1c5e18a049f04b = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2Fdd785e9c-f1d6-42fd-bf92-1a22209e6016%2Fdd785e9c-f1d6-42fd-bf92-1a22209e6016.tif\u0026colormap=coolwarm&quot;,
+            var tile_layer_dd6d1214586b3a509069792b0dcf34a5 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2F70c207c1-416f-49c9-a084-c0107d0d63f7%2F70c207c1-416f-49c9-a084-c0107d0d63f7.tif\u0026colormap=coolwarm&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.634011, -120.755927], [38.626923, -117.30451]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_4180d75b6448c2959b1c5e18a049f04b.addTo(map_0326603573115899633aa9d47bcae088);
+            tile_layer_dd6d1214586b3a509069792b0dcf34a5.addTo(map_61f339dbfed71dfac78a12401b9c3eff);
         
     
-            map_0326603573115899633aa9d47bcae088.fitBounds(
+            map_61f339dbfed71dfac78a12401b9c3eff.fitBounds(
                 [[36.634011, -120.755927], [38.626923, -117.30451]],
                 {}
             );
         
     
-            var layer_control_e507e4c5fde6ffb76103820b8be99621_layers = {
+            var layer_control_98aeffd38de3a7958243e4fe8b9cb4af_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_288a07255830d6dca9430a442fd92a6a,
+                    &quot;openstreetmap&quot; : tile_layer_e7680776808e4e7538d0d3056599229a,
                 },
                 overlays :  {
-                    &quot;DEM&quot; : tile_layer_1b60a6e137b6049e33d0a445e98fc02b,
-                    &quot;Classified DEM&quot; : tile_layer_4180d75b6448c2959b1c5e18a049f04b,
+                    &quot;DEM&quot; : tile_layer_8b3fcd2ab9240dad3cdff2e0f5a636d3,
+                    &quot;Classified DEM&quot; : tile_layer_dd6d1214586b3a509069792b0dcf34a5,
                 },
             };
-            let layer_control_e507e4c5fde6ffb76103820b8be99621 = L.control.layers(
-                layer_control_e507e4c5fde6ffb76103820b8be99621_layers.base_layers,
-                layer_control_e507e4c5fde6ffb76103820b8be99621_layers.overlays,
+            let layer_control_98aeffd38de3a7958243e4fe8b9cb4af = L.control.layers(
+                layer_control_98aeffd38de3a7958243e4fe8b9cb4af_layers.base_layers,
+                layer_control_98aeffd38de3a7958243e4fe8b9cb4af_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_0326603573115899633aa9d47bcae088);
+            ).addTo(map_61f339dbfed71dfac78a12401b9c3eff);
 
         
 &lt;/script&gt;
@@ -6105,7 +6128,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_8bae9e0a531a6727d92acfa13deae108 {
+                #map_6a7b4eebe83b788eaaf3e5519a7e2934 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -6128,14 +6151,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_8bae9e0a531a6727d92acfa13deae108&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_6a7b4eebe83b788eaaf3e5519a7e2934&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_8bae9e0a531a6727d92acfa13deae108 = L.map(
-                &quot;map_8bae9e0a531a6727d92acfa13deae108&quot;,
+            var map_6a7b4eebe83b788eaaf3e5519a7e2934 = L.map(
+                &quot;map_6a7b4eebe83b788eaaf3e5519a7e2934&quot;,
                 {
                     center: [37.6, -119.0],
                     crs: L.CRS.EPSG3857,
@@ -6146,24 +6169,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            L.control.scale().addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
 
             
 
         
     
-            var tile_layer_5e65326550135b17b19b1d34948b0a57 = L.tileLayer(
+            var tile_layer_fe84c99b82ce70e79224c918dae210a4 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 19, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_5e65326550135b17b19b1d34948b0a57.addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            tile_layer_fe84c99b82ce70e79224c918dae210a4.addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            ).addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
         
     
             var options = {
@@ -6172,14 +6195,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_f47b9ec051421b73e5088b4a35909717 = new L.featureGroup().addTo(
-                map_8bae9e0a531a6727d92acfa13deae108
+            var drawnItems_draw_control_579dc64f22a70e0936cd1e5a76aece9f = new L.featureGroup().addTo(
+                map_6a7b4eebe83b788eaaf3e5519a7e2934
             );
-            options.edit.featureGroup = drawnItems_draw_control_f47b9ec051421b73e5088b4a35909717;
-            var draw_control_f47b9ec051421b73e5088b4a35909717 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_579dc64f22a70e0936cd1e5a76aece9f;
+            var draw_control_579dc64f22a70e0936cd1e5a76aece9f = new L.Control.Draw(
                 options
-            ).addTo( map_8bae9e0a531a6727d92acfa13deae108 );
-            map_8bae9e0a531a6727d92acfa13deae108.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_6a7b4eebe83b788eaaf3e5519a7e2934 );
+            map_6a7b4eebe83b788eaaf3e5519a7e2934.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -6187,17 +6210,17 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_f47b9ec051421b73e5088b4a35909717.addLayer(layer);
+                drawnItems_draw_control_579dc64f22a70e0936cd1e5a76aece9f.addLayer(layer);
              });
-            map_8bae9e0a531a6727d92acfa13deae108.on('draw:created', function(e) {
-                drawnItems_draw_control_f47b9ec051421b73e5088b4a35909717.addLayer(e.layer);
+            map_6a7b4eebe83b788eaaf3e5519a7e2934.on('draw:created', function(e) {
+                drawnItems_draw_control_579dc64f22a70e0936cd1e5a76aece9f.addLayer(e.layer);
             });
             
         
     
-            var measure_control_14fb129eb8853f14bb43473dde26fb74 = new L.Control.Measure(
+            var measure_control_cf2bcd758f8f5788d80f9eba3e2d2304 = new L.Control.Measure(
                 {&quot;position&quot;: &quot;bottomleft&quot;, &quot;primaryAreaUnit&quot;: &quot;sqmeters&quot;, &quot;primaryLengthUnit&quot;: &quot;meters&quot;, &quot;secondaryAreaUnit&quot;: &quot;acres&quot;, &quot;secondaryLengthUnit&quot;: &quot;miles&quot;});
-            map_8bae9e0a531a6727d92acfa13deae108.addControl(measure_control_14fb129eb8853f14bb43473dde26fb74);
+            map_6a7b4eebe83b788eaaf3e5519a7e2934.addControl(measure_control_cf2bcd758f8f5788d80f9eba3e2d2304);
 
             // Workaround for using this plugin with Leaflet&gt;=1.8.0
             // https://github.com/ljagis/leaflet-measure/issues/171
@@ -6217,74 +6240,74 @@ m</div>
         
     
 
-            var geocoderOpts_geocoder_8ccf8467b424927cd3c9f40044454a36 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_647d07fb0a9cb8b1256eb187aa44cfea = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_8ccf8467b424927cd3c9f40044454a36 = geocoderOpts_geocoder_8ccf8467b424927cd3c9f40044454a36[&quot;provider&quot;];
+            var geocoderName_geocoder_647d07fb0a9cb8b1256eb187aa44cfea = geocoderOpts_geocoder_647d07fb0a9cb8b1256eb187aa44cfea[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_8ccf8467b424927cd3c9f40044454a36 = L.Control.Geocoder[ geocoderName_geocoder_8ccf8467b424927cd3c9f40044454a36 ](
-                geocoderOpts_geocoder_8ccf8467b424927cd3c9f40044454a36['providerOptions']
+            var customGeocoder_geocoder_647d07fb0a9cb8b1256eb187aa44cfea = L.Control.Geocoder[ geocoderName_geocoder_647d07fb0a9cb8b1256eb187aa44cfea ](
+                geocoderOpts_geocoder_647d07fb0a9cb8b1256eb187aa44cfea['providerOptions']
             );
-            geocoderOpts_geocoder_8ccf8467b424927cd3c9f40044454a36[&quot;geocoder&quot;] = customGeocoder_geocoder_8ccf8467b424927cd3c9f40044454a36;
+            geocoderOpts_geocoder_647d07fb0a9cb8b1256eb187aa44cfea[&quot;geocoder&quot;] = customGeocoder_geocoder_647d07fb0a9cb8b1256eb187aa44cfea;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_8ccf8467b424927cd3c9f40044454a36
+                geocoderOpts_geocoder_647d07fb0a9cb8b1256eb187aa44cfea
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_8ccf8467b424927cd3c9f40044454a36['zoom'] || map_8bae9e0a531a6727d92acfa13deae108.getZoom();
-                map_8bae9e0a531a6727d92acfa13deae108.setView(e.geocode.center, zoom);
-            }).addTo(map_8bae9e0a531a6727d92acfa13deae108);
+                var zoom = geocoderOpts_geocoder_647d07fb0a9cb8b1256eb187aa44cfea['zoom'] || map_6a7b4eebe83b788eaaf3e5519a7e2934.getZoom();
+                map_6a7b4eebe83b788eaaf3e5519a7e2934.setView(e.geocode.center, zoom);
+            }).addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
 
         
     
-            map_8bae9e0a531a6727d92acfa13deae108.fitBounds(
+            map_6a7b4eebe83b788eaaf3e5519a7e2934.fitBounds(
                 [[37.6, -119], [37.6, -119]],
                 {&quot;maxZoom&quot;: 9}
             );
         
     
-            var tile_layer_967ac0814705a53bc53ee04f1361850b = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Fsrtm90.tif\u0026colormap=terrain&quot;,
+            var tile_layer_b62f40cd46ac846caa47c1303f202336 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Fsrtm90.tif\u0026colormap=terrain&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.634011, -120.755927], [38.626923, -117.30451]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_967ac0814705a53bc53ee04f1361850b.addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            tile_layer_b62f40cd46ac846caa47c1303f202336.addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
         
     
-            var tile_layer_c38beb9ad8c71235da83e3b13224d6ca = L.tileLayer(
-                &quot;http://127.0.0.1:45123/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2Fe4707dc6-7d79-4d59-a6a4-d0e04a49f9a3%2Fe4707dc6-7d79-4d59-a6a4-d0e04a49f9a3.tif\u0026colormap=coolwarm&quot;,
+            var tile_layer_ddf629d438460bd41a263d0e5cf1df38 = L.tileLayer(
+                &quot;http://127.0.0.1:46373/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2F5a856c32-9338-41e8-9d95-9fffc9eb4899%2F5a856c32-9338-41e8-9d95-9fffc9eb4899.tif\u0026colormap=coolwarm&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.634011, -120.755927], [38.626923, -117.30451]], &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_c38beb9ad8c71235da83e3b13224d6ca.addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            tile_layer_ddf629d438460bd41a263d0e5cf1df38.addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
         
     
-            var side_by_side_layers_1b15a7fac78c974ace2f63ccbd0f4804 = L.control.sideBySide(
-                tile_layer_967ac0814705a53bc53ee04f1361850b, tile_layer_c38beb9ad8c71235da83e3b13224d6ca
-            ).addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            var side_by_side_layers_91679450a7f0ceb1ac1f831b2b798266 = L.control.sideBySide(
+                tile_layer_b62f40cd46ac846caa47c1303f202336, tile_layer_ddf629d438460bd41a263d0e5cf1df38
+            ).addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
         
     
-            map_8bae9e0a531a6727d92acfa13deae108.fitBounds(
+            map_6a7b4eebe83b788eaaf3e5519a7e2934.fitBounds(
                 [[36.634011, -120.755927], [38.626923, -117.30451]],
                 {}
             );
         
     
-            var layer_control_2a2e62a29bd4f4e9adfb725cea4d9b9c_layers = {
+            var layer_control_c5847d437517202ce5b2cde62124fe0f_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_5e65326550135b17b19b1d34948b0a57,
+                    &quot;openstreetmap&quot; : tile_layer_fe84c99b82ce70e79224c918dae210a4,
                 },
                 overlays :  {
-                    &quot;DEM&quot; : tile_layer_967ac0814705a53bc53ee04f1361850b,
-                    &quot;Classified DEM&quot; : tile_layer_c38beb9ad8c71235da83e3b13224d6ca,
+                    &quot;DEM&quot; : tile_layer_b62f40cd46ac846caa47c1303f202336,
+                    &quot;Classified DEM&quot; : tile_layer_ddf629d438460bd41a263d0e5cf1df38,
                 },
             };
-            let layer_control_2a2e62a29bd4f4e9adfb725cea4d9b9c = L.control.layers(
-                layer_control_2a2e62a29bd4f4e9adfb725cea4d9b9c_layers.base_layers,
-                layer_control_2a2e62a29bd4f4e9adfb725cea4d9b9c_layers.overlays,
+            let layer_control_c5847d437517202ce5b2cde62124fe0f = L.control.layers(
+                layer_control_c5847d437517202ce5b2cde62124fe0f_layers.base_layers,
+                layer_control_c5847d437517202ce5b2cde62124fe0f_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_8bae9e0a531a6727d92acfa13deae108);
+            ).addTo(map_6a7b4eebe83b788eaaf3e5519a7e2934);
 
         
 &lt;/script&gt;
