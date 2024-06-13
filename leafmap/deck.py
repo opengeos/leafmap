@@ -193,6 +193,7 @@ class Map(pdk.Deck):
     def add_vector(
         self,
         data: str,
+        layer_type: str = "GeoJsonLayer",
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
         **kwargs
@@ -201,6 +202,7 @@ class Map(pdk.Deck):
 
         Args:
             data (str): The input file path to the vector dataset.
+            layer_type (str, optional): The layer type to be used. Defaults to "GeoJsonLayer".
             layer_name (str, optional): The layer name to be used. Defaults to None.
             random_color_column (str, optional): The column name to use for random color. Defaults to None.
 
@@ -226,7 +228,7 @@ class Map(pdk.Deck):
             else:
                 gdf = data
 
-            self.add_gdf(gdf, layer_name, random_color_column, **kwargs)
+            self.add_gdf(gdf, layer_type, layer_name, random_color_column, **kwargs)
 
         except Exception as e:
             raise Exception(e)
