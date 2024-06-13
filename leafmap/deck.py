@@ -91,10 +91,11 @@ class Map(pdk.Deck):
                 self.add_layer(url, name)
 
             elif basemap in basemaps:
+                # Use pydeck_myTileLayer from https://github.com/agressin/pydeck_myTileLayer
                 pdk.settings.custom_libraries = [
                     {
                         "libraryName": "MyTileLayerLibrary",
-                        "resourceUri": "https://cdn.jsdelivr.net/gh/giswqs/pydeck_myTileLayer@master/dist/bundle.js",
+                        "resourceUri": "https://cdn.jsdelivr.net/gh/agressin/pydeck_myTileLayer@master/dist/bundle.js",
                     }
                 ]
 
