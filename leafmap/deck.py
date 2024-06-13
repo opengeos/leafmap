@@ -120,6 +120,7 @@ class Map(pdk.Deck):
     def add_gdf(
         self,
         gdf,
+        layer_type="GeoJsonLayer",
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
         **kwargs
@@ -128,6 +129,7 @@ class Map(pdk.Deck):
 
         Args:
             gdf (GeoPandas.GeoDataFrame): The GeoPandas GeoDataFrame to add to the map.
+            layer_type (str, optional): The layer type to be used. Defaults to "GeoJsonLayer".
             layer_name (str, optional): The layer name to be used. Defaults to None.
             random_color_column (str, optional): The column name to use for random color. Defaults to None.
 
@@ -144,24 +146,25 @@ class Map(pdk.Deck):
             if layer_name is None:
                 layer_name = "layer_" + random_string(3)
 
-            if "pickable" not in kwargs:
-                kwargs["pickable"] = True
-            if "opacity" not in kwargs:
-                kwargs["opacity"] = 0.5
-            if "stroked" not in kwargs:
-                kwargs["stroked"] = True
-            if "filled" not in kwargs:
-                kwargs["filled"] = True
-            if "extruded" not in kwargs:
-                kwargs["extruded"] = False
-            if "wireframe" not in kwargs:
-                kwargs["wireframe"] = True
-            if "get_line_color" not in kwargs:
-                kwargs["get_line_color"] = [0, 0, 0]
-            if "get_line_width" not in kwargs:
-                kwargs["get_line_width"] = 2
-            if "line_width_min_pixels" not in kwargs:
-                kwargs["line_width_min_pixels"] = 1
+            if "layer_type" == "GeoJsonLayer":
+                if "pickable" not in kwargs:
+                    kwargs["pickable"] = True
+                if "opacity" not in kwargs:
+                    kwargs["opacity"] = 0.5
+                if "stroked" not in kwargs:
+                    kwargs["stroked"] = True
+                if "filled" not in kwargs:
+                    kwargs["filled"] = True
+                if "extruded" not in kwargs:
+                    kwargs["extruded"] = False
+                if "wireframe" not in kwargs:
+                    kwargs["wireframe"] = True
+                if "get_line_color" not in kwargs:
+                    kwargs["get_line_color"] = [0, 0, 0]
+                if "get_line_width" not in kwargs:
+                    kwargs["get_line_width"] = 2
+                if "line_width_min_pixels" not in kwargs:
+                    kwargs["line_width_min_pixels"] = 1
 
             if random_color_column is not None:
                 if random_color_column not in gdf.columns.values.tolist():
@@ -177,7 +180,7 @@ class Map(pdk.Deck):
                 kwargs["get_fill_color"] = "color"
 
             layer = pdk.Layer(
-                "GeoJsonLayer",
+                layer_type,
                 gdf,
                 id=layer_name,
                 **kwargs,
@@ -189,7 +192,8 @@ class Map(pdk.Deck):
 
     def add_vector(
         self,
-        filename: str,
+        data: str,
+        layer_type: str = "GeoJsonLayer",
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
         **kwargs
@@ -197,7 +201,8 @@ class Map(pdk.Deck):
         """Adds a vector file to the map.
 
         Args:
-            filename (str): The input file path to the vector dataset.
+            data (str): The input file path to the vector dataset.
+            layer_type (str, optional): The layer type to be used. Defaults to "GeoJsonLayer".
             layer_name (str, optional): The layer name to be used. Defaults to None.
             random_color_column (str, optional): The column name to use for random color. Defaults to None.
 
@@ -209,18 +214,21 @@ class Map(pdk.Deck):
             import geopandas as gpd
             import fiona
 
-            if not filename.startswith("http"):
-                filename = os.path.abspath(filename)
-                if filename.endswith(".zip"):
-                    filename = "zip://" + filename
+            if isinstance(data, str):
+                if not data.startswith("http"):
+                    data = os.path.abspath(data)
+                    if data.endswith(".zip"):
+                        data = "zip://" + data
 
-            if filename.endswith(".kml"):
-                fiona.drvsupport.supported_drivers["KML"] = "rw"
-                gdf = gpd.read_file(filename, driver="KML")
+                if data.endswith(".kml"):
+                    fiona.drvsupport.supported_drivers["KML"] = "rw"
+                    gdf = gpd.read_file(data, driver="KML")
+                else:
+                    gdf = gpd.read_file(data)
             else:
-                gdf = gpd.read_file(filename)
+                gdf = data
 
-            self.add_gdf(gdf, layer_name, random_color_column, **kwargs)
+            self.add_gdf(gdf, layer_type, layer_name, random_color_column, **kwargs)
 
         except Exception as e:
             raise Exception(e)
