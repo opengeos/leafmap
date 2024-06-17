@@ -13418,7 +13418,7 @@ def image_min_max(
     return vmin, vmax
 
 
-def df_to_geojson(
+def pandas_to_geojson(
     df,
     coordinates=["lng", "lat"],
     geometry_type: str = "Point",
