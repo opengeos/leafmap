@@ -2309,6 +2309,7 @@ class Map(ipyleaflet.Map):
         visible=True,
         opacity=1.0,
         array_args={},
+        client_args={"cors_all": False},
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -2333,6 +2334,7 @@ class Map(ipyleaflet.Map):
             visible (bool, optional): Whether the layer is visible. Defaults to True.
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.
+            client_args (dict, optional): Additional arguments to pass to localtileserver.TileClient. Defaults to { "cors_all": False }.
         """
         import numpy as np
         import xarray as xr
@@ -2350,6 +2352,7 @@ class Map(ipyleaflet.Map):
             opacity=opacity,
             attribution=attribution,
             layer_name=layer_name,
+            client_args=client_args,
             return_client=True,
             **kwargs,
         )

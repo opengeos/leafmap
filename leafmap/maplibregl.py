@@ -694,3 +694,95 @@ class Map(MapWidget):
         )
         if fit_bounds:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
+
+    def add_raster(
+        self,
+        source,
+        indexes=None,
+        colormap=None,
+        vmin=None,
+        vmax=None,
+        nodata=None,
+        attribution="Localtileserver",
+        name="Raster",
+        before_id=None,
+        fit_bounds=True,
+        visible=True,
+        opacity=1.0,
+        array_args={},
+        client_args={"cors_all": True},
+        **kwargs,
+    ):
+        """Add a local raster dataset to the map.
+            If you are using this function in JupyterHub on a remote server
+            (e.g., Binder, Microsoft Planetary Computer) and if the raster
+            does not render properly, try installing jupyter-server-proxy using
+            `pip install jupyter-server-proxy`, then running the following code
+            before calling this function. For more info, see https://bit.ly/3JbmF93.
+
+            import os
+            os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = 'proxy/{port}'
+
+        Args:
+            source (str): The path to the GeoTIFF file or the URL of the Cloud
+                Optimized GeoTIFF.
+            indexes (int, optional): The band(s) to use. Band indexing starts
+                at 1. Defaults to None.
+            colormap (str, optional): The name of the colormap from `matplotlib`
+                to use when plotting a single band.
+                See https://matplotlib.org/stable/gallery/color/colormap_reference.html.
+                Default is greyscale.
+            vmin (float, optional): The minimum value to use when colormapping
+                the palette when plotting a single band. Defaults to None.
+            vmax (float, optional): The maximum value to use when colormapping
+                the palette when plotting a single band. Defaults to None.
+            nodata (float, optional): The value from the band to use to interpret
+                as not valid data. Defaults to None.
+            attribution (str, optional): Attribution for the source raster. This
+                defaults to a message about it being a local file.. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
+            layer_index (int, optional): The index of the layer. Defaults to None.
+            zoom_to_layer (bool, optional): Whether to zoom to the extent of the
+                layer. Defaults to True.
+            visible (bool, optional): Whether the layer is visible. Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
+            array_args (dict, optional): Additional arguments to pass to
+                `array_to_memory_file` when reading the raster. Defaults to {}.
+            client_args (dict, optional): Additional arguments to pass to
+                localtileserver.TileClient. Defaults to { "cors_all": False }.
+        """
+        import numpy as np
+        import xarray as xr
+
+        if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
+            source = array_to_image(source, **array_args)
+
+        tile_layer, tile_client = get_local_tile_layer(
+            source,
+            indexes=indexes,
+            colormap=colormap,
+            vmin=vmin,
+            vmax=vmax,
+            nodata=nodata,
+            opacity=opacity,
+            attribution=attribution,
+            layer_name=name,
+            client_args=client_args,
+            return_client=True,
+            **kwargs,
+        )
+
+        self.add_tile_layer(
+            tile_layer.url,
+            name=name,
+            opacity=opacity,
+            visible=visible,
+            attribution=attribution,
+            before_id=before_id,
+        )
+
+        bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
+        bounds = [[bounds[2], bounds[0]], [bounds[3], bounds[1]]]
+        # [minx, miny, maxx, maxy]
+        if fit_bounds:
+            self.fit_bounds(bounds)
