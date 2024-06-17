@@ -3530,13 +3530,41 @@ def gdf_geom_type(gdf, first_only=True):
 
     Args:
         gdf (gpd.GeoDataFrame): A GeoDataFrame.
-        first_only (bool, optional): Whether to return the geometry type of the first feature in the GeoDataFrame. Defaults to True.
+        first_only (bool, optional): Whether to return the geometry type of the f
+            irst feature in the GeoDataFrame. Defaults to True.
 
     Returns:
-        str: The geometry type of the GeoDataFrame, such as Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
+        str: The geometry type of the GeoDataFrame, such as Point, LineString,
+            Polygon, MultiPoint, MultiLineString, MultiPolygon.
             For more info, see https://shapely.readthedocs.io/en/stable/manual.html
     """
     import geopandas as gpd
+
+    if first_only:
+        return gdf.geometry.type[0]
+    else:
+        return gdf.geometry.type
+
+
+def vector_geom_type(data, first_only=True, **kwargs):
+    """Returns the geometry type of a vector dataset.
+
+    Args:
+        gdf (gpd.GeoDataFrame): A GeoDataFrame.
+        first_only (bool, optional): Whether to return the geometry type of the
+            first feature in the GeoDataFrame. Defaults to True.
+        kwargs: Additional keyword arguments to pass to the geopandas.read_file function.
+
+
+    Returns:
+        str: The geometry type of the GeoDataFrame, such as Point, LineString,
+            Polygon, MultiPoint, MultiLineString, MultiPolygon.
+            For more info, see https://shapely.readthedocs.io/en/stable/manual.html
+    """
+    import geopandas as gpd
+
+    if isinstance(data, str) or isinstance(data, dict):
+        gdf = gpd.read_file(data, **kwargs)
 
     if first_only:
         return gdf.geometry.type[0]
