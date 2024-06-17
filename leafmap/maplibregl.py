@@ -837,3 +837,35 @@ class Map(MapWidget):
         # [minx, miny, maxx, maxy]
         if fit_bounds:
             self.fit_bounds(bounds)
+
+    def to_html(
+        self,
+        title: str = "Map",
+        width: str = "100%",
+        height: str = "880px",
+        output: str = None,
+        **kwargs,
+    ):
+        """Render the map to an HTML page.
+
+        Args:
+            title (str, optional): The title of the HTML page. Defaults to 'Map'.
+            width (str, optional): The width of the map. Defaults to '100%'.
+            height (str, optional): The height of the map. Defaults to '880px'.
+            **kwargs: Additional keyword arguments that are passed to the
+                `maplibre.ipywidget.MapWidget.to_html()` method.
+
+        Returns:
+            str: The HTML content of the map.
+        """
+
+        if "style" not in kwargs:
+            kwargs["style"] = f"width: {width}; height: {height};"
+        else:
+            kwargs["style"] += f"width: {width}; height: {height};"
+        html = super().to_html(title=title, **kwargs)
+        if output:
+            with open(output, "w") as f:
+                f.write(html)
+        else:
+            return html
