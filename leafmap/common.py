@@ -2819,6 +2819,7 @@ def get_local_tile_layer(
     attribution=None,
     tile_format="ipyleaflet",
     layer_name="Local COG",
+    client_args={"cors_all": False},
     return_client=False,
     quiet=False,
     **kwargs,
@@ -2842,6 +2843,7 @@ def get_local_tile_layer(
         attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to None.
+        client_args (dict, optional): Additional arguments to pass to the TileClient. Defaults to {}.
         return_client (bool, optional): If True, the tile client will be returned. Defaults to False.
         quiet (bool, optional): If True, the error messages will be suppressed. Defaults to False.
 
@@ -2942,7 +2944,7 @@ def get_local_tile_layer(
             layer_name = "LocalTile_" + random_string(3)
 
     if isinstance(source, str) or isinstance(source, rasterio.io.DatasetReader):
-        tile_client = TileClient(source, port=port, debug=debug)
+        tile_client = TileClient(source, port=port, debug=debug, **client_args)
     else:
         tile_client = source
 
