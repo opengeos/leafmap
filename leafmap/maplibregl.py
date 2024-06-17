@@ -4,6 +4,7 @@
 import xyzservices
 import geopandas as gpd
 from box import Box
+from maplibre.basemaps import background
 from maplibre.basemaps import construct_carto_basemap_url
 from maplibre.ipywidget import MapWidget
 from maplibre import Layer, LayerType, MapOptions
@@ -30,6 +31,8 @@ class Map(MapWidget):
         self,
         center: Tuple[float, float] = (20, 0),
         zoom: int = 1,
+        pitch: int = 0,
+        bearing: int = 0,
         style: str = "dark-matter",
         height: str = "600px",
         controls: Dict[str, str] = {"fullscreen": "top-right", "scale": "bottom-left"},
@@ -42,12 +45,20 @@ class Map(MapWidget):
             center (tuple, optional): The center of the map (lat, lon). Defaults
                 to (20, 0).
             zoom (int, optional): The zoom level of the map. Defaults to 1.
-            style (str, optional): The style of the map. Defaults to "dark-matter".
+            pitch (int, optional): The pitch of the map. Measured in degrees
+                away from the plane of the screen (0-85) Defaults to 0.
+            bearing (int, optional): The bearing of the map. Measured in degrees
+                counter-clockwise from north. Defaults to 0.
+            style (str, optional): The style of the map. It can be a string or a URL.
+                If it is a string, it must be one of the following: "dark-matter",
+                "positron", "voyager", "positron-nolabels", "dark-matter-nolabels",
+                "voyager-nolabels", or "demotiles". If it is a URL, it must point to
+                a MapLibre style JSON. Defaults to "dark-matter".
             height (str, optional): The height of the map. Defaults to "600px".
             controls (dict, optional): The controls and their positions on the
                 map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.
             **kwargs: Additional keyword arguments that are passed to the MapOptions class.
-                See https://maplibre.org/maplibre-gl-js/docs/API/types/MapOptions/
+                See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/
                 for more information.
 
         Returns:
@@ -62,14 +73,16 @@ class Map(MapWidget):
             "dark-matter-nolabels",
             "voyager-nolabels",
         ]
-        if style in carto_basemaps:
-            style = construct_carto_basemap_url(style)
+        if isinstance(style, str) and style.lower() in carto_basemaps:
+            style = construct_carto_basemap_url(style.lower())
         elif style == "demotiles":
             style = "https://demotiles.maplibre.org/style.json"
 
         if style is not None:
             kwargs["style"] = style
-        map_options = MapOptions(center=center, zoom=zoom, **kwargs)
+        map_options = MapOptions(
+            center=center, zoom=zoom, pitch=pitch, bearing=bearing, **kwargs
+        )
 
         super().__init__(map_options, height=height)
         super().use_message_queue()
@@ -326,7 +339,9 @@ class Map(MapWidget):
         Args:
             data (str | dict): The GeoJSON data. This can be a URL to a GeoJSON
                 file or a GeoJSON dictionary.
-            layer_type (str, optional): The type of the layer. If None, the type
+            layer_type (str, optional): The type of the layer. It can be one of
+                the following: 'circle', 'fill', 'fill-extrusion', 'line', 'symbol',
+                'raster', 'background', 'heatmap', 'hillshade'. If None, the type
                 is inferred from the GeoJSON data.
             filter (dict, optional): The filter to apply to the layer. If None,
                 no filter is applied.
@@ -379,6 +394,71 @@ class Map(MapWidget):
                 data = gdf.__geo_interface__
                 self.fit_bounds(get_bounds(data))
         self.set_visibility(name, visible)
+
+    def add_vector(
+        self,
+        data: Union[str, Dict],
+        layer_type: Optional[str] = None,
+        filter: Optional[Dict] = None,
+        paint: Optional[Dict] = None,
+        name: Optional[str] = None,
+        fit_bounds: bool = True,
+        visible: bool = True,
+        before_id: Optional[str] = None,
+        source_args: Dict = {},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a vector layer to the map.
+
+        This method adds a vector layer to the map. The vector data can be a
+        URL or local file path to a vector file. If a name is provided, it
+        is used as the key to store the layer in the layer dictionary. Otherwise,
+        a random name is generated.
+
+        Args:
+            data (str | dict): The vector data. This can be a URL or local file
+                path to a vector file.
+            layer_type (str, optional): The type of the layer. If None, the type
+                is inferred from the GeoJSON data.
+            filter (dict, optional): The filter to apply to the layer. If None,
+                no filter is applied.
+            paint (dict, optional): The paint properties to apply to the layer.
+                If None, no paint properties are applied.
+            name (str, optional): The name of the layer. If None, a random name
+                is generated.
+            fit_bounds (bool, optional): Whether to adjust the viewport of the
+                map to fit the bounds of the GeoJSON data. Defaults to True.
+            visible (bool, optional): Whether the layer is visible or not.
+                Defaults to True.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
+            source_args (dict, optional): Additional keyword arguments that are
+                passed to the GeoJSONSource class.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the data is not a URL or a GeoJSON dictionary.
+        """
+
+        if not isinstance(data, gpd.GeoDataFrame):
+            data = gpd.read_file(data).__geo_interface__
+
+        self.add_geojson(
+            data,
+            layer_type=layer_type,
+            filter=filter,
+            paint=paint,
+            name=name,
+            fit_bounds=fit_bounds,
+            visible=visible,
+            before_id=before_id,
+            source_args=source_args,
+            **kwargs,
+        )
 
     def add_tile_layer(
         self,
