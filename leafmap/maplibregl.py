@@ -511,6 +511,57 @@ class Map(MapWidget):
         self.set_visibility(name, visible)
         self.set_paint_property(name, "raster-opacity", opacity)
 
+    def add_wms_layer(
+        self,
+        url: str,
+        name: str = "WMS Layer",
+        attribution: str = "",
+        opacity: float = 1.0,
+        visible: bool = True,
+        tile_size: int = 256,
+        before_id: Optional[str] = None,
+        source_args: Dict = {},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a WMS layer to the map.
+
+        This method adds a WMS layer to the map. The WMS  is created from
+            the specified URL, and it is added to the map with the specified
+            name, attribution, visibility, and tile size.
+
+        Args:
+            url (str): The URL of the tile layer.
+            name (str, optional): The name to use for the layer. Defaults to
+                'WMS Layer'.
+            attribution (str, optional): The attribution to use for the layer.
+                Defaults to ''.
+            visible (bool, optional): Whether the layer should be visible by
+                default. Defaults to True.
+            tile_size (int, optional): The size of the tiles in the layer.
+                Defaults to 256.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
+            source_args (dict, optional): Additional keyword arguments that are
+                passed to the RasterTileSource class.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+                See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
+
+        Returns:
+            None
+        """
+        self.add_tile_layer(
+            url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            visible=visible,
+            tile_size=tile_size,
+            before_id=before_id,
+            source_args=source_args,
+            **kwargs,
+        )
+
     def add_ee_layer(
         self,
         asset_id: str,
