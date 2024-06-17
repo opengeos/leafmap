@@ -112,6 +112,7 @@
 89. Visualizing in-memory raster datasets and image arrays ([notebook](https://leafmap.org/notebooks/89_image_array_viz))
 90. Querying pixel values with the interactive pixel inspector ([notebook](https://leafmap.org/notebooks/90_pixel_inspector))
 91. Visualizing raster data interactively ([notebook](https://leafmap.org/notebooks/91_raster_viz_gui))
+92. Creating 3D maps with the MapLibre mapping backend ([notebook](https://leafmap.org/notebooks/92_maplibre))
 
 ## Demo
 
