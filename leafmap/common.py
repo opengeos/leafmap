@@ -2819,6 +2819,7 @@ def get_local_tile_layer(
     attribution=None,
     tile_format="ipyleaflet",
     layer_name="Local COG",
+    client_args={"cors_all": False},
     return_client=False,
     quiet=False,
     **kwargs,
@@ -2842,6 +2843,7 @@ def get_local_tile_layer(
         attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to None.
+        client_args (dict, optional): Additional arguments to pass to the TileClient. Defaults to {}.
         return_client (bool, optional): If True, the tile client will be returned. Defaults to False.
         quiet (bool, optional): If True, the error messages will be suppressed. Defaults to False.
 
@@ -2942,7 +2944,7 @@ def get_local_tile_layer(
             layer_name = "LocalTile_" + random_string(3)
 
     if isinstance(source, str) or isinstance(source, rasterio.io.DatasetReader):
-        tile_client = TileClient(source, port=port, debug=debug)
+        tile_client = TileClient(source, port=port, debug=debug, **client_args)
     else:
         tile_client = source
 
@@ -3530,13 +3532,41 @@ def gdf_geom_type(gdf, first_only=True):
 
     Args:
         gdf (gpd.GeoDataFrame): A GeoDataFrame.
-        first_only (bool, optional): Whether to return the geometry type of the first feature in the GeoDataFrame. Defaults to True.
+        first_only (bool, optional): Whether to return the geometry type of the f
+            irst feature in the GeoDataFrame. Defaults to True.
 
     Returns:
-        str: The geometry type of the GeoDataFrame, such as Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon.
+        str: The geometry type of the GeoDataFrame, such as Point, LineString,
+            Polygon, MultiPoint, MultiLineString, MultiPolygon.
             For more info, see https://shapely.readthedocs.io/en/stable/manual.html
     """
     import geopandas as gpd
+
+    if first_only:
+        return gdf.geometry.type[0]
+    else:
+        return gdf.geometry.type
+
+
+def vector_geom_type(data, first_only=True, **kwargs):
+    """Returns the geometry type of a vector dataset.
+
+    Args:
+        gdf (gpd.GeoDataFrame): A GeoDataFrame.
+        first_only (bool, optional): Whether to return the geometry type of the
+            first feature in the GeoDataFrame. Defaults to True.
+        kwargs: Additional keyword arguments to pass to the geopandas.read_file function.
+
+
+    Returns:
+        str: The geometry type of the GeoDataFrame, such as Point, LineString,
+            Polygon, MultiPoint, MultiLineString, MultiPolygon.
+            For more info, see https://shapely.readthedocs.io/en/stable/manual.html
+    """
+    import geopandas as gpd
+
+    if isinstance(data, str) or isinstance(data, dict):
+        gdf = gpd.read_file(data, **kwargs)
 
     if first_only:
         return gdf.geometry.type[0]
@@ -13388,3 +13418,63 @@ def image_min_max(
     vmax = dataset["band_data"].max().values.item()
 
     return vmin, vmax
+
+
+def pandas_to_geojson(
+    df,
+    coordinates=["lng", "lat"],
+    geometry_type: str = "Point",
+    properties: list = None,
+    output: Optional[str] = None,
+) -> dict:
+    """
+    Convert a DataFrame to a GeoJSON format.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame containing the data.
+        coordinates (list): A list of two column names representing the
+            longitude and latitude coordinates.
+        geometry_type (str): The type of geometry for the GeoJSON features
+            (e.g., "Point", "LineString", "Polygon").
+        properties (list): A list of column names to include in the properties
+            of each GeoJSON feature. If None, all columns except the coordinate
+            columns are included.
+        output (str, optional): The file path to save the GeoJSON output. If None,
+            the GeoJSON is not saved to a file.
+
+    Returns:
+        dict: A dictionary representing the GeoJSON object.
+    """
+
+    import pandas as pd
+
+    if isinstance(df, str):
+        if df.endswith(".csv"):
+            df = pd.read_csv(df)
+        elif df.endswith(".json"):
+            df = pd.read_json(df)
+        else:
+            raise ValueError("The input file must be a CSV or JSON file.")
+
+    geojson = {"type": "FeatureCollection", "features": []}
+
+    if properties is None:
+        properties = [col for col in df.columns if col not in coordinates]
+
+    for _, row in df.iterrows():
+        feature = {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {"type": geometry_type, "coordinates": []},
+        }
+        feature["geometry"]["coordinates"] = list(row[coordinates])
+        for prop in properties:
+            feature["properties"][prop] = row[prop]
+
+        geojson["features"].append(feature)
+
+    if output:
+        with open(output, "w") as f:
+            json.dump(geojson, f, indent=4)
+
+    return geojson
