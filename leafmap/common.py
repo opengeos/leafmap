@@ -13416,3 +13416,63 @@ def image_min_max(
     vmax = dataset["band_data"].max().values.item()
 
     return vmin, vmax
+
+
+def df_to_geojson(
+    df,
+    coordinates=["lng", "lat"],
+    geometry_type: str = "Point",
+    properties: list = None,
+    output: Optional[str] = None,
+) -> dict:
+    """
+    Convert a DataFrame to a GeoJSON format.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame containing the data.
+        coordinates (list): A list of two column names representing the
+            longitude and latitude coordinates.
+        geometry_type (str): The type of geometry for the GeoJSON features
+            (e.g., "Point", "LineString", "Polygon").
+        properties (list): A list of column names to include in the properties
+            of each GeoJSON feature. If None, all columns except the coordinate
+            columns are included.
+        output (str, optional): The file path to save the GeoJSON output. If None,
+            the GeoJSON is not saved to a file.
+
+    Returns:
+        dict: A dictionary representing the GeoJSON object.
+    """
+
+    import pandas as pd
+
+    if isinstance(df, str):
+        if df.endswith(".csv"):
+            df = pd.read_csv(df)
+        elif df.endswith(".json"):
+            df = pd.read_json(df)
+        else:
+            raise ValueError("The input file must be a CSV or JSON file.")
+
+    geojson = {"type": "FeatureCollection", "features": []}
+
+    if properties is None:
+        properties = [col for col in df.columns if col not in coordinates]
+
+    for _, row in df.iterrows():
+        feature = {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {"type": geometry_type, "coordinates": []},
+        }
+        feature["geometry"]["coordinates"] = list(row[coordinates])
+        for prop in properties:
+            feature["properties"][prop] = row[prop]
+
+        geojson["features"].append(feature)
+
+    if output:
+        with open(output, "w") as f:
+            json.dump(geojson, f, indent=4)
+
+    return geojson
