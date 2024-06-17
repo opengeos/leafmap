@@ -78,6 +78,12 @@ for file in files:
             url = f"https://pccompute.westeurope.cloudapp.azure.com/compute/hub/user-redirect/git-pull?repo=https://github.com/opengeos/leafmap&urlpath=lab/tree/leafmap/examples/{base_dir}/{basename}&branch=master"
             badge_url = f"{badge}({url})\n"
             out_lines.append(badge_url)
+        elif (
+            "jupyterlite.rtfd" in line and "studiolab.sagemaker.aws" in lines[index + 1]
+        ):
+            out_lines.append(line)
+            skip_lines.append(index + 1)
+            skip_lines.append(index + 2)
 
         elif ":id:" in line:
             print(file)
