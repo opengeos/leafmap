@@ -9,7 +9,7 @@ from maplibre.basemaps import construct_carto_basemap_url
 from maplibre.ipywidget import MapWidget
 from maplibre import Layer, LayerType, MapOptions
 from maplibre.sources import GeoJSONSource, RasterTileSource
-from maplibre.utils import get_bounds, df_to_geojson
+from maplibre.utils import get_bounds
 from maplibre.controls import (
     ScaleControl,
     FullscreenControl,
@@ -73,10 +73,14 @@ class Map(MapWidget):
             "dark-matter-nolabels",
             "voyager-nolabels",
         ]
-        if isinstance(style, str) and style.lower() in carto_basemaps:
-            style = construct_carto_basemap_url(style.lower())
-        elif style == "demotiles":
-            style = "https://demotiles.maplibre.org/style.json"
+        if isinstance(style, str):
+            if style.lower() in carto_basemaps:
+                style = construct_carto_basemap_url(style.lower())
+            elif style == "demotiles":
+                style = "https://demotiles.maplibre.org/style.json"
+            elif "background-" in style:
+                color = style.split("-")[1]
+                style = background(color)
 
         if style is not None:
             kwargs["style"] = style
@@ -91,6 +95,11 @@ class Map(MapWidget):
             self.add_control(control, position)
 
         self.layer_dict = {}
+        self.layer_dict["background"] = {
+            "layer": Layer(id="background", type=LayerType.BACKGROUND),
+            "opacity": 1.0,
+            "visible": True,
+        }
 
     def add_layer(
         self,
@@ -120,7 +129,8 @@ class Map(MapWidget):
         if name is None:
             name = layer.id
 
-        self.layer_dict[name] = layer
+        self.layer_dict[name] = {}
+        self.layer_dict[name]["layer"] = layer
         super().add_layer(layer, before_id=before_id)
 
     def add_control(
@@ -312,7 +322,7 @@ class Map(MapWidget):
         )
         layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
         self.add_layer(layer)
-        self.set_paint_property(name, "raster-opacity", opacity)
+        self.set_opacity(name, opacity)
         self.set_visibility(name, visible)
 
     def add_geojson(
@@ -394,6 +404,11 @@ class Map(MapWidget):
                 data = gdf.__geo_interface__
                 self.fit_bounds(get_bounds(data))
         self.set_visibility(name, visible)
+
+        if isinstance(paint, dict) and f"{layer_type}-opacity" in paint:
+            self.set_opacity(name, paint[f"{layer_type}-opacity"])
+        else:
+            self.set_opacity(name, 1.0)
 
     def add_vector(
         self,
@@ -509,7 +524,7 @@ class Map(MapWidget):
         layer = Layer(id=name, source=raster_source, type=LayerType.RASTER, **kwargs)
         self.add_layer(layer, before_id=before_id, name=name)
         self.set_visibility(name, visible)
-        self.set_paint_property(name, "raster-opacity", opacity)
+        self.set_opacity(name, opacity)
 
     def add_wms_layer(
         self,
@@ -869,3 +884,115 @@ class Map(MapWidget):
                 f.write(html)
         else:
             return html
+
+    def set_paint_property(self, name: str, prop: str, value: Any) -> None:
+        """
+        Set the opacity of a layer.
+
+        This method sets the opacity of the specified layer to the specified value.
+
+        Args:
+            name (str): The name of the layer.
+            opacity (float): The opacity value to set.
+
+        Returns:
+            None
+        """
+        super().set_paint_property(name, prop, value)
+
+        if "opacity" in prop:
+            self.layer_dict[name]["opacity"] = value
+
+    def set_opacity(self, name: str, opacity: float) -> None:
+        """
+        Set the opacity of a layer.
+
+        This method sets the opacity of the specified layer to the specified value.
+
+        Args:
+            name (str): The name of the layer.
+            opacity (float): The opacity value to set.
+
+        Returns:
+            None
+        """
+        layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
+        prop_name = f"{layer_type}-opacity"
+
+        super().set_paint_property(name, prop_name, opacity)
+        self.layer_dict[name]["opacity"] = opacity
+
+    def set_visibility(self, name: str, visible: bool) -> None:
+        """
+        Set the visibility of a layer.
+
+        This method sets the visibility of the specified layer to the specified value.
+
+        Args:
+            name (str): The name of the layer.
+            visible (bool): The visibility value to set.
+
+        Returns:
+            None
+        """
+        super().set_visibility(name, visible)
+        self.layer_dict[name]["visible"] = visible
+
+    def layer_interact(self, name=None):
+        """Create a layer widget for changing the visibility and opacity of a layer.
+
+        Args:
+            name (str): The name of the layer.
+
+        Returns:
+            ipywidgets.Widget: The layer widget.
+        """
+
+        import ipywidgets as widgets
+
+        layer_names = list(self.layer_dict.keys())
+        if name is None:
+            name = layer_names[-1]
+        elif name not in layer_names:
+            raise ValueError(f"Layer {name} not found.")
+
+        style = {"description_width": "initial"}
+        dropdown = widgets.Dropdown(
+            options=layer_names,
+            value=name,
+            description="Layer",
+            style=style,
+        )
+        checkbox = widgets.Checkbox(
+            description="Visible",
+            value=self.layer_dict[name]["visible"],
+            style=style,
+            layout=widgets.Layout(width="120px"),
+        )
+        opacity_slider = widgets.FloatSlider(
+            description="Opacity",
+            min=0,
+            max=1,
+            step=0.01,
+            value=self.layer_dict[name]["opacity"],
+            style=style,
+        )
+        hbox = widgets.HBox(
+            [dropdown, checkbox, opacity_slider], layout=widgets.Layout(width="600px")
+        )
+
+        def dropdown_event(change):
+            name = change.new
+            checkbox.value = self.layer_dict[dropdown.value]["visible"]
+            opacity_slider.value = self.layer_dict[dropdown.value]["opacity"]
+
+        dropdown.observe(dropdown_event, "value")
+
+        def update_layer(change):
+            self.set_visibility(dropdown.value, checkbox.value)
+            self.set_opacity(dropdown.value, opacity_slider.value)
+
+        checkbox.observe(update_layer, "value")
+        opacity_slider.observe(update_layer, "value")
+
+        return hbox
