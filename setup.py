@@ -28,6 +28,7 @@ extras_requires = {
     "backends": [
         "bokeh",
         "keplergl",
+        "maplibre",
         "pydeck",
         "plotly",
     ],
@@ -59,6 +60,14 @@ extras_requires = {
         "localtileserver>=0.10.0",
         "rastervision",
         "pytorch-lightning",
+    ],
+    "maplibre": [
+        "maplibre",
+        "h3",
+        "geopandas",
+        "localtileserver",
+        "rioxarray",
+        "xarray",
     ],
 }
 
