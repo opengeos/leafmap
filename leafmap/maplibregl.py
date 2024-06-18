@@ -133,8 +133,11 @@ class Map(MapWidget):
         if name is None:
             name = layer.id
 
-        self.layer_dict[name] = {}
-        self.layer_dict[name]["layer"] = layer
+        self.layer_dict[name] = {
+            "layer": layer,
+            "opacity": 1.0,
+            "visible": True,
+        }
         super().add_layer(layer, before_id=before_id)
 
     def remove_layer(self, name: str) -> None:
@@ -1110,3 +1113,100 @@ class Map(MapWidget):
         opacity_slider.observe(update_layer, "value")
 
         return hbox
+
+    def add_pmtiles(
+        self,
+        url: str,
+        style: Optional[Dict] = None,
+        visible: bool = True,
+        opacity: float = 1.0,
+        exclude_mask: bool = False,
+        tooltip: bool = True,
+        properties: Optional[Dict] = None,
+        template: Optional[str] = None,
+        attribution: str = "PMTiles",
+        fit_bounds: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a PMTiles layer to the map.
+
+        Args:
+            url (str): The URL of the PMTiles file.
+            style (dict, optional): The CSS style to apply to the layer. Defaults to None.
+                See https://docs.mapbox.com/style-spec/reference/layers/ for more info.
+            visible (bool, optional): Whether the layer should be shown initially. Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
+            exclude_mask (bool, optional): Whether to exclude the mask layer. Defaults to False.
+            tooltip (bool, optional): Whether to show tooltips on the layer. Defaults to True.
+            properties (dict, optional): The properties to use for the tooltips. Defaults to None.
+            template (str, optional): The template to use for the tooltips. Defaults to None.
+            attribution (str, optional): The attribution to use for the layer. Defaults to 'PMTiles'.
+            fit_bounds (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the PMTilesLayer constructor.
+
+        Returns:
+            None
+        """
+
+        # Function to replace hyphens with underscores in top-level dictionary keys
+        def replace_top_level_hyphens(d):
+            if isinstance(d, dict):
+                return {k.replace("-", "_"): v for k, v in d.items()}
+            return d
+
+        # Function to replace hyphens with underscores in dictionary keys
+        def replace_hyphens_in_keys(d):
+            if isinstance(d, dict):
+                return {
+                    k.replace("-", "_"): replace_hyphens_in_keys(v)
+                    for k, v in d.items()
+                }
+            elif isinstance(d, list):
+                return [replace_hyphens_in_keys(i) for i in d]
+            else:
+                return d
+
+        if "sources" in kwargs:
+            del kwargs["sources"]
+
+        if "version" in kwargs:
+            del kwargs["version"]
+
+        pmtiles_source = {
+            "type": "vector",
+            "url": f"pmtiles://{url}",
+            "attribution": attribution,
+        }
+
+        if style is None:
+            style = pmtiles_style(url)
+
+        if "sources" in style:
+            source_name = list(style["sources"].keys())[0]
+        elif "layers" in style:
+            source_name = style["layers"][0]["source"]
+        else:
+            source_name = "source"
+
+        self.add_source(source_name, pmtiles_source)
+
+        style = replace_hyphens_in_keys(style)
+
+        for params in style["layers"]:
+
+            if exclude_mask and params.get("source_layer") == "mask":
+                continue
+
+            layer = Layer(**params)
+            self.add_layer(layer)
+            self.set_visibility(params["id"], visible)
+            self.set_opacity(params["id"], opacity)
+
+            if tooltip:
+                self.add_tooltip(params["id"], properties, template)
+
+        if fit_bounds:
+            metadata = pmtiles_metadata(url)
+            bounds = metadata["bounds"]  # [minx, miny, maxx, maxy]
+            self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
