@@ -922,9 +922,45 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.layer_interact" class="md-nav__link">
+    <span class="md-ellipsis">
+      layer_interact()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.set_center" class="md-nav__link">
     <span class="md-ellipsis">
       set_center()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_opacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_opacity()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_paint_property" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_paint_property()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_visibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_visibility()
     </span>
   </a>
   
@@ -3484,9 +3520,45 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.layer_interact" class="md-nav__link">
+    <span class="md-ellipsis">
+      layer_interact()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.set_center" class="md-nav__link">
     <span class="md-ellipsis">
       set_center()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_opacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_opacity()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_paint_property" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_paint_property()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_visibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_visibility()
     </span>
   </a>
   
@@ -3625,10 +3697,14 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="s2">&quot;dark-matter-nolabels&quot;</span><span class="p">,</span>
             <span class="s2">&quot;voyager-nolabels&quot;</span><span class="p">,</span>
         <span class="p">]</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
-        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
+            <span class="k">elif</span> <span class="s2">&quot;background-&quot;</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
@@ -3643,6 +3719,11 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">),</span>
+            <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -3672,7 +3753,8 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">id</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_control</span><span class="p">(</span>
@@ -3864,7 +3946,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="p">)</span>
         <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;raster-opacity&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
@@ -3946,6 +4028,11 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">data</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">get_bounds</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">paint</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span> <span class="ow">in</span> <span class="n">paint</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -4061,7 +4148,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;raster-opacity&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_wms_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -4421,6 +4508,118 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">html</span>
+
+    <span class="k">def</span> <span class="nf">set_paint_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the opacity of a layer.</span>
+
+<span class="sd">        This method sets the opacity of the specified layer to the specified value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer.</span>
+<span class="sd">            opacity (float): The opacity value to set.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;opacity&quot;</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">set_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the opacity of a layer.</span>
+
+<span class="sd">        This method sets the opacity of the specified layer to the specified value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer.</span>
+<span class="sd">            opacity (float): The opacity value to set.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layer_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+        <span class="n">prop_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opacity</span>
+
+    <span class="k">def</span> <span class="nf">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the visibility of a layer.</span>
+
+<span class="sd">        This method sets the visibility of the specified layer to the specified value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer.</span>
+<span class="sd">            visible (bool): The visibility value to set.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">visible</span>
+
+    <span class="k">def</span> <span class="nf">layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a layer widget for changing the visibility and opacity of a layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ipywidgets.Widget: The layer widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+
+        <span class="n">layer_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">layer_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layer_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Layer </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">}</span>
+        <span class="n">dropdown</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">layer_names</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">checkbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Visible&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;120px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">opacity_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Opacity&quot;</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">hbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">dropdown_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span>
+            <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span>
+            <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+
+        <span class="n">dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">dropdown_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">update_layer</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">checkbox</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="n">opacity_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">hbox</span>
 </code></pre></div>
         </details>
 
@@ -4587,10 +4786,14 @@ for more information.</p></td>
         <span class="s2">&quot;dark-matter-nolabels&quot;</span><span class="p">,</span>
         <span class="s2">&quot;voyager-nolabels&quot;</span><span class="p">,</span>
     <span class="p">]</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
-        <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
-    <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
-        <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;background-&quot;</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
@@ -4605,6 +4808,11 @@ for more information.</p></td>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">),</span>
+        <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">}</span>
 </code></pre></div>
         </details>
     </div>
@@ -4801,7 +5009,7 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
     <span class="p">)</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;raster-opacity&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
 </code></pre></div>
         </details>
@@ -5491,6 +5699,11 @@ passed to the GeoJSONSource class.</p></td>
             <span class="n">data</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">get_bounds</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">paint</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span> <span class="ow">in</span> <span class="n">paint</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -5595,7 +5808,8 @@ in the layer dictionary. If None, the layer's ID is used as the key.</p></td>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">id</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
 </code></pre></div>
         </details>
@@ -6207,7 +6421,7 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
     <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;raster-opacity&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -6669,6 +6883,122 @@ where each point is a list of two numbers representing the longitude and latitud
 
 
 
+<h3 id="leafmap.maplibregl.Map.layer_interact" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.layer_interact" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Create a layer widget for changing the visibility and opacity of a layer.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>ipywidgets.Widget</code></td>
+      <td><p>The layer widget.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a layer widget for changing the visibility and opacity of a layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the layer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ipywidgets.Widget: The layer widget.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+
+    <span class="n">layer_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">layer_names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layer_names</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Layer </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">}</span>
+    <span class="n">dropdown</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">layer_names</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Layer&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">checkbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Visible&quot;</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">],</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;120px&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">opacity_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Opacity&quot;</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">hbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">dropdown_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span>
+        <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span>
+        <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+
+    <span class="n">dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">dropdown_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_layer</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="n">checkbox</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+    <span class="n">opacity_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">hbox</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="leafmap.maplibregl.Map.set_center" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">set_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
@@ -6751,6 +7081,251 @@ level is not changed.</p></td>
 
     <span class="k">if</span> <span class="n">zoom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;setZoom&quot;</span><span class="p">,</span> <span class="n">zoom</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.set_opacity" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.set_opacity" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the opacity of a layer.</p>
+<p>This method sets the opacity of the specified layer to the specified value.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>opacity</code></td>
+        <td><code>float</code></td>
+        <td><p>The opacity value to set.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the opacity of a layer.</span>
+
+<span class="sd">    This method sets the opacity of the specified layer to the specified value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the layer.</span>
+<span class="sd">        opacity (float): The opacity value to set.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layer_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+    <span class="n">prop_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">prop_name</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">opacity</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.set_paint_property" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_paint_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.set_paint_property" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the opacity of a layer.</p>
+<p>This method sets the opacity of the specified layer to the specified value.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>opacity</code></td>
+        <td><code>float</code></td>
+        <td><p>The opacity value to set.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_paint_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the opacity of a layer.</span>
+
+<span class="sd">    This method sets the opacity of the specified layer to the specified value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the layer.</span>
+<span class="sd">        opacity (float): The opacity value to set.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;opacity&quot;</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.set_visibility" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.set_visibility" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the visibility of a layer.</p>
+<p>This method sets the visibility of the specified layer to the specified value.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>visible</code></td>
+        <td><code>bool</code></td>
+        <td><p>The visibility value to set.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the visibility of a layer.</span>
+
+<span class="sd">    This method sets the visibility of the specified layer to the specified value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the layer.</span>
+<span class="sd">        visible (bool): The visibility value to set.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">visible</span>
 </code></pre></div>
         </details>
     </div>
