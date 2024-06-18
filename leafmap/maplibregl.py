@@ -1167,46 +1167,51 @@ class Map(MapWidget):
             else:
                 return d
 
-        if "sources" in kwargs:
-            del kwargs["sources"]
+        try:
 
-        if "version" in kwargs:
-            del kwargs["version"]
+            if "sources" in kwargs:
+                del kwargs["sources"]
 
-        pmtiles_source = {
-            "type": "vector",
-            "url": f"pmtiles://{url}",
-            "attribution": attribution,
-        }
+            if "version" in kwargs:
+                del kwargs["version"]
 
-        if style is None:
-            style = pmtiles_style(url)
+            pmtiles_source = {
+                "type": "vector",
+                "url": f"pmtiles://{url}",
+                "attribution": attribution,
+            }
 
-        if "sources" in style:
-            source_name = list(style["sources"].keys())[0]
-        elif "layers" in style:
-            source_name = style["layers"][0]["source"]
-        else:
-            source_name = "source"
+            if style is None:
+                style = pmtiles_style(url)
 
-        self.add_source(source_name, pmtiles_source)
+            if "sources" in style:
+                source_name = list(style["sources"].keys())[0]
+            elif "layers" in style:
+                source_name = style["layers"][0]["source"]
+            else:
+                source_name = "source"
 
-        style = replace_hyphens_in_keys(style)
+            self.add_source(source_name, pmtiles_source)
 
-        for params in style["layers"]:
+            style = replace_hyphens_in_keys(style)
 
-            if exclude_mask and params.get("source_layer") == "mask":
-                continue
+            for params in style["layers"]:
 
-            layer = Layer(**params)
-            self.add_layer(layer)
-            self.set_visibility(params["id"], visible)
-            self.set_opacity(params["id"], opacity)
+                if exclude_mask and params.get("source_layer") == "mask":
+                    continue
 
-            if tooltip:
-                self.add_tooltip(params["id"], properties, template)
+                layer = Layer(**params)
+                self.add_layer(layer)
+                self.set_visibility(params["id"], visible)
+                self.set_opacity(params["id"], opacity)
 
-        if fit_bounds:
-            metadata = pmtiles_metadata(url)
-            bounds = metadata["bounds"]  # [minx, miny, maxx, maxy]
-            self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
+                if tooltip:
+                    self.add_tooltip(params["id"], properties, template)
+
+            if fit_bounds:
+                metadata = pmtiles_metadata(url)
+                bounds = metadata["bounds"]  # [minx, miny, maxx, maxy]
+                self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
+
+        except Exception as e:
+            print(e)
