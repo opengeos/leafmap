@@ -35,7 +35,11 @@ class Map(MapWidget):
         bearing: int = 0,
         style: str = "dark-matter",
         height: str = "600px",
-        controls: Dict[str, str] = {"fullscreen": "top-right", "scale": "bottom-left"},
+        controls: Dict[str, str] = {
+            "navigation": "top-right",
+            "fullscreen": "top-right",
+            "scale": "bottom-left",
+        },
         **kwargs: Any,
     ) -> None:
         """
@@ -132,6 +136,23 @@ class Map(MapWidget):
         self.layer_dict[name] = {}
         self.layer_dict[name]["layer"] = layer
         super().add_layer(layer, before_id=before_id)
+
+    def remove_layer(self, name: str) -> None:
+        """
+        Removes a layer from the map.
+
+        This method removes a layer from the map using the layer's name.
+
+        Args:
+            name (str): The name of the layer to remove.
+
+        Returns:
+            None
+        """
+
+        if name in self.layer_dict:
+            super().add_call("removeLayer", name)
+            self.layer_dict.pop(name)
 
     def add_control(
         self, control: Union[str, Any], position: str = "top-right", **kwargs: Any
@@ -235,7 +256,7 @@ class Map(MapWidget):
 
     def add_basemap(
         self,
-        basemap: Union[str, xyzservices.TileProvider] = "HYBRID",
+        basemap: Union[str, xyzservices.TileProvider] = None,
         opacity: float = 1.0,
         visible: bool = True,
         attribution: Optional[str] = None,
@@ -251,7 +272,8 @@ class Map(MapWidget):
         Args:
             basemap (str or TileProvider, optional): The basemap to add. Can be
                 one of the predefined strings, an instance of xyzservices.TileProvider,
-                or a key from the basemaps dictionary. Defaults to 'HYBRID'.
+                or a key from the basemaps dictionary. Defaults to None, which adds
+                the basemap widget.
             opacity (float, optional): The opacity of the basemap. Defaults to 1.0.
             visible (bool, optional): Whether the basemap is visible or not.
                 Defaults to True.
@@ -268,6 +290,9 @@ class Map(MapWidget):
             ValueError: If the basemap is not one of the predefined strings,
                 not an instance of TileProvider, and not a key from the basemaps dictionary.
         """
+
+        if basemap is None:
+            return self._basemap_widget()
 
         map_dict = {
             "ROADMAP": "Google Maps",
@@ -318,6 +343,7 @@ class Map(MapWidget):
             attribution=attribution,
             max_zoom=max_zoom,
             min_zoom=min_zoom,
+            tile_size=256,
             **kwargs,
         )
         layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
@@ -983,6 +1009,94 @@ class Map(MapWidget):
 
         def dropdown_event(change):
             name = change.new
+            checkbox.value = self.layer_dict[dropdown.value]["visible"]
+            opacity_slider.value = self.layer_dict[dropdown.value]["opacity"]
+
+        dropdown.observe(dropdown_event, "value")
+
+        def update_layer(change):
+            self.set_visibility(dropdown.value, checkbox.value)
+            self.set_opacity(dropdown.value, opacity_slider.value)
+
+        checkbox.observe(update_layer, "value")
+        opacity_slider.observe(update_layer, "value")
+
+        return hbox
+
+    def _basemap_widget(self, name=None):
+        """Create a layer widget for changing the visibility and opacity of a layer.
+
+        Args:
+            name (str): The name of the layer.
+
+        Returns:
+            ipywidgets.Widget: The layer widget.
+        """
+
+        import ipywidgets as widgets
+
+        layer_names = [
+            basemaps[basemap]["name"]
+            for basemap in basemaps.keys()
+            if "layers" not in basemaps[basemap]
+        ][1:]
+        if name is None:
+            name = layer_names[0]
+        elif name not in layer_names:
+            raise ValueError(f"Layer {name} not found.")
+
+        tile = basemaps[name]
+        raster_source = RasterTileSource(
+            tiles=[tile["url"]],
+            attribution=tile["attribution"],
+            tile_size=256,
+        )
+        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+        self.add_layer(layer)
+        self.set_opacity(name, 1.0)
+        self.set_visibility(name, True)
+
+        style = {"description_width": "initial"}
+        dropdown = widgets.Dropdown(
+            options=layer_names,
+            value=name,
+            description="Basemap",
+            style=style,
+        )
+        checkbox = widgets.Checkbox(
+            description="Visible",
+            value=self.layer_dict[name]["visible"],
+            style=style,
+            layout=widgets.Layout(width="120px"),
+        )
+        opacity_slider = widgets.FloatSlider(
+            description="Opacity",
+            min=0,
+            max=1,
+            step=0.01,
+            value=self.layer_dict[name]["opacity"],
+            style=style,
+        )
+        hbox = widgets.HBox(
+            [dropdown, checkbox, opacity_slider], layout=widgets.Layout(width="600px")
+        )
+
+        def dropdown_event(change):
+            old = change["old"]
+            name = change.new
+            self.remove_layer(old)
+
+            tile = basemaps[name]
+            raster_source = RasterTileSource(
+                tiles=[tile["url"]],
+                attribution=tile["attribution"],
+                tile_size=256,
+            )
+            layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+            self.add_layer(layer)
+            self.set_opacity(name, 1.0)
+            self.set_visibility(name, True)
+
             checkbox.value = self.layer_dict[dropdown.value]["visible"]
             opacity_slider.value = self.layer_dict[dropdown.value]["opacity"]
 
