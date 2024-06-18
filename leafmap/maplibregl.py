@@ -9,7 +9,7 @@ from maplibre.basemaps import construct_carto_basemap_url
 from maplibre.ipywidget import MapWidget
 from maplibre import Layer, LayerType, MapOptions
 from maplibre.sources import GeoJSONSource, RasterTileSource
-from maplibre.utils import get_bounds, df_to_geojson
+from maplibre.utils import get_bounds
 from maplibre.controls import (
     ScaleControl,
     FullscreenControl,
@@ -73,10 +73,14 @@ class Map(MapWidget):
             "dark-matter-nolabels",
             "voyager-nolabels",
         ]
-        if isinstance(style, str) and style.lower() in carto_basemaps:
-            style = construct_carto_basemap_url(style.lower())
-        elif style == "demotiles":
-            style = "https://demotiles.maplibre.org/style.json"
+        if isinstance(style, str):
+            if style.lower() in carto_basemaps:
+                style = construct_carto_basemap_url(style.lower())
+            elif style == "demotiles":
+                style = "https://demotiles.maplibre.org/style.json"
+            elif "background-" in style:
+                color = style.split("-")[1]
+                style = background(color)
 
         if style is not None:
             kwargs["style"] = style
@@ -91,6 +95,11 @@ class Map(MapWidget):
             self.add_control(control, position)
 
         self.layer_dict = {}
+        self.layer_dict["background"] = {
+            "layer": Layer(id="background", type=LayerType.BACKGROUND),
+            "opacity": 1.0,
+            "visible": True,
+        }
 
     def add_layer(
         self,
@@ -877,7 +886,18 @@ class Map(MapWidget):
             return html
 
     def set_paint_property(self, name: str, prop: str, value: Any) -> None:
+        """
+        Set the opacity of a layer.
 
+        This method sets the opacity of the specified layer to the specified value.
+
+        Args:
+            name (str): The name of the layer.
+            opacity (float): The opacity value to set.
+
+        Returns:
+            None
+        """
         super().set_paint_property(name, prop, value)
 
         if "opacity" in prop:
@@ -899,7 +919,7 @@ class Map(MapWidget):
         layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
         prop_name = f"{layer_type}-opacity"
 
-        self.set_paint_property(name, prop_name, opacity)
+        super().set_paint_property(name, prop_name, opacity)
         self.layer_dict[name]["opacity"] = opacity
 
     def set_visibility(self, name: str, visible: bool) -> None:
@@ -932,7 +952,7 @@ class Map(MapWidget):
 
         layer_names = list(self.layer_dict.keys())
         if name is None:
-            name = layer_names[0]
+            name = layer_names[-1]
         elif name not in layer_names:
             raise ValueError(f"Layer {name} not found.")
 
