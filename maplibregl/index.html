@@ -931,6 +931,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.remove_layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      remove_layer()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.set_center" class="md-nav__link">
     <span class="md-ellipsis">
       set_center()
@@ -3529,6 +3538,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.remove_layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      remove_layer()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.set_center" class="md-nav__link">
     <span class="md-ellipsis">
       set_center()
@@ -3659,7 +3677,11 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">bearing</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;600px&quot;</span><span class="p">,</span>
-        <span class="n">controls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">},</span>
+        <span class="n">controls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;navigation&quot;</span><span class="p">:</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3756,6 +3778,23 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;layer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layer</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes a layer from the map.</span>
+
+<span class="sd">        This method removes a layer from the map using the layer&#39;s name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer to remove.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;removeLayer&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_control</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">control</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
@@ -3859,7 +3898,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
     <span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">basemap</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HYBRID&quot;</span><span class="p">,</span>
+        <span class="n">basemap</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">attribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3875,7 +3914,8 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        Args:</span>
 <span class="sd">            basemap (str or TileProvider, optional): The basemap to add. Can be</span>
 <span class="sd">                one of the predefined strings, an instance of xyzservices.TileProvider,</span>
-<span class="sd">                or a key from the basemaps dictionary. Defaults to &#39;HYBRID&#39;.</span>
+<span class="sd">                or a key from the basemaps dictionary. Defaults to None, which adds</span>
+<span class="sd">                the basemap widget.</span>
 <span class="sd">            opacity (float, optional): The opacity of the basemap. Defaults to 1.0.</span>
 <span class="sd">            visible (bool, optional): Whether the basemap is visible or not.</span>
 <span class="sd">                Defaults to True.</span>
@@ -3892,6 +3932,9 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">            ValueError: If the basemap is not one of the predefined strings,</span>
 <span class="sd">                not an instance of TileProvider, and not a key from the basemaps dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">basemap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basemap_widget</span><span class="p">()</span>
 
         <span class="n">map_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;ROADMAP&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Maps&quot;</span><span class="p">,</span>
@@ -3942,6 +3985,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
             <span class="n">max_zoom</span><span class="o">=</span><span class="n">max_zoom</span><span class="p">,</span>
             <span class="n">min_zoom</span><span class="o">=</span><span class="n">min_zoom</span><span class="p">,</span>
+            <span class="n">tile_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">)</span>
@@ -4620,6 +4664,94 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">opacity_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">hbox</span>
+
+    <span class="k">def</span> <span class="nf">_basemap_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a layer widget for changing the visibility and opacity of a layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ipywidgets.Widget: The layer widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+
+        <span class="n">layer_names</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">basemaps</span><span class="p">[</span><span class="n">basemap</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">basemap</span> <span class="ow">in</span> <span class="n">basemaps</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;layers&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">basemap</span><span class="p">]</span>
+        <span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">layer_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">layer_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Layer </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+
+        <span class="n">tile</span> <span class="o">=</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">raster_source</span> <span class="o">=</span> <span class="n">RasterTileSource</span><span class="p">(</span>
+            <span class="n">tiles</span><span class="o">=</span><span class="p">[</span><span class="n">tile</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]],</span>
+            <span class="n">attribution</span><span class="o">=</span><span class="n">tile</span><span class="p">[</span><span class="s2">&quot;attribution&quot;</span><span class="p">],</span>
+            <span class="n">tile_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">}</span>
+        <span class="n">dropdown</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">layer_names</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Basemap&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">checkbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Visible&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;120px&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">opacity_slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Opacity&quot;</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">hbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">dropdown_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="n">old</span> <span class="o">=</span> <span class="n">change</span><span class="p">[</span><span class="s2">&quot;old&quot;</span><span class="p">]</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="n">old</span><span class="p">)</span>
+
+            <span class="n">tile</span> <span class="o">=</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">raster_source</span> <span class="o">=</span> <span class="n">RasterTileSource</span><span class="p">(</span>
+                <span class="n">tiles</span><span class="o">=</span><span class="p">[</span><span class="n">tile</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]],</span>
+                <span class="n">attribution</span><span class="o">=</span><span class="n">tile</span><span class="p">[</span><span class="s2">&quot;attribution&quot;</span><span class="p">],</span>
+                <span class="n">tile_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span>
+            <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+
+        <span class="n">dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">dropdown_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">update_layer</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="n">checkbox</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+        <span class="n">opacity_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">hbox</span>
 </code></pre></div>
         </details>
 
@@ -4640,7 +4772,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
 
 <h3 id="leafmap.maplibregl.Map.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;dark-matter&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fullscreen&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom-left&#39;</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;dark-matter&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;navigation&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;fullscreen&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom-left&#39;</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -4711,7 +4843,7 @@ a MapLibre style JSON. Defaults to "dark-matter".</p></td>
         <td><code>dict</code></td>
         <td><p>The controls and their positions on the
 map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.</p></td>
-        <td><code>{&#39;fullscreen&#39;: &#39;top-right&#39;, &#39;scale&#39;: &#39;bottom-left&#39;}</code></td>
+        <td><code>{&#39;navigation&#39;: &#39;top-right&#39;, &#39;fullscreen&#39;: &#39;top-right&#39;, &#39;scale&#39;: &#39;bottom-left&#39;}</code></td>
       </tr>
       <tr>
         <td><code>**kwargs</code></td>
@@ -4748,7 +4880,11 @@ for more information.</p></td>
     <span class="n">bearing</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;600px&quot;</span><span class="p">,</span>
-    <span class="n">controls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">},</span>
+    <span class="n">controls</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;navigation&quot;</span><span class="p">:</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;fullscreen&quot;</span><span class="p">:</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4826,7 +4962,7 @@ for more information.</p></td>
 
 
 <h3 id="leafmap.maplibregl.Map.add_basemap" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_basemap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="s1">&#39;HYBRID&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">add_basemap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.add_basemap" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -4854,8 +4990,9 @@ from the basemaps dictionary.</p>
         <td><code>str or TileProvider</code></td>
         <td><p>The basemap to add. Can be
 one of the predefined strings, an instance of xyzservices.TileProvider,
-or a key from the basemaps dictionary. Defaults to 'HYBRID'.</p></td>
-        <td><code>&#39;HYBRID&#39;</code></td>
+or a key from the basemaps dictionary. Defaults to None, which adds
+the basemap widget.</p></td>
+        <td><code>None</code></td>
       </tr>
       <tr>
         <td><code>opacity</code></td>
@@ -4922,7 +5059,7 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
           <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">basemap</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;HYBRID&quot;</span><span class="p">,</span>
+    <span class="n">basemap</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">attribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4938,7 +5075,8 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        basemap (str or TileProvider, optional): The basemap to add. Can be</span>
 <span class="sd">            one of the predefined strings, an instance of xyzservices.TileProvider,</span>
-<span class="sd">            or a key from the basemaps dictionary. Defaults to &#39;HYBRID&#39;.</span>
+<span class="sd">            or a key from the basemaps dictionary. Defaults to None, which adds</span>
+<span class="sd">            the basemap widget.</span>
 <span class="sd">        opacity (float, optional): The opacity of the basemap. Defaults to 1.0.</span>
 <span class="sd">        visible (bool, optional): Whether the basemap is visible or not.</span>
 <span class="sd">            Defaults to True.</span>
@@ -4955,6 +5093,9 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
 <span class="sd">        ValueError: If the basemap is not one of the predefined strings,</span>
 <span class="sd">            not an instance of TileProvider, and not a key from the basemaps dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">basemap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basemap_widget</span><span class="p">()</span>
 
     <span class="n">map_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;ROADMAP&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Maps&quot;</span><span class="p">,</span>
@@ -5005,6 +5146,7 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
         <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
         <span class="n">max_zoom</span><span class="o">=</span><span class="n">max_zoom</span><span class="p">,</span>
         <span class="n">min_zoom</span><span class="o">=</span><span class="n">min_zoom</span><span class="p">,</span>
+        <span class="n">tile_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">raster_source</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">RASTER</span><span class="p">)</span>
@@ -6987,6 +7129,81 @@ where each point is a list of two numbers representing the longitude and latitud
     <span class="n">opacity_slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">update_layer</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">hbox</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.remove_layer" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.remove_layer" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Removes a layer from the map.</p>
+<p>This method removes a layer from the map using the layer's name.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer to remove.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Removes a layer from the map.</span>
+
+<span class="sd">    This method removes a layer from the map using the layer&#39;s name.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the layer to remove.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;removeLayer&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
