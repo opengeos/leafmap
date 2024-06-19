@@ -44,6 +44,12 @@ Use flyTo to smoothly interpolate between locations.
 
 [![](https://i.imgur.com/UVlvpi9.png)](https://leafmap.org/maplibre/fly_to)
 
+## Slowly fly to a location
+
+Use flyTo with flyOptions to slowly zoom to a location.
+
+[![](https://i.imgur.com/ZzOzfP5.png)](https://leafmap.org/maplibre/fly_to_options)
+
 ## Display a satellite map
 
 Display a satellite raster baselayer.
