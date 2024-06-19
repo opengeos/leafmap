@@ -25,3 +25,9 @@ Go beyond hillshade and show elevation in actual 3D.
 Add a default marker to the map.
 
 [![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_marker)
+
+## Add a video
+
+Display a video on top of a satellite raster baselayer.
+
+[![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/add_video)
