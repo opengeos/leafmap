@@ -15,6 +15,7 @@ from maplibre.controls import (
     FullscreenControl,
     GeolocateControl,
     NavigationControl,
+    Marker,
 )
 
 from .basemaps import xyz_to_leaflet
@@ -30,9 +31,9 @@ class Map(MapWidget):
     def __init__(
         self,
         center: Tuple[float, float] = (20, 0),
-        zoom: int = 1,
-        pitch: int = 0,
-        bearing: int = 0,
+        zoom: float = 1,
+        pitch: float = 0,
+        bearing: float = 0,
         style: str = "dark-matter",
         height: str = "600px",
         controls: Dict[str, str] = {
@@ -48,10 +49,10 @@ class Map(MapWidget):
         Args:
             center (tuple, optional): The center of the map (lat, lon). Defaults
                 to (20, 0).
-            zoom (int, optional): The zoom level of the map. Defaults to 1.
-            pitch (int, optional): The pitch of the map. Measured in degrees
+            zoom (float, optional): The zoom level of the map. Defaults to 1.
+            pitch (float, optional): The pitch of the map. Measured in degrees
                 away from the plane of the screen (0-85) Defaults to 0.
-            bearing (int, optional): The bearing of the map. Measured in degrees
+            bearing (float, optional): The bearing of the map. Measured in degrees
                 counter-clockwise from north. Defaults to 0.
             style (str, optional): The style of the map. It can be a string or a URL.
                 If it is a string, it must be one of the following: "dark-matter",
@@ -131,6 +132,9 @@ class Map(MapWidget):
         Returns:
             None
         """
+        if isinstance(layer, dict):
+            layer = replace_top_level_hyphens(layer)
+            layer = Layer(**layer)
 
         if name is None:
             name = layer.id
@@ -1208,24 +1212,6 @@ class Map(MapWidget):
             None
         """
 
-        # Function to replace hyphens with underscores in top-level dictionary keys
-        def replace_top_level_hyphens(d):
-            if isinstance(d, dict):
-                return {k.replace("-", "_"): v for k, v in d.items()}
-            return d
-
-        # Function to replace hyphens with underscores in dictionary keys
-        def replace_hyphens_in_keys(d):
-            if isinstance(d, dict):
-                return {
-                    k.replace("-", "_"): replace_hyphens_in_keys(v)
-                    for k, v in d.items()
-                }
-            elif isinstance(d, list):
-                return [replace_hyphens_in_keys(i) for i in d]
-            else:
-                return d
-
         try:
 
             if "sources" in kwargs:
@@ -1274,3 +1260,24 @@ class Map(MapWidget):
 
         except Exception as e:
             print(e)
+
+    def add_marker(
+        self,
+        lng_lat: List[Union[float, float]],
+        popup: Optional[Dict] = {},
+        options: Optional[Dict] = {},
+    ) -> None:
+        """
+        Adds a marker to the map.
+
+        Args:
+            lng_lat (List[Union[float, float]]): A list of two floats representing the longitude and latitude of the marker.
+            popup (Optional[str], optional): The text to display in a popup when the marker is clicked. Defaults to None.
+            options (Optional[Dict], optional): A dictionary of options to customize the marker. Defaults to None.
+
+        Returns:
+            None
+        """
+
+        marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
+        super().add_marker(marker)

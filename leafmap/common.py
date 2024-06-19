@@ -13478,3 +13478,38 @@ def pandas_to_geojson(
             json.dump(geojson, f, indent=4)
 
     return geojson
+
+
+def replace_top_level_hyphens(d: Union[Dict, Any]) -> Union[Dict, Any]:
+    """
+    Replaces hyphens with underscores in top-level dictionary keys.
+
+    Args:
+        d (Union[Dict, Any]): The input dictionary or any other data type.
+
+    Returns:
+        Union[Dict, Any]: The modified dictionary with top-level keys having hyphens replaced with underscores,
+        or the original input if it's not a dictionary.
+    """
+    if isinstance(d, dict):
+        return {k.replace("-", "_"): v for k, v in d.items()}
+    return d
+
+
+def replace_hyphens_in_keys(d: Union[Dict, List, Any]) -> Union[Dict, List, Any]:
+    """
+    Recursively replaces hyphens with underscores in dictionary keys.
+
+    Args:
+        d (Union[Dict, List, Any]): The input dictionary, list or any other data type.
+
+    Returns:
+        Union[Dict, List, Any]: The modified dictionary or list with keys having hyphens replaced with underscores,
+        or the original input if it's not a dictionary or list.
+    """
+    if isinstance(d, dict):
+        return {k.replace("-", "_"): replace_hyphens_in_keys(v) for k, v in d.items()}
+    elif isinstance(d, list):
+        return [replace_hyphens_in_keys(i) for i in d]
+    else:
+        return d
