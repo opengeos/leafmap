@@ -32,6 +32,12 @@ Display a video on top of a satellite raster baselayer.
 
 [![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/add_video)
 
+## Display a satellite map
+
+Display a satellite raster baselayer.
+
+[![](https://i.imgur.com/S17IRDh.png)](https://leafmap.org/maplibre/satellite_map)
+
 ## Add a vector tile source
 
 Add a vector source to a map.
@@ -43,3 +49,9 @@ Add a vector source to a map.
 Add an external Web Map Service raster layer to the map using addSource's tiles option.
 
 [![](https://i.imgur.com/itFOq8z.png)](https://leafmap.org/maplibre/wms_source)
+
+## Fit a map to a bounding box
+
+Fit the map to a specific area, regardless of the pixel size of the map.
+
+[![](https://i.imgur.com/ufrSWfP.png)](https://leafmap.org/maplibre/fit_bounds)
