@@ -50,6 +50,12 @@ Use flyTo with flyOptions to slowly zoom to a location.
 
 [![](https://i.imgur.com/ZzOzfP5.png)](https://leafmap.org/maplibre/fly_to_options)
 
+## View a fullscreen map
+
+Toggle between current view and fullscreen mode.
+
+[![](https://i.imgur.com/Vn3carH.png)](https://leafmap.org/maplibre/fullscreen)
+
 ## Display a satellite map
 
 Display a satellite raster baselayer.
