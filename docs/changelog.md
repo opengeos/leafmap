@@ -1,5 +1,134 @@
 # Changelog
 
+## v0.33.6 - Jun 18, 2024
+
+**What's Changed**
+
+-   Add color picker for changing layer color interactively by @giswqs in [#771](https://github.com/opengeos/leafmap/pull/771)
+
+**Full Changelog**: [v0.33.5...v0.33.6](https://github.com/opengeos/leafmap/compare/v0.33.5...v0.33.6)
+
+## v0.33.5 - Jun 18, 2024
+
+**What's Changed**
+
+-   Add support for MapLibre PMTiles by @giswqs in [#770](https://github.com/opengeos/leafmap/pull/770)
+
+**Full Changelog**: [v0.33.4...v0.33.5](https://github.com/opengeos/leafmap/compare/v0.33.4...v0.33.5)
+
+## v0.33.4 - Jun 18, 2024
+
+**What's Changed**
+
+-   Add basemap widget by @giswqs in [#769](https://github.com/opengeos/leafmap/pull/769)
+
+**Full Changelog**: [v0.33.3...v0.33.4](https://github.com/opengeos/leafmap/compare/v0.33.3...v0.33.4)
+
+## v0.33.3 - Jun 17, 2024
+
+**What's Changed**
+
+-   Update notebook badges by @giswqs in [#765](https://github.com/opengeos/leafmap/pull/765)
+-   Bump docker/metadata-action from 4 to 5 by @dependabot in [#768](https://github.com/opengeos/leafmap/pull/768)
+-   Bump docker/build-push-action from 5 to 6 by @dependabot in [#767](https://github.com/opengeos/leafmap/pull/767)
+-   Add maplibre layer interact by @giswqs in [#766](https://github.com/opengeos/leafmap/pull/766)
+
+**Full Changelog**: [v0.33.2...v0.33.3](https://github.com/opengeos/leafmap/compare/v0.33.2...v0.33.3)
+
+## v0.33.2 - Jun 17, 2024
+
+**What's Changed**
+
+-   Bump actions/dependency-review-action from 2 to 4 by @dependabot in [#763](https://github.com/opengeos/leafmap/pull/763)
+-   Bump nwtgck/actions-netlify from 2.1 to 3.0 by @dependabot in [#761](https://github.com/opengeos/leafmap/pull/761)
+-   Bump github/codeql-action from 2 to 3 by @dependabot in [#759](https://github.com/opengeos/leafmap/pull/759)
+-   Bump docker/build-push-action from 4 to 5 by @dependabot in [#760](https://github.com/opengeos/leafmap/pull/760)
+-   Bump docker/login-action from 2 to 3 by @dependabot in [#762](https://github.com/opengeos/leafmap/pull/762)
+-   Improve the maplibre module by @giswqs in [#764](https://github.com/opengeos/leafmap/pull/764)
+
+**New Contributors**
+
+-   @dependabot made their first contribution in [#763](https://github.com/opengeos/leafmap/pull/763)
+
+**Full Changelog**: [v0.33.1...v0.33.2](https://github.com/opengeos/leafmap/compare/v0.33.1...v0.33.2)
+
+## v0.33.1 - Jun 13, 2024
+
+**What's Changed**
+
+-   Fix pydeck basemap issue by @giswqs in [#757](https://github.com/opengeos/leafmap/pull/757)
+-   Improve add_vector for the deck module by @giswqs in [#758](https://github.com/opengeos/leafmap/pull/758)
+
+**Full Changelog**: [v0.33.0...v0.33.1](https://github.com/opengeos/leafmap/compare/v0.33.0...v0.33.1)
+
+## v0.33.0 - Jun 10, 2024
+
+**What's Changed**
+
+-   Fix typos and update plt.get_cmap by @giswqs in [#742](https://github.com/opengeos/leafmap/pull/742)
+-   Fix netcdf_to_tif bug by @giswqs in [#743](https://github.com/opengeos/leafmap/pull/743)
+-   [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in [#744](https://github.com/opengeos/leafmap/pull/744)
+-   Fix new typos discovered by codespell by @giswqs in [#745](https://github.com/opengeos/leafmap/pull/745)
+-   Fix transform bug for array to image by @giswqs in [#749](https://github.com/opengeos/leafmap/pull/749)
+-   Add GUI for raster data visualization by @giswqs in [#750](https://github.com/opengeos/leafmap/pull/750)
+
+**Full Changelog**: [v0.32.1...v0.33.0](https://github.com/opengeos/leafmap/compare/v0.32.1...v0.33.0)
+
+## v0.32.1 - May 12, 2024
+
+**What's Changed**
+
+-   Fix AWS checking for localtileserver by @giswqs in [#740](https://github.com/opengeos/leafmap/pull/740)
+
+**Full Changelog**: [v0.32.0...v0.32.1](https://github.com/opengeos/leafmap/compare/v0.32.0...v0.32.1)
+
+## v0.32.0 - May 12, 2024
+
+**What's Changed**
+
+-   Fix custom stac bug by @giswqs in [#725](https://github.com/opengeos/leafmap/pull/725)
+-   Fix docs build error by @giswqs in [#727](https://github.com/opengeos/leafmap/pull/727)
+-   [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in [#731](https://github.com/opengeos/leafmap/pull/731)
+-   Add maplibregl module by @giswqs in [#719](https://github.com/opengeos/leafmap/pull/719)
+-   Improve s3 functions by @giswqs in [#734](https://github.com/opengeos/leafmap/pull/734)
+-   Fix docs date issue by @giswqs in [#735](https://github.com/opengeos/leafmap/pull/735)
+-   Add tile name prefix option to split_raster by @giswqs in [#736](https://github.com/opengeos/leafmap/pull/736)
+-   Fix checking studio lab bug by @giswqs in [#739](https://github.com/opengeos/leafmap/pull/739)
+
+**Full Changelog**: [v0.31.9...v0.32.0](https://github.com/opengeos/leafmap/compare/v0.31.9...v0.32.0)
+
+## v0.31.9 - Apr 15, 2024
+
+**What's Changed**
+
+-   ignore url parameters when checking if file ends with ".pmtiles" by @james-willis in [#722](https://github.com/opengeos/leafmap/pull/722)
+-   [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in [#721](https://github.com/opengeos/leafmap/pull/721)
+-   Improve NASA Earth Data search by @giswqs in [#723](https://github.com/opengeos/leafmap/pull/723)
+
+**New Contributors**
+
+-   @james-willis made their first contribution in [#722](https://github.com/opengeos/leafmap/pull/722)
+
+**Full Changelog**: [v0.31.8...v0.31.9](https://github.com/opengeos/leafmap/compare/v0.31.8...v0.31.9)
+
+## v0.31.8 - Apr 14, 2024
+
+**What's Changed**
+
+-   [pre-commit.ci] pre-commit autoupdate by @pre-commit-ci in [#712](https://github.com/opengeos/leafmap/pull/712)
+-   Fix split-map bug by @giswqs in [#717](https://github.com/opengeos/leafmap/pull/717)
+
+**Full Changelog**: [v0.31.7...v0.31.8](https://github.com/opengeos/leafmap/compare/v0.31.7...v0.31.8)
+
+## v0.31.7 - Apr 2, 2024
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#710](https://github.com/opengeos/leafmap/pull/710)
+-   Add tile layer params for split map by @giswqs in [#711](https://github.com/opengeos/leafmap/pull/711)
+
+**Full Changelog**: [v0.31.6...v0.31.7](https://github.com/opengeos/leafmap/compare/v0.31.6...v0.31.7)
+
 ## v0.31.6 - Mar 29, 2024
 
 **What's Changed**
