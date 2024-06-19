@@ -958,6 +958,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_color" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_color()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.set_opacity" class="md-nav__link">
     <span class="md-ellipsis">
       set_opacity()
@@ -3595,6 +3604,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.set_color" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_color()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.set_opacity" class="md-nav__link">
     <span class="md-ellipsis">
       set_opacity()
@@ -3784,6 +3802,8 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">),</span>
             <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
             <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;background&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
@@ -3814,10 +3834,21 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">id</span>
 
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;paint&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="ow">and</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">paint</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">check_color</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span>
             <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
             <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
 
@@ -4613,6 +4644,25 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="k">if</span> <span class="s2">&quot;opacity&quot;</span> <span class="ow">in</span> <span class="n">prop</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
+    <span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the color of a layer.</span>
+
+<span class="sd">        This method sets the color of the specified layer to the specified value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str): The name of the layer.</span>
+<span class="sd">            color (str): The color value to set.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">check_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span>
+            <span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;layer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span><span class="p">,</span> <span class="n">color</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+
     <span class="k">def</span> <span class="nf">set_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the opacity of a layer.</span>
@@ -4687,14 +4737,41 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
             <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="n">color_picker</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+            <span class="n">concise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">color_picker_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+
+        <span class="n">color_picker</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">color_picker_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
         <span class="n">hbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">,</span> <span class="n">color_picker</span><span class="p">],</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;750px&quot;</span><span class="p">),</span>
         <span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">dropdown_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span>
             <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span>
             <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
+                <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+                <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">dropdown_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
@@ -5092,6 +5169,8 @@ for more information.</p></td>
         <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">Layer</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;background&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">),</span>
         <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;background&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">}</span>
 </code></pre></div>
         </details>
@@ -6094,10 +6173,21 @@ in the layer dictionary. If None, the layer's ID is used as the key.</p></td>
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">layer</span><span class="o">.</span><span class="n">id</span>
 
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="s2">&quot;paint&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="ow">and</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span> <span class="ow">in</span> <span class="n">layer</span><span class="o">.</span><span class="n">paint</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">check_color</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="kc">None</span>
+
     <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;layer&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="p">,</span>
         <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="s2">&quot;visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
 </code></pre></div>
@@ -7477,14 +7567,41 @@ where each point is a list of two numbers representing the longitude and latitud
         <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
         <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
     <span class="p">)</span>
+
+    <span class="n">color_picker</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+        <span class="n">concise</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
+        <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+        <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">color_picker_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
+
+    <span class="n">color_picker</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">color_picker_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
     <span class="n">hbox</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">],</span> <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">checkbox</span><span class="p">,</span> <span class="n">opacity_slider</span><span class="p">,</span> <span class="n">color_picker</span><span class="p">],</span>
+        <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;750px&quot;</span><span class="p">),</span>
     <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">dropdown_event</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">change</span><span class="o">.</span><span class="n">new</span>
         <span class="n">checkbox</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;visible&quot;</span><span class="p">]</span>
         <span class="n">opacity_slider</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;opacity&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span>
+            <span class="n">color_picker</span><span class="o">.</span><span class="n">disabled</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">dropdown_event</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
 
@@ -7665,6 +7782,89 @@ level is not changed.</p></td>
 
     <span class="k">if</span> <span class="n">zoom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;setZoom&quot;</span><span class="p">,</span> <span class="n">zoom</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.set_color" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.set_color" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the color of a layer.</p>
+<p>This method sets the color of the specified layer to the specified value.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>color</code></td>
+        <td><code>str</code></td>
+        <td><p>The color value to set.</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set the color of a layer.</span>
+
+<span class="sd">    This method sets the color of the specified layer to the specified value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name (str): The name of the layer.</span>
+<span class="sd">        color (str): The color value to set.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">check_color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_paint_property</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;layer&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">-color&quot;</span><span class="p">,</span> <span class="n">color</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_dict</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
 </code></pre></div>
         </details>
     </div>
