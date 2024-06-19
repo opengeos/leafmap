@@ -66,6 +66,7 @@ extras_requires = {
         "h3",
         "geopandas",
         "localtileserver",
+        "pmtiles",
         "rioxarray",
         "xarray",
     ],
