@@ -15,6 +15,7 @@ from maplibre.controls import (
     FullscreenControl,
     GeolocateControl,
     NavigationControl,
+    Marker,
 )
 
 from .basemaps import xyz_to_leaflet
@@ -1259,3 +1260,24 @@ class Map(MapWidget):
 
         except Exception as e:
             print(e)
+
+    def add_marker(
+        self,
+        lng_lat: List[Union[float, float]],
+        popup: Optional[Dict] = {},
+        options: Optional[Dict] = {},
+    ) -> None:
+        """
+        Adds a marker to the map.
+
+        Args:
+            lng_lat (List[Union[float, float]]): A list of two floats representing the longitude and latitude of the marker.
+            popup (Optional[str], optional): The text to display in a popup when the marker is clicked. Defaults to None.
+            options (Optional[Dict], optional): A dictionary of options to customize the marker. Defaults to None.
+
+        Returns:
+            None
+        """
+
+        marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
+        super().add_marker(marker)
