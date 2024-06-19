@@ -31,3 +31,15 @@ Add a default marker to the map.
 Display a video on top of a satellite raster baselayer.
 
 [![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/add_video)
+
+## Add a vector tile source
+
+Add a vector source to a map.
+
+[![](https://i.imgur.com/svfZwFh.jpeg)](https://leafmap.org/maplibre/vector_tile)
+
+## Add a WMS source
+
+Add an external Web Map Service raster layer to the map using addSource's tiles option.
+
+[![](https://i.imgur.com/itFOq8z.png)](https://leafmap.org/maplibre/wms_source)
