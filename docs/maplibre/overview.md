@@ -56,6 +56,12 @@ Toggle between current view and fullscreen mode.
 
 [![](https://i.imgur.com/Vn3carH.png)](https://leafmap.org/maplibre/fullscreen)
 
+## Add a GeoJSON line
+
+Add a GeoJSON line to a map using addSource, then style it using addLayer’s paint properties.
+
+[![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
+
 ## Display a satellite map
 
 Display a satellite raster baselayer.
