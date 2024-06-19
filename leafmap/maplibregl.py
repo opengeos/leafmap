@@ -1271,9 +1271,12 @@ class Map(MapWidget):
         Adds a marker to the map.
 
         Args:
-            lng_lat (List[Union[float, float]]): A list of two floats representing the longitude and latitude of the marker.
-            popup (Optional[str], optional): The text to display in a popup when the marker is clicked. Defaults to None.
-            options (Optional[Dict], optional): A dictionary of options to customize the marker. Defaults to None.
+            lng_lat (List[Union[float, float]]): A list of two floats
+                representing the longitude and latitude of the marker.
+            popup (Optional[str], optional): The text to display in a popup when
+                the marker is clicked. Defaults to None.
+            options (Optional[Dict], optional): A dictionary of options to
+                customize the marker. Defaults to None.
 
         Returns:
             None
@@ -1281,3 +1284,41 @@ class Map(MapWidget):
 
         marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
         super().add_marker(marker)
+
+    def fly_to(
+        self,
+        lon: float,
+        lat: float,
+        zoom: Optional[float] = None,
+        speed: Optional[float] = None,
+        essential: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Makes the map fly to a specified location.
+
+        Args:
+            lon (float): The longitude of the location to fly to.
+            lat (float): The latitude of the location to fly to.
+            zoom (Optional[float], optional): The zoom level to use when flying
+                to the location. Defaults to None.
+            speed (Optional[float], optional): The speed of the fly animation.
+                Defaults to None.
+            essential (bool, optional): Whether the flyTo animation is considered
+                essential and not affected by prefers-reduced-motion. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the flyTo function.
+
+        Returns:
+            None
+        """
+
+        center = [lon, lat]
+        kwargs["center"] = center
+        if zoom is not None:
+            kwargs["zoom"] = zoom
+        if speed is not None:
+            kwargs["speed"] = speed
+        if essential:
+            kwargs["essential"] = essential
+
+        super().add_call("flyTo", kwargs)
