@@ -103,6 +103,8 @@ class Map(MapWidget):
             "layer": Layer(id="background", type=LayerType.BACKGROUND),
             "opacity": 1.0,
             "visible": True,
+            "type": "background",
+            "color": None,
         }
 
     def add_layer(
@@ -133,10 +135,21 @@ class Map(MapWidget):
         if name is None:
             name = layer.id
 
+        if (
+            "paint" in layer.to_dict()
+            and f"{layer.type}-color" in layer.paint
+            and isinstance(layer.paint[f"{layer.type}-color"], str)
+        ):
+            color = check_color(layer.paint[f"{layer.type}-color"])
+        else:
+            color = None
+
         self.layer_dict[name] = {
             "layer": layer,
             "opacity": 1.0,
             "visible": True,
+            "type": layer.type,
+            "color": color,
         }
         super().add_layer(layer, before_id=before_id)
 
@@ -932,6 +945,25 @@ class Map(MapWidget):
         if "opacity" in prop:
             self.layer_dict[name]["opacity"] = value
 
+    def set_color(self, name: str, color: str) -> None:
+        """
+        Set the color of a layer.
+
+        This method sets the color of the specified layer to the specified value.
+
+        Args:
+            name (str): The name of the layer.
+            color (str): The color value to set.
+
+        Returns:
+            None
+        """
+        color = check_color(color)
+        super().set_paint_property(
+            name, f"{self.layer_dict[name]['layer'].type}-color", color
+        )
+        self.layer_dict[name]["color"] = color
+
     def set_opacity(self, name: str, opacity: float) -> None:
         """
         Set the opacity of a layer.
@@ -1006,14 +1038,41 @@ class Map(MapWidget):
             value=self.layer_dict[name]["opacity"],
             style=style,
         )
+
+        color_picker = widgets.ColorPicker(
+            concise=True,
+            value="white",
+            style=style,
+        )
+
+        if self.layer_dict[name]["color"] is not None:
+            color_picker.value = self.layer_dict[name]["color"]
+            color_picker.disabled = False
+        else:
+            color_picker.value = "white"
+            color_picker.disabled = True
+
+        def color_picker_event(change):
+            if self.layer_dict[dropdown.value]["color"] is not None:
+                self.set_color(dropdown.value, change.new)
+
+        color_picker.observe(color_picker_event, "value")
+
         hbox = widgets.HBox(
-            [dropdown, checkbox, opacity_slider], layout=widgets.Layout(width="600px")
+            [dropdown, checkbox, opacity_slider, color_picker],
+            layout=widgets.Layout(width="750px"),
         )
 
         def dropdown_event(change):
             name = change.new
             checkbox.value = self.layer_dict[dropdown.value]["visible"]
             opacity_slider.value = self.layer_dict[dropdown.value]["opacity"]
+            if self.layer_dict[dropdown.value]["color"] is not None:
+                color_picker.value = self.layer_dict[dropdown.value]["color"]
+                color_picker.disabled = False
+            else:
+                color_picker.value = "white"
+                color_picker.disabled = True
 
         dropdown.observe(dropdown_event, "value")
 
