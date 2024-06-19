@@ -106,4 +106,4 @@ If you find **leafmap** useful in your research, please consider citing the foll
 
 I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/opengeos/leafmap/issues).
 
-[![Leafmap Tutorials on YouTube](https://wetlands.io/file/images/youtube.png)](https://youtube.com/@giswqs)
+[![Leafmap Tutorials on YouTube](https://wetlands.io/file/images/youtube2024.jpeg)](https://youtube.com/@giswqs)
