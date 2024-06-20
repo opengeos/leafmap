@@ -1347,26 +1347,30 @@ class Map(MapWidget):
         import numpy as np
 
         if isinstance(image, str):
-            if os.path.isfile(image):
-                img = Image.open(image)
-            else:
-                response = requests.get(image)
-                img = Image.open(BytesIO(response.content))
+            try:
+                if os.path.isfile(image):
+                    img = Image.open(image)
+                else:
+                    response = requests.get(image)
+                    img = Image.open(BytesIO(response.content))
 
-            width, height = img.size
+                width, height = img.size
 
-            # Convert image to numpy array and then flatten it
-            img_data = np.array(img, dtype="uint8")
-            flat_img_data = img_data.flatten()
+                # Convert image to numpy array and then flatten it
+                img_data = np.array(img, dtype="uint8")
+                flat_img_data = img_data.flatten()
 
-            # Create the image dictionary with the flattened data
-            image_dict = {
-                "width": width,
-                "height": height,
-                "data": flat_img_data.tolist(),  # Convert to list if necessary
-            }
+                # Create the image dictionary with the flattened data
+                image_dict = {
+                    "width": width,
+                    "height": height,
+                    "data": flat_img_data.tolist(),  # Convert to list if necessary
+                }
 
-            return image_dict
+                return image_dict
+            except Exception as e:
+                print(e)
+                return None
         else:
             raise ValueError("The image must be a URL or a local file path.")
 

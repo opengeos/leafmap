@@ -36,7 +36,7 @@ Add deck.gl layers to the map.
 
 Add an icon to the map from an external URL and use it in a symbol layer.
 
-[![](https://i.imgur.com/oDoxdQ0.png)](https://leafmap.org/maplibre/add_image)
+[![](https://i.imgur.com/Nq1uV9d.png)](https://leafmap.org/maplibre/add_image)
 
 ## Add a video
 
