@@ -1,6 +1,7 @@
 """The maplibregl module provides the Map class for creating interactive maps using the maplibre.ipywidget module.
 """
 
+import requests
 import xyzservices
 import geopandas as gpd
 from box import Box
@@ -79,11 +80,10 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
 
-            style = style.strip().lower()
-            if style.startswith("https://api.maptiler.com") and style.endswith(
-                "key=None"
-            ):
-                style = "dark-matter"
+            if style.startswith("https"):
+                response = requests.get(style)
+                if response.status_code != 200:
+                    style = "dark-matter"
 
             if style.lower() in carto_basemaps:
                 style = construct_carto_basemap_url(style.lower())
