@@ -1374,16 +1374,36 @@ class Map(MapWidget):
         else:
             raise ValueError("The image must be a URL or a local file path.")
 
-    def add_image(self, id: str, image: str) -> None:
+    def add_image(
+        self, id: str, image: Union[str, Dict], width: int = None, height: int = None
+    ) -> None:
         """Add an image to the map.
 
         Args:
             id (str): The layer ID of the image.
-            image (str): The URL or local file path to the image.
+            image (Union[str, Dict, np.ndarray]): The URL or local file path to
+                the image, or a dictionary containing image data, or a numpy
+                array representing the image.
+            width (int, optional): The width of the image. Defaults to None.
+            height (int, optional): The height of the image. Defaults to None.
 
         Returns:
             None
         """
+        import numpy as np
 
-        image_dict = self._read_image(image)
+        if isinstance(image, str):
+            image_dict = self._read_image(image)
+        elif isinstance(image, dict):
+            image_dict = image
+        elif isinstance(image, np.ndarray):
+            image_dict = {
+                "width": width,
+                "height": height,
+                "data": image.tolist(),
+            }
+        else:
+            raise ValueError(
+                "The image must be a URL, a local file path, or a numpy array."
+            )
         super().add_call("addImage", id, image_dict)
