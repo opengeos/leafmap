@@ -1777,7 +1777,10 @@ def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Option
         if _in_colab_shell():
             from google.colab import userdata
 
-            return userdata.get(name)
+            try:
+                return userdata.get(name)
+            except:
+                return os.environ.get(name)
         else:
             return os.environ.get(name)
 
