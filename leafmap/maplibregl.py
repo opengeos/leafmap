@@ -1,6 +1,7 @@
 """The maplibregl module provides the Map class for creating interactive maps using the maplibre.ipywidget module.
 """
 
+import requests
 import xyzservices
 import geopandas as gpd
 from box import Box
@@ -30,7 +31,7 @@ class Map(MapWidget):
 
     def __init__(
         self,
-        center: Tuple[float, float] = (20, 0),
+        center: Tuple[float, float] = (0, 20),
         zoom: float = 1,
         pitch: float = 0,
         bearing: float = 0,
@@ -47,8 +48,8 @@ class Map(MapWidget):
         Create a Map object.
 
         Args:
-            center (tuple, optional): The center of the map (lat, lon). Defaults
-                to (20, 0).
+            center (tuple, optional): The center of the map (lon, lat). Defaults
+                to (0, 20).
             zoom (float, optional): The zoom level of the map. Defaults to 1.
             pitch (float, optional): The pitch of the map. Measured in degrees
                 away from the plane of the screen (0-85) Defaults to 0.
@@ -69,7 +70,6 @@ class Map(MapWidget):
         Returns:
             None
         """
-        center = (center[1], center[0])
         carto_basemaps = [
             "dark-matter",
             "positron",
@@ -79,6 +79,12 @@ class Map(MapWidget):
             "voyager-nolabels",
         ]
         if isinstance(style, str):
+
+            if style.startswith("https"):
+                response = requests.get(style)
+                if response.status_code != 200:
+                    style = "dark-matter"
+
             if style.lower() in carto_basemaps:
                 style = construct_carto_basemap_url(style.lower())
             elif style == "demotiles":
