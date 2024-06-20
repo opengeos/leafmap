@@ -1322,3 +1322,64 @@ class Map(MapWidget):
             kwargs["essential"] = essential
 
         super().add_call("flyTo", kwargs)
+
+    def _read_image(self, image: str) -> Dict[str, Union[int, List[int]]]:
+        """
+        Reads an image from a URL or a local file path and returns a dictionary
+            with the image data.
+
+        Args:
+            image (str): The URL or local file path to the image.
+
+        Returns:
+            Dict[str, Union[int, List[int]]]: A dictionary with the image width,
+                height, and flattened data.
+
+        Raises:
+            ValueError: If the image argument is not a string representing a URL
+                or a local file path.
+        """
+
+        import os
+        from PIL import Image
+        import requests
+        from io import BytesIO
+        import numpy as np
+
+        if isinstance(image, str):
+            if os.path.isfile(image):
+                img = Image.open(image)
+            else:
+                response = requests.get(image)
+                img = Image.open(BytesIO(response.content))
+
+            width, height = img.size
+
+            # Convert image to numpy array and then flatten it
+            img_data = np.array(img, dtype="uint8")
+            flat_img_data = img_data.flatten()
+
+            # Create the image dictionary with the flattened data
+            image_dict = {
+                "width": width,
+                "height": height,
+                "data": flat_img_data.tolist(),  # Convert to list if necessary
+            }
+
+            return image_dict
+        else:
+            raise ValueError("The image must be a URL or a local file path.")
+
+    def add_image(self, id: str, image: str) -> None:
+        """Add an image to the map.
+
+        Args:
+            id (str): The layer ID of the image.
+            image (str): The URL or local file path to the image.
+
+        Returns:
+            None
+        """
+
+        image_dict = self._read_image(image)
+        super().add_call("addImage", id, image_dict)
