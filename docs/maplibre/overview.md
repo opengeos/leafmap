@@ -38,6 +38,12 @@ Add an icon to the map from an external URL and use it in a symbol layer.
 
 [![](https://i.imgur.com/Nq1uV9d.png)](https://leafmap.org/maplibre/add_image)
 
+## Add a generated icon to the map
+
+Add an icon to the map that was generated at runtime.
+
+[![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.
