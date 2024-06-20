@@ -26,6 +26,24 @@ Add a default marker to the map.
 
 [![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_marker)
 
+## Add deck.gl layers
+
+Add deck.gl layers to the map.
+
+[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layers)
+
+## Add an icon to the map
+
+Add an icon to the map from an external URL and use it in a symbol layer.
+
+[![](https://i.imgur.com/Nq1uV9d.png)](https://leafmap.org/maplibre/add_image)
+
+## Add a generated icon to the map
+
+Add an icon to the map that was generated at runtime.
+
+[![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.

@@ -1322,3 +1322,88 @@ class Map(MapWidget):
             kwargs["essential"] = essential
 
         super().add_call("flyTo", kwargs)
+
+    def _read_image(self, image: str) -> Dict[str, Union[int, List[int]]]:
+        """
+        Reads an image from a URL or a local file path and returns a dictionary
+            with the image data.
+
+        Args:
+            image (str): The URL or local file path to the image.
+
+        Returns:
+            Dict[str, Union[int, List[int]]]: A dictionary with the image width,
+                height, and flattened data.
+
+        Raises:
+            ValueError: If the image argument is not a string representing a URL
+                or a local file path.
+        """
+
+        import os
+        from PIL import Image
+        import requests
+        from io import BytesIO
+        import numpy as np
+
+        if isinstance(image, str):
+            try:
+                if os.path.isfile(image):
+                    img = Image.open(image)
+                else:
+                    response = requests.get(image)
+                    img = Image.open(BytesIO(response.content))
+
+                width, height = img.size
+
+                # Convert image to numpy array and then flatten it
+                img_data = np.array(img, dtype="uint8")
+                flat_img_data = img_data.flatten()
+
+                # Create the image dictionary with the flattened data
+                image_dict = {
+                    "width": width,
+                    "height": height,
+                    "data": flat_img_data.tolist(),  # Convert to list if necessary
+                }
+
+                return image_dict
+            except Exception as e:
+                print(e)
+                return None
+        else:
+            raise ValueError("The image must be a URL or a local file path.")
+
+    def add_image(
+        self, id: str, image: Union[str, Dict], width: int = None, height: int = None
+    ) -> None:
+        """Add an image to the map.
+
+        Args:
+            id (str): The layer ID of the image.
+            image (Union[str, Dict, np.ndarray]): The URL or local file path to
+                the image, or a dictionary containing image data, or a numpy
+                array representing the image.
+            width (int, optional): The width of the image. Defaults to None.
+            height (int, optional): The height of the image. Defaults to None.
+
+        Returns:
+            None
+        """
+        import numpy as np
+
+        if isinstance(image, str):
+            image_dict = self._read_image(image)
+        elif isinstance(image, dict):
+            image_dict = image
+        elif isinstance(image, np.ndarray):
+            image_dict = {
+                "width": width,
+                "height": height,
+                "data": image.tolist(),
+            }
+        else:
+            raise ValueError(
+                "The image must be a URL, a local file path, or a numpy array."
+            )
+        super().add_call("addImage", id, image_dict)
