@@ -940,6 +940,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.fly_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      fly_to()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.layer_interact" class="md-nav__link">
     <span class="md-ellipsis">
       layer_interact()
@@ -1545,11 +1554,179 @@
   
   
     <li class="md-nav__item">
+      <a href="../maplibre/fit_bounds/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fit bounds
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/fly_to/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fly to
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/fly_to_options/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fly to options
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/fullscreen/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Fullscreen
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/geojson_line/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Geojson line
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/satellite_map/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Satellite map
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/vector_tile/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Vector tile
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../maplibre/add_video/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
     Add video
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/wms_source/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Wms source
   </span>
   
 
@@ -3763,6 +3940,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.fly_to" class="md-nav__link">
+    <span class="md-ellipsis">
+      fly_to()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.layer_interact" class="md-nav__link">
     <span class="md-ellipsis">
       layer_interact()
@@ -5155,9 +5341,12 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        Adds a marker to the map.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            lng_lat (List[Union[float, float]]): A list of two floats representing the longitude and latitude of the marker.</span>
-<span class="sd">            popup (Optional[str], optional): The text to display in a popup when the marker is clicked. Defaults to None.</span>
-<span class="sd">            options (Optional[Dict], optional): A dictionary of options to customize the marker. Defaults to None.</span>
+<span class="sd">            lng_lat (List[Union[float, float]]): A list of two floats</span>
+<span class="sd">                representing the longitude and latitude of the marker.</span>
+<span class="sd">            popup (Optional[str], optional): The text to display in a popup when</span>
+<span class="sd">                the marker is clicked. Defaults to None.</span>
+<span class="sd">            options (Optional[Dict], optional): A dictionary of options to</span>
+<span class="sd">                customize the marker. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
@@ -5165,6 +5354,44 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
         <span class="n">marker</span> <span class="o">=</span> <span class="n">Marker</span><span class="p">(</span><span class="n">lng_lat</span><span class="o">=</span><span class="n">lng_lat</span><span class="p">,</span> <span class="n">popup</span><span class="o">=</span><span class="n">popup</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_marker</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fly_to</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">speed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">essential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes the map fly to a specified location.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lon (float): The longitude of the location to fly to.</span>
+<span class="sd">            lat (float): The latitude of the location to fly to.</span>
+<span class="sd">            zoom (Optional[float], optional): The zoom level to use when flying</span>
+<span class="sd">                to the location. Defaults to None.</span>
+<span class="sd">            speed (Optional[float], optional): The speed of the fly animation.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">            essential (bool, optional): Whether the flyTo animation is considered</span>
+<span class="sd">                essential and not affected by prefers-reduced-motion. Defaults to True.</span>
+<span class="sd">            **kwargs: Additional keyword arguments to pass to the flyTo function.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">]</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="k">if</span> <span class="n">zoom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom</span>
+        <span class="k">if</span> <span class="n">speed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">speed</span>
+        <span class="k">if</span> <span class="n">essential</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;essential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">essential</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;flyTo&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -6421,19 +6648,22 @@ in the layer dictionary. If None, the layer's ID is used as the key.</p></td>
       <tr>
         <td><code>lng_lat</code></td>
         <td><code>List[Union[float, float]]</code></td>
-        <td><p>A list of two floats representing the longitude and latitude of the marker.</p></td>
+        <td><p>A list of two floats
+representing the longitude and latitude of the marker.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>popup</code></td>
         <td><code>Optional[str]</code></td>
-        <td><p>The text to display in a popup when the marker is clicked. Defaults to None.</p></td>
+        <td><p>The text to display in a popup when
+the marker is clicked. Defaults to None.</p></td>
         <td><code>{}</code></td>
       </tr>
       <tr>
         <td><code>options</code></td>
         <td><code>Optional[Dict]</code></td>
-        <td><p>A dictionary of options to customize the marker. Defaults to None.</p></td>
+        <td><p>A dictionary of options to
+customize the marker. Defaults to None.</p></td>
         <td><code>{}</code></td>
       </tr>
   </tbody>
@@ -6465,9 +6695,12 @@ in the layer dictionary. If None, the layer's ID is used as the key.</p></td>
 <span class="sd">    Adds a marker to the map.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        lng_lat (List[Union[float, float]]): A list of two floats representing the longitude and latitude of the marker.</span>
-<span class="sd">        popup (Optional[str], optional): The text to display in a popup when the marker is clicked. Defaults to None.</span>
-<span class="sd">        options (Optional[Dict], optional): A dictionary of options to customize the marker. Defaults to None.</span>
+<span class="sd">        lng_lat (List[Union[float, float]]): A list of two floats</span>
+<span class="sd">            representing the longitude and latitude of the marker.</span>
+<span class="sd">        popup (Optional[str], optional): The text to display in a popup when</span>
+<span class="sd">            the marker is clicked. Defaults to None.</span>
+<span class="sd">        options (Optional[Dict], optional): A dictionary of options to</span>
+<span class="sd">            customize the marker. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
@@ -7737,6 +7970,134 @@ where each point is a list of two numbers representing the longitude and latitud
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;fitBounds&quot;</span><span class="p">,</span> <span class="n">bounds</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.fly_to" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">fly_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">essential</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.fly_to" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Makes the map fly to a specified location.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>lon</code></td>
+        <td><code>float</code></td>
+        <td><p>The longitude of the location to fly to.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>lat</code></td>
+        <td><code>float</code></td>
+        <td><p>The latitude of the location to fly to.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>zoom</code></td>
+        <td><code>Optional[float]</code></td>
+        <td><p>The zoom level to use when flying
+to the location. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>speed</code></td>
+        <td><code>Optional[float]</code></td>
+        <td><p>The speed of the fly animation.
+Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>essential</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether the flyTo animation is considered
+essential and not affected by prefers-reduced-motion. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments to pass to the flyTo function.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">fly_to</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">speed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">essential</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Makes the map fly to a specified location.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lon (float): The longitude of the location to fly to.</span>
+<span class="sd">        lat (float): The latitude of the location to fly to.</span>
+<span class="sd">        zoom (Optional[float], optional): The zoom level to use when flying</span>
+<span class="sd">            to the location. Defaults to None.</span>
+<span class="sd">        speed (Optional[float], optional): The speed of the fly animation.</span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        essential (bool, optional): Whether the flyTo animation is considered</span>
+<span class="sd">            essential and not affected by prefers-reduced-motion. Defaults to True.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the flyTo function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">center</span> <span class="o">=</span> <span class="p">[</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">]</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
+    <span class="k">if</span> <span class="n">zoom</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom</span>
+    <span class="k">if</span> <span class="n">speed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;speed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">speed</span>
+    <span class="k">if</span> <span class="n">essential</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;essential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">essential</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;flyTo&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
