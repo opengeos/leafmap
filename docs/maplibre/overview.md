@@ -80,6 +80,12 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## Display map navigation controls
+
+Add zoom and rotation controls to the map.
+
+[![](https://i.imgur.com/0A2o0oI.png)](https://leafmap.org/maplibre/navigation)
+
 ## PMTiles source and protocol
 
 Uses the PMTiles plugin and protocol to present a map.
