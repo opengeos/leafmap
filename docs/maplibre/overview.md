@@ -80,6 +80,12 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## PMTiles source and protocol
+
+Uses the PMTiles plugin and protocol to present a map.
+
+[![](https://i.imgur.com/9gQQreo.png)](https://leafmap.org/maplibre/pmtiles)
+
 ## Restrict map panning to an area
 
 Prevent a map from being panned to a different place by setting max_bounds.
