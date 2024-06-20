@@ -79,7 +79,10 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
 
-            if "api.maptiler.com" in style and "key=None" in style:
+            style = style.strip().lower()
+            if style.startswith("https://api.maptiler.com") and style.endswith(
+                "key=None"
+            ):
                 style = "dark-matter"
 
             if style.lower() in carto_basemaps:
