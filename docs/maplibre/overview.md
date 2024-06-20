@@ -86,6 +86,12 @@ Display a satellite raster baselayer.
 
 [![](https://i.imgur.com/S17IRDh.png)](https://leafmap.org/maplibre/satellite_map)
 
+## Set pitch and bearing
+
+Initialize a map with pitch and bearing camera options.
+
+[![](https://i.imgur.com/onKRYXz.png)](https://leafmap.org/maplibre/set_pitch_bearing)
+
 ## Add a vector tile source
 
 Add a vector source to a map.
@@ -97,3 +103,9 @@ Add a vector source to a map.
 Add an external Web Map Service raster layer to the map using addSource's tiles option.
 
 [![](https://i.imgur.com/itFOq8z.png)](https://leafmap.org/maplibre/wms_source)
+
+## Fit to the bounds of a LineString
+
+Get the bounds of a LineString.
+
+[![](https://i.imgur.com/DEnUdXS.png)](https://leafmap.org/maplibre/zoom_to_linestring)
