@@ -1759,8 +1759,8 @@ def vector_col_names(filename, **kwargs):
 
 def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Optional[str]:
     """
-    Retrieves an API key. If a key is provided, it is returned directly. If a 
-    name is provided, the function attempts to retrieve the key from user data 
+    Retrieves an API key. If a key is provided, it is returned directly. If a
+    name is provided, the function attempts to retrieve the key from user data
     (if running in Google Colab) or from environment variables.
 
     Args:
