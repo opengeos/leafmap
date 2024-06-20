@@ -1466,3 +1466,24 @@ class Map(MapWidget):
 
         except Exception as e:
             raise Exception(e)
+
+    def rotate_to(
+        self, bearing: float, options: Dict[str, Any] = {}, **kwargs: Any
+    ) -> None:
+        """
+        Rotate the map to a specified bearing.
+
+        This function rotates the map to a specified bearing. The bearing is specified in degrees
+        counter-clockwise from true north. If the bearing is not specified, the map will rotate to
+        true north. Additional options and keyword arguments can be provided to control the rotation.
+        For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#rotateto
+
+        Args:
+            bearing (float): The bearing to rotate to, in degrees counter-clockwise from true north.
+            options (Dict[str, Any], optional): Additional options to control the rotation. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the rotation.
+
+        Returns:
+            None
+        """
+        super().add_call("rotateTo", bearing, options, **kwargs)

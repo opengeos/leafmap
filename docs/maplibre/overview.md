@@ -92,11 +92,23 @@ Initialize a map with pitch and bearing camera options.
 
 [![](https://i.imgur.com/onKRYXz.png)](https://leafmap.org/maplibre/set_pitch_bearing)
 
+## Variable label placement with offset
+
+Use text-variable-anchor-offset to allow high priority labels to shift position to stay on the map.
+
+[![](https://i.imgur.com/HKfcsoc.png)](https://leafmap.org/maplibre/variable_label_placement)
+
 ## Add a vector tile source
 
 Add a vector source to a map.
 
 [![](https://i.imgur.com/svfZwFh.jpeg)](https://leafmap.org/maplibre/vector_tile)
+
+## Visualize population density
+
+Use a variable binding expression to calculate and display population density.
+
+[![](https://i.imgur.com/7qpnvOP.png)](https://leafmap.org/maplibre/visualize_population_density)
 
 ## Add a WMS source
 
