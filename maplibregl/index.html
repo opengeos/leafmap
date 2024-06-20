@@ -859,6 +859,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_image()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_layer" class="md-nav__link">
     <span class="md-ellipsis">
       add_layer()
@@ -1538,6 +1547,69 @@
   
   <span class="md-ellipsis">
     Add marker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/deckgl_layer/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Deckgl layer
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/add_image/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Add image
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/add_image_generated/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Add image generated
   </span>
   
 
@@ -3859,6 +3931,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_image()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_layer" class="md-nav__link">
     <span class="md-ellipsis">
       add_layer()
@@ -5392,6 +5473,91 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;essential&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">essential</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;flyTo&quot;</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_read_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads an image from a URL or a local file path and returns a dictionary</span>
+<span class="sd">            with the image data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            image (str): The URL or local file path to the image.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Union[int, List[int]]]: A dictionary with the image width,</span>
+<span class="sd">                height, and flattened data.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the image argument is not a string representing a URL</span>
+<span class="sd">                or a local file path.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">os</span>
+        <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+        <span class="kn">import</span> <span class="nn">requests</span>
+        <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+                    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+
+                <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">size</span>
+
+                <span class="c1"># Convert image to numpy array and then flatten it</span>
+                <span class="n">img_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+                <span class="n">flat_img_data</span> <span class="o">=</span> <span class="n">img_data</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+                <span class="c1"># Create the image dictionary with the flattened data</span>
+                <span class="n">image_dict</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
+                    <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">height</span><span class="p">,</span>
+                    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">flat_img_data</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>  <span class="c1"># Convert to list if necessary</span>
+                <span class="p">}</span>
+
+                <span class="k">return</span> <span class="n">image_dict</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The image must be a URL or a local file path.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an image to the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id (str): The layer ID of the image.</span>
+<span class="sd">            image (Union[str, Dict, np.ndarray]): The URL or local file path to</span>
+<span class="sd">                the image, or a dictionary containing image data, or a numpy</span>
+<span class="sd">                array representing the image.</span>
+<span class="sd">            width (int, optional): The width of the image. Defaults to None.</span>
+<span class="sd">            height (int, optional): The height of the image. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">image_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">image_dict</span> <span class="o">=</span> <span class="n">image</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">image_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
+                <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">height</span><span class="p">,</span>
+                <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">image</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The image must be a URL, a local file path, or a numpy array.&quot;</span>
+            <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;addImage&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">image_dict</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -6488,6 +6654,117 @@ passed to the GeoJSONSource class.</p></td>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">paint</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">layer_type</span><span class="si">}</span><span class="s2">-opacity&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_opacity</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.add_image" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.add_image" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Add an image to the map.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>id</code></td>
+        <td><code>str</code></td>
+        <td><p>The layer ID of the image.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>image</code></td>
+        <td><code>Union[str, Dict, np.ndarray]</code></td>
+        <td><p>The URL or local file path to
+the image, or a dictionary containing image data, or a numpy
+array representing the image.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>width</code></td>
+        <td><code>int</code></td>
+        <td><p>The width of the image. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>height</code></td>
+        <td><code>int</code></td>
+        <td><p>The height of the image. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_image</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add an image to the map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (str): The layer ID of the image.</span>
+<span class="sd">        image (Union[str, Dict, np.ndarray]): The URL or local file path to</span>
+<span class="sd">            the image, or a dictionary containing image data, or a numpy</span>
+<span class="sd">            array representing the image.</span>
+<span class="sd">        width (int, optional): The width of the image. Defaults to None.</span>
+<span class="sd">        height (int, optional): The height of the image. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">image_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">image_dict</span> <span class="o">=</span> <span class="n">image</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">image_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span>
+            <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">height</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">image</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The image must be a URL, a local file path, or a numpy array.&quot;</span>
+        <span class="p">)</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;addImage&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">image_dict</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
