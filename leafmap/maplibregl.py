@@ -262,7 +262,8 @@ class Map(MapWidget):
     def fit_bounds(self, bounds: List[Tuple[float, float]]) -> None:
         """
         Adjusts the viewport of the map to fit the specified geographical bounds
-            in the format of [[lon_min, lat_min], [lon_max, lat_max]].
+            in the format of [[lon_min, lat_min], [lon_max, lat_max]] or
+            [lon_min, lat_min, lon_max, lat_max].
 
         This method adjusts the viewport of the map so that the specified geographical bounds
         are visible in the viewport. The bounds are specified as a list of two points,
@@ -277,6 +278,10 @@ class Map(MapWidget):
         Returns:
             None
         """
+
+        if isinstance(bounds, list):
+            if len(bounds) == 4 and all(isinstance(i, (int, float)) for i in bounds):
+                bounds = [[bounds[0], bounds[1]], [bounds[2], bounds[3]]]
 
         self.add_call("fitBounds", bounds)
 
@@ -1413,3 +1418,51 @@ class Map(MapWidget):
                 "The image must be a URL, a local file path, or a numpy array."
             )
         super().add_call("addImage", id, image_dict)
+
+    def to_streamlit(
+        self,
+        width: Optional[int] = None,
+        height: Optional[int] = 600,
+        scrolling: Optional[bool] = False,
+        **kwargs: Any,
+    ) -> Any:
+        """
+        Convert the map to a Streamlit component.
+
+        This function converts the map to a Streamlit component by encoding the
+        HTML representation of the map as base64 and embedding it in an iframe.
+        The width, height, and scrolling parameters control the appearance of
+        the iframe.
+
+        Args:
+            width (Optional[int]): The width of the iframe. If None, the width
+                will be determined by Streamlit.
+            height (Optional[int]): The height of the iframe. Default is 600.
+            scrolling (Optional[bool]): Whether the iframe should be scrollable.
+                Default is False.
+            **kwargs (Any): Additional arguments to pass to the Streamlit iframe
+                function.
+
+        Returns:
+            Any: The Streamlit component.
+
+        Raises:
+            Exception: If there is an error in creating the Streamlit component.
+        """
+
+        try:
+            import streamlit.components.v1 as components
+            import base64
+
+            raw_html = self.to_html().encode("utf-8")
+            raw_html = base64.b64encode(raw_html).decode()
+            return components.iframe(
+                f"data:text/html;base64,{raw_html}",
+                width=width,
+                height=height,
+                scrolling=scrolling,
+                **kwargs,
+            )
+
+        except Exception as e:
+            raise Exception(e)
