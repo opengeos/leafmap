@@ -80,6 +80,12 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## Create a gradient line using an expression
+
+Use the line-gradient paint property and an expression to visualize distance from the starting point of a line.
+
+[![](https://i.imgur.com/I91N6Sk.png)](https://leafmap.org/maplibre/line_gradient)
+
 ## Update a feature in realtime
 
 Change an existing feature on your map in real-time by updating its data.
