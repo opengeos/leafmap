@@ -80,6 +80,24 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## Locate the user
+
+Geolocate the user and then track their current location on the map using the GeolocateControl.
+
+[![](https://i.imgur.com/nqYXzbN.png)](https://leafmap.org/maplibre/locate_user)
+
+## Add a raster tile source
+
+Add a third-party raster source to the map.
+
+[![](https://i.imgur.com/GX7reQP.png)](https://leafmap.org/maplibre/map_tiles)
+
+## Get coordinates of the mouse pointer
+
+Show mouse position on hover with pixel and latitude and longitude coordinates.
+
+[![](https://i.imgur.com/jd2hBSz.png)](https://leafmap.org/maplibre/mouse_position)
+
 ## Add multiple geometries from one GeoJSON source
 
 Add a polygon and circle layer from the same GeoJSON source.
