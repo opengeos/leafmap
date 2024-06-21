@@ -1757,21 +1757,32 @@ def vector_col_names(filename, **kwargs):
     return col_names
 
 
-def get_api_key(token_name, m=None):
-    """Retrieves an API key based on a system environmen variable.
+def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Optional[str]:
+    """
+    Retrieves an API key. If a key is provided, it is returned directly. If a
+    name is provided, the function attempts to retrieve the key from user data
+    (if running in Google Colab) or from environment variables.
 
     Args:
-        token_name (str): The token name.
-        m (ipyleaflet.Map | folium.Map, optional): A Map instance. Defaults to None.
+        name (Optional[str], optional): The name of the key to retrieve. Defaults to None.
+        key (Optional[str], optional): The key to return directly. Defaults to None.
 
     Returns:
-        str: The API key.
+        Optional[str]: The retrieved key, or None if no key was found.
     """
-    api_key = os.environ.get(token_name)
-    if m is not None and token_name in m.api_keys:
-        api_key = m.api_keys[token_name]
 
-    return api_key
+    if key is not None:
+        return key
+    elif name is not None:
+        if _in_colab_shell():
+            from google.colab import userdata
+
+            try:
+                return userdata.get(name)
+            except:
+                return os.environ.get(name)
+        else:
+            return os.environ.get(name)
 
 
 def set_api_key(key: str, name: str = "GOOGLE_MAPS_API_KEY"):
@@ -13513,3 +13524,28 @@ def replace_hyphens_in_keys(d: Union[Dict, List, Any]) -> Union[Dict, List, Any]
         return [replace_hyphens_in_keys(i) for i in d]
     else:
         return d
+
+
+def geojson_bounds(geojson: dict) -> Optional[list]:
+    """
+    Calculate the bounds of a GeoJSON object.
+
+    This function uses the shapely library to calculate the bounds of a GeoJSON object.
+    If the shapely library is not installed, it will print a message and return None.
+
+    Args:
+        geojson (dict): A dictionary representing a GeoJSON object.
+
+    Returns:
+        list: A list of bounds (minx, miny, maxx, maxy) if shapely is installed, None otherwise.
+    """
+    try:
+        import shapely
+    except ImportError:
+        print("shapely is not installed")
+        return
+
+    if isinstance(geojson, str):
+        geojson = json.loads(geojson)
+
+    return list(shapely.bounds(shapely.from_geojson(json.dumps(geojson))))

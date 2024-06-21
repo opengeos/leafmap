@@ -262,7 +262,8 @@ class Map(MapWidget):
     def fit_bounds(self, bounds: List[Tuple[float, float]]) -> None:
         """
         Adjusts the viewport of the map to fit the specified geographical bounds
-            in the format of [[lon_min, lat_min], [lon_max, lat_max]].
+            in the format of [[lon_min, lat_min], [lon_max, lat_max]] or
+            [lon_min, lat_min, lon_max, lat_max].
 
         This method adjusts the viewport of the map so that the specified geographical bounds
         are visible in the viewport. The bounds are specified as a list of two points,
@@ -277,6 +278,10 @@ class Map(MapWidget):
         Returns:
             None
         """
+
+        if isinstance(bounds, list):
+            if len(bounds) == 4 and all(isinstance(i, (int, float)) for i in bounds):
+                bounds = [[bounds[0], bounds[1]], [bounds[2], bounds[3]]]
 
         self.add_call("fitBounds", bounds)
 
@@ -420,6 +425,7 @@ class Map(MapWidget):
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
+                See https://maplibre.org/maplibre-style-spec/layers/ for more info.
 
         Returns:
             None
@@ -428,18 +434,55 @@ class Map(MapWidget):
             ValueError: If the data is not a URL or a GeoJSON dictionary.
         """
 
-        if isinstance(data, str) or isinstance(data, dict):
-            source = data
-        else:
-            raise ValueError("data must be a URL or a GeoJSON dictionary.")
+        import os
 
-        source = GeoJSONSource(data=data, **source_args)
+        bounds = None
+        geom_type = None
+
+        if isinstance(data, str):
+            if os.path.isfile(data) or data.startswith("http"):
+                data = gpd.read_file(data).__geo_interface__
+                bounds = get_bounds(data)
+                source = GeoJSONSource(data=data, **source_args)
+            else:
+                raise ValueError("The data must be a URL or a GeoJSON dictionary.")
+        elif isinstance(data, dict):
+            source = GeoJSONSource(data=data, **source_args)
+
+            bounds = get_bounds(data)
+        else:
+            raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
         if name is None:
             name = "geojson_" + random_string()
 
         if filter is not None:
             kwargs["filter"] = filter
+        if paint is None:
+            geom_type = data["features"][0]["geometry"]["type"]
+            print(geom_type)
+            if geom_type in ["Point", "MultiPoint"]:
+                if layer_type is None:
+                    layer_type = "circle"
+                paint = {
+                    "circle-radius": 5,
+                    "circle-color": "#3388ff",
+                    "circle-stroke-color": "#ffffff",
+                    "circle-stroke-width": 1,
+                }
+            elif geom_type in ["LineString", "MultiLineString"]:
+                if layer_type is None:
+                    layer_type = "line"
+                paint = {"line-color": "#3388ff", "line-width": 2}
+            elif geom_type in ["Polygon", "MultiPolygon"]:
+                if layer_type is None:
+                    layer_type = "fill"
+                paint = {
+                    "fill-color": "#3388ff",
+                    "fill-opacity": 0.8,
+                    "fill-outline-color": "#ffffff",
+                }
+
         if paint is not None:
             kwargs["paint"] = paint
 
@@ -450,11 +493,8 @@ class Map(MapWidget):
             **kwargs,
         )
         self.add_layer(layer, before_id=before_id, name=name)
-        if fit_bounds:
-            if isinstance(data, str):
-                gdf = gpd.read_file(data)
-                data = gdf.__geo_interface__
-                self.fit_bounds(get_bounds(data))
+        if fit_bounds and bounds is not None:
+            self.fit_bounds(bounds)
         self.set_visibility(name, visible)
 
         if isinstance(paint, dict) and f"{layer_type}-opacity" in paint:
@@ -1413,3 +1453,161 @@ class Map(MapWidget):
                 "The image must be a URL, a local file path, or a numpy array."
             )
         super().add_call("addImage", id, image_dict)
+
+    def to_streamlit(
+        self,
+        width: Optional[int] = None,
+        height: Optional[int] = 600,
+        scrolling: Optional[bool] = False,
+        **kwargs: Any,
+    ) -> Any:
+        """
+        Convert the map to a Streamlit component.
+
+        This function converts the map to a Streamlit component by encoding the
+        HTML representation of the map as base64 and embedding it in an iframe.
+        The width, height, and scrolling parameters control the appearance of
+        the iframe.
+
+        Args:
+            width (Optional[int]): The width of the iframe. If None, the width
+                will be determined by Streamlit.
+            height (Optional[int]): The height of the iframe. Default is 600.
+            scrolling (Optional[bool]): Whether the iframe should be scrollable.
+                Default is False.
+            **kwargs (Any): Additional arguments to pass to the Streamlit iframe
+                function.
+
+        Returns:
+            Any: The Streamlit component.
+
+        Raises:
+            Exception: If there is an error in creating the Streamlit component.
+        """
+
+        try:
+            import streamlit.components.v1 as components
+            import base64
+
+            raw_html = self.to_html().encode("utf-8")
+            raw_html = base64.b64encode(raw_html).decode()
+            return components.iframe(
+                f"data:text/html;base64,{raw_html}",
+                width=width,
+                height=height,
+                scrolling=scrolling,
+                **kwargs,
+            )
+
+        except Exception as e:
+            raise Exception(e)
+
+    def rotate_to(
+        self, bearing: float, options: Dict[str, Any] = {}, **kwargs: Any
+    ) -> None:
+        """
+        Rotate the map to a specified bearing.
+
+        This function rotates the map to a specified bearing. The bearing is specified in degrees
+        counter-clockwise from true north. If the bearing is not specified, the map will rotate to
+        true north. Additional options and keyword arguments can be provided to control the rotation.
+        For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#rotateto
+
+        Args:
+            bearing (float): The bearing to rotate to, in degrees counter-clockwise from true north.
+            options (Dict[str, Any], optional): Additional options to control the rotation. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the rotation.
+
+        Returns:
+            None
+        """
+        super().add_call("rotateTo", bearing, options, **kwargs)
+
+    def open_geojson(self, **kwargs: Any) -> "widgets.FileUpload":
+        """
+        Creates a file uploader widget to upload a GeoJSON file. When a file is
+        uploaded, it is written to a temporary file and added to the map.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the add_geojson method.
+
+        Returns:
+            widgets.FileUpload: The file uploader widget.
+        """
+
+        import ipywidgets as widgets
+
+        uploader = widgets.FileUpload(
+            accept=".geojson",  # Accept GeoJSON files
+            multiple=False,  # Only single file upload
+            description="Open GeoJSON",
+        )
+
+        def on_upload(change):
+            content = uploader.value[0]["content"]
+            temp_file = temp_file_path(extension=".geojson")
+            with open(temp_file, "wb") as f:
+                f.write(content)
+            self.add_geojson(temp_file, **kwargs)
+
+        uploader.observe(on_upload, names="value")
+
+        return uploader
+
+    def pan_to(
+        self,
+        lnglat: List[float],
+        options: Dict[str, Any] = {},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Pans the map to a specified location.
+
+        This function pans the map to the specified longitude and latitude coordinates.
+        Additional options and keyword arguments can be provided to control the panning.
+        For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#panto
+
+        Args:
+            lnglat (List[float, float]): The longitude and latitude coordinates to pan to.
+            options (Dict[str, Any], optional): Additional options to control the panning. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the panning.
+
+        Returns:
+            None
+        """
+        super().add_call("panTo", lnglat, options, **kwargs)
+
+    def set_pitch(self, pitch: float, **kwargs: Any) -> None:
+        """
+        Sets the pitch of the map.
+
+        This function sets the pitch of the map to the specified value. The pitch is the
+        angle of the camera measured in degrees where 0 is looking straight down, and 60 is
+        looking towards the horizon. Additional keyword arguments can be provided to control
+        the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setpitch
+
+        Args:
+            pitch (float): The pitch value to set.
+            **kwargs (Any): Additional keyword arguments to control the pitch.
+
+        Returns:
+            None
+        """
+        super().add_call("setPitch", pitch, **kwargs)
+
+    def jump_to(self, options: Dict[str, Any] = {}, **kwargs: Any) -> None:
+        """
+        Jumps the map to a specified location.
+
+        This function jumps the map to the specified location with the specified options.
+        Additional keyword arguments can be provided to control the jump. For more information,
+        see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#jumpto
+
+        Args:
+            options (Dict[str, Any], optional): Additional options to control the jump. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the jump.
+
+        Returns:
+            None
+        """
+        super().add_call("jumpTo", options, **kwargs)
