@@ -80,6 +80,12 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## View local GeoJSON
+
+View local GeoJSON without server upload.
+
+[![](https://i.imgur.com/w3mbV2O.png)](https://leafmap.org/maplibre/local_geojson)
+
 ## Locate the user
 
 Geolocate the user and then track their current location on the map using the GeolocateControl.
