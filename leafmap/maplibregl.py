@@ -1553,3 +1553,61 @@ class Map(MapWidget):
         uploader.observe(on_upload, names="value")
 
         return uploader
+
+    def pan_to(
+        self,
+        lnglat: List[float],
+        options: Dict[str, Any] = {},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Pans the map to a specified location.
+
+        This function pans the map to the specified longitude and latitude coordinates.
+        Additional options and keyword arguments can be provided to control the panning.
+        For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#panto
+
+        Args:
+            lnglat (List[float, float]): The longitude and latitude coordinates to pan to.
+            options (Dict[str, Any], optional): Additional options to control the panning. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the panning.
+
+        Returns:
+            None
+        """
+        super().add_call("panTo", lnglat, options, **kwargs)
+
+    def set_pitch(self, pitch: float, **kwargs: Any) -> None:
+        """
+        Sets the pitch of the map.
+
+        This function sets the pitch of the map to the specified value. The pitch is the
+        angle of the camera measured in degrees where 0 is looking straight down, and 60 is
+        looking towards the horizon. Additional keyword arguments can be provided to control
+        the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#setpitch
+
+        Args:
+            pitch (float): The pitch value to set.
+            **kwargs (Any): Additional keyword arguments to control the pitch.
+
+        Returns:
+            None
+        """
+        super().add_call("setPitch", pitch, **kwargs)
+
+    def jump_to(self, options: Dict[str, Any] = {}, **kwargs: Any) -> None:
+        """
+        Jumps the map to a specified location.
+
+        This function jumps the map to the specified location with the specified options.
+        Additional keyword arguments can be provided to control the jump. For more information,
+        see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#jumpto
+
+        Args:
+            options (Dict[str, Any], optional): Additional options to control the jump. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the jump.
+
+        Returns:
+            None
+        """
+        super().add_call("jumpTo", options, **kwargs)
