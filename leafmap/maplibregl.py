@@ -92,6 +92,8 @@ class Map(MapWidget):
             elif "background-" in style:
                 color = style.split("-")[1]
                 style = background(color)
+            elif style == "3d-terrain":
+                style = self._get_3d_terrain_style()
 
         if style is not None:
             kwargs["style"] = style
@@ -1611,3 +1613,73 @@ class Map(MapWidget):
             None
         """
         super().add_call("jumpTo", options, **kwargs)
+
+    def _get_3d_terrain_style(
+        self,
+        exaggeration: float = 1,
+        token: str = "MAPTILER_KEY",
+        api_key: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Get the 3D terrain style for the map.
+
+        This function generates a style dictionary for the map that includes 3D terrain features.
+        The terrain exaggeration and API key can be specified. If the API key is not provided,
+        it will be retrieved using the specified token.
+
+        Args:
+            exaggeration (float, optional): The terrain exaggeration. Defaults to 1.
+            token (str, optional): The token to use to retrieve the API key. Defaults to "MAPTILER_KEY".
+            api_key (Optional[str], optional): The API key. If not provided, it will be retrieved using the token.
+
+        Returns:
+            Dict[str, Any]: The style dictionary for the map.
+
+        Raises:
+            ValueError: If the API key is not provided and cannot be retrieved using the token.
+        """
+
+        if api_key is None:
+            api_key = get_api_key(token)
+
+        if api_key is None:
+            raise ValueError("An API key is required to use the 3D terrain feature.")
+
+        style = {
+            "version": 8,
+            "sources": {
+                "satellite": {
+                    "type": "raster",
+                    "tiles": [
+                        "https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}.jpg?key="
+                        + api_key
+                    ],
+                    "tileSize": 256,
+                    "attribution": "&copy; MapTiler",
+                    "maxzoom": 19,
+                },
+                "terrainSource": {
+                    "type": "raster-dem",
+                    "url": f"https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key={api_key}",
+                    "tileSize": 256,
+                },
+                "hillshadeSource": {
+                    "type": "raster-dem",
+                    "url": f"https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key={api_key}",
+                    "tileSize": 256,
+                },
+            },
+            "layers": [
+                {"id": "satellite", "type": "raster", "source": "satellite"},
+                {
+                    "id": "hills",
+                    "type": "hillshade",
+                    "source": "hillshadeSource",
+                    "layout": {"visibility": "visible"},
+                    "paint": {"hillshade-shadow-color": "#473B24"},
+                },
+            ],
+            "terrain": {"source": "terrainSource", "exaggeration": exaggeration},
+        }
+
+        return style
