@@ -80,6 +80,18 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## Update a feature in realtime
+
+Change an existing feature on your map in real-time by updating its data.
+
+[![](https://i.imgur.com/zEU8lbu.png)](https://leafmap.org/maplibre/live_update_feature)
+
+## Add live realtime data
+
+Use realtime GeoJSON data streams to move a symbol on your map.
+
+[![](https://i.imgur.com/dayWZIG.png)](https://leafmap.org/maplibre/live_geojson)
+
 ## View local GeoJSON
 
 View local GeoJSON without server upload.
