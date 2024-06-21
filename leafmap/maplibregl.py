@@ -425,6 +425,7 @@ class Map(MapWidget):
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
+                See https://maplibre.org/maplibre-style-spec/layers/ for more info.
 
         Returns:
             None
@@ -433,18 +434,55 @@ class Map(MapWidget):
             ValueError: If the data is not a URL or a GeoJSON dictionary.
         """
 
-        if isinstance(data, str) or isinstance(data, dict):
-            source = data
-        else:
-            raise ValueError("data must be a URL or a GeoJSON dictionary.")
+        import os
 
-        source = GeoJSONSource(data=data, **source_args)
+        bounds = None
+        geom_type = None
+
+        if isinstance(data, str):
+            if os.path.isfile(data) or data.startswith("http"):
+                data = gpd.read_file(data).__geo_interface__
+                bounds = get_bounds(data)
+                source = GeoJSONSource(data=data, **source_args)
+            else:
+                raise ValueError("The data must be a URL or a GeoJSON dictionary.")
+        elif isinstance(data, dict):
+            source = GeoJSONSource(data=data, **source_args)
+
+            bounds = get_bounds(data)
+        else:
+            raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
         if name is None:
             name = "geojson_" + random_string()
 
         if filter is not None:
             kwargs["filter"] = filter
+        if paint is None:
+            geom_type = data["features"][0]["geometry"]["type"]
+            print(geom_type)
+            if geom_type in ["Point", "MultiPoint"]:
+                if layer_type is None:
+                    layer_type = "circle"
+                paint = {
+                    "circle-radius": 5,
+                    "circle-color": "#3388ff",
+                    "circle-stroke-color": "#ffffff",
+                    "circle-stroke-width": 1,
+                }
+            elif geom_type in ["LineString", "MultiLineString"]:
+                if layer_type is None:
+                    layer_type = "line"
+                paint = {"line-color": "#3388ff", "line-width": 2}
+            elif geom_type in ["Polygon", "MultiPolygon"]:
+                if layer_type is None:
+                    layer_type = "fill"
+                paint = {
+                    "fill-color": "#3388ff",
+                    "fill-opacity": 0.8,
+                    "fill-outline-color": "#ffffff",
+                }
+
         if paint is not None:
             kwargs["paint"] = paint
 
@@ -455,11 +493,8 @@ class Map(MapWidget):
             **kwargs,
         )
         self.add_layer(layer, before_id=before_id, name=name)
-        if fit_bounds:
-            if isinstance(data, str):
-                gdf = gpd.read_file(data)
-                data = gdf.__geo_interface__
-                self.fit_bounds(get_bounds(data))
+        if fit_bounds and bounds is not None:
+            self.fit_bounds(bounds)
         self.set_visibility(name, visible)
 
         if isinstance(paint, dict) and f"{layer_type}-opacity" in paint:
@@ -1487,3 +1522,34 @@ class Map(MapWidget):
             None
         """
         super().add_call("rotateTo", bearing, options, **kwargs)
+
+    def open_geojson(self, **kwargs: Any) -> "widgets.FileUpload":
+        """
+        Creates a file uploader widget to upload a GeoJSON file. When a file is
+        uploaded, it is written to a temporary file and added to the map.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the add_geojson method.
+
+        Returns:
+            widgets.FileUpload: The file uploader widget.
+        """
+
+        import ipywidgets as widgets
+
+        uploader = widgets.FileUpload(
+            accept=".geojson",  # Accept GeoJSON files
+            multiple=False,  # Only single file upload
+            description="Open GeoJSON",
+        )
+
+        def on_upload(change):
+            content = uploader.value[0]["content"]
+            temp_file = temp_file_path(extension=".geojson")
+            with open(temp_file, "wb") as f:
+                f.write(content)
+            self.add_geojson(temp_file, **kwargs)
+
+        uploader.observe(on_upload, names="value")
+
+        return uploader
