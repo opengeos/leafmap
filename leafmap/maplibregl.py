@@ -85,6 +85,9 @@ class Map(MapWidget):
                 if response.status_code != 200:
                     style = "dark-matter"
 
+            if style == "3d-terrain":
+                style = self._get_3d_terrain_style()
+
             if style.lower() in carto_basemaps:
                 style = construct_carto_basemap_url(style.lower())
             elif style == "demotiles":
@@ -92,8 +95,6 @@ class Map(MapWidget):
             elif "background-" in style:
                 color = style.split("-")[1]
                 style = background(color)
-            elif style == "3d-terrain":
-                style = self._get_3d_terrain_style()
 
         if style is not None:
             kwargs["style"] = style
@@ -1643,7 +1644,8 @@ class Map(MapWidget):
             api_key = get_api_key(token)
 
         if api_key is None:
-            raise ValueError("An API key is required to use the 3D terrain feature.")
+            print("An API key is required to use the 3D terrain feature.")
+            return "dark-matter"
 
         style = {
             "version": 8,
