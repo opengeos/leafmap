@@ -4679,6 +4679,9 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                     <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
 
+            <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">()</span>
+
             <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
             <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
@@ -6205,6 +6208,77 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;jumpTo&quot;</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_3d_terrain_style</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">exaggeration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">,</span>
+        <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the 3D terrain style for the map.</span>
+
+<span class="sd">        This function generates a style dictionary for the map that includes 3D terrain features.</span>
+<span class="sd">        The terrain exaggeration and API key can be specified. If the API key is not provided,</span>
+<span class="sd">        it will be retrieved using the specified token.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exaggeration (float, optional): The terrain exaggeration. Defaults to 1.</span>
+<span class="sd">            token (str, optional): The token to use to retrieve the API key. Defaults to &quot;MAPTILER_KEY&quot;.</span>
+<span class="sd">            api_key (Optional[str], optional): The API key. If not provided, it will be retrieved using the token.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: The style dictionary for the map.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the API key is not provided and cannot be retrieved using the token.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">api_key</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An API key is required to use the 3D terrain feature.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;dark-matter&quot;</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+            <span class="s2">&quot;sources&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;satellite&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;tiles&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;https://api.maptiler.com/tiles/satellite-v2/</span><span class="si">{z}</span><span class="s2">/</span><span class="si">{x}</span><span class="s2">/</span><span class="si">{y}</span><span class="s2">.jpg?key=&quot;</span>
+                        <span class="o">+</span> <span class="n">api_key</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+                    <span class="s2">&quot;attribution&quot;</span><span class="p">:</span> <span class="s2">&quot;&amp;copy; MapTiler&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;maxzoom&quot;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;terrainSource&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster-dem&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster-dem&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;hills&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;visible&quot;</span><span class="p">},</span>
+                    <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hillshade-shadow-color&quot;</span><span class="p">:</span> <span class="s2">&quot;#473B24&quot;</span><span class="p">},</span>
+                <span class="p">},</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;terrain&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;terrainSource&quot;</span><span class="p">,</span> <span class="s2">&quot;exaggeration&quot;</span><span class="p">:</span> <span class="n">exaggeration</span><span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">style</span>
 </code></pre></div>
         </details>
 
@@ -6380,6 +6454,9 @@ for more information.</p></td>
             <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
+
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>

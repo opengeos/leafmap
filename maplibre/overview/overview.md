@@ -90,7 +90,7 @@ Use the line-gradient paint property and an expression to visualize distance fro
 
 Change an existing feature on your map in real-time by updating its data.
 
-[![](https://i.imgur.com/zEU8lbu.png)](https://leafmap.org/maplibre/live_update_feature)
+[![](https://i.imgur.com/FPB5j6V.png)](https://leafmap.org/maplibre/live_update_feature)
 
 ## Add live realtime data
 
