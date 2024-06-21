@@ -80,6 +80,12 @@ Add a GeoJSON line to a map using addSource, then style it using addLayer’s pa
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
 
+## Add multiple geometries from one GeoJSON source
+
+Add a polygon and circle layer from the same GeoJSON source.
+
+[![](https://i.imgur.com/9q7npbO.png)](https://leafmap.org/maplibre/multiple_geometries)
+
 ## Display map navigation controls
 
 Add zoom and rotation controls to the map.
