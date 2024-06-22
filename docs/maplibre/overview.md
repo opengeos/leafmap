@@ -92,6 +92,18 @@ Create a visualization with a data expression for line-color.
 
 [![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
 
+## Display and style rich text labels
+
+Use the format expression to display country labels in both English and in the local language.
+
+[![](https://i.imgur.com/cUiD0XX.png)](https://leafmap.org/maplibre/display_rich_text)
+
+## Use a fallback image
+
+Use a coalesce expression to display another image when a requested image is not available.
+
+[![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fallback_image)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.
