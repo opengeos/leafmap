@@ -134,6 +134,12 @@ Toggle between current view and fullscreen mode.
 
 [![](https://i.imgur.com/Vn3carH.png)](https://leafmap.org/maplibre/fullscreen)
 
+## Draw GeoJSON points
+
+Draw points from a GeoJSON collection to a map.
+
+[![](https://i.imgur.com/cJsnBby.png)](https://leafmap.org/maplibre/geojson_points)
+
 ## Add a GeoJSON line
 
 Add a GeoJSON line to a map using addSource, then style it using addLayer’s paint properties.

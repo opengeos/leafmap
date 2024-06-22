@@ -1561,22 +1561,40 @@ class Map(MapWidget):
 
         import os
         from PIL import Image
-        import requests
-        from io import BytesIO
         import numpy as np
 
         if isinstance(image, str):
             try:
-                if os.path.isfile(image):
+                if image.startswith("http"):
+                    image = download_file(
+                        image, temp_file_path(image.split(".")[-1]), quiet=True
+                    )
+                if os.path.exists(image):
                     img = Image.open(image)
                 else:
-                    response = requests.get(image)
-                    img = Image.open(BytesIO(response.content))
+                    raise ValueError("The image file does not exist.")
 
                 width, height = img.size
-
                 # Convert image to numpy array and then flatten it
                 img_data = np.array(img, dtype="uint8")
+                if len(img_data.shape) == 3 and img_data.shape[2] == 2:
+                    # Split the grayscale and alpha channels
+                    gray_channel = img_data[:, :, 0]
+                    alpha_channel = img_data[:, :, 1]
+
+                    # Create the R, G, and B channels by duplicating the grayscale channel
+                    R_channel = gray_channel
+                    G_channel = gray_channel
+                    B_channel = gray_channel
+
+                    # Combine the channels into an RGBA image
+                    RGBA_image_data = np.stack(
+                        (R_channel, G_channel, B_channel, alpha_channel), axis=-1
+                    )
+
+                    # Update img_data to the new RGBA image data
+                    img_data = RGBA_image_data
+
                 flat_img_data = img_data.flatten()
 
                 # Create the image dictionary with the flattened data
@@ -1594,7 +1612,14 @@ class Map(MapWidget):
             raise ValueError("The image must be a URL or a local file path.")
 
     def add_image(
-        self, id: str, image: Union[str, Dict], width: int = None, height: int = None
+        self,
+        id: str,
+        image: Union[str, Dict],
+        width: int = None,
+        height: int = None,
+        coordinates: List[float] = None,
+        icon_size: float = 1.0,
+        **kwargs: Any,
     ) -> None:
         """Add an image to the map.
 
@@ -1605,6 +1630,9 @@ class Map(MapWidget):
                 array representing the image.
             width (int, optional): The width of the image. Defaults to None.
             height (int, optional): The height of the image. Defaults to None.
+            coordinates (List[float], optional): The longitude and latitude
+                coordinates to place the image.
+            icon_size (float, optional): The size of the icon. Defaults to 1.0.
 
         Returns:
             None
@@ -1619,13 +1647,39 @@ class Map(MapWidget):
             image_dict = {
                 "width": width,
                 "height": height,
-                "data": image.tolist(),
+                "data": image.flatten().tolist(),
             }
         else:
             raise ValueError(
                 "The image must be a URL, a local file path, or a numpy array."
             )
         super().add_call("addImage", id, image_dict)
+
+        if coordinates is not None:
+
+            source = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": {"type": "Point", "coordinates": coordinates},
+                        }
+                    ],
+                },
+            }
+
+            self.add_source("image_point", source)
+
+            kwargs["id"] = "image_points"
+            kwargs["type"] = "symbol"
+            kwargs["source"] = "image_point"
+            if "layout" not in kwargs:
+                kwargs["layout"] = {}
+            kwargs["layout"]["icon-image"] = id
+            kwargs["layout"]["icon-size"] = icon_size
+            self.add_layer(kwargs)
 
     def to_streamlit(
         self,
