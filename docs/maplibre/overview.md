@@ -44,6 +44,66 @@ Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
 
+## Animate map camera around a point
+
+Animate the map camera around a point.
+
+[![](https://i.imgur.com/odCwtjT.png)](https://leafmap.org/maplibre/animate_camera_around_point)
+
+## Animate a series of images
+
+Use a series of image sources to create an animation.
+
+[![](https://i.imgur.com/2CY0in2.png)](https://leafmap.org/maplibre/animate_images)
+
+## Change the default position for attribution
+
+Place attribution in the top-left position when initializing a map.
+
+[![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
+
+## Change building color based on zoom level
+
+Use the interpolate expression to ease-in the building layer and smoothly fade from one color to the next.
+
+[![](https://i.imgur.com/PayiTON.png)](https://leafmap.org/maplibre/change_building_color)
+
+## Change the case of labels
+
+Use the upcase and downcase expressions to change the case of labels.
+
+[![](https://i.imgur.com/FzGOovv.png)](https://leafmap.org/maplibre/change_case_of_labels)
+
+## Create and style clusters
+
+Use MapLibre GL JS' built-in functions to visualize points as clusters.
+
+[![](https://i.imgur.com/VWvJKwl.png)](https://leafmap.org/maplibre/cluster)
+
+## Change a layer's color with buttons
+
+Use setPaintProperty to change a layer's fill color.
+
+[![](https://i.imgur.com/Q3BbItI.png)](https://leafmap.org/maplibre/color_switcher)
+
+## Style lines with a data-driven property
+
+Create a visualization with a data expression for line-color.
+
+[![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
+
+## Display and style rich text labels
+
+Use the format expression to display country labels in both English and in the local language.
+
+[![](https://i.imgur.com/cUiD0XX.png)](https://leafmap.org/maplibre/display_rich_text)
+
+## Use a fallback image
+
+Use a coalesce expression to display another image when a requested image is not available.
+
+[![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fallback_image)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.
