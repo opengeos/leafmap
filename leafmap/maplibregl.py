@@ -16,6 +16,7 @@ from maplibre.controls import (
     FullscreenControl,
     GeolocateControl,
     NavigationControl,
+    AttributionControl,
     Marker,
 )
 
@@ -98,6 +99,10 @@ class Map(MapWidget):
 
         if style is not None:
             kwargs["style"] = style
+
+        if len(controls) == 0:
+            kwargs["attribution_control"] = False
+
         map_options = MapOptions(
             center=center, zoom=zoom, pitch=pitch, bearing=bearing, **kwargs
         )
@@ -116,6 +121,10 @@ class Map(MapWidget):
             "type": "background",
             "color": None,
         }
+        self._style = style
+        self.style_dict = {}
+        for layer in self.get_style_layers():
+            self.style_dict[layer["id"]] = layer
 
     def add_layer(
         self,
@@ -179,8 +188,8 @@ class Map(MapWidget):
             None
         """
 
+        super().add_call("removeLayer", name)
         if name in self.layer_dict:
-            super().add_call("removeLayer", name)
             self.layer_dict.pop(name)
 
     def add_control(
@@ -190,13 +199,13 @@ class Map(MapWidget):
         Adds a control to the map.
 
         This method adds a control to the map. The control can be one of the
-            following: 'scale', 'fullscreen', 'geolocate', 'navigation'. If the
+            following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution". If the
             control is a string, it is converted to the corresponding control object.
             If the control is not a string, it is assumed to be a control object.
 
         Args:
             control (str or object): The control to add to the map. Can be one
-                of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'.
+                of the following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution".
             position (str, optional): The position of the control. Defaults to "top-right".
             **kwargs: Additional keyword arguments that are passed to the control object.
 
@@ -205,7 +214,7 @@ class Map(MapWidget):
 
         Raises:
             ValueError: If the control is a string and is not one of the
-                following: 'scale', 'fullscreen', 'geolocate', 'navigation'.
+                following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution".
         """
 
         if isinstance(control, str):
@@ -218,6 +227,8 @@ class Map(MapWidget):
                 control = GeolocateControl(**kwargs)
             elif control == "navigation":
                 control = NavigationControl(**kwargs)
+            elif control == "attribution":
+                control = AttributionControl(**kwargs)
             else:
                 print(
                     "Control can only be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'"
@@ -463,8 +474,7 @@ class Map(MapWidget):
             kwargs["filter"] = filter
         if paint is None:
             geom_type = data["features"][0]["geometry"]["type"]
-            print(geom_type)
-            if geom_type in ["Point", "MultiPoint"]:
+            if geom_type in ["Point", "MultiPoint"] and layer_type == "circle":
                 if layer_type is None:
                     layer_type = "circle"
                 paint = {
@@ -995,8 +1005,33 @@ class Map(MapWidget):
         """
         super().set_paint_property(name, prop, value)
 
-        if "opacity" in prop:
+        if "opacity" in prop and name in self.layer_dict:
             self.layer_dict[name]["opacity"] = value
+        elif name in self.style_dict:
+            layer = self.style_dict[name]
+            if "paint" in layer:
+                layer["paint"][prop] = value
+
+    def set_layout_property(self, name: str, prop: str, value: Any) -> None:
+        """
+        Set the layout property of a layer.
+
+        This method sets the layout property of the specified layer to the specified value.
+
+        Args:
+            name (str): The name of the layer.
+            prop (str): The layout property to set.
+            value (Any): The value to set.
+
+        Returns:
+            None
+        """
+        super().set_layout_property(name, prop, value)
+
+        if name in self.style_dict:
+            layer = self.style_dict[name]
+            if "layout" in layer:
+                layer["layout"][prop] = value
 
     def set_color(self, name: str, color: str) -> None:
         """
@@ -1030,11 +1065,18 @@ class Map(MapWidget):
         Returns:
             None
         """
-        layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
-        prop_name = f"{layer_type}-opacity"
 
+        if name in self.layer_dict:
+            layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
+            prop_name = f"{layer_type}-opacity"
+            self.layer_dict[name]["opacity"] = opacity
+        elif name in self.style_dict:
+            layer = self.style_dict[name]
+            layer_type = layer.get("type")
+            prop_name = f"{layer_type}-opacity"
+            if "paint" in layer:
+                layer["paint"][prop_name] = opacity
         super().set_paint_property(name, prop_name, opacity)
-        self.layer_dict[name]["opacity"] = opacity
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
@@ -1132,6 +1174,127 @@ class Map(MapWidget):
         def update_layer(change):
             self.set_visibility(dropdown.value, checkbox.value)
             self.set_opacity(dropdown.value, opacity_slider.value)
+
+        checkbox.observe(update_layer, "value")
+        opacity_slider.observe(update_layer, "value")
+
+        return hbox
+
+    def style_layer_interact(self, id=None):
+        """Create a layer widget for changing the visibility and opacity of a style layer.
+
+        Args:
+            id (str): The is of the layer.
+
+        Returns:
+            ipywidgets.Widget: The layer widget.
+        """
+
+        import ipywidgets as widgets
+
+        layer_ids = list(self.style_dict.keys())
+        layer_ids.sort()
+        if id is None:
+            id = layer_ids[0]
+        elif id not in layer_ids:
+            raise ValueError(f"Layer {id} not found.")
+
+        layer = self.style_dict[id]
+        layer_type = layer.get("type")
+        style = {"description_width": "initial"}
+        dropdown = widgets.Dropdown(
+            options=layer_ids,
+            value=id,
+            description="Layer",
+            style=style,
+        )
+
+        visibility = layer.get("layout", {}).get("visibility", "visible")
+        if visibility == "visible":
+            visibility = True
+        else:
+            visibility = False
+
+        checkbox = widgets.Checkbox(
+            description="Visible",
+            value=visibility,
+            style=style,
+            layout=widgets.Layout(width="120px"),
+        )
+
+        opacity = layer.get("paint", {}).get(f"{layer_type}-opacity", 1.0)
+        opacity_slider = widgets.FloatSlider(
+            description="Opacity",
+            min=0,
+            max=1,
+            step=0.01,
+            value=opacity,
+            style=style,
+        )
+
+        def extract_rgb(rgba_string):
+            import re
+
+            # Extracting the RGB values using regex
+            rgb_tuple = tuple(map(int, re.findall(r"\d+", rgba_string)[:3]))
+            return rgb_tuple
+
+        color = layer.get("paint", {}).get(f"{layer_type}-color", "white")
+        if color.startswith("rgba"):
+            color = extract_rgb(color)
+        color = check_color(color)
+        color_picker = widgets.ColorPicker(
+            concise=True,
+            value=color,
+            style=style,
+        )
+
+        def color_picker_event(change):
+            self.set_paint_property(dropdown.value, f"{layer_type}-color", change.new)
+
+        color_picker.observe(color_picker_event, "value")
+
+        hbox = widgets.HBox(
+            [dropdown, checkbox, opacity_slider, color_picker],
+            layout=widgets.Layout(width="750px"),
+        )
+
+        def dropdown_event(change):
+            name = change.new
+            layer = self.style_dict[name]
+            layer_type = layer.get("type")
+
+            visibility = layer.get("layout", {}).get("visibility", "visible")
+            if visibility == "visible":
+                visibility = True
+            else:
+                visibility = False
+
+            checkbox.value = visibility
+            opacity = layer.get("paint", {}).get(f"{layer_type}-opacity", 1.0)
+            opacity_slider.value = opacity
+
+            color = layer.get("paint", {}).get(f"{layer_type}-color", "white")
+            if color.startswith("rgba"):
+                color = extract_rgb(color)
+            color = check_color(color)
+
+            if color:
+                color_picker.value = color
+                color_picker.disabled = False
+            else:
+                color_picker.value = "white"
+                color_picker.disabled = True
+
+        dropdown.observe(dropdown_event, "value")
+
+        def update_layer(change):
+            self.set_layout_property(
+                dropdown.value, "visibility", "visible" if checkbox.value else "none"
+            )
+            self.set_paint_property(
+                dropdown.value, f"{layer_type}-opacity", opacity_slider.value
+            )
 
         checkbox.observe(update_layer, "value")
         opacity_slider.observe(update_layer, "value")
@@ -1685,3 +1848,75 @@ class Map(MapWidget):
         }
 
         return style
+
+    def get_style(self):
+        """
+        Get the style of the map.
+
+        Returns:
+            Dict: The style of the map.
+        """
+        if self._style is not None:
+            if isinstance(self._style, str):
+                response = requests.get(self._style)
+                style = response.json()
+            elif isinstance(self._style, dict):
+                style = self._style
+            return style
+        else:
+            return {}
+
+    def get_style_layers(self, return_ids=False, sorted=True) -> List[str]:
+        """
+        Get the names of the basemap layers.
+
+        Returns:
+            List[str]: The names of the basemap layers.
+        """
+        style = self.get_style()
+        if "layers" in style:
+            layers = style["layers"]
+            if return_ids:
+                ids = [layer["id"] for layer in layers]
+                if sorted:
+                    ids.sort()
+
+                return ids
+            else:
+                return layers
+        else:
+            return []
+
+    def find_style_layer(self, id: str) -> Optional[Dict]:
+        """
+        Searches for a style layer in the map's current style by its ID and returns it if found.
+
+        Args:
+            id (str): The ID of the style layer to find.
+
+        Returns:
+            Optional[Dict]: The style layer as a dictionary if found, otherwise None.
+        """
+        layers = self.get_style_layers()
+        for layer in layers:
+            if layer["id"] == id:
+                return layer
+        return None
+
+    def zoom_to(self, zoom: float, options: Dict[str, Any] = {}, **kwargs: Any) -> None:
+        """
+        Zooms the map to a specified zoom level.
+
+        This function zooms the map to the specified zoom level. Additional options and keyword
+        arguments can be provided to control the zoom. For more information, see
+        https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#zoomto
+
+        Args:
+            zoom (float): The zoom level to zoom to.
+            options (Dict[str, Any], optional): Additional options to control the zoom. Defaults to {}.
+            **kwargs (Any): Additional keyword arguments to control the zoom.
+
+        Returns:
+            None
+        """
+        super().add_call("zoomTo", zoom, options, **kwargs)
