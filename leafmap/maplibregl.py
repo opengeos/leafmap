@@ -16,6 +16,7 @@ from maplibre.controls import (
     FullscreenControl,
     GeolocateControl,
     NavigationControl,
+    AttributionControl,
     Marker,
 )
 
@@ -98,6 +99,10 @@ class Map(MapWidget):
 
         if style is not None:
             kwargs["style"] = style
+
+        if len(controls) == 0:
+            kwargs["attribution_control"] = False
+
         map_options = MapOptions(
             center=center, zoom=zoom, pitch=pitch, bearing=bearing, **kwargs
         )
@@ -191,13 +196,13 @@ class Map(MapWidget):
         Adds a control to the map.
 
         This method adds a control to the map. The control can be one of the
-            following: 'scale', 'fullscreen', 'geolocate', 'navigation'. If the
+            following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution". If the
             control is a string, it is converted to the corresponding control object.
             If the control is not a string, it is assumed to be a control object.
 
         Args:
             control (str or object): The control to add to the map. Can be one
-                of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'.
+                of the following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution".
             position (str, optional): The position of the control. Defaults to "top-right".
             **kwargs: Additional keyword arguments that are passed to the control object.
 
@@ -206,7 +211,7 @@ class Map(MapWidget):
 
         Raises:
             ValueError: If the control is a string and is not one of the
-                following: 'scale', 'fullscreen', 'geolocate', 'navigation'.
+                following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution".
         """
 
         if isinstance(control, str):
@@ -219,6 +224,8 @@ class Map(MapWidget):
                 control = GeolocateControl(**kwargs)
             elif control == "navigation":
                 control = NavigationControl(**kwargs)
+            elif control == "attribution":
+                control = AttributionControl(**kwargs)
             else:
                 print(
                     "Control can only be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'"

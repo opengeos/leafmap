@@ -50,6 +50,18 @@ Animate the map camera around a point.
 
 [![](https://i.imgur.com/odCwtjT.png)](https://leafmap.org/maplibre/animate_camera_around_point)
 
+## Animate a series of images
+
+Use a series of image sources to create an animation.
+
+[![](https://i.imgur.com/2CY0in2.png)](https://leafmap.org/maplibre/animate_images)
+
+## Change the default position for attribution
+
+Place attribution in the top-left position when initializing a map.
+
+[![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.
