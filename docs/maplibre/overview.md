@@ -86,6 +86,12 @@ Use setPaintProperty to change a layer's fill color.
 
 [![](https://i.imgur.com/Q3BbItI.png)](https://leafmap.org/maplibre/color_switcher)
 
+## Style lines with a data-driven property
+
+Create a visualization with a data expression for line-color.
+
+[![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.

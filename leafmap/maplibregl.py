@@ -1065,7 +1065,6 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().set_paint_property(name, prop_name, opacity)
 
         if name in self.layer_dict:
             layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
@@ -1077,6 +1076,7 @@ class Map(MapWidget):
             prop_name = f"{layer_type}-opacity"
             if "paint" in layer:
                 layer["paint"][prop_name] = opacity
+        super().set_paint_property(name, prop_name, opacity)
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
