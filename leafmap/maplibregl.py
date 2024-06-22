@@ -1981,3 +1981,16 @@ class Map(MapWidget):
             None
         """
         super().add_call("zoomTo", zoom, options, **kwargs)
+
+    def find_first_symbol_layer(self) -> Optional[Dict]:
+        """
+        Find the first symbol layer in the map's current style.
+
+        Returns:
+            Optional[Dict]: The first symbol layer as a dictionary if found, otherwise None.
+        """
+        layers = self.get_style_layers()
+        for layer in layers:
+            if layer["type"] == "symbol":
+                return layer
+        return None
