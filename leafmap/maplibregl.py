@@ -151,6 +151,10 @@ class Map(MapWidget):
             None
         """
         if isinstance(layer, dict):
+            if "minzoom" in layer:
+                layer["min-zoom"] = layer.pop("minzoom")
+            if "maxzoom" in layer:
+                layer["max-zoom"] = layer.pop("maxzoom")
             layer = replace_top_level_hyphens(layer)
             layer = Layer(**layer)
 
@@ -473,7 +477,10 @@ class Map(MapWidget):
         if filter is not None:
             kwargs["filter"] = filter
         if paint is None:
-            geom_type = data["features"][0]["geometry"]["type"]
+            if "features" in data:
+                geom_type = data["features"][0]["geometry"]["type"]
+            elif "geometry" in data:
+                geom_type = data["geometry"]["type"]
             if geom_type in ["Point", "MultiPoint"] and layer_type == "circle":
                 if layer_type is None:
                     layer_type = "circle"

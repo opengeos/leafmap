@@ -30,7 +30,7 @@ Add a default marker to the map.
 
 Add deck.gl layers to the map.
 
-[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layers)
+[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layer)
 
 ## Add an icon to the map
 
@@ -139,6 +139,18 @@ Toggle between current view and fullscreen mode.
 Add a GeoJSON line to a map using addSource, then style it using addLayer’s paint properties.
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
+
+# Add a GeoJSON polygon
+
+Style a polygon with the fill layer type.
+
+[![](https://i.imgur.com/ZRFTymo.png)](https://leafmap.org/maplibre/geojson_polygon)
+
+## Create a heatmap layer
+
+Visualize earthquake frequency by location using a heatmap layer.
+
+[![](https://i.imgur.com/OLCRPKj.png)](https://leafmap.org/maplibre/heatmap_layer)
 
 ## Create a gradient line using an expression
 
