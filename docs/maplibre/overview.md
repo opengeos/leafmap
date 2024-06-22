@@ -152,6 +152,18 @@ Visualize earthquake frequency by location using a heatmap layer.
 
 [![](https://i.imgur.com/OLCRPKj.png)](https://leafmap.org/maplibre/heatmap_layer)
 
+## Display a non-interactive map
+
+Disable interactivity to create a static map.
+
+[![](https://i.imgur.com/qZw8g3C.png)](https://leafmap.org/maplibre/interactive_false)
+
+## Jump to a series of locations
+
+Use the jumpTo function to showcase multiple locations.
+
+[![](https://i.imgur.com/kzzegQ8.png)](https://leafmap.org/maplibre/jump_to)
+
 ## Create a gradient line using an expression
 
 Use the line-gradient paint property and an expression to visualize distance from the starting point of a line.
