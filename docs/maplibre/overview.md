@@ -62,6 +62,30 @@ Place attribution in the top-left position when initializing a map.
 
 [![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
 
+## Change building color based on zoom level
+
+Use the interpolate expression to ease-in the building layer and smoothly fade from one color to the next.
+
+[![](https://i.imgur.com/PayiTON.png)](https://leafmap.org/maplibre/change_building_color)
+
+## Change the case of labels
+
+Use the upcase and downcase expressions to change the case of labels.
+
+[![](https://i.imgur.com/FzGOovv.png)](https://leafmap.org/maplibre/change_case_of_labels)
+
+## Create and style clusters
+
+Use MapLibre GL JS' built-in functions to visualize points as clusters.
+
+[![](https://i.imgur.com/VWvJKwl.png)](https://leafmap.org/maplibre/cluster)
+
+## Change a layer's color with buttons
+
+Use setPaintProperty to change a layer's fill color.
+
+[![](https://i.imgur.com/Q3BbItI.png)](https://leafmap.org/maplibre/color_switcher)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.
