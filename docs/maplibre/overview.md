@@ -44,6 +44,12 @@ Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
 
+## Animate map camera around a point
+
+Animate the map camera around a point.
+
+[![](https://i.imgur.com/odCwtjT.png)](https://leafmap.org/maplibre/animate_camera_around_point)
+
 ## Add a video
 
 Display a video on top of a satellite raster baselayer.
