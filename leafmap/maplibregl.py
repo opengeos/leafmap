@@ -116,6 +116,7 @@ class Map(MapWidget):
             "type": "background",
             "color": None,
         }
+        self._style = style
 
     def add_layer(
         self,
@@ -179,8 +180,8 @@ class Map(MapWidget):
             None
         """
 
+        super().add_call("removeLayer", name)
         if name in self.layer_dict:
-            super().add_call("removeLayer", name)
             self.layer_dict.pop(name)
 
     def add_control(
@@ -1685,3 +1686,41 @@ class Map(MapWidget):
         }
 
         return style
+
+    def get_style(self):
+        """
+        Get the style of the map.
+
+        Returns:
+            Dict: The style of the map.
+        """
+        if self._style is not None:
+            if isinstance(self._style, str):
+                response = requests.get(self._style)
+                style = response.json()
+            elif isinstance(self._style, dict):
+                style = self._style
+            return style
+        else:
+            return {}
+
+    def get_style_layers(self, return_ids=False, sorted=True) -> List[str]:
+        """
+        Get the names of the basemap layers.
+
+        Returns:
+            List[str]: The names of the basemap layers.
+        """
+        style = self.get_style()
+        if "layers" in style:
+            layers = style["layers"]
+            if return_ids:
+                ids = [layer["id"] for layer in layers]
+                if sorted:
+                    ids.sort()
+
+                return ids
+            else:
+                return layers
+        else:
+            return []
