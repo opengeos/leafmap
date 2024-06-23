@@ -248,6 +248,12 @@ View local GeoJSON without server upload.
 
 [![](https://i.imgur.com/w3mbV2O.png)](https://leafmap.org/maplibre/local_geojson)
 
+## View local raster datasets
+
+View local raster datasets with localtileserver
+
+[![](https://i.imgur.com/Q9sQLCP.png)](https://leafmap.org/maplibre/local_raster)
+
 ## Locate the user
 
 Geolocate the user and then track their current location on the map using the GeolocateControl.
