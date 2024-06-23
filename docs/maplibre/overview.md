@@ -20,6 +20,18 @@ Go beyond hillshade and show elevation in actual 3D.
 
 [![](https://i.imgur.com/sjXZ2Jm.jpeg)](https://leafmap.org/maplibre/3d_terrain)
 
+## Add a default marker
+
+Add a default marker to the map.
+
+[![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_a_marker)
+
+## Add deck.gl layers
+
+Add deck.gl layers to the map.
+
+[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/add_deckgl_layer)
+
 ## Add an icon to the map
 
 Add an icon to the map from an external URL and use it in a symbol layer.
@@ -31,12 +43,6 @@ Add an icon to the map from an external URL and use it in a symbol layer.
 Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
-
-## Add a default marker
-
-Add a default marker to the map.
-
-[![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_marker)
 
 ## Animate map camera around a point
 
@@ -85,12 +91,6 @@ Use setPaintProperty to change a layer's fill color.
 Create a visualization with a data expression for line-color.
 
 [![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
-
-## Add deck.gl layers
-
-Add deck.gl layers to the map.
-
-[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layer)
 
 ## Display and style rich text labels
 
