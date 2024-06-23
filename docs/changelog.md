@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.34.2 - Jun 21, 2024
+
+**What's Changed**
+
+-   Add 3d terrain style by @giswqs in [#779](https://github.com/opengeos/leafmap/pull/779)
+
+**Full Changelog**: [v0.34.1...v0.34.2](https://github.com/opengeos/leafmap/compare/v0.34.1...v0.34.2)
+
+## v0.34.1 - Jun 21, 2024
+
+**What's Changed**
+
+-   Add to_streamlit and more examples by @giswqs in [#777](https://github.com/opengeos/leafmap/pull/777)
+
+**Full Changelog**: [v0.34.0...v0.34.1](https://github.com/opengeos/leafmap/compare/v0.34.0...v0.34.1)
+
+## v0.34.0 - Jun 20, 2024
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#772](https://github.com/opengeos/leafmap/pull/772)
+-   Add more MapLibre example by @giswqs in [#773](https://github.com/opengeos/leafmap/pull/773)
+-   Add more MapLibre examples by @giswqs in [#774](https://github.com/opengeos/leafmap/pull/774)
+-   Add more MapLibre examples by @giswqs in [#775](https://github.com/opengeos/leafmap/pull/775)
+-   Change MapLibre center from lat_lon to lon_lat by @giswqs in [#776](https://github.com/opengeos/leafmap/pull/776)
+
+**Full Changelog**: [v0.33.6...v0.34.0](https://github.com/opengeos/leafmap/compare/v0.33.6...v0.34.0)
+
 ## v0.33.6 - Jun 18, 2024
 
 **What's Changed**
