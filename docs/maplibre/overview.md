@@ -98,6 +98,12 @@ Use the upcase and downcase expressions to change the case of labels.
 
 [![](https://i.imgur.com/FzGOovv.png)](https://leafmap.org/maplibre/change_case_of_labels)
 
+## Cloud Optimized GeoTIFF (COG)
+
+Visualize Cloud Optimized GeoTIFF (COG) files with TiTiler.
+
+[![](https://i.imgur.com/t3nX3vj.png)](https://leafmap.org/maplibre/cloud_optimized_geotiff)
+
 ## Create and style clusters
 
 Use MapLibre GL JS' built-in functions to visualize points as clusters.
