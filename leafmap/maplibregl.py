@@ -89,7 +89,7 @@ class Map(MapWidget):
             if style == "3d-terrain":
                 style = self._get_3d_terrain_style()
 
-            if style.lower() in carto_basemaps:
+            if isinstance(style, str) and (style.lower() in carto_basemaps):
                 style = construct_carto_basemap_url(style.lower())
             elif style == "demotiles":
                 style = "https://demotiles.maplibre.org/style.json"
