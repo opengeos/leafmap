@@ -44,6 +44,12 @@ Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
 
+## Animate a line
+
+Animate a line by updating a GeoJSON source on each frame.
+
+[![](https://i.imgur.com/LRwfBl9.png)](https://leafmap.org/maplibre/animate_a_line)
+
 ## Animate map camera around a point
 
 Animate the map camera around a point.
