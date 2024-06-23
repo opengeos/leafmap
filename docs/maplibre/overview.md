@@ -20,18 +20,6 @@ Go beyond hillshade and show elevation in actual 3D.
 
 [![](https://i.imgur.com/sjXZ2Jm.jpeg)](https://leafmap.org/maplibre/3d_terrain)
 
-## Add a default marker
-
-Add a default marker to the map.
-
-[![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_marker)
-
-## Add deck.gl layers
-
-Add deck.gl layers to the map.
-
-[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layer)
-
 ## Add an icon to the map
 
 Add an icon to the map from an external URL and use it in a symbol layer.
@@ -43,6 +31,12 @@ Add an icon to the map from an external URL and use it in a symbol layer.
 Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
+
+## Add a default marker
+
+Add a default marker to the map.
+
+[![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_marker)
 
 ## Animate map camera around a point
 
@@ -92,6 +86,12 @@ Create a visualization with a data expression for line-color.
 
 [![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
 
+## Add deck.gl layers
+
+Add deck.gl layers to the map.
+
+[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layer)
+
 ## Display and style rich text labels
 
 Use the format expression to display country labels in both English and in the local language.
@@ -103,12 +103,6 @@ Use the format expression to display country labels in both English and in the l
 Use a coalesce expression to display another image when a requested image is not available.
 
 [![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fallback_image)
-
-## Add a video
-
-Display a video on top of a satellite raster baselayer.
-
-[![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/add_video)
 
 ## Fit a map to a bounding box
 
@@ -152,7 +146,7 @@ Draw points from a GeoJSON collection to a map.
 
 [![](https://i.imgur.com/cJsnBby.png)](https://leafmap.org/maplibre/geojson_points)
 
-# Add a GeoJSON polygon
+## Add a GeoJSON polygon
 
 Style a polygon with the fill layer type.
 
@@ -182,17 +176,17 @@ Use the line-gradient paint property and an expression to visualize distance fro
 
 [![](https://i.imgur.com/I91N6Sk.png)](https://leafmap.org/maplibre/line_gradient)
 
-## Update a feature in realtime
-
-Change an existing feature on your map in real-time by updating its data.
-
-[![](https://i.imgur.com/FPB5j6V.png)](https://leafmap.org/maplibre/live_update_feature)
-
 ## Add live realtime data
 
 Use realtime GeoJSON data streams to move a symbol on your map.
 
 [![](https://i.imgur.com/dayWZIG.png)](https://leafmap.org/maplibre/live_geojson)
+
+## Update a feature in realtime
+
+Change an existing feature on your map in real-time by updating its data.
+
+[![](https://i.imgur.com/FPB5j6V.png)](https://leafmap.org/maplibre/live_update_feature)
 
 ## View local GeoJSON
 
@@ -271,6 +265,12 @@ Use text-variable-anchor-offset to allow high priority labels to shift position 
 Add a vector source to a map.
 
 [![](https://i.imgur.com/svfZwFh.jpeg)](https://leafmap.org/maplibre/vector_tile)
+
+## Add a video
+
+Display a video on top of a satellite raster baselayer.
+
+[![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/video_on_a_map)
 
 ## Visualize population density
 
