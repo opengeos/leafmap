@@ -4,6 +4,7 @@
 import requests
 import xyzservices
 import geopandas as gpd
+import ipyvuetify as v
 from box import Box
 from maplibre.basemaps import background
 from maplibre.basemaps import construct_carto_basemap_url
@@ -1997,3 +1998,61 @@ class Map(MapWidget):
             if layer["type"] == "symbol":
                 return layer
         return None
+
+
+class Container(v.Container):
+
+    def __init__(self, host_map=None, *args, **kwargs):
+
+
+        # Create the left column with the map
+        left_col_layout = v.Col(
+            cols=11,
+            children=[],
+            class_='pa-1'  # padding for consistent spacing
+        )
+        if host_map is not None:
+            left_col_layout.children = [host_map]
+
+        # Create the right column with some output
+        right_col_layout = v.Col(
+            cols=1,
+            children=[
+                v.Card(children=[v.CardText(children=['Output Content'])])
+            ],
+            class_='pa-1'  # padding for consistent spacing
+        )
+
+        # Create a toggle button with an icon
+        btn = v.Btn(
+            children=[
+                v.Icon(left=False, children=['mdi-layers']),
+            ],
+            # class_='ma-1',
+            v_model=False
+        )
+
+        # Create the button toggle
+        toggle = v.BtnToggle(
+            v_model='toggle_exclusive',
+            children=[btn]
+        )
+
+
+        # Function to change column widths
+        def change_column_widths(*args, **kwargs):
+            if toggle.v_model == 0:
+                left_col_layout.cols = 10
+                right_col_layout.cols = 2
+            else:
+                left_col_layout.cols = 11
+                right_col_layout.cols = 1
+
+
+        # Observe changes in the v_model of the toggle button
+        toggle.on_event('change', change_column_widths)
+
+        # Update the right column to include the toggle button
+        right_col_layout.children = [toggle]
+        row = v.Row(class_='d-flex flex-wrap', children=[left_col_layout, right_col_layout], *args, **kwargs)
+        super().__init__(fluid=True, children=[row])
