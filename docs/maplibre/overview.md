@@ -62,6 +62,18 @@ Use a series of image sources to create an animation.
 
 [![](https://i.imgur.com/2CY0in2.png)](https://leafmap.org/maplibre/animate_images)
 
+## Animate a point
+
+Animate the position of a point by updating a GeoJSON source on each frame.
+
+[![](https://i.imgur.com/EAxNQx4.png)](https://leafmap.org/maplibre/animate_point_along_line)
+
+## Animate a point along a route
+
+Animate a point along the distance of a line.
+
+[![](https://i.imgur.com/kdP1oT1.png)](https://leafmap.org/maplibre/animate_point_along_route)
+
 ## Change the default position for attribution
 
 Place attribution in the top-left position when initializing a map.
