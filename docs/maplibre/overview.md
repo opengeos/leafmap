@@ -98,6 +98,12 @@ Use the upcase and downcase expressions to change the case of labels.
 
 [![](https://i.imgur.com/FzGOovv.png)](https://leafmap.org/maplibre/change_case_of_labels)
 
+## Cloud Optimized GeoTIFF (COG)
+
+Visualize Cloud Optimized GeoTIFF (COG) files with TiTiler.
+
+[![](https://i.imgur.com/t3nX3vj.png)](https://leafmap.org/maplibre/cloud_optimized_geotiff)
+
 ## Create and style clusters
 
 Use MapLibre GL JS' built-in functions to visualize points as clusters.
@@ -242,6 +248,12 @@ View local GeoJSON without server upload.
 
 [![](https://i.imgur.com/w3mbV2O.png)](https://leafmap.org/maplibre/local_geojson)
 
+## View local raster datasets
+
+View local raster datasets with localtileserver
+
+[![](https://i.imgur.com/Q9sQLCP.png)](https://leafmap.org/maplibre/local_raster)
+
 ## Locate the user
 
 Geolocate the user and then track their current location on the map using the GeolocateControl.
@@ -295,6 +307,12 @@ Display a satellite raster baselayer.
 Initialize a map with pitch and bearing camera options.
 
 [![](https://i.imgur.com/onKRYXz.png)](https://leafmap.org/maplibre/set_pitch_bearing)
+
+## Visualize SpatioTemporal Asset Catalog (STAC)
+
+Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.
+
+[![](https://i.imgur.com/zWsNXSF.png)](https://leafmap.org/maplibre/stac)
 
 ## Variable label placement
 
