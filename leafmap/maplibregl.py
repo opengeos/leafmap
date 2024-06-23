@@ -151,6 +151,10 @@ class Map(MapWidget):
             None
         """
         if isinstance(layer, dict):
+            if "minzoom" in layer:
+                layer["min-zoom"] = layer.pop("minzoom")
+            if "maxzoom" in layer:
+                layer["max-zoom"] = layer.pop("maxzoom")
             layer = replace_top_level_hyphens(layer)
             layer = Layer(**layer)
 
@@ -473,7 +477,10 @@ class Map(MapWidget):
         if filter is not None:
             kwargs["filter"] = filter
         if paint is None:
-            geom_type = data["features"][0]["geometry"]["type"]
+            if "features" in data:
+                geom_type = data["features"][0]["geometry"]["type"]
+            elif "geometry" in data:
+                geom_type = data["geometry"]["type"]
             if geom_type in ["Point", "MultiPoint"] and layer_type == "circle":
                 if layer_type is None:
                     layer_type = "circle"
@@ -1475,7 +1482,8 @@ class Map(MapWidget):
 
     def add_marker(
         self,
-        lng_lat: List[Union[float, float]],
+        marker: Marker = None,
+        lng_lat: List[Union[float, float]] = [],
         popup: Optional[Dict] = {},
         options: Optional[Dict] = {},
     ) -> None:
@@ -1483,6 +1491,7 @@ class Map(MapWidget):
         Adds a marker to the map.
 
         Args:
+            marker (Marker, optional): A Marker object. Defaults to None.
             lng_lat (List[Union[float, float]]): A list of two floats
                 representing the longitude and latitude of the marker.
             popup (Optional[str], optional): The text to display in a popup when
@@ -1494,7 +1503,8 @@ class Map(MapWidget):
             None
         """
 
-        marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
+        if marker is None:
+            marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
         super().add_marker(marker)
 
     def fly_to(
@@ -1554,22 +1564,40 @@ class Map(MapWidget):
 
         import os
         from PIL import Image
-        import requests
-        from io import BytesIO
         import numpy as np
 
         if isinstance(image, str):
             try:
-                if os.path.isfile(image):
+                if image.startswith("http"):
+                    image = download_file(
+                        image, temp_file_path(image.split(".")[-1]), quiet=True
+                    )
+                if os.path.exists(image):
                     img = Image.open(image)
                 else:
-                    response = requests.get(image)
-                    img = Image.open(BytesIO(response.content))
+                    raise ValueError("The image file does not exist.")
 
                 width, height = img.size
-
                 # Convert image to numpy array and then flatten it
                 img_data = np.array(img, dtype="uint8")
+                if len(img_data.shape) == 3 and img_data.shape[2] == 2:
+                    # Split the grayscale and alpha channels
+                    gray_channel = img_data[:, :, 0]
+                    alpha_channel = img_data[:, :, 1]
+
+                    # Create the R, G, and B channels by duplicating the grayscale channel
+                    R_channel = gray_channel
+                    G_channel = gray_channel
+                    B_channel = gray_channel
+
+                    # Combine the channels into an RGBA image
+                    RGBA_image_data = np.stack(
+                        (R_channel, G_channel, B_channel, alpha_channel), axis=-1
+                    )
+
+                    # Update img_data to the new RGBA image data
+                    img_data = RGBA_image_data
+
                 flat_img_data = img_data.flatten()
 
                 # Create the image dictionary with the flattened data
@@ -1587,7 +1615,14 @@ class Map(MapWidget):
             raise ValueError("The image must be a URL or a local file path.")
 
     def add_image(
-        self, id: str, image: Union[str, Dict], width: int = None, height: int = None
+        self,
+        id: str,
+        image: Union[str, Dict],
+        width: int = None,
+        height: int = None,
+        coordinates: List[float] = None,
+        icon_size: float = 1.0,
+        **kwargs: Any,
     ) -> None:
         """Add an image to the map.
 
@@ -1598,6 +1633,9 @@ class Map(MapWidget):
                 array representing the image.
             width (int, optional): The width of the image. Defaults to None.
             height (int, optional): The height of the image. Defaults to None.
+            coordinates (List[float], optional): The longitude and latitude
+                coordinates to place the image.
+            icon_size (float, optional): The size of the icon. Defaults to 1.0.
 
         Returns:
             None
@@ -1612,13 +1650,39 @@ class Map(MapWidget):
             image_dict = {
                 "width": width,
                 "height": height,
-                "data": image.tolist(),
+                "data": image.flatten().tolist(),
             }
         else:
             raise ValueError(
                 "The image must be a URL, a local file path, or a numpy array."
             )
         super().add_call("addImage", id, image_dict)
+
+        if coordinates is not None:
+
+            source = {
+                "type": "geojson",
+                "data": {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": {"type": "Point", "coordinates": coordinates},
+                        }
+                    ],
+                },
+            }
+
+            self.add_source("image_point", source)
+
+            kwargs["id"] = "image_points"
+            kwargs["type"] = "symbol"
+            kwargs["source"] = "image_point"
+            if "layout" not in kwargs:
+                kwargs["layout"] = {}
+            kwargs["layout"]["icon-image"] = id
+            kwargs["layout"]["icon-size"] = icon_size
+            self.add_layer(kwargs)
 
     def to_streamlit(
         self,
@@ -1920,3 +1984,16 @@ class Map(MapWidget):
             None
         """
         super().add_call("zoomTo", zoom, options, **kwargs)
+
+    def find_first_symbol_layer(self) -> Optional[Dict]:
+        """
+        Find the first symbol layer in the map's current style.
+
+        Returns:
+            Optional[Dict]: The first symbol layer as a dictionary if found, otherwise None.
+        """
+        layers = self.get_style_layers()
+        for layer in layers:
+            if layer["type"] == "symbol":
+                return layer
+        return None

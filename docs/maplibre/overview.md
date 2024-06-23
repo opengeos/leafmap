@@ -24,13 +24,13 @@ Go beyond hillshade and show elevation in actual 3D.
 
 Add a default marker to the map.
 
-[![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_marker)
+[![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_a_marker)
 
 ## Add deck.gl layers
 
 Add deck.gl layers to the map.
 
-[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/deckgl_layers)
+[![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/add_deckgl_layer)
 
 ## Add an icon to the map
 
@@ -44,6 +44,12 @@ Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
 
+## Animate a line
+
+Animate a line by updating a GeoJSON source on each frame.
+
+[![](https://i.imgur.com/LRwfBl9.png)](https://leafmap.org/maplibre/animate_a_line)
+
 ## Animate map camera around a point
 
 Animate the map camera around a point.
@@ -56,11 +62,29 @@ Use a series of image sources to create an animation.
 
 [![](https://i.imgur.com/2CY0in2.png)](https://leafmap.org/maplibre/animate_images)
 
+## Animate a point
+
+Animate the position of a point by updating a GeoJSON source on each frame.
+
+[![](https://i.imgur.com/EAxNQx4.png)](https://leafmap.org/maplibre/animate_point_along_line)
+
+## Animate a point along a route
+
+Animate a point along the distance of a line.
+
+[![](https://i.imgur.com/kdP1oT1.png)](https://leafmap.org/maplibre/animate_point_along_route)
+
 ## Change the default position for attribution
 
 Place attribution in the top-left position when initializing a map.
 
 [![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
+
+## Center the map on a clicked symbol
+
+Use events and flyTo to center the map on a symbol.
+
+[![](https://i.imgur.com/kfU5VLm.png)](https://leafmap.org/maplibre/center_on_symbol)
 
 ## Change building color based on zoom level
 
@@ -92,11 +116,23 @@ Create a visualization with a data expression for line-color.
 
 [![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
 
+## Disable scroll zoom
+
+Prevent scroll from zooming a map.
+
+[![](https://i.imgur.com/ShhYGaq.png)](https://leafmap.org/maplibre/disable_scroll_zoom)
+
 ## Display and style rich text labels
 
 Use the format expression to display country labels in both English and in the local language.
 
 [![](https://i.imgur.com/cUiD0XX.png)](https://leafmap.org/maplibre/display_rich_text)
+
+## Create a draggable Marker
+
+Drag the marker to a new location on a map and populate its coordinates in a display.
+
+[![](https://i.imgur.com/9RNVuRf.png)](https://leafmap.org/maplibre/drag_a_marker)
 
 ## Use a fallback image
 
@@ -104,11 +140,11 @@ Use a coalesce expression to display another image when a requested image is not
 
 [![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fallback_image)
 
-## Add a video
+## Add a pattern to a polygon
 
-Display a video on top of a satellite raster baselayer.
+Use fill-pattern to draw a polygon from a repeating image pattern.
 
-[![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/add_video)
+[![](https://i.imgur.com/ZEV5gbI.png)](https://leafmap.org/maplibre/fill_pattern)
 
 ## Fit a map to a bounding box
 
@@ -134,11 +170,53 @@ Toggle between current view and fullscreen mode.
 
 [![](https://i.imgur.com/Vn3carH.png)](https://leafmap.org/maplibre/fullscreen)
 
+## Add a new layer below labels
+
+Use the second argument of addLayer to add a layer below labels.
+
+[![](https://i.imgur.com/TelRIyZ.png)](https://leafmap.org/maplibre/geojson_layer_in_stack)
+
 ## Add a GeoJSON line
 
 Add a GeoJSON line to a map using addSource, then style it using addLayer’s paint properties.
 
 [![](https://i.imgur.com/03ylQm0.png)](https://leafmap.org/maplibre/geojson_line)
+
+## Draw GeoJSON points
+
+Draw points from a GeoJSON collection to a map.
+
+[![](https://i.imgur.com/cJsnBby.png)](https://leafmap.org/maplibre/geojson_points)
+
+## Add a GeoJSON polygon
+
+Style a polygon with the fill layer type.
+
+[![](https://i.imgur.com/ZRFTymo.png)](https://leafmap.org/maplibre/geojson_polygon)
+
+## Create a heatmap layer
+
+Visualize earthquake frequency by location using a heatmap layer.
+
+[![](https://i.imgur.com/OLCRPKj.png)](https://leafmap.org/maplibre/heatmap_layer)
+
+## Display a non-interactive map
+
+Disable interactivity to create a static map.
+
+[![](https://i.imgur.com/qZw8g3C.png)](https://leafmap.org/maplibre/interactive_false)
+
+## Jump to a series of locations
+
+Use the jumpTo function to showcase multiple locations.
+
+[![](https://i.imgur.com/kzzegQ8.png)](https://leafmap.org/maplibre/jump_to)
+
+## Change a map's language
+
+Use setLayoutProperty to switch languages dynamically.
+
+[![](https://i.imgur.com/gIRDqQK.png)](https://leafmap.org/maplibre/language_switch)
 
 ## Create a gradient line using an expression
 
@@ -146,17 +224,17 @@ Use the line-gradient paint property and an expression to visualize distance fro
 
 [![](https://i.imgur.com/I91N6Sk.png)](https://leafmap.org/maplibre/line_gradient)
 
-## Update a feature in realtime
-
-Change an existing feature on your map in real-time by updating its data.
-
-[![](https://i.imgur.com/FPB5j6V.png)](https://leafmap.org/maplibre/live_update_feature)
-
 ## Add live realtime data
 
 Use realtime GeoJSON data streams to move a symbol on your map.
 
 [![](https://i.imgur.com/dayWZIG.png)](https://leafmap.org/maplibre/live_geojson)
+
+## Update a feature in realtime
+
+Change an existing feature on your map in real-time by updating its data.
+
+[![](https://i.imgur.com/FPB5j6V.png)](https://leafmap.org/maplibre/live_update_feature)
 
 ## View local GeoJSON
 
@@ -235,6 +313,12 @@ Use text-variable-anchor-offset to allow high priority labels to shift position 
 Add a vector source to a map.
 
 [![](https://i.imgur.com/svfZwFh.jpeg)](https://leafmap.org/maplibre/vector_tile)
+
+## Add a video
+
+Display a video on top of a satellite raster baselayer.
+
+[![](https://i.imgur.com/8YGYanS.jpeg)](https://leafmap.org/maplibre/video_on_a_map)
 
 ## Visualize population density
 
