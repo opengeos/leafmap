@@ -5375,7 +5375,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">):</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
             <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
@@ -7462,7 +7462,7 @@ for more information.</p></td>
         <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">):</span>
             <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
         <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
