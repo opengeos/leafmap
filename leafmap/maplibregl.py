@@ -1482,7 +1482,8 @@ class Map(MapWidget):
 
     def add_marker(
         self,
-        lng_lat: List[Union[float, float]],
+        marker: Marker = None,
+        lng_lat: List[Union[float, float]] = [],
         popup: Optional[Dict] = {},
         options: Optional[Dict] = {},
     ) -> None:
@@ -1490,6 +1491,7 @@ class Map(MapWidget):
         Adds a marker to the map.
 
         Args:
+            marker (Marker, optional): A Marker object. Defaults to None.
             lng_lat (List[Union[float, float]]): A list of two floats
                 representing the longitude and latitude of the marker.
             popup (Optional[str], optional): The text to display in a popup when
@@ -1501,7 +1503,8 @@ class Map(MapWidget):
             None
         """
 
-        marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
+        if marker is None:
+            marker = Marker(lng_lat=lng_lat, popup=popup, options=options)
         super().add_marker(marker)
 
     def fly_to(
