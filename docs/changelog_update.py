@@ -3,11 +3,10 @@ import re
 # Copy the release notes from the GitHub release page
 markdown_text = """
 ## What's Changed
-* Change tms_to_geotiff to map_tiles_to_geotiff by @giswqs in https://github.com/opengeos/leafmap/pull/536
-* Fix MosaicJSON bug in add_stac_layer by @giswqs in https://github.com/opengeos/leafmap/pull/538
+* Add 3d terrain style by @giswqs in https://github.com/opengeos/leafmap/pull/779
 
 
-**Full Changelog**: https://github.com/opengeos/leafmap/compare/v0.24.1...v0.24.2
+**Full Changelog**: https://github.com/opengeos/leafmap/compare/v0.34.1...v0.34.2
 """
 
 # Regular expression pattern to match the Markdown hyperlinks
