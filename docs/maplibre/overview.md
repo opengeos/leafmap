@@ -308,6 +308,12 @@ Initialize a map with pitch and bearing camera options.
 
 [![](https://i.imgur.com/onKRYXz.png)](https://leafmap.org/maplibre/set_pitch_bearing)
 
+## Visualize SpatioTemporal Asset Catalog (STAC)
+
+Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.
+
+[![](https://i.imgur.com/zWsNXSF.png)](https://leafmap.org/maplibre/stac)
+
 ## Variable label placement
 
 Use text-variable-anchor to allow high priority labels to shift position to stay on the map.
