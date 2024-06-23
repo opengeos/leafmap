@@ -80,6 +80,12 @@ Place attribution in the top-left position when initializing a map.
 
 [![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
 
+## Center the map on a clicked symbol
+
+Use events and flyTo to center the map on a symbol.
+
+[![](https://i.imgur.com/kfU5VLm.png)](https://leafmap.org/maplibre/center_on_symbol)
+
 ## Change building color based on zoom level
 
 Use the interpolate expression to ease-in the building layer and smoothly fade from one color to the next.
@@ -110,17 +116,35 @@ Create a visualization with a data expression for line-color.
 
 [![](https://i.imgur.com/GY2ZVtf.png)](https://leafmap.org/maplibre/data_driven_lines)
 
+## Disable scroll zoom
+
+Prevent scroll from zooming a map.
+
+[![](https://i.imgur.com/ShhYGaq.png)](https://leafmap.org/maplibre/disable_scroll_zoom)
+
 ## Display and style rich text labels
 
 Use the format expression to display country labels in both English and in the local language.
 
 [![](https://i.imgur.com/cUiD0XX.png)](https://leafmap.org/maplibre/display_rich_text)
 
+## Create a draggable Marker
+
+Drag the marker to a new location on a map and populate its coordinates in a display.
+
+[![](https://i.imgur.com/9RNVuRf.png)](https://leafmap.org/maplibre/drag_a_marker)
+
 ## Use a fallback image
 
 Use a coalesce expression to display another image when a requested image is not available.
 
 [![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fallback_image)
+
+## Add a pattern to a polygon
+
+Use fill-pattern to draw a polygon from a repeating image pattern.
+
+[![](https://i.imgur.com/ZEV5gbI.png)](https://leafmap.org/maplibre/fill_pattern)
 
 ## Fit a map to a bounding box
 
@@ -187,6 +211,12 @@ Disable interactivity to create a static map.
 Use the jumpTo function to showcase multiple locations.
 
 [![](https://i.imgur.com/kzzegQ8.png)](https://leafmap.org/maplibre/jump_to)
+
+## Change a map's language
+
+Use setLayoutProperty to switch languages dynamically.
+
+[![](https://i.imgur.com/gIRDqQK.png)](https://leafmap.org/maplibre/language_switch)
 
 ## Create a gradient line using an expression
 
