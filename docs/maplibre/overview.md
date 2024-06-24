@@ -206,6 +206,12 @@ Style a polygon with the fill layer type.
 
 [![](https://i.imgur.com/ZRFTymo.png)](https://leafmap.org/maplibre/geojson_polygon)
 
+## Add a GeoPandas GeoDataFrame
+
+Add a GeoPandas GeoDataFrame to a map.
+
+[![](https://i.imgur.com/CQHcD7N.png)](https://leafmap.org/maplibre/geopandas)
+
 ## Create a heatmap layer
 
 Visualize earthquake frequency by location using a heatmap layer.

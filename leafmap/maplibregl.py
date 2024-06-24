@@ -497,7 +497,7 @@ class Map(MapWidget):
                 geom_type = data["features"][0]["geometry"]["type"]
             elif "geometry" in data:
                 geom_type = data["geometry"]["type"]
-            if geom_type in ["Point", "MultiPoint"] and layer_type == "circle":
+            if geom_type in ["Point", "MultiPoint"]:
                 if layer_type is None:
                     layer_type = "circle"
                 paint = {
@@ -529,6 +529,7 @@ class Map(MapWidget):
             **kwargs,
         )
         self.add_layer(layer, before_id=before_id, name=name)
+        self.add_popup(name)
         if fit_bounds and bounds is not None:
             self.fit_bounds(bounds)
         self.set_visibility(name, visible)
@@ -589,9 +590,71 @@ class Map(MapWidget):
 
         if not isinstance(data, gpd.GeoDataFrame):
             data = gpd.read_file(data).__geo_interface__
+        else:
+            data = data.__geo_interface__
 
         self.add_geojson(
             data,
+            layer_type=layer_type,
+            filter=filter,
+            paint=paint,
+            name=name,
+            fit_bounds=fit_bounds,
+            visible=visible,
+            before_id=before_id,
+            source_args=source_args,
+            **kwargs,
+        )
+
+    def add_gdf(
+        self,
+        gdf: gpd.GeoDataFrame,
+        layer_type: Optional[str] = None,
+        filter: Optional[Dict] = None,
+        paint: Optional[Dict] = None,
+        name: Optional[str] = None,
+        fit_bounds: bool = True,
+        visible: bool = True,
+        before_id: Optional[str] = None,
+        source_args: Dict = {},
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a vector layer to the map.
+
+        This method adds a GeoDataFrame to the map as a vector layer.
+
+        Args:
+            gdf (gpd.GeoDataFrame): The GeoDataFrame to add to the map.
+            layer_type (str, optional): The type of the layer. If None, the type
+                is inferred from the GeoJSON data.
+            filter (dict, optional): The filter to apply to the layer. If None,
+                no filter is applied.
+            paint (dict, optional): The paint properties to apply to the layer.
+                If None, no paint properties are applied.
+            name (str, optional): The name of the layer. If None, a random name
+                is generated.
+            fit_bounds (bool, optional): Whether to adjust the viewport of the
+                map to fit the bounds of the GeoJSON data. Defaults to True.
+            visible (bool, optional): Whether the layer is visible or not.
+                Defaults to True.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
+            source_args (dict, optional): Additional keyword arguments that are
+                passed to the GeoJSONSource class.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the data is not a URL or a GeoJSON dictionary.
+        """
+        if not isinstance(gdf, gpd.GeoDataFrame):
+            raise ValueError("The data must be a GeoDataFrame.")
+        geojson = gdf.__geo_interface__
+        self.add_geojson(
+            geojson,
             layer_type=layer_type,
             filter=filter,
             paint=paint,
