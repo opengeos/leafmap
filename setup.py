@@ -62,10 +62,11 @@ extras_requires = {
         "pytorch-lightning",
     ],
     "maplibre": [
-        "maplibre",
-        "h3",
         "geopandas",
+        "h3",
+        "ipyvuetify",
         "localtileserver",
+        "maplibre",
         "pmtiles",
         "rioxarray",
         "xarray",
