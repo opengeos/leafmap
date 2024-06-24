@@ -850,6 +850,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_gdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_gdf()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_geojson" class="md-nav__link">
     <span class="md-ellipsis">
       add_geojson()
@@ -898,6 +907,15 @@
   <a href="#leafmap.maplibregl.Map.add_raster" class="md-nav__link">
     <span class="md-ellipsis">
       add_raster()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_source" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_source()
     </span>
   </a>
   
@@ -1995,6 +2013,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../maplibre/custom_marker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Custom marker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../maplibre/data_driven_lines/" class="md-nav__link">
         
   
@@ -2273,6 +2312,27 @@
   
   <span class="md-ellipsis">
     Geojson polygon
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/geopandas/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Geopandas
   </span>
   
 
@@ -4942,6 +5002,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_gdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_gdf()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_geojson" class="md-nav__link">
     <span class="md-ellipsis">
       add_geojson()
@@ -4990,6 +5059,15 @@
   <a href="#leafmap.maplibregl.Map.add_raster" class="md-nav__link">
     <span class="md-ellipsis">
       add_raster()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_source" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_source()
     </span>
   </a>
   
@@ -5412,6 +5490,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="bp">self</span><span class="o">.</span><span class="n">style_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_style_layers</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">style_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">layer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -5527,6 +5606,20 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="k">return</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a source to the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id (str): The ID of the source.</span>
+<span class="sd">            source (str or dict): The source data. .</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_dict</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span>
 
     <span class="k">def</span> <span class="nf">set_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -5768,7 +5861,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">geom_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
             <span class="k">elif</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
                 <span class="n">geom_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">geom_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;MultiPoint&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;circle&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">geom_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;MultiPoint&quot;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">layer_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">layer_type</span> <span class="o">=</span> <span class="s2">&quot;circle&quot;</span>
                 <span class="n">paint</span> <span class="o">=</span> <span class="p">{</span>
@@ -5800,6 +5893,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_popup</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">fit_bounds</span> <span class="ow">and</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
@@ -5860,9 +5954,71 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">__geo_interface__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">__geo_interface__</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
             <span class="n">data</span><span class="p">,</span>
+            <span class="n">layer_type</span><span class="o">=</span><span class="n">layer_type</span><span class="p">,</span>
+            <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">,</span>
+            <span class="n">paint</span><span class="o">=</span><span class="n">paint</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span><span class="p">,</span>
+            <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+            <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+            <span class="n">source_args</span><span class="o">=</span><span class="n">source_args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">layer_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">paint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fit_bounds</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">source_args</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a vector layer to the map.</span>
+
+<span class="sd">        This method adds a GeoDataFrame to the map as a vector layer.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gdf (gpd.GeoDataFrame): The GeoDataFrame to add to the map.</span>
+<span class="sd">            layer_type (str, optional): The type of the layer. If None, the type</span>
+<span class="sd">                is inferred from the GeoJSON data.</span>
+<span class="sd">            filter (dict, optional): The filter to apply to the layer. If None,</span>
+<span class="sd">                no filter is applied.</span>
+<span class="sd">            paint (dict, optional): The paint properties to apply to the layer.</span>
+<span class="sd">                If None, no paint properties are applied.</span>
+<span class="sd">            name (str, optional): The name of the layer. If None, a random name</span>
+<span class="sd">                is generated.</span>
+<span class="sd">            fit_bounds (bool, optional): Whether to adjust the viewport of the</span>
+<span class="sd">                map to fit the bounds of the GeoJSON data. Defaults to True.</span>
+<span class="sd">            visible (bool, optional): Whether the layer is visible or not.</span>
+<span class="sd">                Defaults to True.</span>
+<span class="sd">            before_id (str, optional): The ID of an existing layer before which</span>
+<span class="sd">                the new layer should be inserted.</span>
+<span class="sd">            source_args (dict, optional): Additional keyword arguments that are</span>
+<span class="sd">                passed to the GeoJSONSource class.</span>
+<span class="sd">            **kwargs: Additional keyword arguments that are passed to the Layer class.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the data is not a URL or a GeoJSON dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a GeoDataFrame.&quot;</span><span class="p">)</span>
+        <span class="n">geojson</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+            <span class="n">geojson</span><span class="p">,</span>
             <span class="n">layer_type</span><span class="o">=</span><span class="n">layer_type</span><span class="p">,</span>
             <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">,</span>
             <span class="n">paint</span><span class="o">=</span><span class="n">paint</span><span class="p">,</span>
@@ -7499,6 +7655,7 @@ for more information.</p></td>
     <span class="bp">self</span><span class="o">.</span><span class="n">style_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_style_layers</span><span class="p">():</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">style_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">layer</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">source_dict</span> <span class="o">=</span> <span class="p">{}</span>
 </code></pre></div>
         </details>
     </div>
@@ -8184,6 +8341,201 @@ the new layer should be inserted.</p></td>
 
 
 
+<h3 id="leafmap.maplibregl.Map.add_gdf" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_gdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">layer_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">paint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source_args</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.add_gdf" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a vector layer to the map.</p>
+<p>This method adds a GeoDataFrame to the map as a vector layer.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>gdf</code></td>
+        <td><code>gpd.GeoDataFrame</code></td>
+        <td><p>The GeoDataFrame to add to the map.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>layer_type</code></td>
+        <td><code>str</code></td>
+        <td><p>The type of the layer. If None, the type
+is inferred from the GeoJSON data.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>filter</code></td>
+        <td><code>dict</code></td>
+        <td><p>The filter to apply to the layer. If None,
+no filter is applied.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>paint</code></td>
+        <td><code>dict</code></td>
+        <td><p>The paint properties to apply to the layer.
+If None, no paint properties are applied.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer. If None, a random name
+is generated.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>fit_bounds</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to adjust the viewport of the
+map to fit the bounds of the GeoJSON data. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>visible</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether the layer is visible or not.
+Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>before_id</code></td>
+        <td><code>str</code></td>
+        <td><p>The ID of an existing layer before which
+the new layer should be inserted.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>source_args</code></td>
+        <td><code>dict</code></td>
+        <td><p>Additional keyword arguments that are
+passed to the GeoJSONSource class.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments that are passed to the Layer class.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the data is not a URL or a GeoJSON dictionary.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="nb">filter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">paint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">fit_bounds</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">source_args</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a vector layer to the map.</span>
+
+<span class="sd">    This method adds a GeoDataFrame to the map as a vector layer.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        gdf (gpd.GeoDataFrame): The GeoDataFrame to add to the map.</span>
+<span class="sd">        layer_type (str, optional): The type of the layer. If None, the type</span>
+<span class="sd">            is inferred from the GeoJSON data.</span>
+<span class="sd">        filter (dict, optional): The filter to apply to the layer. If None,</span>
+<span class="sd">            no filter is applied.</span>
+<span class="sd">        paint (dict, optional): The paint properties to apply to the layer.</span>
+<span class="sd">            If None, no paint properties are applied.</span>
+<span class="sd">        name (str, optional): The name of the layer. If None, a random name</span>
+<span class="sd">            is generated.</span>
+<span class="sd">        fit_bounds (bool, optional): Whether to adjust the viewport of the</span>
+<span class="sd">            map to fit the bounds of the GeoJSON data. Defaults to True.</span>
+<span class="sd">        visible (bool, optional): Whether the layer is visible or not.</span>
+<span class="sd">            Defaults to True.</span>
+<span class="sd">        before_id (str, optional): The ID of an existing layer before which</span>
+<span class="sd">            the new layer should be inserted.</span>
+<span class="sd">        source_args (dict, optional): Additional keyword arguments that are</span>
+<span class="sd">            passed to the GeoJSONSource class.</span>
+<span class="sd">        **kwargs: Additional keyword arguments that are passed to the Layer class.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the data is not a URL or a GeoJSON dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a GeoDataFrame.&quot;</span><span class="p">)</span>
+    <span class="n">geojson</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+        <span class="n">geojson</span><span class="p">,</span>
+        <span class="n">layer_type</span><span class="o">=</span><span class="n">layer_type</span><span class="p">,</span>
+        <span class="nb">filter</span><span class="o">=</span><span class="nb">filter</span><span class="p">,</span>
+        <span class="n">paint</span><span class="o">=</span><span class="n">paint</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span><span class="p">,</span>
+        <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+        <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+        <span class="n">source_args</span><span class="o">=</span><span class="n">source_args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="leafmap.maplibregl.Map.add_geojson" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">add_geojson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">layer_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">paint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source_args</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -8396,7 +8748,7 @@ See https://maplibre.org/maplibre-style-spec/layers/ for more info.</p></td>
             <span class="n">geom_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
         <span class="k">elif</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
             <span class="n">geom_type</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">geom_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;MultiPoint&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">layer_type</span> <span class="o">==</span> <span class="s2">&quot;circle&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">geom_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Point&quot;</span><span class="p">,</span> <span class="s2">&quot;MultiPoint&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">layer_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">layer_type</span> <span class="o">=</span> <span class="s2">&quot;circle&quot;</span>
             <span class="n">paint</span> <span class="o">=</span> <span class="p">{</span>
@@ -8428,6 +8780,7 @@ See https://maplibre.org/maplibre-style-spec/layers/ for more info.</p></td>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_popup</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">fit_bounds</span> <span class="ow">and</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">visible</span><span class="p">)</span>
@@ -9276,6 +9629,83 @@ localtileserver.TileClient. Defaults to { "cors_all": False }.</p></td>
 
 
 
+<h3 id="leafmap.maplibregl.Map.add_source" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.add_source" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a source to the map.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>id</code></td>
+        <td><code>str</code></td>
+        <td><p>The ID of the source.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>source</code></td>
+        <td><code>str or dict</code></td>
+        <td><p>The source data. .</p></td>
+        <td><em>required</em></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a source to the map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (str): The ID of the source.</span>
+<span class="sd">        source (str or dict): The source data. .</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">source_dict</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="leafmap.maplibregl.Map.add_stac_layer" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">add_stac_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;STAC Layer&#39;</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -9833,6 +10263,8 @@ passed to the GeoJSONSource class.</p></td>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">__geo_interface__</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">__geo_interface__</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
         <span class="n">data</span><span class="p">,</span>
