@@ -116,6 +116,12 @@ Use setPaintProperty to change a layer's fill color.
 
 [![](https://i.imgur.com/Q3BbItI.png)](https://leafmap.org/maplibre/color_switcher)
 
+## Customize marker icon image
+
+Use the icon-image property to change the icon image of a marker.
+
+[![](https://i.imgur.com/yEVKJlA.png)](https://leafmap.org/maplibre/custom_marker)
+
 ## Style lines with a data-driven property
 
 Create a visualization with a data expression for line-color.

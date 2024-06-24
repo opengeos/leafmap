@@ -126,6 +126,7 @@ class Map(MapWidget):
         self.style_dict = {}
         for layer in self.get_style_layers():
             self.style_dict[layer["id"]] = layer
+        self.source_dict = {}
 
     def add_layer(
         self,
@@ -241,6 +242,20 @@ class Map(MapWidget):
                 return
 
         super().add_control(control, position)
+
+    def add_source(self, id: str, source: Union[str, Dict]) -> None:
+        """
+        Adds a source to the map.
+
+        Args:
+            id (str): The ID of the source.
+            source (str or dict): The source data. .
+
+        Returns:
+            None
+        """
+        super().add_source(id, source)
+        self.source_dict[id] = source
 
     def set_center(self, lon: float, lat: float, zoom: Optional[int] = None) -> None:
         """
