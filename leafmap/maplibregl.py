@@ -500,24 +500,24 @@ class Map(MapWidget):
             if geom_type in ["Point", "MultiPoint"]:
                 if layer_type is None:
                     layer_type = "circle"
-                paint = {
-                    "circle-radius": 5,
-                    "circle-color": "#3388ff",
-                    "circle-stroke-color": "#ffffff",
-                    "circle-stroke-width": 1,
-                }
+                    paint = {
+                        "circle-radius": 5,
+                        "circle-color": "#3388ff",
+                        "circle-stroke-color": "#ffffff",
+                        "circle-stroke-width": 1,
+                    }
             elif geom_type in ["LineString", "MultiLineString"]:
                 if layer_type is None:
                     layer_type = "line"
-                paint = {"line-color": "#3388ff", "line-width": 2}
+                    paint = {"line-color": "#3388ff", "line-width": 2}
             elif geom_type in ["Polygon", "MultiPolygon"]:
                 if layer_type is None:
                     layer_type = "fill"
-                paint = {
-                    "fill-color": "#3388ff",
-                    "fill-opacity": 0.8,
-                    "fill-outline-color": "#ffffff",
-                }
+                    paint = {
+                        "fill-color": "#3388ff",
+                        "fill-opacity": 0.8,
+                        "fill-outline-color": "#ffffff",
+                    }
 
         if paint is not None:
             kwargs["paint"] = paint
