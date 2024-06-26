@@ -841,6 +841,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_draw_control" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_draw_control()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_ee_layer" class="md-nav__link">
     <span class="md-ellipsis">
       add_ee_layer()
@@ -1060,6 +1069,15 @@
   <a href="#leafmap.maplibregl.Map.rotate_to" class="md-nav__link">
     <span class="md-ellipsis">
       rotate_to()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.save_draw_features" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_draw_features()
     </span>
   </a>
   
@@ -2102,6 +2120,27 @@
   
   <span class="md-ellipsis">
     Drag a marker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/draw_features/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Draw features
   </span>
   
 
@@ -4993,6 +5032,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_draw_control" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_draw_control()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_ee_layer" class="md-nav__link">
     <span class="md-ellipsis">
       add_ee_layer()
@@ -5212,6 +5260,15 @@
   <a href="#leafmap.maplibregl.Map.rotate_to" class="md-nav__link">
     <span class="md-ellipsis">
       rotate_to()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.save_draw_features" class="md-nav__link">
+    <span class="md-ellipsis">
+      save_draw_features()
     </span>
   </a>
   
@@ -5569,13 +5626,15 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        Adds a control to the map.</span>
 
 <span class="sd">        This method adds a control to the map. The control can be one of the</span>
-<span class="sd">            following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, and &quot;attribution&quot;. If the</span>
-<span class="sd">            control is a string, it is converted to the corresponding control object.</span>
-<span class="sd">            If the control is not a string, it is assumed to be a control object.</span>
+<span class="sd">            following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, &quot;attribution&quot;,</span>
+<span class="sd">            and &quot;draw&quot;. If the control is a string, it is converted to the</span>
+<span class="sd">            corresponding control object. If the control is not a string, it is</span>
+<span class="sd">            assumed to be a control object.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            control (str or object): The control to add to the map. Can be one</span>
-<span class="sd">                of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, and &quot;attribution&quot;.</span>
+<span class="sd">                of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;,</span>
+<span class="sd">                 &quot;attribution&quot;, and &quot;draw&quot;.</span>
 <span class="sd">            position (str, optional): The position of the control. Defaults to &quot;top-right&quot;.</span>
 <span class="sd">            **kwargs: Additional keyword arguments that are passed to the control object.</span>
 
@@ -5599,13 +5658,73 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">control</span> <span class="o">=</span> <span class="n">NavigationControl</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">control</span> <span class="o">==</span> <span class="s2">&quot;attribution&quot;</span><span class="p">:</span>
                 <span class="n">control</span> <span class="o">=</span> <span class="n">AttributionControl</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">control</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_draw_control</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;Control can only be one of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;&quot;</span>
+                    <span class="s2">&quot;Control can only be one of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, and &#39;draw&#39;.&quot;</span>
                 <span class="p">)</span>
                 <span class="k">return</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_draw_control</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-left&quot;</span><span class="p">,</span>
+        <span class="n">geojson</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a drawing control to the map.</span>
+
+<span class="sd">        This method enables users to add interactive drawing controls to the map,</span>
+<span class="sd">        allowing for the creation, editing, and deletion of geometric shapes on</span>
+<span class="sd">        the map. The options, position, and initial GeoJSON can be customized.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            options (Optional[Dict[str, Any]]): Configuration options for the</span>
+<span class="sd">                drawing control. Defaults to None.</span>
+<span class="sd">            position (str): The position of the control on the map. Defaults</span>
+<span class="sd">                to &quot;top-left&quot;.</span>
+<span class="sd">            geojson (Optional[Dict[str, Any]]): Initial GeoJSON data to load</span>
+<span class="sd">                into the drawing control. Defaults to None.</span>
+<span class="sd">            **kwargs (Any): Additional keyword arguments to be passed to the</span>
+<span class="sd">                drawing control.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_mapbox_draw</span><span class="p">(</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">geojson</span><span class="o">=</span><span class="n">geojson</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves the drawn features to a file.</span>
+
+<span class="sd">        This method saves all features created with the drawing control to a</span>
+<span class="sd">        specified file in GeoJSON format. If there are no features to save, the</span>
+<span class="sd">        file will not be created.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath (str): The path to the file where the GeoJSON data will be saved.</span>
+<span class="sd">            **kwargs (Any): Additional keyword arguments to be passed to</span>
+<span class="sd">            json.dump for custom serialization.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the feature collection is empty.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are no features to save.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -8059,9 +8178,10 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
 
       <p>Adds a control to the map.</p>
 <p>This method adds a control to the map. The control can be one of the
-    following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution". If the
-    control is a string, it is converted to the corresponding control object.
-    If the control is not a string, it is assumed to be a control object.</p>
+    following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution",
+    and "draw". If the control is a string, it is converted to the
+    corresponding control object. If the control is not a string, it is
+    assumed to be a control object.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -8078,7 +8198,8 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
         <td><code>control</code></td>
         <td><code>str or object</code></td>
         <td><p>The control to add to the map. Can be one
-of the following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution".</p></td>
+of the following: 'scale', 'fullscreen', 'geolocate', 'navigation',
+ "attribution", and "draw".</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
@@ -8135,13 +8256,15 @@ following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution".</p><
 <span class="sd">    Adds a control to the map.</span>
 
 <span class="sd">    This method adds a control to the map. The control can be one of the</span>
-<span class="sd">        following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, and &quot;attribution&quot;. If the</span>
-<span class="sd">        control is a string, it is converted to the corresponding control object.</span>
-<span class="sd">        If the control is not a string, it is assumed to be a control object.</span>
+<span class="sd">        following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, &quot;attribution&quot;,</span>
+<span class="sd">        and &quot;draw&quot;. If the control is a string, it is converted to the</span>
+<span class="sd">        corresponding control object. If the control is not a string, it is</span>
+<span class="sd">        assumed to be a control object.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        control (str or object): The control to add to the map. Can be one</span>
-<span class="sd">            of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, and &quot;attribution&quot;.</span>
+<span class="sd">            of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;,</span>
+<span class="sd">             &quot;attribution&quot;, and &quot;draw&quot;.</span>
 <span class="sd">        position (str, optional): The position of the control. Defaults to &quot;top-right&quot;.</span>
 <span class="sd">        **kwargs: Additional keyword arguments that are passed to the control object.</span>
 
@@ -8165,13 +8288,129 @@ following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution".</p><
             <span class="n">control</span> <span class="o">=</span> <span class="n">NavigationControl</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">control</span> <span class="o">==</span> <span class="s2">&quot;attribution&quot;</span><span class="p">:</span>
             <span class="n">control</span> <span class="o">=</span> <span class="n">AttributionControl</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">control</span> <span class="o">==</span> <span class="s2">&quot;draw&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_draw_control</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;Control can only be one of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;&quot;</span>
+                <span class="s2">&quot;Control can only be one of the following: &#39;scale&#39;, &#39;fullscreen&#39;, &#39;geolocate&#39;, &#39;navigation&#39;, and &#39;draw&#39;.&quot;</span>
             <span class="p">)</span>
             <span class="k">return</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.add_draw_control" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_draw_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s1">&#39;top-left&#39;</span><span class="p">,</span> <span class="n">geojson</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.add_draw_control" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a drawing control to the map.</p>
+<p>This method enables users to add interactive drawing controls to the map,
+allowing for the creation, editing, and deletion of geometric shapes on
+the map. The options, position, and initial GeoJSON can be customized.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>options</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>Configuration options for the
+drawing control. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>position</code></td>
+        <td><code>str</code></td>
+        <td><p>The position of the control on the map. Defaults
+to "top-left".</p></td>
+        <td><code>&#39;top-left&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>geojson</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>Initial GeoJSON data to load
+into the drawing control. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments to be passed to the
+drawing control.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_draw_control</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-left&quot;</span><span class="p">,</span>
+    <span class="n">geojson</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a drawing control to the map.</span>
+
+<span class="sd">    This method enables users to add interactive drawing controls to the map,</span>
+<span class="sd">    allowing for the creation, editing, and deletion of geometric shapes on</span>
+<span class="sd">    the map. The options, position, and initial GeoJSON can be customized.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        options (Optional[Dict[str, Any]]): Configuration options for the</span>
+<span class="sd">            drawing control. Defaults to None.</span>
+<span class="sd">        position (str): The position of the control on the map. Defaults</span>
+<span class="sd">            to &quot;top-left&quot;.</span>
+<span class="sd">        geojson (Optional[Dict[str, Any]]): Initial GeoJSON data to load</span>
+<span class="sd">            into the drawing control. Defaults to None.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments to be passed to the</span>
+<span class="sd">            drawing control.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_mapbox_draw</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">geojson</span><span class="o">=</span><span class="n">geojson</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -11474,6 +11713,113 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;rotateTo&quot;</span><span class="p">,</span> <span class="n">bearing</span><span class="p">,</span> <span class="n">options</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.save_draw_features" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.save_draw_features" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Saves the drawn features to a file.</p>
+<p>This method saves all features created with the drawing control to a
+specified file in GeoJSON format. If there are no features to save, the
+file will not be created.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>filepath</code></td>
+        <td><code>str</code></td>
+        <td><p>The path to the file where the GeoJSON data will be saved.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments to be passed to</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the feature collection is empty.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Saves the drawn features to a file.</span>
+
+<span class="sd">    This method saves all features created with the drawing control to a</span>
+<span class="sd">    specified file in GeoJSON format. If there are no features to save, the</span>
+<span class="sd">    file will not be created.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filepath (str): The path to the file where the GeoJSON data will be saved.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments to be passed to</span>
+<span class="sd">        json.dump for custom serialization.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the feature collection is empty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are no features to save.&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
