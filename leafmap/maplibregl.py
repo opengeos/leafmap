@@ -205,13 +205,15 @@ class Map(MapWidget):
         Adds a control to the map.
 
         This method adds a control to the map. The control can be one of the
-            following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution". If the
-            control is a string, it is converted to the corresponding control object.
-            If the control is not a string, it is assumed to be a control object.
+            following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution",
+            and "draw". If the control is a string, it is converted to the
+            corresponding control object. If the control is not a string, it is
+            assumed to be a control object.
 
         Args:
             control (str or object): The control to add to the map. Can be one
-                of the following: 'scale', 'fullscreen', 'geolocate', 'navigation', and "attribution".
+                of the following: 'scale', 'fullscreen', 'geolocate', 'navigation',
+                 "attribution", and "draw".
             position (str, optional): The position of the control. Defaults to "top-right".
             **kwargs: Additional keyword arguments that are passed to the control object.
 
@@ -235,13 +237,73 @@ class Map(MapWidget):
                 control = NavigationControl(**kwargs)
             elif control == "attribution":
                 control = AttributionControl(**kwargs)
+            elif control == "draw":
+                self.add_draw_control(position=position, **kwargs)
             else:
                 print(
-                    "Control can only be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation'"
+                    "Control can only be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation', and 'draw'."
                 )
                 return
 
         super().add_control(control, position)
+
+    def add_draw_control(
+        self,
+        options: Optional[Dict[str, Any]] = None,
+        position: str = "top-left",
+        geojson: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a drawing control to the map.
+
+        This method enables users to add interactive drawing controls to the map,
+        allowing for the creation, editing, and deletion of geometric shapes on
+        the map. The options, position, and initial GeoJSON can be customized.
+
+        Args:
+            options (Optional[Dict[str, Any]]): Configuration options for the
+                drawing control. Defaults to None.
+            position (str): The position of the control on the map. Defaults
+                to "top-left".
+            geojson (Optional[Dict[str, Any]]): Initial GeoJSON data to load
+                into the drawing control. Defaults to None.
+            **kwargs (Any): Additional keyword arguments to be passed to the
+                drawing control.
+
+        Returns:
+            None
+        """
+
+        super().add_mapbox_draw(
+            options=options, position=position, geojson=geojson, **kwargs
+        )
+
+    def save_draw_features(self, filepath: str, indent=4, **kwargs) -> None:
+        """
+        Saves the drawn features to a file.
+
+        This method saves all features created with the drawing control to a
+        specified file in GeoJSON format. If there are no features to save, the
+        file will not be created.
+
+        Args:
+            filepath (str): The path to the file where the GeoJSON data will be saved.
+            **kwargs (Any): Additional keyword arguments to be passed to
+            json.dump for custom serialization.
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If the feature collection is empty.
+        """
+
+        if len(self.draw_feature_collection_all) > 0:
+            with open(filepath, "w") as f:
+                json.dump(self.draw_feature_collection_all, f, indent=indent, **kwargs)
+        else:
+            print("There are no features to save.")
 
     def add_source(self, id: str, source: Union[str, Dict]) -> None:
         """

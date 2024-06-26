@@ -146,6 +146,12 @@ Drag the marker to a new location on a map and populate its coordinates in a dis
 
 [![](https://i.imgur.com/9RNVuRf.png)](https://leafmap.org/maplibre/drag_a_marker)
 
+## Draw features on the map
+
+Use the draw control to draw features on the map.
+
+[![](https://i.imgur.com/w8UFssd.png)](https://leafmap.org/maplibre/draw_features)
+
 ## Use a fallback image
 
 Use a coalesce expression to display another image when a requested image is not available.
