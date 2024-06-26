@@ -1,5 +1,41 @@
 # Changelog
 
+## v0.34.6 - Jun 24, 2024
+
+**What's Changed**
+
+-   Fix add_geojson paint bug by @giswqs in [#788](https://github.com/opengeos/leafmap/pull/788)
+
+**Full Changelog**: [v0.34.5...v0.34.6](https://github.com/opengeos/leafmap/compare/v0.34.5...v0.34.6)
+
+## v0.34.5 - Jun 23, 2024
+
+**What's Changed**
+
+-   Add a Container class by @giswqs in [#786](https://github.com/opengeos/leafmap/pull/786)
+-   Add add_source function and custom marker notebook by @giswqs in [#787](https://github.com/opengeos/leafmap/pull/787)
+
+**Full Changelog**: [v0.34.4...v0.34.5](https://github.com/opengeos/leafmap/compare/v0.34.4...v0.34.5)
+
+## v0.34.4 - Jun 23, 2024
+
+**What's Changed**
+
+-   Add COG and STAC examples for MapLibre by @giswqs in [#783](https://github.com/opengeos/leafmap/pull/783)
+-   Fix MapLibre style bug by @giswqs in [#785](https://github.com/opengeos/leafmap/pull/785)
+
+**Full Changelog**: [v0.34.3...v0.34.4](https://github.com/opengeos/leafmap/compare/v0.34.3...v0.34.4)
+
+## v0.34.3 - Jun 23, 2024
+
+**What's Changed**
+
+-   Fix terrain style api key bug by @giswqs in [#780](https://github.com/opengeos/leafmap/pull/780)
+-   Add get style layers and more examples by @giswqs in [#781](https://github.com/opengeos/leafmap/pull/781)
+-   Add more MapLibre examples by @giswqs in [#782](https://github.com/opengeos/leafmap/pull/782)
+
+**Full Changelog**: [v0.34.2...v0.34.3](https://github.com/opengeos/leafmap/compare/v0.34.2...v0.34.3)
+
 ## v0.34.2 - Jun 21, 2024
 
 **What's Changed**
