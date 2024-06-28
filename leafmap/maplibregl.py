@@ -2475,7 +2475,7 @@ class Map(MapWidget):
         theme: str = "default",
         css_text: Optional[str] = None,
         position: str = "top-left",
-        background: bool = False,
+        bg_layers: Optional[Union[bool, List[str]]] = False,
     ) -> None:
         """
         Adds a layer control to the map.
@@ -2492,7 +2492,7 @@ class Map(MapWidget):
                 Defaults to None.
             position (str): The position of the layer control on the map. Can be "top-left", "top-right", "bottom-left",
                 or "bottom-right". Defaults to "top-left".
-            background (bool): If True, background layers will be included in the control. Defaults to False.
+            bg_layers (bool): If True, background layers will be included in the control. Defaults to False.
 
         Returns:
             None
@@ -2504,19 +2504,23 @@ class Map(MapWidget):
             if layer_ids[0] == "background":
                 layer_ids = layer_ids[1:]
 
-        if background:
+        if isinstance(bg_layers, list):
+            layer_ids = bg_layers + layer_ids
+        elif bg_layers:
             background_ids = list(self.style_dict.keys())
             layer_ids = background_ids + layer_ids
 
         if css_text is None:
             css_text = "padding: 5px; border: 1px solid darkgrey; border-radius: 4px;"
 
-        control = LayerSwitcherControl(
-            layer_ids=layer_ids,
-            theme=theme,
-            css_text=css_text,
-        )
-        self.add_control(control, position=position)
+        if len(layer_ids) > 0:
+
+            control = LayerSwitcherControl(
+                layer_ids=layer_ids,
+                theme=theme,
+                css_text=css_text,
+            )
+            self.add_control(control, position=position)
 
 
 class Container(v.Container):

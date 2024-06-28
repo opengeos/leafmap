@@ -278,6 +278,12 @@ Use setLayoutProperty to switch languages dynamically.
 
 [![](https://i.imgur.com/gIRDqQK.png)](https://leafmap.org/maplibre/language_switch)
 
+## Add a layer control
+
+Control layer visibility with a layer control.
+
+[![](https://i.imgur.com/NffngdY.png)](https://leafmap.org/maplibre/layer_control)
+
 ## Create a gradient line using an expression
 
 Use the line-gradient paint property and an expression to visualize distance from the starting point of a line.
