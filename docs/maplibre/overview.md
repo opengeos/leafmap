@@ -32,6 +32,12 @@ Add a colorbar to the map.
 
 [![](https://i.imgur.com/84t0Sum.png)](https://leafmap.org/maplibre/add_colorbar)
 
+## Add components to the map
+
+Add various components to the map, including legends, colorbars, text, and HTML content.
+
+[![](https://i.imgur.com/ZWmiKAF.png)](https://leafmap.org/maplibre/add_components)
+
 ## Add deck.gl layers
 
 Add deck.gl layers to the map.
