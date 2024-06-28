@@ -26,11 +26,29 @@ Add a default marker to the map.
 
 [![](https://i.imgur.com/ufmqTzx.png)](https://leafmap.org/maplibre/add_a_marker)
 
+## Add a colorbar
+
+Add a colorbar to the map.
+
+[![](https://i.imgur.com/84t0Sum.png)](https://leafmap.org/maplibre/add_colorbar)
+
+## Add components to the map
+
+Add various components to the map, including legends, colorbars, text, and HTML content.
+
+[![](https://i.imgur.com/ZWmiKAF.png)](https://leafmap.org/maplibre/add_components)
+
 ## Add deck.gl layers
 
 Add deck.gl layers to the map.
 
 [![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/add_deckgl_layer)
+
+## Add HTML content to the map
+
+Add HTML content to the map.
+
+[![](https://i.imgur.com/TgalNOv.png)](https://leafmap.org/maplibre/add_html)
 
 ## Add an icon to the map
 
@@ -43,6 +61,24 @@ Add an icon to the map from an external URL and use it in a symbol layer.
 Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
+
+## Add a legend to the map
+
+Add a custom legend to the map.
+
+[![](https://i.imgur.com/dy60trf.png)](https://leafmap.org/maplibre/add_legend)
+
+## Add a logo to the map
+
+Add an image to the map as a logo.
+
+[![](https://i.imgur.com/Pp9U4Li.png)](https://leafmap.org/maplibre/add_logo)
+
+## Add text to the map
+
+Add text to the map.
+
+[![](https://i.imgur.com/UAtlh3r.png)](https://leafmap.org/maplibre/add_text)
 
 ## Animate a line
 
@@ -241,6 +277,12 @@ Use the jumpTo function to showcase multiple locations.
 Use setLayoutProperty to switch languages dynamically.
 
 [![](https://i.imgur.com/gIRDqQK.png)](https://leafmap.org/maplibre/language_switch)
+
+## Add a layer control
+
+Control layer visibility with a layer control.
+
+[![](https://i.imgur.com/NffngdY.png)](https://leafmap.org/maplibre/layer_control)
 
 ## Create a gradient line using an expression
 
