@@ -239,6 +239,9 @@ class Map(MapWidget):
                 control = AttributionControl(**kwargs)
             elif control == "draw":
                 self.add_draw_control(position=position, **kwargs)
+            elif control == "layers":
+                self.add_layer_control(position=position, **kwargs)
+                return
             else:
                 print(
                     "Control can only be one of the following: 'scale', 'fullscreen', 'geolocate', 'navigation', and 'draw'."
@@ -1757,11 +1760,12 @@ class Map(MapWidget):
 
     def add_image(
         self,
-        id: str,
-        image: Union[str, Dict],
+        id: str = None,
+        image: Union[str, Dict] = None,
         width: int = None,
         height: int = None,
         coordinates: List[float] = None,
+        position: str = None,
         icon_size: float = 1.0,
         **kwargs: Any,
     ) -> None:
@@ -1776,6 +1780,8 @@ class Map(MapWidget):
             height (int, optional): The height of the image. Defaults to None.
             coordinates (List[float], optional): The longitude and latitude
                 coordinates to place the image.
+            position (str, optional): The position of the image. Defaults to None.
+                Can be one of 'top-right', 'top-left', 'bottom-right', 'bottom-left'.
             icon_size (float, optional): The size of the icon. Defaults to 1.0.
 
         Returns:
@@ -1783,47 +1789,57 @@ class Map(MapWidget):
         """
         import numpy as np
 
-        if isinstance(image, str):
-            image_dict = self._read_image(image)
-        elif isinstance(image, dict):
-            image_dict = image
-        elif isinstance(image, np.ndarray):
-            image_dict = {
-                "width": width,
-                "height": height,
-                "data": image.flatten().tolist(),
-            }
+        if id is None:
+            id = "image"
+
+        if position is not None:
+            html = f'<img src="{image}">'
+            self.add_html(html, position=position, **kwargs)
         else:
-            raise ValueError(
-                "The image must be a URL, a local file path, or a numpy array."
-            )
-        super().add_call("addImage", id, image_dict)
+            if isinstance(image, str):
+                image_dict = self._read_image(image)
+            elif isinstance(image, dict):
+                image_dict = image
+            elif isinstance(image, np.ndarray):
+                image_dict = {
+                    "width": width,
+                    "height": height,
+                    "data": image.flatten().tolist(),
+                }
+            else:
+                raise ValueError(
+                    "The image must be a URL, a local file path, or a numpy array."
+                )
+            super().add_call("addImage", id, image_dict)
 
-        if coordinates is not None:
+            if coordinates is not None:
 
-            source = {
-                "type": "geojson",
-                "data": {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "geometry": {"type": "Point", "coordinates": coordinates},
-                        }
-                    ],
-                },
-            }
+                source = {
+                    "type": "geojson",
+                    "data": {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "type": "Feature",
+                                "geometry": {
+                                    "type": "Point",
+                                    "coordinates": coordinates,
+                                },
+                            }
+                        ],
+                    },
+                }
 
-            self.add_source("image_point", source)
+                self.add_source("image_point", source)
 
-            kwargs["id"] = "image_points"
-            kwargs["type"] = "symbol"
-            kwargs["source"] = "image_point"
-            if "layout" not in kwargs:
-                kwargs["layout"] = {}
-            kwargs["layout"]["icon-image"] = id
-            kwargs["layout"]["icon-size"] = icon_size
-            self.add_layer(kwargs)
+                kwargs["id"] = "image_points"
+                kwargs["type"] = "symbol"
+                kwargs["source"] = "image_point"
+                if "layout" not in kwargs:
+                    kwargs["layout"] = {}
+                kwargs["layout"]["icon-image"] = id
+                kwargs["layout"]["icon-size"] = icon_size
+                self.add_layer(kwargs)
 
     def to_streamlit(
         self,
@@ -2138,6 +2154,373 @@ class Map(MapWidget):
             if layer["type"] == "symbol":
                 return layer
         return None
+
+    def add_text(
+        self,
+        text: str,
+        fontsize: int = 20,
+        fontcolor: str = "black",
+        bold: bool = False,
+        padding: str = "5px",
+        bg_color: str = "white",
+        border_radius: str = "5px",
+        position: str = "bottom-right",
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds text to the map with customizable styling.
+
+        This method allows adding a text widget to the map with various styling options such as font size, color,
+        background color, and more. The text's appearance can be further customized using additional CSS properties
+        passed through kwargs.
+
+        Args:
+            text (str): The text to add to the map.
+            fontsize (int, optional): The font size of the text. Defaults to 20.
+            fontcolor (str, optional): The color of the text. Defaults to "black".
+            bold (bool, optional): If True, the text will be bold. Defaults to False.
+            padding (str, optional): The padding around the text. Defaults to "5px".
+            bg_color (str, optional): The background color of the text widget. Defaults to "white".
+                To make the background transparent, set this to "transparent".
+                To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
+            border_radius (str, optional): The border radius of the text widget. Defaults to "5px".
+            position (str, optional): The position of the text widget on the map. Defaults to "bottom-right".
+            **kwargs (Any): Additional CSS properties to apply to the text widget.
+
+        Returns:
+            None
+        """
+        from maplibre.controls import InfoBoxControl
+
+        if bg_color == "transparent" and "box-shadow" not in kwargs:
+            kwargs["box-shadow"] = "none"
+
+        css_text = f"""font-size: {fontsize}px; color: {fontcolor};
+        font-weight: {'bold' if bold else 'normal'}; padding: {padding};
+        background-color: {bg_color}; border-radius: {border_radius};"""
+
+        for key, value in kwargs.items():
+            css_text += f" {key.replace('_', '-')}: {value};"
+
+        control = InfoBoxControl(content=text, css_text=css_text)
+        self.add_control(control, position=position)
+
+    def add_html(
+        self,
+        html: str,
+        bg_color: str = "white",
+        position: str = "bottom-right",
+        **kwargs: Union[str, int, float],
+    ) -> None:
+        """
+        Add HTML content to the map.
+
+        This method allows for the addition of arbitrary HTML content to the map, which can be used to display
+        custom information or controls. The background color and position of the HTML content can be customized.
+
+        Args:
+            html (str): The HTML content to add.
+            bg_color (str, optional): The background color of the HTML content. Defaults to "white".
+                To make the background transparent, set this to "transparent".
+                To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
+            position (str, optional): The position of the HTML content on the map. Can be one of "top-left",
+                "top-right", "bottom-left", "bottom-right". Defaults to "bottom-right".
+            **kwargs: Additional keyword arguments for future use.
+
+        Returns:
+            None
+        """
+        # Check if an HTML string contains local images and convert them to base64.
+        html = check_html_string(html)
+        self.add_text(html, position=position, bg_color=bg_color, **kwargs)
+
+    def add_legend(
+        self,
+        title: str = "Legend",
+        legend_dict: Optional[Dict[str, str]] = None,
+        labels: Optional[List[str]] = None,
+        colors: Optional[List[str]] = None,
+        fontsize: int = 15,
+        bg_color: str = "white",
+        position: str = "bottom-right",
+        builtin_legend: Optional[str] = None,
+        **kwargs: Union[str, int, float],
+    ) -> None:
+        """
+        Adds a legend to the map.
+
+        This method allows for the addition of a legend to the map. The legend can be customized with a title,
+        labels, colors, and more. A built-in legend can also be specified.
+
+        Args:
+            title (str, optional): The title of the legend. Defaults to "Legend".
+            legend_dict (Optional[Dict[str, str]], optional): A dictionary with legend items as keys and colors as values.
+                If provided, `labels` and `colors` will be ignored. Defaults to None.
+            labels (Optional[List[str]], optional): A list of legend labels. Defaults to None.
+            colors (Optional[List[str]], optional): A list of colors corresponding to the labels. Defaults to None.
+            fontsize (int, optional): The font size of the legend text. Defaults to 15.
+            bg_color (str, optional): The background color of the legend. Defaults to "white".
+                To make the background transparent, set this to "transparent".
+                To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
+            position (str, optional): The position of the legend on the map. Can be one of "top-left",
+                "top-right", "bottom-left", "bottom-right". Defaults to "bottom-right".
+            builtin_legend (Optional[str], optional): The name of a built-in legend to use. Defaults to None.
+            **kwargs: Additional keyword arguments for future use.
+
+        Returns:
+            None
+        """
+        import pkg_resources
+        from .legends import builtin_legends
+
+        pkg_dir = os.path.dirname(
+            pkg_resources.resource_filename("leafmap", "leafmap.py")
+        )
+        legend_template = os.path.join(pkg_dir, "data/template/legend.html")
+
+        if not os.path.exists(legend_template):
+            print("The legend template does not exist.")
+            return
+
+        if labels is not None:
+            if not isinstance(labels, list):
+                print("The legend keys must be a list.")
+                return
+        else:
+            labels = ["One", "Two", "Three", "Four", "etc"]
+
+        if colors is not None:
+            if not isinstance(colors, list):
+                print("The legend colors must be a list.")
+                return
+            elif all(isinstance(item, tuple) for item in colors):
+                try:
+                    colors = [rgb_to_hex(x) for x in colors]
+                except Exception as e:
+                    print(e)
+            elif all((item.startswith("#") and len(item) == 7) for item in colors):
+                pass
+            elif all((len(item) == 6) for item in colors):
+                pass
+            else:
+                print("The legend colors must be a list of tuples.")
+                return
+        else:
+            colors = [
+                "#8DD3C7",
+                "#FFFFB3",
+                "#BEBADA",
+                "#FB8072",
+                "#80B1D3",
+            ]
+
+        if len(labels) != len(colors):
+            print("The legend keys and values must be the same length.")
+            return
+
+        allowed_builtin_legends = builtin_legends.keys()
+        if builtin_legend is not None:
+            if builtin_legend not in allowed_builtin_legends:
+                print(
+                    "The builtin legend must be one of the following: {}".format(
+                        ", ".join(allowed_builtin_legends)
+                    )
+                )
+                return
+            else:
+                legend_dict = builtin_legends[builtin_legend]
+                labels = list(legend_dict.keys())
+                colors = list(legend_dict.values())
+
+        if legend_dict is not None:
+            if not isinstance(legend_dict, dict):
+                print("The legend dict must be a dictionary.")
+                return
+            else:
+                labels = list(legend_dict.keys())
+                colors = list(legend_dict.values())
+                if all(isinstance(item, tuple) for item in colors):
+                    try:
+                        colors = [rgb_to_hex(x) for x in colors]
+                    except Exception as e:
+                        print(e)
+
+        allowed_positions = [
+            "top-left",
+            "top-right",
+            "bottom-left",
+            "bottom-right",
+        ]
+        if position not in allowed_positions:
+            print(
+                "The position must be one of the following: {}".format(
+                    ", ".join(allowed_positions)
+                )
+            )
+            return
+
+        header = []
+        content = []
+        footer = []
+
+        with open(legend_template) as f:
+            lines = f.readlines()
+            lines[3] = lines[3].replace("Legend", title)
+            header = lines[:6]
+            footer = lines[11:]
+
+        for index, key in enumerate(labels):
+            color = colors[index]
+            if not color.startswith("#"):
+                color = "#" + color
+            item = "      <li><span style='background:{};'></span>{}</li>\n".format(
+                color, key
+            )
+            content.append(item)
+
+        legend_html = header + content + footer
+        legend_text = "".join(legend_html)
+
+        self.add_html(
+            legend_text,
+            fontsize=fontsize,
+            bg_color=bg_color,
+            position=position,
+            **kwargs,
+        )
+
+    def add_colorbar(
+        self,
+        width: Optional[float] = 3.0,
+        height: Optional[float] = 0.2,
+        vmin: Optional[float] = 0,
+        vmax: Optional[float] = 1.0,
+        palette: Optional[List[str]] = None,
+        vis_params: Optional[Dict[str, Union[str, float, int]]] = None,
+        cmap: Optional[str] = "gray",
+        discrete: Optional[bool] = False,
+        label: Optional[str] = None,
+        label_size: Optional[int] = 10,
+        label_weight: Optional[str] = "normal",
+        tick_size: Optional[int] = 8,
+        bg_color: Optional[str] = "white",
+        orientation: Optional[str] = "horizontal",
+        dpi: Optional[Union[str, float]] = "figure",
+        transparent: Optional[bool] = False,
+        position: str = "bottom-right",
+        **kwargs,
+    ) -> str:
+        """
+        Add a colorbar to the map.
+
+        This function uses matplotlib to generate a colorbar, saves it as a PNG file, and adds it to the map using
+        the Map.add_html() method. The colorbar can be customized in various ways including its size, color palette,
+        label, and orientation.
+
+        Args:
+            width (Optional[float]): Width of the colorbar in inches. Defaults to 3.0.
+            height (Optional[float]): Height of the colorbar in inches. Defaults to 0.2.
+            vmin (Optional[float]): Minimum value of the colorbar. Defaults to 0.
+            vmax (Optional[float]): Maximum value of the colorbar. Defaults to 1.0.
+            palette (Optional[List[str]]): List of colors or a colormap name for the colorbar. Defaults to None.
+            vis_params (Optional[Dict[str, Union[str, float, int]]]): Visualization parameters as a dictionary.
+            cmap (Optional[str]): Matplotlib colormap name. Defaults to "gray".
+            discrete (Optional[bool]): Whether to create a discrete colorbar. Defaults to False.
+            label (Optional[str]): Label for the colorbar. Defaults to None.
+            label_size (Optional[int]): Font size for the colorbar label. Defaults to 10.
+            label_weight (Optional[str]): Font weight for the colorbar label. Defaults to "normal".
+            tick_size (Optional[int]): Font size for the colorbar tick labels. Defaults to 8.
+            bg_color (Optional[str]): Background color for the colorbar. Defaults to "white".
+            orientation (Optional[str]): Orientation of the colorbar ("vertical" or "horizontal"). Defaults to "horizontal".
+            dpi (Optional[Union[str, float]]): Resolution in dots per inch. If 'figure', uses the figure's dpi value. Defaults to "figure".
+            transparent (Optional[bool]): Whether the background is transparent. Defaults to False.
+            position (str): Position of the colorbar on the map. Defaults to "bottom-right".
+            **kwargs: Additional keyword arguments passed to matplotlib.pyplot.savefig().
+
+        Returns:
+            str: Path to the generated colorbar image.
+        """
+
+        if transparent:
+            bg_color = "transparent"
+
+        colorbar = save_colorbar(
+            None,
+            width,
+            height,
+            vmin,
+            vmax,
+            palette,
+            vis_params,
+            cmap,
+            discrete,
+            label,
+            label_size,
+            label_weight,
+            tick_size,
+            bg_color,
+            orientation,
+            dpi,
+            transparent,
+            show_colorbar=False,
+        )
+
+        html = f'<img src="{colorbar}">'
+
+        self.add_html(html, bg_color=bg_color, position=position, **kwargs)
+
+    def add_layer_control(
+        self,
+        layer_ids: Optional[List[str]] = None,
+        theme: str = "default",
+        css_text: Optional[str] = None,
+        position: str = "top-left",
+        bg_layers: Optional[Union[bool, List[str]]] = False,
+    ) -> None:
+        """
+        Adds a layer control to the map.
+
+        This function creates and adds a layer switcher control to the map, allowing users to toggle the visibility
+        of specified layers. The appearance and functionality of the layer control can be customized with parameters
+        such as theme, CSS styling, and position on the map.
+
+        Args:
+            layer_ids (Optional[List[str]]): A list of layer IDs to include in the control. If None, all layers
+                in the map will be included. Defaults to None.
+            theme (str): The theme for the layer switcher control. Can be "default" or other custom themes. Defaults to "default".
+            css_text (Optional[str]): Custom CSS text for styling the layer control. If None, a default style will be applied.
+                Defaults to None.
+            position (str): The position of the layer control on the map. Can be "top-left", "top-right", "bottom-left",
+                or "bottom-right". Defaults to "top-left".
+            bg_layers (bool): If True, background layers will be included in the control. Defaults to False.
+
+        Returns:
+            None
+        """
+        from maplibre.controls import LayerSwitcherControl
+
+        if layer_ids is None:
+            layer_ids = list(self.layer_dict.keys())
+            if layer_ids[0] == "background":
+                layer_ids = layer_ids[1:]
+
+        if isinstance(bg_layers, list):
+            layer_ids = bg_layers + layer_ids
+        elif bg_layers:
+            background_ids = list(self.style_dict.keys())
+            layer_ids = background_ids + layer_ids
+
+        if css_text is None:
+            css_text = "padding: 5px; border: 1px solid darkgrey; border-radius: 4px;"
+
+        if len(layer_ids) > 0:
+
+            control = LayerSwitcherControl(
+                layer_ids=layer_ids,
+                theme=theme,
+                css_text=css_text,
+            )
+            self.add_control(control, position=position)
 
 
 class Container(v.Container):
