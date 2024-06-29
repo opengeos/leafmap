@@ -5746,7 +5746,13 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                     <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
 
             <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
-                <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">()</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
+                    <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain-background&quot;</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
+                    <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">):</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
@@ -7659,6 +7665,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
     <span class="k">def</span> <span class="nf">_get_3d_terrain_style</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">satellite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">exaggeration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">,</span>
         <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -7689,6 +7696,21 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An API key is required to use the 3D terrain feature.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="s2">&quot;dark-matter&quot;</span>
 
+        <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">satellite</span><span class="p">:</span>
+            <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">})</span>
+
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;hills&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;visible&quot;</span><span class="p">},</span>
+                <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hillshade-shadow-color&quot;</span><span class="p">:</span> <span class="s2">&quot;#473B24&quot;</span><span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
         <span class="n">style</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
             <span class="s2">&quot;sources&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -7713,16 +7735,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                     <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">},</span>
-            <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;satellite&quot;</span><span class="p">},</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;hills&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;visible&quot;</span><span class="p">},</span>
-                    <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hillshade-shadow-color&quot;</span><span class="p">:</span> <span class="s2">&quot;#473B24&quot;</span><span class="p">},</span>
-                <span class="p">},</span>
-            <span class="p">],</span>
+            <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="n">layers</span><span class="p">,</span>
             <span class="s2">&quot;terrain&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;terrainSource&quot;</span><span class="p">,</span> <span class="s2">&quot;exaggeration&quot;</span><span class="p">:</span> <span class="n">exaggeration</span><span class="p">},</span>
         <span class="p">}</span>
 
@@ -8356,7 +8369,13 @@ for more information.</p></td>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
 
         <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">()</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
+                <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain-background&quot;</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
+                <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">):</span>
             <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
