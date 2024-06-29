@@ -254,6 +254,12 @@ Add a GeoPandas GeoDataFrame to a map.
 
 [![](https://i.imgur.com/CQHcD7N.png)](https://leafmap.org/maplibre/geopandas)
 
+## Google Earth Engine
+
+Add Google Earth Engine data layers to a map.
+
+[![](https://i.imgur.com/oHQDf79.png)](https://leafmap.org/maplibre/google_earth_engine)
+
 ## Create a heatmap layer
 
 Visualize earthquake frequency by location using a heatmap layer.
