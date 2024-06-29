@@ -88,7 +88,13 @@ class Map(MapWidget):
                     style = "dark-matter"
 
             if style == "3d-terrain":
-                style = self._get_3d_terrain_style()
+                style = self._get_3d_terrain_style(
+                    exaggeration=kwargs.pop("exaggeration", 1.0)
+                )
+            elif style == "3d-terrain-background":
+                style = self._get_3d_terrain_style(
+                    satellite=False, exaggeration=kwargs.pop("exaggeration", 1.0)
+                )
 
             if isinstance(style, str) and (style.lower() in carto_basemaps):
                 style = construct_carto_basemap_url(style.lower())
@@ -2001,6 +2007,7 @@ class Map(MapWidget):
 
     def _get_3d_terrain_style(
         self,
+        satellite=True,
         exaggeration: float = 1,
         token: str = "MAPTILER_KEY",
         api_key: Optional[str] = None,
@@ -2031,6 +2038,21 @@ class Map(MapWidget):
             print("An API key is required to use the 3D terrain feature.")
             return "dark-matter"
 
+        layers = []
+
+        if satellite:
+            layers.append({"id": "satellite", "type": "raster", "source": "satellite"})
+
+        layers.append(
+            {
+                "id": "hills",
+                "type": "hillshade",
+                "source": "hillshadeSource",
+                "layout": {"visibility": "visible"},
+                "paint": {"hillshade-shadow-color": "#473B24"},
+            }
+        )
+
         style = {
             "version": 8,
             "sources": {
@@ -2055,16 +2077,7 @@ class Map(MapWidget):
                     "tileSize": 256,
                 },
             },
-            "layers": [
-                {"id": "satellite", "type": "raster", "source": "satellite"},
-                {
-                    "id": "hills",
-                    "type": "hillshade",
-                    "source": "hillshadeSource",
-                    "layout": {"visibility": "visible"},
-                    "paint": {"hillshade-shadow-color": "#473B24"},
-                },
-            ],
+            "layers": layers,
             "terrain": {"source": "terrainSource", "exaggeration": exaggeration},
         }
 
