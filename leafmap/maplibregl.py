@@ -841,12 +841,15 @@ class Map(MapWidget):
 
     def add_ee_layer(
         self,
-        asset_id: str,
+        ee_object=None,
+        vis_params={},
+        asset_id: str = None,
         name: str = None,
         opacity: float = 1.0,
         attribution: str = "Google Earth Engine",
         visible: bool = True,
         before_id: Optional[str] = None,
+        ee_initialize: bool = False,
         **kwargs,
     ) -> None:
         """
@@ -854,6 +857,8 @@ class Map(MapWidget):
             https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
 
         Args:
+            ee_object (object): The Earth Engine object to display.
+            vis_params (dict): Visualization parameters. For example, {'min': 0, 'max': 100}.
             asset_id (str): The ID of the Earth Engine asset.
             name (str, optional): The name of the tile layer. If not provided,
                 the asset ID will be used. Default is None.
@@ -865,6 +870,7 @@ class Map(MapWidget):
                 the map. Default is True.
             before_id (str, optional): The ID of an existing layer before which
                 the new layer should be inserted.
+            ee_initialize (bool, optional): Whether to initialize the Earth Engine
             **kwargs: Additional keyword arguments to be passed to the underlying
                 `add_tile_layer` method.
 
@@ -873,28 +879,54 @@ class Map(MapWidget):
         """
         import pandas as pd
 
-        df = pd.read_csv(
-            "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
-            sep="\t",
-        )
-
-        asset_id = asset_id.strip()
-        if name is None:
-            name = asset_id
-
-        if asset_id in df["id"].values:
-            url = df.loc[df["id"] == asset_id, "url"].values[0]
-            self.add_tile_layer(
-                url,
-                name,
-                attribution=attribution,
-                opacity=opacity,
-                visible=visible,
-                before_id=before_id,
-                **kwargs,
+        if isinstance(asset_id, str):
+            df = pd.read_csv(
+                "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
+                sep="\t",
             )
-        else:
-            print(f"The provided EE tile layer {asset_id} does not exist.")
+
+            asset_id = asset_id.strip()
+            if name is None:
+                name = asset_id
+
+            if asset_id in df["id"].values:
+                url = df.loc[df["id"] == asset_id, "url"].values[0]
+                self.add_tile_layer(
+                    url,
+                    name,
+                    attribution=attribution,
+                    opacity=opacity,
+                    visible=visible,
+                    before_id=before_id,
+                    **kwargs,
+                )
+            else:
+                print(f"The provided EE tile layer {asset_id} does not exist.")
+        elif ee_object is not None:
+            try:
+                import geemap
+                from geemap.ee_tile_layers import _get_tile_url_format
+
+                if ee_initialize:
+                    geemap.ee_initialize()
+                url = _get_tile_url_format(ee_object, vis_params)
+                if name is None:
+                    name = "EE Layer"
+                self.add_tile_layer(
+                    url,
+                    name,
+                    attribution=attribution,
+                    opacity=opacity,
+                    visible=visible,
+                    before_id=before_id,
+                    **kwargs,
+                )
+            except Exception as e:
+                print(e)
+                print(
+                    "Please install the `geemap` package to use the `add_ee_layer` function."
+                )
+                return
 
     def add_cog_layer(
         self,
