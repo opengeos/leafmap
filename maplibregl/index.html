@@ -2559,6 +2559,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../maplibre/google_earth_engine/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google earth engine
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../maplibre/heatmap_layer/" class="md-nav__link">
         
   
@@ -6499,12 +6520,15 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
     <span class="k">def</span> <span class="nf">add_ee_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">asset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ee_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">vis_params</span><span class="o">=</span><span class="p">{},</span>
+        <span class="n">asset_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">attribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Google Earth Engine&quot;</span><span class="p">,</span>
         <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ee_initialize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -6512,6 +6536,8 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">            https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            ee_object (object): The Earth Engine object to display.</span>
+<span class="sd">            vis_params (dict): Visualization parameters. For example, {&#39;min&#39;: 0, &#39;max&#39;: 100}.</span>
 <span class="sd">            asset_id (str): The ID of the Earth Engine asset.</span>
 <span class="sd">            name (str, optional): The name of the tile layer. If not provided,</span>
 <span class="sd">                the asset ID will be used. Default is None.</span>
@@ -6523,6 +6549,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">                the map. Default is True.</span>
 <span class="sd">            before_id (str, optional): The ID of an existing layer before which</span>
 <span class="sd">                the new layer should be inserted.</span>
+<span class="sd">            ee_initialize (bool, optional): Whether to initialize the Earth Engine</span>
 <span class="sd">            **kwargs: Additional keyword arguments to be passed to the underlying</span>
 <span class="sd">                `add_tile_layer` method.</span>
 
@@ -6531,28 +6558,54 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-            <span class="s2">&quot;https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv&quot;</span><span class="p">,</span>
-            <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">asset_id</span>
-
-        <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">asset_id</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
-                <span class="n">url</span><span class="p">,</span>
-                <span class="n">name</span><span class="p">,</span>
-                <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
-                <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
-                <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
-                <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                <span class="s2">&quot;https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv&quot;</span><span class="p">,</span>
+                <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provided EE tile layer </span><span class="si">{</span><span class="n">asset_id</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+
+            <span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">asset_id</span>
+
+            <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">asset_id</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+                    <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+                    <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                    <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provided EE tile layer </span><span class="si">{</span><span class="n">asset_id</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ee_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">geemap</span>
+                <span class="kn">from</span> <span class="nn">geemap.ee_tile_layers</span> <span class="kn">import</span> <span class="n">_get_tile_url_format</span>
+
+                <span class="k">if</span> <span class="n">ee_initialize</span><span class="p">:</span>
+                    <span class="n">geemap</span><span class="o">.</span><span class="n">ee_initialize</span><span class="p">()</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">_get_tile_url_format</span><span class="p">(</span><span class="n">ee_object</span><span class="p">,</span> <span class="n">vis_params</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;EE Layer&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span>
+                    <span class="n">name</span><span class="p">,</span>
+                    <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+                    <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+                    <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                    <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Please install the `geemap` package to use the `add_ee_layer` function.&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">add_cog_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -9308,7 +9361,7 @@ drawing control.</p></td>
 
 
 <h3 id="leafmap.maplibregl.Map.add_ee_layer" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_ee_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asset_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;Google Earth Engine&#39;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">add_ee_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ee_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vis_params</span><span class="o">=</span><span class="p">{},</span> <span class="n">asset_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;Google Earth Engine&#39;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ee_initialize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.add_ee_layer" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -9330,10 +9383,22 @@ drawing control.</p></td>
   </thead>
   <tbody>
       <tr>
+        <td><code>ee_object</code></td>
+        <td><code>object</code></td>
+        <td><p>The Earth Engine object to display.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>vis_params</code></td>
+        <td><code>dict</code></td>
+        <td><p>Visualization parameters. For example, {'min': 0, 'max': 100}.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
         <td><code>asset_id</code></td>
         <td><code>str</code></td>
         <td><p>The ID of the Earth Engine asset.</p></td>
-        <td><em>required</em></td>
+        <td><code>None</code></td>
       </tr>
       <tr>
         <td><code>name</code></td>
@@ -9371,6 +9436,12 @@ the new layer should be inserted.</p></td>
         <td><code>None</code></td>
       </tr>
       <tr>
+        <td><code>ee_initialize</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to initialize the Earth Engine</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
         <td><code>**kwargs</code></td>
         <td></td>
         <td><p>Additional keyword arguments to be passed to the underlying
@@ -9398,12 +9469,15 @@ the new layer should be inserted.</p></td>
           <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_ee_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">asset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">ee_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">vis_params</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">asset_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">attribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Google Earth Engine&quot;</span><span class="p">,</span>
     <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ee_initialize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -9411,6 +9485,8 @@ the new layer should be inserted.</p></td>
 <span class="sd">        https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.</span>
 
 <span class="sd">    Args:</span>
+<span class="sd">        ee_object (object): The Earth Engine object to display.</span>
+<span class="sd">        vis_params (dict): Visualization parameters. For example, {&#39;min&#39;: 0, &#39;max&#39;: 100}.</span>
 <span class="sd">        asset_id (str): The ID of the Earth Engine asset.</span>
 <span class="sd">        name (str, optional): The name of the tile layer. If not provided,</span>
 <span class="sd">            the asset ID will be used. Default is None.</span>
@@ -9422,6 +9498,7 @@ the new layer should be inserted.</p></td>
 <span class="sd">            the map. Default is True.</span>
 <span class="sd">        before_id (str, optional): The ID of an existing layer before which</span>
 <span class="sd">            the new layer should be inserted.</span>
+<span class="sd">        ee_initialize (bool, optional): Whether to initialize the Earth Engine</span>
 <span class="sd">        **kwargs: Additional keyword arguments to be passed to the underlying</span>
 <span class="sd">            `add_tile_layer` method.</span>
 
@@ -9430,28 +9507,54 @@ the new layer should be inserted.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-        <span class="s2">&quot;https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv&quot;</span><span class="p">,</span>
-        <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="n">asset_id</span>
-
-    <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
-        <span class="n">url</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">asset_id</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
-            <span class="n">url</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
-            <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
-            <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
-            <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
-            <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_id</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="s2">&quot;https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv&quot;</span><span class="p">,</span>
+            <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provided EE tile layer </span><span class="si">{</span><span class="n">asset_id</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+
+        <span class="n">asset_id</span> <span class="o">=</span> <span class="n">asset_id</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">asset_id</span>
+
+        <span class="k">if</span> <span class="n">asset_id</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">asset_id</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+                <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The provided EE tile layer </span><span class="si">{</span><span class="n">asset_id</span><span class="si">}</span><span class="s2"> does not exist.&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">ee_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">geemap</span>
+            <span class="kn">from</span> <span class="nn">geemap.ee_tile_layers</span> <span class="kn">import</span> <span class="n">_get_tile_url_format</span>
+
+            <span class="k">if</span> <span class="n">ee_initialize</span><span class="p">:</span>
+                <span class="n">geemap</span><span class="o">.</span><span class="n">ee_initialize</span><span class="p">()</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">_get_tile_url_format</span><span class="p">(</span><span class="n">ee_object</span><span class="p">,</span> <span class="n">vis_params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;EE Layer&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+                <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Please install the `geemap` package to use the `add_ee_layer` function.&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span>
 </code></pre></div>
         </details>
     </div>
