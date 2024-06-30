@@ -6828,18 +6828,28 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 
     <span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Map&quot;</span><span class="p">,</span>
-        <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
-        <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;880px&quot;</span><span class="p">,</span>
         <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Leafmap&quot;</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
+        <span class="n">replace_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the map to an HTML page.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            title (str, optional): The title of the HTML page. Defaults to &#39;Map&#39;.</span>
+<span class="sd">            output (str, optional): The output HTML file. If None, the HTML content</span>
+<span class="sd">                is returned as a string. Defaults</span>
+<span class="sd">            title (str, optional): The title of the HTML page. Defaults to &#39;Leafmap&#39;.</span>
 <span class="sd">            width (str, optional): The width of the map. Defaults to &#39;100%&#39;.</span>
-<span class="sd">            height (str, optional): The height of the map. Defaults to &#39;880px&#39;.</span>
+<span class="sd">            height (str, optional): The height of the map. Defaults to &#39;100%&#39;.</span>
+<span class="sd">            replace_key (bool, optional): Whether to replace the API key in the HTML.</span>
+<span class="sd">                If True, the API key is replaced with the public API key.</span>
+<span class="sd">                The API key is read from the environment variable `MAPTILER_KEY`.</span>
+<span class="sd">                The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.</span>
+<span class="sd">                Defaults to True.</span>
+<span class="sd">            preview (bool, optional): Whether to preview the HTML file in a web browser.</span>
 <span class="sd">            **kwargs: Additional keyword arguments that are passed to the</span>
 <span class="sd">                `maplibre.ipywidget.MapWidget.to_html()` method.</span>
 
@@ -6852,9 +6862,33 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="k">else</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">; height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">;&quot;</span>
         <span class="n">html</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;%&quot;</span> <span class="ow">in</span> <span class="n">height</span><span class="p">:</span>
+            <span class="n">style_before</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;/style&gt;</span><span class="se">\n</span><span class="s2">&lt;body&gt;&quot;&quot;&quot;</span>
+            <span class="n">style_after</span> <span class="o">=</span> <span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;html, body {height: 100%; margin: 0; padding: 0;} #pymaplibregl {width: 100%; height: &quot;&quot;&quot;</span>
+                <span class="o">+</span> <span class="n">height</span>
+                <span class="o">+</span> <span class="s2">&quot;&quot;&quot;;}</span><span class="se">\n</span><span class="s2">&lt;/style&gt;</span><span class="se">\n</span><span class="s2">&lt;body&gt;&quot;&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">style_before</span><span class="p">,</span> <span class="n">style_after</span><span class="p">)</span>
+
+            <span class="n">div_before</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div id=&quot;pymaplibregl&quot; style=&quot;width: 100%; height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">;&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;</span>
+            <span class="n">div_after</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div id=&quot;pymaplibregl&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">div_before</span><span class="p">,</span> <span class="n">div_after</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">replace_key</span><span class="p">:</span>
+            <span class="n">key_before</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
+            <span class="n">key_after</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY_PUBLIC&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key_before</span><span class="p">,</span> <span class="n">key_after</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">preview</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">webbrowser</span>
+
+                <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">html</span>
 
@@ -14374,7 +14408,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
 
 <h3 id="leafmap.maplibregl.Map.to_html" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Map&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;880px&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;Leafmap&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.to_html" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -14395,10 +14429,17 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
   </thead>
   <tbody>
       <tr>
+        <td><code>output</code></td>
+        <td><code>str</code></td>
+        <td><p>The output HTML file. If None, the HTML content
+is returned as a string. Defaults</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
         <td><code>title</code></td>
         <td><code>str</code></td>
-        <td><p>The title of the HTML page. Defaults to 'Map'.</p></td>
-        <td><code>&#39;Map&#39;</code></td>
+        <td><p>The title of the HTML page. Defaults to 'Leafmap'.</p></td>
+        <td><code>&#39;Leafmap&#39;</code></td>
       </tr>
       <tr>
         <td><code>width</code></td>
@@ -14409,8 +14450,24 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
       <tr>
         <td><code>height</code></td>
         <td><code>str</code></td>
-        <td><p>The height of the map. Defaults to '880px'.</p></td>
-        <td><code>&#39;880px&#39;</code></td>
+        <td><p>The height of the map. Defaults to '100%'.</p></td>
+        <td><code>&#39;100%&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>replace_key</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to replace the API key in the HTML.
+If True, the API key is replaced with the public API key.
+The API key is read from the environment variable <code>MAPTILER_KEY</code>.
+The public API key is read from the environment variable <code>MAPTILER_KEY_PUBLIC</code>.
+Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>preview</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to preview the HTML file in a web browser.</p></td>
+        <td><code>False</code></td>
       </tr>
       <tr>
         <td><code>**kwargs</code></td>
@@ -14440,18 +14497,28 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
           <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
-    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Map&quot;</span><span class="p">,</span>
-    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
-    <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;880px&quot;</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Leafmap&quot;</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
+    <span class="n">replace_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the map to an HTML page.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        title (str, optional): The title of the HTML page. Defaults to &#39;Map&#39;.</span>
+<span class="sd">        output (str, optional): The output HTML file. If None, the HTML content</span>
+<span class="sd">            is returned as a string. Defaults</span>
+<span class="sd">        title (str, optional): The title of the HTML page. Defaults to &#39;Leafmap&#39;.</span>
 <span class="sd">        width (str, optional): The width of the map. Defaults to &#39;100%&#39;.</span>
-<span class="sd">        height (str, optional): The height of the map. Defaults to &#39;880px&#39;.</span>
+<span class="sd">        height (str, optional): The height of the map. Defaults to &#39;100%&#39;.</span>
+<span class="sd">        replace_key (bool, optional): Whether to replace the API key in the HTML.</span>
+<span class="sd">            If True, the API key is replaced with the public API key.</span>
+<span class="sd">            The API key is read from the environment variable `MAPTILER_KEY`.</span>
+<span class="sd">            The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.</span>
+<span class="sd">            Defaults to True.</span>
+<span class="sd">        preview (bool, optional): Whether to preview the HTML file in a web browser.</span>
 <span class="sd">        **kwargs: Additional keyword arguments that are passed to the</span>
 <span class="sd">            `maplibre.ipywidget.MapWidget.to_html()` method.</span>
 
@@ -14464,9 +14531,33 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
     <span class="k">else</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">; height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">;&quot;</span>
     <span class="n">html</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;%&quot;</span> <span class="ow">in</span> <span class="n">height</span><span class="p">:</span>
+        <span class="n">style_before</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;&lt;/style&gt;</span><span class="se">\n</span><span class="s2">&lt;body&gt;&quot;&quot;&quot;</span>
+        <span class="n">style_after</span> <span class="o">=</span> <span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;html, body {height: 100%; margin: 0; padding: 0;} #pymaplibregl {width: 100%; height: &quot;&quot;&quot;</span>
+            <span class="o">+</span> <span class="n">height</span>
+            <span class="o">+</span> <span class="s2">&quot;&quot;&quot;;}</span><span class="se">\n</span><span class="s2">&lt;/style&gt;</span><span class="se">\n</span><span class="s2">&lt;body&gt;&quot;&quot;&quot;</span>
+        <span class="p">)</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">style_before</span><span class="p">,</span> <span class="n">style_after</span><span class="p">)</span>
+
+        <span class="n">div_before</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div id=&quot;pymaplibregl&quot; style=&quot;width: 100%; height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">;&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;</span>
+        <span class="n">div_after</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div id=&quot;pymaplibregl&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">div_before</span><span class="p">,</span> <span class="n">div_after</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">replace_key</span><span class="p">:</span>
+        <span class="n">key_before</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
+        <span class="n">key_after</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY_PUBLIC&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key_before</span><span class="p">,</span> <span class="n">key_after</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">preview</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">webbrowser</span>
+
+            <span class="n">webbrowser</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">html</span>
 </code></pre></div>
