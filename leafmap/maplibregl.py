@@ -1199,8 +1199,9 @@ class Map(MapWidget):
 
         if replace_key:
             key_before = get_api_key("MAPTILER_KEY")
-            key_after = get_api_key("MAPTILER_KEY_PUBLIC", key_before)
-            html = html.replace(key_before, key_after)
+            key_after = get_api_key("MAPTILER_KEY_PUBLIC")
+            if key_after is not None:
+                html = html.replace(key_before, key_after)
 
         if output:
             with open(output, "w") as f:
