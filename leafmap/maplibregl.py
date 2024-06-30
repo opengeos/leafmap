@@ -1149,18 +1149,28 @@ class Map(MapWidget):
 
     def to_html(
         self,
-        title: str = "Map",
-        width: str = "100%",
-        height: str = "880px",
         output: str = None,
+        title: str = "Leafmap",
+        width: str = "100%",
+        height: str = "100%",
+        replace_key: bool = True,
+        preview: bool = False,
         **kwargs,
     ):
         """Render the map to an HTML page.
 
         Args:
-            title (str, optional): The title of the HTML page. Defaults to 'Map'.
+            output (str, optional): The output HTML file. If None, the HTML content
+                is returned as a string. Defaults
+            title (str, optional): The title of the HTML page. Defaults to 'Leafmap'.
             width (str, optional): The width of the map. Defaults to '100%'.
-            height (str, optional): The height of the map. Defaults to '880px'.
+            height (str, optional): The height of the map. Defaults to '100%'.
+            replace_key (bool, optional): Whether to replace the API key in the HTML.
+                If True, the API key is replaced with the public API key.
+                The API key is read from the environment variable `MAPTILER_KEY`.
+                The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.
+                Defaults to True.
+            preview (bool, optional): Whether to preview the HTML file in a web browser.
             **kwargs: Additional keyword arguments that are passed to the
                 `maplibre.ipywidget.MapWidget.to_html()` method.
 
@@ -1173,9 +1183,33 @@ class Map(MapWidget):
         else:
             kwargs["style"] += f"width: {width}; height: {height};"
         html = super().to_html(title=title, **kwargs)
+
+        if isinstance(height, str) and "%" in height:
+            style_before = """</style>\n<body>"""
+            style_after = (
+                """html, body {height: 100%; margin: 0; padding: 0;} #pymaplibregl {width: 100%; height: """
+                + height
+                + """;}\n</style>\n<body>"""
+            )
+            html = html.replace(style_before, style_after)
+
+            div_before = f"""<div id="pymaplibregl" style="width: 100%; height: {height};"></div>"""
+            div_after = f"""<div id="pymaplibregl"></div>"""
+            html = html.replace(div_before, div_after)
+
+        if replace_key:
+            key_before = get_api_key("MAPTILER_KEY")
+            key_after = get_api_key("MAPTILER_KEY_PUBLIC")
+            if key_after is not None:
+                html = html.replace(key_before, key_after)
+
         if output:
             with open(output, "w") as f:
                 f.write(html)
+            if preview:
+                import webbrowser
+
+                webbrowser.open(output)
         else:
             return html
 
