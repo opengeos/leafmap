@@ -4977,6 +4977,7 @@ Map            (<span title="lonboard._map.Map">Map</span>)
         <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
         <span class="n">layers</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
         <span class="n">show_tooltip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">view_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a Map object.</span>
@@ -4987,21 +4988,23 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 <span class="sd">            height (int, optional): Height of the map. Defaults to 600.</span>
 <span class="sd">            layers (list, optional): List of additional layers to add to the map. Defaults to [].</span>
 <span class="sd">            show_tooltip (bool, optional): Flag to show tooltips on the map. Defaults to True.</span>
+<span class="sd">            view_state (dict, optional): The view state of the map. Defaults to {}.</span>
 <span class="sd">            **kwargs: Additional keyword arguments to pass to lonboard.Map.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom</span>
+        <span class="n">view_state</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">view_state</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">view_state</span><span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;view_state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view_state</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">_height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
             <span class="n">show_tooltip</span><span class="o">=</span><span class="n">show_tooltip</span><span class="p">,</span>
             <span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span>
-            <span class="n">view_state</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
@@ -5284,7 +5287,7 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 
 
 <h3 id="leafmap.deckgl.Map.__init__" class="doc doc-heading">
-<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="p">[],</span> <span class="n">show_tooltip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="p">[],</span> <span class="n">show_tooltip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">view_state</span><span class="o">=</span><span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
   <span class="doc doc-properties">
       <small class="doc doc-property doc-property-special"><code>special</code></small>
@@ -5338,6 +5341,12 @@ Map            (<span title="lonboard._map.Map">Map</span>)
         <td><code>True</code></td>
       </tr>
       <tr>
+        <td><code>view_state</code></td>
+        <td><code>dict</code></td>
+        <td><p>The view state of the map. Defaults to {}.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
         <td><code>**kwargs</code></td>
         <td></td>
         <td><p>Additional keyword arguments to pass to lonboard.Map.</p></td>
@@ -5369,6 +5378,7 @@ Map            (<span title="lonboard._map.Map">Map</span>)
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
     <span class="n">layers</span><span class="p">:</span> <span class="n">List</span> <span class="o">=</span> <span class="p">[],</span>
     <span class="n">show_tooltip</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">view_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize a Map object.</span>
@@ -5379,21 +5389,23 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 <span class="sd">        height (int, optional): Height of the map. Defaults to 600.</span>
 <span class="sd">        layers (list, optional): List of additional layers to add to the map. Defaults to [].</span>
 <span class="sd">        show_tooltip (bool, optional): Flag to show tooltips on the map. Defaults to True.</span>
+<span class="sd">        view_state (dict, optional): The view state of the map. Defaults to {}.</span>
 <span class="sd">        **kwargs: Additional keyword arguments to pass to lonboard.Map.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom</span>
+    <span class="n">view_state</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">view_state</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">view_state</span><span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">zoom</span>
+    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;view_state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">view_state</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
         <span class="n">_height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
         <span class="n">show_tooltip</span><span class="o">=</span><span class="n">show_tooltip</span><span class="p">,</span>
         <span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span>
-        <span class="n">view_state</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
         </details>
