@@ -27,6 +27,7 @@ class Map(lonboard.Map):
         height: int = 600,
         layers: List = [],
         show_tooltip: bool = True,
+        view_state: Optional[Dict] = {},
         **kwargs,
     ) -> None:
         """Initialize a Map object.
@@ -37,21 +38,23 @@ class Map(lonboard.Map):
             height (int, optional): Height of the map. Defaults to 600.
             layers (list, optional): List of additional layers to add to the map. Defaults to [].
             show_tooltip (bool, optional): Flag to show tooltips on the map. Defaults to True.
+            view_state (dict, optional): The view state of the map. Defaults to {}.
             **kwargs: Additional keyword arguments to pass to lonboard.Map.
 
         Returns:
             None
         """
 
-        kwargs["latitude"] = center[0]
-        kwargs["longitude"] = center[1]
-        kwargs["zoom"] = zoom
+        view_state["latitude"] = center[0]
+        view_state["longitude"] = center[1]
+        view_state["zoom"] = zoom
+        kwargs["view_state"] = view_state
 
         super().__init__(
             _height=height,
             show_tooltip=show_tooltip,
             layers=layers,
-            view_state=kwargs,
+            **kwargs,
         )
 
     def add_gdf(
