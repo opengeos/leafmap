@@ -3669,7 +3669,7 @@ def dict_to_json(data, file_path, indent=4):
         raise TypeError("The provided data must be a dictionary.")
 
 
-def image_to_geotiff(image, dst_path, dtype=None, **kwargs):
+def image_to_geotiff(image, dst_path, dtype=None, to_cog=True, **kwargs):
     """
     Converts an image to a GeoTIFF file.
 
@@ -3682,6 +3682,7 @@ def image_to_geotiff(image, dst_path, dtype=None, **kwargs):
         dst_path (str): The destination path where the GeoTIFF file will be saved.
         dtype (Optional[str]): The data type for the output GeoTIFF file. If None, the data type of the input image
             will be used. Defaults to None.
+        to_cog (bool): Whether to convert the output GeoTIFF to a Cloud Optimized GeoTIFF (COG). Defaults to True.
         **kwargs: Additional keyword arguments to be included in the GeoTIFF profile.
 
     Raises:
@@ -3691,6 +3692,7 @@ def image_to_geotiff(image, dst_path, dtype=None, **kwargs):
         None
     """
     import rasterio
+    from rasterio.enums import Resampling
 
     if not isinstance(image, rasterio.io.DatasetReader):
         raise ValueError("The input image must be a rasterio.io.DatasetReader object.")
@@ -3706,6 +3708,9 @@ def image_to_geotiff(image, dst_path, dtype=None, **kwargs):
 
     with rasterio.open(dst_path, "w", **profile) as dst:
         dst.write(image.read())
+
+    if to_cog:
+        image_to_cog(dst_path, dst_path)
 
 
 def image_to_cog(source, dst_path=None, profile="deflate", **kwargs):
