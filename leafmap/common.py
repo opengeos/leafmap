@@ -13549,3 +13549,239 @@ def geojson_bounds(geojson: dict) -> Optional[list]:
         geojson = json.loads(geojson)
 
     return list(shapely.bounds(shapely.from_geojson(json.dumps(geojson))))
+
+
+def execute_notebook(in_file):
+    """Executes a Jupyter notebook and save output cells
+
+    Args:
+        in_file (str): Input Jupyter notebook.
+    """
+    # command = 'jupyter nbconvert --to notebook --execute ' + in_file + ' --inplace'
+    command = 'jupyter nbconvert --to notebook --execute "{}" --inplace'.format(in_file)
+    print(os.popen(command).read().rstrip())
+    # os.popen(command)
+
+
+def execute_notebook_dir(in_dir):
+    """Executes all Jupyter notebooks in the given directory recursively and save output cells.
+
+    Args:
+        in_dir (str): Input folder containing notebooks.
+    """
+    from pathlib import Path
+
+    in_dir = os.path.abspath(in_dir)
+    files = list(Path(in_dir).rglob("*.ipynb"))
+    count = len(files)
+    if files is not None:
+        for index, file in enumerate(files):
+            in_file = str(file)
+            print(f"Processing {index + 1}/{count}: {file} ...")
+            execute_notebook(in_file)
+
+
+def github_get_release_id_by_tag(username, repository, tag_name, access_token=None):
+    """
+    Fetches the release ID by tag name for a given GitHub repository.
+
+    Args:
+        username (str): GitHub username or organization name.
+        repository (str): Name of the GitHub repository.
+        tag_name (str): Tag name of the release.
+        access_token (str, optional): Personal access token for authentication. Defaults to None.
+
+    Returns:
+        int: The release ID if found, None otherwise.
+    """
+
+    if access_token is None:
+        access_token = get_api_key("GITHUB_API_TOKEN")
+
+    # GitHub API URL for fetching releases
+    url = (
+        f"https://api.github.com/repos/{username}/{repository}/releases/tags/{tag_name}"
+    )
+
+    # Headers for authentication (optional)
+    headers = {"Authorization": f"token {access_token}"} if access_token else {}
+
+    # Make the request to the GitHub API
+    response = requests.get(url, headers=headers)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        release_info = response.json()
+        return release_info.get("id")
+    else:
+        print(
+            f"Error: Unable to fetch release info for tag {tag_name} (Status code: {response.status_code})"
+        )
+        return None
+
+
+def github_upload_asset_to_release(
+    username, repository, release_id, asset_path, access_token=None
+):
+    """
+    Uploads an asset to a GitHub release.
+
+    Args:
+        username (str): GitHub username or organization name.
+        repository (str): Name of the GitHub repository.
+        release_id (int): ID of the release to upload the asset to.
+        asset_path (str): Path to the asset file.
+        access_token (str): Personal access token for authentication.
+
+    Returns:
+        dict: The response JSON from the GitHub API if the upload is successful.
+        None: If the upload fails.
+    """
+    if access_token is None:
+        access_token = get_api_key("GITHUB_API_TOKEN")
+    # GitHub API URL for uploading release assets
+    url = f"https://uploads.github.com/repos/{username}/{repository}/releases/{release_id}/assets"
+
+    # Extract the filename from the asset path
+    asset_name = os.path.basename(asset_path)
+
+    # Set the headers for the upload request
+    headers = {
+        "Authorization": f"token {access_token}",
+        "Content-Type": "application/octet-stream",
+    }
+
+    # Set the parameters for the upload request
+    params = {"name": asset_name}
+
+    # Open the asset file in binary mode
+    with open(asset_path, "rb") as asset_file:
+        # Make the request to upload the asset
+        response = requests.post(url, headers=headers, params=params, data=asset_file)
+
+    # Check if the request was successful
+    if response.status_code == 201:
+        print(f"Successfully uploaded asset: {asset_name}")
+        return response.json()
+    else:
+        print(f"Error: Unable to upload asset (Status code: {response.status_code})")
+        print(response.json())
+        return None
+
+
+def github_get_release_assets(username, repository, release_id, access_token=None):
+    """
+    Fetches the assets for a given release.
+
+    Args:
+        username (str): GitHub username or organization name.
+        repository (str): Name of the GitHub repository.
+        release_id (int): ID of the release to fetch assets for.
+        access_token (str): Personal access token for authentication.
+
+    Returns:
+        list: List of assets if successful, None otherwise.
+    """
+    if access_token is None:
+        access_token = get_api_key("GITHUB_API_TOKEN")
+    url = f"https://api.github.com/repos/{username}/{repository}/releases/{release_id}/assets"
+    headers = {
+        "Authorization": f"token {access_token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Error: Unable to fetch assets (Status code: {response.status_code})")
+        return None
+
+
+def github_delete_asset(username, repository, asset_id, access_token=None):
+    """
+    Deletes an asset from a GitHub release.
+
+    Args:
+        username (str): GitHub username or organization name.
+        repository (str): Name of the GitHub repository.
+        asset_id (int): ID of the asset to delete.
+        access_token (str): Personal access token for authentication.
+    """
+    if access_token is None:
+        access_token = get_api_key("GITHUB_API_TOKEN")
+    url = f"https://api.github.com/repos/{username}/{repository}/releases/assets/{asset_id}"
+    headers = {
+        "Authorization": f"token {access_token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+
+    response = requests.delete(url, headers=headers)
+
+    if response.status_code == 204:
+        print(f"Successfully deleted asset ID: {asset_id}")
+    else:
+        print(f"Error: Unable to delete asset (Status code: {response.status_code})")
+
+
+def github_upload_asset_to_release(
+    username, repository, release_id, asset_path, quiet=False, access_token=None
+):
+    """
+    Uploads an asset to a GitHub release.
+
+    Args:
+        username (str): GitHub username or organization name.
+        repository (str): Name of the GitHub repository.
+        release_id (int): ID of the release to upload the asset to.
+        asset_path (str): Path to the asset file.
+
+        access_token (str): Personal access token for authentication.
+
+    Returns:
+        dict: The response JSON from the GitHub API if the upload is successful.
+        None: If the upload fails.
+    """
+    if access_token is None:
+        access_token = get_api_key("GITHUB_API_TOKEN")
+    # GitHub API URL for uploading release assets
+    url = f"https://uploads.github.com/repos/{username}/{repository}/releases/{release_id}/assets"
+
+    # Extract the filename from the asset path
+    asset_name = os.path.basename(asset_path)
+
+    # Set the headers for the upload request
+    headers = {
+        "Authorization": f"token {access_token}",
+        "Content-Type": "application/octet-stream",
+    }
+
+    # Set the parameters for the upload request
+    params = {"name": asset_name}
+
+    # Check if the asset already exists
+    assets = github_get_release_assets(username, repository, release_id, access_token)
+    if assets:
+        for asset in assets:
+            if asset["name"] == asset_name:
+                github_delete_asset(username, repository, asset["id"], access_token)
+                break
+
+    # Open the asset file in binary mode
+    with open(asset_path, "rb") as asset_file:
+        # Make the request to upload the asset
+        response = requests.post(url, headers=headers, params=params, data=asset_file)
+
+    # Check if the request was successful
+    if response.status_code == 201:
+        print(f"Successfully uploaded asset: {asset_name}")
+        if not quiet:
+            return response.json()
+        else:
+            return None
+    else:
+        print(f"Error: Unable to upload asset (Status code: {response.status_code})")
+        if not quiet:
+            print(response.json())
+        return None
