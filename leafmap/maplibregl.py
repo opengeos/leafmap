@@ -1,6 +1,7 @@
 """The maplibregl module provides the Map class for creating interactive maps using the maplibre.ipywidget module.
 """
 
+import os
 import requests
 import xyzservices
 import geopandas as gpd
@@ -133,6 +134,17 @@ class Map(MapWidget):
         for layer in self.get_style_layers():
             self.style_dict[layer["id"]] = layer
         self.source_dict = {}
+
+    def show(self) -> None:
+        """Displays the map."""
+        return Container(self)
+
+    def _repr_html_(self, **kwargs):
+        """Displays the map."""
+
+        filename = os.environ.get("MAPLIBRE_HTML", None)
+        if filename is not None:
+            self.to_html(filename, replace_key=False)
 
     def add_layer(
         self,
@@ -973,6 +985,10 @@ class Map(MapWidget):
         Returns:
             None
         """
+        import numpy as np
+
+        if "nodata" not in kwargs:
+            kwargs["nodata"] = np.nan
 
         if name is None:
             name = "COG_" + random_string()
@@ -1042,6 +1058,12 @@ class Map(MapWidget):
         Returns:
             None
         """
+
+        import numpy as np
+
+        if "nodata" not in kwargs:
+            kwargs["nodata"] = np.nan
+
         if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
             kwargs.pop("colormap_name")
 
