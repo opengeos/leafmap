@@ -1201,6 +1201,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.show" class="md-nav__link">
+    <span class="md-ellipsis">
+      show()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.style_layer_interact" class="md-nav__link">
     <span class="md-ellipsis">
       style_layer_interact()
@@ -5605,6 +5614,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.show" class="md-nav__link">
+    <span class="md-ellipsis">
+      show()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.style_layer_interact" class="md-nav__link">
     <span class="md-ellipsis">
       style_layer_interact()
@@ -5812,6 +5830,17 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_style_layers</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">style_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">layer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Displays the map.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Displays the map.&quot;&quot;&quot;</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_HTML&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -6652,6 +6681,10 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+        <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COG_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
@@ -6721,6 +6754,12 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+        <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
         <span class="k">if</span> <span class="s2">&quot;colormap_name&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">)</span>
 
@@ -8871,6 +8910,10 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COG_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
@@ -11695,6 +11738,12 @@ bands, use something like <code>rescale=["164,223","130,211","99,212"]</code>.</
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
     <span class="k">if</span> <span class="s2">&quot;colormap_name&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">)</span>
 
@@ -14217,6 +14266,33 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_call</span><span class="p">(</span><span class="s2">&quot;setZoom&quot;</span><span class="p">,</span> <span class="n">zoom</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.show" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.show" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Displays the map.</p>
+
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays the map.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
