@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.28">
     
     
       
@@ -5232,7 +5232,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_address</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">features_from_address</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -5332,7 +5332,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_bbox</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">west</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">features_from_bbox</span><span class="p">(</span><span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">west</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -5530,9 +5530,10 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
 
-    <span class="n">ox</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">use_cache</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log_console</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ox</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">use_cache</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">ox</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">log_console</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_place</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">which_result</span><span class="p">,</span> <span class="n">buffer_dist</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">features_from_place</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">which_result</span><span class="p">,</span> <span class="n">buffer_dist</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -5620,7 +5621,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_point</span><span class="p">(</span><span class="n">center_point</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">features_from_point</span><span class="p">(</span><span class="n">center_point</span><span class="p">,</span> <span class="n">tags</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -5699,7 +5700,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">features_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -5785,7 +5786,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geometries_from_xml</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">features_from_xml</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -7009,7 +7010,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      <script src="../assets/javascripts/bundle.fe8b6f2b.min.js"></script>
       
         <script src="../js/timeago.min.js"></script>
       
