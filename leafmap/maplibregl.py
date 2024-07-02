@@ -1172,10 +1172,10 @@ class Map(MapWidget):
     def to_html(
         self,
         output: str = None,
-        title: str = "Leafmap",
+        title: str = "My Awesome Map",
         width: str = "100%",
         height: str = "100%",
-        replace_key: bool = True,
+        replace_key: bool = False,
         preview: bool = False,
         **kwargs,
     ):
@@ -1184,14 +1184,14 @@ class Map(MapWidget):
         Args:
             output (str, optional): The output HTML file. If None, the HTML content
                 is returned as a string. Defaults
-            title (str, optional): The title of the HTML page. Defaults to 'Leafmap'.
+            title (str, optional): The title of the HTML page. Defaults to 'My Awesome Map'.
             width (str, optional): The width of the map. Defaults to '100%'.
             height (str, optional): The height of the map. Defaults to '100%'.
             replace_key (bool, optional): Whether to replace the API key in the HTML.
                 If True, the API key is replaced with the public API key.
                 The API key is read from the environment variable `MAPTILER_KEY`.
                 The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.
-                Defaults to True.
+                Defaults to False.
             preview (bool, optional): Whether to preview the HTML file in a web browser.
             **kwargs: Additional keyword arguments that are passed to the
                 `maplibre.ipywidget.MapWidget.to_html()` method.
@@ -1199,6 +1199,10 @@ class Map(MapWidget):
         Returns:
             str: The HTML content of the map.
         """
+        if isinstance(height, int):
+            height = f"{height}px"
+        if isinstance(width, int):
+            width = f"{width}px"
 
         if "style" not in kwargs:
             kwargs["style"] = f"width: {width}; height: {height};"
@@ -1206,17 +1210,20 @@ class Map(MapWidget):
             kwargs["style"] += f"width: {width}; height: {height};"
         html = super().to_html(title=title, **kwargs)
 
-        if isinstance(height, str) and "%" in height:
-            style_before = """</style>\n<body>"""
+        if isinstance(height, str) and ("%" in height):
+            style_before = """</style>\n"""
             style_after = (
                 """html, body {height: 100%; margin: 0; padding: 0;} #pymaplibregl {width: 100%; height: """
                 + height
-                + """;}\n</style>\n<body>"""
+                + """;}\n</style>\n"""
             )
             html = html.replace(style_before, style_after)
 
             div_before = f"""<div id="pymaplibregl" style="width: 100%; height: {height};"></div>"""
             div_after = f"""<div id="pymaplibregl"></div>"""
+            html = html.replace(div_before, div_after)
+
+            div_before = f"""<div id="pymaplibregl" style="height: {height};"></div>"""
             html = html.replace(div_before, div_after)
 
         if replace_key:
@@ -1965,7 +1972,6 @@ class Map(MapWidget):
         Raises:
             Exception: If there is an error in creating the Streamlit component.
         """
-
         try:
             import streamlit.components.v1 as components
             import base64

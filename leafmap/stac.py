@@ -195,7 +195,7 @@ def cog_tile(
                     )
                 kwargs["rescale"] = rescale
             except Exception as e:
-                print(e)
+                pass
 
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
