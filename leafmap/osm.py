@@ -25,7 +25,7 @@ def osm_gdf_from_address(address: str, tags: Dict, dist: Optional[int] = 1000):
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    gdf = ox.geometries_from_address(address, tags, dist)
+    gdf = ox.features_from_address(address, tags, dist)
     return gdf
 
 
@@ -86,9 +86,10 @@ def osm_gdf_from_place(
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    ox.config(use_cache=True, log_console=False)
+    ox.settings.use_cache = True
+    ox.settings.log_console = False
 
-    gdf = ox.geometries_from_place(query, tags, which_result, buffer_dist)
+    gdf = ox.features_from_place(query, tags, which_result, buffer_dist)
     return gdf
 
 
@@ -155,7 +156,7 @@ def osm_gdf_from_point(
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    gdf = ox.geometries_from_point(center_point, tags, dist)
+    gdf = ox.features_from_point(center_point, tags, dist)
     return gdf
 
 
@@ -214,7 +215,7 @@ def osm_gdf_from_polygon(polygon, tags: Dict):
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    gdf = ox.geometries_from_polygon(polygon, tags)
+    gdf = ox.features_from_polygon(polygon, tags)
     return gdf
 
 
@@ -266,7 +267,7 @@ def osm_gdf_from_bbox(north: float, south: float, east: float, west: float, tags
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    gdf = ox.geometries_from_bbox(north, south, east, west, tags)
+    gdf = ox.features_from_bbox(north, south, east, west, tags)
     return gdf
 
 
@@ -329,7 +330,7 @@ def osm_gdf_from_xml(filepath: str, polygon=None, tags: Dict = None):
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    gdf = ox.geometries_from_xml(filepath, polygon, tags)
+    gdf = ox.features_from_xml(filepath, polygon, tags)
     return gdf
 
 
