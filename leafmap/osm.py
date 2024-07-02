@@ -86,8 +86,8 @@ def osm_gdf_from_place(
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
     import osmnx as ox
 
-    ox.settings.use_cache=True
-    ox.settings.log_console=False
+    ox.settings.use_cache = True
+    ox.settings.log_console = False
 
     gdf = ox.features_from_place(query, tags, which_result, buffer_dist)
     return gdf
