@@ -572,7 +572,7 @@ class Map(MapWidget):
             raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
         if name is None:
-            name = "geojson_" + random_string()
+            name = "geojson"
 
         if filter is not None:
             kwargs["filter"] = filter
@@ -1177,6 +1177,7 @@ class Map(MapWidget):
         width: str = "100%",
         height: str = "100%",
         replace_key: bool = False,
+        remove_port: bool = True,
         preview: bool = False,
         overwrite: bool = False,
         **kwargs,
@@ -1194,6 +1195,7 @@ class Map(MapWidget):
                 The API key is read from the environment variable `MAPTILER_KEY`.
                 The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.
                 Defaults to False.
+            remove_port (bool, optional): Whether to remove the port number from the HTML.
             preview (bool, optional): Whether to preview the HTML file in a web browser.
                 Defaults to False.
             overwrite (bool, optional): Whether to overwrite the output file if it already exists.
@@ -1236,7 +1238,11 @@ class Map(MapWidget):
             if key_after is not None:
                 html = html.replace(key_before, key_after)
 
-        output = os.getenv("MAPLIBRE_OUTPUT", None)
+        if remove_port:
+            html = remove_port_from_string(html)
+
+        if output is None:
+            output = os.getenv("MAPLIBRE_OUTPUT", None)
 
         if output:
 
