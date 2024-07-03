@@ -6289,7 +6289,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a URL or a GeoJSON dictionary.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;geojson_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;geojson&quot;</span>
 
         <span class="k">if</span> <span class="nb">filter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">filter</span>
@@ -6894,6 +6894,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
         <span class="n">replace_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">remove_port</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -6911,6 +6912,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">                The API key is read from the environment variable `MAPTILER_KEY`.</span>
 <span class="sd">                The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.</span>
 <span class="sd">                Defaults to False.</span>
+<span class="sd">            remove_port (bool, optional): Whether to remove the port number from the HTML.</span>
 <span class="sd">            preview (bool, optional): Whether to preview the HTML file in a web browser.</span>
 <span class="sd">                Defaults to False.</span>
 <span class="sd">            overwrite (bool, optional): Whether to overwrite the output file if it already exists.</span>
@@ -6953,7 +6955,11 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="k">if</span> <span class="n">key_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key_before</span><span class="p">,</span> <span class="n">key_after</span><span class="p">)</span>
 
-        <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">remove_port</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="n">remove_port_from_string</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
 
@@ -10095,7 +10101,7 @@ See https://maplibre.org/maplibre-style-spec/layers/ for more info.</p></td>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a URL or a GeoJSON dictionary.&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;geojson_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;geojson&quot;</span>
 
     <span class="k">if</span> <span class="nb">filter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">filter</span>
@@ -14550,7 +14556,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
 
 <h3 id="leafmap.maplibregl.Map.to_html" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Awesome Map&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Awesome Map&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">remove_port</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.to_html" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -14606,6 +14612,12 @@ Defaults to False.</p></td>
         <td><code>False</code></td>
       </tr>
       <tr>
+        <td><code>remove_port</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to remove the port number from the HTML.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
         <td><code>preview</code></td>
         <td><code>bool</code></td>
         <td><p>Whether to preview the HTML file in a web browser.
@@ -14651,6 +14663,7 @@ Defaults to False.</p></td>
     <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
     <span class="n">replace_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">remove_port</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -14668,6 +14681,7 @@ Defaults to False.</p></td>
 <span class="sd">            The API key is read from the environment variable `MAPTILER_KEY`.</span>
 <span class="sd">            The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.</span>
 <span class="sd">            Defaults to False.</span>
+<span class="sd">        remove_port (bool, optional): Whether to remove the port number from the HTML.</span>
 <span class="sd">        preview (bool, optional): Whether to preview the HTML file in a web browser.</span>
 <span class="sd">            Defaults to False.</span>
 <span class="sd">        overwrite (bool, optional): Whether to overwrite the output file if it already exists.</span>
@@ -14710,7 +14724,11 @@ Defaults to False.</p></td>
         <span class="k">if</span> <span class="n">key_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key_before</span><span class="p">,</span> <span class="n">key_after</span><span class="p">)</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">remove_port</span><span class="p">:</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="n">remove_port_from_string</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
 
