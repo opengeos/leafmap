@@ -13666,7 +13666,8 @@ def execute_maplibre_notebook_dir(
             os.remove(file)
 
     files = find_files(in_dir, "*.ipynb", recursive=recursive)
-    for file in files:
+    for index, file in enumerate(files):
+        print(f"Processing {index + 1}/{len(files)}: {file} ...")
         basename = os.path.basename(file)
         out_file = os.path.join(out_dir, basename)
         shutil.copy(file, out_file)
@@ -13688,8 +13689,11 @@ def execute_maplibre_notebook_dir(
         os.environ["MAPLIBRE_OUTPUT"] = out_html
         execute_notebook(out_file)
 
-        if not keep_notebook:
-            os.remove(out_file)
+    if not keep_notebook:
+        all_files = find_files(out_dir, "*", recursive=recursive)
+        for file in all_files:
+            if not file.endswith(".html"):
+                os.remove(file)
 
     if index_html:
         generate_index_html(out_dir)
