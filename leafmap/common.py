@@ -13951,3 +13951,28 @@ def github_upload_asset_to_release(
         if not quiet:
             print(response.json())
         return None
+
+
+def remove_port_from_string(data: str) -> str:
+    """
+    Removes the port number from all URLs in the given string.
+
+    Args::
+        data (str): The input string containing URLs.
+
+    Returns:
+        str: The string with port numbers removed from all URLs.
+    """
+    import re
+
+    # Regular expression to match URLs with port numbers
+    url_with_port_pattern = re.compile(r"(http://[\d\w.]+):\d+")
+
+    # Function to remove the port from the matched URLs
+    def remove_port(match):
+        return match.group(1)
+
+    # Substitute the URLs with ports removed
+    result = url_with_port_pattern.sub(remove_port, data)
+
+    return result
