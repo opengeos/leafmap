@@ -86,8 +86,6 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
 
-            style = style.lower()
-
             if style.startswith("https"):
                 response = requests.get(style)
                 if response.status_code != 200:
@@ -100,8 +98,8 @@ class Map(MapWidget):
                 style = self._get_3d_terrain_style(
                     satellite=False, exaggeration=kwargs.pop("exaggeration", 1.0)
                 )
-            elif style in carto_basemaps:
-                style = construct_carto_basemap_url(style)
+            elif style.lower() in carto_basemaps:
+                style = construct_carto_basemap_url(style.lower())
             elif style == "demotiles":
                 style = "https://demotiles.maplibre.org/style.json"
             elif "background-" in style:
