@@ -814,6 +814,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_3d_buildings" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_3d_buildings()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_basemap" class="md-nav__link">
     <span class="md-ellipsis">
       add_basemap()
@@ -1247,6 +1256,15 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.construct_maptiler_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      construct_maptiler_style()
+    </span>
+  </a>
   
 </li>
       
@@ -1733,6 +1751,27 @@
   
   <span class="md-ellipsis">
     3d terrain
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/add_3d_buildings/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Add 3d buildings
   </span>
   
 
@@ -2846,6 +2885,27 @@
   
   <span class="md-ellipsis">
     Map tiles
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/maptiler_styles/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Maptiler styles
   </span>
   
 
@@ -5248,6 +5308,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_3d_buildings" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_3d_buildings()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_basemap" class="md-nav__link">
     <span class="md-ellipsis">
       add_basemap()
@@ -5684,6 +5753,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.construct_maptiler_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      construct_maptiler_style()
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5778,7 +5856,10 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">            style (str, optional): The style of the map. It can be a string or a URL.</span>
 <span class="sd">                If it is a string, it must be one of the following: &quot;dark-matter&quot;,</span>
 <span class="sd">                &quot;positron&quot;, &quot;voyager&quot;, &quot;positron-nolabels&quot;, &quot;dark-matter-nolabels&quot;,</span>
-<span class="sd">                &quot;voyager-nolabels&quot;, or &quot;demotiles&quot;. If it is a URL, it must point to</span>
+<span class="sd">                &quot;voyager-nolabels&quot;, or &quot;demotiles&quot;. If a MapTiler API key is set,</span>
+<span class="sd">                you can also use any of the MapTiler styles, such as aquarelle,</span>
+<span class="sd">                backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,</span>
+<span class="sd">                satellite, streets, toner, topo, winter, etc. If it is a URL, it must point to</span>
 <span class="sd">                a MapLibre style JSON. Defaults to &quot;dark-matter&quot;.</span>
 <span class="sd">            height (str, optional): The height of the map. Defaults to &quot;600px&quot;.</span>
 <span class="sd">            controls (dict, optional): The controls and their positions on the</span>
@@ -5800,12 +5881,13 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 
+            <span class="n">style</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
             <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">):</span>
                 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                     <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
-
-            <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
                     <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
                 <span class="p">)</span>
@@ -5813,14 +5895,18 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
                     <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
                 <span class="p">)</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">):</span>
-                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="k">elif</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
             <span class="k">elif</span> <span class="s2">&quot;background-&quot;</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>
                 <span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
@@ -8377,6 +8463,79 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">css_text</span><span class="o">=</span><span class="n">css_text</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_3d_buildings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+        <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span>
+        <span class="n">colors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lightgray&quot;</span><span class="p">,</span> <span class="s2">&quot;royalblue&quot;</span><span class="p">,</span> <span class="s2">&quot;lightblue&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a 3D buildings layer to the map.</span>
+
+<span class="sd">        This function creates and adds a 3D buildings layer to the map using fill-extrusion. The buildings&#39; heights</span>
+<span class="sd">        are determined by the &#39;render_height&#39; property, and their colors are interpolated based on specified values.</span>
+<span class="sd">        The layer is only visible from a certain zoom level, specified by the &#39;min_zoom&#39; parameter.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            min_zoom (int): The minimum zoom level at which the 3D buildings will start to be visible. Defaults to 15.</span>
+<span class="sd">            values (List[int]): A list of height values (in meters) used for color interpolation. Defaults to [0, 200, 400].</span>
+<span class="sd">            colors (List[str]): A list of colors corresponding to the &#39;values&#39; list. Each color is applied to the</span>
+<span class="sd">                building height range defined by the &#39;values&#39;. Defaults to [&quot;lightgray&quot;, &quot;royalblue&quot;, &quot;lightblue&quot;].</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the lengths of &#39;values&#39; and &#39;colors&#39; lists do not match.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">MAPTILER_KEY</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/v3/tiles.json?key=</span><span class="si">{</span><span class="n">MAPTILER_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;vector&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The values and colors must have the same length.&quot;</span><span class="p">)</span>
+
+        <span class="n">value_color_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="n">value_color_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">value_color_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+        <span class="n">layer</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;3d-buildings&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;openmaptiles&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source-layer&quot;</span><span class="p">:</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;fill-extrusion&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;min-zoom&quot;</span><span class="p">:</span> <span class="n">min_zoom</span><span class="p">,</span>
+            <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fill-extrusion-color&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;interpolate&quot;</span><span class="p">,</span>
+                    <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">],</span>
+                    <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;render_height&quot;</span><span class="p">],</span>
+                <span class="p">]</span>
+                <span class="o">+</span> <span class="n">value_color_pairs</span><span class="p">,</span>
+                <span class="s2">&quot;fill-extrusion-height&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;interpolate&quot;</span><span class="p">,</span>
+                    <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">],</span>
+                    <span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">],</span>
+                    <span class="mi">15</span><span class="p">,</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                    <span class="mi">16</span><span class="p">,</span>
+                    <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;render_height&quot;</span><span class="p">],</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;fill-extrusion-base&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;case&quot;</span><span class="p">,</span>
+                    <span class="p">[</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;zoom&quot;</span><span class="p">],</span> <span class="mi">16</span><span class="p">],</span>
+                    <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;render_min_height&quot;</span><span class="p">],</span>
+                    <span class="mi">0</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="s2">&quot;openmaptiles&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -8453,7 +8612,10 @@ counter-clockwise from north. Defaults to 0.</p></td>
         <td><p>The style of the map. It can be a string or a URL.
 If it is a string, it must be one of the following: "dark-matter",
 "positron", "voyager", "positron-nolabels", "dark-matter-nolabels",
-"voyager-nolabels", or "demotiles". If it is a URL, it must point to
+"voyager-nolabels", or "demotiles". If a MapTiler API key is set,
+you can also use any of the MapTiler styles, such as aquarelle,
+backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,
+satellite, streets, toner, topo, winter, etc. If it is a URL, it must point to
 a MapLibre style JSON. Defaults to "dark-matter".</p></td>
         <td><code>&#39;dark-matter&#39;</code></td>
       </tr>
@@ -8526,7 +8688,10 @@ for more information.</p></td>
 <span class="sd">        style (str, optional): The style of the map. It can be a string or a URL.</span>
 <span class="sd">            If it is a string, it must be one of the following: &quot;dark-matter&quot;,</span>
 <span class="sd">            &quot;positron&quot;, &quot;voyager&quot;, &quot;positron-nolabels&quot;, &quot;dark-matter-nolabels&quot;,</span>
-<span class="sd">            &quot;voyager-nolabels&quot;, or &quot;demotiles&quot;. If it is a URL, it must point to</span>
+<span class="sd">            &quot;voyager-nolabels&quot;, or &quot;demotiles&quot;. If a MapTiler API key is set,</span>
+<span class="sd">            you can also use any of the MapTiler styles, such as aquarelle,</span>
+<span class="sd">            backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,</span>
+<span class="sd">            satellite, streets, toner, topo, winter, etc. If it is a URL, it must point to</span>
 <span class="sd">            a MapLibre style JSON. Defaults to &quot;dark-matter&quot;.</span>
 <span class="sd">        height (str, optional): The height of the map. Defaults to &quot;600px&quot;.</span>
 <span class="sd">        controls (dict, optional): The controls and their positions on the</span>
@@ -8548,12 +8713,13 @@ for more information.</p></td>
     <span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 
+        <span class="n">style</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">):</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
-
-        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
                 <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="p">)</span>
@@ -8561,14 +8727,18 @@ for more information.</p></td>
             <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
                 <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">):</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
         <span class="k">elif</span> <span class="s2">&quot;background-&quot;</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>
             <span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">style</span> <span class="o">=</span> <span class="n">background</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
@@ -8599,6 +8769,167 @@ for more information.</p></td>
     <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_style_layers</span><span class="p">():</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">style_dict</span><span class="p">[</span><span class="n">layer</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">layer</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">source_dict</span> <span class="o">=</span> <span class="p">{}</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.add_3d_buildings" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_3d_buildings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_zoom</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span> <span class="n">colors</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;lightgray&#39;</span><span class="p">,</span> <span class="s1">&#39;royalblue&#39;</span><span class="p">,</span> <span class="s1">&#39;lightblue&#39;</span><span class="p">])</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.add_3d_buildings" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a 3D buildings layer to the map.</p>
+<p>This function creates and adds a 3D buildings layer to the map using fill-extrusion. The buildings' heights
+are determined by the 'render_height' property, and their colors are interpolated based on specified values.
+The layer is only visible from a certain zoom level, specified by the 'min_zoom' parameter.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>min_zoom</code></td>
+        <td><code>int</code></td>
+        <td><p>The minimum zoom level at which the 3D buildings will start to be visible. Defaults to 15.</p></td>
+        <td><code>15</code></td>
+      </tr>
+      <tr>
+        <td><code>values</code></td>
+        <td><code>List[int]</code></td>
+        <td><p>A list of height values (in meters) used for color interpolation. Defaults to [0, 200, 400].</p></td>
+        <td><code>[0, 200, 400]</code></td>
+      </tr>
+      <tr>
+        <td><code>colors</code></td>
+        <td><code>List[str]</code></td>
+        <td><p>A list of colors corresponding to the 'values' list. Each color is applied to the
+building height range defined by the 'values'. Defaults to ["lightgray", "royalblue", "lightblue"].</p></td>
+        <td><code>[&#39;lightgray&#39;, &#39;royalblue&#39;, &#39;lightblue&#39;]</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the lengths of 'values' and 'colors' lists do not match.</p></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_3d_buildings</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">min_zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">],</span>
+    <span class="n">colors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;lightgray&quot;</span><span class="p">,</span> <span class="s2">&quot;royalblue&quot;</span><span class="p">,</span> <span class="s2">&quot;lightblue&quot;</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a 3D buildings layer to the map.</span>
+
+<span class="sd">    This function creates and adds a 3D buildings layer to the map using fill-extrusion. The buildings&#39; heights</span>
+<span class="sd">    are determined by the &#39;render_height&#39; property, and their colors are interpolated based on specified values.</span>
+<span class="sd">    The layer is only visible from a certain zoom level, specified by the &#39;min_zoom&#39; parameter.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        min_zoom (int): The minimum zoom level at which the 3D buildings will start to be visible. Defaults to 15.</span>
+<span class="sd">        values (List[int]): A list of height values (in meters) used for color interpolation. Defaults to [0, 200, 400].</span>
+<span class="sd">        colors (List[str]): A list of colors corresponding to the &#39;values&#39; list. Each color is applied to the</span>
+<span class="sd">            building height range defined by the &#39;values&#39;. Defaults to [&quot;lightgray&quot;, &quot;royalblue&quot;, &quot;lightblue&quot;].</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the lengths of &#39;values&#39; and &#39;colors&#39; lists do not match.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">MAPTILER_KEY</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/v3/tiles.json?key=</span><span class="si">{</span><span class="n">MAPTILER_KEY</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;vector&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The values and colors must have the same length.&quot;</span><span class="p">)</span>
+
+    <span class="n">value_color_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+        <span class="n">value_color_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">value_color_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="n">layer</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;3d-buildings&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;openmaptiles&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source-layer&quot;</span><span class="p">:</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;fill-extrusion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;min-zoom&quot;</span><span class="p">:</span> <span class="n">min_zoom</span><span class="p">,</span>
+        <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;fill-extrusion-color&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;interpolate&quot;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;render_height&quot;</span><span class="p">],</span>
+            <span class="p">]</span>
+            <span class="o">+</span> <span class="n">value_color_pairs</span><span class="p">,</span>
+            <span class="s2">&quot;fill-extrusion-height&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;interpolate&quot;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;zoom&quot;</span><span class="p">],</span>
+                <span class="mi">15</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">16</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;render_height&quot;</span><span class="p">],</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;fill-extrusion-base&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;case&quot;</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;zoom&quot;</span><span class="p">],</span> <span class="mi">16</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;render_min_height&quot;</span><span class="p">],</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="s2">&quot;openmaptiles&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -14996,6 +15327,123 @@ https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#zoomto</p>
 
   </div>
 
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.maplibregl.construct_maptiler_style" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.construct_maptiler_style" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Constructs a URL for a MapTiler style with an optional API key.</p>
+<p>This function generates a URL for accessing a specific MapTiler map style. If an API key is not provided,
+it attempts to retrieve one using a predefined method. If the request to MapTiler fails, it defaults to
+a "dark-matter" style.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>style</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the MapTiler style to be accessed. It can be one of the following:
+aquarelle, backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,
+satellite, streets, toner, topo, winter, etc.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>api_key</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>An optional API key for accessing MapTiler services. If None, the function
+attempts to retrieve the API key using a predefined method. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>str</code></td>
+      <td><p>The URL for the requested MapTiler style. If the request fails, returns a URL for the "dark-matter" style.</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>requests.exceptions.RequestException</code></td>
+        <td><p>If the request to the MapTiler API fails.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs a URL for a MapTiler style with an optional API key.</span>
+
+<span class="sd">    This function generates a URL for accessing a specific MapTiler map style. If an API key is not provided,</span>
+<span class="sd">    it attempts to retrieve one using a predefined method. If the request to MapTiler fails, it defaults to</span>
+<span class="sd">    a &quot;dark-matter&quot; style.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        style (str): The name of the MapTiler style to be accessed. It can be one of the following:</span>
+<span class="sd">            aquarelle, backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,</span>
+<span class="sd">            satellite, streets, toner, topo, winter, etc.</span>
+<span class="sd">        api_key (Optional[str]): An optional API key for accessing MapTiler services. If None, the function</span>
+<span class="sd">            attempts to retrieve the API key using a predefined method. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The URL for the requested MapTiler style. If the request fails, returns a URL for the &quot;dark-matter&quot; style.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        requests.exceptions.RequestException: If the request to the MapTiler API fails.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">api_key</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/maps/</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">/style.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
+
+    <span class="k">return</span> <span class="n">url</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 
