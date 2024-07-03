@@ -1,6 +1,8 @@
 # Overview
 
-This directory contains examples of using MapLibre with Leafmap. The source code for each example is adapted from the [MapLibre documentation](https://maplibre.org/maplibre-gl-js/docs/examples/). Credits to the original authors.
+This page contains examples of using [MapLibre](https://maplibre.org) with Leafmap. Built on top of the [py-maplibregl](https://github.com/eodaGmbH/py-maplibregl) Python package, Leafmap makes it much easier to create stunning 3D maps with MapLibre in just a few lines of code. Some examples are adapted from the [MapLibre documentation](https://maplibre.org/maplibre-gl-js/docs/examples/) and [py-maplibregl examples](https://eodagmbh.github.io/py-maplibregl/examples/every_person_in_manhattan/). Credits to the original authors.
+
+To preview the examples, visit <https://maps.gishub.org>.
 
 ## Display buildings in 3D
 
