@@ -13616,13 +13616,135 @@ def execute_notebook_dir(in_dir):
     from pathlib import Path
 
     in_dir = os.path.abspath(in_dir)
+
     files = list(Path(in_dir).rglob("*.ipynb"))
+    files.sort()
     count = len(files)
     if files is not None:
         for index, file in enumerate(files):
             in_file = str(file)
             print(f"Processing {index + 1}/{count}: {file} ...")
             execute_notebook(in_file)
+
+
+def execute_maplibre_notebook_dir(
+    in_dir: str,
+    out_dir: str,
+    delete_html: bool = True,
+    replace_api_key: bool = True,
+    recursive: bool = False,
+    keep_notebook: bool = False,
+    index_html: bool = True,
+) -> None:
+    """
+    Executes Jupyter notebooks found in a specified directory, optionally replacing API keys and deleting HTML outputs.
+
+    Args:
+        in_dir (str): The input directory containing Jupyter notebooks to be executed.
+        out_dir (str): The output directory where the executed notebooks and their HTML outputs will be saved.
+        delete_html (bool, optional): If True, deletes any existing HTML files in the output directory before execution. Defaults to True.
+        replace_api_key (bool, optional): If True, replaces the API key in the output HTML. Defaults to True.
+            set "MAPTILER_KEY" and "MAPTILER_KEY_PUBLIC" to your MapTiler API key and public key, respectively.
+        recursive (bool, optional): If True, searches for notebooks in the input directory recursively. Defaults to False.
+        keep_notebook (bool, optional): If True, keeps the executed notebooks in the output directory. Defaults to False.
+        index_html (bool, optional): If True, generates an index.html file in the output directory listing all files. Defaults to True.
+
+    Returns:
+        None
+    """
+    import shutil
+
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    if replace_api_key:
+        os.environ["MAPTILER_REPLACE_KEY"] = "True"
+
+    if delete_html:
+        html_files = find_files(out_dir, "*.html", recursive=recursive)
+        for file in html_files:
+            os.remove(file)
+
+    files = find_files(in_dir, "*.ipynb", recursive=recursive)
+    for index, file in enumerate(files):
+        print(f"Processing {index + 1}/{len(files)}: {file} ...")
+        basename = os.path.basename(file)
+        out_file = os.path.join(out_dir, basename)
+        shutil.copy(file, out_file)
+
+        with open(out_file, "r") as f:
+            lines = f.readlines()
+
+        out_lines = []
+        for line in lines:
+            if line.strip() == '"m"':
+                out_lines.append(line.replace("m", "m.to_html()"))
+            else:
+                out_lines.append(line)
+
+        with open(out_file, "w") as f:
+            f.writelines(out_lines)
+
+        out_html = os.path.basename(out_file).replace(".ipynb", ".html")
+        os.environ["MAPLIBRE_OUTPUT"] = out_html
+        execute_notebook(out_file)
+
+    if not keep_notebook:
+        all_files = find_files(out_dir, "*", recursive=recursive)
+        for file in all_files:
+            if not file.endswith(".html"):
+                os.remove(file)
+
+    if index_html:
+        generate_index_html(out_dir)
+
+
+def generate_index_html(directory: str, output: str = "index.html") -> None:
+    """
+    Generates an HTML file named 'index.html' in the specified directory, listing
+    all files in that directory as clickable links.
+
+    Args:
+        directory (str): The path to the directory for which to generate the index.html file.
+        output (str, optional): The name of the output HTML file. Defaults to "index.html".
+
+    Returns:
+        None
+    """
+    # Get a list of files in the directory
+    files = sorted(
+        [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+    )
+
+    # Start the HTML content
+    html_content = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index of {directory}</title>
+</head>
+<body>
+    <h1>Index of {directory}</h1>
+    <ul>
+""".format(
+        directory=directory
+    )
+
+    # Add each file to the HTML list
+    for file in files:
+        html_content += '        <li><a href="{file}">{file}</a></li>\n'.format(
+            file=file
+        )
+
+    # Close the HTML content
+    html_content += """    </ul>
+</body>
+</html>"""
+
+    # Write the HTML content to index.html in the specified directory
+    with open(os.path.join(directory, output), "w") as f:
+        f.write(html_content)
 
 
 def github_get_release_id_by_tag(username, repository, tag_name, access_token=None):
