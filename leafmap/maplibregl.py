@@ -142,9 +142,10 @@ class Map(MapWidget):
     def _repr_html_(self, **kwargs):
         """Displays the map."""
 
-        filename = os.environ.get("MAPLIBRE_HTML", None)
+        filename = os.environ.get("MAPLIBRE_OUTPUT", None)
+        replace_key = os.environ.get("MAPTILER_REPLACE_KEY", False)
         if filename is not None:
-            self.to_html(filename, replace_key=False)
+            self.to_html(filename, replace_key=replace_key)
 
     def add_layer(
         self,
@@ -1177,6 +1178,7 @@ class Map(MapWidget):
         height: str = "100%",
         replace_key: bool = False,
         preview: bool = False,
+        overwrite: bool = False,
         **kwargs,
     ):
         """Render the map to an HTML page.
@@ -1193,6 +1195,8 @@ class Map(MapWidget):
                 The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.
                 Defaults to False.
             preview (bool, optional): Whether to preview the HTML file in a web browser.
+                Defaults to False.
+            overwrite (bool, optional): Whether to overwrite the output file if it already exists.
             **kwargs: Additional keyword arguments that are passed to the
                 `maplibre.ipywidget.MapWidget.to_html()` method.
 
@@ -1226,13 +1230,22 @@ class Map(MapWidget):
             div_before = f"""<div id="pymaplibregl" style="height: {height};"></div>"""
             html = html.replace(div_before, div_after)
 
-        if replace_key:
+        if replace_key or (os.getenv("MAPTILER_REPLACE_KEY") is not None):
             key_before = get_api_key("MAPTILER_KEY")
             key_after = get_api_key("MAPTILER_KEY_PUBLIC")
             if key_after is not None:
                 html = html.replace(key_before, key_after)
 
+        output = os.getenv("MAPLIBRE_OUTPUT", None)
+
         if output:
+
+            if not overwrite and os.path.exists(output):
+                import glob
+
+                num = len(glob.glob(output.replace(".html", "*.html")))
+                output = output.replace(".html", f"_{num}.html")
+
             with open(output, "w") as f:
                 f.write(html)
             if preview:
@@ -1893,8 +1906,21 @@ class Map(MapWidget):
         if id is None:
             id = "image"
 
+        style = ""
+        if isinstance(width, int):
+            style += f"width: {width}px; "
+        elif isinstance(width, str) and width.endswith("px"):
+            style += f"width: {width}; "
+        if isinstance(height, int):
+            style += f"height: {height}px; "
+        elif isinstance(height, str) and height.endswith("px"):
+            style += f"height: {height}; "
+
         if position is not None:
-            html = f'<img src="{image}">'
+            if style == "":
+                html = f'<img src="{image}">'
+            else:
+                html = f'<img src="{image}" style="{style}">'
             self.add_html(html, position=position, **kwargs)
         else:
             if isinstance(image, str):

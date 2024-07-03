@@ -44,6 +44,12 @@ Add deck.gl layers to the map.
 
 [![](https://i.imgur.com/rQR4687.png)](https://leafmap.org/maplibre/add_deckgl_layer)
 
+## Add GIF animations to the map
+
+Add GIF animations to the map.
+
+[![](https://i.imgur.com/auytBtD.png)](https://leafmap.org/maplibre/add_gif)
+
 ## Add HTML content to the map
 
 Add HTML content to the map.
