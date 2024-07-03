@@ -20,6 +20,12 @@ Go beyond hillshade and show elevation in actual 3D.
 
 [![](https://i.imgur.com/sjXZ2Jm.jpeg)](https://leafmap.org/maplibre/3d_terrain)
 
+## Add 3D buildings and GIF animations
+
+Add 3D buildings and GIF animations to the map.
+
+[![](https://i.imgur.com/qadwFXm.png)](https://leafmap.org/maplibre/3d_buildings_gif)
+
 ## Add a default marker
 
 Add a default marker to the map.
@@ -337,6 +343,12 @@ Geolocate the user and then track their current location on the map using the Ge
 Add a third-party raster source to the map.
 
 [![](https://i.imgur.com/GX7reQP.png)](https://leafmap.org/maplibre/map_tiles)
+
+## Use MapTiler styles
+
+Use MapTiler styles to customize the look of your map.
+
+[![](https://i.imgur.com/0CKEFBx.png)](https://leafmap.org/maplibre/maptiler_styles)
 
 ## Get coordinates of the mouse pointer
 

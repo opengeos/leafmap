@@ -61,7 +61,10 @@ class Map(MapWidget):
             style (str, optional): The style of the map. It can be a string or a URL.
                 If it is a string, it must be one of the following: "dark-matter",
                 "positron", "voyager", "positron-nolabels", "dark-matter-nolabels",
-                "voyager-nolabels", or "demotiles". If it is a URL, it must point to
+                "voyager-nolabels", or "demotiles". If a MapTiler API key is set,
+                you can also use any of the MapTiler styles, such as aquarelle,
+                backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,
+                satellite, streets, toner, topo, winter, etc. If it is a URL, it must point to
                 a MapLibre style JSON. Defaults to "dark-matter".
             height (str, optional): The height of the map. Defaults to "600px".
             controls (dict, optional): The controls and their positions on the
@@ -83,12 +86,13 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
 
+            style = style.lower()
+
             if style.startswith("https"):
                 response = requests.get(style)
                 if response.status_code != 200:
                     style = "dark-matter"
-
-            if style == "3d-terrain":
+            elif style == "3d-terrain":
                 style = self._get_3d_terrain_style(
                     exaggeration=kwargs.pop("exaggeration", 1.0)
                 )
@@ -96,14 +100,18 @@ class Map(MapWidget):
                 style = self._get_3d_terrain_style(
                     satellite=False, exaggeration=kwargs.pop("exaggeration", 1.0)
                 )
-
-            if isinstance(style, str) and (style.lower() in carto_basemaps):
-                style = construct_carto_basemap_url(style.lower())
+            elif style in carto_basemaps:
+                style = construct_carto_basemap_url(style)
             elif style == "demotiles":
                 style = "https://demotiles.maplibre.org/style.json"
             elif "background-" in style:
                 color = style.split("-")[1]
                 style = background(color)
+            else:
+                style = construct_maptiler_style(style)
+
+            if style in carto_basemaps:
+                style = construct_carto_basemap_url(style)
 
         if style is not None:
             kwargs["style"] = style
@@ -2661,6 +2669,79 @@ class Map(MapWidget):
             )
             self.add_control(control, position=position)
 
+    def add_3d_buildings(
+        self,
+        min_zoom: int = 15,
+        values: List[int] = [0, 200, 400],
+        colors: List[str] = ["lightgray", "royalblue", "lightblue"],
+    ) -> None:
+        """
+        Adds a 3D buildings layer to the map.
+
+        This function creates and adds a 3D buildings layer to the map using fill-extrusion. The buildings' heights
+        are determined by the 'render_height' property, and their colors are interpolated based on specified values.
+        The layer is only visible from a certain zoom level, specified by the 'min_zoom' parameter.
+
+        Args:
+            min_zoom (int): The minimum zoom level at which the 3D buildings will start to be visible. Defaults to 15.
+            values (List[int]): A list of height values (in meters) used for color interpolation. Defaults to [0, 200, 400].
+            colors (List[str]): A list of colors corresponding to the 'values' list. Each color is applied to the
+                building height range defined by the 'values'. Defaults to ["lightgray", "royalblue", "lightblue"].
+
+        Raises:
+            ValueError: If the lengths of 'values' and 'colors' lists do not match.
+
+        Returns:
+            None
+        """
+
+        MAPTILER_KEY = get_api_key("MAPTILER_KEY")
+        source = {
+            "url": f"https://api.maptiler.com/tiles/v3/tiles.json?key={MAPTILER_KEY}",
+            "type": "vector",
+        }
+
+        if len(values) != len(colors):
+            raise ValueError("The values and colors must have the same length.")
+
+        value_color_pairs = []
+        for i, value in enumerate(values):
+            value_color_pairs.append(value)
+            value_color_pairs.append(colors[i])
+
+        layer = {
+            "id": "3d-buildings",
+            "source": "openmaptiles",
+            "source-layer": "building",
+            "type": "fill-extrusion",
+            "min-zoom": min_zoom,
+            "paint": {
+                "fill-extrusion-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["get", "render_height"],
+                ]
+                + value_color_pairs,
+                "fill-extrusion-height": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    15,
+                    0,
+                    16,
+                    ["get", "render_height"],
+                ],
+                "fill-extrusion-base": [
+                    "case",
+                    [">=", ["get", "zoom"], 16],
+                    ["get", "render_min_height"],
+                    0,
+                ],
+            },
+        }
+        self.add_source("openmaptiles", source)
+        self.add_layer(layer)
+
 
 class Container(v.Container):
 
@@ -2713,3 +2794,37 @@ class Container(v.Container):
             **kwargs,
         )
         super().__init__(fluid=True, children=[row])
+
+
+def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
+    """
+    Constructs a URL for a MapTiler style with an optional API key.
+
+    This function generates a URL for accessing a specific MapTiler map style. If an API key is not provided,
+    it attempts to retrieve one using a predefined method. If the request to MapTiler fails, it defaults to
+    a "dark-matter" style.
+
+    Args:
+        style (str): The name of the MapTiler style to be accessed. It can be one of the following:
+            aquarelle, backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,
+            satellite, streets, toner, topo, winter, etc.
+        api_key (Optional[str]): An optional API key for accessing MapTiler services. If None, the function
+            attempts to retrieve the API key using a predefined method. Defaults to None.
+
+    Returns:
+        str: The URL for the requested MapTiler style. If the request fails, returns a URL for the "dark-matter" style.
+
+    Raises:
+        requests.exceptions.RequestException: If the request to the MapTiler API fails.
+    """
+
+    if api_key is None:
+        api_key = get_api_key("MAPTILER_KEY")
+
+    url = f"https://api.maptiler.com/maps/{style}/style.json?key={api_key}"
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        url = "dark-matter"
+
+    return url
