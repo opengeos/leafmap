@@ -5881,8 +5881,6 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 
-            <span class="n">style</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
             <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">):</span>
                 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
@@ -5895,8 +5893,8 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                 <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
                     <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
                 <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
-                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
             <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
             <span class="k">elif</span> <span class="s2">&quot;background-&quot;</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>
@@ -8713,8 +8711,6 @@ for more information.</p></td>
     <span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
 
-        <span class="n">style</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-
         <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">):</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
@@ -8727,8 +8723,8 @@ for more information.</p></td>
             <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
                 <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
         <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;https://demotiles.maplibre.org/style.json&quot;</span>
         <span class="k">elif</span> <span class="s2">&quot;background-&quot;</span> <span class="ow">in</span> <span class="n">style</span><span class="p">:</span>

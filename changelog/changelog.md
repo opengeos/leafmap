@@ -1,5 +1,80 @@
 # Changelog
 
+## v0.35.6 - Jul 3, 2024
+
+**What's Changed**
+
+-   Add MapTiler style function by @giswqs in [#808](https://github.com/opengeos/leafmap/pull/808)
+-   Add script for checking maplibre notebooks by @giswqs in [#809](https://github.com/opengeos/leafmap/pull/809)
+
+**Full Changelog**: [v0.35.5...v0.35.6](https://github.com/opengeos/leafmap/compare/v0.35.5...v0.35.6)
+
+## v0.35.5 - Jul 3, 2024
+
+**What's Changed**
+
+-   Improve MapLibre to_html function by @giswqs in [#807](https://github.com/opengeos/leafmap/pull/807)
+
+**Full Changelog**: [v0.35.4...v0.35.5](https://github.com/opengeos/leafmap/compare/v0.35.4...v0.35.5)
+
+## v0.35.4 - Jul 2, 2024
+
+**What's Changed**
+
+-   Add functions for executing MapLibre notebook by @giswqs in [#806](https://github.com/opengeos/leafmap/pull/806)
+
+**Full Changelog**: [v0.35.3...v0.35.4](https://github.com/opengeos/leafmap/compare/v0.35.3...v0.35.4)
+
+## v0.35.3 - Jul 2, 2024
+
+**What's Changed**
+
+-   Update osm.py by @spatialthoughts in [#803](https://github.com/opengeos/leafmap/pull/803)
+-   Fix MapLibre to_html bug by @giswqs in [#804](https://github.com/opengeos/leafmap/pull/804)
+
+**New Contributors**
+
+-   @spatialthoughts made their first contribution in [#803](https://github.com/opengeos/leafmap/pull/803)
+
+**Full Changelog**: [v0.35.2...v0.35.3](https://github.com/opengeos/leafmap/compare/v0.35.2...v0.35.3)
+
+## v0.35.2 - Jul 1, 2024
+
+**What's Changed**
+
+-   Add GitHub API functions by @giswqs in [#800](https://github.com/opengeos/leafmap/pull/800)
+-   Add image_to_geotiff function by @giswqs in [#802](https://github.com/opengeos/leafmap/pull/802)
+
+**Full Changelog**: [v0.35.1...v0.35.2](https://github.com/opengeos/leafmap/compare/v0.35.1...v0.35.2)
+
+## v0.35.1 - Jun 30, 2024
+
+**What's Changed**
+
+-   Improve the MapLibre to_html method by @giswqs in [#797](https://github.com/opengeos/leafmap/pull/797)
+-   Fix lonboard map init bug by @giswqs in [#799](https://github.com/opengeos/leafmap/pull/799)
+
+**Full Changelog**: [v0.35.0...v0.35.1](https://github.com/opengeos/leafmap/compare/v0.35.0...v0.35.1)
+
+## v0.35.0 - Jul 29, 2024
+
+**What's Changed**
+
+-   Add support for html and layer control by @giswqs in [#793](https://github.com/opengeos/leafmap/pull/793)
+-   Add ipyvuetify dependency and MapLibre 3d terrain exaggeration by @giswqs in [#794](https://github.com/opengeos/leafmap/pull/794)
+-   Improve support for adding GEE layers by @giswqs in [#795](https://github.com/opengeos/leafmap/pull/795)
+
+**Full Changelog**: [v0.34.7...v0.35.0](https://github.com/opengeos/leafmap/compare/v0.34.7...v0.35.0)
+
+## v0.34.7 - Jun 26, 2024
+
+**What's Changed**
+
+-   Update changelog by @giswqs in [#792](https://github.com/opengeos/leafmap/pull/792)
+-   Add mapbox draw control notebook example
+
+**Full Changelog**: [v0.34.6...v0.34.7](https://github.com/opengeos/leafmap/compare/v0.34.6...v0.34.7)
+
 ## v0.34.6 - Jun 24, 2024
 
 **What's Changed**
