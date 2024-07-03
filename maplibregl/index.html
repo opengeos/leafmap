@@ -1833,6 +1833,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../maplibre/add_gif/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Add gif
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../maplibre/add_html/" class="md-nav__link">
         
   
@@ -5838,9 +5859,10 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
     <span class="k">def</span> <span class="nf">_repr_html_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Displays the map.&quot;&quot;&quot;</span>
 
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_HTML&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">replace_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;MAPTILER_REPLACE_KEY&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="n">replace_key</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -6873,6 +6895,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
         <span class="n">replace_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Render the map to an HTML page.</span>
@@ -6889,6 +6912,8 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">                The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.</span>
 <span class="sd">                Defaults to False.</span>
 <span class="sd">            preview (bool, optional): Whether to preview the HTML file in a web browser.</span>
+<span class="sd">                Defaults to False.</span>
+<span class="sd">            overwrite (bool, optional): Whether to overwrite the output file if it already exists.</span>
 <span class="sd">            **kwargs: Additional keyword arguments that are passed to the</span>
 <span class="sd">                `maplibre.ipywidget.MapWidget.to_html()` method.</span>
 
@@ -6922,13 +6947,22 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="n">div_before</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div id=&quot;pymaplibregl&quot; style=&quot;height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">;&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;</span>
             <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">div_before</span><span class="p">,</span> <span class="n">div_after</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">replace_key</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">replace_key</span> <span class="ow">or</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPTILER_REPLACE_KEY&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="n">key_before</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
             <span class="n">key_after</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY_PUBLIC&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">key_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key_before</span><span class="p">,</span> <span class="n">key_after</span><span class="p">)</span>
 
+        <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output</span><span class="p">):</span>
+                <span class="kn">import</span> <span class="nn">glob</span>
+
+                <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="s2">&quot;*.html&quot;</span><span class="p">)))</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
+
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">preview</span><span class="p">:</span>
@@ -7589,8 +7623,21 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
 
+        <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">px; &quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">width</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;px&quot;</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">; &quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">px; &quot;</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">height</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;px&quot;</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">; &quot;</span>
+
         <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
+            <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s1">&quot; style=&quot;</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -10339,8 +10386,21 @@ Can be one of 'top-right', 'top-left', 'bottom-right', 'bottom-left'.</p></td>
     <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;image&quot;</span>
 
+    <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">px; &quot;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">width</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;px&quot;</span><span class="p">):</span>
+        <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">; &quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">px; &quot;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">height</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;px&quot;</span><span class="p">):</span>
+        <span class="n">style</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">; &quot;</span>
+
     <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;img src=&quot;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s1">&quot; style=&quot;</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -14490,7 +14550,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
 
 <h3 id="leafmap.maplibregl.Map.to_html" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Awesome Map&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;My Awesome Map&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">replace_key</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">preview</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.to_html" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -14548,7 +14608,14 @@ Defaults to False.</p></td>
       <tr>
         <td><code>preview</code></td>
         <td><code>bool</code></td>
-        <td><p>Whether to preview the HTML file in a web browser.</p></td>
+        <td><p>Whether to preview the HTML file in a web browser.
+Defaults to False.</p></td>
+        <td><code>False</code></td>
+      </tr>
+      <tr>
+        <td><code>overwrite</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to overwrite the output file if it already exists.</p></td>
         <td><code>False</code></td>
       </tr>
       <tr>
@@ -14585,6 +14652,7 @@ Defaults to False.</p></td>
     <span class="n">height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span>
     <span class="n">replace_key</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">preview</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the map to an HTML page.</span>
@@ -14601,6 +14669,8 @@ Defaults to False.</p></td>
 <span class="sd">            The public API key is read from the environment variable `MAPTILER_KEY_PUBLIC`.</span>
 <span class="sd">            Defaults to False.</span>
 <span class="sd">        preview (bool, optional): Whether to preview the HTML file in a web browser.</span>
+<span class="sd">            Defaults to False.</span>
+<span class="sd">        overwrite (bool, optional): Whether to overwrite the output file if it already exists.</span>
 <span class="sd">        **kwargs: Additional keyword arguments that are passed to the</span>
 <span class="sd">            `maplibre.ipywidget.MapWidget.to_html()` method.</span>
 
@@ -14634,13 +14704,22 @@ Defaults to False.</p></td>
         <span class="n">div_before</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;&lt;div id=&quot;pymaplibregl&quot; style=&quot;height: </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">;&quot;&gt;&lt;/div&gt;&quot;&quot;&quot;</span>
         <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">div_before</span><span class="p">,</span> <span class="n">div_after</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">replace_key</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">replace_key</span> <span class="ow">or</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPTILER_REPLACE_KEY&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">key_before</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">)</span>
         <span class="n">key_after</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;MAPTILER_KEY_PUBLIC&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">key_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key_before</span><span class="p">,</span> <span class="n">key_after</span><span class="p">)</span>
 
+    <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MAPLIBRE_OUTPUT&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">output</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">overwrite</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">glob</span>
+
+            <span class="n">num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="s2">&quot;*.html&quot;</span><span class="p">)))</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
+
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">preview</span><span class="p">:</span>
