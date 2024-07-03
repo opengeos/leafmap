@@ -1906,8 +1906,21 @@ class Map(MapWidget):
         if id is None:
             id = "image"
 
+        style = ""
+        if isinstance(width, int):
+            style += f"width: {width}px; "
+        elif isinstance(width, str) and width.endswith("px"):
+            style += f"width: {width}; "
+        if isinstance(height, int):
+            style += f"height: {height}px; "
+        elif isinstance(height, str) and height.endswith("px"):
+            style += f"height: {height}; "
+
         if position is not None:
-            html = f'<img src="{image}">'
+            if style == "":
+                html = f'<img src="{image}">'
+            else:
+                html = f'<img src="{image}" style="{style}">'
             self.add_html(html, position=position, **kwargs)
         else:
             if isinstance(image, str):
