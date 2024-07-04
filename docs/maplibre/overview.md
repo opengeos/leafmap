@@ -4,6 +4,12 @@ This page contains examples of using [MapLibre](https://maplibre.org) with Leafm
 
 To preview the examples, visit <https://maps.gishub.org>.
 
+## Video tutorials on YouTube
+
+Video tutorials on how to use Leafmap with MapLibre are available on YouTube: <https://bit.ly/maplibre>
+
+[![](https://i.imgur.com/dsxACGG.png)](https://bit.ly/maplibre)
+
 ## Display buildings in 3D
 
 Use extrusions to display buildings' height in 3D.
@@ -129,6 +135,12 @@ Animate a point along the distance of a line.
 Place attribution in the top-left position when initializing a map.
 
 [![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
+
+## Customize basemaps
+
+Customize basemaps with MapTiler and xyzservices.
+
+[![](https://i.imgur.com/inM3a7w.png)](https://leafmap.org/maplibre/basemaps)
 
 ## Center the map on a clicked symbol
 
