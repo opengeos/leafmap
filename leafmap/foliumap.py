@@ -18,7 +18,7 @@ from jinja2 import Template
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
 import pandas as pd
-from typing import Optional, Union, Any, Callable, Dict, Tuple
+from typing import Optional, Union, Any, Callable, Dict, Tuple, Sequence, Literal
 
 
 class Map(folium.Map):
@@ -28,132 +28,78 @@ class Map(folium.Map):
         object: folium map object.
     """
 
-    def __init__(self, **kwargs):
-        # Default map center location and zoom level
-        latlon = [20, 0]
-        zoom = 2
-
-        # Interchangeable parameters between ipyleaflet and folium
-        if "center" in kwargs:
-            kwargs["location"] = kwargs["center"]
-            kwargs.pop("center")
-        if "location" in kwargs:
-            latlon = kwargs["location"]
-        else:
-            kwargs["location"] = latlon
-
-        if "zoom" in kwargs:
-            kwargs["zoom_start"] = kwargs["zoom"]
-            kwargs.pop("zoom")
-        if "zoom_start" in kwargs:
-            zoom = kwargs["zoom_start"]
-        else:
-            kwargs["zoom_start"] = zoom
-        if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 24
-
-        if "scale_control" not in kwargs:
-            kwargs["scale_control"] = True
-
-        if kwargs["scale_control"]:
-            kwargs["control_scale"] = True
-            kwargs.pop("scale_control")
-
-        # if "control_scale" not in kwargs:
-        #     kwargs["control_scale"] = True
-
-        if "draw_export" not in kwargs:
-            kwargs["draw_export"] = False
-
-        if "height" in kwargs and isinstance(kwargs["height"], str):
-            kwargs["height"] = float(kwargs["height"].replace("px", ""))
-
-        if (
-            "width" in kwargs
-            and isinstance(kwargs["width"], str)
-            and ("%" not in kwargs["width"])
-        ):
-            kwargs["width"] = float(kwargs["width"].replace("px", ""))
-
-        height = None
-        width = None
-
-        if "height" in kwargs:
-            height = kwargs.pop("height")
-        else:
-            height = 600
-
-        if "width" in kwargs:
-            width = kwargs.pop("width")
-        else:
-            width = "100%"
-
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        center: Sequence[float] = [20, 0],
+        zoom: int = 2,
+        min_zoom: Optional[int] = None,
+        max_zoom: int = 24,
+        scale_control: bool = True,
+        height: Union[str, float] = 600,
+        width: Union[str, float] = "100%",
+        draw_export: bool = False,
+        fullscreen_control: bool = True,
+        draw_control: bool = True,
+        measure_control: bool = True,
+        latlon_control: bool = False,
+        locate_control: bool = False,
+        minimap_control: bool = False,
+        search_control: bool = True,
+        google_map: Optional[
+            Literal["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]
+        ] = None,
+        layers_control: bool = True,
+    ):
+        # Init folium.Map with Interchangeable parameters between ipyleaflet and folium
+        super().__init__(
+            location=center,
+            zoom_start=zoom,
+            min_zoom=min_zoom,
+            max_zoom=max_zoom,
+            control_scale=scale_control,
+            height=height,
+            width=width,
+        )
         self.baseclass = "folium"
 
-        if (height is not None) or (width is not None):
-            f = folium.Figure(width=width, height=height)
-            self.add_to(f)
+        # Finish the map configuration
+        f = folium.Figure(width=width, height=height)
+        self.add_to(f)
 
-        if "fullscreen_control" not in kwargs:
-            kwargs["fullscreen_control"] = True
-        if kwargs["fullscreen_control"]:
+        if fullscreen_control:
             plugins.Fullscreen().add_to(self)
 
-        if "draw_control" not in kwargs:
-            kwargs["draw_control"] = True
-        if kwargs["draw_control"]:
-            plugins.Draw(export=kwargs.get("draw_export")).add_to(self)
+        if draw_control:
+            plugins.Draw(export=draw_export).add_to(self)
 
-        if "measure_control" not in kwargs:
-            kwargs["measure_control"] = True
-        if kwargs["measure_control"]:
+        if measure_control:
             plugins.MeasureControl(position="bottomleft").add_to(self)
 
-        if "latlon_control" not in kwargs:
-            kwargs["latlon_control"] = False
-        if kwargs["latlon_control"]:
+        if latlon_control:
             folium.LatLngPopup().add_to(self)
 
-        if "locate_control" not in kwargs:
-            kwargs["locate_control"] = False
-        if kwargs["locate_control"]:
+        if locate_control:
             plugins.LocateControl().add_to(self)
 
-        if "minimap_control" not in kwargs:
-            kwargs["minimap_control"] = False
-        if kwargs["minimap_control"]:
+        if minimap_control:
             plugins.MiniMap().add_to(self)
 
-        if "search_control" not in kwargs:
-            kwargs["search_control"] = True
-        if kwargs["search_control"]:
+        if search_control:
             plugins.Geocoder(collapsed=True, position="topleft").add_to(self)
 
-        if "google_map" not in kwargs:
-            pass
-        elif kwargs["google_map"] is not None:
-            if kwargs["google_map"].upper() == "ROADMAP":
-                layer = basemaps["ROADMAP"]
-            elif kwargs["google_map"].upper() == "HYBRID":
-                layer = basemaps["HYBRID"]
-            elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = basemaps["TERRAIN"]
-            elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = basemaps["SATELLITE"]
-            else:
-                print(
-                    f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
-                )
-                layer = basemaps["ROADMAP"]
+        if google_map:
+            assert google_map.upper() in [
+                "ROADMAP",
+                "HYBRID",
+                "TERRAIN",
+                "SATELLITE",
+            ], f'{google_map} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]'
+            layer = basemaps[google_map.upper()]
             layer.add_to(self)
 
-        if "layers_control" not in kwargs:
-            self.options["layersControl"] = True
-        else:
-            self.options["layersControl"] = kwargs["layers_control"]
+        self.options["layersControl"] = layers_control
 
-        self.fit_bounds([latlon, latlon], max_zoom=zoom)
+        self.fit_bounds([center, center], max_zoom=zoom)
 
     def add(self, object, **kwargs):
         """Adds something to the map. This method is not implemented in folium."""
