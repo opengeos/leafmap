@@ -6,7 +6,8 @@ import os
 import unittest
 import leafmap.foliumap as leafmap
 import geopandas as gpd
-from leafmap import common
+import pandas as pd
+from unittest.mock import patch
 
 
 class TestFoliumap(unittest.TestCase):
@@ -21,7 +22,7 @@ class TestFoliumap(unittest.TestCase):
     def test_add_basemap(self):
         """Check basemaps"""
         m = leafmap.Map()
-        set_api_key("API-KEY")
+        leafmap.set_api_key("API-KEY")
         m.add_basemap("TERRAIN")
         out_str = m.to_html()
         assert "Google Terrain" in out_str
@@ -319,7 +320,7 @@ class TestFoliumap(unittest.TestCase):
         """Check adding time slider"""
         with self.assertRaises(NotImplementedError):
             m = leafmap.Map()
-            layers_dict = planet_quarterly_tiles()
+            layers_dict = leafmap.planet_quarterly_tiles()
             m.add_time_slider(layers_dict, time_interval=1)
             out_str = m.to_html()
             assert "Planet_2019_q2" in out_str
