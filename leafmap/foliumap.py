@@ -49,6 +49,7 @@ class Map(folium.Map):
             Literal["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]
         ] = None,
         layers_control: bool = True,
+        **kwargs,
     ):
         # Init folium.Map with Interchangeable parameters between ipyleaflet and folium
         super().__init__(
