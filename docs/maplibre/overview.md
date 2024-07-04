@@ -130,6 +130,12 @@ Place attribution in the top-left position when initializing a map.
 
 [![](https://i.imgur.com/DsmqIOy.png)](https://leafmap.org/maplibre/attribution_position)
 
+## Customize basemaps
+
+Customize basemaps with MapTiler and xyzservices.
+
+[![](https://i.imgur.com/inM3a7w.png)](https://leafmap.org/maplibre/basemaps)
+
 ## Center the map on a clicked symbol
 
 Use events and flyTo to center the map on a symbol.
