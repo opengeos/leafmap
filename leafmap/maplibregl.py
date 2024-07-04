@@ -89,6 +89,9 @@ class Map(MapWidget):
             if style.startswith("https"):
                 response = requests.get(style)
                 if response.status_code != 200:
+                    print(
+                        "The provided style URL is invalid. Falling back to 'dark-matter'."
+                    )
                     style = "dark-matter"
             elif style == "3d-terrain":
                 style = self._get_3d_terrain_style(
@@ -2823,6 +2826,9 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
 
     response = requests.get(url)
     if response.status_code != 200:
+        print(
+            "Failed to retrieve the MapTiler style. Defaulting to 'dark-matter' style."
+        )
         url = "dark-matter"
 
     return url
