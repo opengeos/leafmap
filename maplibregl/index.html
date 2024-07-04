@@ -2145,6 +2145,27 @@
   
   
     <li class="md-nav__item">
+      <a href="../maplibre/basemaps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Basemaps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../maplibre/center_on_symbol/" class="md-nav__link">
         
   
@@ -5884,6 +5905,9 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
             <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">):</span>
                 <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;The provided style URL is invalid. Falling back to &#39;dark-matter&#39;.&quot;</span>
+                    <span class="p">)</span>
                     <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
             <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
@@ -8714,6 +8738,9 @@ for more information.</p></td>
         <span class="k">if</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;https&quot;</span><span class="p">):</span>
             <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">style</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;The provided style URL is invalid. Falling back to &#39;dark-matter&#39;.&quot;</span>
+                <span class="p">)</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
         <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
@@ -15432,6 +15459,9 @@ attempts to retrieve the API key using a predefined method. Defaults to None.</p
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Failed to retrieve the MapTiler style. Defaulting to &#39;dark-matter&#39; style.&quot;</span>
+        <span class="p">)</span>
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
 
     <span class="k">return</span> <span class="n">url</span>
