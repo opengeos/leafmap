@@ -2,14 +2,12 @@ import os
 import folium
 import folium.plugins as plugins
 from box import Box
+from typing import Optional, Union, Any, Callable, Dict, Tuple, Sequence, Literal, List
 
-from .common import *
-from .legends import builtin_legends
+import pandas as pd
+
 from .basemaps import xyz_to_folium
-from .osm import *
-from . import examples
-from .map_widgets import *
-from .plot import *
+from . import common, osm, stac
 
 from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
@@ -17,8 +15,6 @@ from folium.map import Layer
 from jinja2 import Template
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
-import pandas as pd
-from typing import Optional, Union, Any, Callable, Dict, Tuple
 
 
 class Map(folium.Map):
@@ -28,132 +24,78 @@ class Map(folium.Map):
         object: folium map object.
     """
 
-    def __init__(self, **kwargs):
-        # Default map center location and zoom level
-        latlon = [20, 0]
-        zoom = 2
-
-        # Interchangeable parameters between ipyleaflet and folium
-        if "center" in kwargs:
-            kwargs["location"] = kwargs["center"]
-            kwargs.pop("center")
-        if "location" in kwargs:
-            latlon = kwargs["location"]
-        else:
-            kwargs["location"] = latlon
-
-        if "zoom" in kwargs:
-            kwargs["zoom_start"] = kwargs["zoom"]
-            kwargs.pop("zoom")
-        if "zoom_start" in kwargs:
-            zoom = kwargs["zoom_start"]
-        else:
-            kwargs["zoom_start"] = zoom
-        if "max_zoom" not in kwargs:
-            kwargs["max_zoom"] = 24
-
-        if "scale_control" not in kwargs:
-            kwargs["scale_control"] = True
-
-        if kwargs["scale_control"]:
-            kwargs["control_scale"] = True
-            kwargs.pop("scale_control")
-
-        # if "control_scale" not in kwargs:
-        #     kwargs["control_scale"] = True
-
-        if "draw_export" not in kwargs:
-            kwargs["draw_export"] = False
-
-        if "height" in kwargs and isinstance(kwargs["height"], str):
-            kwargs["height"] = float(kwargs["height"].replace("px", ""))
-
-        if (
-            "width" in kwargs
-            and isinstance(kwargs["width"], str)
-            and ("%" not in kwargs["width"])
-        ):
-            kwargs["width"] = float(kwargs["width"].replace("px", ""))
-
-        height = None
-        width = None
-
-        if "height" in kwargs:
-            height = kwargs.pop("height")
-        else:
-            height = 600
-
-        if "width" in kwargs:
-            width = kwargs.pop("width")
-        else:
-            width = "100%"
-
-        super().__init__(**kwargs)
+    def __init__(
+        self,
+        center: Sequence[float] = [20, 0],
+        zoom: int = 2,
+        min_zoom: Optional[int] = None,
+        max_zoom: int = 24,
+        scale_control: bool = True,
+        height: Union[str, float] = 600,
+        width: Union[str, float] = "100%",
+        draw_export: bool = False,
+        fullscreen_control: bool = True,
+        draw_control: bool = True,
+        measure_control: bool = True,
+        latlon_control: bool = False,
+        locate_control: bool = False,
+        minimap_control: bool = False,
+        search_control: bool = True,
+        google_map: Optional[
+            Literal["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]
+        ] = None,
+        layers_control: bool = True,
+    ):
+        # Init folium.Map with Interchangeable parameters between ipyleaflet and folium
+        super().__init__(
+            location=center,
+            zoom_start=zoom,
+            min_zoom=min_zoom,
+            max_zoom=max_zoom,
+            control_scale=scale_control,
+            height=height,
+            width=width,
+        )
         self.baseclass = "folium"
 
-        if (height is not None) or (width is not None):
-            f = folium.Figure(width=width, height=height)
-            self.add_to(f)
+        # Finish the map configuration
+        f = folium.Figure(width=width, height=height)
+        self.add_to(f)
 
-        if "fullscreen_control" not in kwargs:
-            kwargs["fullscreen_control"] = True
-        if kwargs["fullscreen_control"]:
+        if fullscreen_control:
             plugins.Fullscreen().add_to(self)
 
-        if "draw_control" not in kwargs:
-            kwargs["draw_control"] = True
-        if kwargs["draw_control"]:
-            plugins.Draw(export=kwargs.get("draw_export")).add_to(self)
+        if draw_control:
+            plugins.Draw(export=draw_export).add_to(self)
 
-        if "measure_control" not in kwargs:
-            kwargs["measure_control"] = True
-        if kwargs["measure_control"]:
+        if measure_control:
             plugins.MeasureControl(position="bottomleft").add_to(self)
 
-        if "latlon_control" not in kwargs:
-            kwargs["latlon_control"] = False
-        if kwargs["latlon_control"]:
+        if latlon_control:
             folium.LatLngPopup().add_to(self)
 
-        if "locate_control" not in kwargs:
-            kwargs["locate_control"] = False
-        if kwargs["locate_control"]:
+        if locate_control:
             plugins.LocateControl().add_to(self)
 
-        if "minimap_control" not in kwargs:
-            kwargs["minimap_control"] = False
-        if kwargs["minimap_control"]:
+        if minimap_control:
             plugins.MiniMap().add_to(self)
 
-        if "search_control" not in kwargs:
-            kwargs["search_control"] = True
-        if kwargs["search_control"]:
+        if search_control:
             plugins.Geocoder(collapsed=True, position="topleft").add_to(self)
 
-        if "google_map" not in kwargs:
-            pass
-        elif kwargs["google_map"] is not None:
-            if kwargs["google_map"].upper() == "ROADMAP":
-                layer = basemaps["ROADMAP"]
-            elif kwargs["google_map"].upper() == "HYBRID":
-                layer = basemaps["HYBRID"]
-            elif kwargs["google_map"].upper() == "TERRAIN":
-                layer = basemaps["TERRAIN"]
-            elif kwargs["google_map"].upper() == "SATELLITE":
-                layer = basemaps["SATELLITE"]
-            else:
-                print(
-                    f'{kwargs["google_map"]} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]. Adding the default ROADMAP.'
-                )
-                layer = basemaps["ROADMAP"]
+        if google_map:
+            assert google_map.upper() in [
+                "ROADMAP",
+                "HYBRID",
+                "TERRAIN",
+                "SATELLITE",
+            ], f'{google_map} is invalid. google_map must be one of: ["ROADMAP", "HYBRID", "TERRAIN", "SATELLITE"]'
+            layer = basemaps[google_map.upper()]
             layer.add_to(self)
 
-        if "layers_control" not in kwargs:
-            self.options["layersControl"] = True
-        else:
-            self.options["layersControl"] = kwargs["layers_control"]
+        self.options["layersControl"] = layers_control
 
-        self.fit_bounds([latlon, latlon], max_zoom=zoom)
+        self.fit_bounds([center, center], max_zoom=zoom)
 
     def add(self, object, **kwargs):
         """Adds something to the map. This method is not implemented in folium."""
@@ -248,7 +190,7 @@ class Map(folium.Map):
 
         try:
             if style is None:
-                style = pmtiles_style(url)
+                style = common.pmtiles_style(url)
             layer = PMTilesLayer(
                 url,
                 style=style,
@@ -262,7 +204,7 @@ class Map(folium.Map):
             self.add_child(layer)
 
             if zoom_to_layer:
-                metadata = pmtiles_metadata(url)
+                metadata = common.pmtiles_metadata(url)
                 bounds = metadata["bounds"]
                 self.zoom_to_bounds(bounds)
         except Exception as e:
@@ -293,7 +235,7 @@ class Map(folium.Map):
         """
         self.fit_bounds([[lat, lon], [lat, lon]], max_zoom=zoom)
 
-        arc_zoom_to_extent(lon, lat, lon, lat)
+        common.arc_zoom_to_extent(lon, lat, lon, lat)
 
     def zoom_to_bounds(
         self, bounds: Union[List[float], Tuple[float, float, float, float]]
@@ -329,7 +271,9 @@ class Map(folium.Map):
 
         try:
             if basemap in ["ROADMAP", "SATELLITE", "HYBRID", "TERRAIN"]:
-                layer = get_google_map(basemap, backend="folium", show=show, **kwargs)
+                layer = common.get_google_map(
+                    basemap, backend="folium", show=show, **kwargs
+                )
                 layer.add_to(self)
                 return
 
@@ -354,7 +298,7 @@ class Map(folium.Map):
 
                 self.add_layer(layer)
 
-                arc_add_layer(url, name)
+                common.arc_add_layer(url, name)
 
             elif basemap in basemaps:
                 bmap = basemaps[basemap]
@@ -364,7 +308,7 @@ class Map(folium.Map):
                     url = basemaps[basemap].tiles
                 elif isinstance(basemaps[basemap], folium.WmsTileLayer):
                     url = basemaps[basemap].url
-                arc_add_layer(url, basemap)
+                common.arc_add_layer(url, basemap)
             else:
                 print(
                     "Basemap can only be one of the following: {}".format(
@@ -436,7 +380,7 @@ class Map(folium.Map):
         Args:
             url (str): URL of the WMS legend image. Should have this format if using wms legend: {geoserver}/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER={layer}
         """
-        from branca.element import Figure, MacroElement, Element
+        from branca.element import MacroElement
 
         # Check if the map is a Folium Map instance
         if not isinstance(self, Map):
@@ -504,7 +448,7 @@ class Map(folium.Map):
                 **kwargs,
             ).add_to(self)
 
-            arc_add_layer(url, name, shown, opacity)
+            common.arc_add_layer(url, name, shown, opacity)
 
         except Exception as e:
             raise Exception(e)
@@ -546,9 +490,9 @@ class Map(folium.Map):
         import xarray as xr
 
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
-            source = array_to_image(source, **array_args)
+            source = common.array_to_image(source, **array_args)
 
-        tile_layer, tile_client = get_local_tile_layer(
+        tile_layer, tile_client = common.get_local_tile_layer(
             source,
             indexes=indexes,
             colormap=colormap,
@@ -572,8 +516,8 @@ class Map(folium.Map):
         )  # [minx, miny, maxx, maxy]
         self.zoom_to_bounds(bounds)
 
-        arc_add_layer(tile_layer.tiles, layer_name, True, 1.0)
-        arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+        common.arc_add_layer(tile_layer.tiles, layer_name, True, 1.0)
+        common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     add_local_tile = add_raster
 
@@ -654,7 +598,7 @@ class Map(folium.Map):
             lon (str, optional): Name of the longitude variable. Defaults to 'lon'.
         """
 
-        tif, vars = netcdf_to_tif(
+        tif, vars = common.netcdf_to_tif(
             filename, shift_lon=shift_lon, lat=lat, lon=lon, return_vars=True
         )
 
@@ -825,7 +769,7 @@ class Map(folium.Map):
 
         """
 
-        gdf = osm_gdf_from_geocode(
+        gdf = osm.osm_gdf_from_geocode(
             query, which_result=which_result, by_osmid=by_osmid, buffer_dist=buffer_dist
         )
         geojson = gdf.__geo_interface__
@@ -867,7 +811,7 @@ class Map(folium.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_address(address, tags, dist)
+        gdf = osm.osm_gdf_from_address(address, tags, dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -909,7 +853,7 @@ class Map(folium.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_place(query, tags, which_result, buffer_dist)
+        gdf = osm.osm_gdf_from_place(query, tags, which_result, buffer_dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -949,7 +893,7 @@ class Map(folium.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_point(center_point, tags, dist)
+        gdf = osm.osm_gdf_from_point(center_point, tags, dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -987,7 +931,7 @@ class Map(folium.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_polygon(polygon, tags)
+        gdf = osm.osm_gdf_from_polygon(polygon, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -1032,7 +976,7 @@ class Map(folium.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_bbox(north, south, east, west, tags)
+        gdf = osm.osm_gdf_from_bbox(north, south, east, west, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -1119,8 +1063,8 @@ class Map(folium.Map):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
-        tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
-        bounds = cog_bounds(url, titiler_endpoint)
+        tile_url = stac.cog_tile(url, bands, titiler_endpoint, **kwargs)
+        bounds = stac.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
             url=tile_url,
             name=name,
@@ -1130,7 +1074,7 @@ class Map(folium.Map):
         )
         if zoom_to_layer:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+            common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def add_cog_mosaic(self, **kwargs):
         raise NotImplementedError(
@@ -1172,10 +1116,10 @@ class Map(folium.Map):
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             fit_bounds (bool, optional): A flag indicating whether the map should be zoomed to the layer extent. Defaults to True.
         """
-        tile_url = stac_tile(
+        tile_url = stac.stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
-        bounds = stac_bounds(url, collection, item, titiler_endpoint)
+        bounds = stac.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(
             url=tile_url,
             name=name,
@@ -1186,7 +1130,7 @@ class Map(folium.Map):
 
         if fit_bounds:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+            common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
     def add_mosaic_layer(
         self,
@@ -1208,8 +1152,8 @@ class Map(folium.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
         """
-        tile_url = mosaic_tile(url, titiler_endpoint, **kwargs)
-        bounds = mosaic_bounds(url, titiler_endpoint)
+        tile_url = common.mosaic_tile(url, titiler_endpoint, **kwargs)
+        bounds = common.mosaic_bounds(url, titiler_endpoint)
         self.add_tile_layer(
             url=tile_url,
             name=name,
@@ -1261,7 +1205,7 @@ class Map(folium.Map):
                 }
 
         """
-        content = create_legend(
+        content = common.create_legend(
             title,
             labels,
             colors,
@@ -1365,7 +1309,7 @@ class Map(folium.Map):
             basename = os.path.basename(in_shp)
             filename = os.path.join(out_dir, basename)
             # download_from_url(in_shp, out_dir=out_dir, verbose=False)
-            download_file(in_shp, filename)
+            common.download_file(in_shp, filename)
             files = list(glob.glob(os.path.join(out_dir, "*.shp")))
             if len(files) > 0:
                 in_shp = files[0]
@@ -1378,7 +1322,7 @@ class Map(folium.Map):
             if not os.path.exists(in_shp):
                 raise FileNotFoundError("The provided shapefile could not be found.")
 
-        data = shp_to_geojson(in_shp)
+        data = common.shp_to_geojson(in_shp)
 
         self.add_geojson(
             data,
@@ -1417,7 +1361,7 @@ class Map(folium.Map):
         try:
             if isinstance(in_geojson, str):
                 if in_geojson.startswith("http"):
-                    if is_jupyterlite():
+                    if common.is_jupyterlite():
                         import pyodide
 
                         output = os.path.basename(in_geojson)
@@ -1425,11 +1369,11 @@ class Map(folium.Map):
                         output = os.path.abspath(output)
                         obj = pyodide.http.open_url(in_geojson)
                         with open(output, "w") as fd:
-                            shutil.copyfileobj(obj, fd)
+                            common.shutil.copyfileobj(obj, fd)
                         with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
-                        in_geojson = github_raw_url(in_geojson)
+                        in_geojson = common.github_raw_url(in_geojson)
                         data = requests.get(in_geojson).json()
                 else:
                     in_geojson = os.path.abspath(in_geojson)
@@ -1513,7 +1457,7 @@ class Map(folium.Map):
         geojson.add_to(self)
 
         if zoom_to_layer:
-            bounds = get_bounds(data)
+            bounds = common.get_bounds(data)
             self.zoom_to_bounds(bounds)
 
     def add_gdf(
@@ -1538,7 +1482,7 @@ class Map(folium.Map):
             if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
                 gdf[col] = gdf[col].astype(str)
 
-        data = gdf_to_geojson(gdf, epsg="4326")
+        data = common.gdf_to_geojson(gdf, epsg="4326")
 
         self.add_geojson(
             data,
@@ -1579,8 +1523,8 @@ class Map(folium.Map):
         """
         if "fill_colors" in kwargs:
             kwargs.pop("fill_colors")
-        gdf = read_postgis(sql, con, **kwargs)
-        data = gdf_to_geojson(gdf, epsg="4326")
+        gdf = common.read_postgis(sql, con, **kwargs)
+        data = common.gdf_to_geojson(gdf, epsg="4326")
 
         self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
@@ -1616,7 +1560,7 @@ class Map(folium.Map):
             out_dir = os.path.abspath("./cache")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            in_kml = download_file(in_kml)
+            in_kml = common.download_file(in_kml)
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The downloaded kml file could not be found.")
         else:
@@ -1624,7 +1568,7 @@ class Map(folium.Map):
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The provided KML could not be found.")
 
-        data = kml_to_geojson(in_kml)
+        data = common.kml_to_geojson(in_kml)
 
         self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
 
@@ -1660,7 +1604,7 @@ class Map(folium.Map):
         elif ext in [".json", ".geojson"]:
             self.add_geojson(filename, layer_name, **kwargs)
         else:
-            geojson = vector_to_geojson(
+            geojson = common.vector_to_geojson(
                 filename,
                 bbox=bbox,
                 mask=mask,
@@ -1697,7 +1641,7 @@ class Map(folium.Map):
         """
         if layer_name is None and "name" in kwargs:
             layer_name = kwargs.pop("name")
-        layer = planet_tile_by_month(
+        layer = common.planet_tile_by_month(
             year, month, layer_name, api_key, token_name, tile_format="folium"
         )
         layer.add_to(self)
@@ -1722,7 +1666,7 @@ class Map(folium.Map):
         """
         if layer_name is None and "name" in kwargs:
             layer_name = kwargs.pop("name")
-        layer = planet_tile_by_quarter(
+        layer = common.planet_tile_by_quarter(
             year, quarter, layer_name, api_key, token_name, tile_format="folium"
         )
         layer.add_to(self)
@@ -1818,7 +1762,7 @@ class Map(folium.Map):
                 os.makedirs(out_dir)
             self.save(outfile, **kwargs)
         else:
-            outfile = os.path.abspath(random_string() + ".html")
+            outfile = os.path.abspath(common.random_string() + ".html")
             self.save(outfile, **kwargs)
             out_html = ""
             with open(outfile) as f:
@@ -2017,13 +1961,13 @@ class Map(folium.Map):
         """
         if isinstance(self, folium.Map):
             if out_file is None:
-                out_file = "./cache/" + "folium_" + random_string(3) + ".html"
+                out_file = "./cache/" + "folium_" + common.random_string(3) + ".html"
             out_dir = os.path.abspath(os.path.dirname(out_file))
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
 
             self.to_html(out_file)
-            display_html(src=out_file, width=width, height=height)
+            common.display_html(src=out_file, width=width, height=height)
         else:
             raise TypeError("The provided map is not a folium map.")
 
@@ -2040,7 +1984,7 @@ class Map(folium.Map):
 
         try:
             if census_dict is None:
-                census_dict = get_census_dict()
+                census_dict = common.get_census_dict()
 
             if wms not in census_dict.keys():
                 raise ValueError(
@@ -2182,7 +2126,7 @@ class Map(folium.Map):
             str: Path to the output image.
         """
 
-        colorbar = save_colorbar(
+        colorbar = common.save_colorbar(
             None,
             width,
             height,
@@ -2357,7 +2301,7 @@ class Map(folium.Map):
             ).add_to(marker_cluster)
 
         if items is not None and add_legend:
-            marker_colors = [check_color(c) for c in marker_colors]
+            marker_colors = [common.check_color(c) for c in marker_colors]
             self.add_legend(
                 title=color_column.title(), colors=marker_colors, labels=items
             )
@@ -2606,8 +2550,8 @@ class Map(folium.Map):
                 if left_layer in basemaps.keys():
                     left_layer = basemaps[left_layer]
                 elif left_layer.startswith("http") and left_layer.endswith(".tif"):
-                    url = cog_tile(left_layer, **left_args)
-                    bbox = cog_bounds(left_layer)
+                    url = stac.cog_tile(left_layer, **left_args)
+                    bbox = stac.cog_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=url,
@@ -2618,8 +2562,8 @@ class Map(folium.Map):
                     )
 
                 elif left_layer.startswith("http") and left_layer.endswith(".json"):
-                    left_tile_url = stac_tile(left_layer, **left_args)
-                    bbox = stac_bounds(left_layer)
+                    left_tile_url = stac.stac_tile(left_layer, **left_args)
+                    bbox = stac.stac_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=left_tile_url,
@@ -2630,13 +2574,13 @@ class Map(folium.Map):
                     )
 
                 elif os.path.exists(left_layer):
-                    left_layer, left_client = get_local_tile_layer(
+                    left_layer, left_client = common.get_local_tile_layer(
                         left_layer,
                         tile_format="folium",
                         return_client=True,
                         **left_args,
                     )
-                    bounds = image_bounds(left_client)
+                    bounds = common.image_bounds(left_client)
 
                 else:
                     left_layer = folium.raster_layers.TileLayer(
@@ -2650,9 +2594,9 @@ class Map(folium.Map):
                 left_layer, folium.WmsTileLayer
             ):
                 pass
-            elif is_array(left_layer):
-                left_layer = array_to_image(left_layer, **left_array_args)
-                left_layer, _ = get_local_tile_layer(
+            elif common.is_array(left_layer):
+                left_layer = common.array_to_image(left_layer, **left_array_args)
+                left_layer, _ = common.get_local_tile_layer(
                     left_layer,
                     return_client=True,
                     tile_format="folium",
@@ -2667,8 +2611,8 @@ class Map(folium.Map):
                 if right_layer in basemaps.keys():
                     right_layer = basemaps[right_layer]
                 elif right_layer.startswith("http") and right_layer.endswith(".tif"):
-                    url = cog_tile(right_layer, **right_args)
-                    bbox = cog_bounds(right_layer)
+                    url = stac.cog_tile(right_layer, **right_args)
+                    bbox = stac.cog_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=url,
@@ -2679,8 +2623,8 @@ class Map(folium.Map):
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
-                    right_tile_url = stac_tile(right_layer, **left_args)
-                    bbox = stac_bounds(right_layer)
+                    right_tile_url = stac.stac_tile(right_layer, **left_args)
+                    bbox = stac.stac_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=right_tile_url,
@@ -2691,13 +2635,13 @@ class Map(folium.Map):
                     )
 
                 elif os.path.exists(right_layer):
-                    right_layer, right_client = get_local_tile_layer(
+                    right_layer, right_client = common.get_local_tile_layer(
                         right_layer,
                         tile_format="folium",
                         return_client=True,
                         **right_args,
                     )
-                    bounds = image_bounds(right_client)
+                    bounds = common.image_bounds(right_client)
                 else:
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=right_layer,
@@ -2710,9 +2654,9 @@ class Map(folium.Map):
                 left_layer, folium.WmsTileLayer
             ):
                 pass
-            elif is_array(right_layer):
-                right_layer = array_to_image(right_layer, **right_array_args)
-                right_layer, _ = get_local_tile_layer(
+            elif common.is_array(right_layer):
+                right_layer = common.array_to_image(right_layer, **right_array_args)
+                right_layer, _ = common.get_local_tile_layer(
                     right_layer,
                     return_client=True,
                     tile_format="folium",
@@ -2828,7 +2772,7 @@ class Map(folium.Map):
 
         import warnings
 
-        gdf, legend_dict = classify(
+        gdf, legend_dict = common.classify(
             data=data,
             column=column,
             cmap=cmap,
@@ -3136,7 +3080,7 @@ class Map(folium.Map):
             **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
         """
 
-        gdf = oam_search(
+        gdf = common.oam_search(
             bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs
         )
 
