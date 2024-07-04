@@ -6,7 +6,7 @@ import os
 import unittest
 import leafmap.foliumap as leafmap
 import geopandas as gpd
-from leafmap.common import set_api_key
+from leafmap import common
 
 
 class TestFoliumap(unittest.TestCase):
@@ -319,7 +319,7 @@ class TestFoliumap(unittest.TestCase):
         """Check adding time slider"""
         with self.assertRaises(NotImplementedError):
             m = leafmap.Map()
-            layers_dict = leafmap.planet_quarterly_tiles()
+            layers_dict = planet_quarterly_tiles()
             m.add_time_slider(layers_dict, time_interval=1)
             out_str = m.to_html()
             assert "Planet_2019_q2" in out_str
