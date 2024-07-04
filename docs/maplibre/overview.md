@@ -4,6 +4,12 @@ This page contains examples of using [MapLibre](https://maplibre.org) with Leafm
 
 To preview the examples, visit <https://maps.gishub.org>.
 
+## Video tutorials on YouTube
+
+Video tutorials on how to use Leafmap with MapLibre are available on YouTube: <https://bit.ly/maplibre>
+
+[![](https://i.imgur.com/dsxACGG.png)](https://bit.ly/maplibre)
+
 ## Display buildings in 3D
 
 Use extrusions to display buildings' height in 3D.
