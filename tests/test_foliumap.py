@@ -6,7 +6,7 @@ import os
 import unittest
 import leafmap.foliumap as leafmap
 import geopandas as gpd
-from ..leafmap.common import set_api_key
+from leafmap.common import set_api_key
 
 
 class TestFoliumap(unittest.TestCase):
