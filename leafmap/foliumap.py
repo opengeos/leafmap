@@ -60,6 +60,7 @@ class Map(folium.Map):
             control_scale=scale_control,
             height=height,
             width=width,
+            **kwargs,
         )
         self.baseclass = "folium"
 
