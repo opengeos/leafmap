@@ -2743,6 +2743,47 @@ class Map(MapWidget):
         self.add_source("openmaptiles", source)
         self.add_layer(layer)
 
+    def add_video(
+        self,
+        urls: Union[str, List[str]],
+        coordinates: List[List[float]],
+        layer_id: str = "video",
+        before_id: Optional[str] = None,
+    ) -> None:
+        """
+        Adds a video layer to the map.
+
+        This method allows embedding a video into the map by specifying the video URLs and the geographical coordinates
+        that the video should cover. The video will be stretched and fitted into the specified coordinates.
+
+        Args:
+            urls (Union[str, List[str]]): A single video URL or a list of video URLs. These URLs must be accessible
+                from the client's location.
+            coordinates (List[List[float]]): A list of four coordinates in [longitude, latitude] format, specifying
+                the corners of the video. The coordinates order should be top-left, top-right, bottom-right, bottom-left.
+            layer_id (str): The ID for the video layer. Defaults to "video".
+            before_id (Optional[str]): The ID of an existing layer to insert the new layer before. If None, the layer
+                will be added on top. Defaults to None.
+
+        Returns:
+            None
+        """
+
+        if isinstance(urls, str):
+            urls = [urls]
+        source = {
+            "type": "video",
+            "urls": urls,
+            "coordinates": coordinates,
+        }
+        self.add_source("video_source", source)
+        layer = {
+            "id": layer_id,
+            "type": "raster",
+            "source": "video_source",
+        }
+        self.add_layer(layer, before_id=before_id)
+
 
 class Container(v.Container):
 
