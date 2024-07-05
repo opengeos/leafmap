@@ -1012,6 +1012,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_video" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_video()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_wms_layer" class="md-nav__link">
     <span class="md-ellipsis">
       add_wms_layer()
@@ -5548,6 +5557,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_video" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_video()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.maplibregl.Map.add_wms_layer" class="md-nav__link">
     <span class="md-ellipsis">
       add_wms_layer()
@@ -8579,6 +8597,47 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="s2">&quot;openmaptiles&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_video</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">urls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+        <span class="n">coordinates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+        <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span>
+        <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a video layer to the map.</span>
+
+<span class="sd">        This method allows embedding a video into the map by specifying the video URLs and the geographical coordinates</span>
+<span class="sd">        that the video should cover. The video will be stretched and fitted into the specified coordinates.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            urls (Union[str, List[str]]): A single video URL or a list of video URLs. These URLs must be accessible</span>
+<span class="sd">                from the client&#39;s location.</span>
+<span class="sd">            coordinates (List[List[float]]): A list of four coordinates in [longitude, latitude] format, specifying</span>
+<span class="sd">                the corners of the video. The coordinates order should be top-left, top-right, bottom-right, bottom-left.</span>
+<span class="sd">            layer_id (str): The ID for the video layer. Defaults to &quot;video&quot;.</span>
+<span class="sd">            before_id (Optional[str]): The ID of an existing layer to insert the new layer before. If None, the layer</span>
+<span class="sd">                will be added on top. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">urls</span><span class="p">]</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;urls&quot;</span><span class="p">:</span> <span class="n">urls</span><span class="p">,</span>
+            <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="n">coordinates</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="s2">&quot;video_source&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+        <span class="n">layer</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">layer_id</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;video_source&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -12729,6 +12788,127 @@ passed to the GeoJSONSource class.</p></td>
         <span class="n">source_args</span><span class="o">=</span><span class="n">source_args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.maplibregl.Map.add_video" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_video</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">coordinates</span><span class="p">,</span> <span class="n">layer_id</span><span class="o">=</span><span class="s1">&#39;video&#39;</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.Map.add_video" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a video layer to the map.</p>
+<p>This method allows embedding a video into the map by specifying the video URLs and the geographical coordinates
+that the video should cover. The video will be stretched and fitted into the specified coordinates.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>urls</code></td>
+        <td><code>Union[str, List[str]]</code></td>
+        <td><p>A single video URL or a list of video URLs. These URLs must be accessible
+from the client's location.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>coordinates</code></td>
+        <td><code>List[List[float]]</code></td>
+        <td><p>A list of four coordinates in [longitude, latitude] format, specifying
+the corners of the video. The coordinates order should be top-left, top-right, bottom-right, bottom-left.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>layer_id</code></td>
+        <td><code>str</code></td>
+        <td><p>The ID for the video layer. Defaults to "video".</p></td>
+        <td><code>&#39;video&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>before_id</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>The ID of an existing layer to insert the new layer before. If None, the layer
+will be added on top. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_video</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">urls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+    <span class="n">coordinates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="n">layer_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span>
+    <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a video layer to the map.</span>
+
+<span class="sd">    This method allows embedding a video into the map by specifying the video URLs and the geographical coordinates</span>
+<span class="sd">    that the video should cover. The video will be stretched and fitted into the specified coordinates.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        urls (Union[str, List[str]]): A single video URL or a list of video URLs. These URLs must be accessible</span>
+<span class="sd">            from the client&#39;s location.</span>
+<span class="sd">        coordinates (List[List[float]]): A list of four coordinates in [longitude, latitude] format, specifying</span>
+<span class="sd">            the corners of the video. The coordinates order should be top-left, top-right, bottom-right, bottom-left.</span>
+<span class="sd">        layer_id (str): The ID for the video layer. Defaults to &quot;video&quot;.</span>
+<span class="sd">        before_id (Optional[str]): The ID of an existing layer to insert the new layer before. If None, the layer</span>
+<span class="sd">            will be added on top. Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">urls</span><span class="p">]</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;video&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;urls&quot;</span><span class="p">:</span> <span class="n">urls</span><span class="p">,</span>
+        <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="n">coordinates</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="s2">&quot;video_source&quot;</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+    <span class="n">layer</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">layer_id</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;video_source&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
