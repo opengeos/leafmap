@@ -412,6 +412,12 @@ Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.
 
 [![](https://i.imgur.com/zWsNXSF.png)](https://leafmap.org/maplibre/stac)
 
+## Export 3D maps as HTML files for website hosting
+
+Export 3D maps as HTML files for website hosting.
+
+[![](https://i.imgur.com/1h8tKqw.png)](https://leafmap.org/maplibre/to_html)
+
 ## Variable label placement
 
 Use text-variable-anchor to allow high priority labels to shift position to stay on the map.
