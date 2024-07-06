@@ -95,7 +95,7 @@ class Map(MapWidget):
                     style = "dark-matter"
             elif style.startswith("3d-"):
                 style = maptiler_3d_style(
-                    style=style.replace("3d-", ""),
+                    style=style.replace("3d-", "").lower(),
                     exaggeration=kwargs.pop("exaggeration", 1),
                     tile_size=kwargs.pop("tile_size", 512),
                     hillshade=kwargs.pop("hillshade", True),
@@ -2894,7 +2894,7 @@ def maptiler_3d_style(
 
     Args:
         style (str): The name of the MapTiler style to be accessed. It can be one of the following:
-            aquarelle, backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,
+            aquarelle, backdrop, basic, bright, dataviz, hillshade, landscape, ocean, openstreetmap, outdoor,
             satellite, streets, toner, topo, winter, etc.
         exaggeration (float, optional): The terrain exaggeration. Defaults to 1.
         tile_size (int, optional): The size of the tiles. Defaults to 512.
@@ -2921,6 +2921,8 @@ def maptiler_3d_style(
 
     if style == "terrain":
         style = "satellite"
+    elif style == "hillshade":
+        style = None
 
     if tile_type is None:
 
