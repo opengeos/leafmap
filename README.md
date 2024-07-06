@@ -108,6 +108,6 @@ If you find **leafmap** useful in your research, please consider citing the foll
 
 ## YouTube Channel
 
-I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. If there is any specific tutorial you would like to see, please submit a feature request [here](https://github.com/opengeos/leafmap/issues).
+I have created a [YouTube Channel](https://youtube.com/@giswqs) for sharing geospatial tutorials. You can subscribe to my channel for regular updates. Check out the following videos for 3D mapping with MapLibre and Leafmap.
 
-[![Earth Engine Tutorials on YouTube](https://wetlands.io/file/images/youtube2024.jpeg)](https://youtube.com/@giswqs)
+[![MapLibre tutorials](https://assets.gishub.org/images/maplibre-tutorials.png)](https://bit.ly/maplibre)
