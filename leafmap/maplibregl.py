@@ -93,14 +93,14 @@ class Map(MapWidget):
                         "The provided style URL is invalid. Falling back to 'dark-matter'."
                     )
                     style = "dark-matter"
-            elif style == "3d-terrain":
-                style = self._get_3d_terrain_style(
-                    exaggeration=kwargs.pop("exaggeration", 1.0)
+            elif style.startswith("3d-"):
+                style = maptiler_3d_style(
+                    style=style.replace("3d-", "").lower(),
+                    exaggeration=kwargs.pop("exaggeration", 1),
+                    tile_size=kwargs.pop("tile_size", 512),
+                    hillshade=kwargs.pop("hillshade", True),
                 )
-            elif style == "3d-terrain-background":
-                style = self._get_3d_terrain_style(
-                    satellite=False, exaggeration=kwargs.pop("exaggeration", 1.0)
-                )
+
             elif style.lower() in carto_basemaps:
                 style = construct_carto_basemap_url(style.lower())
             elif style == "demotiles":
@@ -2873,3 +2873,149 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
         url = "dark-matter"
 
     return url
+
+
+def maptiler_3d_style(
+    style="satellite",
+    exaggeration: float = 1,
+    tile_size: int = 512,
+    tile_type: str = None,
+    max_zoom: int = 24,
+    hillshade: bool = True,
+    token: str = "MAPTILER_KEY",
+    api_key: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Get the 3D terrain style for the map.
+
+    This function generates a style dictionary for the map that includes 3D terrain features.
+    The terrain exaggeration and API key can be specified. If the API key is not provided,
+    it will be retrieved using the specified token.
+
+    Args:
+        style (str): The name of the MapTiler style to be accessed. It can be one of the following:
+            aquarelle, backdrop, basic, bright, dataviz, hillshade, landscape, ocean, openstreetmap, outdoor,
+            satellite, streets, toner, topo, winter, etc.
+        exaggeration (float, optional): The terrain exaggeration. Defaults to 1.
+        tile_size (int, optional): The size of the tiles. Defaults to 512.
+        tile_type (str, optional): The type of the tiles. It can be one of the following:
+            webp, png, jpg. Defaults to None.
+        max_zoom (int, optional): The maximum zoom level. Defaults to 24.
+        hillshade (bool, optional): Whether to include hillshade. Defaults to True.
+        token (str, optional): The token to use to retrieve the API key. Defaults to "MAPTILER_KEY".
+        api_key (Optional[str], optional): The API key. If not provided, it will be retrieved using the token.
+
+    Returns:
+        Dict[str, Any]: The style dictionary for the map.
+
+    Raises:
+        ValueError: If the API key is not provided and cannot be retrieved using the token.
+    """
+
+    if api_key is None:
+        api_key = get_api_key(token)
+
+    if api_key is None:
+        print("An API key is required to use the 3D terrain feature.")
+        return "dark-matter"
+
+    if style == "terrain":
+        style = "satellite"
+    elif style == "hillshade":
+        style = None
+
+    if tile_type is None:
+
+        image_types = {
+            "aquarelle": "webp",
+            "backdrop": "png",
+            "basic": "png",
+            "basic-v2": "png",
+            "bright": "png",
+            "bright-v2": "png",
+            "dataviz": "png",
+            "hybrid": "jpg",
+            "landscape": "png",
+            "ocean": "png",
+            "openstreetmap": "jpg",
+            "outdoor": "png",
+            "outdoor-v2": "png",
+            "satellite": "jpg",
+            "toner": "png",
+            "toner-v2": "png",
+            "topo": "png",
+            "topo-v2": "png",
+            "winter": "png",
+            "winter-v2": "png",
+        }
+        if style in image_types:
+            tile_type = image_types[style]
+        else:
+            tile_type = "png"
+
+    layers = []
+
+    if isinstance(style, str):
+        layers.append({"id": style, "type": "raster", "source": style})
+
+    if hillshade:
+        layers.append(
+            {
+                "id": "hillshade",
+                "type": "hillshade",
+                "source": "hillshadeSource",
+                "layout": {"visibility": "visible"},
+                "paint": {"hillshade-shadow-color": "#473B24"},
+            }
+        )
+
+    if style == "ocean":
+        sources = {
+            "terrainSource": {
+                "type": "raster-dem",
+                "url": f"https://api.maptiler.com/tiles/ocean-rgb/tiles.json?key={api_key}",
+                "tileSize": tile_size,
+            },
+            "hillshadeSource": {
+                "type": "raster-dem",
+                "url": f"https://api.maptiler.com/tiles/ocean-rgb/tiles.json?key={api_key}",
+                "tileSize": tile_size,
+            },
+        }
+    else:
+        sources = {
+            "terrainSource": {
+                "type": "raster-dem",
+                "url": f"https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key={api_key}",
+                "tileSize": tile_size,
+            },
+            "hillshadeSource": {
+                "type": "raster-dem",
+                "url": f"https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key={api_key}",
+                "tileSize": tile_size,
+            },
+        }
+    if isinstance(style, str):
+        sources[style] = {
+            "type": "raster",
+            "tiles": [
+                "https://api.maptiler.com/maps/"
+                + style
+                + "/{z}/{x}/{y}."
+                + tile_type
+                + "?key="
+                + api_key
+            ],
+            "tileSize": tile_size,
+            "attribution": "&copy; MapTiler",
+            "maxzoom": max_zoom,
+        }
+
+    style = {
+        "version": 8,
+        "sources": sources,
+        "layers": layers,
+        "terrain": {"source": "terrainSource", "exaggeration": exaggeration},
+    }
+
+    return style

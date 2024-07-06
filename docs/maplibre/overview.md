@@ -22,6 +22,10 @@ Create a 3D indoor map with the fill-extrude-height paint property.
 
 [![](https://i.imgur.com/eYhSWaT.png)](https://leafmap.org/maplibre/3d_indoor_mapping)
 
+## Construct 3D map styles with MapTiler
+
+[![](https://i.imgur.com/3Q2Q3CG.png)](https://leafmap.org/maplibre/3d_style)
+
 ## 3D Terrain
 
 Go beyond hillshade and show elevation in actual 3D.
@@ -381,6 +385,12 @@ Add a polygon and circle layer from the same GeoJSON source.
 Add zoom and rotation controls to the map.
 
 [![](https://i.imgur.com/0A2o0oI.png)](https://leafmap.org/maplibre/navigation)
+
+## Ocean Bathymetry 3D
+
+Visualize ocean bathymetry in 3D.
+
+[![](https://i.imgur.com/m6NwSWG.png)](https://leafmap.org/maplibre/ocean_bathymetry)
 
 ## PMTiles source and protocol
 
