@@ -1277,6 +1277,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.maptiler_3d_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      maptiler_3d_style()
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1739,6 +1748,27 @@
   
   <span class="md-ellipsis">
     3d indoor mapping
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/3d_style/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    3d style
   </span>
   
 
@@ -2999,6 +3029,27 @@
   
   <span class="md-ellipsis">
     Navigation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/ocean_bathymetry/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Ocean bathymetry
   </span>
   
 
@@ -5822,6 +5873,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.maptiler_3d_style" class="md-nav__link">
+    <span class="md-ellipsis">
+      maptiler_3d_style()
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5948,14 +6008,14 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
                         <span class="s2">&quot;The provided style URL is invalid. Falling back to &#39;dark-matter&#39;.&quot;</span>
                     <span class="p">)</span>
                     <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
-            <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
-                <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
-                    <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;3d-&quot;</span><span class="p">):</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="n">maptiler_3d_style</span><span class="p">(</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;3d-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                    <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="n">tile_size</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tile_size&quot;</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+                    <span class="n">hillshade</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;hillshade&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
                 <span class="p">)</span>
-            <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain-background&quot;</span><span class="p">:</span>
-                <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
-                    <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-                <span class="p">)</span>
+
             <span class="k">elif</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
             <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
@@ -8822,14 +8882,14 @@ for more information.</p></td>
                     <span class="s2">&quot;The provided style URL is invalid. Falling back to &#39;dark-matter&#39;.&quot;</span>
                 <span class="p">)</span>
                 <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
-        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain&quot;</span><span class="p">:</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
-                <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">style</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;3d-&quot;</span><span class="p">):</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="n">maptiler_3d_style</span><span class="p">(</span>
+                <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;3d-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">tile_size</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tile_size&quot;</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+                <span class="n">hillshade</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;hillshade&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;3d-terrain-background&quot;</span><span class="p">:</span>
-            <span class="n">style</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_3d_terrain_style</span><span class="p">(</span>
-                <span class="n">satellite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;exaggeration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
-            <span class="p">)</span>
+
         <span class="k">elif</span> <span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">carto_basemaps</span><span class="p">:</span>
             <span class="n">style</span> <span class="o">=</span> <span class="n">construct_carto_basemap_url</span><span class="p">(</span><span class="n">style</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
         <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;demotiles&quot;</span><span class="p">:</span>
@@ -15666,6 +15726,271 @@ attempts to retrieve the API key using a predefined method. Defaults to None.</p
         <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;dark-matter&quot;</span>
 
     <span class="k">return</span> <span class="n">url</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.maplibregl.maptiler_3d_style" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">maptiler_3d_style</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;satellite&#39;</span><span class="p">,</span> <span class="n">exaggeration</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">tile_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_zoom</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">hillshade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s1">&#39;MAPTILER_KEY&#39;</span><span class="p">,</span> <span class="n">api_key</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.maplibregl.maptiler_3d_style" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the 3D terrain style for the map.</p>
+<p>This function generates a style dictionary for the map that includes 3D terrain features.
+The terrain exaggeration and API key can be specified. If the API key is not provided,
+it will be retrieved using the specified token.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>style</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the MapTiler style to be accessed. It can be one of the following:
+aquarelle, backdrop, basic, bright, dataviz, hillshade, landscape, ocean, openstreetmap, outdoor,
+satellite, streets, toner, topo, winter, etc.</p></td>
+        <td><code>&#39;satellite&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>exaggeration</code></td>
+        <td><code>float</code></td>
+        <td><p>The terrain exaggeration. Defaults to 1.</p></td>
+        <td><code>1</code></td>
+      </tr>
+      <tr>
+        <td><code>tile_size</code></td>
+        <td><code>int</code></td>
+        <td><p>The size of the tiles. Defaults to 512.</p></td>
+        <td><code>512</code></td>
+      </tr>
+      <tr>
+        <td><code>tile_type</code></td>
+        <td><code>str</code></td>
+        <td><p>The type of the tiles. It can be one of the following:
+webp, png, jpg. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>max_zoom</code></td>
+        <td><code>int</code></td>
+        <td><p>The maximum zoom level. Defaults to 24.</p></td>
+        <td><code>24</code></td>
+      </tr>
+      <tr>
+        <td><code>hillshade</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to include hillshade. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>token</code></td>
+        <td><code>str</code></td>
+        <td><p>The token to use to retrieve the API key. Defaults to "MAPTILER_KEY".</p></td>
+        <td><code>&#39;MAPTILER_KEY&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>api_key</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>The API key. If not provided, it will be retrieved using the token.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Dict[str, Any]</code></td>
+      <td><p>The style dictionary for the map.</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the API key is not provided and cannot be retrieved using the token.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">maptiler_3d_style</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="s2">&quot;satellite&quot;</span><span class="p">,</span>
+    <span class="n">exaggeration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">tile_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
+    <span class="n">tile_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span><span class="p">,</span>
+    <span class="n">hillshade</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;MAPTILER_KEY&quot;</span><span class="p">,</span>
+    <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the 3D terrain style for the map.</span>
+
+<span class="sd">    This function generates a style dictionary for the map that includes 3D terrain features.</span>
+<span class="sd">    The terrain exaggeration and API key can be specified. If the API key is not provided,</span>
+<span class="sd">    it will be retrieved using the specified token.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        style (str): The name of the MapTiler style to be accessed. It can be one of the following:</span>
+<span class="sd">            aquarelle, backdrop, basic, bright, dataviz, hillshade, landscape, ocean, openstreetmap, outdoor,</span>
+<span class="sd">            satellite, streets, toner, topo, winter, etc.</span>
+<span class="sd">        exaggeration (float, optional): The terrain exaggeration. Defaults to 1.</span>
+<span class="sd">        tile_size (int, optional): The size of the tiles. Defaults to 512.</span>
+<span class="sd">        tile_type (str, optional): The type of the tiles. It can be one of the following:</span>
+<span class="sd">            webp, png, jpg. Defaults to None.</span>
+<span class="sd">        max_zoom (int, optional): The maximum zoom level. Defaults to 24.</span>
+<span class="sd">        hillshade (bool, optional): Whether to include hillshade. Defaults to True.</span>
+<span class="sd">        token (str, optional): The token to use to retrieve the API key. Defaults to &quot;MAPTILER_KEY&quot;.</span>
+<span class="sd">        api_key (Optional[str], optional): The API key. If not provided, it will be retrieved using the token.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Any]: The style dictionary for the map.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the API key is not provided and cannot be retrieved using the token.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">api_key</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">api_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An API key is required to use the 3D terrain feature.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;dark-matter&quot;</span>
+
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;terrain&quot;</span><span class="p">:</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="s2">&quot;satellite&quot;</span>
+    <span class="k">elif</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">:</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">tile_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="n">image_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;aquarelle&quot;</span><span class="p">:</span> <span class="s2">&quot;webp&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;backdrop&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;basic&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;basic-v2&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bright&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bright-v2&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dataviz&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hybrid&quot;</span><span class="p">:</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;landscape&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ocean&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;openstreetmap&quot;</span><span class="p">:</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;outdoor&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;outdoor-v2&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;satellite&quot;</span><span class="p">:</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;toner&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;toner-v2&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;topo&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;topo-v2&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;winter&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;winter-v2&quot;</span><span class="p">:</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">style</span> <span class="ow">in</span> <span class="n">image_types</span><span class="p">:</span>
+            <span class="n">tile_type</span> <span class="o">=</span> <span class="n">image_types</span><span class="p">[</span><span class="n">style</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tile_type</span> <span class="o">=</span> <span class="s2">&quot;png&quot;</span>
+
+    <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">style</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">style</span><span class="p">})</span>
+
+    <span class="k">if</span> <span class="n">hillshade</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;visibility&quot;</span><span class="p">:</span> <span class="s2">&quot;visible&quot;</span><span class="p">},</span>
+                <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hillshade-shadow-color&quot;</span><span class="p">:</span> <span class="s2">&quot;#473B24&quot;</span><span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">style</span> <span class="o">==</span> <span class="s2">&quot;ocean&quot;</span><span class="p">:</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;terrainSource&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster-dem&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/ocean-rgb/tiles.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="n">tile_size</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster-dem&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/ocean-rgb/tiles.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="n">tile_size</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sources</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;terrainSource&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster-dem&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="n">tile_size</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;hillshadeSource&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster-dem&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="n">tile_size</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">sources</span><span class="p">[</span><span class="n">style</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;raster&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tiles&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;https://api.maptiler.com/maps/&quot;</span>
+                <span class="o">+</span> <span class="n">style</span>
+                <span class="o">+</span> <span class="s2">&quot;/</span><span class="si">{z}</span><span class="s2">/</span><span class="si">{x}</span><span class="s2">/</span><span class="si">{y}</span><span class="s2">.&quot;</span>
+                <span class="o">+</span> <span class="n">tile_type</span>
+                <span class="o">+</span> <span class="s2">&quot;?key=&quot;</span>
+                <span class="o">+</span> <span class="n">api_key</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;tileSize&quot;</span><span class="p">:</span> <span class="n">tile_size</span><span class="p">,</span>
+            <span class="s2">&quot;attribution&quot;</span><span class="p">:</span> <span class="s2">&quot;&amp;copy; MapTiler&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;maxzoom&quot;</span><span class="p">:</span> <span class="n">max_zoom</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;sources&quot;</span><span class="p">:</span> <span class="n">sources</span><span class="p">,</span>
+        <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="n">layers</span><span class="p">,</span>
+        <span class="s2">&quot;terrain&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;terrainSource&quot;</span><span class="p">,</span> <span class="s2">&quot;exaggeration&quot;</span><span class="p">:</span> <span class="n">exaggeration</span><span class="p">},</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">style</span>
 </code></pre></div>
         </details>
     </div>
