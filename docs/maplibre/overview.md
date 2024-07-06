@@ -16,6 +16,12 @@ Use extrusions to display buildings' height in 3D.
 
 [![](https://i.imgur.com/9QeicaE.png)](https://leafmap.org/maplibre/3d_buildings)
 
+## Create a 3D choropleth map
+
+Create a 3D choropleth map of Europe with countries extruded
+
+[![](https://i.imgur.com/fLgqYTa.png)](https://leafmap.org/maplibre/3d_choropleth)
+
 ## Extrude polygons for 3D indoor mapping
 
 Create a 3D indoor map with the fill-extrude-height paint property.
