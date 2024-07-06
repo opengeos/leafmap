@@ -188,6 +188,12 @@ Use setPaintProperty to change a layer's fill color.
 
 [![](https://i.imgur.com/Q3BbItI.png)](https://leafmap.org/maplibre/color_switcher)
 
+## Countries filter
+
+Utilize and refine data from the MapTiler Countries to create a Choropleth map of the US states.
+
+[![](https://i.imgur.com/k1d6k9I.png)](https://leafmap.org/maplibre/countries_filter)
+
 ## Customize marker icon image
 
 Use the icon-image property to change the icon image of a marker.
