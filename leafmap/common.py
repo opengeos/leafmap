@@ -5127,7 +5127,7 @@ def classify(
     # Convert categorical data to numeric
     init_column = None
     value_list = None
-    if np.issubdtype(df[column].dtype, np.object0):
+    if np.issubdtype(df[column].dtype, np.object_):
         value_list = df[column].unique().tolist()
         value_list.sort()
         df["category"] = df[column].replace(value_list, range(0, len(value_list)))
