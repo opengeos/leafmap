@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.35.x - July 9, 2024
+
+Reduce repo size
+
 ## v0.35.6 - Jul 3, 2024
 
 **What's Changed**
