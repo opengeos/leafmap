@@ -2718,7 +2718,7 @@ class Map(ipyleaflet.Map):
 
         style_callback_only = False
 
-        if len(style) == 0 and style_callback is not None:
+        if len(style) == 0:
             style_callback_only = True
 
         try:
