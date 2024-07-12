@@ -6184,7 +6184,7 @@ def layer_manager_gui(
 
             all_layers_chk.observe(all_layers_chk_changed, "value")
 
-            layers = [lyr for lyr in m.layers]
+            layers = [lyr for lyr in m.layers if lyr.name]
 
             # if the layers contain unsupported layers (e.g., GeoJSON, GeoData), adds the ipyleaflet built-in LayerControl
             if len(layers) < (len(m.layers) - 1):
