@@ -14,7 +14,7 @@ import folium
 import ipyleaflet
 import ipywidgets as widgets
 import whitebox
-from typing import Union, List, Dict, Optional, Tuple, Optional
+from typing import Union, List, Dict, Optional, Tuple
 from .stac import *
 
 try:
