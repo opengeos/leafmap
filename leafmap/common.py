@@ -75,7 +75,9 @@ def _is_drive_mounted() -> bool:
         return False
 
 
-def set_proxy(port: Optional[int] = 1080, ip: Optional[str] = "http://127.0.0.1"):
+def set_proxy(
+    port: Optional[int] = 1080, ip: Optional[str] = "http://127.0.0.1"
+) -> None:
     """Sets proxy if needed. This is only needed for countries where Google services are not available.
 
     Args:
@@ -102,7 +104,7 @@ def set_proxy(port: Optional[int] = 1080, ip: Optional[str] = "http://127.0.0.1"
         raise Exception(e)
 
 
-def _check_install(package: str):
+def _check_install(package: str) -> None:
     """Checks whether a package is installed. If not, it will install the package.
 
     Args:
@@ -123,7 +125,7 @@ def _check_install(package: str):
         print("{} has been installed successfully.".format(package))
 
 
-def update_package():
+def update_package() -> None:
     """Updates the leafmap package from the leafmap GitHub repository without the need to use pip or conda.
     In this way, I don't have to keep updating pypi and conda-forge with every minor update of the package.
 
@@ -155,7 +157,7 @@ def update_package():
         raise Exception(e)
 
 
-def check_package(name: str, URL: Optional[str] = ""):
+def check_package(name: str, URL: Optional[str] = "") -> None:
     try:
         __import__(name.lower())
     except Exception:
@@ -164,7 +166,7 @@ def check_package(name: str, URL: Optional[str] = ""):
         )
 
 
-def _clone_repo(out_dir: Optional[str] = ".", unzip: Optional[bool] = True):
+def _clone_repo(out_dir: Optional[str] = ".", unzip: Optional[bool] = True) -> None:
     """Clones the leafmap GitHub repository.
 
     Args:
@@ -176,7 +178,7 @@ def _clone_repo(out_dir: Optional[str] = ".", unzip: Optional[bool] = True):
     download_from_url(url, out_file_name=filename, out_dir=out_dir, unzip=unzip)
 
 
-def __install_from_github(url: str):
+def __install_from_github(url: str) -> None:
     """Install a package from a GitHub repository.
 
     Args:
@@ -234,7 +236,7 @@ def _check_git_install() -> bool:
         return False
 
 
-def _clone_github_repo(url: str, out_dir: str):
+def _clone_github_repo(url: str, out_dir: str) -> None:
     """Clones a GitHub repository.
 
     Args:
@@ -269,10 +271,12 @@ def _clone_github_repo(url: str, out_dir: str):
     os.remove(out_file_path)
 
 
-def _is_tool(name: str):
+def _is_tool(name: str) -> Optional[bool]:
     """Check whether `name` is on PATH and marked as executable."""
-
-    return shutil.which(name) is not None
+    try:
+        return shutil.which(name) is not None
+    except FileNotFoundError:
+        return None
 
 
 def random_string(string_length: Optional[int] = 3) -> str:
