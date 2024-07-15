@@ -46,7 +46,7 @@ def get_palette(
     cmap_name: Optional[str] = None,
     n_class: Optional[int] = None,
     hashtag: Optional[bool] = False,
-) -> List:
+) -> List[str]:
     """Get a palette from a matplotlib colormap. See the list of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
     Args:
@@ -81,7 +81,7 @@ def get_colorbar(
     height: Optional[float] = 0.4,
     orientation: Optional[str] = "horizontal",
     discrete: Optional[bool] = False,
-):
+) -> None:
     """Creates a colorbar based on custom colors.
 
     Args:
@@ -135,7 +135,7 @@ def create_colormap(
     show_name: Optional[bool] = False,
     font_size: Optional[int] = 12,
     **kwargs
-):
+) -> None:
     """Plot a matplotlib colormap.
 
     Args:
@@ -204,7 +204,7 @@ def plot_colormap(
     show_name: Optional[bool] = False,
     font_size: Optional[int] = 12,
     **kwargs
-):
+) -> None:
     """Plot a matplotlib colormap.
 
     Args:
@@ -264,7 +264,7 @@ def plot_colormaps(
     height: Optional[float] = 0.4,
     return_fig: Optional[bool] = False,
     **kwargs
-):
+) -> None:
     """Plot all available colormaps.
 
     Args:
