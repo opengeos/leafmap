@@ -15,6 +15,11 @@ class TestColormaps(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures, if any."""
+        # self.__palette_dict: dict = {
+        #     "dem": ["#000000", "#FFFFFF"],
+        #     "ndvi": ["#00FF00", "#FF0000"],
+        #     "ndwi": ["#0000FF", "#00FFFF"],
+        # }
 
     def tearDown(self):
         """Tear down test fixtures, if any."""
@@ -31,6 +36,16 @@ class TestColormaps(unittest.TestCase):
         # test the function with an invalid palette
         # with self.assertRaises(ValueError):
         #     cm.get_palette("not_a_palette")
+
+    def test_invalid_colormap(self):
+        with self.assertRaises(KeyError):
+            cm.get_palette("invd", 5, True)
+
+    def test_colormap_with_n_class(self):
+        res = cm.get_palette("viridis", 5, False)
+        self.assertEqual(len(res), 5)
+        for color in res:
+            self.assertFalse(color.startswith("#"))
 
     # @patch("matplotlib.pyplot.show")
     # def test_get_colorbar(self, mock_show):
