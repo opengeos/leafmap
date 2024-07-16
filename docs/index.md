@@ -100,7 +100,7 @@ If you find **leafmap** useful in your research, please consider citing the foll
 
 ## Demo
 
-![](data/leafmap_demo.gif)
+![](https://assets.gishub.org/images/leafmap_demo.gif)
 
 ## YouTube Channel
 
