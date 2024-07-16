@@ -104,7 +104,7 @@ If you find **leafmap** useful in your research, please consider citing the foll
 
 ## Demo
 
-![](https://wetlands.io/file/images/leafmap_demo.gif)
+![](https://assets.gishub.org/images/leafmap_demo.gif)
 
 ## YouTube Channel
 
