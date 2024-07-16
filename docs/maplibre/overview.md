@@ -28,6 +28,12 @@ Create a 3D indoor map with the fill-extrude-height paint property.
 
 [![](https://i.imgur.com/eYhSWaT.png)](https://leafmap.org/maplibre/3d_indoor_mapping)
 
+## Visualize PMTiles in 3D
+
+Visualize polygons from a PMTiles source in 3D.
+
+[![](https://i.imgur.com/113bGei.png)](https://leafmap.org/maplibre/3d_pmtiles)
+
 ## Construct 3D map styles with MapTiler
 
 [![](https://i.imgur.com/3Q2Q3CG.png)](https://leafmap.org/maplibre/3d_style)
