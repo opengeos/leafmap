@@ -211,7 +211,7 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-    def add(self, object, index=None, **kwargs):
+    def add(self, object, index=None, **kwargs) -> None:
         """Adds a layer to the map.
 
         Args:
@@ -248,7 +248,7 @@ class Map(ipyleaflet.Map):
         if hasattr(self, "layer_manager_widget"):
             self.update_layer_manager()
 
-    def set_center(self, lon, lat, zoom=None):
+    def set_center(self, lon, lat, zoom=None) -> None:
         """Centers the map view at a given coordinates with the given zoom level.
 
         Args:
@@ -260,7 +260,7 @@ class Map(ipyleaflet.Map):
         if zoom is not None:
             self.zoom = zoom
 
-    def zoom_to_bounds(self, bounds):
+    def zoom_to_bounds(self, bounds) -> None:
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
 
         Args:
@@ -278,7 +278,7 @@ class Map(ipyleaflet.Map):
         bounds = gdf.total_bounds
         self.zoom_to_bounds(bounds)
 
-    def get_scale(self):
+    def get_scale(self) -> float:
         """Returns the approximate pixel scale of the current map view, in meters.
 
         Returns:
@@ -291,7 +291,7 @@ class Map(ipyleaflet.Map):
         resolution = 156543.04 * math.cos(0) / math.pow(2, zoom_level)
         return resolution
 
-    def get_layer_names(self):
+    def get_layer_names(self) -> list:
         """Gets layer names as a list.
 
         Returns:
@@ -305,7 +305,7 @@ class Map(ipyleaflet.Map):
 
         return layer_names
 
-    def add_marker(self, location, **kwargs):
+    def add_marker(self, location, **kwargs) -> None:
         """Adds a marker to the map. More info about marker at https://ipyleaflet.readthedocs.io/en/latest/api_reference/marker.html.
 
         Args:
@@ -321,7 +321,7 @@ class Map(ipyleaflet.Map):
         else:
             raise TypeError("The location must be a list or a tuple.")
 
-    def add_basemap(self, basemap="HYBRID", show=True, **kwargs):
+    def add_basemap(self, basemap="HYBRID", show=True, **kwargs) -> None:
         """Adds a basemap to the map.
 
         Args:
@@ -402,7 +402,7 @@ class Map(ipyleaflet.Map):
                 return layer
         return None
 
-    def find_layer_index(self, name):
+    def find_layer_index(self, name) -> int:
         """Finds layer index by name
 
         Args:
@@ -419,7 +419,7 @@ class Map(ipyleaflet.Map):
 
         return -1
 
-    def add_layer(self, layer):
+    def add_layer(self, layer) -> None:
         """Adds a layer to the map.
 
         Args:
@@ -478,7 +478,7 @@ class Map(ipyleaflet.Map):
         else:
             print(f"The provided EE tile layer {asset_id} does not exist.")
 
-    def add_layer_control(self, position="topright"):
+    def add_layer_control(self, position="topright") -> None:
         """Adds a layer control to the map.
 
         Args:
@@ -487,7 +487,7 @@ class Map(ipyleaflet.Map):
 
         self.add(ipyleaflet.LayersControl(position=position))
 
-    def layer_opacity(self, name, value=1.0):
+    def layer_opacity(self, name, value=1.0) -> None:
         """Changes layer opacity.
 
         Args:
@@ -511,7 +511,7 @@ class Map(ipyleaflet.Map):
         opacity=1.0,
         shown=True,
         **kwargs,
-    ):
+    ) -> None:
         """Add a WMS layer to the map.
 
         Args:
@@ -555,7 +555,7 @@ class Map(ipyleaflet.Map):
         shown=True,
         layer_index=None,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a TileLayer to the map.
 
         Args:
@@ -593,7 +593,7 @@ class Map(ipyleaflet.Map):
         styles: Optional[dict] = {},
         layer_name: Optional[str] = "Vector Tile",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a VectorTileLayer to the map. It wraps the ipyleaflet.VectorTileLayer class. See
             https://ipyleaflet.readthedocs.io/en/latest/layers/vector_tile.html
 
@@ -629,7 +629,7 @@ class Map(ipyleaflet.Map):
         show=True,
         zoom_to_layer=True,
         **kwargs,
-    ):
+    ) -> None:
         """
         Adds a PMTiles layer to the map. This function is not officially supported yet by ipyleaflet yet.
         Install it with the following command:
@@ -686,7 +686,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM data of place(s) by name or ID to the map.
 
         Args:
@@ -730,7 +730,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM entities within some distance N, S, E, W of address to the map.
 
         Args:
@@ -771,7 +771,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM entities within boundaries of geocodable place(s) to the map.
 
         Args:
@@ -812,7 +812,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM entities within some distance N, S, E, W of a point to the map.
 
         Args:
@@ -851,7 +851,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM entities within boundaries of a (multi)polygon to the map.
 
         Args:
@@ -892,7 +892,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM entities within a N, S, E, W bounding box to the map.
 
 
@@ -933,7 +933,7 @@ class Map(ipyleaflet.Map):
         style_callback=None,
         fill_colors=["black"],
         info_mode="on_hover",
-    ):
+    ) -> None:
         """Adds OSM entities within the current map view to the map.
 
         Args:
@@ -985,7 +985,7 @@ class Map(ipyleaflet.Map):
         zoom_to_layer=True,
         layer_index=None,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a COG TileLayer to the map.
 
         Args:
@@ -1070,12 +1070,12 @@ class Map(ipyleaflet.Map):
         }
         self.cog_layer_dict[name] = params
 
-    def add_cog_mosaic(self, **kwargs):
+    def add_cog_mosaic(self, **kwargs) -> None:
         raise NotImplementedError(
             "This function is no longer supported.See https://github.com/opengeos/leafmap/issues/180."
         )
 
-    def add_cog_mosaic_from_file(self, **kwargs):
+    def add_cog_mosaic_from_file(self, **kwargs) -> None:
         raise NotImplementedError(
             "This function is no longer supported.See https://github.com/opengeos/leafmap/issues/180."
         )
@@ -1095,7 +1095,7 @@ class Map(ipyleaflet.Map):
         fit_bounds=True,
         layer_index=None,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a STAC TileLayer to the map.
 
         Args:
@@ -1177,7 +1177,7 @@ class Map(ipyleaflet.Map):
         opacity=1.0,
         shown=True,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a STAC TileLayer to the map.
 
         Args:
@@ -1267,7 +1267,7 @@ class Map(ipyleaflet.Map):
         opacity=1.0,
         layer_name="Circle Markers",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a marker cluster to the map. For a list of options, see https://ipyleaflet.readthedocs.io/en/latest/_modules/ipyleaflet/leaflet.html#Path
 
         Args:
@@ -1469,23 +1469,23 @@ class Map(ipyleaflet.Map):
 
     def split_map(
         self,
-        left_layer="TERRAIN",
-        right_layer="OpenTopoMap",
-        left_args={},
-        right_args={},
-        left_array_args={},
-        right_array_args={},
-        zoom_control=True,
-        fullscreen_control=True,
-        layer_control=True,
-        add_close_button=False,
-        left_label=None,
-        right_label=None,
-        left_position="bottomleft",
-        right_position="bottomright",
-        widget_layout=None,
-        draggable=True,
-    ):
+        left_layer: Optional[str] = "TERRAIN",
+        right_layer: Optional[str] = "OpenTopoMap",
+        left_args: Optional[dict] = {},
+        right_args: Optional[dict] = {},
+        left_array_args: Optional[dict] = {},
+        right_array_args: Optional[dict] = {},
+        zoom_control: Optional[bool] = True,
+        fullscreen_control: Optional[bool] = True,
+        layer_control: Optional[bool] = True,
+        add_close_button: Optional[bool] = False,
+        left_label: Optional[str] = None,
+        right_label: Optional[str] = None,
+        left_position: Optional[str] = "bottomleft",
+        right_position: Optional[str] = "bottomright",
+        widget_layout: Optional[dict] = None,
+        draggable: Optional[bool] = True,
+    ) -> None:
         """Adds split map.
 
         Args:
@@ -1750,7 +1750,7 @@ class Map(ipyleaflet.Map):
             print("The provided layers are invalid!")
             raise ValueError(e)
 
-    def basemap_demo(self):
+    def basemap_demo(self) -> None:
         """A demo for using leafmap basemaps."""
         dropdown = widgets.Dropdown(
             options=list(basemaps.keys()),
@@ -1769,15 +1769,15 @@ class Map(ipyleaflet.Map):
 
     def add_legend(
         self,
-        title="Legend",
-        legend_dict=None,
-        labels=None,
-        colors=None,
-        position="bottomright",
-        builtin_legend=None,
-        layer_name=None,
+        title: Optional[str] = "Legend",
+        legend_dict: Optional[dict] = None,
+        labels: Optional[list] = None,
+        colors: Optional[list] = None,
+        position: Optional[str] = "bottomright",
+        builtin_legend: Optional[str] = None,
+        layer_name: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a customized basemap to the map.
 
         Args:
@@ -1958,18 +1958,18 @@ class Map(ipyleaflet.Map):
 
     def add_colorbar(
         self,
-        colors,
-        vmin=0,
-        vmax=1.0,
-        index=None,
-        caption="",
-        categorical=False,
-        step=None,
-        height="45px",
-        transparent_bg=False,
-        position="bottomright",
+        colors: Union[list[int], tuple[int]],
+        vmin: Optional[int] = 0,
+        vmax: Optional[float] = 1.0,
+        index: Optional[list] = None,
+        caption: Optional[str] = "",
+        categorical: Optional[bool] = False,
+        step: Optional[int] = None,
+        height: Optional[str] = "45px",
+        transparent_bg: Optional[bool] = False,
+        position: Optional[str] = "bottomright",
         **kwargs,
-    ):
+    ) -> None:
         """Add a branca colorbar to the map.
 
         Args:
@@ -2031,22 +2031,22 @@ class Map(ipyleaflet.Map):
 
     def add_colormap(
         self,
-        cmap="gray",
-        colors=None,
-        discrete=False,
-        label=None,
-        width=3,
-        height=0.25,
-        orientation="horizontal",
-        vmin=0,
-        vmax=1.0,
-        axis_off=False,
-        show_name=False,
-        font_size=8,
-        transparent_bg=False,
-        position="bottomright",
+        cmap: Optional[str] = "gray",
+        colors: Optional[list] = None,
+        discrete: Optional[bool] = False,
+        label: Optional[str] = None,
+        width: Optional[float] = 3,
+        height: Optional[float] = 0.25,
+        orientation: Optional[str] = "horizontal",
+        vmin: Optional[float] = 0,
+        vmax: Optional[float] = 1.0,
+        axis_off: Optional[bool] = False,
+        show_name: Optional[bool] = False,
+        font_size: Optional[int] = 8,
+        transparent_bg: Optional[bool] = False,
+        position: Optional[str] = "bottomright",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a matplotlib colormap to the map.
 
         Args:
@@ -2095,7 +2095,7 @@ class Map(ipyleaflet.Map):
         self.colorbar = colormap_ctrl
         self.add(colormap_ctrl)
 
-    def image_overlay(self, url, bounds, name):
+    def image_overlay(self, url: str, bounds: str, name: str) -> None:
         """Overlays an image from the Internet or locally on the map.
 
         Args:
@@ -2144,7 +2144,9 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
-    def video_overlay(self, url, bounds, layer_name=None, **kwargs):
+    def video_overlay(
+        self, url: str, bounds: Tuple, layer_name: str = None, **kwargs
+    ) -> None:
         """Overlays a video from the Internet on the map.
 
         Args:
@@ -2162,13 +2164,13 @@ class Map(ipyleaflet.Map):
 
     def to_html(
         self,
-        outfile=None,
-        title="My Map",
-        width="100%",
-        height="880px",
-        add_layer_control=True,
+        outfile: Optional[str] = None,
+        title: Optional[str] = "My Map",
+        width: Optional[str] = "100%",
+        height: Optional[str] = "880px",
+        add_layer_control: Optional[bool] = True,
         **kwargs,
-    ):
+    ) -> None:
         """Saves the map as an HTML file.
 
         Args:
@@ -2235,7 +2237,9 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
-    def to_image(self, outfile=None, monitor=1):
+    def to_image(
+        self, outfile: Optional[str] = None, monitor: Optional[int] = 1
+    ) -> None:
         """Saves the map as a PNG or JPG image.
 
         Args:
@@ -2258,7 +2262,13 @@ class Map(ipyleaflet.Map):
         screenshot = screen_capture(outfile, monitor)
         self.screenshot = screenshot
 
-    def to_streamlit(self, width=None, height=600, scrolling=False, **kwargs):
+    def to_streamlit(
+        self,
+        width: Optional[int] = None,
+        height: Optional[int] = 600,
+        scrolling: Optional[bool] = False,
+        **kwargs,
+    ):
         """Renders map figure in a Streamlit app.
 
         Args:
@@ -2288,7 +2298,7 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
-    def toolbar_reset(self):
+    def toolbar_reset(self) -> None:
         """Reset the toolbar so that no tool is selected."""
         toolbar_grid = self.toolbar
         for tool in toolbar_grid.children:
@@ -2296,22 +2306,22 @@ class Map(ipyleaflet.Map):
 
     def add_raster(
         self,
-        source,
-        indexes=None,
-        colormap=None,
-        vmin=None,
-        vmax=None,
-        nodata=None,
-        attribution=None,
-        layer_name="Raster",
-        layer_index=None,
-        zoom_to_layer=True,
-        visible=True,
-        opacity=1.0,
-        array_args={},
-        client_args={"cors_all": False},
+        source: str,
+        indexes: Optional[int] = None,
+        colormap: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = "Raster",
+        layer_index: Optional[int] = None,
+        zoom_to_layer: Optional[bool] = True,
+        visible: Optional[bool] = True,
+        opacity: Optional[float] = 1.0,
+        array_args: Optional[Dict] = {},
+        client_args: Optional[Dict] = {"cors_all": False},
         **kwargs,
-    ):
+    ) -> None:
         """Add a local raster dataset to the map.
             If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
             if the raster does not render properly, try installing jupyter-server-proxy using `pip install jupyter-server-proxy`,
@@ -2406,16 +2416,16 @@ class Map(ipyleaflet.Map):
 
     def add_remote_tile(
         self,
-        source,
-        band=None,
-        palette=None,
-        vmin=None,
-        vmax=None,
-        nodata=None,
-        attribution=None,
-        layer_name=None,
+        source: str,
+        band: Optional[int] = None,
+        palette: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> None:
         """Add a remote Cloud Optimized GeoTIFF (COG) to the map.
 
         Args:
@@ -2445,22 +2455,22 @@ class Map(ipyleaflet.Map):
 
     def add_netcdf(
         self,
-        filename,
-        variables=None,
-        palette=None,
-        vmin=None,
-        vmax=None,
-        nodata=None,
-        attribution=None,
-        layer_name="NetCDF layer",
-        shift_lon=True,
-        lat="lat",
-        lon="lon",
-        lev="lev",
-        level_index=0,
-        time=0,
+        filename: str,
+        variables: Optional[int] = None,
+        palette: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = "NetCDF layer",
+        shift_lon: Optional[bool] = True,
+        lat: Optional[str] = "lat",
+        lon: Optional[str] = "lon",
+        lev: Optional[str] = "lev",
+        level_index: Optional[int] = 0,
+        time: Optional[int] = 0,
         **kwargs,
-    ):
+    ) -> None:
         """Generate an ipyleaflet/folium TileLayer from a netCDF file.
             If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer),
             try adding to following two lines to the beginning of the notebook if the raster does not render properly.
@@ -2522,14 +2532,14 @@ class Map(ipyleaflet.Map):
 
     def add_raster_legacy(
         self,
-        image,
-        bands=None,
-        layer_name=None,
-        colormap=None,
-        x_dim="x",
-        y_dim="y",
-        fit_bounds=True,
-    ):
+        image: str,
+        bands: Optional[Union[int, list]] = None,
+        layer_name: Optional[str] = None,
+        colormap: Optional[str] = None,
+        x_dim: Optional[str] = "x",
+        y_dim: Optional[str] = "y",
+        fit_bounds: Optional[bool] = True,
+    ) -> None:
         """Adds a local raster dataset to the map.
 
         Args:
@@ -2622,16 +2632,16 @@ class Map(ipyleaflet.Map):
 
     def add_shp(
         self,
-        in_shp,
-        layer_name="Untitled",
-        style={},
-        hover_style={},
-        style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",
-        zoom_to_layer=False,
-        encoding="utf-8",
-    ):
+        in_shp: str,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[Dict] = {},
+        hover_style: Optional[Dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[list[str]] = ["black"],
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = False,
+        encoding: Optional[str] = "utf-8",
+    ) -> None:
         """Adds a shapefile to the map.
 
         Args:
@@ -2685,17 +2695,17 @@ class Map(ipyleaflet.Map):
 
     def add_geojson(
         self,
-        in_geojson,
-        layer_name="Untitled",
-        style={},
-        hover_style={},
-        style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",
-        zoom_to_layer=False,
-        encoding="utf-8",
+        in_geojson: Union[str, Dict],
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[list[str]] = ["black"],
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = False,
+        encoding: Optional[str] = "utf-8",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a GeoJSON file to the map.
 
         Args:
@@ -2914,8 +2924,13 @@ class Map(ipyleaflet.Map):
                 print(e)
 
     def add_search_control(
-        self, url, marker=None, zoom=None, position="topleft", **kwargs
-    ):
+        self,
+        url: str,
+        marker: Optional[ipyleaflet.Marker] = None,
+        zoom: Optional[int] = None,
+        position: Optional[str] = "topleft",
+        **kwargs,
+    ) -> None:
         """Adds a search control to the map.
 
         Args:
@@ -2943,16 +2958,16 @@ class Map(ipyleaflet.Map):
     def add_gdf(
         self,
         gdf,
-        layer_name="Untitled",
-        style={},
-        hover_style={},
-        style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",
-        zoom_to_layer=False,
-        encoding="utf-8",
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[list[str]] = ["black"],
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = False,
+        encoding: Optional[str] = "utf-8",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a GeoDataFrame to the map.
 
         Args:
@@ -3000,17 +3015,17 @@ class Map(ipyleaflet.Map):
 
     def add_gdf_from_postgis(
         self,
-        sql,
+        sql: str,
         con,
-        layer_name="Untitled",
-        style={},
-        hover_style={},
-        style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",
-        zoom_to_layer=True,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[list[str]] = ["black"],
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = True,
         **kwargs,
-    ):
+    ) -> None:
         """Reads a PostGIS database and returns data as a GeoDataFrame to be added to the map.
 
         Args:
@@ -3039,14 +3054,14 @@ class Map(ipyleaflet.Map):
 
     def add_kml(
         self,
-        in_kml,
-        layer_name="Untitled",
-        style={},
-        hover_style={},
-        style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",
-    ):
+        in_kml: str,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[list[str]] = ["black"],
+        info_mode: Optional[str] = "on_hover",
+    ) -> None:
         """Adds a KML file to the map.
 
         Args:
@@ -3086,20 +3101,20 @@ class Map(ipyleaflet.Map):
 
     def add_vector(
         self,
-        filename,
-        layer_name="Untitled",
-        bbox=None,
-        mask=None,
-        rows=None,
-        style={},
-        hover_style={},
-        style_callback=None,
-        fill_colors=["black"],
-        info_mode="on_hover",
-        zoom_to_layer=False,
-        encoding="utf-8",
+        filename: str,
+        layer_name: Optional[str] = "Untitled",
+        bbox: Optional[tuple] = None,
+        mask: Optional[dict] = None,
+        rows: Optional[tuple[int]] = None,
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: list[str] = ["black"],
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = False,
+        encoding: Optional[str] = "utf-8",
         **kwargs,
-    ):
+    ) -> None:
         """Adds any geopandas-supported vector dataset to the map.
 
         Args:
@@ -3168,12 +3183,12 @@ class Map(ipyleaflet.Map):
 
     def add_xy_data(
         self,
-        in_csv,
-        x="longitude",
-        y="latitude",
-        label=None,
-        layer_name="Marker cluster",
-    ):
+        in_csv: str,
+        x: Optional[str] = "longitude",
+        y: Optional[str] = "latitude",
+        label: Optional[str] = None,
+        layer_name: Optional[str] = "Marker cluster",
+    ) -> None:
         """Adds points from a CSV file containing lat/lon information and display data on the map.
 
         Args:
@@ -3236,8 +3251,12 @@ class Map(ipyleaflet.Map):
         self.default_style = {"cursor": "default"}
 
     def add_point_layer(
-        self, filename, popup=None, layer_name="Marker Cluster", **kwargs
-    ):
+        self,
+        filename: str,
+        popup: Optional[Union[list, str]] = None,
+        layer_name: Optional[str] = "Marker Cluster",
+        **kwargs,
+    ) -> None:
         """Adds a point layer to the map with a popup attribute.
 
         Args:
@@ -3329,20 +3348,20 @@ class Map(ipyleaflet.Map):
 
     def add_points_from_xy(
         self,
-        data,
-        x="longitude",
-        y="latitude",
-        popup=None,
-        layer_name="Marker Cluster",
-        color_column=None,
-        marker_colors=None,
-        icon_colors=["white"],
-        icon_names=["info"],
-        spin=False,
-        add_legend=True,
-        max_cluster_radius=80,
+        data: Optional[Union[pd.DataFrame, str]],
+        x: Optional[str] = "longitude",
+        y: Optional[str] = "latitude",
+        popup: Optional[list] = None,
+        layer_name: Optional[str] = "Marker Cluster",
+        color_column: Optional[str] = None,
+        marker_colors: Optional[str] = None,
+        icon_colors: Optional[list[str]] = ["white"],
+        icon_names: Optional[list[str]] = ["info"],
+        spin: Optional[bool] = False,
+        add_legend: Optional[bool] = True,
+        max_cluster_radius: Optional[int] = 80,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a marker cluster to the map.
 
         Args:
@@ -3575,14 +3594,14 @@ class Map(ipyleaflet.Map):
 
     def add_heatmap(
         self,
-        data,
-        latitude="latitude",
-        longitude="longitude",
-        value="value",
-        name="Heat map",
-        radius=25,
+        data: Union[str, list, pd.DataFrame],
+        latitude: Optional[str] = "latitude",
+        longitude: Optional[str] = "longitude",
+        value: Optional[str] = "value",
+        name: Optional[str] = "Heat map",
+        radius: Optional[int] = 25,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a heat map to the map. Reference: https://ipyleaflet.readthedocs.io/en/latest/api_reference/heatmap.html
 
         Args:
@@ -3618,16 +3637,16 @@ class Map(ipyleaflet.Map):
 
     def add_labels(
         self,
-        data,
-        column,
-        font_size="12pt",
-        font_color="black",
-        font_family="arial",
-        font_weight="normal",
-        x="longitude",
-        y="latitude",
-        draggable=True,
-        layer_name="Labels",
+        data: Union[str, pd.DataFrame],
+        column: str,
+        font_size: Optional[str] = "12pt",
+        font_color: Optional[str] = "black",
+        font_family: Optional[str] = "arial",
+        font_weight: Optional[str] = "normal",
+        x: Optional[str] = "longitude",
+        y: Optional[str] = "latitude",
+        draggable: Optional[bool] = True,
+        layer_name: Optional[str] = "Labels",
         **kwargs,
     ):
         """Adds a label layer to the map. Reference: https://ipyleaflet.readthedocs.io/en/latest/api_reference/divicon.html
@@ -3714,13 +3733,13 @@ class Map(ipyleaflet.Map):
 
     def add_planet_by_month(
         self,
-        year=2016,
-        month=1,
-        layer_name=None,
-        api_key=None,
-        token_name="PLANET_API_KEY",
+        year: Optional[int] = 2016,
+        month: Optional[int] = 1,
+        layer_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        token_name: Optional[str] = "PLANET_API_KEY",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
 
         Args:
@@ -3737,13 +3756,13 @@ class Map(ipyleaflet.Map):
 
     def add_planet_by_quarter(
         self,
-        year=2016,
-        quarter=1,
-        layer_name=None,
-        api_key=None,
-        token_name="PLANET_API_KEY",
+        year: Optional[int] = 2016,
+        quarter: Optional[int] = 1,
+        layer_name: Optional[str] = None,
+        api_key: Optional[str] = None,
+        token_name: Optional[str] = "PLANET_API_KEY",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a Planet global mosaic by quarter to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis
 
         Args:
@@ -3760,14 +3779,14 @@ class Map(ipyleaflet.Map):
 
     def add_time_slider(
         self,
-        layers={},
-        labels=None,
-        time_interval=1,
-        position="bottomright",
-        slider_length="150px",
-        zoom_to_layer=False,
+        layers: dict = {},
+        labels: list = None,
+        time_interval: int = 1,
+        position: str = "bottomright",
+        slider_length: str = "150px",
+        zoom_to_layer: Optional[bool] = False,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a time slider to the map.
 
         Args:
@@ -3792,7 +3811,13 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
-    def static_map(self, width=950, height=600, out_file=None, **kwargs):
+    def static_map(
+        self,
+        width: int = 950,
+        height: int = 600,
+        out_file: Optional[str] = None,
+        **kwargs,
+    ) -> None:
         """Display an ipyleaflet static map in a Jupyter Notebook.
 
         Args
@@ -3814,7 +3839,9 @@ class Map(ipyleaflet.Map):
         else:
             raise TypeError("The provided map is not an ipyleaflet map.")
 
-    def add_census_data(self, wms, layer, census_dict=None, **kwargs):
+    def add_census_data(
+        self, wms: str, layer: str, census_dict: Optional[dict] = None, **kwargs
+    ) -> None:
         """Adds a census data layer to the map.
 
         Args:
@@ -3853,7 +3880,7 @@ class Map(ipyleaflet.Map):
         except Exception as e:
             raise Exception(e)
 
-    def add_xyz_service(self, provider, **kwargs):
+    def add_xyz_service(self, provider: str, **kwargs) -> None:
         """Add a XYZ tile layer to the map.
 
         Args:
@@ -3886,15 +3913,24 @@ class Map(ipyleaflet.Map):
                 f"The provider {provider} is not valid. It must start with xyz or qms."
             )
 
-    def add_title(self, title, align="center", font_size="16px", style=None, **kwargs):
+    def add_title(
+        self,
+        title: str,
+        align: str = "center",
+        font_size: str = "16px",
+        style=None,
+        **kwargs,
+    ) -> None:
         print("The ipyleaflet map does not support titles.")
 
-    def get_pc_collections(self):
+    def get_pc_collections(self) -> None:
         """Get the list of Microsoft Planetary Computer collections."""
         if not hasattr(self, "pc_collections"):
             setattr(self, "pc_collections", get_pc_collections())
 
-    def save_draw_features(self, out_file, indent=4, crs="epsg:4326", **kwargs):
+    def save_draw_features(
+        self, out_file: str, indent: int = 4, crs: Optional[str] = "epsg:4326", **kwargs
+    ) -> None:
         """Save the draw features to a file.
 
         Args:
@@ -3916,7 +3952,7 @@ class Map(ipyleaflet.Map):
         gdf.crs = "epsg:4326"
         gdf.to_crs(crs).to_file(out_file, **kwargs)
 
-    def update_draw_features(self):
+    def update_draw_features(self) -> None:
         """Update the draw features by removing features that have been edited and no longer exist."""
 
         geometries = [feature["geometry"] for feature in self.draw_control.data]
@@ -3925,7 +3961,9 @@ class Map(ipyleaflet.Map):
             if feature["geometry"] not in geometries:
                 self.draw_features.remove(feature)
 
-    def get_draw_props(self, n=None, return_df=False):
+    def get_draw_props(
+        self, n: Optional[int] = None, return_df: bool = False
+    ) -> pd.DataFrame:
         """Get the properties of the draw features.
 
         Args:
@@ -3956,7 +3994,7 @@ class Map(ipyleaflet.Map):
         else:
             return props
 
-    def update_draw_props(self, df):
+    def update_draw_props(self, df: pd.DataFrame) -> None:
         """Update the draw features properties.
 
         Args:
@@ -3983,7 +4021,7 @@ class Map(ipyleaflet.Map):
                 if prop not in self.edit_props:
                     self.edit_props.append(prop)
 
-    def edit_vector(self, data, **kwargs):
+    def edit_vector(self, data: Union[dict, str], **kwargs) -> None:
         """Edit a vector layer.
 
         Args:
@@ -4006,20 +4044,20 @@ class Map(ipyleaflet.Map):
 
     def add_velocity(
         self,
-        data,
-        zonal_speed,
-        meridional_speed,
-        latitude_dimension="lat",
-        longitude_dimension="lon",
-        level_dimension="lev",
-        level_index=0,
-        time_index=0,
-        velocity_scale=0.01,
-        max_velocity=20,
-        display_options={},
-        name="Velocity",
-        color_scale=None,
-    ):
+        data: str,
+        zonal_speed: str,
+        meridional_speed: str,
+        latitude_dimension: str = "lat",
+        longitude_dimension: str = "lon",
+        level_dimension: Optional[str] = "lev",
+        level_index: int = 0,
+        time_index: int = 0,
+        velocity_scale: float = 0.01,
+        max_velocity: int = 20,
+        display_options: Optional[dict] = {},
+        name: Optional[str] = "Velocity",
+        color_scale: Optional[list] = None,
+    ) -> None:
         """Add a velocity layer to the map.
 
         Args:
@@ -4105,28 +4143,28 @@ class Map(ipyleaflet.Map):
 
     def add_data(
         self,
-        data,
-        column,
-        colors=None,
-        labels=None,
-        cmap=None,
-        scheme="Quantiles",
-        k=5,
-        add_legend=True,
-        legend_title=None,
-        legend_position="bottomright",
-        legend_kwds=None,
-        classification_kwds=None,
-        layer_name="Untitled",
-        style=None,
-        hover_style=None,
-        style_callback=None,
-        marker_radius=10,
+        data: Union[str, pd.DataFrame],
+        column: str,
+        colors: Optional[str] = None,
+        labels: Optional[str] = None,
+        cmap: Optional[str] = None,
+        scheme: Optional[str] = "Quantiles",
+        k: int = 5,
+        add_legend: Optional[bool] = True,
+        legend_title: Optional[bool] = None,
+        legend_position: Optional[str] = "bottomright",
+        legend_kwds: Optional[dict] = None,
+        classification_kwds: Optional[dict] = None,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = None,
+        hover_style: Optional[dict] = None,
+        style_callback: Optional[dict] = None,
+        marker_radius: int = 10,
         marker_args=None,
-        info_mode="on_hover",
-        encoding="utf-8",
+        info_mode: Optional[str] = "on_hover",
+        encoding: Optional[str] = "utf-8",
         **kwargs,
-    ):
+    ) -> None:
         """Add vector data to the map with a variety of classification schemes.
 
         Args:
@@ -4258,7 +4296,7 @@ class Map(ipyleaflet.Map):
                 title=legend_title, legend_dict=legend_dict, position=legend_position
             )
 
-    def user_roi_bounds(self, decimals=4):
+    def user_roi_bounds(self, decimals: int = 4) -> list:
         """Get the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
 
         Args:
@@ -4274,18 +4312,18 @@ class Map(ipyleaflet.Map):
 
     def add_widget(
         self,
-        content,
-        position="bottomright",
-        add_header=False,
-        opened=True,
-        show_close_button=True,
-        widget_icon="gear",
-        close_button_icon="times",
-        widget_args={},
-        close_button_args={},
+        content: str,
+        position: Optional[str] = "bottomright",
+        add_header: Optional[bool] = False,
+        opened: Optional[bool] = True,
+        show_close_button: Optional[bool] = True,
+        widget_icon: Optional[str] = "gear",
+        close_button_icon: Optional[str] = "times",
+        widget_args: Optional[dict] = {},
+        close_button_args: Optional[dict] = {},
         display_widget=None,
         **kwargs,
-    ):
+    ) -> None:
         """Add a widget (e.g., text, HTML, figure) to the map.
 
         Args:
@@ -4364,7 +4402,9 @@ class Map(ipyleaflet.Map):
 
         self.add_widget(image, position=position)
 
-    def add_html(self, html, position="bottomright", **kwargs):
+    def add_html(
+        self, html: str, position: Optional[str] = "bottomright", **kwargs
+    ) -> None:
         """Add HTML to the map.
 
         Args:
@@ -4378,17 +4418,17 @@ class Map(ipyleaflet.Map):
 
     def add_text(
         self,
-        text,
-        fontsize=20,
-        fontcolor="black",
-        bold=False,
-        padding="5px",
-        background=True,
-        bg_color="white",
-        border_radius="5px",
-        position="bottomright",
+        text: str,
+        fontsize: int = 20,
+        fontcolor: int = "black",
+        bold: Optional[bool] = False,
+        padding: Optional[str] = "5px",
+        background: Optional[bool] = True,
+        bg_color: Optional[str] = "white",
+        border_radius: Optional[str] = "5px",
+        position: Optional[str] = "bottomright",
         **kwargs,
-    ):
+    ) -> None:
         """Add text to the map.
 
         Args:
@@ -4413,7 +4453,7 @@ class Map(ipyleaflet.Map):
 
         self.add_html(text, position=position, **kwargs)
 
-    def get_bbox(self):
+    def get_bbox(self) -> list:
         """Get the bounds of the map as a list of [(]minx, miny, maxx, maxy].
 
         Returns:
@@ -4425,15 +4465,15 @@ class Map(ipyleaflet.Map):
 
     def oam_search(
         self,
-        bbox=None,
-        start_date=None,
-        end_date=None,
-        limit=100,
-        info_mode="on_click",
-        layer_args={},
-        add_image=True,
+        bbox: Optional[Union[list, str]] = None,
+        start_date: str = None,
+        end_date: str = None,
+        limit: int = 100,
+        info_mode: str = "on_click",
+        layer_args: Optional[dict] = {},
+        add_image: Optional[bool] = True,
         **kwargs,
-    ):
+    ) -> None:
         """Search OpenAerialMap for images within a bounding box and time range.
 
         Args:
@@ -4501,7 +4541,7 @@ class Map(ipyleaflet.Map):
         else:
             print("No images found.")
 
-    def set_catalog_source(self, source):
+    def set_catalog_source(self, source: Optional[str]) -> None:
         """Set the catalog source.
 
         Args:
@@ -4517,14 +4557,16 @@ class Map(ipyleaflet.Map):
 
         self._STAC_CATALOGS = source
 
-    def clear_drawings(self):
+    def clear_drawings(self) -> None:
         """Clear drawings on the map."""
         self.draw_control.clear()
         self.draw_features = []
         self.user_rois = None
         self.user_roi = None
 
-    def add_layer_manager(self, position="topright", opened=True):
+    def add_layer_manager(
+        self, position: Optional[str] = "topright", opened: bool = True
+    ) -> None:
         """Add the Layer Manager to the map.
 
         Args:
@@ -4534,13 +4576,15 @@ class Map(ipyleaflet.Map):
 
         layer_manager_gui(self, position, opened)
 
-    def update_layer_manager(self):
+    def update_layer_manager(self) -> None:
         """Update the Layer Manager."""
         from .toolbar import layer_manager_gui
 
         self.layer_manager_widget.children = layer_manager_gui(self, return_widget=True)
 
-    def add_oam_gui(self, position="topright", opened=True):
+    def add_oam_gui(
+        self, position: Optional[str] = "topright", opened: bool = True
+    ) -> None:
         """Add the OpenAerialMap search widget to the map.
 
         Args:
@@ -4551,7 +4595,7 @@ class Map(ipyleaflet.Map):
 
         oam_search_gui(self, position, opened)
 
-    def add_stac_gui(self, position="topright", opened=True):
+    def add_stac_gui(self, position: str = "topright", opened: bool = True) -> None:
         """Add the STAC search widget to the map.
 
         Args:
@@ -4562,7 +4606,9 @@ class Map(ipyleaflet.Map):
 
         stac_gui(self, position, opened)
 
-    def add_inspector_gui(self, position="topright", opened=True):
+    def add_inspector_gui(
+        self, position: Optional[str] = "topright", opened: bool = True
+    ) -> None:
         """Add the Inspector widget to the map.
 
         Args:
@@ -4574,7 +4620,7 @@ class Map(ipyleaflet.Map):
 
         inspector_gui(self, position, opened)
 
-    def add_basemap_gui(self, position="topright"):
+    def add_basemap_gui(self, position: Optional[str] = "topright") -> None:
         """Add the basemap widget to the map.
 
         Args:
@@ -4679,13 +4725,13 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
 
 
 def linked_maps(
-    rows=2,
-    cols=2,
-    height="400px",
-    layers=[],
-    labels=[],
-    label_position="topright",
-    layer_args=[],
+    rows: int = 2,
+    cols: int = 2,
+    height: Optional[str] = "400px",
+    layers: list = [],
+    labels: list = [],
+    label_position: Optional[str] = "topright",
+    layer_args: list = [],
     **kwargs,
 ):
     """Create linked maps of XYZ tile layers.
@@ -4809,12 +4855,12 @@ def linked_maps(
 
 
 def split_map(
-    left_layer="TERRAIN",
-    right_layer="OpenTopoMap",
-    left_args={},
-    right_args={},
+    left_layer: Optional[str] = "TERRAIN",
+    right_layer: Optional[str] = "OpenTopoMap",
+    left_args: Optional[dict] = {},
+    right_args: Optional[dict] = {},
     **kwargs,
-):
+) -> None:
     """Adds split map.
 
     Args:
@@ -4974,12 +5020,12 @@ def split_map(
 
 
 def ts_inspector(
-    layers_dict=None,
-    left_name=None,
-    right_name=None,
-    width="120px",
-    center=[40, -100],
-    zoom=4,
+    layers_dict: Optional[dict] = None,
+    left_name: Optional[str] = None,
+    right_name: Optional[str] = None,
+    width: Optional[str] = "120px",
+    center: list[int] = [40, -100],
+    zoom: int = 4,
     **kwargs,
 ):
     """Creates a time series inspector.
@@ -5078,14 +5124,14 @@ def ts_inspector(
 
 
 def geojson_layer(
-    in_geojson,
-    layer_name="Untitled",
-    style={},
-    hover_style={},
-    style_callback=None,
-    fill_colors=["black"],
-    encoding="utf-8",
-):
+    in_geojson: Union[str, dict],
+    layer_name: str = "Untitled",
+    style: Optional[dict] = {},
+    hover_style: Optional[dict] = {},
+    style_callback: Optional[Callable] = None,
+    fill_colors: Optional[list[str]] = ["black"],
+    encoding: Optional[str] = "utf-8",
+) -> None:
     """Adds a GeoJSON file to the map.
 
     Args:
@@ -5177,7 +5223,7 @@ def geojson_layer(
     return geojson
 
 
-def get_basemap(name):
+def get_basemap(name: str):
     """Gets a basemap tile layer by name.
 
     Args:
