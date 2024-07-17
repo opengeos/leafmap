@@ -132,7 +132,7 @@ def cog_tile(
     bands: str = None,
     titiler_endpoint: Optional[str] = None,
     **kwargs,
-):
+) -> Tuple:
     """Get a tile layer from a Cloud Optimized GeoTIFF (COG).
         Source code adapted from https://developmentseed.org/titiler/examples/notebooks/Working_with_CloudOptimizedGeoTIFF_simple/
 
