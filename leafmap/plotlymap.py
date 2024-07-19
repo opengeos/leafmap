@@ -32,7 +32,7 @@ class Canvas:
         map_max_width: Optional[str] = "98%",
         map_refresh: Optional[bool] = False,
         **kwargs,
-    ):
+    ) -> None:
         """Initialize the Canvas.
 
         Args:
@@ -81,7 +81,7 @@ class Map(go.FigureWidget):
         basemap: Optional[str] = "open-street-map",
         height: Optional[int] = 600,
         **kwargs,
-    ):
+    ) -> None:
         """Initializes a map. More info at https://plotly.com/python/mapbox-layers/
 
         Args:
@@ -111,7 +111,7 @@ class Map(go.FigureWidget):
         map_max_width: Optional[str] = "98%",
         refresh: Optional[bool] = False,
         **kwargs,
-    ):
+    ) -> None:
         """Shows the map.
 
         Args:
@@ -145,7 +145,7 @@ class Map(go.FigureWidget):
         }
         self.show(toolbar=False, config=config)
 
-    def add_controls(self, controls: List):
+    def add_controls(self, controls: List) -> None:
         """Adds controls to the map.
 
         Args:
@@ -175,7 +175,7 @@ class Map(go.FigureWidget):
 
         self.update_layout(modebar_remove=controls)
 
-    def set_center(self, lat: float, lon: float, zoom: Optional[float] = None):
+    def set_center(self, lat: float, lon: float, zoom: Optional[float] = None) -> None:
         """Sets the center of the map.
 
         Args:
@@ -190,7 +190,7 @@ class Map(go.FigureWidget):
             )
         )
 
-    def add_basemap(self, basemap: Optional[str] = "ROADMAP"):
+    def add_basemap(self, basemap: Optional[str] = "ROADMAP") -> None:
         """Adds a basemap to the map.
 
         Args:
@@ -206,7 +206,7 @@ class Map(go.FigureWidget):
         layers = list(self.layout.mapbox.layers) + [basemaps[basemap]]
         self.update_layout(mapbox_layers=layers)
 
-    def remove_basemap(self, name: str):
+    def remove_basemap(self, name: str) -> None:
         """Removes a basemap from the map.
 
         Args:
@@ -216,7 +216,7 @@ class Map(go.FigureWidget):
         layers = [layer for layer in layers if layer["name"] != name]
         self.layout.mapbox.layers = layers
 
-    def add_mapbox_layer(self, style: Union[str, Dict], access_token=None):
+    def add_mapbox_layer(self, style: Union[str, Dict], access_token=None) -> None:
         """Adds a mapbox layer to the map.
 
         Args:
@@ -242,7 +242,7 @@ class Map(go.FigureWidget):
             layer.name = name
         self.add_trace(layer, **kwargs)
 
-    def remove_layer(self, name: str):
+    def remove_layer(self, name: str) -> None:
         """Removes a layer from the map.
 
         Args:
@@ -333,7 +333,7 @@ class Map(go.FigureWidget):
 
         return None
 
-    def set_layer_visibility(self, name: str, show: Optional[bool] = True):
+    def set_layer_visibility(self, name: str, show: Optional[bool] = True) -> None:
         """Sets the visibility of a layer.
 
         Args:
@@ -350,7 +350,7 @@ class Map(go.FigureWidget):
         else:
             print(f"Layer {name} not found.")
 
-    def set_layer_opacity(self, name: str, opacity: Optional[float] = 1):
+    def set_layer_opacity(self, name: str, opacity: Optional[float] = 1) -> None:
         """Sets the visibility of a layer.
 
         Args:
@@ -378,7 +378,7 @@ class Map(go.FigureWidget):
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a TileLayer to the map.
 
         Args:
@@ -408,7 +408,7 @@ class Map(go.FigureWidget):
         bands: Optional[List] = None,
         titiler_endpoint: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a COG TileLayer to the map.
 
         Args:
@@ -440,7 +440,7 @@ class Map(go.FigureWidget):
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a STAC TileLayer to the map.
 
         Args:
@@ -469,7 +469,7 @@ class Map(go.FigureWidget):
         attribution: Optional[str] = "",
         opacity: Optional[float] = 1.0,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a STAC TileLayer to the map.
 
         Args:
@@ -493,7 +493,7 @@ class Map(go.FigureWidget):
         name: Optional[str] = None,
         attribution: str = "",
         opacity: Optional[float] = 1.0,
-    ):
+    ) -> None:
         """Adds Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis/
 
         Args:
@@ -521,7 +521,7 @@ class Map(go.FigureWidget):
         name: Optional[str] = None,
         attribution: str = "",
         opacity: Optional[float] = 1.0,
-    ):
+    ) -> None:
         """Adds Planet global mosaic by month to the map. To get a Planet API key, see https://developers.planet.com/quickstart/apis/
 
         Args:
@@ -548,7 +548,7 @@ class Map(go.FigureWidget):
         height: Optional[int] = None,
         scale: Optional[int] = None,
         **kwargs,
-    ):
+    ) -> None:
         """Convert a map to a static image and write it to a file or writeable object
 
         Args:
@@ -569,7 +569,7 @@ class Map(go.FigureWidget):
         z: Optional[str] = None,
         colorscale: Optional[str] = "Viridis",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a choropleth map to the map.
 
         Args:
@@ -594,7 +594,7 @@ class Map(go.FigureWidget):
             **kwargs,
         )
 
-    def add_scatter_plot_demo(self, **kwargs):
+    def add_scatter_plot_demo(self, **kwargs) -> None:
         """Adds a scatter plot to the map."""
         lons = np.random.random(1000) * 360.0
         lats = np.random.random(1000) * 180.0 - 90.0
@@ -613,7 +613,7 @@ class Map(go.FigureWidget):
         colorscale: Optional[str] = None,
         name: Optional[str] = "Heat map",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a heat map to the map. Reference: https://plotly.com/python/mapbox-density-heatmaps
 
         Args:
@@ -645,7 +645,7 @@ class Map(go.FigureWidget):
         )
         self.add_trace(heatmap)
 
-    def add_heatmap_demo(self, **kwargs):
+    def add_heatmap_demo(self, **kwargs) -> None:
         """Adds a heatmap to the map."""
         quakes = pd.read_csv(
             "https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv"
@@ -764,7 +764,7 @@ class Map(go.FigureWidget):
         name: str,
         color: Optional[str] = "blue",
         opacity: Optional[float] = 1,
-    ):
+    ) -> None:
         """Prepare proper and give style for different type of Geometry
 
         Args:
@@ -809,7 +809,7 @@ class Map(go.FigureWidget):
         type: Optional[str],
         color: Optional[str],
         opacity: Optional[float],
-    ):
+    ) -> None:
         """Add layers to the Map
 
         Args:
@@ -835,7 +835,7 @@ class Map(go.FigureWidget):
         self.update_layout(mapbox={"layers": tuple(existing_layers)})
 
 
-def fix_widget_error():
+def fix_widget_error() -> None:
     """
     Fix FigureWidget - 'mapbox._derived' Value Error.
     Adopted from: https://github.com/plotly/plotly.py/issues/2570#issuecomment-738735816
