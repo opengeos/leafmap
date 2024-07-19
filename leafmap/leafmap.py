@@ -2369,19 +2369,11 @@ class Map(ipyleaflet.Map):
         tile_layer.visible = visible
 
         self.add(tile_layer, index=layer_index)
-        bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
-        bounds = (
-            bounds[2],
-            bounds[0],
-            bounds[3],
-            bounds[1],
-        )  # [minx, miny, maxx, maxy]
         if zoom_to_layer:
-            self.zoom_to_bounds(bounds)
+            self.center = tile_client.center()
+            self.zoom = tile_client.default_zoom
 
         arc_add_layer(tile_layer.url, layer_name, True, 1.0)
-        if zoom_to_layer:
-            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -2400,7 +2392,6 @@ class Map(ipyleaflet.Map):
             "indexes": indexes,
             "vis_bands": vis_bands,
             "band_names": tile_client.band_names,
-            "bounds": bounds,
             "vmin": vmin,
             "vmax": vmax,
             "nodata": nodata,

@@ -867,8 +867,21 @@ class RasterLayerEditor(ipywidgets.VBox):
 
         self._host_map.remove(old_layer)
 
+        if self._layer_dict["type"] == "LOCAL":
+            self._host_map.add_raster(
+                self._filename,
+                indexes=vis["indexes"],
+                colormap=vis["colormap"],
+                vmin=vis["vmin"],
+                vmax=vis["vmax"],
+                opacity=vis["opacity"],
+                nodata=self._nodata,
+                layer_name=self._layer_name,
+                zoom_to_layer=False,
+                layer_index=layer_index,
+            )
         # Add support for hyperspectral data via HyperCoast
-        if self._xds is not None:
+        elif self._xds is not None:
             self._host_map.add_hyper(
                 self._xds,
                 type=self._layer_dict["hyper"],
@@ -905,19 +918,6 @@ class RasterLayerEditor(ipywidgets.VBox):
                 opacity=vis["opacity"],
                 name=self._layer_name,
                 fit_bounds=False,
-                layer_index=layer_index,
-            )
-        else:
-            self._host_map.add_raster(
-                self._filename,
-                indexes=vis["indexes"],
-                colormap=vis["colormap"],
-                vmin=vis["vmin"],
-                vmax=vis["vmax"],
-                opacity=vis["opacity"],
-                nodata=self._nodata,
-                layer_name=self._layer_name,
-                zoom_to_layer=False,
                 layer_index=layer_index,
             )
 
