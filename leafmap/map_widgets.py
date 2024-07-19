@@ -434,7 +434,7 @@ class LayerEditor(ipywidgets.VBox):
         )
         self._embedded_widget = ipywidgets.Label(value="Vis params are uneditable")
         if layer_dict is not None:
-            if layer_dict["type"] in ["LOCAL", "COG", "STAC"]:
+            if layer_dict["type"] in ["LOCAL", "COG", "STAC", "XARRAY"]:
                 self._embedded_widget = RasterLayerEditor(
                     host_map=host_map, layer_dict=layer_dict
                 )
