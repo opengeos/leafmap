@@ -130,7 +130,7 @@ class Map(here_map_widget.Map):
         bounds = gdf.total_bounds
         self.zoom_to_bounds(bounds)
 
-    def add_basemap(self, basemap: Optional[str] = "HYBRID"):
+    def add_basemap(self, basemap: Optional[str] = "HYBRID") -> None:
         """Adds a basemap to the map.
 
         Args:
@@ -169,7 +169,7 @@ class Map(here_map_widget.Map):
         attribution: str,
         opacity: Optional[float] = 1.0,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a TileLayer to the map.
 
         Args:
@@ -203,7 +203,7 @@ class Map(here_map_widget.Map):
         info_mode: Optional[str] = "on_hover",
         point_style: Optional[Dict] = None,
         default_popup: Optional[bool] = False,
-    ):
+    ) -> None:
         """Adds a GeoJSON file to the map.
 
         Args:
@@ -350,7 +350,7 @@ class Map(here_map_widget.Map):
         info_mode: Optional[str] = "on_hover",
         point_style: Optional[Dict] = None,
         default_popup: Optional[bool] = False,
-    ):
+    ) -> None:
         """Adds a shapefile to the map.
 
         Args:
@@ -396,7 +396,7 @@ class Map(here_map_widget.Map):
         zoom_to_layer: Optional[bool] = True,
         point_style: Optional[Dict] = None,
         default_popup: Optional[bool] = False,
-    ):
+    ) -> None:
         """Adds a GeoJSON file to the map.
 
         Args:
@@ -445,7 +445,7 @@ class Map(here_map_widget.Map):
         info_mode: Optional[str] = "on_hover",
         point_style: Optional[Dict] = None,
         default_popup: Optional[bool] = False,
-    ):
+    ) -> None:
         """Adds a GeoJSON file to the map.
 
         Args:
@@ -497,7 +497,7 @@ class Map(here_map_widget.Map):
         point_style: Optional[Dict] = None,
         default_popup: Optional[bool] = False,
         **kwargs,
-    ):
+    ) -> None:
         """Adds any geopandas-supported vector dataset to the map.
 
         Args:
@@ -572,7 +572,7 @@ class Map(here_map_widget.Map):
         width: Optional[str] = "100%",
         height: Optional[str] = "880px",
         **kwargs,
-    ):
+    ) -> None:
         """Saves the map as an HTML file.
 
         Args:
@@ -642,7 +642,7 @@ class Map(here_map_widget.Map):
         responsive: Optional[bool] = True,
         scrolling: Optional[bool] = False,
         **kwargs,
-    ):
+    ) -> None:
         """Renders map figure in a Streamlit app.
 
         Args:
