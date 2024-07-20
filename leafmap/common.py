@@ -116,13 +116,13 @@ def _check_install(package: str) -> None:
         __import__(package)
         # print('{} is already installed.'.format(package))
     except ImportError:
-        print("{} is not installed. Installing ...".format(package))
+        print(f"{package} is not installed. Installing...")
         try:
             subprocess.check_call(["python", "-m", "pip", "install", package])
-        except Exception as e:
-            print("Failed to install {}".format(package))
-            print(e)
-        print("{} has been installed successfully.".format(package))
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to install {package}, Error: {e}")
+            raise
+        print(f"{package} has been installed successfully.")
 
 
 def update_package() -> None:
