@@ -109,6 +109,10 @@ def get_colorbar(
 def list_colormaps(add_extra: bool = False, lowercase: bool = False) -> List:
     """List all available colormaps. See a complete lost of colormaps at https://matplotlib.org/stable/tutorials/colors/colormaps.html.
 
+    Args:
+        add_extra (bool, optional): If True, include additional colormaps, Default False,
+        lowercase (bool, optional): If True, convert colormaps names to lowercase, Default is False.
+
     Returns:
         list: The list of colormap names.
     """
