@@ -13,6 +13,8 @@ import zipfile
 import folium
 import ipyleaflet
 import ipywidgets as widgets
+import numpy as np
+import pandas as pd
 import whitebox
 from typing import Union, List, Dict, Optional, Tuple
 from .stac import *
@@ -21,6 +23,11 @@ try:
     from IPython.display import display, IFrame
 except ImportError:
     pass
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = None
 
 
 class WhiteboxTools(whitebox.WhiteboxTools):
@@ -3673,7 +3680,7 @@ def dict_to_json(data, file_path, indent=4):
         raise TypeError("The provided data must be a dictionary.")
 
 
-def image_to_geotiff(image, dst_path, dtype=None, to_cog=True, **kwargs):
+def image_to_geotiff(image, dst_path, dtype=None, to_cog=True, **kwargs) -> None:
     """
     Converts an image to a GeoTIFF file.
 
@@ -10855,7 +10862,7 @@ def merge_vector(
     quiet: bool = False,
     return_gdf: bool = False,
     **kwargs,
-):
+) -> Optional[gpd.GeoDataFrame]:
     """
     Merge vector files into a single GeoDataFrame.
 
@@ -11226,7 +11233,7 @@ def widget_template(
 
 def start_server(
     directory: str = None, port: int = 8000, background: bool = True, quiet: bool = True
-):
+) -> None:
     """
     Start a simple web server to serve files from the specified directory
     with directory listing and CORS support. Optionally, run the server
@@ -11442,20 +11449,14 @@ def mbtiles_to_pmtiles(
         Any exception raised by pmtiles.convert.mbtiles_to_pmtiles will be propagated up.
     """
 
-    try:
-        import pmtiles.convert as convert
-    except ImportError:
-        print(
-            "pmtiles is not installed. Please install it using `pip install pmtiles`."
-        )
-        return
+    import pmtiles.convert as convert
 
     convert.mbtiles_to_pmtiles(input_file, output_file, maxzoom=max_zoom)
 
 
 def vector_to_pmtiles(
     source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
-):
+) -> None:
     """
     Converts a vector file to PMTiles format.
 
@@ -12111,7 +12112,7 @@ def gdb_to_vector(
     overwrite: bool = False,
     quiet=False,
     **kwargs,
-):
+) -> None:
     """Converts layers from a File Geodatabase (GDB) to a vector format.
 
     Args:
@@ -12460,7 +12461,7 @@ def assign_continuous_colors(
     to_rgb: bool = True,
     return_type: str = "array",
     return_legend: bool = False,
-):
+) -> Union[np.ndarray, Tuple[np.ndarray, dict]]:
     """Assigns continuous colors to a DataFrame column based on a specified scheme.
 
     Args:
@@ -12508,7 +12509,7 @@ def gedi_search(
     output: Optional[str] = None,
     sort_filesize: bool = False,
     **kwargs,
-):
+) -> Union[pd.DataFrame, None]:
     """
     Searches for GEDI data using the Common Metadata Repository (CMR) API.
     The source code for this function is adapted from https://github.com/ornldaac/gedi_tutorials.
@@ -13162,7 +13163,7 @@ def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> N
 
     Args:
         strategy (str, optional): The authentication method.
-               "all": (default) try all methods until one works
+                "all": (default) try all methods until one works
                 "interactive": enter username and password.
                 "netrc": retrieve username and password from ~/.netrc.
                 "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
@@ -13399,7 +13400,7 @@ def convert_coordinates(x, y, source_crs, target_crs="epsg:4326"):
     return lon, lat
 
 
-def extract_archive(archive, outdir=None, **kwargs):
+def extract_archive(archive, outdir=None, **kwargs) -> None:
     """
     Extracts a multipart archive.
 
