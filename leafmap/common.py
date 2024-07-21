@@ -10862,7 +10862,7 @@ def merge_vector(
     quiet: bool = False,
     return_gdf: bool = False,
     **kwargs,
-) -> Optional[gpd.GeoDataFrame]:
+):
     """
     Merge vector files into a single GeoDataFrame.
 
