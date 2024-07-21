@@ -97,4 +97,4 @@ m
 
 ## Leafmap demo with ipyleaflet backend
 
-![](data/leafmap_demo.gif)
+![](https://assets.gishub.org/images/leafmap_demo.gif)
