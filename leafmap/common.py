@@ -14019,3 +14019,54 @@ def xarray_to_raster(dataset, filename: str, **kwargs: Dict[str, Any]) -> None:
 
     dataset = dataset.rename(new_names)
     dataset.transpose(..., "y", "x").rio.to_raster(filename, **kwargs)
+
+
+def ee_tile_url(
+    ee_object=None,
+    vis_params={},
+    asset_id: str = None,
+    ee_initialize: bool = False,
+    project_id=None,
+    **kwargs,
+) -> None:
+    """
+    Adds a Google Earth Engine tile layer to the map based on the tile layer URL from
+        https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
+
+    Args:
+        ee_object (object): The Earth Engine object to display.
+        vis_params (dict): Visualization parameters. For example, {'min': 0, 'max': 100}.
+        asset_id (str): The ID of the Earth Engine asset.
+        ee_initialize (bool, optional): Whether to initialize the Earth Engine
+
+    Returns:
+        None
+    """
+    import pandas as pd
+
+    if isinstance(asset_id, str):
+        df = pd.read_csv(
+            "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
+            sep="\t",
+        )
+
+        asset_id = asset_id.strip()
+
+        if asset_id in df["id"].values:
+            url = df.loc[df["id"] == asset_id, "url"].values[0]
+            return url
+        else:
+            print(f"The provided EE tile layer {asset_id} does not exist.")
+            return None
+    elif ee_object is not None:
+        try:
+            import geemap
+            from geemap.ee_tile_layers import _get_tile_url_format
+
+            if ee_initialize:
+                geemap.ee_initialize(project=project_id, **kwargs)
+            url = _get_tile_url_format(ee_object, vis_params)
+            return url
+        except Exception as e:
+            print(e)
+            return None
