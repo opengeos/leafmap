@@ -140,15 +140,15 @@ class Colorbar(ipywidgets.Output):
 
     def _get_dimensions(self, orientation, kwargs):
         default_dims = {"horizontal": (3.0, 0.3), "vertical": (0.3, 3.0)}
-        if orientation in default_dims:
-            default = default_dims[orientation]
-            return (
-                kwargs.get("width", default[0]),
-                kwargs.get("height", default[1]),
+        if orientation not in default_dims:
+            valid_orientations = ", ".join(default_dims.keys())
+            raise ValueError(
+                f"orientation must be one of [{', '.join(valid_orientations)}]"
             )
-        raise ValueError(
-            f"orientation must be one of [{', '.join(default_dims.keys())}]."
-        )
+        default_width, default_height = default_dims[orientation]
+        width = kwargs.get("width", default_width)
+        height = kwargs.get("height", default_height)
+        return width, height
 
 
 class Legend(ipywidgets.VBox):
