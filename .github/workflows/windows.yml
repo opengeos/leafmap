@@ -1,3 +1,5 @@
+name: Testing Leafmap Package (windows)
+
 on:
     push:
         branches:
@@ -5,8 +7,6 @@ on:
     pull_request:
         branches:
             - master
-
-name: Windows build
 jobs:
     test-windows:
         runs-on: windows-latest
@@ -57,6 +57,14 @@ jobs:
               run: |
                   pip install -r requirements.txt
                   pip install .
+                  pip install pytest
+                  pip install geopandas
+                  pip install pmtiles
+                  pip install -r requirements_dev.txt
 
             - name: Test import
               run: python -c "import leafmap; print('leafmap import successful')"
+
+            - name: Testing with pytest
+              run: |
+                 pytest . --verbose
