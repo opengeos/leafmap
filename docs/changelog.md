@@ -1,6 +1,79 @@
 # Changelog
 
-## v0.35.x - July 9, 2024
+## v0.36.1 - July 22, 2024
+
+**What's Changed**
+
+-   Add support for displaying EE layers with Mapbox by @giswqs in [#845](https://github.com/opengeos/leafmap/pull/845)
+
+**Full Changelog**: [v0.36.0...v0.36.1](https://github.com/opengeos/leafmap/compare/v0.36.0...v0.36.1)
+
+## v0.36.0 - July 21, 2024
+
+**What's Changed**
+
+-   Pin dependencies to the latest version by @giswqs in [#840](https://github.com/opengeos/leafmap/pull/840)
+-   Add support for Mapbox by @giswqs in [#841](https://github.com/opengeos/leafmap/pull/841)
+-   Loosen numpy version by @giswqs in [#842](https://github.com/opengeos/leafmap/pull/842)
+-   Fix typo by @giswqs in [#843](https://github.com/opengeos/leafmap/pull/843)
+
+**Full Changelog**: [v0.35.11...v0.36.0](https://github.com/opengeos/leafmap/compare/v0.35.11...v0.36.0)
+
+## v0.35.11 - July 20, 2024
+
+**What's Changed**
+
+-   Add xarray_to_raster function by @giswqs in [#827](https://github.com/opengeos/leafmap/pull/827)
+-   chore: improving typehints by @slowy07 in [#828](https://github.com/opengeos/leafmap/pull/828)
+-   chore: update unittest and improvement typehinting by @slowy07 in [#829](https://github.com/opengeos/leafmap/pull/829)
+-   Add 3D PMTiles example by @giswqs in [#830](https://github.com/opengeos/leafmap/pull/830)
+-   Fix the demo broken link by @giswqs in [#832](https://github.com/opengeos/leafmap/pull/832)
+-   chore: update unittest and improvement typehinting by @slowy07 in [#831](https://github.com/opengeos/leafmap/pull/831)
+-   Fix add raster fit_bounds bug by @giswqs in [#836](https://github.com/opengeos/leafmap/pull/836)
+-   chore: update unittest and improvement typehinting by @slowy07 in [#835](https://github.com/opengeos/leafmap/pull/835)
+-   Improve support for LayerEditor by @giswqs in [#837](https://github.com/opengeos/leafmap/pull/837)
+-   Update 3D choropleth map example by @giswqs in [#839](https://github.com/opengeos/leafmap/pull/839)
+-   chore: update docstring args, subprocess error handler by @slowy07 in [#838](https://github.com/opengeos/leafmap/pull/838)
+
+**New Contributors**
+
+-   @slowy07 made their first contribution in [#828](https://github.com/opengeos/leafmap/pull/828)
+
+**Full Changelog**: [v0.35.10...v0.35.11](https://github.com/opengeos/leafmap/compare/v0.35.10...v0.35.11)
+
+## v0.35.10 - July 12, 2024
+
+**What's Changed**
+
+-   Fix add geojson color bug by @giswqs in [#824](https://github.com/opengeos/leafmap/pull/824)
+-   Improve layer manager gui by @giswqs in [#825](https://github.com/opengeos/leafmap/pull/825)
+
+**Full Changelog**: [v0.35.9...v0.35.10](https://github.com/opengeos/leafmap/compare/v0.35.9...v0.35.10)
+
+## v0.35.9 - July 8, 2024
+
+**What's Changed**
+
+-   Add maptiler 3d style function by @giswqs in [#818](https://github.com/opengeos/leafmap/pull/818)
+-   Add 3D choropleth notebook example by @giswqs in [#819](https://github.com/opengeos/leafmap/pull/819)
+-   Add more MapLibre examples by @giswqs in [#820](https://github.com/opengeos/leafmap/pull/820)
+-   Update numpy requirement from <2.0.0 to <3.0.0 by @dependabot in [#821](https://github.com/opengeos/leafmap/pull/821)
+
+**Full Changelog**: [v0.35.8...v0.35.9](https://github.com/opengeos/leafmap/compare/v0.35.8...v0.35.9)
+
+## v0.35.8 - July 5, 2024
+
+**What's Changed**
+
+-   Update MapLibre overview page by @giswqs in [#810](https://github.com/opengeos/leafmap/pull/810)
+-   Update MapLibre notebook examples by @giswqs in [#811](https://github.com/opengeos/leafmap/pull/811)
+-   Improve the basemap notebook by @giswqs in [#814](https://github.com/opengeos/leafmap/pull/814)
+-   Add to_html notebook example by @giswqs in [#815](https://github.com/opengeos/leafmap/pull/815)
+-   Add add_video function by @giswqs in [#816](https://github.com/opengeos/leafmap/pull/816)
+
+**Full Changelog**: [v0.35.7...v0.35.8](https://github.com/opengeos/leafmap/compare/v0.35.7...v0.35.8)
+
+## v0.35.7 - July 3, 2024
 
 Reduce repo size
 
