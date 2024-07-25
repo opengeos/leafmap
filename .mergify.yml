@@ -1,0 +1,17 @@
+pull_request_rules:
+  - name: auto merge ready
+    conditions:
+      - base=master
+      - label=ready-to-merge
+      - check-success=Testing Leafmap Package
+      - check-success=CodeQL
+      - check-success=Testing Leafmap Package (windows)
+      - '#approved-reviews-by>=1'
+    actions:
+      comment:
+        message: thanks for the contribution @{{author}}!
+      label:
+        add:
+          - reviewed !
+      merge:
+        method: squash
