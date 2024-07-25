@@ -16,6 +16,8 @@ import ipywidgets as widgets
 import numpy as np
 import pandas as pd
 import whitebox
+import subprocess
+from pathlib import Path
 from typing import Union, List, Dict, Optional, Tuple
 from .stac import *
 
@@ -92,23 +94,22 @@ def set_proxy(
         ip (str, optional): The IP address. Defaults to 'http://127.0.0.1'.
     """
 
+    if not ip.startswith("http://") and not ip.startswith("https://"):
+        ip = f"http://{ip}"
+    proxy = f"{ip}:{port}"
+
+    os.environ["HTTP_PROXY"] = proxy
+    os.environ["HTTPS_PROXY"] = proxy
+
     try:
-        if not ip.startswith("http"):
-            ip = "http://" + ip
-        proxy = "{}:{}".format(ip, port)
-
-        os.environ["HTTP_PROXY"] = proxy
-        os.environ["HTTPS_PROXY"] = proxy
-
-        a = requests.get("https://google.com")
-
-        if a.status_code != 200:
-            print(
-                "Failed to connect to Google services. Please double check the port number and ip address."
-            )
-
-    except Exception as e:
-        raise Exception(e)
+        response = requests.get("https://google.com")
+        response.raise_for_status()
+    except requests.exceptions.RequestException as error_requests:
+        print(
+            "Failed to connect to Google Services. "
+            "Please double check the port number and IP address."
+        )
+        print(f"Error: {e}")
 
 
 def _check_install(package: str) -> None:
@@ -138,30 +139,28 @@ def update_package() -> None:
 
     """
 
+    download_dir = Path.home() / "Downloads"
+    download_dir.mkdir(parents=True, exist_ok=True)
+    _clone_repo(out_dir=str(download_dir))
+    pkg_dir = download_dir / "leafmap-master"
+    work_dir = Path.cwd()
+
+    os.chdir(pkg_dir)
     try:
-        download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
-        if not os.path.exists(download_dir):
-            os.makedirs(download_dir)
-        _clone_repo(out_dir=download_dir)
-
-        pkg_dir = os.path.join(download_dir, "leafmap-master")
-        work_dir = os.getcwd()
-        os.chdir(pkg_dir)
-
-        if shutil.which("pip") is None:
-            cmd = "pip3 install ."
+        if shutil.which("pip"):
+            cmd = ["pip", "install", "."]
         else:
-            cmd = "pip install ."
-
-        os.system(cmd)
+            cmd = ["pip3", "install", "."]
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as error:
+        print(f"Failed to install the package: {error}")
+    finally:
         os.chdir(work_dir)
 
-        print(
-            "\nPlease comment out 'leafmap.update_package()' and restart the kernel to take effect:\nJupyter menu -> Kernel -> Restart & Clear Output"
-        )
-
-    except Exception as e:
-        raise Exception(e)
+    print(
+        "\nPlease comment out 'leafmap.update_package()' and restart kernel to take effect:\n"
+        "Jupyter menu -> Kernel -> Restart & Clear Output"
+    )
 
 
 def check_package(name: str, URL: Optional[str] = "") -> None:
