@@ -19,8 +19,8 @@ class TestCommon(unittest.TestCase):
         self.in_csv = os.path.abspath("examples/data/world_cities.csv")
         self.in_geojson = os.path.abspath("examples/data/cable_geo.geojson")
         self.in_shp = os.path.abspath("examples/data/countries.shp")
-        self.in_kml = os.path.abspath("examples/data/states.kml")
-        self.in_kmz = os.path.abspath("examples/data/states.kmz")
+        self.in_kml = os.path.abspath("examples/data/us_states.kml")
+        self.in_kmz = os.path.abspath("examples/data/us_states.kmz")
         self.in_cog = "https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif"
 
     def tearDown(self):
