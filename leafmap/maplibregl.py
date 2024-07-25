@@ -813,6 +813,8 @@ class Map(MapWidget):
     def add_wms_layer(
         self,
         url: str,
+        layers: str,
+        format: str = "image/png",
         name: str = "WMS Layer",
         attribution: str = "",
         opacity: float = 1.0,
@@ -831,6 +833,8 @@ class Map(MapWidget):
 
         Args:
             url (str): The URL of the tile layer.
+            layers (str): The layers to include in the WMS request.
+            format (str, optional): The format of the tiles in the layer.
             name (str, optional): The name to use for the layer. Defaults to
                 'WMS Layer'.
             attribution (str, optional): The attribution to use for the layer.
@@ -849,6 +853,9 @@ class Map(MapWidget):
         Returns:
             None
         """
+
+        url = f"{url.strip()}?service=WMS&request=GetMap&layers={layers}&styles=&format={format.replace('/', '%2F')}&transparent=true&version=1.1.1&height=256&width=256&srs=EPSG%3A3857&bbox={{bbox-epsg-3857}}"
+
         self.add_tile_layer(
             url,
             name=name,
