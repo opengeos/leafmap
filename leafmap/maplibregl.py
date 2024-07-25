@@ -2679,6 +2679,7 @@ class Map(MapWidget):
 
     def add_3d_buildings(
         self,
+        name: str = "buildings",
         min_zoom: int = 15,
         values: List[int] = [0, 200, 400],
         colors: List[str] = ["lightgray", "royalblue", "lightblue"],
@@ -2691,6 +2692,7 @@ class Map(MapWidget):
         The layer is only visible from a certain zoom level, specified by the 'min_zoom' parameter.
 
         Args:
+            name (str): The name of the 3D buildings layer. Defaults to "buildings".
             min_zoom (int): The minimum zoom level at which the 3D buildings will start to be visible. Defaults to 15.
             values (List[int]): A list of height values (in meters) used for color interpolation. Defaults to [0, 200, 400].
             colors (List[str]): A list of colors corresponding to the 'values' list. Each color is applied to the
@@ -2718,7 +2720,7 @@ class Map(MapWidget):
             value_color_pairs.append(colors[i])
 
         layer = {
-            "id": "3d-buildings",
+            "id": name,
             "source": "openmaptiles",
             "source-layer": "building",
             "type": "fill-extrusion",
