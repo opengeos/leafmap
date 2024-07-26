@@ -6,7 +6,9 @@ import os
 import unittest
 import geopandas
 import pandas
+import requests
 from leafmap.common import *
+from unittest.mock import patch, MagicMock
 from pmtiles.tile import MagicNumberNotFound
 
 
@@ -60,6 +62,17 @@ class TestCommon(unittest.TestCase):
     def test_cog_center(self):
         self.assertIsInstance(cog_center(self.in_cog), tuple)
         self.assertEqual(len(cog_center(self.in_cog)), 2)
+
+    @patch("os.environ", {})
+    @patch("requests.get")
+    def test_set_proxy_successful_request(self, mock_get):
+        mock_response = MagicMock()
+        mock_response.raise_for_status.return_value = None
+        mock_get.return_value = mock_response
+        set_proxy(port=8080, ip="192.168.0.1")
+        self.assertEqual(os.environ["HTTP_PROXY"], "http://192.168.0.1:8080")
+        self.assertEqual(os.environ["HTTPS_PROXY"], "http://192.168.0.1:8080")
+        mock_get.assert_called_once_with("https://google.com")
 
     # def test_pmtile_metadata_validates_pmtiles_suffix(self):
     #     with self.assertRaises(ValueError) as cm:
