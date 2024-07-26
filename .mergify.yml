@@ -1,17 +1,30 @@
 pull_request_rules:
-  - name: auto merge ready
+  - name: CI automerge when passing all test
     conditions:
-      - base=master
       - label=ready-to-merge
-      - check-success=Testing Leafmap Package
       - check-success=CodeQL
-      - check-success=Testing Leafmap Package (windows)
-      - '#approved-reviews-by>=1'
+      - check-success=test-ubuntu (3.9)
+      - check-success=test-ubuntu (3.10)
+      - check-success=test-ubuntu (3.11)
+      - check-success=test-ubuntu (3.12)
+      - check-success=test-windows (3.11)
+      - "#approved-reviews-by>=1"
+      - base=master
     actions:
       comment:
-        message: thanks for the contribution @{{author}}!
+        message: thanks for the contribution @{{author}} 🤩
       label:
         add:
-          - reviewed !
+          - already reviewed
       merge:
         method: squash
+
+  - name: information about conflicts pull request
+    conditions:
+      - conflict
+    actions:
+      comment:
+        message: your pull request are conflict @{{author}}, please fix it !
+      label:
+        add:
+          - conflicts pull request
