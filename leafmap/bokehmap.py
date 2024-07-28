@@ -61,7 +61,7 @@ class Map:
         self.output_notebook = output_notebook
         self.output_notebook_done = False
 
-    def _repr_mimebundle_(self, **kwargs):
+    def _repr_mimebundle_(self, **kwargs) -> None:
         """Display the bokeh map. Reference: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_"""
         if self.output_notebook and (os.environ["OUTPUT_NOTEBOOK"] == "False"):
             output_notebook()
@@ -73,7 +73,7 @@ class Map:
         basemap: Optional[str] = "OpenStreetMap",
         retina: Optional[bool] = True,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a basemap to the map.
 
         Args:
@@ -113,7 +113,7 @@ class Map:
         elif basemap is None:
             raise ValueError("Please specify a valid basemap")
 
-    def add_tile(self, tile: str, **kwargs):
+    def add_tile(self, tile: str, **kwargs) -> None:
         """Adds a tile to the map.
 
         Args:
@@ -136,7 +136,7 @@ class Map:
         cog_args: Dict = {},
         fit_bounds: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a COG TileLayer to the map.
 
         Args:
@@ -174,7 +174,7 @@ class Map:
         layer_name="Local COG",
         open_args={},
         **kwargs,
-    ):
+    ) -> None:
         """Add a local raster dataset to the map.
             If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
             if the raster does not render properly, try running the following code before calling this function:
@@ -236,7 +236,7 @@ class Map:
         fit_bounds: Optional[bool] = True,
         open_args={},
         **kwargs,
-    ):
+    ) -> None:
         """Adds a STAC TileLayer to the map.
 
         Args:
@@ -266,8 +266,13 @@ class Map:
             self.fit_bounds(stac_bounds(url, collection, item, titiler_endpoint))
 
     def add_gdf(
-        self, gdf, to_crs="epsg:3857", tooltips=None, fit_bounds=True, **kwargs
-    ):
+        self,
+        gdf,
+        to_crs: Optional[str] = "epsg:3857",
+        tooltips: Optional[list] = None,
+        fit_bounds: bool = True,
+        **kwargs,
+    ) -> None:
         """Adds a GeoDataFrame to the map.
 
         Args:
@@ -319,7 +324,7 @@ class Map:
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a GeoJSON file to the map.
 
         Args:
@@ -351,7 +356,7 @@ class Map:
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a shapefile to the map.
 
         Args:
@@ -404,7 +409,7 @@ class Map:
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         """Adds a vector dataset to the map.
 
         Args:
@@ -433,7 +438,7 @@ class Map:
 
     def to_html(
         self, filename: Optional[str] = None, title: Optional[str] = None, **kwargs
-    ):
+    ) -> None:
         """Converts the map to HTML.
 
         Args:
@@ -463,7 +468,7 @@ class Map:
         height: Optional[int] = 600,
         use_container_width: bool = True,
         **kwargs,
-    ):
+    ) -> None:
         """Displays the map in a Streamlit app.
 
         Args:
