@@ -184,10 +184,12 @@ def _clone_repo(out_dir: Optional[str] = ".", unzip: Optional[bool] = True) -> N
 
     try:
         if not isinstance(out_dir, str):
-            raise ValueError(f"The out_dir parametermust be string. Provided: {type(out_dir).__name__}")
+            raise ValueError(
+                f"The out_dir parametermust be string. Provided: {type(out_dir).__name__}"
+            )
         download_from_url(url, out_file_name=filename, out_dir=out_dir, unzip=unzip)
     except Exception as error:
-        print(f"An error occured while clone the repository: {str(error)}")
+        print(f"An error occurred while clone the repository: {str(error)}")
 
 
 def __install_from_github(url: str) -> None:
