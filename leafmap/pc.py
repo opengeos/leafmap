@@ -6,16 +6,19 @@ import json
 import os
 from pystac_client import Client
 from .common import stac_assets, stac_bands
-from typing import Optional, List
+from typing import Optional, List, Optional, Union
 
 PC_ENDPOINT = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
 
-def get_pc_collections(verbose: Optional[bool] = False):
+def get_pc_collections(verbose: Optional[bool] = False) -> dict[str, str]:
     """Get a list of all collections in the Microsoft Planetary Computer catalog.
 
     Args:
         verbose (bool, optional): If True, print the collections to the console.
+
+    Returns:
+        dict: A dictionary with collections IDs as keys and cllection titles as value.
     """
     catalog = Client.open(PC_ENDPOINT)
     collections = catalog.get_children()
@@ -47,7 +50,7 @@ def get_first_item(collection: str, return_id: Optional[bool] = False):
         return item
 
 
-def get_bands(collection, item=None):
+def get_bands(collection: str, item: Optional[str] = None) -> List[str]:
     """Get the bands of an item.
 
     Args:
@@ -62,7 +65,9 @@ def get_bands(collection, item=None):
     return stac_bands(collection=collection, items=item)
 
 
-def get_pc_inventory(refresh: Optional[bool] = False, verbose: Optional[bool] = False):
+def get_pc_inventory(
+    refresh: Optional[bool] = False, verbose: Optional[bool] = False
+) -> dict[str, dict[str, Union[str, list, str]]]:
     """Get the inventory of the Microsoft Planetary Computer catalog.
 
     Args:
@@ -106,7 +111,7 @@ def get_pc_inventory(refresh: Optional[bool] = False, verbose: Optional[bool] = 
     return data
 
 
-def get_pc_collection_list() -> List:
+def get_pc_collection_list() -> List[str]:
     """Get a list of collections in the Microsoft Planetary Computer catalog.
 
     Returns:
