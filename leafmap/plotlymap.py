@@ -669,7 +669,7 @@ class Map(go.FigureWidget):
         color_col: Optional[str],
         color_continuous_scale: Optional[str] = "Viridis",
         **kwargs,
-    ):
+    ) -> None:
         check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 
@@ -709,7 +709,7 @@ class Map(go.FigureWidget):
         zoom: Optional[int] = None,
         color_continuous_scale: Optional[str] = "Viridis",
         **kwargs,
-    ):
+    ) -> None:
         """Adds a GeoDataFrame to the map.
         Args:
             gdf (GeoDataFrame): A GeoDataFrame.
