@@ -965,6 +965,7 @@ class Map(MapWidget):
         opacity: float = 1.0,
         visible: bool = True,
         bands: Optional[List[int]] = None,
+        nodata: Optional[Union[int, float]] = 0,
         titiler_endpoint: str = "https://titiler.xyz",
         fit_bounds: bool = True,
         before_id: Optional[str] = None,
@@ -988,6 +989,7 @@ class Map(MapWidget):
                 Defaults to True.
             bands (list, optional): A list of bands to use for the layer.
                 Defaults to None.
+            nodata (float, optional): The nodata value to use for the layer.
             titiler_endpoint (str, optional): The endpoint of the titiler service.
                 Defaults to "https://titiler.xyz".
             fit_bounds (bool, optional): Whether to adjust the viewport of
@@ -1010,7 +1012,7 @@ class Map(MapWidget):
         if name is None:
             name = "COG_" + random_string()
 
-        tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
+        tile_url = cog_tile(url, bands, titiler_endpoint, nodata=nodata, **kwargs)
         bounds = cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
             tile_url, name, attribution, opacity, visible, before_id=before_id
@@ -1025,6 +1027,7 @@ class Map(MapWidget):
         item: Optional[str] = None,
         assets: Optional[Union[str, List[str]]] = None,
         bands: Optional[List[str]] = None,
+        nodata: Optional[Union[int, float]] = 0,
         titiler_endpoint: Optional[str] = None,
         name: str = "STAC Layer",
         attribution: str = "",
@@ -1053,6 +1056,7 @@ class Map(MapWidget):
                 e.g., ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.
             bands (list, optional): A list of band names, e.g.,
                 ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.
+            no_data (int | float, optional): The nodata value to use for the layer.
             titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz",
                 "https://planetarycomputer.microsoft.com/api/data/v1",
                 "planetary-computer", "pc". Defaults to None.
@@ -1085,7 +1089,14 @@ class Map(MapWidget):
             kwargs.pop("colormap_name")
 
         tile_url = stac_tile(
-            url, collection, item, assets, bands, titiler_endpoint, **kwargs
+            url,
+            collection,
+            item,
+            assets,
+            bands,
+            titiler_endpoint,
+            nodata=nodata,
+            **kwargs,
         )
         bounds = stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(
