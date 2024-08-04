@@ -1004,10 +1004,6 @@ class Map(MapWidget):
         Returns:
             None
         """
-        import numpy as np
-
-        if "nodata" not in kwargs:
-            kwargs["nodata"] = np.nan
 
         if name is None:
             name = "COG_" + random_string()
@@ -1079,11 +1075,6 @@ class Map(MapWidget):
         Returns:
             None
         """
-
-        import numpy as np
-
-        if "nodata" not in kwargs:
-            kwargs["nodata"] = np.nan
 
         if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
             kwargs.pop("colormap_name")
