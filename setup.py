@@ -66,6 +66,7 @@ extras_requires = {
         "h3",
         "ipyvuetify",
         "localtileserver",
+        "mapclassify",
         "maplibre",
         "pmtiles",
         "rioxarray",
