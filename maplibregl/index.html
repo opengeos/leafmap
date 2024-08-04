@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.30">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.31">
     
     
       
@@ -1643,6 +1643,27 @@
   
   <span class="md-ellipsis">
     EarthCube 2023
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../workshops/Taiwan_2024/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Taiwan 2024
   </span>
   
 
@@ -6964,6 +6985,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://titiler.xyz&quot;</span><span class="p">,</span>
         <span class="n">fit_bounds</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -6987,6 +7009,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">                Defaults to True.</span>
 <span class="sd">            bands (list, optional): A list of bands to use for the layer.</span>
 <span class="sd">                Defaults to None.</span>
+<span class="sd">            nodata (float, optional): The nodata value to use for the layer.</span>
 <span class="sd">            titiler_endpoint (str, optional): The endpoint of the titiler service.</span>
 <span class="sd">                Defaults to &quot;https://titiler.xyz&quot;.</span>
 <span class="sd">            fit_bounds (bool, optional): Whether to adjust the viewport of</span>
@@ -7001,15 +7024,11 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">        Returns:</span>
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-        <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COG_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
 
-        <span class="n">tile_url</span> <span class="o">=</span> <span class="n">cog_tile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">tile_url</span> <span class="o">=</span> <span class="n">cog_tile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">bounds</span> <span class="o">=</span> <span class="n">cog_bounds</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
             <span class="n">tile_url</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attribution</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">visible</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span>
@@ -7024,6 +7043,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
         <span class="n">item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">assets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;STAC Layer&quot;</span><span class="p">,</span>
         <span class="n">attribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -7052,6 +7072,7 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">                e.g., [&quot;SR_B7&quot;, &quot;SR_B5&quot;, &quot;SR_B4&quot;]. Defaults to None.</span>
 <span class="sd">            bands (list, optional): A list of band names, e.g.,</span>
 <span class="sd">                [&quot;SR_B7&quot;, &quot;SR_B5&quot;, &quot;SR_B4&quot;]. Defaults to None.</span>
+<span class="sd">            no_data (int | float, optional): The nodata value to use for the layer.</span>
 <span class="sd">            titiler_endpoint (str, optional): Titiler endpoint, e.g., &quot;https://titiler.xyz&quot;,</span>
 <span class="sd">                &quot;https://planetarycomputer.microsoft.com/api/data/v1&quot;,</span>
 <span class="sd">                &quot;planetary-computer&quot;, &quot;pc&quot;. Defaults to None.</span>
@@ -7075,16 +7096,18 @@ Map            (<span title="maplibre.ipywidget.MapWidget">MapWidget</span>)
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-        <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-
         <span class="k">if</span> <span class="s2">&quot;colormap_name&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">)</span>
 
         <span class="n">tile_url</span> <span class="o">=</span> <span class="n">stac_tile</span><span class="p">(</span>
-            <span class="n">url</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">assets</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="n">url</span><span class="p">,</span>
+            <span class="n">collection</span><span class="p">,</span>
+            <span class="n">item</span><span class="p">,</span>
+            <span class="n">assets</span><span class="p">,</span>
+            <span class="n">bands</span><span class="p">,</span>
+            <span class="n">titiler_endpoint</span><span class="p">,</span>
+            <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">bounds</span> <span class="o">=</span> <span class="n">stac_bounds</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
@@ -9411,7 +9434,7 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
 
 
 <h3 id="leafmap.maplibregl.Map.add_cog_layer" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_cog_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="s1">&#39;https://titiler.xyz&#39;</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">add_cog_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="s1">&#39;https://titiler.xyz&#39;</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.add_cog_layer" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -9475,6 +9498,12 @@ Defaults to None.</p></td>
         <td><code>None</code></td>
       </tr>
       <tr>
+        <td><code>nodata</code></td>
+        <td><code>float</code></td>
+        <td><p>The nodata value to use for the layer.</p></td>
+        <td><code>0</code></td>
+      </tr>
+      <tr>
         <td><code>titiler_endpoint</code></td>
         <td><code>str</code></td>
         <td><p>The endpoint of the titiler service.
@@ -9527,6 +9556,7 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
     <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://titiler.xyz&quot;</span><span class="p">,</span>
     <span class="n">fit_bounds</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9550,6 +9580,7 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
 <span class="sd">            Defaults to True.</span>
 <span class="sd">        bands (list, optional): A list of bands to use for the layer.</span>
 <span class="sd">            Defaults to None.</span>
+<span class="sd">        nodata (float, optional): The nodata value to use for the layer.</span>
 <span class="sd">        titiler_endpoint (str, optional): The endpoint of the titiler service.</span>
 <span class="sd">            Defaults to &quot;https://titiler.xyz&quot;.</span>
 <span class="sd">        fit_bounds (bool, optional): Whether to adjust the viewport of</span>
@@ -9564,15 +9595,11 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
 <span class="sd">    Returns:</span>
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-    <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
     <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;COG_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
 
-    <span class="n">tile_url</span> <span class="o">=</span> <span class="n">cog_tile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">tile_url</span> <span class="o">=</span> <span class="n">cog_tile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="n">cog_bounds</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
         <span class="n">tile_url</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">attribution</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">visible</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span>
@@ -12212,7 +12239,7 @@ localtileserver.TileClient. Defaults to { "cors_all": False }.</p></td>
 
 
 <h3 id="leafmap.maplibregl.Map.add_stac_layer" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_stac_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;STAC Layer&#39;</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">add_stac_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">item</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;STAC Layer&#39;</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.maplibregl.Map.add_stac_layer" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -12270,6 +12297,12 @@ e.g., ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.</p></td>
         <td><p>A list of band names, e.g.,
 ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.</p></td>
         <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>no_data</code></td>
+        <td><code>int | float</code></td>
+        <td><p>The nodata value to use for the layer.</p></td>
+        <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>titiler_endpoint</code></td>
@@ -12355,6 +12388,7 @@ bands, use something like <code>rescale=["164,223","130,211","99,212"]</code>.</
     <span class="n">item</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">assets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;STAC Layer&quot;</span><span class="p">,</span>
     <span class="n">attribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -12383,6 +12417,7 @@ bands, use something like <code>rescale=["164,223","130,211","99,212"]</code>.</
 <span class="sd">            e.g., [&quot;SR_B7&quot;, &quot;SR_B5&quot;, &quot;SR_B4&quot;]. Defaults to None.</span>
 <span class="sd">        bands (list, optional): A list of band names, e.g.,</span>
 <span class="sd">            [&quot;SR_B7&quot;, &quot;SR_B5&quot;, &quot;SR_B4&quot;]. Defaults to None.</span>
+<span class="sd">        no_data (int | float, optional): The nodata value to use for the layer.</span>
 <span class="sd">        titiler_endpoint (str, optional): Titiler endpoint, e.g., &quot;https://titiler.xyz&quot;,</span>
 <span class="sd">            &quot;https://planetarycomputer.microsoft.com/api/data/v1&quot;,</span>
 <span class="sd">            &quot;planetary-computer&quot;, &quot;pc&quot;. Defaults to None.</span>
@@ -12406,16 +12441,18 @@ bands, use something like <code>rescale=["164,223","130,211","99,212"]</code>.</
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-    <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;nodata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-
     <span class="k">if</span> <span class="s2">&quot;colormap_name&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">)</span>
 
     <span class="n">tile_url</span> <span class="o">=</span> <span class="n">stac_tile</span><span class="p">(</span>
-        <span class="n">url</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">assets</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="n">url</span><span class="p">,</span>
+        <span class="n">collection</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">,</span>
+        <span class="n">assets</span><span class="p">,</span>
+        <span class="n">bands</span><span class="p">,</span>
+        <span class="n">titiler_endpoint</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">bounds</span> <span class="o">=</span> <span class="n">stac_bounds</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
