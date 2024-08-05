@@ -16944,7 +16944,7 @@ Defaults to None, using the bottom left corner.</p></td>
 
 
 <h2 id="leafmap.common.csv_to_gdf" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">csv_to_gdf</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">csv_to_gdf</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.common.csv_to_gdf" class="headerlink" title="Permanent link">&para;</a></h2>
@@ -16983,6 +16983,18 @@ Defaults to None, using the bottom left corner.</p></td>
         <td><code>&#39;longitude&#39;</code></td>
       </tr>
       <tr>
+        <td><code>geometry</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the column containing geometry. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>crs</code></td>
+        <td><code>str</code></td>
+        <td><p>The coordinate reference system. Defaults to "EPSG:4326".</p></td>
+        <td><code>&#39;EPSG:4326&#39;</code></td>
+      </tr>
+      <tr>
         <td><code>encoding</code></td>
         <td><code>str</code></td>
         <td><p>The encoding of characters. Defaults to "utf-8".</p></td>
@@ -17007,13 +17019,23 @@ Defaults to None, using the bottom left corner.</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>leafmap/common.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">csv_to_gdf</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="s2">&quot;latitude&quot;</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="s2">&quot;longitude&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">csv_to_gdf</span><span class="p">(</span>
+    <span class="n">in_csv</span><span class="p">,</span>
+    <span class="n">latitude</span><span class="o">=</span><span class="s2">&quot;latitude&quot;</span><span class="p">,</span>
+    <span class="n">longitude</span><span class="o">=</span><span class="s2">&quot;longitude&quot;</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Creates points for a CSV file and converts them to a GeoDataFrame.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        in_csv (str): The file path to the input CSV file.</span>
 <span class="sd">        latitude (str, optional): The name of the column containing latitude coordinates. Defaults to &quot;latitude&quot;.</span>
 <span class="sd">        longitude (str, optional): The name of the column containing longitude coordinates. Defaults to &quot;longitude&quot;.</span>
+<span class="sd">        geometry (str, optional): The name of the column containing geometry. Defaults to None.</span>
+<span class="sd">        crs (str, optional): The coordinate reference system. Defaults to &quot;EPSG:4326&quot;.</span>
 <span class="sd">        encoding (str, optional): The encoding of characters. Defaults to &quot;utf-8&quot;.</span>
 
 <span class="sd">    Returns:</span>
@@ -17023,14 +17045,21 @@ Defaults to None, using the bottom left corner.</p></td>
     <span class="n">check_package</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;geopandas&quot;</span><span class="p">,</span> <span class="n">URL</span><span class="o">=</span><span class="s2">&quot;https://geopandas.org&quot;</span><span class="p">)</span>
 
     <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">from</span> <span class="nn">shapely</span> <span class="kn">import</span> <span class="n">wkt</span>
 
     <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
 
-    <span class="n">out_geojson</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">random_string</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.geojson&quot;</span><span class="p">)</span>
-    <span class="n">csv_to_geojson</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">out_geojson</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_geojson</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">random_string</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;.geojson&quot;</span><span class="p">)</span>
+        <span class="n">csv_to_geojson</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">out_geojson</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">out_geojson</span><span class="p">)</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">out_geojson</span><span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">out_geojson</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">out_geojson</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">geometry</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">wkt</span><span class="o">.</span><span class="n">loads</span><span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
@@ -17242,7 +17271,7 @@ Defaults to None, using the bottom left corner.</p></td>
 
 
 <h2 id="leafmap.common.csv_to_vector" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">csv_to_vector</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">csv_to_vector</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">latitude</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">longitude</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.common.csv_to_vector" class="headerlink" title="Permanent link">&para;</a></h2>
@@ -17287,10 +17316,28 @@ Defaults to None, using the bottom left corner.</p></td>
         <td><code>&#39;longitude&#39;</code></td>
       </tr>
       <tr>
+        <td><code>geometry</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the column containing geometry. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>crs</code></td>
+        <td><code>str</code></td>
+        <td><p>The coordinate reference system. Defaults to "EPSG:4326".</p></td>
+        <td><code>&#39;EPSG:4326&#39;</code></td>
+      </tr>
+      <tr>
         <td><code>encoding</code></td>
         <td><code>str</code></td>
         <td><p>The encoding of characters. Defaults to "utf-8".</p></td>
         <td><code>&#39;utf-8&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to gdf.to_file().</p></td>
+        <td><code>{}</code></td>
       </tr>
   </tbody>
 </table>
@@ -17301,6 +17348,8 @@ Defaults to None, using the bottom left corner.</p></td>
     <span class="n">output</span><span class="p">,</span>
     <span class="n">latitude</span><span class="o">=</span><span class="s2">&quot;latitude&quot;</span><span class="p">,</span>
     <span class="n">longitude</span><span class="o">=</span><span class="s2">&quot;longitude&quot;</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
     <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
@@ -17311,10 +17360,13 @@ Defaults to None, using the bottom left corner.</p></td>
 <span class="sd">        output (str): The file path to the output vector dataset.</span>
 <span class="sd">        latitude (str, optional): The name of the column containing latitude coordinates. Defaults to &quot;latitude&quot;.</span>
 <span class="sd">        longitude (str, optional): The name of the column containing longitude coordinates. Defaults to &quot;longitude&quot;.</span>
+<span class="sd">        geometry (str, optional): The name of the column containing geometry. Defaults to None.</span>
+<span class="sd">        crs (str, optional): The coordinate reference system. Defaults to &quot;EPSG:4326&quot;.</span>
 <span class="sd">        encoding (str, optional): The encoding of characters. Defaults to &quot;utf-8&quot;.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to gdf.to_file().</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">csv_to_gdf</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">csv_to_gdf</span><span class="p">(</span><span class="n">in_csv</span><span class="p">,</span> <span class="n">latitude</span><span class="p">,</span> <span class="n">longitude</span><span class="p">,</span> <span class="n">geometry</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
     <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </code></pre></div>
         </details>

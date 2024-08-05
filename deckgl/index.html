@@ -730,6 +730,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.deckgl.Map.add_basemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_basemap()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.deckgl.Map.add_gdf" class="md-nav__link">
     <span class="md-ellipsis">
       add_gdf()
@@ -776,6 +785,24 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.deckgl.apply_categorical_cmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      apply_categorical_cmap()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.deckgl.apply_continuous_cmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      apply_continuous_cmap()
+    </span>
+  </a>
   
 </li>
       
@@ -5092,6 +5119,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.deckgl.Map.add_basemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_basemap()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.deckgl.Map.add_gdf" class="md-nav__link">
     <span class="md-ellipsis">
       add_gdf()
@@ -5141,6 +5177,24 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#leafmap.deckgl.apply_categorical_cmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      apply_categorical_cmap()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.deckgl.apply_continuous_cmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      apply_continuous_cmap()
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -5174,6 +5228,7 @@
 
 
   <div class="doc doc-children">
+
 
 
 
@@ -5269,6 +5324,8 @@ Map            (<span title="lonboard._map.Map">Map</span>)
         <span class="n">color_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">color_k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
         <span class="n">color_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">rescale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -5299,6 +5356,7 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span> <span class="nn">lonboard</span> <span class="kn">import</span> <span class="n">ScatterplotLayer</span><span class="p">,</span> <span class="n">PathLayer</span><span class="p">,</span> <span class="n">SolidPolygonLayer</span>
+        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
         <span class="n">geom_type</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geom_type</span>
         <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;pickable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pickable</span>
@@ -5308,18 +5366,14 @@ Map            (<span title="lonboard._map.Map">Map</span>)
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_radius&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
             <span class="k">if</span> <span class="n">color_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_continuous_colors</span><span class="p">(</span>
-                        <span class="n">gdf</span><span class="p">,</span>
-                        <span class="n">color_column</span><span class="p">,</span>
-                        <span class="n">color_map</span><span class="p">,</span>
-                        <span class="n">scheme</span><span class="o">=</span><span class="n">color_scheme</span><span class="p">,</span>
-                        <span class="n">k</span><span class="o">=</span><span class="n">color_k</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">color_args</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_continuous_cmap</span><span class="p">(</span>
+                        <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rescale</span>
                     <span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_discrete_colors</span><span class="p">(</span>
-                        <span class="n">gdf</span><span class="p">,</span> <span class="n">color_column</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">to_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;array&quot;</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_categorical_cmap</span><span class="p">(</span>
+                        <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span>
                     <span class="p">)</span>
+
             <span class="k">if</span> <span class="s2">&quot;get_fill_color&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
             <span class="n">layer</span> <span class="o">=</span> <span class="n">ScatterplotLayer</span><span class="o">.</span><span class="n">from_geopandas</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -5328,33 +5382,24 @@ Map            (<span title="lonboard._map.Map">Map</span>)
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
             <span class="k">if</span> <span class="n">color_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_continuous_colors</span><span class="p">(</span>
-                        <span class="n">gdf</span><span class="p">,</span>
-                        <span class="n">color_column</span><span class="p">,</span>
-                        <span class="n">color_map</span><span class="p">,</span>
-                        <span class="n">scheme</span><span class="o">=</span><span class="n">color_scheme</span><span class="p">,</span>
-                        <span class="n">k</span><span class="o">=</span><span class="n">color_k</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">color_args</span><span class="p">,</span>
+                    <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">color_map</span><span class="p">)</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_continuous_cmap</span><span class="p">(</span>
+                        <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rescale</span>
                     <span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_discrete_colors</span><span class="p">(</span>
-                        <span class="n">gdf</span><span class="p">,</span> <span class="n">color_column</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">to_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;array&quot;</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_categorical_cmap</span><span class="p">(</span>
+                        <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span>
                     <span class="p">)</span>
             <span class="n">layer</span> <span class="o">=</span> <span class="n">PathLayer</span><span class="o">.</span><span class="n">from_geopandas</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">geom_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Polygon&quot;</span><span class="p">,</span> <span class="s2">&quot;MultiPolygon&quot;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">color_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_continuous_colors</span><span class="p">(</span>
-                        <span class="n">gdf</span><span class="p">,</span>
-                        <span class="n">color_column</span><span class="p">,</span>
-                        <span class="n">color_map</span><span class="p">,</span>
-                        <span class="n">scheme</span><span class="o">=</span><span class="n">color_scheme</span><span class="p">,</span>
-                        <span class="n">k</span><span class="o">=</span><span class="n">color_k</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">color_args</span><span class="p">,</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_continuous_cmap</span><span class="p">(</span>
+                        <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rescale</span>
                     <span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_discrete_colors</span><span class="p">(</span>
-                        <span class="n">gdf</span><span class="p">,</span> <span class="n">color_column</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">to_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;array&quot;</span>
+                    <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_categorical_cmap</span><span class="p">(</span>
+                        <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span>
                     <span class="p">)</span>
             <span class="k">if</span> <span class="s2">&quot;get_fill_color&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
@@ -5456,18 +5501,37 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 <span class="sd">            None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">lonboard</span> <span class="kn">import</span> <span class="n">ScatterplotLayer</span><span class="p">,</span> <span class="n">PathLayer</span><span class="p">,</span> <span class="n">SolidPolygonLayer</span>
+        <span class="kn">from</span> <span class="nn">lonboard</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">BitmapLayer</span><span class="p">,</span>
+            <span class="n">BitmapTileLayer</span><span class="p">,</span>
+            <span class="n">HeatmapLayer</span><span class="p">,</span>
+            <span class="n">PathLayer</span><span class="p">,</span>
+            <span class="n">PointCloudLayer</span><span class="p">,</span>
+            <span class="n">PolygonLayer</span><span class="p">,</span>
+            <span class="n">ScatterplotLayer</span><span class="p">,</span>
+            <span class="n">SolidPolygonLayer</span><span class="p">,</span>
+        <span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ScatterplotLayer</span><span class="p">,</span> <span class="n">PathLayer</span><span class="p">,</span> <span class="n">SolidPolygonLayer</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">BitmapLayer</span><span class="p">,</span>
+            <span class="n">BitmapTileLayer</span><span class="p">,</span>
+            <span class="n">HeatmapLayer</span><span class="p">,</span>
+            <span class="n">ScatterplotLayer</span><span class="p">,</span>
+            <span class="n">PathLayer</span><span class="p">,</span>
+            <span class="n">PointCloudLayer</span><span class="p">,</span>
+            <span class="n">PolygonLayer</span><span class="p">,</span>
+            <span class="n">SolidPolygonLayer</span><span class="p">,</span>
+        <span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">lonboard._viewport</span> <span class="kn">import</span> <span class="n">compute_view</span>
 
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">view_state</span> <span class="o">=</span> <span class="n">compute_view</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">table</span><span class="p">])</span>
-                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">):</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">view_state</span> <span class="o">=</span> <span class="n">compute_view</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">table</span><span class="p">])</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span>
                 <span class="n">layer</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="n">zoom_to_layer</span><span class="p">,</span> <span class="n">pickable</span><span class="o">=</span><span class="n">pickable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
@@ -5519,6 +5583,79 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">e</span>
+
+    <span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="s2">&quot;HYBRID&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a basemap to the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            basemap (str, optional): Can be one of string from basemaps. Defaults to &#39;HYBRID&#39;.</span>
+<span class="sd">            visible (bool, optional): Whether the basemap is visible or not. Defaults to True.</span>
+<span class="sd">            **kwargs: Keyword arguments for the TileLayer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">xyzservices</span>
+
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="n">map_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;ROADMAP&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Maps&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;SATELLITE&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Satellite&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;TERRAIN&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Terrain&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;HYBRID&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Hybrid&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">basemap</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">map_dict</span><span class="p">:</span>
+                    <span class="n">tile</span> <span class="o">=</span> <span class="n">get_google_map</span><span class="p">(</span><span class="n">basemap</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+                    <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                        <span class="n">min_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">min_zoom</span><span class="p">,</span>
+                        <span class="n">max_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">max_zoom</span><span class="p">,</span>
+                        <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+                    <span class="k">return</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">):</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">basemap</span><span class="o">.</span><span class="n">build_url</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s2">&quot;max_zoom&quot;</span> <span class="ow">in</span> <span class="n">basemap</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">max_zoom</span> <span class="o">=</span> <span class="n">basemap</span><span class="p">[</span><span class="s2">&quot;max_zoom&quot;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">max_zoom</span> <span class="o">=</span> <span class="mi">22</span>
+                    <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                        <span class="n">min_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">min_zoom</span><span class="p">,</span>
+                        <span class="n">max_zoom</span><span class="o">=</span><span class="n">max_zoom</span><span class="p">,</span>
+                        <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">basemap</span> <span class="ow">in</span> <span class="n">basemaps</span> <span class="ow">and</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">basemap</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">tile</span> <span class="o">=</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">basemap</span><span class="p">]</span>
+                <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                    <span class="n">min_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_zoom&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                    <span class="n">max_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_zoom&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">),</span>
+                    <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Basemap can only be one of the following:</span><span class="se">\n</span><span class="s2">  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basemaps</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Basemap can only be one of the following:</span><span class="se">\n</span><span class="s2">  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basemaps</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -5671,8 +5808,135 @@ Map            (<span title="lonboard._map.Map">Map</span>)
 
 
 
+<h3 id="leafmap.deckgl.Map.add_basemap" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_basemap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="s1">&#39;HYBRID&#39;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.deckgl.Map.add_basemap" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a basemap to the map.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>basemap</code></td>
+        <td><code>str</code></td>
+        <td><p>Can be one of string from basemaps. Defaults to 'HYBRID'.</p></td>
+        <td><code>&#39;HYBRID&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>visible</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether the basemap is visible or not. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Keyword arguments for the TileLayer.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/deckgl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="s2">&quot;HYBRID&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a basemap to the map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        basemap (str, optional): Can be one of string from basemaps. Defaults to &#39;HYBRID&#39;.</span>
+<span class="sd">        visible (bool, optional): Whether the basemap is visible or not. Defaults to True.</span>
+<span class="sd">        **kwargs: Keyword arguments for the TileLayer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">xyzservices</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="n">map_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;ROADMAP&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Maps&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;SATELLITE&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Satellite&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;TERRAIN&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Terrain&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;HYBRID&quot;</span><span class="p">:</span> <span class="s2">&quot;Google Hybrid&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">basemap</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">in</span> <span class="n">map_dict</span><span class="p">:</span>
+                <span class="n">tile</span> <span class="o">=</span> <span class="n">get_google_map</span><span class="p">(</span><span class="n">basemap</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span>
+
+                <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                    <span class="n">min_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">min_zoom</span><span class="p">,</span>
+                    <span class="n">max_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">max_zoom</span><span class="p">,</span>
+                    <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">):</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">basemap</span><span class="o">.</span><span class="n">build_url</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;max_zoom&quot;</span> <span class="ow">in</span> <span class="n">basemap</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">max_zoom</span> <span class="o">=</span> <span class="n">basemap</span><span class="p">[</span><span class="s2">&quot;max_zoom&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">max_zoom</span> <span class="o">=</span> <span class="mi">22</span>
+                <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                    <span class="n">min_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">min_zoom</span><span class="p">,</span>
+                    <span class="n">max_zoom</span><span class="o">=</span><span class="n">max_zoom</span><span class="p">,</span>
+                    <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">basemap</span> <span class="ow">in</span> <span class="n">basemaps</span> <span class="ow">and</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">basemap</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">tile</span> <span class="o">=</span> <span class="n">basemaps</span><span class="p">[</span><span class="n">basemap</span><span class="p">]</span>
+            <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                <span class="n">min_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;min_zoom&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="n">max_zoom</span><span class="o">=</span><span class="n">tile</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;max_zoom&quot;</span><span class="p">,</span> <span class="mi">24</span><span class="p">),</span>
+                <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Basemap can only be one of the following:</span><span class="se">\n</span><span class="s2">  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basemaps</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Basemap can only be one of the following:</span><span class="se">\n</span><span class="s2">  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basemaps</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
 <h3 id="leafmap.deckgl.Map.add_gdf" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_gdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pickable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_scheme</span><span class="o">=</span><span class="s1">&#39;Quantiles&#39;</span><span class="p">,</span> <span class="n">color_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">color_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">zoom</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">add_gdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pickable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">color_column</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_scheme</span><span class="o">=</span><span class="s1">&#39;Quantiles&#39;</span><span class="p">,</span> <span class="n">color_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color_k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">color_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.deckgl.Map.add_gdf" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -5789,6 +6053,8 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
     <span class="n">color_map</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">color_k</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">color_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">rescale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -5819,6 +6085,7 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="kn">from</span> <span class="nn">lonboard</span> <span class="kn">import</span> <span class="n">ScatterplotLayer</span><span class="p">,</span> <span class="n">PathLayer</span><span class="p">,</span> <span class="n">SolidPolygonLayer</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
     <span class="n">geom_type</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">geom_type</span>
     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;pickable&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pickable</span>
@@ -5828,18 +6095,14 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_radius&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span>
         <span class="k">if</span> <span class="n">color_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_continuous_colors</span><span class="p">(</span>
-                    <span class="n">gdf</span><span class="p">,</span>
-                    <span class="n">color_column</span><span class="p">,</span>
-                    <span class="n">color_map</span><span class="p">,</span>
-                    <span class="n">scheme</span><span class="o">=</span><span class="n">color_scheme</span><span class="p">,</span>
-                    <span class="n">k</span><span class="o">=</span><span class="n">color_k</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">color_args</span><span class="p">,</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_continuous_cmap</span><span class="p">(</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rescale</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_discrete_colors</span><span class="p">(</span>
-                    <span class="n">gdf</span><span class="p">,</span> <span class="n">color_column</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">to_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;array&quot;</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_categorical_cmap</span><span class="p">(</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span>
                 <span class="p">)</span>
+
         <span class="k">if</span> <span class="s2">&quot;get_fill_color&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">180</span><span class="p">]</span>
         <span class="n">layer</span> <span class="o">=</span> <span class="n">ScatterplotLayer</span><span class="o">.</span><span class="n">from_geopandas</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -5848,33 +6111,24 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
         <span class="k">if</span> <span class="n">color_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_continuous_colors</span><span class="p">(</span>
-                    <span class="n">gdf</span><span class="p">,</span>
-                    <span class="n">color_column</span><span class="p">,</span>
-                    <span class="n">color_map</span><span class="p">,</span>
-                    <span class="n">scheme</span><span class="o">=</span><span class="n">color_scheme</span><span class="p">,</span>
-                    <span class="n">k</span><span class="o">=</span><span class="n">color_k</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">color_args</span><span class="p">,</span>
+                <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">color_map</span><span class="p">)</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_continuous_cmap</span><span class="p">(</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rescale</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_discrete_colors</span><span class="p">(</span>
-                    <span class="n">gdf</span><span class="p">,</span> <span class="n">color_column</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">to_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;array&quot;</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_categorical_cmap</span><span class="p">(</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span>
                 <span class="p">)</span>
         <span class="n">layer</span> <span class="o">=</span> <span class="n">PathLayer</span><span class="o">.</span><span class="n">from_geopandas</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">geom_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Polygon&quot;</span><span class="p">,</span> <span class="s2">&quot;MultiPolygon&quot;</span><span class="p">]:</span>
         <span class="k">if</span> <span class="n">color_column</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_continuous_colors</span><span class="p">(</span>
-                    <span class="n">gdf</span><span class="p">,</span>
-                    <span class="n">color_column</span><span class="p">,</span>
-                    <span class="n">color_map</span><span class="p">,</span>
-                    <span class="n">scheme</span><span class="o">=</span><span class="n">color_scheme</span><span class="p">,</span>
-                    <span class="n">k</span><span class="o">=</span><span class="n">color_k</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">color_args</span><span class="p">,</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_continuous_cmap</span><span class="p">(</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">rescale</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">color_map</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">assign_discrete_colors</span><span class="p">(</span>
-                    <span class="n">gdf</span><span class="p">,</span> <span class="n">color_column</span><span class="p">,</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">to_rgb</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_type</span><span class="o">=</span><span class="s2">&quot;array&quot;</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">apply_categorical_cmap</span><span class="p">(</span>
+                    <span class="n">gdf</span><span class="p">[</span><span class="n">color_column</span><span class="p">],</span> <span class="n">color_map</span><span class="p">,</span> <span class="n">alpha</span>
                 <span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;get_fill_color&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
@@ -5996,18 +6250,37 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
 <span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">from</span> <span class="nn">lonboard</span> <span class="kn">import</span> <span class="n">ScatterplotLayer</span><span class="p">,</span> <span class="n">PathLayer</span><span class="p">,</span> <span class="n">SolidPolygonLayer</span>
+    <span class="kn">from</span> <span class="nn">lonboard</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">BitmapLayer</span><span class="p">,</span>
+        <span class="n">BitmapTileLayer</span><span class="p">,</span>
+        <span class="n">HeatmapLayer</span><span class="p">,</span>
+        <span class="n">PathLayer</span><span class="p">,</span>
+        <span class="n">PointCloudLayer</span><span class="p">,</span>
+        <span class="n">PolygonLayer</span><span class="p">,</span>
+        <span class="n">ScatterplotLayer</span><span class="p">,</span>
+        <span class="n">SolidPolygonLayer</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ScatterplotLayer</span><span class="p">,</span> <span class="n">PathLayer</span><span class="p">,</span> <span class="n">SolidPolygonLayer</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="n">BitmapLayer</span><span class="p">,</span>
+        <span class="n">BitmapTileLayer</span><span class="p">,</span>
+        <span class="n">HeatmapLayer</span><span class="p">,</span>
+        <span class="n">ScatterplotLayer</span><span class="p">,</span>
+        <span class="n">PathLayer</span><span class="p">,</span>
+        <span class="n">PointCloudLayer</span><span class="p">,</span>
+        <span class="n">PolygonLayer</span><span class="p">,</span>
+        <span class="n">SolidPolygonLayer</span><span class="p">,</span>
+    <span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">lonboard._viewport</span> <span class="kn">import</span> <span class="n">compute_view</span>
 
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">view_state</span> <span class="o">=</span> <span class="n">compute_view</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">table</span><span class="p">])</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s2">&quot;table&quot;</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">view_state</span> <span class="o">=</span> <span class="n">compute_view</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">table</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span>
             <span class="n">layer</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="n">zoom_to_layer</span><span class="p">,</span> <span class="n">pickable</span><span class="o">=</span><span class="n">pickable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
@@ -6375,6 +6648,211 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
 
   </div>
 
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.deckgl.apply_categorical_cmap" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">apply_categorical_cmap</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.deckgl.apply_categorical_cmap" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply a categorical colormap to a set of values.</p>
+<p>This function applies a specified categorical colormap to the input values.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>values</code></td>
+        <td><code>array-like</code></td>
+        <td><p>The input values to which the colormap will be applied.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cmap</code></td>
+        <td><code>str or Colormap</code></td>
+        <td><p>The colormap to apply. Can be a string name of a matplotlib colormap or a Colormap object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>alpha</code></td>
+        <td><code>float</code></td>
+        <td><p>The alpha transparency to apply to the colormap. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the colormap function.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>array</code></td>
+      <td><p>The colors mapped to the input values.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/deckgl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">apply_categorical_cmap</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a categorical colormap to a set of values.</span>
+
+<span class="sd">    This function applies a specified categorical colormap to the input values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        values (array-like): The input values to which the colormap will be applied.</span>
+<span class="sd">        cmap (str or Colormap): The colormap to apply. Can be a string name of a matplotlib colormap or a Colormap object.</span>
+<span class="sd">        alpha (float, optional): The alpha transparency to apply to the colormap. Defaults to None.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the colormap function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array: The colors mapped to the input values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">colormap</span><span class="o">.</span><span class="n">apply_categorical_cmap</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.deckgl.apply_continuous_cmap" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">apply_continuous_cmap</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.deckgl.apply_continuous_cmap" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Apply a continuous colormap to a set of values.</p>
+<p>This function rescales the input values to the range [0, 1] if <code>rescale</code> is True,
+and then applies the specified colormap.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>values</code></td>
+        <td><code>array-like</code></td>
+        <td><p>The input values to which the colormap will be applied.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>cmap</code></td>
+        <td><code>str or Colormap</code></td>
+        <td><p>The colormap to apply. Can be a string name of a matplotlib colormap or a Colormap object.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>alpha</code></td>
+        <td><code>float</code></td>
+        <td><p>The alpha transparency to apply to the colormap. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>rescale</code></td>
+        <td><code>bool</code></td>
+        <td><p>If True, rescales the input values to the range [0, 1]. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the colormap function.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>array</code></td>
+      <td><p>The colors mapped to the input values.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/deckgl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">apply_continuous_cmap</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rescale</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a continuous colormap to a set of values.</span>
+
+<span class="sd">    This function rescales the input values to the range [0, 1] if `rescale` is True,</span>
+<span class="sd">    and then applies the specified colormap.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        values (array-like): The input values to which the colormap will be applied.</span>
+<span class="sd">        cmap (str or Colormap): The colormap to apply. Can be a string name of a matplotlib colormap or a Colormap object.</span>
+<span class="sd">        alpha (float, optional): The alpha transparency to apply to the colormap. Defaults to None.</span>
+<span class="sd">        rescale (bool, optional): If True, rescales the input values to the range [0, 1]. Defaults to True.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the colormap function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array: The colors mapped to the input values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+    <span class="k">if</span> <span class="n">rescale</span><span class="p">:</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span> <span class="o">-</span> <span class="n">values</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">values</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">values</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cmap</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmap</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">colormap</span><span class="o">.</span><span class="n">apply_continuous_cmap</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">cmap</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
 
 
 
