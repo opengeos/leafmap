@@ -757,6 +757,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.deckgl.Map.add_raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_raster()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.deckgl.Map.add_tile_layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_tile_layer()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.deckgl.Map.add_vector" class="md-nav__link">
     <span class="md-ellipsis">
       add_vector()
@@ -5146,6 +5164,24 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.deckgl.Map.add_raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_raster()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.deckgl.Map.add_tile_layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_tile_layer()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.deckgl.Map.add_vector" class="md-nav__link">
     <span class="md-ellipsis">
       add_vector()
@@ -5656,6 +5692,123 @@ Map            (<span title="lonboard._map.Map">Map</span>)
                     <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">basemaps</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_tile_layer</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">tile_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a TileLayer to the map.</span>
+
+<span class="sd">        This method adds a TileLayer to the map. The TileLayer is created from</span>
+<span class="sd">            the specified URL, and it is added to the map with the specified</span>
+<span class="sd">            name, attribution, visibility, and tile size.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url (str): The URL of the tile layer.</span>
+<span class="sd">            opacity (float, optional): The opacity of the layer. Defaults to 1.0.</span>
+<span class="sd">            visible (bool, optional): Whether the layer should be visible by</span>
+<span class="sd">                default. Defaults to True.</span>
+<span class="sd">            tile_size (int, optional): The size of the tiles in the layer.</span>
+<span class="sd">                Defaults to 256.</span>
+<span class="sd">            **kwargs: Additional keyword arguments that are passed to the lonboard.BitmapTileLayer class.</span>
+<span class="sd">                See https://developmentseed.org/lonboard/latest/api/layers/bitmap-tile-layer/#lonboard.BitmapTileLayer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+            <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_raster</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">indexes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">colormap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">attribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Raster&quot;</span><span class="p">,</span>
+        <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">visible</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">array_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+        <span class="n">client_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cors_all&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a local raster dataset to the map.</span>
+<span class="sd">            If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and</span>
+<span class="sd">            if the raster does not render properly, try installing jupyter-server-proxy using `pip install jupyter-server-proxy`,</span>
+<span class="sd">            then running the following code before calling this function. For more info, see https://bit.ly/3JbmF93.</span>
+
+<span class="sd">            import os</span>
+<span class="sd">            os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.</span>
+<span class="sd">            indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.</span>
+<span class="sd">            colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.</span>
+<span class="sd">            vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.</span>
+<span class="sd">            vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.</span>
+<span class="sd">            nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.</span>
+<span class="sd">            attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.</span>
+<span class="sd">            layer_name (str, optional): The layer name to use. Defaults to &#39;Raster&#39;.</span>
+<span class="sd">            layer_index (int, optional): The index of the layer. Defaults to None.</span>
+<span class="sd">            zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.</span>
+<span class="sd">            visible (bool, optional): Whether the layer is visible. Defaults to True.</span>
+<span class="sd">            opacity (float, optional): The opacity of the layer. Defaults to 1.0.</span>
+<span class="sd">            array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.</span>
+<span class="sd">            client_args (dict, optional): Additional arguments to pass to localtileserver.TileClient. Defaults to { &quot;cors_all&quot;: False }.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+        <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">array_to_image</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="o">**</span><span class="n">array_args</span><span class="p">)</span>
+
+        <span class="n">tile_layer</span><span class="p">,</span> <span class="n">tile_client</span> <span class="o">=</span> <span class="n">get_local_tile_layer</span><span class="p">(</span>
+            <span class="n">source</span><span class="p">,</span>
+            <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span>
+            <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+            <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+            <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+            <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+            <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+            <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span>
+            <span class="n">client_args</span><span class="o">=</span><span class="n">client_args</span><span class="p">,</span>
+            <span class="n">return_client</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+            <span class="n">tile_layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+            <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+            <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+            <span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_state</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;latitude&quot;</span><span class="p">:</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;longitude&quot;</span><span class="p">:</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;zoom&quot;</span><span class="p">:</span> <span class="n">zoom</span><span class="p">,</span>
+            <span class="p">}</span>
 </code></pre></div>
         </details>
 
@@ -6285,6 +6438,337 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
         <span class="bp">self</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span>
             <span class="n">layer</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="n">zoom_to_layer</span><span class="p">,</span> <span class="n">pickable</span><span class="o">=</span><span class="n">pickable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.deckgl.Map.add_raster" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s1">&#39;Raster&#39;</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">array_args</span><span class="o">=</span><span class="p">{},</span> <span class="n">client_args</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cors_all&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.deckgl.Map.add_raster" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Add a local raster dataset to the map.
+    If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
+    if the raster does not render properly, try installing jupyter-server-proxy using <code>pip install jupyter-server-proxy</code>,
+    then running the following code before calling this function. For more info, see https://bit.ly/3JbmF93.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code>import os
+os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
+</code></pre></div></td></tr></table></div>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>source</code></td>
+        <td><code>str</code></td>
+        <td><p>The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>indexes</code></td>
+        <td><code>int</code></td>
+        <td><p>The band(s) to use. Band indexing starts at 1. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>colormap</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the colormap from <code>matplotlib</code> to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>vmin</code></td>
+        <td><code>float</code></td>
+        <td><p>The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>vmax</code></td>
+        <td><code>float</code></td>
+        <td><p>The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>nodata</code></td>
+        <td><code>float</code></td>
+        <td><p>The value from the band to use to interpret as not valid data. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>attribution</code></td>
+        <td><code>str</code></td>
+        <td><p>Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>layer_name</code></td>
+        <td><code>str</code></td>
+        <td><p>The layer name to use. Defaults to 'Raster'.</p></td>
+        <td><code>&#39;Raster&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>layer_index</code></td>
+        <td><code>int</code></td>
+        <td><p>The index of the layer. Defaults to None.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>zoom_to_layer</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to zoom to the extent of the layer. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>visible</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether the layer is visible. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>opacity</code></td>
+        <td><code>float</code></td>
+        <td><p>The opacity of the layer. Defaults to 1.0.</p></td>
+        <td><code>1.0</code></td>
+      </tr>
+      <tr>
+        <td><code>array_args</code></td>
+        <td><code>dict</code></td>
+        <td><p>Additional arguments to pass to <code>array_to_memory_file</code> when reading the raster. Defaults to {}.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+      <tr>
+        <td><code>client_args</code></td>
+        <td><code>dict</code></td>
+        <td><p>Additional arguments to pass to localtileserver.TileClient. Defaults to { "cors_all": False }.</p></td>
+        <td><code>{&#39;cors_all&#39;: True}</code></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/deckgl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_raster</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">indexes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">colormap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vmin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vmax</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nodata</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">tile_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">attribution</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Raster&quot;</span><span class="p">,</span>
+    <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">visible</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">array_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">client_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;cors_all&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a local raster dataset to the map.</span>
+<span class="sd">        If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and</span>
+<span class="sd">        if the raster does not render properly, try installing jupyter-server-proxy using `pip install jupyter-server-proxy`,</span>
+<span class="sd">        then running the following code before calling this function. For more info, see https://bit.ly/3JbmF93.</span>
+
+<span class="sd">        import os</span>
+<span class="sd">        os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.</span>
+<span class="sd">        indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.</span>
+<span class="sd">        colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.</span>
+<span class="sd">        vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.</span>
+<span class="sd">        vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.</span>
+<span class="sd">        nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.</span>
+<span class="sd">        attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.</span>
+<span class="sd">        layer_name (str, optional): The layer name to use. Defaults to &#39;Raster&#39;.</span>
+<span class="sd">        layer_index (int, optional): The index of the layer. Defaults to None.</span>
+<span class="sd">        zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.</span>
+<span class="sd">        visible (bool, optional): Whether the layer is visible. Defaults to True.</span>
+<span class="sd">        opacity (float, optional): The opacity of the layer. Defaults to 1.0.</span>
+<span class="sd">        array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.</span>
+<span class="sd">        client_args (dict, optional): Additional arguments to pass to localtileserver.TileClient. Defaults to { &quot;cors_all&quot;: False }.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">array_to_image</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="o">**</span><span class="n">array_args</span><span class="p">)</span>
+
+    <span class="n">tile_layer</span><span class="p">,</span> <span class="n">tile_client</span> <span class="o">=</span> <span class="n">get_local_tile_layer</span><span class="p">(</span>
+        <span class="n">source</span><span class="p">,</span>
+        <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">,</span>
+        <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span>
+        <span class="n">vmin</span><span class="o">=</span><span class="n">vmin</span><span class="p">,</span>
+        <span class="n">vmax</span><span class="o">=</span><span class="n">vmax</span><span class="p">,</span>
+        <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+        <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+        <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span>
+        <span class="n">client_args</span><span class="o">=</span><span class="n">client_args</span><span class="p">,</span>
+        <span class="n">return_client</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+        <span class="n">tile_layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+        <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+        <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
+        <span class="n">center</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
+        <span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_state</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;latitude&quot;</span><span class="p">:</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="s2">&quot;longitude&quot;</span><span class="p">:</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;zoom&quot;</span><span class="p">:</span> <span class="n">zoom</span><span class="p">,</span>
+        <span class="p">}</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.deckgl.Map.add_tile_layer" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_tile_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tile_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.deckgl.Map.add_tile_layer" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds a TileLayer to the map.</p>
+<p>This method adds a TileLayer to the map. The TileLayer is created from
+    the specified URL, and it is added to the map with the specified
+    name, attribution, visibility, and tile size.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>url</code></td>
+        <td><code>str</code></td>
+        <td><p>The URL of the tile layer.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>opacity</code></td>
+        <td><code>float</code></td>
+        <td><p>The opacity of the layer. Defaults to 1.0.</p></td>
+        <td><code>1.0</code></td>
+      </tr>
+      <tr>
+        <td><code>visible</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether the layer should be visible by
+default. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>tile_size</code></td>
+        <td><code>int</code></td>
+        <td><p>The size of the tiles in the layer.
+Defaults to 256.</p></td>
+        <td><code>256</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments that are passed to the lonboard.BitmapTileLayer class.
+See https://developmentseed.org/lonboard/latest/api/layers/bitmap-tile-layer/#lonboard.BitmapTileLayer.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/deckgl.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_tile_layer</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tile_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a TileLayer to the map.</span>
+
+<span class="sd">    This method adds a TileLayer to the map. The TileLayer is created from</span>
+<span class="sd">        the specified URL, and it is added to the map with the specified</span>
+<span class="sd">        name, attribution, visibility, and tile size.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url (str): The URL of the tile layer.</span>
+<span class="sd">        opacity (float, optional): The opacity of the layer. Defaults to 1.0.</span>
+<span class="sd">        visible (bool, optional): Whether the layer should be visible by</span>
+<span class="sd">            default. Defaults to True.</span>
+<span class="sd">        tile_size (int, optional): The size of the tiles in the layer.</span>
+<span class="sd">            Defaults to 256.</span>
+<span class="sd">        **kwargs: Additional keyword arguments that are passed to the lonboard.BitmapTileLayer class.</span>
+<span class="sd">            See https://developmentseed.org/lonboard/latest/api/layers/bitmap-tile-layer/#lonboard.BitmapTileLayer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">lonboard</span><span class="o">.</span><span class="n">BitmapTileLayer</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+        <span class="n">tile_size</span><span class="o">=</span><span class="n">tile_size</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+        <span class="n">visible</span><span class="o">=</span><span class="n">visible</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
