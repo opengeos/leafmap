@@ -900,13 +900,23 @@ def csv_to_geojson(
             f.write(json.dumps(geojson))
 
 
-def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude", encoding="utf-8"):
+def csv_to_gdf(
+    in_csv,
+    latitude="latitude",
+    longitude="longitude",
+    geometry=None,
+    crs="EPSG:4326",
+    encoding="utf-8",
+    **kwargs,
+):
     """Creates points for a CSV file and converts them to a GeoDataFrame.
 
     Args:
         in_csv (str): The file path to the input CSV file.
         latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
         longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+        geometry (str, optional): The name of the column containing geometry. Defaults to None.
+        crs (str, optional): The coordinate reference system. Defaults to "EPSG:4326".
         encoding (str, optional): The encoding of characters. Defaults to "utf-8".
 
     Returns:
@@ -916,14 +926,21 @@ def csv_to_gdf(in_csv, latitude="latitude", longitude="longitude", encoding="utf
     check_package(name="geopandas", URL="https://geopandas.org")
 
     import geopandas as gpd
+    import pandas as pd
+    from shapely import wkt
 
     out_dir = os.getcwd()
 
-    out_geojson = os.path.join(out_dir, random_string() + ".geojson")
-    csv_to_geojson(in_csv, out_geojson, latitude, longitude, encoding)
+    if geometry is None:
+        out_geojson = os.path.join(out_dir, random_string() + ".geojson")
+        csv_to_geojson(in_csv, out_geojson, latitude, longitude, encoding=encoding)
 
-    gdf = gpd.read_file(out_geojson)
-    os.remove(out_geojson)
+        gdf = gpd.read_file(out_geojson)
+        os.remove(out_geojson)
+    else:
+        df = pd.read_csv(in_csv, encoding=encoding)
+        df["geometry"] = df[geometry].apply(wkt.loads)
+        gdf = gpd.GeoDataFrame(df, geometry="geometry", crs=crs, **kwargs)
     return gdf
 
 
@@ -932,6 +949,8 @@ def csv_to_vector(
     output,
     latitude="latitude",
     longitude="longitude",
+    geometry=None,
+    crs="EPSG:4326",
     encoding="utf-8",
     **kwargs,
 ):
@@ -942,10 +961,13 @@ def csv_to_vector(
         output (str): The file path to the output vector dataset.
         latitude (str, optional): The name of the column containing latitude coordinates. Defaults to "latitude".
         longitude (str, optional): The name of the column containing longitude coordinates. Defaults to "longitude".
+        geometry (str, optional): The name of the column containing geometry. Defaults to None.
+        crs (str, optional): The coordinate reference system. Defaults to "EPSG:4326".
         encoding (str, optional): The encoding of characters. Defaults to "utf-8".
+        **kwargs: Additional keyword arguments to pass to gdf.to_file().
 
     """
-    gdf = csv_to_gdf(in_csv, latitude, longitude, encoding)
+    gdf = csv_to_gdf(in_csv, latitude, longitude, geometry, crs, encoding)
     gdf.to_file(output, **kwargs)
 
 

@@ -1,4 +1,7 @@
+from box import Box
+
 from typing import Union, List, Dict, Optional, Tuple, Any
+from .basemaps import xyz_to_leaflet
 from .common import *
 from .map_widgets import *
 from .plot import *
@@ -11,6 +14,8 @@ except ImportError:
     raise Exception(
         "lonboard needs to be installed to use this module. Use 'pip install lonboard' to install the package."
     )
+
+basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 
 class Map(lonboard.Map):
@@ -67,6 +72,8 @@ class Map(lonboard.Map):
         color_map: Optional[Union[str, Dict]] = None,
         color_k: Optional[int] = 5,
         color_args: dict = {},
+        alpha: Optional[float] = 1.0,
+        rescale: bool = True,
         zoom: Optional[float] = 10.0,
         **kwargs: Any,
     ) -> None:
@@ -97,6 +104,7 @@ class Map(lonboard.Map):
         """
 
         from lonboard import ScatterplotLayer, PathLayer, SolidPolygonLayer
+        import matplotlib.pyplot as plt
 
         geom_type = gdf.geometry.iloc[0].geom_type
         kwargs["pickable"] = pickable
@@ -106,18 +114,14 @@ class Map(lonboard.Map):
                 kwargs["get_radius"] = 10
             if color_column is not None:
                 if isinstance(color_map, str):
-                    kwargs["get_fill_color"] = assign_continuous_colors(
-                        gdf,
-                        color_column,
-                        color_map,
-                        scheme=color_scheme,
-                        k=color_k,
-                        **color_args,
+                    kwargs["get_fill_color"] = apply_continuous_cmap(
+                        gdf[color_column], color_map, alpha, rescale
                     )
                 elif isinstance(color_map, dict):
-                    kwargs["get_fill_color"] = assign_discrete_colors(
-                        gdf, color_column, color_map, to_rgb=True, return_type="array"
+                    kwargs["get_fill_color"] = apply_categorical_cmap(
+                        gdf[color_column], color_map, alpha
                     )
+
             if "get_fill_color" not in kwargs:
                 kwargs["get_fill_color"] = [255, 0, 0, 180]
             layer = ScatterplotLayer.from_geopandas(gdf, **kwargs)
@@ -126,33 +130,24 @@ class Map(lonboard.Map):
                 kwargs["get_width"] = 5
             if color_column is not None:
                 if isinstance(color_map, str):
-                    kwargs["get_color"] = assign_continuous_colors(
-                        gdf,
-                        color_column,
-                        color_map,
-                        scheme=color_scheme,
-                        k=color_k,
-                        **color_args,
+                    cmap = plt.get_cmap(color_map)
+                    kwargs["get_color"] = apply_continuous_cmap(
+                        gdf[color_column], cmap, alpha, rescale
                     )
                 elif isinstance(color_map, dict):
-                    kwargs["get_color"] = assign_discrete_colors(
-                        gdf, color_column, color_map, to_rgb=True, return_type="array"
+                    kwargs["get_color"] = apply_categorical_cmap(
+                        gdf[color_column], color_map, alpha
                     )
             layer = PathLayer.from_geopandas(gdf, **kwargs)
         elif geom_type in ["Polygon", "MultiPolygon"]:
             if color_column is not None:
                 if isinstance(color_map, str):
-                    kwargs["get_fill_color"] = assign_continuous_colors(
-                        gdf,
-                        color_column,
-                        color_map,
-                        scheme=color_scheme,
-                        k=color_k,
-                        **color_args,
+                    kwargs["get_fill_color"] = apply_continuous_cmap(
+                        gdf[color_column], color_map, alpha, rescale
                     )
                 elif isinstance(color_map, dict):
-                    kwargs["get_fill_color"] = assign_discrete_colors(
-                        gdf, color_column, color_map, to_rgb=True, return_type="array"
+                    kwargs["get_fill_color"] = apply_categorical_cmap(
+                        gdf[color_column], color_map, alpha
                     )
             if "get_fill_color" not in kwargs:
                 kwargs["get_fill_color"] = [0, 0, 255, 128]
@@ -254,18 +249,37 @@ class Map(lonboard.Map):
             None
         """
 
-        from lonboard import ScatterplotLayer, PathLayer, SolidPolygonLayer
+        from lonboard import (
+            BitmapLayer,
+            BitmapTileLayer,
+            HeatmapLayer,
+            PathLayer,
+            PointCloudLayer,
+            PolygonLayer,
+            ScatterplotLayer,
+            SolidPolygonLayer,
+        )
 
-        if type(layer) in [ScatterplotLayer, PathLayer, SolidPolygonLayer]:
+        if type(layer) in [
+            BitmapLayer,
+            BitmapTileLayer,
+            HeatmapLayer,
+            ScatterplotLayer,
+            PathLayer,
+            PointCloudLayer,
+            PolygonLayer,
+            SolidPolygonLayer,
+        ]:
             self.layers = self.layers + [layer]
 
             if zoom_to_layer:
                 from lonboard._viewport import compute_view
 
-                try:
-                    self.view_state = compute_view([self.layers[-1].table])
-                except Exception as e:
-                    print(e)
+                if hasattr(layer, "table"):
+                    try:
+                        self.view_state = compute_view([self.layers[-1].table])
+                    except Exception as e:
+                        print(e)
         else:
             self.add_vector(
                 layer, zoom_to_layer=zoom_to_layer, pickable=pickable, **kwargs
@@ -317,3 +331,96 @@ class Map(lonboard.Map):
 
         except Exception as e:
             raise e
+
+    def add_basemap(self, basemap="HYBRID", visible=True, **kwargs) -> None:
+        """Adds a basemap to the map.
+
+        Args:
+            basemap (str, optional): Can be one of string from basemaps. Defaults to 'HYBRID'.
+            visible (bool, optional): Whether the basemap is visible or not. Defaults to True.
+            **kwargs: Keyword arguments for the TileLayer.
+        """
+        import xyzservices
+
+        try:
+
+            map_dict = {
+                "ROADMAP": "Google Maps",
+                "SATELLITE": "Google Satellite",
+                "TERRAIN": "Google Terrain",
+                "HYBRID": "Google Hybrid",
+            }
+
+            if isinstance(basemap, str):
+                if basemap.upper() in map_dict:
+                    tile = get_google_map(basemap.upper())
+
+                    layer = lonboard.BitmapTileLayer(
+                        data=tile.url,
+                        min_zoom=tile.min_zoom,
+                        max_zoom=tile.max_zoom,
+                        visible=visible,
+                        **kwargs,
+                    )
+
+                    self.add_layer(layer)
+                    return
+
+            if isinstance(basemap, xyzservices.TileProvider):
+                url = basemap.build_url()
+                if "max_zoom" in basemap.keys():
+                    max_zoom = basemap["max_zoom"]
+                else:
+                    max_zoom = 22
+                    layer = lonboard.BitmapTileLayer(
+                        data=url,
+                        min_zoom=tile.min_zoom,
+                        max_zoom=max_zoom,
+                        visible=visible,
+                        **kwargs,
+                    )
+
+                    self.add_layer(layer)
+            elif basemap in basemaps and basemaps[basemap].name:
+                tile = basemaps[basemap]
+                layer = lonboard.BitmapTileLayer(
+                    data=tile.url,
+                    min_zoom=tile.get("min_zoom", 0),
+                    max_zoom=tile.get("max_zoom", 24),
+                    visible=visible,
+                    **kwargs,
+                )
+                self.add_layer(layer)
+            else:
+                print(
+                    "Basemap can only be one of the following:\n  {}".format(
+                        "\n  ".join(basemaps.keys())
+                    )
+                )
+
+        except Exception as e:
+            raise ValueError(
+                "Basemap can only be one of the following:\n  {}".format(
+                    "\n  ".join(basemaps.keys())
+                )
+            )
+
+
+def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    if rescale:
+        values = np.array(values)
+        values = (values - values.min()) / (values.max() - values.min())
+
+    if isinstance(cmap, str):
+        cmap = plt.get_cmap(cmap)
+
+    return lonboard.colormap.apply_continuous_cmap(values, cmap, alpha=alpha, **kwargs)
+
+
+def apply_categorical_cmap(values, cmap, alpha=None, **kwargs):
+
+    return lonboard.colormap.apply_categorical_cmap(values, cmap, alpha=alpha, **kwargs)
