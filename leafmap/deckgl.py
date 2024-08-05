@@ -405,6 +405,123 @@ class Map(lonboard.Map):
                 )
             )
 
+    def add_tile_layer(
+        self,
+        url: str,
+        opacity: float = 1.0,
+        visible: bool = True,
+        tile_size: int = 256,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a TileLayer to the map.
+
+        This method adds a TileLayer to the map. The TileLayer is created from
+            the specified URL, and it is added to the map with the specified
+            name, attribution, visibility, and tile size.
+
+        Args:
+            url (str): The URL of the tile layer.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
+            visible (bool, optional): Whether the layer should be visible by
+                default. Defaults to True.
+            tile_size (int, optional): The size of the tiles in the layer.
+                Defaults to 256.
+            **kwargs: Additional keyword arguments that are passed to the lonboard.BitmapTileLayer class.
+                See https://developmentseed.org/lonboard/latest/api/layers/bitmap-tile-layer/#lonboard.BitmapTileLayer.
+
+        Returns:
+            None
+        """
+
+        layer = lonboard.BitmapTileLayer(
+            data=url,
+            tile_size=tile_size,
+            opacity=opacity,
+            visible=visible,
+            **kwargs,
+        )
+        self.add_layer(layer)
+
+    def add_raster(
+        self,
+        source: str,
+        indexes: Optional[int] = None,
+        colormap: Optional[str] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        nodata: Optional[float] = None,
+        tile_size: Optional[int] = 256,
+        attribution: Optional[str] = None,
+        layer_name: Optional[str] = "Raster",
+        zoom_to_layer: Optional[bool] = True,
+        visible: Optional[bool] = True,
+        opacity: Optional[float] = 1.0,
+        array_args: Optional[Dict] = {},
+        client_args: Optional[Dict] = {"cors_all": True},
+        **kwargs,
+    ) -> None:
+        """Add a local raster dataset to the map.
+            If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
+            if the raster does not render properly, try installing jupyter-server-proxy using `pip install jupyter-server-proxy`,
+            then running the following code before calling this function. For more info, see https://bit.ly/3JbmF93.
+
+            import os
+            os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = 'proxy/{port}'
+
+        Args:
+            source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
+            indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.
+            colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+            vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
+            attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
+            layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
+            layer_index (int, optional): The index of the layer. Defaults to None.
+            zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
+            visible (bool, optional): Whether the layer is visible. Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
+            array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.
+            client_args (dict, optional): Additional arguments to pass to localtileserver.TileClient. Defaults to { "cors_all": False }.
+        """
+        import numpy as np
+        import xarray as xr
+
+        if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
+            source = array_to_image(source, **array_args)
+
+        tile_layer, tile_client = get_local_tile_layer(
+            source,
+            indexes=indexes,
+            colormap=colormap,
+            vmin=vmin,
+            vmax=vmax,
+            nodata=nodata,
+            opacity=opacity,
+            attribution=attribution,
+            layer_name=layer_name,
+            client_args=client_args,
+            return_client=True,
+        )
+
+        self.add_tile_layer(
+            tile_layer.url,
+            opacity=opacity,
+            visible=visible,
+            tile_size=tile_size,
+            **kwargs,
+        )
+        if zoom_to_layer:
+            center = tile_client.center()
+            zoom = tile_client.default_zoom
+
+            self.view_state = {
+                "latitude": center[0],
+                "longitude": center[1],
+                "zoom": zoom,
+            }
+
 
 def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
     """
