@@ -110,6 +110,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/opengeos/leafmap",
-    version="0.36.3",
+    version="0.36.4",
     zip_safe=False,
 )
