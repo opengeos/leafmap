@@ -407,7 +407,22 @@ class Map(lonboard.Map):
 
 
 def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
+    """
+    Apply a continuous colormap to a set of values.
 
+    This function rescales the input values to the range [0, 1] if `rescale` is True,
+    and then applies the specified colormap.
+
+    Args:
+        values (array-like): The input values to which the colormap will be applied.
+        cmap (str or Colormap): The colormap to apply. Can be a string name of a matplotlib colormap or a Colormap object.
+        alpha (float, optional): The alpha transparency to apply to the colormap. Defaults to None.
+        rescale (bool, optional): If True, rescales the input values to the range [0, 1]. Defaults to True.
+        **kwargs: Additional keyword arguments to pass to the colormap function.
+
+    Returns:
+        array: The colors mapped to the input values.
+    """
     import numpy as np
     import matplotlib.pyplot as plt
 
@@ -422,5 +437,18 @@ def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
 
 
 def apply_categorical_cmap(values, cmap, alpha=None, **kwargs):
+    """
+    Apply a categorical colormap to a set of values.
 
+    This function applies a specified categorical colormap to the input values.
+
+    Args:
+        values (array-like): The input values to which the colormap will be applied.
+        cmap (str or Colormap): The colormap to apply. Can be a string name of a matplotlib colormap or a Colormap object.
+        alpha (float, optional): The alpha transparency to apply to the colormap. Defaults to None.
+        **kwargs: Additional keyword arguments to pass to the colormap function.
+
+    Returns:
+        array: The colors mapped to the input values.
+    """
     return lonboard.colormap.apply_categorical_cmap(values, cmap, alpha=alpha, **kwargs)
