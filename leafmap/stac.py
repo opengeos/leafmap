@@ -146,6 +146,7 @@ def cog_tile(
     Returns:
         tuple: Returns the COG Tile layer URL and bounds.
     """
+    import json
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
@@ -180,7 +181,7 @@ def cog_tile(
     elif isinstance(kwargs["bidx"], int):
         kwargs["bidx"] = [kwargs["bidx"]]
 
-    if "rescale" not in kwargs:
+    if "rescale" not in kwargs and ("colormap" not in kwargs):
         stats = cog_stats(url, titiler_endpoint)
 
         if "message" not in stats:
@@ -196,6 +197,9 @@ def cog_tile(
                 kwargs["rescale"] = rescale
             except Exception as e:
                 pass
+
+    if "colormap" in kwargs and isinstance(kwargs["colormap"], dict):
+        kwargs["colormap"] = json.dumps(kwargs["colormap"])
 
     TileMatrixSetId = "WebMercatorQuad"
     if "TileMatrixSetId" in kwargs.keys():
