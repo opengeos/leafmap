@@ -10623,6 +10623,7 @@ def array_to_image(
     import numpy as np
     import rasterio
     import xarray as xr
+    import rioxarray
     from rasterio.transform import Affine
 
     if output is None:
@@ -10640,14 +10641,31 @@ def array_to_image(
         )
 
     if isinstance(array, xr.DataArray):
-        coords = [coord for coord in array.coords]
-        if coords[0] == "time":
-            x_dim = coords[1]
-            y_dim = coords[2]
-            array = (
-                array.isel(time=0).rename({y_dim: "y", x_dim: "x"}).transpose("y", "x")
+        if (
+            hasattr(array, "rio")
+            and (array.rio.crs is not None)
+            and (array.rio.transform() is not None)
+        ):
+
+            if "latitude" in array.dims and "longitude" in array.dims:
+                array = array.rename({"latitude": "y", "longitude": "x"})
+            elif "lat" in array.dims and "lon" in array.dims:
+                array = array.rename({"lat": "y", "lon": "x"})
+
+            if array.ndim == 2 and ("x" in array.dims) and ("y" in array.dims):
+                array = array.transpose("y", "x")
+            elif array.ndim == 3 and ("x" in array.dims) and ("y" in array.dims):
+                dims = list(array.dims)
+                dims.remove("x")
+                dims.remove("y")
+                array = array.transpose(dims[0], "y", "x")
+            if "long_name" in array.attrs:
+                array.attrs.pop("long_name")
+
+            array.rio.to_raster(
+                output, driver=driver, compress=compress, dtype=dtype, **kwargs
             )
-        array = array.values
+            return
 
     if array.ndim == 3 and transpose:
         array = np.transpose(array, (1, 2, 0))
