@@ -14117,3 +14117,32 @@ def ee_tile_url(
         except Exception as e:
             print(e)
             return None
+
+
+def d2s_tile(
+    url: str, titiler_endpoint: str = "https://tt.d2s.org", **kwargs: Any
+) -> str:
+    """Generate a D2S tile URL with optional API key.
+
+    Args:
+        url (str): The base URL for the tile.
+        titiler_endpoint (str, optional): The endpoint for the titiler service.
+            Defaults to "https://tt.d2s.org".
+        **kwargs (Any): Additional keyword arguments to pass to the cog_stats function.
+
+    Returns:
+        str: The modified URL with the API key if required, otherwise the original URL.
+
+    Raises:
+        ValueError: If the API key is required but not set in the environment variables.
+    """
+
+    stats = cog_stats(url, titiler_endpoint=titiler_endpoint, **kwargs)
+    if "detail" in stats:
+        api_key = get_api_key("D2S_API_KEY")
+        if api_key is None:
+            raise ValueError("Please set the D2S_API_KEY environment variable.")
+        else:
+            return f"{url}?API_KEY={api_key}"
+    else:
+        return url
