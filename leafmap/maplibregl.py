@@ -966,7 +966,7 @@ class Map(MapWidget):
         visible: bool = True,
         bands: Optional[List[int]] = None,
         nodata: Optional[Union[int, float]] = 0,
-        titiler_endpoint: str = "https://titiler.xyz",
+        titiler_endpoint: str = None,
         fit_bounds: bool = True,
         before_id: Optional[str] = None,
         **kwargs: Any,
