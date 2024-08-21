@@ -211,39 +211,39 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-    def add(self, object, index=None, **kwargs) -> None:
+    def add(self, obj, index=None, **kwargs) -> None:
         """Adds a layer to the map.
 
         Args:
             layer (object): The layer to add to the map.
             index (int, optional): The index at which to add the layer. Defaults to None.
         """
-        if isinstance(object, str):
-            if object in basemaps.keys():
-                object = get_basemap(object)
+        if isinstance(obj, str):
+            if obj in basemaps.keys():
+                obj = get_basemap(obj)
             else:
-                if object == "nasa_earth_data":
+                if obj == "nasa_earth_data":
                     from .toolbar import nasa_data_gui
 
                     nasa_data_gui(self, **kwargs)
-                elif object == "inspector":
+                elif obj == "inspector":
                     from .toolbar import inspector_gui
 
                     inspector_gui(self, **kwargs)
 
-                elif object == "stac":
+                elif obj == "stac":
                     self.add_stac_gui(**kwargs)
-                elif object == "basemap":
+                elif obj == "basemap":
                     self.add_basemap_gui(**kwargs)
-                elif object == "inspector":
+                elif obj == "inspector":
                     self.add_inspector_gui(**kwargs)
-                elif object == "layer_manager":
+                elif obj == "layer_manager":
                     self.add_layer_manager(**kwargs)
-                elif object == "oam":
+                elif obj == "oam":
                     self.add_oam_gui(**kwargs)
                 return
 
-        super().add(object, index=index)
+        super().add(obj, index=index)
 
         if hasattr(self, "layer_manager_widget"):
             self.update_layer_manager()
