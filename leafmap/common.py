@@ -14236,3 +14236,64 @@ def convert_to_gdf(
     gdf.set_crs(crs, inplace=True)
 
     return gdf
+
+
+def points_to_line(
+    data: Union[str, pd.DataFrame],
+    src_lat: str,
+    src_lon: str,
+    dst_lat: str,
+    dst_lon: str,
+    crs: str = "EPSG:4326",
+    **kwargs: Any,
+) -> "gpd.GeoDataFrame":
+    """
+    Converts source and destination coordinates into a GeoDataFrame with LineString geometries.
+
+    Args:
+        data (Union[str, pd.DataFrame, gpd.GeoDataFrame]): Input data which can be a file path or a DataFrame.
+        src_lat (str): Column name for source latitude.
+        src_lon (str): Column name for source longitude.
+        dst_lat (str): Column name for destination latitude.
+        dst_lon (str): Column name for destination longitude.
+        crs (str, optional): Coordinate reference system. Defaults to "EPSG:4326".
+        **kwargs (Any): Additional arguments passed to the file reading functions.
+
+    Returns:
+        gpd.GeoDataFrame: A GeoDataFrame with LineString geometries.
+    """
+    import geopandas as gpd
+    from shapely.geometry import LineString
+
+    if isinstance(data, str):
+        if data.endswith(".parquet"):
+            gdf = pd.read_parquet(data, **kwargs)
+        elif data.endswith(".csv"):
+            gdf = pd.read_csv(data, **kwargs)
+        elif data.endswith(".json"):
+            gdf = pd.read_json(data, **kwargs)
+        elif data.endswith(".xlsx"):
+            gdf = pd.read_excel(data, **kwargs)
+        else:
+            gdf = gpd.read_file(data, **kwargs)
+
+    elif isinstance(data, pd.DataFrame) or isinstance(data, gpd.GeoDataFrame):
+        gdf = data.copy()
+    else:
+        raise ValueError(
+            "Unsupported data type. Please provide a file path or a DataFrame."
+        )
+
+    # Assuming you have a GeoDataFrame 'gdf' with the source and destination coordinates
+    def create_polyline(row):
+        source_point = (row[src_lon], row[src_lat])
+        dst_point = (row[dst_lon], row[dst_lat])
+        return LineString([source_point, dst_point])
+
+    # Apply the function to create the polyline geometry
+    gdf["geometry"] = gdf.apply(create_polyline, axis=1)
+
+    # Set the GeoDataFrame's geometry column to the newly created geometry column
+    gdf = gdf.set_geometry("geometry")
+    gdf.crs = crs
+    return gdf
