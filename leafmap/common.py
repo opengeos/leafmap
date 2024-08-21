@@ -26,6 +26,9 @@ try:
 except ImportError:
     pass
 
+if TYPE_CHECKING:
+    import geopandas as gpd
+
 
 class WhiteboxTools(whitebox.WhiteboxTools):
     """This class inherits the whitebox WhiteboxTools class."""
