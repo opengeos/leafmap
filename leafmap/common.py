@@ -26,14 +26,6 @@ try:
 except ImportError:
     pass
 
-try:
-    import geopandas as gpd
-except ImportError:
-    gpd = None
-
-if TYPE_CHECKING:
-    import geopandas as gpd
-
 
 class WhiteboxTools(whitebox.WhiteboxTools):
     """This class inherits the whitebox WhiteboxTools class."""
@@ -14149,7 +14141,7 @@ def convert_to_gdf(
     obj_to_str: bool = False,
     open_args: Optional[Dict[str, Any]] = None,
     **kwargs: Any,
-) -> gpd.GeoDataFrame:
+) -> "gpd.GeoDataFrame":
     """Convert data to a GeoDataFrame.
 
     Args:
