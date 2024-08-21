@@ -23,9 +23,13 @@ from .stac import *
 
 try:
     from IPython.display import display
-    import geopandas as gpd
 except ImportError:
     pass
+
+try:
+    import geopandas as gpd
+except ImportError:
+    gpd = None
 
 if TYPE_CHECKING:
     import geopandas as gpd
