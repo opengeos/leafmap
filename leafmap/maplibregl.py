@@ -2754,6 +2754,363 @@ class Map(MapWidget):
         self.add_source("openmaptiles", source)
         self.add_layer(layer)
 
+    def add_overture_3d_buildings(
+        self,
+        release: Optional[str] = "2024-07-22",
+        style: Optional[Dict[str, Any]] = None,
+        values: Optional[List[int]] = None,
+        colors: Optional[List[str]] = None,
+        visible: bool = True,
+        opacity: float = 1.0,
+        tooltip: bool = True,
+        template: str = "simple",
+        fit_bounds: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Add 3D buildings from Overture Maps to the map.
+
+        Args:
+            release (Optional[str], optional): The release date of the Overture Maps data.
+                Defaults to "2024-07-22". For more info, see
+                https://github.com/OvertureMaps/overture-tiles.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the buildings. Defaults to None.
+            values (Optional[List[int]], optional): List of height values for
+                color interpolation. Defaults to None.
+            colors (Optional[List[str]], optional): List of colors corresponding
+                to the height values. Defaults to None.
+            visible (bool, optional): Whether the buildings layer is visible.
+                Defaults to True.
+            opacity (float, optional): The opacity of the buildings layer.
+                Defaults to 1.0.
+            tooltip (bool, optional): Whether to show tooltips on the buildings.
+                Defaults to True.
+            template (str, optional): The template for the tooltip. It can be
+                "simple" or "all". Defaults to "simple".
+            fit_bounds (bool, optional): Whether to fit the map bounds to the
+                buildings layer. Defaults to False.
+
+        Raises:
+            ValueError: If the length of values and colors lists are not the same.
+        """
+        url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
+
+        if template == "simple":
+            template = "Name: {{@name}}<br>Subtype: {{subtype}}<br>Class: {{class}}<br>Height: {{height}}"
+        elif template == "all":
+            template = None
+
+        if style is None:
+            if values is None:
+                values = [0, 200, 400]
+            if colors is None:
+                colors = ["lightgray", "royalblue", "lightblue"]
+
+            if len(values) != len(colors):
+                raise ValueError("The values and colors must have the same length.")
+            value_color_pairs = []
+            for i, value in enumerate(values):
+                value_color_pairs.append(value)
+                value_color_pairs.append(colors[i])
+
+            style = {
+                "layers": [
+                    {
+                        "id": "buildings",
+                        "source": "example_source",
+                        "source-layer": "building",
+                        "type": "fill-extrusion",
+                        "filter": [
+                            ">",
+                            ["get", "height"],
+                            0,
+                        ],  # only show buildings with height info
+                        "paint": {
+                            "fill-extrusion-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["get", "height"],
+                            ]
+                            + value_color_pairs,
+                            "fill-extrusion-height": ["*", ["get", "height"], 1],
+                        },
+                    },
+                    {
+                        "id": "building-parts",
+                        "source": "example_source",
+                        "source-layer": "building_part",
+                        "type": "fill-extrusion",
+                        "filter": [
+                            ">",
+                            ["get", "height"],
+                            0,
+                        ],  # only show buildings with height info
+                        "paint": {
+                            "fill-extrusion-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["get", "height"],
+                            ]
+                            + value_color_pairs,
+                            "fill-extrusion-height": ["*", ["get", "height"], 1],
+                        },
+                    },
+                ],
+            }
+
+        self.add_pmtiles(
+            url,
+            style=style,
+            visible=visible,
+            opacity=opacity,
+            tooltip=tooltip,
+            template=template,
+            fit_bounds=fit_bounds,
+            **kwargs,
+        )
+
+    def add_overture_data(
+        self,
+        release: str = "2024-07-22",
+        theme: str = "buildings",
+        style: Optional[Dict[str, Any]] = None,
+        visible: bool = True,
+        opacity: float = 1.0,
+        tooltip: bool = True,
+        fit_bounds: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Add Overture Maps data to the map.
+
+        Args:
+            release (str, optional): The release date of the data. Defaults to
+                "2024-07-22". For more info, see https://github.com/OvertureMaps/overture-tiles
+            theme (str, optional): The theme of the data. It can be one of the following:
+                "addresses", "base", "buildings", "divisions", "places", "transportation".
+                Defaults to "buildings".
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the data. Defaults to None.
+            visible (bool, optional): Whether the data layer is visible. Defaults to True.
+            opacity (float, optional): The opacity of the data layer. Defaults to 1.0.
+            tooltip (bool, optional): Whether to show tooltips on the data.
+                Defaults to True.
+            fit_bounds (bool, optional): Whether to fit the map bounds to the
+                data layer. Defaults to False.
+            **kwargs (Any): Additional keyword arguments for the add_pmtiles method.
+
+        Raises:
+            ValueError: If the theme is not one of the allowed themes.
+        """
+
+        allowed_themes = [
+            "addresses",
+            "base",
+            "buildings",
+            "divisions",
+            "places",
+            "transportation",
+        ]
+        if theme not in allowed_themes:
+            raise ValueError(
+                f"The theme must be one of the following: {', '.join(allowed_themes)}"
+            )
+
+        styles = {
+            "addresses": {
+                "layers": [
+                    {
+                        "id": "Address",
+                        "source": "example_source",
+                        "source-layer": "address",
+                        "type": "circle",
+                        "paint": {
+                            "circle-radius": 4,
+                            "circle-color": "#8dd3c7",
+                            "circle-stroke-color": "#8dd3c7",
+                            "circle-stroke-width": 1,
+                        },
+                    },
+                ]
+            },
+            "base": {
+                "layers": [
+                    {
+                        "id": "Infrastructure",
+                        "source": "example_source",
+                        "source-layer": "infrastructure",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#8DD3C7",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                    {
+                        "id": "Land",
+                        "source": "example_source",
+                        "source-layer": "land",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#FFFFB3",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                    {
+                        "id": "Land_cover",
+                        "source": "example_source",
+                        "source-layer": "land_cover",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#BEBADA",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                    {
+                        "id": "Land_use",
+                        "source": "example_source",
+                        "source-layer": "land_use",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#FB8072",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                    {
+                        "id": "Water",
+                        "source": "example_source",
+                        "source-layer": "water",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#80B1D3",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                ]
+            },
+            "buildings": {
+                "layers": [
+                    {
+                        "id": "Building",
+                        "source": "example_source",
+                        "source-layer": "building",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#6ea299",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                    {
+                        "id": "Building_part",
+                        "source": "example_source",
+                        "source-layer": "building_part",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#fdfdb2",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                ]
+            },
+            "divisions": {
+                "layers": [
+                    {
+                        "id": "Division",
+                        "source": "example_source",
+                        "source-layer": "division",
+                        "type": "circle",
+                        "paint": {
+                            "circle-radius": 4,
+                            "circle-color": "#8dd3c7",
+                            "circle-stroke-color": "#8dd3c7",
+                            "circle-stroke-width": 1,
+                        },
+                    },
+                    {
+                        "id": "Division_area",
+                        "source": "example_source",
+                        "source-layer": "division_area",
+                        "type": "fill",
+                        "paint": {
+                            "fill-color": "#FFFFB3",
+                            "fill-opacity": 1.0,
+                            "fill-outline-color": "#888888",
+                        },
+                    },
+                    {
+                        "id": "Division_boundary",
+                        "source": "example_source",
+                        "source-layer": "division_boundary",
+                        "type": "line",
+                        "paint": {
+                            "line-color": "#BEBADA",
+                            "line-width": 1.0,
+                        },
+                    },
+                ]
+            },
+            "places": {
+                "layers": [
+                    {
+                        "id": "Place",
+                        "source": "example_source",
+                        "source-layer": "place",
+                        "type": "circle",
+                        "paint": {
+                            "circle-radius": 4,
+                            "circle-color": "#8dd3c7",
+                            "circle-stroke-color": "#8dd3c7",
+                            "circle-stroke-width": 1,
+                        },
+                    },
+                ]
+            },
+            "transportation": {
+                "layers": [
+                    {
+                        "id": "Segment",
+                        "source": "example_source",
+                        "source-layer": "segment",
+                        "type": "line",
+                        "paint": {
+                            "line-color": "#ffffb3",
+                            "line-width": 1.0,
+                        },
+                    },
+                    {
+                        "id": "Connector",
+                        "source": "example_source",
+                        "source-layer": "connector",
+                        "type": "circle",
+                        "paint": {
+                            "circle-radius": 4,
+                            "circle-color": "#8dd3c7",
+                            "circle-stroke-color": "#8dd3c7",
+                            "circle-stroke-width": 1,
+                        },
+                    },
+                ]
+            },
+        }
+
+        url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/{theme}.pmtiles"
+        if style is None:
+            style = styles.get(theme, None)
+        self.add_pmtiles(
+            url,
+            style=style,
+            visible=visible,
+            opacity=opacity,
+            tooltip=tooltip,
+            fit_bounds=fit_bounds,
+            **kwargs,
+        )
+
     def add_video(
         self,
         urls: Union[str, List[str]],
