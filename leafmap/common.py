@@ -14297,3 +14297,43 @@ def points_to_line(
     gdf = gdf.set_geometry("geometry")
     gdf.crs = crs
     return gdf
+
+
+def read_file(data: str, **kwargs: Any) -> Union[pd.DataFrame, "gpd.GeoDataFrame"]:
+    """
+    Reads a file and returns a DataFrame or GeoDataFrame.
+
+    Args:
+        data (str): The file path or a DataFrame/GeoDataFrame.
+        **kwargs (Any): Additional arguments passed to the file reading function.
+
+    Returns:
+        Union[pd.DataFrame, gpd.GeoDataFrame]: The read data as a DataFrame or GeoDataFrame.
+
+    Raises:
+        ValueError: If the data type is unsupported.
+    """
+    import geopandas as gpd
+
+    if isinstance(data, str):
+        if data.endswith(".parquet"):
+            df = pd.read_parquet(data, **kwargs)
+        elif data.endswith(".csv"):
+            df = pd.read_csv(data, **kwargs)
+        elif data.endswith(".json"):
+            df = pd.read_json(data, **kwargs)
+        elif data.endswith(".xlsx"):
+            df = pd.read_excel(data, **kwargs)
+        else:
+            df = gpd.read_file(data, **kwargs)
+    elif isinstance(data, dict) or isinstance(data, list):
+        df = pd.DataFrame(data, **kwargs)
+
+    elif isinstance(data, pd.DataFrame) or isinstance(data, gpd.GeoDataFrame):
+        df = data
+    else:
+        raise ValueError(
+            "Unsupported data type. Please provide a file path or a DataFrame."
+        )
+
+    return df
