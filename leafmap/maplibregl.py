@@ -2754,6 +2754,119 @@ class Map(MapWidget):
         self.add_source("openmaptiles", source)
         self.add_layer(layer)
 
+    def add_overture_3d_buildings(
+        self,
+        url: Optional[str] = None,
+        style: Optional[Dict[str, Any]] = None,
+        values: Optional[List[int]] = None,
+        colors: Optional[List[str]] = None,
+        visible: bool = True,
+        opacity: float = 1.0,
+        tooltip: bool = True,
+        template: str = "simple",
+        fit_bounds: bool = False,
+    ) -> None:
+        """Add 3D buildings from Overture Maps to the map.
+
+        Args:
+            url (Optional[str], optional): The URL of the PMTiles file. Defaults to None.
+                For more info, see https://github.com/OvertureMaps/overture-tiles.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the buildings. Defaults to None.
+            values (Optional[List[int]], optional): List of height values for
+                color interpolation. Defaults to None.
+            colors (Optional[List[str]], optional): List of colors corresponding
+                to the height values. Defaults to None.
+            visible (bool, optional): Whether the buildings layer is visible.
+                Defaults to True.
+            opacity (float, optional): The opacity of the buildings layer.
+                Defaults to 1.0.
+            tooltip (bool, optional): Whether to show tooltips on the buildings.
+                Defaults to True.
+            template (str, optional): The template for the tooltip. It can be
+                "simple" or "all". Defaults to "simple".
+            fit_bounds (bool, optional): Whether to fit the map bounds to the
+                buildings layer. Defaults to False.
+
+        Raises:
+            ValueError: If the length of values and colors lists are not the same.
+        """
+        if url is None:
+            url = "https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/2024-07-22/buildings.pmtiles"
+
+        if template == "simple":
+            template = "Name: {{@name}}<br>Subtype: {{subtype}}<br>Class: {{class}}<br>Height: {{height}}"
+        elif template == "all":
+            template = None
+
+        if style is None:
+            if values is None:
+                values = [0, 200, 400]
+            if colors is None:
+                colors = ["lightgray", "royalblue", "lightblue"]
+
+            if len(values) != len(colors):
+                raise ValueError("The values and colors must have the same length.")
+            value_color_pairs = []
+            for i, value in enumerate(values):
+                value_color_pairs.append(value)
+                value_color_pairs.append(colors[i])
+
+            style = {
+                "layers": [
+                    {
+                        "id": "buildings",
+                        "source": "example_source",
+                        "source-layer": "building",
+                        "type": "fill-extrusion",
+                        "filter": [
+                            ">",
+                            ["get", "height"],
+                            0,
+                        ],  # only show buildings with height info
+                        "paint": {
+                            "fill-extrusion-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["get", "height"],
+                            ]
+                            + value_color_pairs,
+                            "fill-extrusion-height": ["*", ["get", "height"], 1],
+                        },
+                    },
+                    {
+                        "id": "building-parts",
+                        "source": "example_source",
+                        "source-layer": "building_part",
+                        "type": "fill-extrusion",
+                        "filter": [
+                            ">",
+                            ["get", "height"],
+                            0,
+                        ],  # only show buildings with height info
+                        "paint": {
+                            "fill-extrusion-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["get", "height"],
+                            ]
+                            + value_color_pairs,
+                            "fill-extrusion-height": ["*", ["get", "height"], 1],
+                        },
+                    },
+                ],
+            }
+
+        self.add_pmtiles(
+            url,
+            style=style,
+            visible=visible,
+            opacity=opacity,
+            tooltip=tooltip,
+            template=template,
+            fit_bounds=fit_bounds,
+        )
+
     def add_video(
         self,
         urls: Union[str, List[str]],
