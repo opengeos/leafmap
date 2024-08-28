@@ -4658,6 +4658,234 @@ class Map(ipyleaflet.Map):
         if isinstance(widget, ipywidgets.Widget):
             widget.close()
 
+    def edit_points(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        display_props: Optional[List[str]] = None,
+        widget_width: str = "250px",
+        name: str = "Points",
+        radius: int = 5,
+        color: str = "white",
+        weight: int = 1,
+        fill_color: str = "#3388ff",
+        fill_opacity: float = 0.6,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Edit points on a map by creating interactive circle markers with popups.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data source,
+                which can be a file path, GeoDataFrame, or GeoJSON dictionary.
+            display_props (Optional[List[str]], optional): List of properties to
+                display in the popup. Defaults to None.
+            widget_width (str, optional): Width of the widget in the popup.
+                Defaults to "250px".
+            name (str, optional): Name of the layer group. Defaults to "Points".
+            radius (int, optional): Initial radius of the circle markers. Defaults to 5.
+            color (str, optional): Outline color of the circle markers. Defaults to "white".
+            weight (int, optional): Outline weight of the circle markers. Defaults to 1.
+            fill_color (str, optional): Fill color of the circle markers. Defaults to "#3388ff".
+            fill_opacity (float, optional): Fill opacity of the circle markers. Defaults to 0.6.
+            **kwargs (Any): Additional arguments for the CircleMarker.
+
+        Returns:
+            None
+        """
+
+        import geopandas as gpd
+        from ipyleaflet import CircleMarker, Popup
+
+        if isinstance(data, gpd.GeoDataFrame):
+            geojson_data = data.__geo_interface__
+        elif isinstance(data, str):
+            data = gpd.read_file(data)
+            geojson_data = data.__geo_interface__
+        elif isinstance(data, dict):
+            geojson_data = data
+        else:
+            raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
+
+        self._geojson_data = geojson_data
+
+        def create_popup_widget(
+            circle_marker, properties, original_properties, display_properties=None
+        ):
+            """Create a popup widget to change circle properties and edit feature attributes."""
+            # Widgets for circle properties
+            radius_slider = widgets.IntSlider(
+                value=circle_marker.radius,
+                min=1,
+                max=50,
+                description="Radius:",
+                continuous_update=False,
+                layout=widgets.Layout(width=widget_width),
+            )
+
+            color_picker = widgets.ColorPicker(
+                value=circle_marker.color,
+                description="Color:",
+                continuous_update=False,
+                layout=widgets.Layout(width=widget_width),
+            )
+
+            fill_color_picker = widgets.ColorPicker(
+                value=circle_marker.fill_color,
+                description="Fill color:",
+                continuous_update=False,
+                layout=widgets.Layout(width=widget_width),
+            )
+
+            # Widgets for feature properties
+            property_widgets = {}
+            display_properties = display_properties or properties.keys()
+            for key in display_properties:
+                value = properties.get(key, "")
+                if isinstance(value, str):
+                    widget = widgets.Text(
+                        value=value,
+                        description=f"{key}:",
+                        continuous_update=False,
+                        layout=widgets.Layout(width=widget_width),
+                    )
+                elif isinstance(value, (int, float)):
+                    widget = widgets.FloatText(
+                        value=value,
+                        description=f"{key}:",
+                        continuous_update=False,
+                        layout=widgets.Layout(width=widget_width),
+                    )
+                else:
+                    widget = widgets.Label(
+                        value=f"{key}: {value}",
+                        layout=widgets.Layout(width=widget_width),
+                    )
+
+                property_widgets[key] = widget
+
+            def update_circle(change):
+                """Update circle properties based on widget values."""
+                circle_marker.radius = radius_slider.value
+                circle_marker.color = color_picker.value
+                circle_marker.fill_color = fill_color_picker.value
+                for key, widget in property_widgets.items():
+                    properties[key] = widget.value
+
+            def reset_circle(change):
+                """Reset circle properties to their original values."""
+                circle_marker.radius = original_properties["radius"]
+                circle_marker.color = original_properties["color"]
+                circle_marker.fill_color = original_properties["fill_color"]
+                radius_slider.value = original_properties["radius"]
+                color_picker.value = original_properties["color"]
+                fill_color_picker.value = original_properties["fill_color"]
+                for key, widget in property_widgets.items():
+                    widget.value = original_properties["properties"].get(key, "")
+
+            # Link widgets to update the circle marker properties and point attributes
+            radius_slider.observe(update_circle, "value")
+            color_picker.observe(update_circle, "value")
+            fill_color_picker.observe(update_circle, "value")
+            for widget in property_widgets.values():
+                widget.observe(update_circle, "value")
+
+            # Reset button
+            reset_button = widgets.Button(
+                description="Reset", layout=widgets.Layout(width=widget_width)
+            )
+            reset_button.on_click(reset_circle)
+
+            # Arrange widgets in a vertical box with increased width
+            vbox = widgets.VBox(
+                [radius_slider, color_picker, fill_color_picker]
+                + list(property_widgets.values())
+                + [reset_button],
+                layout=widgets.Layout(
+                    width="310px"
+                ),  # Set the width of the popup widget
+            )
+            return vbox
+
+        def create_on_click_handler(circle_marker, properties, display_properties=None):
+            """Create an on_click handler with the circle_marker bound."""
+            # Save the original properties for reset
+            original_properties = {
+                "radius": circle_marker.radius,
+                "color": circle_marker.color,
+                "fill_color": circle_marker.fill_color,
+                "properties": properties.copy(),
+            }
+
+            def on_click(**kwargs):
+                if kwargs.get("type") == "click":
+                    # Create a popup widget with controls
+                    popup_widget = create_popup_widget(
+                        circle_marker,
+                        properties,
+                        original_properties,
+                        display_properties,
+                    )
+                    popup = Popup(
+                        location=circle_marker.location,
+                        child=popup_widget,
+                        close_button=True,
+                        auto_close=False,
+                        close_on_escape_key=True,
+                        min_width=int(widget_width[:-2]) + 10,
+                    )
+                    self.add_layer(popup)
+                    popup.open = True
+
+            return on_click
+
+        layers = []
+
+        # Iterate over each feature in the GeoJSON data and create a CircleMarker
+        for feature in geojson_data["features"]:
+            coordinates = feature["geometry"]["coordinates"]
+            properties = feature["properties"]
+
+            circle_marker = CircleMarker(
+                location=(coordinates[1], coordinates[0]),  # (lat, lon)
+                radius=radius,  # Initial radius of the circle
+                color=color,  # Outline color
+                weight=weight,  # Outline
+                fill_color=fill_color,  # Fill color
+                fill_opacity=fill_opacity,
+                **kwargs,
+            )
+
+            # Create and bind the on_click handler for each circle_marker
+            circle_marker.on_click(
+                create_on_click_handler(circle_marker, properties, display_props)
+            )
+
+            # Add the circle marker to the map
+            layers.append(circle_marker)
+
+        group = ipyleaflet.LayerGroup(layers=tuple(layers), name=name)
+        self.add(group)
+
+    def save_edits(self, filename: str, **kwargs: Any) -> None:
+        """
+        Save the edited GeoJSON data to a file.
+
+        Args:
+            filename (str): The name of the file to save the edited GeoJSON data.
+            **kwargs (Any): Additional arguments passed to the GeoDataFrame `to_file` method.
+
+        Returns:
+            None
+        """
+        import geopandas as gpd
+
+        if not hasattr(self, "_geojson_data"):
+            print("No GeoJSON data to save.")
+            return
+
+        gdf = gpd.GeoDataFrame.from_features(self._geojson_data)
+        gdf.to_file(filename, **kwargs)
+
 
 # The functions below are outside the Map class.
 
