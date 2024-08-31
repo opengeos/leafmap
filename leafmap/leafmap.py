@@ -4866,12 +4866,144 @@ class Map(ipyleaflet.Map):
         group = ipyleaflet.LayerGroup(layers=tuple(layers), name=name)
         self.add(group)
 
-    def save_edits(self, filename: str, **kwargs: Any) -> None:
+    def edit_polygons(
+        self,
+        data,
+        style=None,
+        hover_style=None,
+        name="GeoJSON",
+        widget_width="250px",
+        info_mode="on_click",
+        zoom_to_layer=True,
+        **kwargs,
+    ):
+
+        from ipyleaflet import GeoJSON, Popup
+        from shapely.geometry import shape
+        import copy
+        import geopandas as gpd
+
+        bounds = None
+        if isinstance(data, gpd.GeoDataFrame):
+            geojson_data = data.__geo_interface__
+            bounds = data.total_bounds
+        elif isinstance(data, str):
+            data = gpd.read_file(data)
+            geojson_data = data.__geo_interface__
+            bounds = data.total_bounds
+        elif isinstance(data, dict):
+            geojson_data = data
+            if zoom_to_layer:
+                bounds = gpd.GeoDataFrame.from_features(data).total_bounds
+
+        else:
+            raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
+
+        layout = widgets.Layout(width=widget_width)
+
+        if style is None:
+            style = {"color": "#3388ff"}
+        if hover_style is None:
+            hover_style = {"color": "yellow", "weight": 5}
+
+        def calculate_centroid(polygon_coordinates, geom_type):
+            polygon = shape({"type": geom_type, "coordinates": polygon_coordinates})
+            centroid = polygon.centroid
+            return centroid.y, centroid.x  # Return as (lat, lon)
+
+        def create_property_widgets(properties):
+            """Dynamically create widgets for each property."""
+            widgets_list = []
+            for key, value in properties.items():
+                if key == "style":
+                    continue
+                if isinstance(value, (int, float)):
+                    widget = widgets.FloatText(
+                        value=value, description=f"{key}:", layout=layout
+                    )
+                else:
+                    widget = widgets.Text(
+                        value=str(value), description=f"{key}:", layout=layout
+                    )
+                widget._property_key = (
+                    key  # Store the key in the widget for easy access later
+                )
+                widgets_list.append(widget)
+            return widgets_list
+
+        def on_click(event, feature, **kwargs):
+            # Dynamically create input widgets for each property
+            property_widgets = create_property_widgets(feature["properties"])
+            save_button = widgets.Button(description="Save", layout=layout)
+            geom_type = feature["geometry"]["type"]
+            centroid = calculate_centroid(feature["geometry"]["coordinates"], geom_type)
+
+            # Create and open the popup
+            popup_content = widgets.VBox(property_widgets + [save_button])
+
+            popup = Popup(
+                location=centroid,
+                child=popup_content,
+                close_button=True,
+                auto_close=True,
+                close_on_escape_key=True,
+                min_width=int(widget_width[:-2]) + 5,
+            )
+
+            self.add_layer(popup)
+
+            def save_changes(_):
+
+                original_data = copy.deepcopy(geojson_layer.data)
+                original_feature = copy.deepcopy(feature)
+                print(original_feature)
+                # Update the properties with the new values
+                for widget in property_widgets:
+                    feature["properties"][widget._property_key] = widget.value
+
+                for i, f in enumerate(original_data["features"]):
+                    print(f)
+                    if f == original_feature:
+                        print(f)
+                        original_data["features"][i] = feature
+                        break
+
+                # Update the GeoJSON layer to reflect the changes
+
+                geojson_layer.data = original_data
+                self._geojson_data = original_data
+
+                self.remove_layer(popup)  # Close the popup by removing it from the map
+
+            save_button.on_click(save_changes)
+
+        # Add GeoJSON layer to the map
+        geojson_layer = GeoJSON(
+            data=geojson_data, style=style, hover_style=hover_style, name=name, **kwargs
+        )
+
+        # Attach event to the GeoJSON layer
+        if info_mode == "on_click":
+            geojson_layer.on_click(on_click)
+        elif info_mode == "on_hover":
+            geojson_layer.on_hover(on_click)
+
+        # Add layers to map
+        self.add_layer(geojson_layer)
+        self._geojson_data = geojson_layer.data
+
+        if bounds is not None and zoom_to_layer:
+            west, south, east, north = bounds
+            self.fit_bounds([[south, east], [north, west]])
+
+    def save_edits(self, filename: str, drop_style: bool = True, **kwargs: Any) -> None:
         """
         Save the edited GeoJSON data to a file.
 
         Args:
             filename (str): The name of the file to save the edited GeoJSON data.
+            drop_style (bool, optional): Whether to drop the style properties
+                from the GeoJSON data. Defaults to True.
             **kwargs (Any): Additional arguments passed to the GeoDataFrame `to_file` method.
 
         Returns:
@@ -4884,6 +5016,8 @@ class Map(ipyleaflet.Map):
             return
 
         gdf = gpd.GeoDataFrame.from_features(self._geojson_data)
+        if drop_style:
+            gdf = gdf.drop(columns=["style"])
         gdf.to_file(filename, **kwargs)
 
 
