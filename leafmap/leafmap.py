@@ -684,7 +684,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM data of place(s) by name or ID to the map.
@@ -728,7 +728,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within some distance N, S, E, W of address to the map.
@@ -769,7 +769,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within boundaries of geocodable place(s) to the map.
@@ -810,7 +810,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within some distance N, S, E, W of a point to the map.
@@ -849,7 +849,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within boundaries of a (multi)polygon to the map.
@@ -890,7 +890,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within a N, S, E, W bounding box to the map.
@@ -931,7 +931,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within the current map view to the map.
@@ -2691,7 +2691,7 @@ class Map(ipyleaflet.Map):
         style: Optional[dict] = {},
         hover_style: Optional[dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: Optional[list[str]] = ["black"],
+        fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
@@ -2700,15 +2700,25 @@ class Map(ipyleaflet.Map):
         """Adds a GeoJSON file to the map.
 
         Args:
-            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
-            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
-            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            in_geojson (str | dict): The file path or http URL to the input
+                GeoJSON or a dictionary containing the geojson.
+            layer_name (str, optional): The layer name to be used.. Defaults to
+                "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used.
+                Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
-            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to False.
-            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer after
+                adding it to the map. Defaults to False.
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults
+                to "utf-8".
 
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
@@ -2719,7 +2729,7 @@ class Map(ipyleaflet.Map):
 
         style_callback_only = False
 
-        if len(style) == 0:
+        if fill_colors is not None:
             style_callback_only = True
 
         try:
@@ -2777,7 +2787,11 @@ class Map(ipyleaflet.Map):
             style["weight"] = 1
 
         if not hover_style:
-            hover_style = {"weight": style["weight"] + 2, "fillOpacity": 0}
+            hover_style = {
+                "weight": style["weight"] + 2,
+                "fillOpacity": 0,
+                "color": "yellow",
+            }
 
         def random_color(feature):
             return {
@@ -2859,7 +2873,7 @@ class Map(ipyleaflet.Map):
             value = """{}""".format("".join(value))
             html.value = value
 
-        if style_callback is None:
+        if fill_colors is not None:
             style_callback = random_color
 
         if style_callback_only:
@@ -2870,12 +2884,15 @@ class Map(ipyleaflet.Map):
                 name=layer_name,
             )
         else:
+            kwargs = {}
+            if style_callback is not None:
+                kwargs["style_callback"] = style_callback
             geojson = ipyleaflet.GeoJSON(
                 data=data,
                 style=style,
                 hover_style=hover_style,
-                style_callback=style_callback,
                 name=layer_name,
+                **kwargs,
             )
 
         if info_mode == "on_hover":
@@ -2953,7 +2970,7 @@ class Map(ipyleaflet.Map):
         style: Optional[dict] = {},
         hover_style: Optional[dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: Optional[list[str]] = ["black"],
+        fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
@@ -2966,9 +2983,14 @@ class Map(ipyleaflet.Map):
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
