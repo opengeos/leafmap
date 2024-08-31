@@ -5016,7 +5016,7 @@ class Map(ipyleaflet.Map):
             return
 
         gdf = gpd.GeoDataFrame.from_features(self._geojson_data)
-        if drop_style:
+        if drop_style and "style" in gdf.columns:
             gdf = gdf.drop(columns=["style"])
         gdf.to_file(filename, **kwargs)
 
