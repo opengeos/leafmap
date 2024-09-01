@@ -684,7 +684,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM data of place(s) by name or ID to the map.
@@ -728,7 +728,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within some distance N, S, E, W of address to the map.
@@ -769,7 +769,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within boundaries of geocodable place(s) to the map.
@@ -810,7 +810,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within some distance N, S, E, W of a point to the map.
@@ -849,7 +849,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within boundaries of a (multi)polygon to the map.
@@ -890,7 +890,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within a N, S, E, W bounding box to the map.
@@ -931,7 +931,7 @@ class Map(ipyleaflet.Map):
         style={},
         hover_style={},
         style_callback=None,
-        fill_colors=["black"],
+        fill_colors=None,
         info_mode="on_hover",
     ) -> None:
         """Adds OSM entities within the current map view to the map.
@@ -2691,7 +2691,7 @@ class Map(ipyleaflet.Map):
         style: Optional[dict] = {},
         hover_style: Optional[dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: Optional[list[str]] = ["black"],
+        fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
@@ -2700,15 +2700,25 @@ class Map(ipyleaflet.Map):
         """Adds a GeoJSON file to the map.
 
         Args:
-            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
-            layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
-            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            in_geojson (str | dict): The file path or http URL to the input
+                GeoJSON or a dictionary containing the geojson.
+            layer_name (str, optional): The layer name to be used.. Defaults to
+                "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used.
+                Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
-            zoom_to_layer (bool, optional): Whether to zoom to the layer after adding it to the map. Defaults to False.
-            encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer after
+                adding it to the map. Defaults to False.
+            encoding (str, optional): The encoding of the GeoJSON file. Defaults
+                to "utf-8".
 
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
@@ -2719,7 +2729,7 @@ class Map(ipyleaflet.Map):
 
         style_callback_only = False
 
-        if len(style) == 0:
+        if fill_colors is not None:
             style_callback_only = True
 
         try:
@@ -2777,7 +2787,11 @@ class Map(ipyleaflet.Map):
             style["weight"] = 1
 
         if not hover_style:
-            hover_style = {"weight": style["weight"] + 2, "fillOpacity": 0}
+            hover_style = {
+                "weight": style["weight"] + 2,
+                "fillOpacity": 0,
+                "color": "yellow",
+            }
 
         def random_color(feature):
             return {
@@ -2859,7 +2873,7 @@ class Map(ipyleaflet.Map):
             value = """{}""".format("".join(value))
             html.value = value
 
-        if style_callback is None:
+        if fill_colors is not None:
             style_callback = random_color
 
         if style_callback_only:
@@ -2870,12 +2884,15 @@ class Map(ipyleaflet.Map):
                 name=layer_name,
             )
         else:
+            kwargs = {}
+            if style_callback is not None:
+                kwargs["style_callback"] = style_callback
             geojson = ipyleaflet.GeoJSON(
                 data=data,
                 style=style,
                 hover_style=hover_style,
-                style_callback=style_callback,
                 name=layer_name,
+                **kwargs,
             )
 
         if info_mode == "on_hover":
@@ -2953,7 +2970,7 @@ class Map(ipyleaflet.Map):
         style: Optional[dict] = {},
         hover_style: Optional[dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: Optional[list[str]] = ["black"],
+        fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
@@ -2966,9 +2983,14 @@ class Map(ipyleaflet.Map):
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
             style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
@@ -4866,12 +4888,210 @@ class Map(ipyleaflet.Map):
         group = ipyleaflet.LayerGroup(layers=tuple(layers), name=name)
         self.add(group)
 
-    def save_edits(self, filename: str, **kwargs: Any) -> None:
+    def edit_polygons(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        name: str = "GeoJSON",
+        widget_width: str = "250px",
+        info_mode: str = "on_click",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Edit polygons on the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the polygons. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the polygons. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
+        from ipyleaflet import GeoJSON, Popup
+        from shapely.geometry import shape
+        import copy
+        import geopandas as gpd
+        import json
+
+        bounds = None
+
+        if isinstance(data, str):
+            gdf = gpd.read_file(data)
+            bounds = gdf.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            gdf.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+        elif isinstance(data, gpd.GeoDataFrame):
+            bounds = data.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            data.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+
+        if isinstance(data, dict):
+            geojson_data = data
+            if zoom_to_layer and (bounds is not None):
+                bounds = gpd.GeoDataFrame.from_features(data).total_bounds
+        else:
+            raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
+
+        layout = widgets.Layout(width=widget_width)
+
+        if style is None:
+            style = {"color": "#3388ff"}
+        if hover_style is None:
+            hover_style = {"color": "yellow", "weight": 5}
+
+        def calculate_centroid(polygon_coordinates, geom_type):
+            polygon = shape({"type": geom_type, "coordinates": polygon_coordinates})
+            centroid = polygon.centroid
+            return centroid.y, centroid.x  # Return as (lat, lon)
+
+        def create_property_widgets(properties):
+            """Dynamically create widgets for each property."""
+            widgets_list = []
+            for key, value in properties.items():
+                if key == "style":
+                    continue
+                if isinstance(value, (int, float)):
+                    widget = widgets.FloatText(
+                        value=value, description=f"{key}:", layout=layout
+                    )
+                else:
+                    widget = widgets.Text(
+                        value=str(value), description=f"{key}:", layout=layout
+                    )
+                widget._property_key = (
+                    key  # Store the key in the widget for easy access later
+                )
+                widgets_list.append(widget)
+            return widgets_list
+
+        def on_click(event, feature, **kwargs):
+            # Dynamically create input widgets for each property
+            property_widgets = create_property_widgets(feature["properties"])
+            save_button = widgets.Button(description="Save", layout=layout)
+            geom_type = feature["geometry"]["type"]
+            centroid = calculate_centroid(feature["geometry"]["coordinates"], geom_type)
+
+            # Create and open the popup
+            popup_content = widgets.VBox(property_widgets + [save_button])
+
+            popup = Popup(
+                location=centroid,
+                child=popup_content,
+                close_button=True,
+                auto_close=True,
+                close_on_escape_key=True,
+                min_width=int(widget_width[:-2]) + 5,
+            )
+
+            self.add_layer(popup)
+
+            def save_changes(_):
+
+                original_data = copy.deepcopy(geojson_layer.data)
+                original_feature = copy.deepcopy(feature)
+                # Update the properties with the new values
+                for widget in property_widgets:
+                    feature["properties"][widget._property_key] = widget.value
+
+                for i, f in enumerate(original_data["features"]):
+                    if f == original_feature:
+                        original_data["features"][i] = feature
+                        break
+
+                # Update the GeoJSON layer to reflect the changes
+
+                geojson_layer.data = original_data
+                self._geojson_data = original_data
+
+                self.remove_layer(popup)  # Close the popup by removing it from the map
+
+            save_button.on_click(save_changes)
+
+        # Add GeoJSON layer to the map
+        geojson_layer = GeoJSON(
+            data=geojson_data, style=style, hover_style=hover_style, name=name, **kwargs
+        )
+
+        # Attach event to the GeoJSON layer
+        if info_mode == "on_click":
+            geojson_layer.on_click(on_click)
+        elif info_mode == "on_hover":
+            geojson_layer.on_hover(on_click)
+
+        # Add layers to map
+        self.add_layer(geojson_layer)
+        self._geojson_data = geojson_layer.data
+
+        if bounds is not None and zoom_to_layer:
+            west, south, east, north = bounds
+            self.fit_bounds([[south, east], [north, west]])
+
+    def edit_lines(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        name: str = "GeoJSON",
+        widget_width: str = "250px",
+        info_mode: str = "on_click",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Edit lines on the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the lines. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the lines. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
+        self.edit_polygons(
+            data=data,
+            style=style,
+            hover_style=hover_style,
+            name=name,
+            widget_width=widget_width,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
+
+    def save_edits(self, filename: str, drop_style: bool = True, **kwargs: Any) -> None:
         """
         Save the edited GeoJSON data to a file.
 
         Args:
             filename (str): The name of the file to save the edited GeoJSON data.
+            drop_style (bool, optional): Whether to drop the style properties
+                from the GeoJSON data. Defaults to True.
             **kwargs (Any): Additional arguments passed to the GeoDataFrame `to_file` method.
 
         Returns:
@@ -4884,6 +5104,8 @@ class Map(ipyleaflet.Map):
             return
 
         gdf = gpd.GeoDataFrame.from_features(self._geojson_data)
+        if drop_style and "style" in gdf.columns:
+            gdf = gdf.drop(columns=["style"])
         gdf.to_file(filename, **kwargs)
 
 
