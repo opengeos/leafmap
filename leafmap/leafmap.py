@@ -4890,34 +4890,61 @@ class Map(ipyleaflet.Map):
 
     def edit_polygons(
         self,
-        data,
-        style=None,
-        hover_style=None,
-        name="GeoJSON",
-        widget_width="250px",
-        info_mode="on_click",
-        zoom_to_layer=True,
-        **kwargs,
-    ):
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        name: str = "GeoJSON",
+        widget_width: str = "250px",
+        info_mode: str = "on_click",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Edit polygons on the map.
 
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the polygons. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the polygons. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
         from ipyleaflet import GeoJSON, Popup
         from shapely.geometry import shape
         import copy
         import geopandas as gpd
+        import json
 
         bounds = None
-        if isinstance(data, gpd.GeoDataFrame):
-            geojson_data = data.__geo_interface__
-            bounds = data.total_bounds
-        elif isinstance(data, str):
-            data = gpd.read_file(data)
-            geojson_data = data.__geo_interface__
-            bounds = data.total_bounds
-        elif isinstance(data, dict):
-            geojson_data = data
-            if zoom_to_layer:
-                bounds = gpd.GeoDataFrame.from_features(data).total_bounds
 
+        if isinstance(data, str):
+            gdf = gpd.read_file(data)
+            bounds = gdf.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            gdf.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+        elif isinstance(data, gpd.GeoDataFrame):
+            bounds = data.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            data.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+
+        if isinstance(data, dict):
+            geojson_data = data
+            if zoom_to_layer and (bounds is not None):
+                bounds = gpd.GeoDataFrame.from_features(data).total_bounds
         else:
             raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
 
@@ -4978,15 +5005,12 @@ class Map(ipyleaflet.Map):
 
                 original_data = copy.deepcopy(geojson_layer.data)
                 original_feature = copy.deepcopy(feature)
-                print(original_feature)
                 # Update the properties with the new values
                 for widget in property_widgets:
                     feature["properties"][widget._property_key] = widget.value
 
                 for i, f in enumerate(original_data["features"]):
-                    print(f)
                     if f == original_feature:
-                        print(f)
                         original_data["features"][i] = feature
                         break
 
@@ -5017,6 +5041,48 @@ class Map(ipyleaflet.Map):
         if bounds is not None and zoom_to_layer:
             west, south, east, north = bounds
             self.fit_bounds([[south, east], [north, west]])
+
+    def edit_lines(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        name: str = "GeoJSON",
+        widget_width: str = "250px",
+        info_mode: str = "on_click",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Edit lines on the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the lines. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the lines. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
+        self.edit_polygons(
+            data=data,
+            style=style,
+            hover_style=hover_style,
+            name=name,
+            widget_width=widget_width,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
 
     def save_edits(self, filename: str, drop_style: bool = True, **kwargs: Any) -> None:
         """
