@@ -5,8 +5,8 @@ RUN mamba install -c conda-forge leafmap geopandas "localtileserver>=0.10.0" osm
     fix-permissions "/home/${NB_USER}"
 
 RUN mkdir ./examples
-COPY /examples/notebooks ./examples/notebooks
-COPY /examples/workshops ./examples/workshops
+COPY /docs/notebooks ./examples/notebooks
+COPY /docs/workshops ./examples/workshops
 COPY /examples/data ./examples/data
 COPY /examples/README.md ./examples/README.md
 
