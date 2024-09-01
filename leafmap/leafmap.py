@@ -2628,7 +2628,7 @@ class Map(ipyleaflet.Map):
         style: Optional[Dict] = {},
         hover_style: Optional[Dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: Optional[list[str]] = ["black"],
+        fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
@@ -3072,7 +3072,7 @@ class Map(ipyleaflet.Map):
         style: Optional[dict] = {},
         hover_style: Optional[dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: Optional[list[str]] = ["black"],
+        fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
     ) -> None:
         """Adds a KML file to the map.
@@ -3080,11 +3080,17 @@ class Map(ipyleaflet.Map):
         Args:
             in_kml (str): The input file path or HTTP URL to the KML.
             layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
-            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            style (dict, optional): A dictionary specifying the style to be used.
+                Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
 
         Raises:
             FileNotFoundError: The provided KML file could not be found.
@@ -3122,7 +3128,7 @@ class Map(ipyleaflet.Map):
         style: Optional[dict] = {},
         hover_style: Optional[dict] = {},
         style_callback: Optional[Callable] = None,
-        fill_colors: list[str] = ["black"],
+        fill_colors: list[str] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
@@ -3131,16 +3137,32 @@ class Map(ipyleaflet.Map):
         """Adds any geopandas-supported vector dataset to the map.
 
         Args:
-            filename (str): Either the absolute or relative path to the file or URL to be opened, or any object with a read() method (such as an open file or StringIO).
+            filename (str): Either the absolute or relative path to the file or
+                URL to be opened, or any object with a read() method (such as
+                an open file or StringIO).
             layer_name (str, optional): The layer name to use. Defaults to "Untitled".
-            bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter features by given bounding box, GeoSeries, GeoDataFrame or a shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
-            mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional): Filter for features that intersect with the given dict-like geojson geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox. Defaults to None.
-            rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
-            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            bbox (tuple | GeoDataFrame or GeoSeries | shapely Geometry, optional):
+                Filter features by given bounding box, GeoSeries, GeoDataFrame or
+                a shapely geometry. CRS mis-matches are resolved if given a
+                GeoSeries or GeoDataFrame. Cannot be used with mask. Defaults to None.
+            mask (dict | GeoDataFrame or GeoSeries | shapely Geometry, optional):
+                Filter for features that intersect with the given dict-like geojson
+                geometry, GeoSeries, GeoDataFrame or shapely geometry. CRS mis-matches
+                are resolved if given a GeoSeries or GeoDataFrame. Cannot be used with bbox.
+                Defaults to None.
+            rows (int or slice, optional): Load in specific rows by passing an
+                integer (first n rows) or a slice() object.. Defaults to None.
+            style (dict, optional): A dictionary specifying the style to be used.
+                Defaults to {}.
             hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-            style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-            fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-            info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling polygons.
+                Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
             encoding (str, optional): The encoding to use to read the file. Defaults to "utf-8".
 
         """
@@ -5570,19 +5592,25 @@ def geojson_layer(
     style: Optional[dict] = {},
     hover_style: Optional[dict] = {},
     style_callback: Optional[Callable] = None,
-    fill_colors: Optional[list[str]] = ["black"],
+    fill_colors: Optional[list[str]] = None,
     encoding: Optional[str] = "utf-8",
 ) -> None:
     """Adds a GeoJSON file to the map.
 
     Args:
-        in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+        in_geojson (str | dict): The file path or http URL to the input GeoJSON
+            or a dictionary containing the geojson.
         layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
         style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
         hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-        style_callback (function, optional): Styling function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
-        fill_colors (list, optional): The random colors to use for filling polygons. Defaults to ["black"].
-        info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+        style_callback (function, optional): Styling function that is called for
+            each feature, and should return the feature style. This styling
+            function takes the feature as argument. Defaults to None.
+        fill_colors (list, optional): The random colors to use for filling polygons.
+            Defaults to ["black"].
+        info_mode (str, optional): Displays the attributes by either on_hover or
+            on_click. Any value other than "on_hover" or "on_click" will be
+            treated as None. Defaults to "on_hover".
         encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
 
     Raises:
