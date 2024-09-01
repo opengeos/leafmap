@@ -6559,7 +6559,8 @@ def nasa_data_gui(
             short_name.value = default_dataset
             title.value = default_title
             max_items.value = 50
-            bbox.value = "Map bounds"
+            bbox.value = ""
+            bbox.placeholder = "xmin, ymin, xmax, ymax"
             start_date.value = None
             end_date.value = None
             dataset.options = []
