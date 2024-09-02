@@ -6918,7 +6918,42 @@ RasterLayerEditor            (<span title="ipywidgets.widgets.widget_box.VBox">V
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">old_layer</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">:</span>
+        <span class="c1"># Add support for hyperspectral data via HyperCoast</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="n">r_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">g_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">index</span>
+            <span class="n">b_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">index</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">r_index</span> <span class="o">&gt;=</span> <span class="n">g_index</span> <span class="ow">and</span> <span class="n">g_index</span> <span class="o">&gt;=</span> <span class="n">b_index</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">r_index</span> <span class="o">&lt;=</span> <span class="n">g_index</span> <span class="ow">and</span> <span class="n">g_index</span> <span class="o">&lt;=</span> <span class="n">b_index</span>
+            <span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sorted_indexes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">r_index</span><span class="p">,</span> <span class="n">g_index</span><span class="p">,</span> <span class="n">b_index</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">sorted_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">sorted_indexes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">sorted_indexes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_band_1_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_band_2_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_band_3_dropdown</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_hyper</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">],</span>
+                <span class="n">wvl_indexes</span><span class="o">=</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]],</span>
+                <span class="n">colormap</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span>
+                <span class="n">vmin</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">],</span>
+                <span class="n">vmax</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">],</span>
+                <span class="n">opacity</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
+                <span class="n">nodata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span><span class="p">,</span>
+                <span class="n">layer_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">,</span>
+                <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_raster</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span>
                 <span class="n">indexes</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">],</span>
@@ -6931,21 +6966,7 @@ RasterLayerEditor            (<span title="ipywidgets.widgets.widget_box.VBox">V
                 <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="c1"># Add support for hyperspectral data via HyperCoast</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_hyper</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_xds</span><span class="p">,</span>
-                <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;hyper&quot;</span><span class="p">],</span>
-                <span class="n">wvl_indexes</span><span class="o">=</span><span class="p">[</span><span class="n">index</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">vis</span><span class="p">[</span><span class="s2">&quot;indexes&quot;</span><span class="p">]],</span>
-                <span class="n">colormap</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;colormap&quot;</span><span class="p">],</span>
-                <span class="n">vmin</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmin&quot;</span><span class="p">],</span>
-                <span class="n">vmax</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;vmax&quot;</span><span class="p">],</span>
-                <span class="n">opacity</span><span class="o">=</span><span class="n">vis</span><span class="p">[</span><span class="s2">&quot;opacity&quot;</span><span class="p">],</span>
-                <span class="n">nodata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span><span class="p">,</span>
-                <span class="n">layer_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_layer_name</span><span class="p">,</span>
-                <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
-            <span class="p">)</span>
+
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;COG&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_host_map</span><span class="o">.</span><span class="n">add_cog_layer</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_layer_dict</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">],</span>
