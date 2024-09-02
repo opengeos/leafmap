@@ -867,7 +867,42 @@ class RasterLayerEditor(ipywidgets.VBox):
 
         self._host_map.remove(old_layer)
 
-        if self._layer_dict["type"] == "LOCAL":
+        # Add support for hyperspectral data via HyperCoast
+        if self._xds is not None:
+
+            r_index = self._band_1_dropdown.index
+            g_index = self._band_2_dropdown.index
+            b_index = self._band_3_dropdown.index
+
+            if (r_index >= g_index and g_index >= b_index) or (
+                r_index <= g_index and g_index <= b_index
+            ):
+                pass
+            else:
+                sorted_indexes = sorted([r_index, g_index, b_index], reverse=True)
+                self._band_1_dropdown.index = sorted_indexes[0]
+                self._band_2_dropdown.index = sorted_indexes[1]
+                self._band_3_dropdown.index = sorted_indexes[2]
+                vis["indexes"] = [
+                    self._band_1_dropdown.index + 1,
+                    self._band_2_dropdown.index + 1,
+                    self._band_3_dropdown.index + 1,
+                ]
+            self._host_map.add_hyper(
+                self._xds,
+                dtype=self._layer_dict["hyper"],
+                wvl_indexes=[index - 1 for index in vis["indexes"]],
+                colormap=vis["colormap"],
+                vmin=vis["vmin"],
+                vmax=vis["vmax"],
+                opacity=vis["opacity"],
+                nodata=self._nodata,
+                layer_name=self._layer_name,
+                zoom_to_layer=False,
+                layer_index=layer_index,
+            )
+
+        elif self._layer_dict["type"] == "LOCAL":
             self._host_map.add_raster(
                 self._filename,
                 indexes=vis["indexes"],
@@ -880,21 +915,7 @@ class RasterLayerEditor(ipywidgets.VBox):
                 zoom_to_layer=False,
                 layer_index=layer_index,
             )
-        # Add support for hyperspectral data via HyperCoast
-        elif self._xds is not None:
-            self._host_map.add_hyper(
-                self._xds,
-                type=self._layer_dict["hyper"],
-                wvl_indexes=[index - 1 for index in vis["indexes"]],
-                colormap=vis["colormap"],
-                vmin=vis["vmin"],
-                vmax=vis["vmax"],
-                opacity=vis["opacity"],
-                nodata=self._nodata,
-                layer_name=self._layer_name,
-                zoom_to_layer=False,
-                layer_index=layer_index,
-            )
+
         elif self._layer_dict["type"] == "COG":
             self._host_map.add_cog_layer(
                 self._layer_dict["url"],
