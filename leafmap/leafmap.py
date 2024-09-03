@@ -1040,7 +1040,9 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
 
-        vmin, vmax = cog_tile_vmin_vmax(url, bands=bands, titiler_endpoint=titiler_endpoint)
+        vmin, vmax = cog_tile_vmin_vmax(
+            url, bands=bands, titiler_endpoint=titiler_endpoint
+        )
 
         if "colormap_name" in kwargs:
             colormap = kwargs["colormap_name"]
