@@ -8146,7 +8146,9 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;cog_layer_dict&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cog_layer_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">cog_tile_vmin_vmax</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">)</span>
+        <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">cog_tile_vmin_vmax</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="n">titiler_endpoint</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="s2">&quot;colormap_name&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">colormap</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span>
@@ -13016,7 +13018,9 @@ apply a rescaling to multiple bands, use something like <code>rescale=["164,223"
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;cog_layer_dict&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cog_layer_dict</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">cog_tile_vmin_vmax</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">)</span>
+    <span class="n">vmin</span><span class="p">,</span> <span class="n">vmax</span> <span class="o">=</span> <span class="n">cog_tile_vmin_vmax</span><span class="p">(</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="n">titiler_endpoint</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="s2">&quot;colormap_name&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">colormap</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;colormap_name&quot;</span><span class="p">]</span>
