@@ -5238,7 +5238,6 @@ class Map(ipyleaflet.Map):
                         ] = highlight_style
 
             geojson_layer.data = original_data
-            geojson_layer.data = None
 
         # Function to clear the selection
         def clear_selection(_):
