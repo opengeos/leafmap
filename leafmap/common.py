@@ -14104,9 +14104,7 @@ def ee_tile_url(
             return None
 
 
-def d2s_tile(
-    url: str, titiler_endpoint: str = "https://tt.d2s.org", **kwargs: Any
-) -> str:
+def d2s_tile(url: str, titiler_endpoint: str = None, **kwargs: Any) -> str:
     """Generate a D2S tile URL with optional API key.
 
     Args:
@@ -14121,6 +14119,9 @@ def d2s_tile(
     Raises:
         ValueError: If the API key is required but not set in the environment variables.
     """
+
+    if titiler_endpoint is None:
+        titiler_endpoint = os.environ.get("TITILER_ENDPOINT", "https://titiler.xyz")
 
     stats = cog_stats(url, titiler_endpoint=titiler_endpoint, **kwargs)
     if "detail" in stats:
