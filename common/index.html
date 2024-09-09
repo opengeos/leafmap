@@ -17743,7 +17743,7 @@ Defaults to None, using the bottom left corner.</p></td>
 
 
 <h2 id="leafmap.common.d2s_tile" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">d2s_tile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="s1">&#39;https://tt.d2s.org&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">d2s_tile</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.common.d2s_tile" class="headerlink" title="Permanent link">&para;</a></h2>
@@ -17774,7 +17774,7 @@ Defaults to None, using the bottom left corner.</p></td>
         <td><code>str</code></td>
         <td><p>The endpoint for the titiler service.
 Defaults to "https://tt.d2s.org".</p></td>
-        <td><code>&#39;https://tt.d2s.org&#39;</code></td>
+        <td><code>None</code></td>
       </tr>
       <tr>
         <td><code>**kwargs</code></td>
@@ -17816,9 +17816,7 @@ Defaults to "https://tt.d2s.org".</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>leafmap/common.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">d2s_tile</span><span class="p">(</span>
-    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://tt.d2s.org&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">d2s_tile</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate a D2S tile URL with optional API key.</span>
 
 <span class="sd">    Args:</span>
@@ -17833,6 +17831,9 @@ Defaults to "https://tt.d2s.org".</p></td>
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: If the API key is required but not set in the environment variables.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">titiler_endpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">titiler_endpoint</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TITILER_ENDPOINT&quot;</span><span class="p">,</span> <span class="s2">&quot;https://titiler.xyz&quot;</span><span class="p">)</span>
 
     <span class="n">stats</span> <span class="o">=</span> <span class="n">cog_stats</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="n">titiler_endpoint</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;detail&quot;</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
