@@ -1393,6 +1393,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.batch_edit_lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      batch_edit_lines()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.batch_edit_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      batch_edit_points()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.batch_edit_polygons" class="md-nav__link">
+    <span class="md-ellipsis">
+      batch_edit_polygons()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.leafmap.Map.clear_drawings" class="md-nav__link">
     <span class="md-ellipsis">
       clear_drawings()
@@ -5945,6 +5972,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/96_batch_edit_vector/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    96 batch edit vector
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -6559,6 +6607,33 @@
   <a href="#leafmap.leafmap.Map.basemap_demo" class="md-nav__link">
     <span class="md-ellipsis">
       basemap_demo()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.batch_edit_lines" class="md-nav__link">
+    <span class="md-ellipsis">
+      batch_edit_lines()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.batch_edit_points" class="md-nav__link">
+    <span class="md-ellipsis">
+      batch_edit_points()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.batch_edit_polygons" class="md-nav__link">
+    <span class="md-ellipsis">
+      batch_edit_polygons()
     </span>
   </a>
   
@@ -12237,6 +12312,542 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
         <span class="k">if</span> <span class="n">drop_style</span> <span class="ow">and</span> <span class="s2">&quot;style&quot;</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
             <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">])</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">batch_edit_points</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+        <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hover_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">changed_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">display_props</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Points&quot;</span><span class="p">,</span>
+        <span class="n">text_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;250px&quot;</span><span class="p">,</span>
+        <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Batch editing points (CircleMarkers) on the map from GeoJSON data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (Union[str, dict]): The GeoJSON data or path to the GeoJSON file.</span>
+<span class="sd">            style (Optional[Dict[str, Any]]): Style for the CircleMarkers.</span>
+<span class="sd">            hover_style (Optional[Dict[str, Any]]): Style for the CircleMarkers on hover.</span>
+<span class="sd">            changed_style (Optional[Dict[str, Any]]): Style for the CircleMarkers when changed.</span>
+<span class="sd">            display_props (Optional[List[str]]): List of properties to display in the attribute editor.</span>
+<span class="sd">            name (str): Name of the layer group.</span>
+<span class="sd">            text_width (str): Width of the text widgets in the attribute editor.</span>
+<span class="sd">            zoom_to_layer (bool): Whether to zoom to the layer bounds.</span>
+<span class="sd">            **kwargs (Any): Additional keyword arguments for the LayerGroup.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.</span>
+<span class="sd">            ValueError: If the GeoJSON data does not contain only Point geometries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span>
+            <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">total_bounds</span>
+            <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">geojson_data</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">if</span> <span class="n">zoom_to_layer</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">bounds</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a GeoDataFrame or a GeoJSON dictionary.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ensure the data contains Point geometries</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Point&quot;</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">geojson_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The GeoJSON data must contain only Point geometries.&quot;</span><span class="p">)</span>
+
+        <span class="n">highlighted_markers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">attribute_widgets</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Create CircleMarker objects for each point in the GeoJSON data</span>
+        <span class="n">markers</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;fill_opacity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">hover_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hover_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">changed_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">changed_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]:</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">]</span>
+            <span class="n">properties</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+
+            <span class="n">marker</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">CircleMarker</span><span class="p">(</span>
+                <span class="n">location</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">),</span>  <span class="c1"># GeoJSON coordinates are (longitude, latitude)</span>
+                <span class="n">radius</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;radius&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">color</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">),</span>
+                <span class="n">fill_color</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">),</span>
+                <span class="n">fill_opacity</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_opacity&quot;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;properties&quot;</span><span class="p">,</span> <span class="n">properties</span><span class="p">)</span>
+            <span class="n">markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+
+        <span class="c1"># Create a LayerGroup to hold the markers</span>
+        <span class="n">layer_group</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">LayerGroup</span><span class="p">(</span><span class="n">layers</span><span class="o">=</span><span class="n">markers</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Get the keys from the first feature&#39;s properties</span>
+        <span class="n">first_feature</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+
+        <span class="c1"># If display_props is not provided, show all attributes</span>
+        <span class="k">if</span> <span class="n">display_props</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">display_props</span> <span class="o">=</span> <span class="n">first_feature</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="n">text_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">text_width</span><span class="p">)</span>
+
+        <span class="c1"># Loop through the specified properties in display_props</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">display_props</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">first_feature</span><span class="p">:</span>  <span class="c1"># Ensure the property exists</span>
+                <span class="n">attribute_widgets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">text_layout</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Update button and clear selection button</span>
+        <span class="n">button_width</span> <span class="o">=</span> <span class="s2">&quot;80px&quot;</span>
+        <span class="n">button_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">button_width</span><span class="p">)</span>
+        <span class="n">update_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+        <span class="n">clear_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Clear&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+        <span class="n">close_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Close&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+        <span class="n">output_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+
+        <span class="c1"># Function to highlight the clicked marker and clear attribute fields</span>
+        <span class="k">def</span> <span class="nf">highlight_marker</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">highlighted_markers</span>
+
+            <span class="k">if</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">highlighted_markers</span><span class="p">:</span>
+                <span class="n">highlighted_markers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">highlighted_markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">hover_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">hover_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Function to clear the selection</span>
+        <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">highlighted_markers</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">!=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span>
+                <span class="p">)</span> <span class="ow">and</span> <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">!=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">):</span>
+                    <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+                    <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">highlighted_markers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">get_geojson_data</span><span class="p">():</span>
+            <span class="n">geojson_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span> <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layer_group</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+                <span class="n">feature</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                    <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">layer</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">layer</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+
+                <span class="n">geojson_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_geojson_data</span> <span class="o">=</span> <span class="n">geojson_data</span>
+
+        <span class="c1"># Function to apply changes to highlighted markers</span>
+        <span class="k">def</span> <span class="nf">update_highlighted_markers</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="n">output_widget</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+
+            <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">marker</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">highlighted_markers</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                        <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be an integer.&quot;</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a float.&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span>
+
+                <span class="c1"># Apply changed_style if defined</span>
+                <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+                    <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">)</span>
+                    <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No changes to apply.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+                <span class="n">clear_selection</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">get_geojson_data</span><span class="p">()</span>
+
+        <span class="c1"># Function to populate attribute fields on hover</span>
+        <span class="k">def</span> <span class="nf">populate_hover_attributes</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Register click event to highlight markers</span>
+        <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">markers</span><span class="p">:</span>
+            <span class="n">marker</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">highlight_marker</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+            <span class="n">marker</span><span class="o">.</span><span class="n">on_mouseover</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">populate_hover_attributes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+
+        <span class="c1"># Add the LayerGroup of markers to the map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer_group</span><span class="p">)</span>
+
+        <span class="c1"># Add event listeners to the buttons</span>
+        <span class="n">update_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">update_highlighted_markers</span><span class="p">)</span>
+        <span class="n">clear_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">clear_selection</span><span class="p">)</span>
+
+        <span class="c1"># Create a VBox to hold the widgets for editing attributes and the buttons</span>
+        <span class="n">buttons</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">update_button</span><span class="p">,</span> <span class="n">clear_button</span><span class="p">,</span> <span class="n">close_button</span><span class="p">])</span>
+        <span class="n">attribute_editor</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">(</span>
+            <span class="p">[</span><span class="o">*</span><span class="n">attribute_widgets</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">buttons</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Embed the attribute editor inside the map using WidgetControl</span>
+        <span class="n">widget_control</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">WidgetControl</span><span class="p">(</span>
+            <span class="n">widget</span><span class="o">=</span><span class="n">attribute_editor</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">&quot;topright&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">close_widget_control</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+        <span class="n">close_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">close_widget_control</span><span class="p">)</span>
+
+        <span class="c1"># Optionally zoom to the bounds of the points</span>
+        <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span>
+            <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bounds</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">([[</span><span class="n">south</span><span class="p">,</span> <span class="n">west</span><span class="p">],</span> <span class="p">[</span><span class="n">north</span><span class="p">,</span> <span class="n">east</span><span class="p">]])</span>
+
+    <span class="k">def</span> <span class="nf">batch_edit_polygons</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hover_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">highlight_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">changed_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">display_props</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GeoJSON&quot;</span><span class="p">,</span>
+        <span class="n">text_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;250px&quot;</span><span class="p">,</span>
+        <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Batch editing polygons on the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be</span>
+<span class="sd">                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.</span>
+<span class="sd">            style (Optional[Dict[str, Any]], optional): The style dictionary for</span>
+<span class="sd">                the polygons. Defaults to None.</span>
+<span class="sd">            hover_style (Optional[Dict[str, Any]], optional): The hover style</span>
+<span class="sd">                dictionary for the polygons. Defaults to None.</span>
+<span class="sd">            name (str, optional): The name of the GeoJSON layer. Defaults to &quot;GeoJSON&quot;.</span>
+<span class="sd">            widget_width (str, optional): The width of the widgets. Defaults to &quot;250px&quot;.</span>
+<span class="sd">            info_mode (str, optional): The mode for displaying information,</span>
+<span class="sd">                either &quot;on_click&quot; or &quot;on_hover&quot;. Defaults to &quot;on_click&quot;.</span>
+<span class="sd">            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.</span>
+<span class="sd">                Defaults to True.</span>
+<span class="sd">            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">ipyleaflet</span> <span class="kn">import</span> <span class="n">GeoJSON</span>
+        <span class="kn">import</span> <span class="nn">copy</span>
+        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="n">bounds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span>
+            <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">total_bounds</span>
+            <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+            <span class="k">if</span> <span class="n">zoom_to_layer</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">bounds</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a GeoDataFrame or a GeoJSON dictionary.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">hover_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">hover_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;dashArray&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">highlight_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">highlight_style</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">changed_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">changed_style</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="c1"># List to store the IDs of highlighted features</span>
+        <span class="n">highlighted_features</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Create a dictionary to hold attribute widgets</span>
+        <span class="n">attribute_widgets</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Get the keys from the first feature to dynamically create widgets</span>
+        <span class="n">first_feature</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+
+        <span class="c1"># If display_props is not provided, show all attributes</span>
+        <span class="k">if</span> <span class="n">display_props</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">display_props</span> <span class="o">=</span> <span class="n">first_feature</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="n">text_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">text_width</span><span class="p">)</span>
+        <span class="c1"># Loop through only the specified properties in display_props</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">display_props</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">first_feature</span><span class="p">:</span>  <span class="c1"># Ensure the property exists</span>
+                <span class="n">attribute_widgets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">text_layout</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Update button and clear selection button</span>
+        <span class="n">button_width</span> <span class="o">=</span> <span class="s2">&quot;80px&quot;</span>
+        <span class="n">button_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">button_width</span><span class="p">)</span>
+        <span class="n">update_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+        <span class="n">clear_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Clear&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+        <span class="n">close_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Close&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+        <span class="n">output_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+
+        <span class="c1"># Function to highlight the clicked feature and clear attribute fields</span>
+        <span class="k">def</span> <span class="nf">highlight_feature</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">highlighted_features</span>
+            <span class="n">original_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]):</span>
+                <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="n">feature</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">highlighted_features</span><span class="p">:</span>
+                        <span class="n">highlighted_features</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                        <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">highlighted_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                        <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span>
+                            <span class="s2">&quot;style&quot;</span>
+                        <span class="p">]</span> <span class="o">=</span> <span class="n">highlight_style</span>
+
+            <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span>
+
+        <span class="c1"># Function to clear the selection</span>
+        <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="n">original_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="c1"># Reset the style for all highlighted features</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">highlighted_features</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;style&quot;</span><span class="p">]</span>
+                    <span class="o">!=</span> <span class="n">changed_style</span>
+                <span class="p">):</span>
+                    <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
+
+            <span class="n">highlighted_features</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span>
+
+        <span class="c1"># Function to apply changes to highlighted features</span>
+        <span class="k">def</span> <span class="nf">update_highlighted_features</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="n">output_widget</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+            <span class="n">original_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="c1"># Update the properties for all highlighted features</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">highlighted_features</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                        <span class="n">dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span>
+                            <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                                <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                    <span class="k">continue</span>
+                        <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                                <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                    <span class="k">continue</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span>
+                        <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                        <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span>
+                            <span class="s2">&quot;style&quot;</span>
+                        <span class="p">]</span> <span class="o">=</span> <span class="n">changed_style</span>
+
+            <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_geojson_data</span> <span class="o">=</span> <span class="n">original_data</span>
+            <span class="n">clear_selection</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># Function to populate attribute fields on hover</span>
+        <span class="k">def</span> <span class="nf">populate_hover_attributes</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="c1"># Populate the widget fields with the hovered feature&#39;s attributes</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">widget</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+        <span class="c1"># Create the GeoJSON layer</span>
+        <span class="n">geojson_layer</span> <span class="o">=</span> <span class="n">GeoJSON</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+            <span class="n">hover_style</span><span class="o">=</span><span class="n">hover_style</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add click event to highlight features and clear attribute fields</span>
+        <span class="n">geojson_layer</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">highlight_feature</span><span class="p">)</span>
+
+        <span class="c1"># Add hover event to populate attribute fields</span>
+        <span class="n">geojson_layer</span><span class="o">.</span><span class="n">on_hover</span><span class="p">(</span><span class="n">populate_hover_attributes</span><span class="p">)</span>
+
+        <span class="c1"># Add the GeoJSON layer to the map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">geojson_layer</span><span class="p">)</span>
+
+        <span class="c1"># Add event listeners to the buttons</span>
+        <span class="n">update_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">update_highlighted_features</span><span class="p">)</span>
+        <span class="n">clear_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">clear_selection</span><span class="p">)</span>
+
+        <span class="c1"># Create a VBox to hold the widgets for editing attributes and the buttons</span>
+        <span class="n">buttons</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">update_button</span><span class="p">,</span> <span class="n">clear_button</span><span class="p">,</span> <span class="n">close_button</span><span class="p">])</span>
+        <span class="n">attribute_editor</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">(</span>
+            <span class="p">[</span><span class="o">*</span><span class="n">attribute_widgets</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">buttons</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Embed the attribute editor inside the map using WidgetControl</span>
+        <span class="n">widget_control</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">WidgetControl</span><span class="p">(</span>
+            <span class="n">widget</span><span class="o">=</span><span class="n">attribute_editor</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">&quot;topright&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">close_widget_control</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+        <span class="n">close_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">close_widget_control</span><span class="p">)</span>
+
+        <span class="c1"># Add layers to map</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geojson_data</span> <span class="o">=</span> <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
+            <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bounds</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">([[</span><span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">],</span> <span class="p">[</span><span class="n">north</span><span class="p">,</span> <span class="n">west</span><span class="p">]])</span>
+
+    <span class="k">def</span> <span class="nf">batch_edit_lines</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">hover_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">highlight_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">changed_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">display_props</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GeoJSON&quot;</span><span class="p">,</span>
+        <span class="n">text_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;250px&quot;</span><span class="p">,</span>
+        <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Batch editing lines on the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be</span>
+<span class="sd">                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.</span>
+<span class="sd">            style (Optional[Dict[str, Any]], optional): The style dictionary for</span>
+<span class="sd">                the polygons. Defaults to None.</span>
+<span class="sd">            hover_style (Optional[Dict[str, Any]], optional): The hover style</span>
+<span class="sd">                dictionary for the polygons. Defaults to None.</span>
+<span class="sd">            name (str, optional): The name of the GeoJSON layer. Defaults to &quot;GeoJSON&quot;.</span>
+<span class="sd">            widget_width (str, optional): The width of the widgets. Defaults to &quot;250px&quot;.</span>
+<span class="sd">            info_mode (str, optional): The mode for displaying information,</span>
+<span class="sd">                either &quot;on_click&quot; or &quot;on_hover&quot;. Defaults to &quot;on_click&quot;.</span>
+<span class="sd">            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.</span>
+<span class="sd">                Defaults to True.</span>
+<span class="sd">            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_edit_polygons</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+            <span class="n">hover_style</span><span class="o">=</span><span class="n">hover_style</span><span class="p">,</span>
+            <span class="n">highlight_style</span><span class="o">=</span><span class="n">highlight_style</span><span class="p">,</span>
+            <span class="n">changed_style</span><span class="o">=</span><span class="n">changed_style</span><span class="p">,</span>
+            <span class="n">display_props</span><span class="o">=</span><span class="n">display_props</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">text_width</span><span class="o">=</span><span class="n">text_width</span><span class="p">,</span>
+            <span class="n">zoom_to_layer</span><span class="o">=</span><span class="n">zoom_to_layer</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -21342,6 +21953,859 @@ be treated as None. Defaults to "on_hover".</p></td>
     <span class="n">dropdown</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">on_click</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)</span>
     <span class="n">basemap_control</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">WidgetControl</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">dropdown</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">&quot;topright&quot;</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">basemap_control</span><span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.leafmap.Map.batch_edit_lines" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">batch_edit_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hover_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlight_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">changed_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">display_props</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">,</span> <span class="n">text_width</span><span class="o">=</span><span class="s1">&#39;250px&#39;</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.leafmap.Map.batch_edit_lines" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Batch editing lines on the map.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Union[str, gpd.GeoDataFrame, Dict[str, Any]]</code></td>
+        <td><p>The data to be
+edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>The style dictionary for
+the polygons. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>hover_style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>The hover style
+dictionary for the polygons. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the GeoJSON layer. Defaults to "GeoJSON".</p></td>
+        <td><code>&#39;GeoJSON&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>widget_width</code></td>
+        <td><code>str</code></td>
+        <td><p>The width of the widgets. Defaults to "250px".</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>info_mode</code></td>
+        <td><code>str</code></td>
+        <td><p>The mode for displaying information,
+either "on_click" or "on_hover". Defaults to "on_click".</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>zoom_to_layer</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to zoom to the layer bounds.
+Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments for the GeoJSON layer.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the data is not a GeoDataFrame or a GeoJSON dictionary.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/leafmap.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">batch_edit_lines</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hover_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">highlight_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">changed_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">display_props</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GeoJSON&quot;</span><span class="p">,</span>
+    <span class="n">text_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;250px&quot;</span><span class="p">,</span>
+    <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch editing lines on the map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be</span>
+<span class="sd">            edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.</span>
+<span class="sd">        style (Optional[Dict[str, Any]], optional): The style dictionary for</span>
+<span class="sd">            the polygons. Defaults to None.</span>
+<span class="sd">        hover_style (Optional[Dict[str, Any]], optional): The hover style</span>
+<span class="sd">            dictionary for the polygons. Defaults to None.</span>
+<span class="sd">        name (str, optional): The name of the GeoJSON layer. Defaults to &quot;GeoJSON&quot;.</span>
+<span class="sd">        widget_width (str, optional): The width of the widgets. Defaults to &quot;250px&quot;.</span>
+<span class="sd">        info_mode (str, optional): The mode for displaying information,</span>
+<span class="sd">            either &quot;on_click&quot; or &quot;on_hover&quot;. Defaults to &quot;on_click&quot;.</span>
+<span class="sd">        zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.</span>
+<span class="sd">            Defaults to True.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments for the GeoJSON layer.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">batch_edit_polygons</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="n">hover_style</span><span class="o">=</span><span class="n">hover_style</span><span class="p">,</span>
+        <span class="n">highlight_style</span><span class="o">=</span><span class="n">highlight_style</span><span class="p">,</span>
+        <span class="n">changed_style</span><span class="o">=</span><span class="n">changed_style</span><span class="p">,</span>
+        <span class="n">display_props</span><span class="o">=</span><span class="n">display_props</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">text_width</span><span class="o">=</span><span class="n">text_width</span><span class="p">,</span>
+        <span class="n">zoom_to_layer</span><span class="o">=</span><span class="n">zoom_to_layer</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.leafmap.Map.batch_edit_points" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">batch_edit_points</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hover_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">changed_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">display_props</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Points&#39;</span><span class="p">,</span> <span class="n">text_width</span><span class="o">=</span><span class="s1">&#39;250px&#39;</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.leafmap.Map.batch_edit_points" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Batch editing points (CircleMarkers) on the map from GeoJSON data.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Union[str, dict]</code></td>
+        <td><p>The GeoJSON data or path to the GeoJSON file.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>Style for the CircleMarkers.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>hover_style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>Style for the CircleMarkers on hover.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>changed_style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>Style for the CircleMarkers when changed.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>display_props</code></td>
+        <td><code>Optional[List[str]]</code></td>
+        <td><p>List of properties to display in the attribute editor.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>Name of the layer group.</p></td>
+        <td><code>&#39;Points&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>text_width</code></td>
+        <td><code>str</code></td>
+        <td><p>Width of the text widgets in the attribute editor.</p></td>
+        <td><code>&#39;250px&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>zoom_to_layer</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to zoom to the layer bounds.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments for the LayerGroup.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the data is not a GeoDataFrame or a GeoJSON dictionary.</p></td>
+      </tr>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the GeoJSON data does not contain only Point geometries.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/leafmap.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">batch_edit_points</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hover_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">changed_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">display_props</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Points&quot;</span><span class="p">,</span>
+    <span class="n">text_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;250px&quot;</span><span class="p">,</span>
+    <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch editing points (CircleMarkers) on the map from GeoJSON data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (Union[str, dict]): The GeoJSON data or path to the GeoJSON file.</span>
+<span class="sd">        style (Optional[Dict[str, Any]]): Style for the CircleMarkers.</span>
+<span class="sd">        hover_style (Optional[Dict[str, Any]]): Style for the CircleMarkers on hover.</span>
+<span class="sd">        changed_style (Optional[Dict[str, Any]]): Style for the CircleMarkers when changed.</span>
+<span class="sd">        display_props (Optional[List[str]]): List of properties to display in the attribute editor.</span>
+<span class="sd">        name (str): Name of the layer group.</span>
+<span class="sd">        text_width (str): Width of the text widgets in the attribute editor.</span>
+<span class="sd">        zoom_to_layer (bool): Whether to zoom to the layer bounds.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments for the LayerGroup.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.</span>
+<span class="sd">        ValueError: If the GeoJSON data does not contain only Point geometries.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+
+    <span class="n">bounds</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">geojson_data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">if</span> <span class="n">zoom_to_layer</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a GeoDataFrame or a GeoJSON dictionary.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Ensure the data contains Point geometries</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Point&quot;</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">geojson_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The GeoJSON data must contain only Point geometries.&quot;</span><span class="p">)</span>
+
+    <span class="n">highlighted_markers</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">attribute_widgets</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Create CircleMarker objects for each point in the GeoJSON data</span>
+    <span class="n">markers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fill_opacity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">hover_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hover_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">changed_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">changed_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;fill_color&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]:</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;coordinates&quot;</span><span class="p">]</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+
+        <span class="n">marker</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">CircleMarker</span><span class="p">(</span>
+            <span class="n">location</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">),</span>  <span class="c1"># GeoJSON coordinates are (longitude, latitude)</span>
+            <span class="n">radius</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;radius&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="n">weight</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">),</span>
+            <span class="n">fill_color</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">),</span>
+            <span class="n">fill_opacity</span><span class="o">=</span><span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_opacity&quot;</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="s2">&quot;properties&quot;</span><span class="p">,</span> <span class="n">properties</span><span class="p">)</span>
+        <span class="n">markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+
+    <span class="c1"># Create a LayerGroup to hold the markers</span>
+    <span class="n">layer_group</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">LayerGroup</span><span class="p">(</span><span class="n">layers</span><span class="o">=</span><span class="n">markers</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Get the keys from the first feature&#39;s properties</span>
+    <span class="n">first_feature</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+
+    <span class="c1"># If display_props is not provided, show all attributes</span>
+    <span class="k">if</span> <span class="n">display_props</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">display_props</span> <span class="o">=</span> <span class="n">first_feature</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="n">text_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">text_width</span><span class="p">)</span>
+
+    <span class="c1"># Loop through the specified properties in display_props</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">display_props</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">first_feature</span><span class="p">:</span>  <span class="c1"># Ensure the property exists</span>
+            <span class="n">attribute_widgets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+                <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">text_layout</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Update button and clear selection button</span>
+    <span class="n">button_width</span> <span class="o">=</span> <span class="s2">&quot;80px&quot;</span>
+    <span class="n">button_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">button_width</span><span class="p">)</span>
+    <span class="n">update_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+    <span class="n">clear_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Clear&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+    <span class="n">close_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Close&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+    <span class="n">output_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+
+    <span class="c1"># Function to highlight the clicked marker and clear attribute fields</span>
+    <span class="k">def</span> <span class="nf">highlight_marker</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">highlighted_markers</span>
+
+        <span class="k">if</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">highlighted_markers</span><span class="p">:</span>
+            <span class="n">highlighted_markers</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+            <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+            <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">highlighted_markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+            <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">hover_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+            <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">hover_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Function to clear the selection</span>
+    <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">highlighted_markers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">!=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span>
+            <span class="p">)</span> <span class="ow">and</span> <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">!=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">):</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;white&quot;</span><span class="p">)</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">highlighted_markers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_geojson_data</span><span class="p">():</span>
+        <span class="n">geojson_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span> <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layer_group</span><span class="o">.</span><span class="n">layers</span><span class="p">:</span>
+            <span class="n">feature</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">layer</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
+                <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">layer</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">layer</span><span class="o">.</span><span class="n">location</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+
+            <span class="n">geojson_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_geojson_data</span> <span class="o">=</span> <span class="n">geojson_data</span>
+
+    <span class="c1"># Function to apply changes to highlighted markers</span>
+    <span class="k">def</span> <span class="nf">update_highlighted_markers</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="n">output_widget</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+
+        <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">marker</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">highlighted_markers</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be an integer.&quot;</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">float</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> must be a float.&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="c1"># Apply changed_style if defined</span>
+            <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">)</span>
+                <span class="n">marker</span><span class="o">.</span><span class="n">fill_color</span> <span class="o">=</span> <span class="n">changed_style</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;fill_color&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No changes to apply.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="n">clear_selection</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">get_geojson_data</span><span class="p">()</span>
+
+    <span class="c1"># Function to populate attribute fields on hover</span>
+    <span class="k">def</span> <span class="nf">populate_hover_attributes</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">marker</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Register click event to highlight markers</span>
+    <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">markers</span><span class="p">:</span>
+        <span class="n">marker</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">highlight_marker</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+        <span class="n">marker</span><span class="o">.</span><span class="n">on_mouseover</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">populate_hover_attributes</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+
+    <span class="c1"># Add the LayerGroup of markers to the map</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">layer_group</span><span class="p">)</span>
+
+    <span class="c1"># Add event listeners to the buttons</span>
+    <span class="n">update_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">update_highlighted_markers</span><span class="p">)</span>
+    <span class="n">clear_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">clear_selection</span><span class="p">)</span>
+
+    <span class="c1"># Create a VBox to hold the widgets for editing attributes and the buttons</span>
+    <span class="n">buttons</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">update_button</span><span class="p">,</span> <span class="n">clear_button</span><span class="p">,</span> <span class="n">close_button</span><span class="p">])</span>
+    <span class="n">attribute_editor</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">(</span>
+        <span class="p">[</span><span class="o">*</span><span class="n">attribute_widgets</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">buttons</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Embed the attribute editor inside the map using WidgetControl</span>
+    <span class="n">widget_control</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">WidgetControl</span><span class="p">(</span>
+        <span class="n">widget</span><span class="o">=</span><span class="n">attribute_editor</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">&quot;topright&quot;</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">close_widget_control</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+    <span class="n">close_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">close_widget_control</span><span class="p">)</span>
+
+    <span class="c1"># Optionally zoom to the bounds of the points</span>
+    <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">([[</span><span class="n">south</span><span class="p">,</span> <span class="n">west</span><span class="p">],</span> <span class="p">[</span><span class="n">north</span><span class="p">,</span> <span class="n">east</span><span class="p">]])</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.leafmap.Map.batch_edit_polygons" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">batch_edit_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hover_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">highlight_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">changed_style</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">display_props</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">,</span> <span class="n">text_width</span><span class="o">=</span><span class="s1">&#39;250px&#39;</span><span class="p">,</span> <span class="n">zoom_to_layer</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.leafmap.Map.batch_edit_polygons" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Batch editing polygons on the map.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Union[str, gpd.GeoDataFrame, Dict[str, Any]]</code></td>
+        <td><p>The data to be
+edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>The style dictionary for
+the polygons. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>hover_style</code></td>
+        <td><code>Optional[Dict[str, Any]]</code></td>
+        <td><p>The hover style
+dictionary for the polygons. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the GeoJSON layer. Defaults to "GeoJSON".</p></td>
+        <td><code>&#39;GeoJSON&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>widget_width</code></td>
+        <td><code>str</code></td>
+        <td><p>The width of the widgets. Defaults to "250px".</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>info_mode</code></td>
+        <td><code>str</code></td>
+        <td><p>The mode for displaying information,
+either "on_click" or "on_hover". Defaults to "on_click".</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>zoom_to_layer</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to zoom to the layer bounds.
+Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments for the GeoJSON layer.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the data is not a GeoDataFrame or a GeoJSON dictionary.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/leafmap.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">batch_edit_polygons</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">hover_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">highlight_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">changed_style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">display_props</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GeoJSON&quot;</span><span class="p">,</span>
+    <span class="n">text_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;250px&quot;</span><span class="p">,</span>
+    <span class="n">zoom_to_layer</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Batch editing polygons on the map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be</span>
+<span class="sd">            edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.</span>
+<span class="sd">        style (Optional[Dict[str, Any]], optional): The style dictionary for</span>
+<span class="sd">            the polygons. Defaults to None.</span>
+<span class="sd">        hover_style (Optional[Dict[str, Any]], optional): The hover style</span>
+<span class="sd">            dictionary for the polygons. Defaults to None.</span>
+<span class="sd">        name (str, optional): The name of the GeoJSON layer. Defaults to &quot;GeoJSON&quot;.</span>
+<span class="sd">        widget_width (str, optional): The width of the widgets. Defaults to &quot;250px&quot;.</span>
+<span class="sd">        info_mode (str, optional): The mode for displaying information,</span>
+<span class="sd">            either &quot;on_click&quot; or &quot;on_hover&quot;. Defaults to &quot;on_click&quot;.</span>
+<span class="sd">        zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.</span>
+<span class="sd">            Defaults to True.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments for the GeoJSON layer.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">ipyleaflet</span> <span class="kn">import</span> <span class="n">GeoJSON</span>
+    <span class="kn">import</span> <span class="nn">copy</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+
+    <span class="n">bounds</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">total_bounds</span>
+        <span class="n">temp_geojson</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;geojson&quot;</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">temp_geojson</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">if</span> <span class="n">zoom_to_layer</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The data must be a GeoDataFrame or a GeoJSON dictionary.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">hover_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hover_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;dashArray&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">highlight_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">highlight_style</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">changed_style</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">changed_style</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="c1"># List to store the IDs of highlighted features</span>
+    <span class="n">highlighted_features</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Create a dictionary to hold attribute widgets</span>
+    <span class="n">attribute_widgets</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Get the keys from the first feature to dynamically create widgets</span>
+    <span class="n">first_feature</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span>
+
+    <span class="c1"># If display_props is not provided, show all attributes</span>
+    <span class="k">if</span> <span class="n">display_props</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">display_props</span> <span class="o">=</span> <span class="n">first_feature</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="n">text_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">text_width</span><span class="p">)</span>
+    <span class="c1"># Loop through only the specified properties in display_props</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">display_props</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">first_feature</span><span class="p">:</span>  <span class="c1"># Ensure the property exists</span>
+            <span class="n">attribute_widgets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+                <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">text_layout</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Update button and clear selection button</span>
+    <span class="n">button_width</span> <span class="o">=</span> <span class="s2">&quot;80px&quot;</span>
+    <span class="n">button_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="n">button_width</span><span class="p">)</span>
+    <span class="n">update_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+    <span class="n">clear_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Clear&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+    <span class="n">close_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;Close&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span><span class="p">)</span>
+    <span class="n">output_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+
+    <span class="c1"># Function to highlight the clicked feature and clear attribute fields</span>
+    <span class="k">def</span> <span class="nf">highlight_feature</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">highlighted_features</span>
+        <span class="n">original_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="o">==</span> <span class="n">feature</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">highlighted_features</span><span class="p">:</span>
+                    <span class="n">highlighted_features</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">highlighted_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                    <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span>
+                        <span class="s2">&quot;style&quot;</span>
+                    <span class="p">]</span> <span class="o">=</span> <span class="n">highlight_style</span>
+
+        <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span>
+
+    <span class="c1"># Function to clear the selection</span>
+    <span class="k">def</span> <span class="nf">clear_selection</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="n">original_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Reset the style for all highlighted features</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">highlighted_features</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;style&quot;</span><span class="p">]</span>
+                <span class="o">!=</span> <span class="n">changed_style</span>
+            <span class="p">):</span>
+                <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;style&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">style</span>
+
+        <span class="n">highlighted_features</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span>
+
+    <span class="c1"># Function to apply changes to highlighted features</span>
+    <span class="k">def</span> <span class="nf">update_highlighted_features</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="n">output_widget</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+        <span class="n">original_data</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># Update the properties for all highlighted features</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">highlighted_features</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                    <span class="n">dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span>
+                        <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="k">continue</span>
+                    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">float</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">output_widget</span><span class="p">:</span>
+                                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid value for </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                                <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span>
+                    <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="n">original_data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span>
+                        <span class="s2">&quot;style&quot;</span>
+                    <span class="p">]</span> <span class="o">=</span> <span class="n">changed_style</span>
+
+        <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geojson_data</span> <span class="o">=</span> <span class="n">original_data</span>
+        <span class="n">clear_selection</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Function to populate attribute fields on hover</span>
+    <span class="k">def</span> <span class="nf">populate_hover_attributes</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Populate the widget fields with the hovered feature&#39;s attributes</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">widget</span> <span class="ow">in</span> <span class="n">attribute_widgets</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">widget</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">widget</span><span class="o">.</span><span class="n">placeholder</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Create the GeoJSON layer</span>
+    <span class="n">geojson_layer</span> <span class="o">=</span> <span class="n">GeoJSON</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="n">hover_style</span><span class="o">=</span><span class="n">hover_style</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Add click event to highlight features and clear attribute fields</span>
+    <span class="n">geojson_layer</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">highlight_feature</span><span class="p">)</span>
+
+    <span class="c1"># Add hover event to populate attribute fields</span>
+    <span class="n">geojson_layer</span><span class="o">.</span><span class="n">on_hover</span><span class="p">(</span><span class="n">populate_hover_attributes</span><span class="p">)</span>
+
+    <span class="c1"># Add the GeoJSON layer to the map</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">geojson_layer</span><span class="p">)</span>
+
+    <span class="c1"># Add event listeners to the buttons</span>
+    <span class="n">update_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">update_highlighted_features</span><span class="p">)</span>
+    <span class="n">clear_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">clear_selection</span><span class="p">)</span>
+
+    <span class="c1"># Create a VBox to hold the widgets for editing attributes and the buttons</span>
+    <span class="n">buttons</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">update_button</span><span class="p">,</span> <span class="n">clear_button</span><span class="p">,</span> <span class="n">close_button</span><span class="p">])</span>
+    <span class="n">attribute_editor</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">(</span>
+        <span class="p">[</span><span class="o">*</span><span class="n">attribute_widgets</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="n">buttons</span><span class="p">,</span> <span class="n">output_widget</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Embed the attribute editor inside the map using WidgetControl</span>
+    <span class="n">widget_control</span> <span class="o">=</span> <span class="n">ipyleaflet</span><span class="o">.</span><span class="n">WidgetControl</span><span class="p">(</span>
+        <span class="n">widget</span><span class="o">=</span><span class="n">attribute_editor</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">&quot;topright&quot;</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">close_widget_control</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">widget_control</span><span class="p">)</span>
+
+    <span class="n">close_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">close_widget_control</span><span class="p">)</span>
+
+    <span class="c1"># Add layers to map</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_geojson_data</span> <span class="o">=</span> <span class="n">geojson_layer</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="k">if</span> <span class="n">bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
+        <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">([[</span><span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">],</span> <span class="p">[</span><span class="n">north</span><span class="p">,</span> <span class="n">west</span><span class="p">]])</span>
 </code></pre></div>
         </details>
     </div>
