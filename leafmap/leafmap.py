@@ -5134,7 +5134,7 @@ class Map(ipyleaflet.Map):
 
     def batch_edit_points(
         self,
-        data: Union[str, dict],  # GeoJSON file path or dictionary with point data
+        data: Union[str, dict],
         style: Optional[Dict[str, Any]] = None,
         hover_style: Optional[Dict[str, Any]] = None,
         changed_style: Optional[Dict[str, Any]] = None,
@@ -5144,8 +5144,23 @@ class Map(ipyleaflet.Map):
         zoom_to_layer: bool = True,
         **kwargs: Any,
     ) -> None:
-        """Batch editing points (CircleMarkers) on the map from GeoJSON data."""
+        """Batch editing points (CircleMarkers) on the map from GeoJSON data.
 
+        Args:
+            data (Union[str, dict]): The GeoJSON data or path to the GeoJSON file.
+            style (Optional[Dict[str, Any]]): Style for the CircleMarkers.
+            hover_style (Optional[Dict[str, Any]]): Style for the CircleMarkers on hover.
+            changed_style (Optional[Dict[str, Any]]): Style for the CircleMarkers when changed.
+            display_props (Optional[List[str]]): List of properties to display in the attribute editor.
+            name (str): Name of the layer group.
+            text_width (str): Width of the text widgets in the attribute editor.
+            zoom_to_layer (bool): Whether to zoom to the layer bounds.
+            **kwargs (Any): Additional keyword arguments for the LayerGroup.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+            ValueError: If the GeoJSON data does not contain only Point geometries.
+        """
         import geopandas as gpd
         import json
 
@@ -5219,7 +5234,7 @@ class Map(ipyleaflet.Map):
             markers.append(marker)
 
         # Create a LayerGroup to hold the markers
-        layer_group = ipyleaflet.LayerGroup(layers=markers, name=name)
+        layer_group = ipyleaflet.LayerGroup(layers=markers, name=name, **kwargs)
 
         # Get the keys from the first feature's properties
         first_feature = data["features"][0]["properties"]
@@ -5429,6 +5444,28 @@ class Map(ipyleaflet.Map):
         else:
             raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
 
+        if style is None:
+            style = {"color": "#3388ff"}
+
+        if hover_style is None:
+            hover_style = {"color": "yellow", "dashArray": "0", "fillOpacity": 0.3}
+
+        if highlight_style is None:
+            highlight_style = {
+                "color": "#3388ff",
+                "fillColor": "yellow",
+                "weight": 3,
+                "fillOpacity": 0.5,
+            }
+
+        if changed_style is None:
+            changed_style = {
+                "color": "#3388ff",
+                "fillColor": "red",
+                "weight": 3,
+                "fillOpacity": 0.3,
+            }
+
         # List to store the IDs of highlighted features
         highlighted_features = []
 
@@ -5584,6 +5621,52 @@ class Map(ipyleaflet.Map):
         if bounds is not None and zoom_to_layer:
             west, south, east, north = bounds
             self.fit_bounds([[south, east], [north, west]])
+
+    def batch_edit_lines(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        highlight_style: Optional[Dict[str, Any]] = None,
+        changed_style: Optional[Dict[str, Any]] = None,
+        display_props: Optional[List[str]] = None,
+        name: str = "GeoJSON",
+        text_width: str = "250px",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Batch editing lines on the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the polygons. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the polygons. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
+        self.batch_edit_polygons(
+            data=data,
+            style=style,
+            hover_style=hover_style,
+            highlight_style=highlight_style,
+            changed_style=changed_style,
+            display_props=display_props,
+            name=name,
+            text_width=text_width,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
 
 
 # The functions below are outside the Map class.
