@@ -5272,6 +5272,21 @@ class Map(ipyleaflet.Map):
                 widget.placeholder = ""
             highlighted_markers.clear()
 
+        def get_geojson_data():
+            geojson_data = {"type": "FeatureCollection", "features": []}
+            for layer in layer_group.layers:
+                feature = {
+                    "type": "Feature",
+                    "properties": layer.properties,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [layer.location[1], layer.location[0]],
+                    },
+                }
+
+                geojson_data["features"].append(feature)
+                self._geojson_data = geojson_data
+
         # Function to apply changes to highlighted markers
         def update_highlighted_markers(_):
             output_widget.clear_output()
@@ -5311,6 +5326,7 @@ class Map(ipyleaflet.Map):
                 clear_selection(None)
                 for key, widget in attribute_widgets.items():
                     widget.value = ""
+                get_geojson_data()
 
         # Function to populate attribute fields on hover
         def populate_hover_attributes(marker, **kwargs):
