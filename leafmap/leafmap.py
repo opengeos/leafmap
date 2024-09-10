@@ -5202,7 +5202,7 @@ class Map(ipyleaflet.Map):
 
         for feature in data["features"]:
             coords = feature["geometry"]["coordinates"]
-            props = feature["properties"]
+            properties = feature["properties"]
 
             marker = ipyleaflet.CircleMarker(
                 location=(
@@ -5215,6 +5215,7 @@ class Map(ipyleaflet.Map):
                 fill_color=style.get("fill_color", "#3388ff"),
                 fill_opacity=style.get("fill_opacity", 0.6),
             )
+            setattr(marker, "properties", properties)
             markers.append(marker)
 
         # Create a LayerGroup to hold the markers
@@ -5266,44 +5267,61 @@ class Map(ipyleaflet.Map):
                 ) and marker.fill_color != changed_style.get("fill_color", "red"):
                     marker.color = style.get("color", "white")
                     marker.fill_color = style.get("fill_color", "#3388ff")
+            for key, widget in attribute_widgets.items():
+                widget.value = ""
+                widget.placeholder = ""
             highlighted_markers.clear()
 
         # Function to apply changes to highlighted markers
         def update_highlighted_markers(_):
             output_widget.clear_output()
 
-            for marker in highlighted_markers:
+            changed = False
+            for index, marker in enumerate(highlighted_markers):
                 for key, widget in attribute_widgets.items():
                     if widget.value.strip() != "":
-                        if key == "radius":
+                        changed = True
+                        if isinstance(marker.properties[key], int):
                             try:
-                                value = int(widget.value)
-                                marker.radius = value
-                            except ValueError:
-                                with output_widget:
-                                    print(f"Invalid value for {key}")
-                        elif key == "color":
-                            marker.color = widget.value
-                        elif key == "fill_color":
-                            marker.fill_color = widget.value
+                                marker.properties[key] = int(widget.value)
+                            except ValueError as e:
+                                if index == 0:
+                                    with output_widget:
+                                        print(f"{key} must be an integer.")
+                        elif isinstance(marker.properties[key], float):
+                            try:
+                                marker.properties[key] = float(widget.value)
+                            except ValueError as e:
+                                if index == 0:
+                                    with output_widget:
+                                        print(f"{key} must be a float.")
+                        else:
+                            marker.properties[key] = widget.value
 
-                        # Apply changed_style if defined
+                # Apply changed_style if defined
+                if changed:
                     marker.color = changed_style.get("color", "cyan")
                     marker.fill_color = changed_style.get("fill_color", "red")
+                else:
+                    if index == 0:
+                        with output_widget:
+                            print("No changes to apply.")
 
-            # clear_selection(None)
-            for key, widget in attribute_widgets.items():
-                widget.value = ""
+            if changed:
+                clear_selection(None)
+                for key, widget in attribute_widgets.items():
+                    widget.value = ""
 
         # Function to populate attribute fields on hover
         def populate_hover_attributes(marker, **kwargs):
             for key, widget in attribute_widgets.items():
                 widget.value = ""
-                widget.placeholder = str(getattr(marker, key, ""))
+                widget.placeholder = str(marker.properties.get(key, ""))
 
         # Register click event to highlight markers
         for marker in markers:
             marker.on_click(lambda m=marker, **kwargs: highlight_marker(m))
+            marker.on_mouseover(lambda m=marker, **kwargs: populate_hover_attributes(m))
 
         # Add the LayerGroup of markers to the map
         self.add_layer(layer_group)
