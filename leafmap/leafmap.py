@@ -5132,6 +5132,542 @@ class Map(ipyleaflet.Map):
             gdf = gdf.drop(columns=["style"])
         gdf.to_file(filename, **kwargs)
 
+    def batch_edit_points(
+        self,
+        data: Union[str, dict],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        changed_style: Optional[Dict[str, Any]] = None,
+        display_props: Optional[List[str]] = None,
+        name: str = "Points",
+        text_width: str = "250px",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Batch editing points (CircleMarkers) on the map from GeoJSON data.
+
+        Args:
+            data (Union[str, dict]): The GeoJSON data or path to the GeoJSON file.
+            style (Optional[Dict[str, Any]]): Style for the CircleMarkers.
+            hover_style (Optional[Dict[str, Any]]): Style for the CircleMarkers on hover.
+            changed_style (Optional[Dict[str, Any]]): Style for the CircleMarkers when changed.
+            display_props (Optional[List[str]]): List of properties to display in the attribute editor.
+            name (str): Name of the layer group.
+            text_width (str): Width of the text widgets in the attribute editor.
+            zoom_to_layer (bool): Whether to zoom to the layer bounds.
+            **kwargs (Any): Additional keyword arguments for the LayerGroup.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+            ValueError: If the GeoJSON data does not contain only Point geometries.
+        """
+        import geopandas as gpd
+        import json
+
+        bounds = None
+
+        if isinstance(data, str):
+            gdf = gpd.read_file(data)
+            bounds = gdf.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            gdf.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+        elif isinstance(data, gpd.GeoDataFrame):
+            bounds = data.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            data.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+
+        if isinstance(data, dict):
+            geojson_data = data
+            if zoom_to_layer and (bounds is not None):
+                bounds = gpd.GeoDataFrame.from_features(data).total_bounds
+        else:
+            raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
+
+        # Ensure the data contains Point geometries
+        if not all(
+            feature["geometry"]["type"] == "Point"
+            for feature in geojson_data["features"]
+        ):
+            raise ValueError("The GeoJSON data must contain only Point geometries.")
+
+        highlighted_markers = []
+        attribute_widgets = {}
+
+        # Create CircleMarker objects for each point in the GeoJSON data
+        markers = []
+
+        if style is None:
+            style = {
+                "radius": 5,
+                "weight": 1,
+                "color": "white",
+                "fill_color": "#3388ff",
+                "fill_opacity": 0.6,
+            }
+
+        if hover_style is None:
+            hover_style = {"color": "purple", "fill_color": "yellow"}
+
+        if changed_style is None:
+            changed_style = {"color": "cyan", "fill_color": "red"}
+
+        for feature in data["features"]:
+            coords = feature["geometry"]["coordinates"]
+            properties = feature["properties"]
+
+            marker = ipyleaflet.CircleMarker(
+                location=(
+                    coords[1],
+                    coords[0],
+                ),  # GeoJSON coordinates are (longitude, latitude)
+                radius=style.get("radius", 5),
+                weight=style.get("weight", 1),
+                color=style.get("color", "white"),
+                fill_color=style.get("fill_color", "#3388ff"),
+                fill_opacity=style.get("fill_opacity", 0.6),
+            )
+            setattr(marker, "properties", properties)
+            markers.append(marker)
+
+        # Create a LayerGroup to hold the markers
+        layer_group = ipyleaflet.LayerGroup(layers=markers, name=name, **kwargs)
+
+        # Get the keys from the first feature's properties
+        first_feature = data["features"][0]["properties"]
+
+        # If display_props is not provided, show all attributes
+        if display_props is None:
+            display_props = first_feature.keys()
+
+        text_layout = widgets.Layout(width=text_width)
+
+        # Loop through the specified properties in display_props
+        for key in display_props:
+            if key in first_feature:  # Ensure the property exists
+                attribute_widgets[key] = widgets.Text(
+                    description=f"{key}:", layout=text_layout
+                )
+
+        # Update button and clear selection button
+        button_width = "80px"
+        button_layout = widgets.Layout(width=button_width)
+        update_button = widgets.Button(description="Update", layout=button_layout)
+        clear_button = widgets.Button(description="Clear", layout=button_layout)
+        close_button = widgets.Button(description="Close", layout=button_layout)
+        output_widget = widgets.Output()
+
+        # Function to highlight the clicked marker and clear attribute fields
+        def highlight_marker(marker, **kwargs):
+            nonlocal highlighted_markers
+
+            if marker in highlighted_markers:
+                highlighted_markers.remove(marker)
+                marker.color = style.get("color", "white")
+                marker.fill_color = style.get("fill_color", "#3388ff")
+
+            else:
+                highlighted_markers.append(marker)
+                marker.color = hover_style.get("color", "purple")
+                marker.fill_color = hover_style.get("fill_color", "yellow")
+
+        # Function to clear the selection
+        def clear_selection(_):
+            for marker in highlighted_markers:
+                if marker.color != changed_style.get(
+                    "color", "cyan"
+                ) and marker.fill_color != changed_style.get("fill_color", "red"):
+                    marker.color = style.get("color", "white")
+                    marker.fill_color = style.get("fill_color", "#3388ff")
+            for key, widget in attribute_widgets.items():
+                widget.value = ""
+                widget.placeholder = ""
+            highlighted_markers.clear()
+
+        def get_geojson_data():
+            geojson_data = {"type": "FeatureCollection", "features": []}
+            for layer in layer_group.layers:
+                feature = {
+                    "type": "Feature",
+                    "properties": layer.properties,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [layer.location[1], layer.location[0]],
+                    },
+                }
+
+                geojson_data["features"].append(feature)
+                self._geojson_data = geojson_data
+
+        # Function to apply changes to highlighted markers
+        def update_highlighted_markers(_):
+            output_widget.clear_output()
+
+            changed = False
+            for index, marker in enumerate(highlighted_markers):
+                for key, widget in attribute_widgets.items():
+                    if widget.value.strip() != "":
+                        changed = True
+                        if isinstance(marker.properties[key], int):
+                            try:
+                                marker.properties[key] = int(widget.value)
+                            except ValueError as e:
+                                if index == 0:
+                                    with output_widget:
+                                        print(f"{key} must be an integer.")
+                        elif isinstance(marker.properties[key], float):
+                            try:
+                                marker.properties[key] = float(widget.value)
+                            except ValueError as e:
+                                if index == 0:
+                                    with output_widget:
+                                        print(f"{key} must be a float.")
+                        else:
+                            marker.properties[key] = widget.value
+
+                # Apply changed_style if defined
+                if changed:
+                    marker.color = changed_style.get("color", "cyan")
+                    marker.fill_color = changed_style.get("fill_color", "red")
+                else:
+                    if index == 0:
+                        with output_widget:
+                            print("No changes to apply.")
+
+            if changed:
+                clear_selection(None)
+                for key, widget in attribute_widgets.items():
+                    widget.value = ""
+                get_geojson_data()
+
+        # Function to populate attribute fields on hover
+        def populate_hover_attributes(marker, **kwargs):
+            for key, widget in attribute_widgets.items():
+                widget.value = ""
+                widget.placeholder = str(marker.properties.get(key, ""))
+
+        # Register click event to highlight markers
+        for marker in markers:
+            marker.on_click(lambda m=marker, **kwargs: highlight_marker(m))
+            marker.on_mouseover(lambda m=marker, **kwargs: populate_hover_attributes(m))
+
+        # Add the LayerGroup of markers to the map
+        self.add_layer(layer_group)
+
+        # Add event listeners to the buttons
+        update_button.on_click(update_highlighted_markers)
+        clear_button.on_click(clear_selection)
+
+        # Create a VBox to hold the widgets for editing attributes and the buttons
+        buttons = widgets.HBox([update_button, clear_button, close_button])
+        attribute_editor = widgets.VBox(
+            [*attribute_widgets.values(), buttons, output_widget]
+        )
+
+        # Embed the attribute editor inside the map using WidgetControl
+        widget_control = ipyleaflet.WidgetControl(
+            widget=attribute_editor, position="topright"
+        )
+        self.add_control(widget_control)
+
+        def close_widget_control(_):
+            self.remove(widget_control)
+
+        close_button.on_click(close_widget_control)
+
+        # Optionally zoom to the bounds of the points
+        if zoom_to_layer:
+            bounds = gpd.GeoDataFrame.from_features(data).total_bounds
+            west, south, east, north = bounds
+            self.fit_bounds([[south, west], [north, east]])
+
+    def batch_edit_polygons(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        highlight_style: Optional[Dict[str, Any]] = None,
+        changed_style: Optional[Dict[str, Any]] = None,
+        display_props: Optional[List[str]] = None,
+        name: str = "GeoJSON",
+        text_width: str = "250px",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Batch editing polygons on the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the polygons. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the polygons. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
+        from ipyleaflet import GeoJSON
+        import copy
+        import geopandas as gpd
+        import json
+
+        bounds = None
+        if isinstance(data, str):
+            gdf = gpd.read_file(data)
+            bounds = gdf.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            gdf.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+        elif isinstance(data, gpd.GeoDataFrame):
+            bounds = data.total_bounds
+            temp_geojson = temp_file_path("geojson")
+            data.to_file(temp_geojson, driver="GeoJSON")
+            with open(temp_geojson) as f:
+                data = json.load(f)
+
+        if isinstance(data, dict):
+            data = data
+            if zoom_to_layer and (bounds is not None):
+                bounds = gpd.GeoDataFrame.from_features(data).total_bounds
+        else:
+            raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
+
+        if style is None:
+            style = {"color": "#3388ff"}
+
+        if hover_style is None:
+            hover_style = {"color": "yellow", "dashArray": "0", "fillOpacity": 0.3}
+
+        if highlight_style is None:
+            highlight_style = {
+                "color": "#3388ff",
+                "fillColor": "yellow",
+                "weight": 3,
+                "fillOpacity": 0.5,
+            }
+
+        if changed_style is None:
+            changed_style = {
+                "color": "#3388ff",
+                "fillColor": "red",
+                "weight": 3,
+                "fillOpacity": 0.3,
+            }
+
+        # List to store the IDs of highlighted features
+        highlighted_features = []
+
+        # Create a dictionary to hold attribute widgets
+        attribute_widgets = {}
+
+        # Get the keys from the first feature to dynamically create widgets
+        first_feature = data["features"][0]["properties"]
+
+        # If display_props is not provided, show all attributes
+        if display_props is None:
+            display_props = first_feature.keys()
+
+        text_layout = widgets.Layout(width=text_width)
+        # Loop through only the specified properties in display_props
+        for key in display_props:
+            if key in first_feature:  # Ensure the property exists
+                attribute_widgets[key] = widgets.Text(
+                    description=f"{key.capitalize()}:", layout=text_layout
+                )
+
+        # Update button and clear selection button
+        button_width = "80px"
+        button_layout = widgets.Layout(width=button_width)
+        update_button = widgets.Button(description="Update", layout=button_layout)
+        clear_button = widgets.Button(description="Clear", layout=button_layout)
+        close_button = widgets.Button(description="Close", layout=button_layout)
+        output_widget = widgets.Output()
+
+        # Function to highlight the clicked feature and clear attribute fields
+        def highlight_feature(event, feature, **kwargs):
+            nonlocal highlighted_features
+            original_data = copy.deepcopy(geojson_layer.data)
+
+            for index, f in enumerate(original_data["features"]):
+                if f == feature:
+                    if index in highlighted_features:
+                        highlighted_features.remove(index)
+                        original_data["features"][index]["properties"]["style"] = style
+                    else:
+                        highlighted_features.append(index)
+                        original_data["features"][index]["properties"][
+                            "style"
+                        ] = highlight_style
+
+            geojson_layer.data = original_data
+
+        # Function to clear the selection
+        def clear_selection(_):
+            original_data = copy.deepcopy(geojson_layer.data)
+
+            # Reset the style for all highlighted features
+            for index in highlighted_features:
+                if (
+                    original_data["features"][index]["properties"]["style"]
+                    != changed_style
+                ):
+                    original_data["features"][index]["properties"]["style"] = style
+
+            highlighted_features.clear()
+            geojson_layer.data = original_data
+
+        # Function to apply changes to highlighted features
+        def update_highlighted_features(_):
+            output_widget.clear_output()
+            original_data = copy.deepcopy(geojson_layer.data)
+
+            # Update the properties for all highlighted features
+            for index in highlighted_features:
+                for key, widget in attribute_widgets.items():
+                    if widget.value.strip() != "":
+                        dtype = type(
+                            original_data["features"][index]["properties"][key]
+                        )
+                        if dtype == str:
+                            value = str(widget.value)
+                        elif dtype == int:
+                            try:
+                                value = int(widget.value)
+                            except ValueError:
+                                with output_widget:
+                                    print(f"Invalid value for {key}")
+                                    continue
+                        elif dtype == float:
+                            try:
+                                value = float(widget.value)
+                            except ValueError:
+                                with output_widget:
+                                    print(f"Invalid value for {key}")
+                                    continue
+                        else:
+                            value = widget.value
+                        original_data["features"][index]["properties"][key] = value
+                        original_data["features"][index]["properties"][
+                            "style"
+                        ] = changed_style
+
+            geojson_layer.data = original_data
+            self._geojson_data = original_data
+            clear_selection(None)
+            for key, widget in attribute_widgets.items():
+                widget.value = ""
+
+        # Function to populate attribute fields on hover
+        def populate_hover_attributes(event, feature, **kwargs):
+            # Populate the widget fields with the hovered feature's attributes
+            for key, widget in attribute_widgets.items():
+                if widget.value.strip() == "":
+                    widget.value = ""
+                    widget.placeholder = str(feature["properties"].get(key, ""))
+
+        # Create the GeoJSON layer
+        geojson_layer = GeoJSON(
+            data=data,
+            style=style,
+            hover_style=hover_style,
+            name=name,
+        )
+
+        # Add click event to highlight features and clear attribute fields
+        geojson_layer.on_click(highlight_feature)
+
+        # Add hover event to populate attribute fields
+        geojson_layer.on_hover(populate_hover_attributes)
+
+        # Add the GeoJSON layer to the map
+        self.add_layer(geojson_layer)
+
+        # Add event listeners to the buttons
+        update_button.on_click(update_highlighted_features)
+        clear_button.on_click(clear_selection)
+
+        # Create a VBox to hold the widgets for editing attributes and the buttons
+        buttons = widgets.HBox([update_button, clear_button, close_button])
+        attribute_editor = widgets.VBox(
+            [*attribute_widgets.values(), buttons, output_widget]
+        )
+
+        # Embed the attribute editor inside the map using WidgetControl
+        widget_control = ipyleaflet.WidgetControl(
+            widget=attribute_editor, position="topright"
+        )
+        self.add_control(widget_control)
+
+        def close_widget_control(_):
+            self.remove(widget_control)
+
+        close_button.on_click(close_widget_control)
+
+        # Add layers to map
+        self._geojson_data = geojson_layer.data
+
+        if bounds is not None and zoom_to_layer:
+            west, south, east, north = bounds
+            self.fit_bounds([[south, east], [north, west]])
+
+    def batch_edit_lines(
+        self,
+        data: Union[str, "gpd.GeoDataFrame", Dict[str, Any]],
+        style: Optional[Dict[str, Any]] = None,
+        hover_style: Optional[Dict[str, Any]] = None,
+        highlight_style: Optional[Dict[str, Any]] = None,
+        changed_style: Optional[Dict[str, Any]] = None,
+        display_props: Optional[List[str]] = None,
+        name: str = "GeoJSON",
+        text_width: str = "250px",
+        zoom_to_layer: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Batch editing lines on the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame, Dict[str, Any]]): The data to be
+                edited, either as a file path, GeoDataFrame, or GeoJSON dictionary.
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the polygons. Defaults to None.
+            hover_style (Optional[Dict[str, Any]], optional): The hover style
+                dictionary for the polygons. Defaults to None.
+            name (str, optional): The name of the GeoJSON layer. Defaults to "GeoJSON".
+            widget_width (str, optional): The width of the widgets. Defaults to "250px".
+            info_mode (str, optional): The mode for displaying information,
+                either "on_click" or "on_hover". Defaults to "on_click".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer bounds.
+                Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the GeoJSON layer.
+
+        Raises:
+            ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
+        """
+        self.batch_edit_polygons(
+            data=data,
+            style=style,
+            hover_style=hover_style,
+            highlight_style=highlight_style,
+            changed_style=changed_style,
+            display_props=display_props,
+            name=name,
+            text_width=text_width,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
+
 
 # The functions below are outside the Map class.
 
