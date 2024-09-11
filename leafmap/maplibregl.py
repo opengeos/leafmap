@@ -2120,7 +2120,7 @@ class Map(MapWidget):
             Exception: If there is an error in creating the Streamlit component.
         """
         try:
-            import streamlit.components.v1 as components
+            import streamlit.components.v1 as components  # pylint: disable=E0401
             import base64
 
             raw_html = self.to_html().encode("utf-8")

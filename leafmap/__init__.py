@@ -42,25 +42,25 @@ def view_vector(
     """Visualize a vector dataset on the map.
 
     Args:
-            vector (Union[str, GeoDataFrame]): The file path or URL to the vector data, or a GeoDataFrame.
-            zoom_to_layer (bool, optional): Flag to zoom to the added layer. Defaults to True.
-            pickable (bool, optional): Flag to enable picking on the added layer. Defaults to True.
-            color_column (Optional[str], optional): The column to be used for color encoding. Defaults to None.
-            color_map (Optional[Union[str, Dict]], optional): The color map to use for color encoding. It can be a string or a dictionary. Defaults to None.
-            color_scheme (Optional[str], optional): The color scheme to use for color encoding. Defaults to "Quantiles".
-                Name of a choropleth classification scheme (requires mapclassify).
-                A mapclassify.MapClassifier object will be used
-                under the hood. Supported are all schemes provided by mapclassify (e.g.
-                'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
-                'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
-                'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
-                'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
-                'UserDefined'). Arguments can be passed in classification_kwds.
-            color_k (Optional[int], optional): The number of classes to use for color encoding. Defaults to 5.
-            color_args (dict, optional): Additional keyword arguments that will be passed to assign_continuous_colors(). Defaults to {}.
-            open_args (dict, optional): Additional keyword arguments that will be passed to geopandas.read_file(). Defaults to {}.
-            map_args (dict, optional): Additional keyword arguments that will be passed to lonboard.Map. Defaults to {}.
-            **kwargs: Additional keyword arguments that will be passed to lonboard.Layer.from_geopandas()
+        vector (Union[str, GeoDataFrame]): The file path or URL to the vector data, or a GeoDataFrame.
+        zoom_to_layer (bool, optional): Flag to zoom to the added layer. Defaults to True.
+        pickable (bool, optional): Flag to enable picking on the added layer. Defaults to True.
+        color_column (Optional[str], optional): The column to be used for color encoding. Defaults to None.
+        color_map (Optional[Union[str, Dict]], optional): The color map to use for color encoding. It can be a string or a dictionary. Defaults to None.
+        color_scheme (Optional[str], optional): The color scheme to use for color encoding. Defaults to "Quantiles".
+            Name of a choropleth classification scheme (requires mapclassify).
+            A mapclassify.MapClassifier object will be used
+            under the hood. Supported are all schemes provided by mapclassify (e.g.
+            'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+            'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+            'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+            'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+            'UserDefined'). Arguments can be passed in classification_kwds.
+        color_k (Optional[int], optional): The number of classes to use for color encoding. Defaults to 5.
+        color_args (dict, optional): Additional keyword arguments that will be passed to assign_continuous_colors(). Defaults to {}.
+        open_args (dict, optional): Additional keyword arguments that will be passed to geopandas.read_file(). Defaults to {}.
+        map_args (dict, optional): Additional keyword arguments that will be passed to lonboard.Map. Defaults to {}.
+        **kwargs: Additional keyword arguments that will be passed to lonboard.Layer.from_geopandas()
 
     Returns:
         lonboard.Map: A lonboard Map object.
@@ -95,8 +95,7 @@ def view_pmtiles(
     map_args={},
     **kwargs,
 ):
-    """
-    Visualize PMTiles the map.
+    """Visualize PMTiles the map.
 
     Args:
         url (str): The URL of the PMTiles file.
