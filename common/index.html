@@ -1305,15 +1305,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#leafmap.common.download_from_gdrive" class="md-nav__link">
-    <span class="md-ellipsis">
-      download_from_gdrive()
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#leafmap.common.download_from_url" class="md-nav__link">
     <span class="md-ellipsis">
       download_from_url()
@@ -8319,15 +8310,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#leafmap.common.download_from_gdrive" class="md-nav__link">
-    <span class="md-ellipsis">
-      download_from_gdrive()
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#leafmap.common.download_from_url" class="md-nav__link">
     <span class="md-ellipsis">
       download_from_url()
@@ -12288,7 +12270,7 @@ WhiteboxTools            (<span title="whitebox.whitebox_tools.WhiteboxTools">Wh
 <span class="sd">        arcpy.Map: The active map in ArcGIS Pro.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_arcpy</span><span class="p">():</span>
-        <span class="kn">import</span> <span class="nn">arcpy</span>
+        <span class="kn">import</span> <span class="nn">arcpy</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="n">aprx</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mp</span><span class="o">.</span><span class="n">ArcGISProject</span><span class="p">(</span><span class="s2">&quot;CURRENT&quot;</span><span class="p">)</span>
         <span class="n">m</span> <span class="o">=</span> <span class="n">aprx</span><span class="o">.</span><span class="n">activeMap</span>
@@ -12341,7 +12323,7 @@ WhiteboxTools            (<span title="whitebox.whitebox_tools.WhiteboxTools">Wh
 <span class="sd">        arcpy.MapView: The active view in ArcGIS Pro.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_arcpy</span><span class="p">():</span>
-        <span class="kn">import</span> <span class="nn">arcpy</span>
+        <span class="kn">import</span> <span class="nn">arcpy</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="n">aprx</span> <span class="o">=</span> <span class="n">arcpy</span><span class="o">.</span><span class="n">mp</span><span class="o">.</span><span class="n">ArcGISProject</span><span class="p">(</span><span class="s2">&quot;CURRENT&quot;</span><span class="p">)</span>
         <span class="n">view</span> <span class="o">=</span> <span class="n">aprx</span><span class="o">.</span><span class="n">activeView</span>
@@ -12576,7 +12558,7 @@ WhiteboxTools            (<span title="whitebox.whitebox_tools.WhiteboxTools">Wh
 <span class="sd">        ymax (float): The maximum y value of the extent.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">is_arcpy</span><span class="p">():</span>
-        <span class="kn">import</span> <span class="nn">arcpy</span>
+        <span class="kn">import</span> <span class="nn">arcpy</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="n">view</span> <span class="o">=</span> <span class="n">arc_active_view</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">view</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -15625,7 +15607,7 @@ Defaults to '4326' (EPSG code for WGS84).</p></td>
     <span class="n">transformer</span> <span class="o">=</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="n">source_crs</span><span class="p">,</span> <span class="n">target_crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="c1"># Perform the transformation</span>
-    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>  <span class="c1"># pylint: disable=E0633</span>
 
     <span class="c1"># Return the converted coordinates</span>
     <span class="k">return</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span>
@@ -16279,7 +16261,9 @@ Can be "bucket-owner" or "requester". Defaults to "bucket-owner".</p></td>
             <span class="n">width</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">width</span>
             <span class="n">height</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">height</span>
             <span class="k">if</span> <span class="n">coord_crs</span> <span class="o">!=</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">:</span>
-                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">transform_coords</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">coord_crs</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">transform_coords</span><span class="p">(</span>
+                    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">coord_crs</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>  <span class="c1"># pylint: disable=E0633</span>
             <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">rowcol</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">[[</span><span class="n">col</span><span class="p">,</span> <span class="n">row</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">rows</span><span class="p">)]</span>
 
@@ -18353,14 +18337,14 @@ on their relationship to the features from this layer.</p></td>
 
 
 <h2 id="leafmap.common.display_html" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">display_html</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">display_html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.common.display_html" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents ">
 
-      <p>Show an HTML file in a Jupyter notebook.</p>
+      <p>Displays an HTML file or HTML string in a Jupyter Notebook.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -18374,22 +18358,22 @@ on their relationship to the features from this layer.</p></td>
   </thead>
   <tbody>
       <tr>
-        <td><code>filename</code></td>
-        <td><code>str</code></td>
-        <td><p>The path to the HTML file.</p></td>
+        <td><code>html</code></td>
+        <td><code>Union[str, bytes]</code></td>
+        <td><p>Path to an HTML file or an HTML string.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>width</code></td>
         <td><code>str</code></td>
-        <td><p>The width of the HTML file. Defaults to "100%".</p></td>
+        <td><p>Width of the displayed iframe. Default is '100%'.</p></td>
         <td><code>&#39;100%&#39;</code></td>
       </tr>
       <tr>
         <td><code>height</code></td>
-        <td><code>str</code></td>
-        <td><p>The height of the HTML file. Defaults to "600px".</p></td>
-        <td><code>&#39;600px&#39;</code></td>
+        <td><code>int</code></td>
+        <td><p>Height of the displayed iframe. Default is 500.</p></td>
+        <td><code>500</code></td>
       </tr>
   </tbody>
 </table>
@@ -18403,31 +18387,43 @@ on their relationship to the features from this layer.</p></td>
   </thead>
   <tbody>
     <tr>
-      <td><code>IFrame</code></td>
-      <td><p>An IFrame object.</p></td>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
     </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>leafmap/common.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">display_html</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">&quot;600px&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Show an HTML file in a Jupyter notebook.</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">display_html</span><span class="p">(</span>
+    <span class="n">html</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span> <span class="n">width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Displays an HTML file or HTML string in a Jupyter Notebook.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        filename (str): The path to the HTML file.</span>
-<span class="sd">        width (str, optional): The width of the HTML file. Defaults to &quot;100%&quot;.</span>
-<span class="sd">        height (str, optional): The height of the HTML file. Defaults to &quot;600px&quot;.</span>
+<span class="sd">        html (Union[str, bytes]): Path to an HTML file or an HTML string.</span>
+<span class="sd">        width (str, optional): Width of the displayed iframe. Default is &#39;100%&#39;.</span>
+<span class="sd">        height (int, optional): Height of the displayed iframe. Default is 500.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        IFrame: An IFrame object.</span>
+<span class="sd">        None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span><span class="p">,</span> <span class="n">display</span>
 
-    <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">IFrame</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">html</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">):</span>
+        <span class="c1"># If the input is an HTML string</span>
+        <span class="n">html_content</span> <span class="o">=</span> <span class="n">html</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># If the input is a file path</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">html_content</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="c1"># If the input is a byte string</span>
+        <span class="n">html_content</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid input type. Expected a file path or an HTML string.&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">IFrame</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">display</span><span class="p">(</span><span class="n">IFrame</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">html_content</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">))</span>
 </code></pre></div>
         </details>
     </div>
@@ -18734,7 +18730,7 @@ in which case it must be a path to a CA bundle to use. Default is True.. Default
 <span class="sd">        overwrite (bool, optional): Whether to overwrite the file if it exists. Defaults to False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">sys</span>
-    <span class="kn">import</span> <span class="nn">pyodide</span>
+    <span class="kn">import</span> <span class="nn">pyodide</span>  <span class="c1"># pylint: disable=E0401</span>
 
     <span class="k">if</span> <span class="s2">&quot;pyodide&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pyodide is not available.&quot;</span><span class="p">)</span>
@@ -19119,99 +19115,6 @@ leafmap.download_files(urls, out_dir="models", multi_part=True)</p>
         <span class="n">url</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">quiet</span><span class="p">,</span> <span class="n">proxy</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">use_cookies</span><span class="p">,</span> <span class="n">remaining_ok</span>
     <span class="p">)</span>
     <span class="k">return</span> <span class="n">files</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="leafmap.common.download_from_gdrive" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">download_from_gdrive</span><span class="p">(</span><span class="n">gfile_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">unzip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
-
-
-<a href="#leafmap.common.download_from_gdrive" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Download a file shared via Google Drive
-   (e.g., https://drive.google.com/file/d/18SUo_HcDGltuWYZs1s7PpOmOq_FvFn04/view?usp=sharing)</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>gfile_url</code></td>
-        <td><code>str</code></td>
-        <td><p>The Google Drive shared file URL</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>file_name</code></td>
-        <td><code>str</code></td>
-        <td><p>The output file name to use.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>out_dir</code></td>
-        <td><code>str</code></td>
-        <td><p>The output directory. Defaults to '.'.</p></td>
-        <td><code>&#39;.&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>unzip</code></td>
-        <td><code>bool</code></td>
-        <td><p>Whether to unzip the output file if it is a zip file. Defaults to True.</p></td>
-        <td><code>True</code></td>
-      </tr>
-      <tr>
-        <td><code>verbose</code></td>
-        <td><code>bool</code></td>
-        <td><p>Whether to display or not the output of the function</p></td>
-        <td><code>True</code></td>
-      </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>leafmap/common.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">download_from_gdrive</span><span class="p">(</span><span class="n">gfile_url</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">unzip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download a file shared via Google Drive</span>
-<span class="sd">       (e.g., https://drive.google.com/file/d/18SUo_HcDGltuWYZs1s7PpOmOq_FvFn04/view?usp=sharing)</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        gfile_url (str): The Google Drive shared file URL</span>
-<span class="sd">        file_name (str): The output file name to use.</span>
-<span class="sd">        out_dir (str, optional): The output directory. Defaults to &#39;.&#39;.</span>
-<span class="sd">        unzip (bool, optional): Whether to unzip the output file if it is a zip file. Defaults to True.</span>
-<span class="sd">        verbose (bool, optional): Whether to display or not the output of the function</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">google_drive_downloader</span> <span class="kn">import</span> <span class="n">GoogleDriveDownloader</span> <span class="k">as</span> <span class="n">gdd</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s1">&#39;Please install googledrivedownloader using &quot;pip install googledrivedownloader&quot;&#39;</span>
-        <span class="p">)</span>
-
-    <span class="n">file_id</span> <span class="o">=</span> <span class="n">gfile_url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">5</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Google Drive file id: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_id</span><span class="p">))</span>
-
-    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">check_dir</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
-    <span class="n">dest_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
-    <span class="n">gdd</span><span class="o">.</span><span class="n">download_file_from_google_drive</span><span class="p">(</span><span class="n">file_id</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">unzip</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -22694,14 +22597,20 @@ Defaults to False.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">harmony</span>
+        <span class="kn">import</span> <span class="nn">harmony</span>  <span class="c1"># pylint: disable=E0401</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="n">install_package</span><span class="p">(</span><span class="s2">&quot;harmony-py&quot;</span><span class="p">)</span>
 
     <span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">re</span>
     <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
     <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-    <span class="kn">from</span> <span class="nn">harmony</span> <span class="kn">import</span> <span class="n">BBox</span><span class="p">,</span> <span class="n">Client</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Environment</span><span class="p">,</span> <span class="n">Request</span>
+    <span class="kn">from</span> <span class="nn">harmony</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">BBox</span><span class="p">,</span>
+        <span class="n">Client</span><span class="p">,</span>
+        <span class="n">Collection</span><span class="p">,</span>
+        <span class="n">Environment</span><span class="p">,</span>
+        <span class="n">Request</span><span class="p">,</span>
+    <span class="p">)</span>  <span class="c1"># pylint: disable=E0401</span>
 
     <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
@@ -24112,7 +24021,7 @@ name is provided, the function attempts to retrieve the key from user data
         <span class="k">return</span> <span class="n">key</span>
     <span class="k">elif</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">_in_colab_shell</span><span class="p">():</span>
-            <span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">userdata</span>
+            <span class="kn">from</span> <span class="nn">google.colab</span> <span class="kn">import</span> <span class="n">userdata</span>  <span class="c1"># pylint: disable=E0611</span>
 
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">userdata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
@@ -28317,14 +28226,14 @@ name as the input file with the extension changed to '.geojson'.</p></td>
 
 
 <h2 id="leafmap.common.html_to_streamlit" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">html_to_streamlit</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replace_dict</span><span class="o">=</span><span class="p">{})</span></code>
+<code class="highlight language-python"><span class="n">html_to_streamlit</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">responsive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">token_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.common.html_to_streamlit" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents ">
 
-      <p>Renders an HTML file as a Streamlit component.</p>
+      <p>Renders an HTML file in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.</p>
 
 <p><strong>Parameters:</strong></p>
 <table>
@@ -28338,22 +28247,28 @@ name as the input file with the extension changed to '.geojson'.</p></td>
   </thead>
   <tbody>
       <tr>
-        <td><code>filename</code></td>
+        <td><code>html</code></td>
         <td><code>str</code></td>
-        <td><p>The filename of the HTML file.</p></td>
+        <td><p>The HTML file to render. It can a local file path or a URL.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
         <td><code>width</code></td>
         <td><code>int</code></td>
-        <td><p>Width of the map. Defaults to None.</p></td>
-        <td><code>None</code></td>
+        <td><p>Width of the map. Defaults to 800.</p></td>
+        <td><code>800</code></td>
       </tr>
       <tr>
         <td><code>height</code></td>
         <td><code>int</code></td>
         <td><p>Height of the map. Defaults to 600.</p></td>
-        <td><code>None</code></td>
+        <td><code>600</code></td>
+      </tr>
+      <tr>
+        <td><code>responsive</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to make the map responsive. Defaults to True.</p></td>
+        <td><code>True</code></td>
       </tr>
       <tr>
         <td><code>scrolling</code></td>
@@ -28362,25 +28277,16 @@ name as the input file with the extension changed to '.geojson'.</p></td>
         <td><code>False</code></td>
       </tr>
       <tr>
-        <td><code>replace_dict</code></td>
-        <td><code>dict</code></td>
-        <td><p>A dictionary of strings to replace in the HTML file. Defaults to {}.</p></td>
-        <td><code>{}</code></td>
+        <td><code>token_name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the token in the HTML file to be replaced. Defaults to None.</p></td>
+        <td><code>None</code></td>
       </tr>
-  </tbody>
-</table>
-<p><strong>Exceptions:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
       <tr>
-        <td><code>ValueError</code></td>
-        <td><p>If the filename does not exist.</p></td>
+        <td><code>token_value</code></td>
+        <td><code>str</code></td>
+        <td><p>The value of the token to pass to the HTML file. Defaults to None.</p></td>
+        <td><code>None</code></td>
       </tr>
   </tbody>
 </table>
@@ -28402,37 +28308,70 @@ name as the input file with the extension changed to '.geojson'.</p></td>
         <details class="quote">
           <summary>Source code in <code>leafmap/common.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">html_to_streamlit</span><span class="p">(</span>
-    <span class="n">filename</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">replace_dict</span><span class="o">=</span><span class="p">{}</span>
+    <span class="n">html</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mi">800</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span>
+    <span class="n">responsive</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">token_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">token_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Renders an HTML file as a Streamlit component.</span>
-<span class="sd">    Args:</span>
-<span class="sd">        filename (str): The filename of the HTML file.</span>
-<span class="sd">        width (int, optional): Width of the map. Defaults to None.</span>
-<span class="sd">        height (int, optional): Height of the map. Defaults to 600.</span>
-<span class="sd">        scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.</span>
-<span class="sd">        replace_dict (dict, optional): A dictionary of strings to replace in the HTML file. Defaults to {}.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Renders an HTML file in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.</span>
 
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: If the filename does not exist.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        html (str): The HTML file to render. It can a local file path or a URL.</span>
+<span class="sd">        width (int, optional): Width of the map. Defaults to 800.</span>
+<span class="sd">        height (int, optional): Height of the map. Defaults to 600.</span>
+<span class="sd">        responsive (bool, optional): Whether to make the map responsive. Defaults to True.</span>
+<span class="sd">        scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.</span>
+<span class="sd">        token_name (str, optional): The name of the token in the HTML file to be replaced. Defaults to None.</span>
+<span class="sd">        token_value (str, optional): The value of the token to pass to the HTML file. Defaults to None.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        streamlit.components: components.html object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
+        <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>  <span class="c1"># pylint: disable=E0401</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;filename must exist.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">temp_path</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">html</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">html</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">):</span>
+                <span class="n">temp_path</span> <span class="o">=</span> <span class="n">temp_file_path</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">)</span>
+                <span class="n">out_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+                <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
+                <span class="n">download_from_url</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">out_dir</span><span class="p">)</span>
+                <span class="n">html</span> <span class="o">=</span> <span class="n">temp_path</span>
 
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">html</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;The specified input html does not exist.&quot;</span><span class="p">)</span>
 
-    <span class="n">html</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">html</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">token_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">token_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">token_name</span><span class="p">,</span> <span class="n">token_value</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+                <span class="n">html_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">replace_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">html</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">temp_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">temp_path</span><span class="p">)</span>
 
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">components</span><span class="o">.</span><span class="n">html</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">scrolling</span><span class="o">=</span><span class="n">scrolling</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">responsive</span><span class="p">:</span>
+                <span class="n">make_map_responsive</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">                &lt;style&gt;</span>
+<span class="s2">                [title~=&quot;st.iframe&quot;] { width: 100%}</span>
+<span class="s2">                &lt;/style&gt;</span>
+<span class="s2">                &quot;&quot;&quot;</span>
+                <span class="n">st</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">make_map_responsive</span><span class="p">,</span> <span class="n">unsafe_allow_html</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">components</span><span class="o">.</span><span class="n">html</span><span class="p">(</span>
+                <span class="n">html_str</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">scrolling</span><span class="o">=</span><span class="n">scrolling</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The html must be a string.&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
@@ -43269,8 +43208,12 @@ to uncompressed data.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">bbox</span>
 
-    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">transform_coords</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">src_crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">transform_coords</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">src_crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">transform_coords</span><span class="p">(</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">src_crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>  <span class="c1"># pylint: disable=E0633</span>
+    <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">transform_coords</span><span class="p">(</span>
+        <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">src_crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span>  <span class="c1"># pylint: disable=E0633</span>
 
     <span class="k">return</span> <span class="p">[</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">]</span>
 </code></pre></div>

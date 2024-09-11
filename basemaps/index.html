@@ -5450,7 +5450,7 @@ Defaults to False.</p></td>
 
 
 <h2 id="leafmap.basemaps.search_qms" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">search_qms</span><span class="p">(</span><span class="n">keywords</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">search_qms</span><span class="p">(</span><span class="n">keywords</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.basemaps.search_qms" class="headerlink" title="Permanent link">&para;</a></h2>
@@ -5486,17 +5486,19 @@ Defaults to False.</p></td>
 </table>
         <details class="quote">
           <summary>Source code in <code>leafmap/basemaps.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">search_qms</span><span class="p">(</span><span class="n">keywords</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">search_qms</span><span class="p">(</span><span class="n">keywords</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Search qms files for keywords. Reference: https://github.com/geopandas/xyzservices/issues/65</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        keywords (str): Keywords to search for.</span>
 <span class="sd">        limit (int): Number of results to return.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">QMS_API</span> <span class="o">=</span> <span class="s2">&quot;https://qms.nextgis.com/api/v1/geoservices&quot;</span>
 
     <span class="n">services</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">QMS_API</span><span class="si">}</span><span class="s2">/?search=</span><span class="si">{</span><span class="n">keywords</span><span class="si">}</span><span class="s2">&amp;type=tms&amp;epsg=3857&amp;limit=</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">QMS_API</span><span class="si">}</span><span class="s2">/?search=</span><span class="si">{</span><span class="n">keywords</span><span class="si">}</span><span class="s2">&amp;type=tms&amp;epsg=3857&amp;limit=</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">services</span> <span class="o">=</span> <span class="n">services</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">services</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -5714,12 +5716,12 @@ Defaults to False.</p></td>
 
     <span class="c1"># Add custom tiles.</span>
     <span class="k">for</span> <span class="n">tile_type</span><span class="p">,</span> <span class="n">tile_dict</span> <span class="ow">in</span> <span class="n">custom_tiles</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">for</span> <span class="n">tile_provider</span><span class="p">,</span> <span class="n">tile_info</span> <span class="ow">in</span> <span class="n">tile_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">tile_info</span> <span class="ow">in</span> <span class="n">tile_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">tile_info</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tile_type</span>
             <span class="n">leaflet_dict</span><span class="p">[</span><span class="n">tile_info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tile_info</span>
 
     <span class="c1"># Add xyzservices.provider tiles.</span>
-    <span class="k">for</span> <span class="n">tile_provider</span><span class="p">,</span> <span class="n">tile_info</span> <span class="ow">in</span> <span class="n">get_xyz_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">tile_info</span> <span class="ow">in</span> <span class="n">get_xyz_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">tile_info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">ignore_list</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">tile_info</span><span class="p">[</span><span class="s2">&quot;url&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tile_info</span><span class="o">.</span><span class="n">build_url</span><span class="p">()</span>

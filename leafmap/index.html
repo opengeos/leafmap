@@ -1231,15 +1231,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.leafmap.Map.add_raster_legacy" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_raster_legacy()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#leafmap.leafmap.Map.add_remote_tile" class="md-nav__link">
     <span class="md-ellipsis">
       add_remote_tile()
@@ -6451,15 +6442,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.leafmap.Map.add_raster_legacy" class="md-nav__link">
-    <span class="md-ellipsis">
-      add_raster_legacy()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#leafmap.leafmap.Map.add_remote_tile" class="md-nav__link">
     <span class="md-ellipsis">
       add_remote_tile()
@@ -7245,6 +7227,7 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
         <span class="bp">self</span><span class="o">.</span><span class="n">geojson_layers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edit_mode</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">edit_props</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_manager_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">()</span>
 
         <span class="c1"># sandbox path for Voila app to restrict access to system directories.</span>
         <span class="k">if</span> <span class="s2">&quot;sandbox_path&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -7426,7 +7409,7 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;layer_manager_widget&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_layer_manager_widget&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_layer_manager</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">set_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -9465,7 +9448,7 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+            <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>  <span class="c1"># pylint: disable=E0401</span>
 
             <span class="c1"># if responsive:</span>
             <span class="c1">#     make_map_responsive = &quot;&quot;&quot;</span>
@@ -9704,106 +9687,6 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_raster_legacy</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">colormap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">x_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-        <span class="n">y_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
-        <span class="n">fit_bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a local raster dataset to the map.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            image (str): The image file path.</span>
-<span class="sd">            bands (int or list, optional): The image bands to use. It can be either a number (e.g., 1) or a list (e.g., [3, 2, 1]). Defaults to None.</span>
-<span class="sd">            layer_name (str, optional): The layer name to use for the raster. Defaults to None.</span>
-<span class="sd">            colormap (str, optional): The name of the colormap to use for the raster, such as &#39;gray&#39; and &#39;terrain&#39;. More can be found at https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html. Defaults to None.</span>
-<span class="sd">            x_dim (str, optional): The x dimension. Defaults to &#39;x&#39;.</span>
-<span class="sd">            y_dim (str, optional): The y dimension. Defaults to &#39;y&#39;.</span>
-<span class="sd">            fit_bounds (bool, optional): Whether to fit map bounds to raster bounds.  Defaults to True.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">xarray_leaflet</span>
-
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="c1"># import platform</span>
-            <span class="c1"># if platform.system() != &quot;Windows&quot;:</span>
-            <span class="c1">#     # install_from_github(</span>
-            <span class="c1">#     #     url=&#39;https://github.com/davidbrochart/xarray_leaflet&#39;)</span>
-            <span class="c1">#     check_install(&#39;xarray_leaflet&#39;)</span>
-            <span class="c1">#     import xarray_leaflet</span>
-            <span class="c1"># else:</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;You need to install xarray_leaflet first. See https://github.com/davidbrochart/xarray_leaflet&quot;</span>
-            <span class="p">)</span>
-
-        <span class="kn">import</span> <span class="nn">warnings</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-        <span class="kn">import</span> <span class="nn">rioxarray</span>
-
-        <span class="c1"># import xarray as xr</span>
-        <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-        <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-
-        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The image file does not exist.&quot;</span><span class="p">)</span>
-                <span class="k">return</span>
-
-        <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">inferno</span>
-
-        <span class="k">if</span> <span class="n">layer_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">layer_name</span> <span class="o">=</span> <span class="s2">&quot;Layer_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colormap</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">colormap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colormaps</span><span class="p">[</span><span class="n">colormap</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">rioxarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">image</span>
-
-        <span class="c1"># print(da.rio.nodata)</span>
-
-        <span class="n">multi_band</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">band</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">multi_band</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">if</span> <span class="n">bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">bands</span> <span class="o">=</span> <span class="mi">1</span>
-
-        <span class="k">if</span> <span class="n">multi_band</span><span class="p">:</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_nodata</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_nodata</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="n">bands</span><span class="p">)</span>
-
-        <span class="c1"># crs = da.rio.crs</span>
-        <span class="c1"># nan = da.attrs[&#39;nodatavals&#39;][0]</span>
-        <span class="c1"># da = da / da.max()</span>
-        <span class="c1"># # if multi_band:</span>
-        <span class="c1"># da = xr.where(da == nan, np.nan, da)</span>
-        <span class="c1"># da = da.rio.write_nodata(0)</span>
-        <span class="c1"># da = da.rio.write_crs(crs)</span>
-
-        <span class="k">if</span> <span class="n">multi_band</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
-            <span class="n">layer</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">leaflet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">rgb_dim</span><span class="o">=</span><span class="s2">&quot;band&quot;</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">layer</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">leaflet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span>
-            <span class="p">)</span>
-
-        <span class="n">layer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">layer_name</span>
-
     <span class="k">def</span> <span class="nf">add_shp</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_shp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -9919,7 +9802,7 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">in_geojson</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">is_jupyterlite</span><span class="p">():</span>
-                        <span class="kn">import</span> <span class="nn">pyodide</span>
+                        <span class="kn">import</span> <span class="nn">pyodide</span>  <span class="c1"># pylint: disable=E0401</span>
 
                         <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">)</span>
 
@@ -11053,7 +10936,7 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
-            <span class="n">display_html</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+            <span class="n">display_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The provided map is not an ipyleaflet map.&quot;</span><span class="p">)</span>
 
@@ -11798,7 +11681,9 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the Layer Manager.&quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.toolbar</span> <span class="kn">import</span> <span class="n">layer_manager_gui</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">layer_manager_widget</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">layer_manager_gui</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_widget</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_layer_manager_widget</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">layer_manager_gui</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">return_widget</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">add_oam_gui</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;topright&quot;</span><span class="p">,</span> <span class="n">opened</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
@@ -12939,7 +12824,7 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;layer_manager_widget&quot;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_layer_manager_widget&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_layer_manager</span><span class="p">()</span>
 </code></pre></div>
         </details>
@@ -14949,7 +14834,7 @@ to "utf-8".</p></td>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">in_geojson</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">is_jupyterlite</span><span class="p">():</span>
-                    <span class="kn">import</span> <span class="nn">pyodide</span>
+                    <span class="kn">import</span> <span class="nn">pyodide</span>  <span class="c1"># pylint: disable=E0401</span>
 
                     <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">)</span>
 
@@ -19559,184 +19444,6 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LOCAL&quot;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">cog_layer_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
-<h3 id="leafmap.leafmap.Map.add_raster_legacy" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_raster_legacy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
-
-
-<a href="#leafmap.leafmap.Map.add_raster_legacy" class="headerlink" title="Permanent link">&para;</a></h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Adds a local raster dataset to the map.</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>image</code></td>
-        <td><code>str</code></td>
-        <td><p>The image file path.</p></td>
-        <td><em>required</em></td>
-      </tr>
-      <tr>
-        <td><code>bands</code></td>
-        <td><code>int or list</code></td>
-        <td><p>The image bands to use. It can be either a number (e.g., 1) or a list (e.g., [3, 2, 1]). Defaults to None.</p></td>
-        <td><code>None</code></td>
-      </tr>
-      <tr>
-        <td><code>layer_name</code></td>
-        <td><code>str</code></td>
-        <td><p>The layer name to use for the raster. Defaults to None.</p></td>
-        <td><code>None</code></td>
-      </tr>
-      <tr>
-        <td><code>colormap</code></td>
-        <td><code>str</code></td>
-        <td><p>The name of the colormap to use for the raster, such as 'gray' and 'terrain'. More can be found at https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html. Defaults to None.</p></td>
-        <td><code>None</code></td>
-      </tr>
-      <tr>
-        <td><code>x_dim</code></td>
-        <td><code>str</code></td>
-        <td><p>The x dimension. Defaults to 'x'.</p></td>
-        <td><code>&#39;x&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>y_dim</code></td>
-        <td><code>str</code></td>
-        <td><p>The y dimension. Defaults to 'y'.</p></td>
-        <td><code>&#39;y&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>fit_bounds</code></td>
-        <td><code>bool</code></td>
-        <td><p>Whether to fit map bounds to raster bounds.  Defaults to True.</p></td>
-        <td><code>True</code></td>
-      </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>leafmap/leafmap.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_raster_legacy</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">bands</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">colormap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">x_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;x&quot;</span><span class="p">,</span>
-    <span class="n">y_dim</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span>
-    <span class="n">fit_bounds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a local raster dataset to the map.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        image (str): The image file path.</span>
-<span class="sd">        bands (int or list, optional): The image bands to use. It can be either a number (e.g., 1) or a list (e.g., [3, 2, 1]). Defaults to None.</span>
-<span class="sd">        layer_name (str, optional): The layer name to use for the raster. Defaults to None.</span>
-<span class="sd">        colormap (str, optional): The name of the colormap to use for the raster, such as &#39;gray&#39; and &#39;terrain&#39;. More can be found at https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html. Defaults to None.</span>
-<span class="sd">        x_dim (str, optional): The x dimension. Defaults to &#39;x&#39;.</span>
-<span class="sd">        y_dim (str, optional): The y dimension. Defaults to &#39;y&#39;.</span>
-<span class="sd">        fit_bounds (bool, optional): Whether to fit map bounds to raster bounds.  Defaults to True.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">xarray_leaflet</span>
-
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="c1"># import platform</span>
-        <span class="c1"># if platform.system() != &quot;Windows&quot;:</span>
-        <span class="c1">#     # install_from_github(</span>
-        <span class="c1">#     #     url=&#39;https://github.com/davidbrochart/xarray_leaflet&#39;)</span>
-        <span class="c1">#     check_install(&#39;xarray_leaflet&#39;)</span>
-        <span class="c1">#     import xarray_leaflet</span>
-        <span class="c1"># else:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;You need to install xarray_leaflet first. See https://github.com/davidbrochart/xarray_leaflet&quot;</span>
-        <span class="p">)</span>
-
-    <span class="kn">import</span> <span class="nn">warnings</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-    <span class="kn">import</span> <span class="nn">rioxarray</span>
-
-    <span class="c1"># import xarray as xr</span>
-    <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-    <span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-
-    <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The image file does not exist.&quot;</span><span class="p">)</span>
-            <span class="k">return</span>
-
-    <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">colormap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">inferno</span>
-
-    <span class="k">if</span> <span class="n">layer_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">layer_name</span> <span class="o">=</span> <span class="s2">&quot;Layer_&quot;</span> <span class="o">+</span> <span class="n">random_string</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colormap</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">colormap</span> <span class="o">=</span> <span class="n">mpl</span><span class="o">.</span><span class="n">colormaps</span><span class="p">[</span><span class="n">colormap</span><span class="p">]</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">rioxarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">image</span>
-
-    <span class="c1"># print(da.rio.nodata)</span>
-
-    <span class="n">multi_band</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">da</span><span class="o">.</span><span class="n">band</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">multi_band</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="n">bands</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">bands</span> <span class="o">=</span> <span class="mi">1</span>
-
-    <span class="k">if</span> <span class="n">multi_band</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_nodata</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_nodata</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
-    <span class="n">da</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="n">bands</span><span class="p">)</span>
-
-    <span class="c1"># crs = da.rio.crs</span>
-    <span class="c1"># nan = da.attrs[&#39;nodatavals&#39;][0]</span>
-    <span class="c1"># da = da / da.max()</span>
-    <span class="c1"># # if multi_band:</span>
-    <span class="c1"># da = xr.where(da == nan, np.nan, da)</span>
-    <span class="c1"># da = da.rio.write_nodata(0)</span>
-    <span class="c1"># da = da.rio.write_crs(crs)</span>
-
-    <span class="k">if</span> <span class="n">multi_band</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
-        <span class="n">layer</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">leaflet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">rgb_dim</span><span class="o">=</span><span class="s2">&quot;band&quot;</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">layer</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">leaflet</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">x_dim</span><span class="o">=</span><span class="n">x_dim</span><span class="p">,</span> <span class="n">y_dim</span><span class="o">=</span><span class="n">y_dim</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="n">colormap</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span>
-        <span class="p">)</span>
-
-    <span class="n">layer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">layer_name</span>
 </code></pre></div>
         </details>
     </div>
@@ -25304,7 +25011,7 @@ from the GeoJSON data. Defaults to True.</p></td>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
-        <span class="n">display_html</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">display_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The provided map is not an ipyleaflet map.&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -25617,7 +25324,7 @@ from the GeoJSON data. Defaults to True.</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+        <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="c1"># if responsive:</span>
         <span class="c1">#     make_map_responsive = &quot;&quot;&quot;</span>
@@ -25790,7 +25497,9 @@ from the GeoJSON data. Defaults to True.</p></td>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Update the Layer Manager.&quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">.toolbar</span> <span class="kn">import</span> <span class="n">layer_manager_gui</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">layer_manager_widget</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">layer_manager_gui</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_widget</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_layer_manager_widget</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="n">layer_manager_gui</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">return_widget</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 </code></pre></div>
         </details>
     </div>

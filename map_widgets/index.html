@@ -6219,7 +6219,7 @@ Legend            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
         <span class="k">with</span> <span class="n">legend_output</span><span class="p">:</span>
             <span class="n">display</span><span class="p">(</span><span class="n">legend_widget</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__check_if_allowed</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value_name</span><span class="p">,</span> <span class="n">allowed_list</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__check_if_allowed</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value_name</span><span class="p">,</span> <span class="n">allowed_list</span><span class="p">):</span>  <span class="c1"># pylint: disable=E0213</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_list</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;The &quot;</span>
@@ -6228,13 +6228,13 @@ Legend            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
             <span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="nf">__convert_rgb_colors_to_hex</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__convert_rgb_colors_to_hex</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>  <span class="c1"># pylint: disable=E0213</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">common</span><span class="o">.</span><span class="n">rgb_to_hex</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">colors</span><span class="p">]</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to convert rgb value to hex.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">__create_legend_items</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__create_legend_items</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>  <span class="c1"># pylint: disable=E0213</span>
         <span class="n">legend_items</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span>
             <span class="n">color</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
@@ -6246,7 +6246,7 @@ Legend            (<span title="ipywidgets.widgets.widget_box.VBox">VBox</span>)
             <span class="n">legend_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">legend_items</span>
 
-    <span class="k">def</span> <span class="nf">__create_layout</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__create_layout</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>  <span class="c1"># pylint: disable=E0213</span>
         <span class="n">height</span> <span class="o">=</span> <span class="n">Legend</span><span class="o">.</span><span class="n">__create_layout_property</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="n">min_height</span> <span class="o">=</span> <span class="n">Legend</span><span class="o">.</span><span class="n">__create_layout_property</span><span class="p">(</span><span class="s2">&quot;min_height&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

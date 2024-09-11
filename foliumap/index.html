@@ -1366,15 +1366,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.foliumap.Map.publish" class="md-nav__link">
-    <span class="md-ellipsis">
-      publish()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#leafmap.foliumap.Map.remove_labels" class="md-nav__link">
     <span class="md-ellipsis">
       remove_labels()
@@ -1646,24 +1637,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leafmap.foliumap.delete_dp_report" class="md-nav__link">
-    <span class="md-ellipsis">
-      delete_dp_report()
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leafmap.foliumap.delete_dp_reports" class="md-nav__link">
-    <span class="md-ellipsis">
-      delete_dp_reports()
-    </span>
-  </a>
   
 </li>
       
@@ -6640,15 +6613,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.foliumap.Map.publish" class="md-nav__link">
-    <span class="md-ellipsis">
-      publish()
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#leafmap.foliumap.Map.remove_labels" class="md-nav__link">
     <span class="md-ellipsis">
       remove_labels()
@@ -6920,24 +6884,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leafmap.foliumap.delete_dp_report" class="md-nav__link">
-    <span class="md-ellipsis">
-      delete_dp_report()
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#leafmap.foliumap.delete_dp_reports" class="md-nav__link">
-    <span class="md-ellipsis">
-      delete_dp_reports()
-    </span>
-  </a>
   
 </li>
       
@@ -8639,7 +8585,7 @@ Map            (<span title="folium.folium.Map">Map</span>)
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">in_geojson</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">is_jupyterlite</span><span class="p">():</span>
-                        <span class="kn">import</span> <span class="nn">pyodide</span>
+                        <span class="kn">import</span> <span class="nn">pyodide</span>  <span class="c1"># pylint: disable=E0401</span>
 
                         <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">)</span>
 
@@ -8948,72 +8894,6 @@ Map            (<span title="folium.folium.Map">Map</span>)
         <span class="p">)</span>
         <span class="n">layer</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">publish</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Folium Map&quot;</span><span class="p">,</span>
-        <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">source_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">source_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="nb">open</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">formatting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Publish the map to datapane.com</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            name (str, optional): The document name - can include spaces, caps, symbols, etc., e.g. &quot;Profit &amp; Loss 2020&quot;. Defaults to &quot;Folium Map&quot;.</span>
-<span class="sd">            description (str, optional): A high-level description for the document, this is displayed in searches and thumbnails. Defaults to &#39;&#39;.</span>
-<span class="sd">            source_url (str, optional): A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook. Defaults to &#39;&#39;.</span>
-<span class="sd">            tags (list, optional): A list of tags (as strings) used to categorise your document. Defaults to None.</span>
-<span class="sd">            source_file (str, optional): Path of jupyter notebook file to upload. Defaults to None.</span>
-<span class="sd">            open (bool, optional): Whether to open the map. Defaults to True.</span>
-<span class="sd">            formatting (ReportFormatting, optional): Set the basic styling for your report.</span>
-<span class="sd">            token (str, optional): The token to use to datapane to publish the map. See https://docs.datapane.com/tut-getting-started. Defaults to None.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">webbrowser</span>
-        <span class="kn">import</span> <span class="nn">warnings</span>
-
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;USE_MKDOCS&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span>
-
-        <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">datapane</span> <span class="k">as</span> <span class="nn">dp</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="n">webbrowser</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="s2">&quot;https://docs.datapane.com/&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                <span class="s2">&quot;The datapane Python package is not installed. You need to install and authenticate datapane first.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">_</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">ping</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DP_TOKEN&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">dp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DP_TOKEN&quot;</span><span class="p">))</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">dp</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span>
-                <span class="n">dp</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-                <span class="n">source_url</span><span class="o">=</span><span class="n">source_url</span><span class="p">,</span>
-                <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span>
-                <span class="n">source_file</span><span class="o">=</span><span class="n">source_file</span><span class="p">,</span>
-                <span class="nb">open</span><span class="o">=</span><span class="nb">open</span><span class="p">,</span>
-                <span class="n">formatting</span><span class="o">=</span><span class="n">formatting</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Exports a map as an HTML file.</span>
 
@@ -9074,13 +8954,13 @@ Map            (<span title="folium.folium.Map">Map</span>)
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+            <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>  <span class="c1"># pylint: disable=E0401</span>
 
             <span class="k">if</span> <span class="n">add_layer_control</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_layer_control</span><span class="p">()</span>
 
             <span class="k">if</span> <span class="n">bidirectional</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">streamlit_folium</span> <span class="kn">import</span> <span class="n">st_folium</span>
+                <span class="kn">from</span> <span class="nn">streamlit_folium</span> <span class="kn">import</span> <span class="n">st_folium</span>  <span class="c1"># pylint: disable=E0401</span>
 
                 <span class="n">output</span> <span class="o">=</span> <span class="n">st_folium</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">output</span>
@@ -9143,7 +9023,7 @@ Map            (<span title="folium.folium.Map">Map</span>)
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+            <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
 
             <span class="k">if</span> <span class="s2">&quot;map_bounds&quot;</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;map_bounds&quot;</span><span class="p">]</span>
@@ -9244,7 +9124,7 @@ Map            (<span title="folium.folium.Map">Map</span>)
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
-            <span class="n">display_html</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+            <span class="n">display_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The provided map is not a folium map.&quot;</span><span class="p">)</span>
 
@@ -12294,7 +12174,7 @@ Any value other than "on_hover" or "on_click" will be treated as None. Defaults 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">in_geojson</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">is_jupyterlite</span><span class="p">():</span>
-                    <span class="kn">import</span> <span class="nn">pyodide</span>
+                    <span class="kn">import</span> <span class="nn">pyodide</span>  <span class="c1"># pylint: disable=E0401</span>
 
                     <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">)</span>
 
@@ -17796,156 +17676,6 @@ https://github.com/iwpnd/folium-vectorgrid</p></td>
 
 
 
-<h3 id="leafmap.foliumap.Map.publish" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Folium Map&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">source_url</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">source_file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">open</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">formatting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
-
-
-<a href="#leafmap.foliumap.Map.publish" class="headerlink" title="Permanent link">&para;</a></h3>
-
-    <div class="doc doc-contents ">
-
-      <p>Publish the map to datapane.com</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>name</code></td>
-        <td><code>str</code></td>
-        <td><p>The document name - can include spaces, caps, symbols, etc., e.g. "Profit &amp; Loss 2020". Defaults to "Folium Map".</p></td>
-        <td><code>&#39;Folium Map&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>description</code></td>
-        <td><code>str</code></td>
-        <td><p>A high-level description for the document, this is displayed in searches and thumbnails. Defaults to ''.</p></td>
-        <td><code>&#39;&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>source_url</code></td>
-        <td><code>str</code></td>
-        <td><p>A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook. Defaults to ''.</p></td>
-        <td><code>&#39;&#39;</code></td>
-      </tr>
-      <tr>
-        <td><code>tags</code></td>
-        <td><code>list</code></td>
-        <td><p>A list of tags (as strings) used to categorise your document. Defaults to None.</p></td>
-        <td><code>None</code></td>
-      </tr>
-      <tr>
-        <td><code>source_file</code></td>
-        <td><code>str</code></td>
-        <td><p>Path of jupyter notebook file to upload. Defaults to None.</p></td>
-        <td><code>None</code></td>
-      </tr>
-      <tr>
-        <td><code>open</code></td>
-        <td><code>bool</code></td>
-        <td><p>Whether to open the map. Defaults to True.</p></td>
-        <td><code>True</code></td>
-      </tr>
-      <tr>
-        <td><code>formatting</code></td>
-        <td><code>ReportFormatting</code></td>
-        <td><p>Set the basic styling for your report.</p></td>
-        <td><code>None</code></td>
-      </tr>
-      <tr>
-        <td><code>token</code></td>
-        <td><code>str</code></td>
-        <td><p>The token to use to datapane to publish the map. See https://docs.datapane.com/tut-getting-started. Defaults to None.</p></td>
-        <td><code>None</code></td>
-      </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>leafmap/foliumap.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">publish</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Folium Map&quot;</span><span class="p">,</span>
-    <span class="n">description</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">source_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">source_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="nb">open</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">formatting</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">token</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Publish the map to datapane.com</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        name (str, optional): The document name - can include spaces, caps, symbols, etc., e.g. &quot;Profit &amp; Loss 2020&quot;. Defaults to &quot;Folium Map&quot;.</span>
-<span class="sd">        description (str, optional): A high-level description for the document, this is displayed in searches and thumbnails. Defaults to &#39;&#39;.</span>
-<span class="sd">        source_url (str, optional): A URL pointing to the source code for the document, e.g. a GitHub repo or a Colab notebook. Defaults to &#39;&#39;.</span>
-<span class="sd">        tags (list, optional): A list of tags (as strings) used to categorise your document. Defaults to None.</span>
-<span class="sd">        source_file (str, optional): Path of jupyter notebook file to upload. Defaults to None.</span>
-<span class="sd">        open (bool, optional): Whether to open the map. Defaults to True.</span>
-<span class="sd">        formatting (ReportFormatting, optional): Set the basic styling for your report.</span>
-<span class="sd">        token (str, optional): The token to use to datapane to publish the map. See https://docs.datapane.com/tut-getting-started. Defaults to None.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">webbrowser</span>
-    <span class="kn">import</span> <span class="nn">warnings</span>
-
-    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;USE_MKDOCS&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span>
-
-    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">datapane</span> <span class="k">as</span> <span class="nn">dp</span>
-    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-        <span class="n">webbrowser</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="s2">&quot;https://docs.datapane.com/&quot;</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;The datapane Python package is not installed. You need to install and authenticate datapane first.&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">_</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">ping</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DP_TOKEN&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">dp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;DP_TOKEN&quot;</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dp</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">dp</span><span class="o">.</span><span class="n">upload_report</span><span class="p">(</span>
-            <span class="n">dp</span><span class="o">.</span><span class="n">Plot</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-            <span class="n">source_url</span><span class="o">=</span><span class="n">source_url</span><span class="p">,</span>
-            <span class="n">tags</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span>
-            <span class="n">source_file</span><span class="o">=</span><span class="n">source_file</span><span class="p">,</span>
-            <span class="nb">open</span><span class="o">=</span><span class="nb">open</span><span class="p">,</span>
-            <span class="n">formatting</span><span class="o">=</span><span class="n">formatting</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-method">
-
-
-
 <h3 id="leafmap.foliumap.Map.remove_labels" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">remove_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -18469,7 +18199,7 @@ https://github.com/iwpnd/folium-vectorgrid</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
+        <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="k">if</span> <span class="s2">&quot;map_bounds&quot;</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
             <span class="n">bounds</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;map_bounds&quot;</span><span class="p">]</span>
@@ -18822,7 +18552,7 @@ https://github.com/iwpnd/folium-vectorgrid</p></td>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
-        <span class="n">display_html</span><span class="p">(</span><span class="n">src</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
+        <span class="n">display_html</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The provided map is not a folium map.&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -19194,13 +18924,13 @@ https://github.com/iwpnd/folium-vectorgrid</p></td>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+        <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="k">if</span> <span class="n">add_layer_control</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_layer_control</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">bidirectional</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">streamlit_folium</span> <span class="kn">import</span> <span class="n">st_folium</span>
+            <span class="kn">from</span> <span class="nn">streamlit_folium</span> <span class="kn">import</span> <span class="n">st_folium</span>  <span class="c1"># pylint: disable=E0401</span>
 
             <span class="n">output</span> <span class="o">=</span> <span class="n">st_folium</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">output</span>
@@ -20152,106 +19882,6 @@ sidebyside.add_to(m)</p>
 
   </div>
 
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="leafmap.foliumap.delete_dp_report" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">delete_dp_report</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></code>
-
-
-<a href="#leafmap.foliumap.delete_dp_report" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Deletes a datapane report.</p>
-
-<p><strong>Parameters:</strong></p>
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Default</th>
-    </tr>
-  </thead>
-  <tbody>
-      <tr>
-        <td><code>name</code></td>
-        <td><code>str</code></td>
-        <td><p>Name of the report to delete.</p></td>
-        <td><em>required</em></td>
-      </tr>
-  </tbody>
-</table>
-        <details class="quote">
-          <summary>Source code in <code>leafmap/foliumap.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_dp_report</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deletes a datapane report.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        name (str): Name of the report to delete.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">datapane</span> <span class="k">as</span> <span class="nn">dp</span>
-
-        <span class="n">reports</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
-        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reports</span><span class="p">)</span>
-        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">items</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-            <span class="n">report</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
-            <span class="c1"># print(&#39;Deleting {}...&#39;.format(url))</span>
-            <span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">by_id</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
-
-
-
-  <div class="doc doc-object doc-function">
-
-
-
-<h2 id="leafmap.foliumap.delete_dp_reports" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">delete_dp_reports</span><span class="p">()</span></code>
-
-
-<a href="#leafmap.foliumap.delete_dp_reports" class="headerlink" title="Permanent link">&para;</a></h2>
-
-    <div class="doc doc-contents ">
-
-      <p>Deletes all datapane reports.</p>
-
-        <details class="quote">
-          <summary>Source code in <code>leafmap/foliumap.py</code></summary>
-          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">delete_dp_reports</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Deletes all datapane reports.&quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">datapane</span> <span class="k">as</span> <span class="nn">dp</span>
-
-        <span class="n">reports</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">reports</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
-            <span class="n">report</span> <span class="o">=</span> <span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
-            <span class="n">url</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;url&quot;</span><span class="p">]</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Deleting </span><span class="si">{}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
-            <span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">dp</span><span class="o">.</span><span class="n">Report</span><span class="o">.</span><span class="n">by_id</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-</code></pre></div>
-        </details>
-    </div>
-
-  </div>
 
 
 
