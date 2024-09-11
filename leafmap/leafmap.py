@@ -64,7 +64,7 @@ class Map(ipyleaflet.Map):
         self.geojson_layers = []
         self.edit_mode = False
         self.edit_props = []
-        self._layer_manager_widget = None
+        self._layer_manager_widget = widgets.VBox()
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
