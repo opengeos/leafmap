@@ -263,15 +263,6 @@ class TestLeafmap(unittest.TestCase):
         out_str = m.to_html()
         assert "US Cities" in out_str
 
-    # def test_add_raster(self):
-    #     """Check loading raster data"""
-    #     m = leafmap.Map()
-    #     landsat_url = "https://drive.google.com/file/d/1vRkAWQYsLWCi6vcTMk8vLxoXMFbdMFn8/view?usp=sharing"
-    #     leafmap.download_from_gdrive(landsat_url, "dem.tif", unzip=False)
-    #     m.add_raster("dem.tif", colormap="terrain", layer_name="DEM")
-    #     out_str = m.to_html()
-    #     assert "DEM" in out_str
-
     # # ensure fit_bounds keyword argument doesn't interfere with rendering
     # m = leafmap.Map()
     # m.add_raster("dem.tif", colormap="terrain", layer_name="DEM", fit_bounds=False)

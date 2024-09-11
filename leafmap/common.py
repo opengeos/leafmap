@@ -667,33 +667,6 @@ def download_from_url(
         print("Data downloaded to: {}".format(final_path))
 
 
-def download_from_gdrive(gfile_url, file_name, out_dir=".", unzip=True, verbose=True):
-    """Download a file shared via Google Drive
-       (e.g., https://drive.google.com/file/d/18SUo_HcDGltuWYZs1s7PpOmOq_FvFn04/view?usp=sharing)
-
-    Args:
-        gfile_url (str): The Google Drive shared file URL
-        file_name (str): The output file name to use.
-        out_dir (str, optional): The output directory. Defaults to '.'.
-        unzip (bool, optional): Whether to unzip the output file if it is a zip file. Defaults to True.
-        verbose (bool, optional): Whether to display or not the output of the function
-    """
-    try:
-        from google_drive_downloader import GoogleDriveDownloader as gdd
-    except ImportError:
-        raise ImportError(
-            'Please install googledrivedownloader using "pip install googledrivedownloader"'
-        )
-
-    file_id = gfile_url.split("/")[5]
-    if verbose:
-        print("Google Drive file id: {}".format(file_id))
-
-    out_dir = check_dir(out_dir)
-    dest_path = os.path.join(out_dir, file_name)
-    gdd.download_file_from_google_drive(file_id, dest_path, True, unzip)
-
-
 def create_download_link(filename, title="Click here to download: "):
     """Downloads a file from voila. Adopted from https://github.com/voila-dashboards/voila/issues/578
 
@@ -1813,7 +1786,7 @@ def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Option
         return key
     elif name is not None:
         if _in_colab_shell():
-            from google.colab import userdata
+            from google.colab import userdata  # pylint: disable=E0611
 
             try:
                 return userdata.get(name)
@@ -3278,8 +3251,8 @@ def html_to_streamlit(
     """
 
     try:
-        import streamlit as st
-        import streamlit.components.v1 as components
+        import streamlit as st  # pylint: disable=E0401
+        import streamlit.components.v1 as components  # pylint: disable=E0401
 
         if isinstance(html, str):
             temp_path = None
@@ -5518,40 +5491,6 @@ def add_crs(filename, epsg):
         src.crs = crs
 
 
-def html_to_streamlit(
-    filename, width=None, height=None, scrolling=False, replace_dict={}
-):
-    """Renders an HTML file as a Streamlit component.
-    Args:
-        filename (str): The filename of the HTML file.
-        width (int, optional): Width of the map. Defaults to None.
-        height (int, optional): Height of the map. Defaults to 600.
-        scrolling (bool, optional): Whether to allow the map to scroll. Defaults to False.
-        replace_dict (dict, optional): A dictionary of strings to replace in the HTML file. Defaults to {}.
-
-    Raises:
-        ValueError: If the filename does not exist.
-
-    Returns:
-        streamlit.components: components.html object.
-    """
-
-    import streamlit.components.v1 as components
-
-    if not os.path.exists(filename):
-        raise ValueError("filename must exist.")
-
-    f = open(filename, "r")
-
-    html = f.read()
-
-    for key, value in replace_dict.items():
-        html = html.replace(key, value)
-
-    f.close()
-    return components.html(html, width=width, height=height, scrolling=scrolling)
-
-
 class The_national_map_USGS:
     """
     The national map is a collection of topological datasets, maintained by the USGS.
@@ -6796,7 +6735,7 @@ async def download_file_lite(url, output=None, binary=False, overwrite=False, **
         overwrite (bool, optional): Whether to overwrite the file if it exists. Defaults to False.
     """
     import sys
-    import pyodide
+    import pyodide  # pylint: disable=E0401
 
     if "pyodide" not in sys.modules:
         raise ValueError("Pyodide is not available.")
@@ -8261,7 +8200,7 @@ def arc_active_map():
         arcpy.Map: The active map in ArcGIS Pro.
     """
     if is_arcpy():
-        import arcpy
+        import arcpy  # pylint: disable=E0401
 
         aprx = arcpy.mp.ArcGISProject("CURRENT")
         m = aprx.activeMap
@@ -8277,7 +8216,7 @@ def arc_active_view():
         arcpy.MapView: The active view in ArcGIS Pro.
     """
     if is_arcpy():
-        import arcpy
+        import arcpy  # pylint: disable=E0401
 
         aprx = arcpy.mp.ArcGISProject("CURRENT")
         view = aprx.activeView
@@ -8318,7 +8257,7 @@ def arc_zoom_to_extent(xmin, ymin, xmax, ymax):
         ymax (float): The maximum y value of the extent.
     """
     if is_arcpy():
-        import arcpy
+        import arcpy  # pylint: disable=E0401
 
         view = arc_active_view()
         if view is not None:
@@ -9164,8 +9103,12 @@ def transform_bbox_coords(bbox, src_crs, dst_crs, **kwargs):
     """
     x1, y1, x2, y2 = bbox
 
-    x1, y1 = transform_coords(x1, y1, src_crs, dst_crs, **kwargs)
-    x2, y2 = transform_coords(x2, y2, src_crs, dst_crs, **kwargs)
+    x1, y1 = transform_coords(
+        x1, y1, src_crs, dst_crs, **kwargs
+    )  # pylint: disable=E0633
+    x2, y2 = transform_coords(
+        x2, y2, src_crs, dst_crs, **kwargs
+    )  # pylint: disable=E0633
 
     return [x1, y1, x2, y2]
 
@@ -9209,7 +9152,9 @@ def coords_to_xy(
             width = src.width
             height = src.height
             if coord_crs != src.crs:
-                xs, ys = transform_coords(xs, ys, coord_crs, src.crs, **kwargs)
+                xs, ys = transform_coords(
+                    xs, ys, coord_crs, src.crs, **kwargs
+                )  # pylint: disable=E0633
             rows, cols = rasterio.transform.rowcol(src.transform, xs, ys, **kwargs)
         result = [[col, row] for col, row in zip(cols, rows)]
 
@@ -9828,26 +9773,6 @@ def image_comparison(
     shutil.rmtree(TEMP_DIR)
 
     display(HTML(htmlcode))
-
-
-def display_html(filename, width="100%", height="600px", **kwargs):
-    """Show an HTML file in a Jupyter notebook.
-
-    Args:
-        filename (str): The path to the HTML file.
-        width (str, optional): The width of the HTML file. Defaults to "100%".
-        height (str, optional): The height of the HTML file. Defaults to "600px".
-
-    Returns:
-        IFrame: An IFrame object.
-    """
-
-    from IPython.display import IFrame
-
-    if not os.path.exists(filename):
-        raise Exception(f"File {filename} does not exist")
-
-    return IFrame(filename, width=width, height=height, **kwargs)
 
 
 def get_nhd_basins(
@@ -12800,14 +12725,20 @@ def gedi_subset(
     """
 
     try:
-        import harmony
+        import harmony  # pylint: disable=E0401
     except ImportError:
         install_package("harmony-py")
 
     import requests as re
     import geopandas as gpd
     from datetime import datetime
-    from harmony import BBox, Client, Collection, Environment, Request
+    from harmony import (
+        BBox,
+        Client,
+        Collection,
+        Environment,
+        Request,
+    )  # pylint: disable=E0401
 
     if out_dir is None:
         out_dir = os.getcwd()
@@ -13426,7 +13357,7 @@ def convert_coordinates(x, y, source_crs, target_crs="epsg:4326"):
     transformer = pyproj.Transformer.from_crs(source_crs, target_crs, always_xy=True)
 
     # Perform the transformation
-    lon, lat = transformer.transform(x, y)
+    lon, lat = transformer.transform(x, y)  # pylint: disable=E0633
 
     # Return the converted coordinates
     return lon, lat
@@ -13820,55 +13751,6 @@ def github_get_release_id_by_tag(username, repository, tag_name, access_token=No
         print(
             f"Error: Unable to fetch release info for tag {tag_name} (Status code: {response.status_code})"
         )
-        return None
-
-
-def github_upload_asset_to_release(
-    username, repository, release_id, asset_path, access_token=None
-):
-    """
-    Uploads an asset to a GitHub release.
-
-    Args:
-        username (str): GitHub username or organization name.
-        repository (str): Name of the GitHub repository.
-        release_id (int): ID of the release to upload the asset to.
-        asset_path (str): Path to the asset file.
-        access_token (str): Personal access token for authentication.
-
-    Returns:
-        dict: The response JSON from the GitHub API if the upload is successful.
-        None: If the upload fails.
-    """
-    if access_token is None:
-        access_token = get_api_key("GITHUB_API_TOKEN")
-    # GitHub API URL for uploading release assets
-    url = f"https://uploads.github.com/repos/{username}/{repository}/releases/{release_id}/assets"
-
-    # Extract the filename from the asset path
-    asset_name = os.path.basename(asset_path)
-
-    # Set the headers for the upload request
-    headers = {
-        "Authorization": f"token {access_token}",
-        "Content-Type": "application/octet-stream",
-    }
-
-    # Set the parameters for the upload request
-    params = {"name": asset_name}
-
-    # Open the asset file in binary mode
-    with open(asset_path, "rb") as asset_file:
-        # Make the request to upload the asset
-        response = requests.post(url, headers=headers, params=params, data=asset_file)
-
-    # Check if the request was successful
-    if response.status_code == 201:
-        print(f"Successfully uploaded asset: {asset_name}")
-        return response.json()
-    else:
-        print(f"Error: Unable to upload asset (Status code: {response.status_code})")
-        print(response.json())
         return None
 
 
