@@ -64,6 +64,7 @@ class Map(ipyleaflet.Map):
         self.geojson_layers = []
         self.edit_mode = False
         self.edit_props = []
+        self._layer_manager_widget = None
 
         # sandbox path for Voila app to restrict access to system directories.
         if "sandbox_path" not in kwargs:
@@ -245,7 +246,7 @@ class Map(ipyleaflet.Map):
 
         super().add(obj, index=index)
 
-        if hasattr(self, "layer_manager_widget"):
+        if hasattr(self, "_layer_manager_widget"):
             self.update_layer_manager()
 
     def set_center(self, lon, lat, zoom=None) -> None:
@@ -2284,7 +2285,7 @@ class Map(ipyleaflet.Map):
         """
 
         try:
-            import streamlit.components.v1 as components
+            import streamlit.components.v1 as components  # pylint: disable=E0401
 
             # if responsive:
             #     make_map_responsive = """
@@ -2523,106 +2524,6 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
-    def add_raster_legacy(
-        self,
-        image: str,
-        bands: Optional[Union[int, list]] = None,
-        layer_name: Optional[str] = None,
-        colormap: Optional[str] = None,
-        x_dim: Optional[str] = "x",
-        y_dim: Optional[str] = "y",
-        fit_bounds: Optional[bool] = True,
-    ) -> None:
-        """Adds a local raster dataset to the map.
-
-        Args:
-            image (str): The image file path.
-            bands (int or list, optional): The image bands to use. It can be either a number (e.g., 1) or a list (e.g., [3, 2, 1]). Defaults to None.
-            layer_name (str, optional): The layer name to use for the raster. Defaults to None.
-            colormap (str, optional): The name of the colormap to use for the raster, such as 'gray' and 'terrain'. More can be found at https://matplotlib.org/3.1.0/tutorials/colors/colormaps.html. Defaults to None.
-            x_dim (str, optional): The x dimension. Defaults to 'x'.
-            y_dim (str, optional): The y dimension. Defaults to 'y'.
-            fit_bounds (bool, optional): Whether to fit map bounds to raster bounds.  Defaults to True.
-        """
-        try:
-            import xarray_leaflet
-
-        except Exception:
-            # import platform
-            # if platform.system() != "Windows":
-            #     # install_from_github(
-            #     #     url='https://github.com/davidbrochart/xarray_leaflet')
-            #     check_install('xarray_leaflet')
-            #     import xarray_leaflet
-            # else:
-            raise ImportError(
-                "You need to install xarray_leaflet first. See https://github.com/davidbrochart/xarray_leaflet"
-            )
-
-        import warnings
-        import numpy as np
-        import rioxarray
-
-        # import xarray as xr
-        import matplotlib.pyplot as plt
-        import matplotlib as mpl
-
-        warnings.simplefilter("ignore")
-
-        if isinstance(image, str):
-            if not os.path.exists(image):
-                print("The image file does not exist.")
-                return
-
-        if colormap is None:
-            colormap = plt.cm.inferno
-
-        if layer_name is None:
-            layer_name = "Layer_" + random_string()
-
-        if isinstance(colormap, str):
-            colormap = mpl.colormaps[colormap]
-
-        if isinstance(image, str):
-            da = rioxarray.open_rasterio(image, masked=True)
-        else:
-            da = image
-
-        # print(da.rio.nodata)
-
-        multi_band = False
-        if len(da.band) > 1:
-            multi_band = True
-            if bands is None:
-                bands = [3, 2, 1]
-        else:
-            bands = 1
-
-        if multi_band:
-            da = da.rio.write_nodata(0)
-        else:
-            da = da.rio.write_nodata(np.nan)
-        da = da.sel(band=bands)
-
-        # crs = da.rio.crs
-        # nan = da.attrs['nodatavals'][0]
-        # da = da / da.max()
-        # # if multi_band:
-        # da = xr.where(da == nan, np.nan, da)
-        # da = da.rio.write_nodata(0)
-        # da = da.rio.write_crs(crs)
-
-        if multi_band and type(bands) == list:
-            layer = da.leaflet.plot(
-                self, x_dim=x_dim, y_dim=y_dim, rgb_dim="band", fit_bounds=fit_bounds
-            )
-        else:
-            layer = da.leaflet.plot(
-                self, x_dim=x_dim, y_dim=y_dim, colormap=colormap, fit_bounds=fit_bounds
-            )
-
-        layer.name = layer_name
-
     def add_shp(
         self,
         in_shp: str,
@@ -2738,7 +2639,7 @@ class Map(ipyleaflet.Map):
             if isinstance(in_geojson, str):
                 if in_geojson.startswith("http"):
                     if is_jupyterlite():
-                        import pyodide
+                        import pyodide  # pylint: disable=E0401
 
                         output = os.path.basename(in_geojson)
 
@@ -3872,7 +3773,7 @@ class Map(ipyleaflet.Map):
                 os.makedirs(out_dir)
 
             self.to_html(out_file)
-            display_html(src=out_file, width=width, height=height)
+            display_html(out_file, width=width, height=height)
         else:
             raise TypeError("The provided map is not an ipyleaflet map.")
 
@@ -4617,7 +4518,9 @@ class Map(ipyleaflet.Map):
         """Update the Layer Manager."""
         from .toolbar import layer_manager_gui
 
-        self.layer_manager_widget.children = layer_manager_gui(self, return_widget=True)
+        self._layer_manager_widget.children = layer_manager_gui(
+            self, return_widget=True
+        )
 
     def add_oam_gui(
         self, position: Optional[str] = "topright", opened: bool = True
