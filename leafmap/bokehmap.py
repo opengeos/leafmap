@@ -6,7 +6,7 @@ from bokeh.plotting import figure, show, save
 from bokeh.io import output_notebook
 from .basemaps import xyz_to_bokeh
 from .common import *
-from typing import Optional, List, Sequence, Tuple, Dict
+from typing import Optional, List, Dict
 
 os.environ["OUTPUT_NOTEBOOK"] = "False"
 basemaps = Box(xyz_to_bokeh(), frozen_box=True)
@@ -477,7 +477,7 @@ class Map:
             use_container_width (bool, optional): A flag indicating whether to use the full width of the container. Defaults to True.
             **kwargs: Arbitrary keyword arguments for bokeh.plotting.show().
         """
-        import streamlit as st
+        import streamlit as st  # pylint: disable=E0401
 
         self.figure.width = width
         self.figure.height = height

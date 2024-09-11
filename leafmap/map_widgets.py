@@ -299,7 +299,7 @@ class Legend(ipywidgets.VBox):
         with legend_output:
             display(legend_widget)
 
-    def __check_if_allowed(value, value_name, allowed_list):
+    def __check_if_allowed(value, value_name, allowed_list):  # pylint: disable=E0213
         if value not in allowed_list:
             raise ValueError(
                 "The "
@@ -308,13 +308,13 @@ class Legend(ipywidgets.VBox):
             )
         return True
 
-    def __convert_rgb_colors_to_hex(colors):
+    def __convert_rgb_colors_to_hex(colors):  # pylint: disable=E0213
         try:
             return [common.rgb_to_hex(x) for x in colors]
         except:
             raise ValueError("Unable to convert rgb value to hex.")
 
-    def __create_legend_items(keys, colors):
+    def __create_legend_items(keys, colors):  # pylint: disable=E0213
         legend_items = []
         for index, key in enumerate(keys):
             color = colors[index]
@@ -326,7 +326,7 @@ class Legend(ipywidgets.VBox):
             legend_items.append(item)
         return legend_items
 
-    def __create_layout(**kwargs):
+    def __create_layout(**kwargs):  # pylint: disable=E0213
         height = Legend.__create_layout_property("height", None, **kwargs)
 
         min_height = Legend.__create_layout_property("min_height", None, **kwargs)

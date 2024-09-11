@@ -317,12 +317,12 @@ def xyz_to_leaflet():
 
     # Add custom tiles.
     for tile_type, tile_dict in custom_tiles.items():
-        for tile_provider, tile_info in tile_dict.items():
+        for _, tile_info in tile_dict.items():
             tile_info["type"] = tile_type
             leaflet_dict[tile_info["name"]] = tile_info
 
     # Add xyzservices.provider tiles.
-    for tile_provider, tile_info in get_xyz_dict().items():
+    for _, tile_info in get_xyz_dict().items():
         if tile_info["name"] in ignore_list:
             continue
         tile_info["url"] = tile_info.build_url()
@@ -490,17 +490,19 @@ def xyz_to_bokeh():
     return bokeh_dict
 
 
-def search_qms(keywords, limit=10):
+def search_qms(keywords, limit=10, timeout=600):
     """Search qms files for keywords. Reference: https://github.com/geopandas/xyzservices/issues/65
 
     Args:
         keywords (str): Keywords to search for.
         limit (int): Number of results to return.
+
     """
     QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
 
     services = requests.get(
-        f"{QMS_API}/?search={keywords}&type=tms&epsg=3857&limit={str(limit)}"
+        f"{QMS_API}/?search={keywords}&type=tms&epsg=3857&limit={str(limit)}",
+        timeout=timeout,
     )
     services = services.json()
     if services["count"] == 0:
@@ -511,9 +513,9 @@ def search_qms(keywords, limit=10):
         return services["results"][:limit]
 
 
-def get_qms(service_id):
+def get_qms(service_id, timeout=60):
     QMS_API = "https://qms.nextgis.com/api/v1/geoservices"
-    service_details = requests.get(f"{QMS_API}/{service_id}")
+    service_details = requests.get(f"{QMS_API}/{service_id}", timeout=timeout)
     return service_details.json()
 
 

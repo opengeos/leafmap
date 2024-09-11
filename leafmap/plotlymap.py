@@ -455,9 +455,9 @@ class Map(go.FigureWidget):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
         """
         tile_url = stac_tile(
-            url, collection, item, assets, bands, titiler_endpoint, **kwargs
+            url, collection, items, assets, bands, titiler_endpoint, **kwargs
         )
-        center = stac_center(url, collection, item, titiler_endpoint)
+        center = stac_center(url, collection, items, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
