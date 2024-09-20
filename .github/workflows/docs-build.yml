@@ -10,18 +10,15 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: ["3.11"]
+                python-version: ["3.12"]
 
         defaults:
             run:
                 shell: bash -el {0}
 
         env:
-            PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
             USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
             USE_MKDOCS: ${{ secrets.USE_MKDOCS }}
-            HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
-            DP_TOKEN: ${{ secrets.DP_TOKEN }}
             MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
