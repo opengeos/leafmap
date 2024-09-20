@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.34">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.35">
     
     
       
@@ -1758,6 +1758,15 @@
   <a href="#leafmap.common.get_overlap" class="md-nav__link">
     <span class="md-ellipsis">
       get_overlap()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_overture_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_overture_data()
     </span>
   </a>
   
@@ -7631,6 +7640,27 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/97_overture_data/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    97 overture data
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -8763,6 +8793,15 @@
   <a href="#leafmap.common.get_overlap" class="md-nav__link">
     <span class="md-ellipsis">
       get_overlap()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_overture_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_overture_data()
     </span>
   </a>
   
@@ -25619,6 +25658,143 @@ Default to True.</p></td>
         <span class="n">clip_image</span><span class="p">(</span><span class="n">img2</span><span class="p">,</span> <span class="n">overlap</span><span class="p">,</span> <span class="n">out_img2</span><span class="p">,</span> <span class="n">to_cog</span><span class="o">=</span><span class="n">to_cog</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">overlap</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.common.get_overture_data" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_overture_data</span><span class="p">(</span><span class="n">overture_type</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.get_overture_data" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Fetches overture data and returns it as a GeoDataFrame.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>overture_type</code></td>
+        <td><code>str</code></td>
+        <td><p>The type of overture data to fetch.It can be one of the following:
+address|building|building_part|division|division_area|division_boundary|place|
+segment|connector|infrastructure|land|land_cover|land_use|water</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>bbox</code></td>
+        <td><code>Tuple[float, float, float, float]</code></td>
+        <td><p>The bounding box to
+filter the data. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>columns</code></td>
+        <td><code>List[str]</code></td>
+        <td><p>The columns to include in the output.
+Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>output</code></td>
+        <td><code>str</code></td>
+        <td><p>The file path to save the output GeoDataFrame.
+Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>gpd.GeoDataFrame</code></td>
+      <td><p>The fetched overture data as a GeoDataFrame.</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ImportError</code></td>
+        <td><p>If the overture package is not installed.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_overture_data</span><span class="p">(</span>
+    <span class="n">overture_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">bbox</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches overture data and returns it as a GeoDataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        overture_type (str): The type of overture data to fetch.It can be one of the following:</span>
+<span class="sd">            address|building|building_part|division|division_area|division_boundary|place|</span>
+<span class="sd">            segment|connector|infrastructure|land|land_cover|land_use|water</span>
+<span class="sd">        bbox (Tuple[float, float, float, float], optional): The bounding box to</span>
+<span class="sd">            filter the data. Defaults to None.</span>
+<span class="sd">        columns (List[str], optional): The columns to include in the output.</span>
+<span class="sd">            Defaults to None.</span>
+<span class="sd">        output (str, optional): The file path to save the output GeoDataFrame.</span>
+<span class="sd">            Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gpd.GeoDataFrame: The fetched overture data as a GeoDataFrame.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ImportError: If the overture package is not installed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">overturemaps</span> <span class="kn">import</span> <span class="n">core</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="n">install_package</span><span class="p">(</span><span class="s2">&quot;overture&quot;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">overturemaps</span> <span class="kn">import</span> <span class="n">core</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">geodataframe</span><span class="p">(</span><span class="n">overture_type</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
+
+    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span>
+    <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
     </div>
@@ -46150,7 +46326,7 @@ meaningful property names.. Defaults to False.</p></td>
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.07f07601.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
       <script src="../assets/javascripts/bundle.56dfad97.min.js"></script>

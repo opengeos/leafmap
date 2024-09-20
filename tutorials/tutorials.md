@@ -108,6 +108,7 @@
 94. Creating 3D maps with Mapbox ([notebook](https://leafmap.org/notebooks/94_mapbox))
 95. Editing vector data interactively ([notebook](https://leafmap.org/notebooks/95_edit_vector))
 96. Batch editing vector data attributes interactively ([notebook](https://leafmap.org/notebooks/96_batch_edit_vector))
+97. Downloading Overture Maps data ([notebook](https://leafmap.org/notebooks/97_overture_data))
 
 ## Demo
 
