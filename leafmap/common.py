@@ -14220,3 +14220,46 @@ def read_file(data: str, **kwargs: Any) -> Union[pd.DataFrame, "gpd.GeoDataFrame
         )
 
     return df
+
+
+def get_overture_data(
+    overture_type: str,
+    bbox: Tuple[float, float, float, float] = None,
+    columns: List[str] = None,
+    output: str = None,
+) -> "gpd.GeoDataFrame":
+    """Fetches overture data and returns it as a GeoDataFrame.
+
+    Args:
+        overture_type (str): The type of overture data to fetch.It can be one of the following:
+            address|building|building_part|division|division_area|division_boundary|place|
+            segment|connector|infrastructure|land|land_cover|land_use|water
+        bbox (Tuple[float, float, float, float], optional): The bounding box to
+            filter the data. Defaults to None.
+        columns (List[str], optional): The columns to include in the output.
+            Defaults to None.
+        output (str, optional): The file path to save the output GeoDataFrame.
+            Defaults to None.
+
+    Returns:
+        gpd.GeoDataFrame: The fetched overture data as a GeoDataFrame.
+
+    Raises:
+        ImportError: If the overture package is not installed.
+    """
+
+    try:
+        from overturemaps import core
+    except ImportError:
+        install_package("overture")
+        from overturemaps import core
+
+    gdf = core.geodataframe(overture_type, bbox=bbox)
+    if columns is not None:
+        gdf = gdf[columns]
+
+    gdf.crs = "EPSG:4326"
+    if output is not None:
+        gdf.to_file(output)
+
+    return gdf
