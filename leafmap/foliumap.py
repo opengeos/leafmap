@@ -90,6 +90,7 @@ class Map(folium.Map):
 
         super().__init__(**kwargs)
         self.baseclass = "folium"
+        self.user_roi = None
 
         if (height is not None) or (width is not None):
             f = folium.Figure(width=width, height=height)
