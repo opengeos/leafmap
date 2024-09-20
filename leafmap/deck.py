@@ -123,7 +123,7 @@ class Map(pdk.Deck):
         layer_type="GeoJsonLayer",
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """Adds a GeoPandas GeoDataFrame to the map.
 
@@ -196,7 +196,7 @@ class Map(pdk.Deck):
         layer_type: str = "GeoJsonLayer",
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """Adds a vector file to the map.
 
@@ -238,7 +238,7 @@ class Map(pdk.Deck):
         filename: str,
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """Adds a GeoJSON file to the map.
 
@@ -257,7 +257,7 @@ class Map(pdk.Deck):
         filename: str,
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """Adds a shapefile to the map.
 
@@ -276,7 +276,7 @@ class Map(pdk.Deck):
         filename: str,
         layer_name: Optional[str] = None,
         random_color_column: Optional[str] = None,
-        **kwargs
+        **kwargs,
     ):
         """Adds a KML file to the map.
 
