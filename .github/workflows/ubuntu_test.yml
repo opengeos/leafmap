@@ -61,10 +61,10 @@ jobs:
                   conda install -c conda-forge mamba --yes
                   mamba install -c conda-forge gdal pyproj pyzmq --yes
 
-            # - name: Test GDAL installation
-            #   run: |
-            #       python -c "from osgeo import gdal"
-            #       gdalinfo --version
+            - name: Test GDAL installation
+              run: |
+                  python -c "from osgeo import gdal"
+                  gdalinfo --version
 
             - name: Install dependencies
               run: |
@@ -80,4 +80,4 @@ jobs:
 
             - name: Running pytest
               run: |
-                    pytest . --verbose
+                  pytest . --verbose
