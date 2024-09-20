@@ -138,7 +138,7 @@ def create_colormap(
     axis_off: Optional[bool] = False,
     show_name: Optional[bool] = False,
     font_size: Optional[int] = 12,
-    **kwargs
+    **kwargs,
 ) -> None:
     """Plot a matplotlib colormap.
 
@@ -207,7 +207,7 @@ def plot_colormap(
     axis_off: Optional[bool] = False,
     show_name: Optional[bool] = False,
     font_size: Optional[int] = 12,
-    **kwargs
+    **kwargs,
 ) -> None:
     """Plot a matplotlib colormap.
 
@@ -267,7 +267,7 @@ def plot_colormaps(
     width: Optional[float] = 8.0,
     height: Optional[float] = 0.4,
     return_fig: Optional[bool] = False,
-    **kwargs
+    **kwargs,
 ) -> None:
     """Plot all available colormaps.
 
