@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leafmap"
+version = "0.37.3"
+dynamic = [
+    "dependencies",
+]
+description = "A Python package for geospatial analysis and interactive mapping in a Jupyter environment."
+readme = "README.md"
+readme-content-type = "text/markdown"
+requires-python = ">=3.8"
+license = {text = "MIT license"}
+keywords = ["leafmap"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+authors = [{name = "Qiusheng Wu", email = "giswqs@gmail.com"}]
+homepage = "https://github.com/opengeos/leafmap"
+requires = ["setuptools>=42"]
+
+[project.optional-dependencies]
+backends = ["bokeh", "keplergl", "maplibre", "pydeck", "plotly"]
+lidar = ["ipygany", "ipyvtklink", "laspy", "panel", "pyntcloud[LAS]", "pyvista"]
+raster = ["localtileserver>=0.10.0", "jupyter-server-proxy", "rio-cogeo", "rioxarray", "netcdf4", "pynhd", "py3dep"]
+sql = ["psycopg2", "sqlalchemy"]
+apps = ["streamlit-folium", "voila", "solara"]
+vector = ["geopandas", "osmnx", "pmtiles", "flask", "flask-cors", "lonboard", "mapclassify"]
+pmtiles = ["pmtiles", "flask", "flask-cors"]
+ai = ["geopandas", "osmnx", "localtileserver>=0.10.0", "rastervision", "pytorch-lightning"]
+maplibre = ["geopandas", "h3", "ipyvuetify", "localtileserver", "mapclassify", "maplibre", "pmtiles", "rioxarray", "xarray"]
+
+[tool]
+[tool.setuptools.packages.find]
+include = ["leafmap*"]
+exclude = ["docs*"]
+
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.distutils.bdist_wheel]
+universal = true
+
+[tool.bumpversion]
+current_version = "0.37.3"
+commit = true
+tag = true
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "leafmap/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[tool.flake8]
+exclude = [
+    "docs",
+]
+max-line-length = 88
+
+[tool.setuptools_scm]
+
+[project.urls]
+Homepage = "https://github.com/opengeos/leafmap"
