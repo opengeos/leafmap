@@ -1449,6 +1449,10 @@ class Map(folium.Map):
             raise Exception(e)
 
         # interchangeable parameters between ipyleaflet and folium.
+
+        if "style_callback" in kwargs:
+            kwargs["style_function"] = kwargs.pop("style_callback")
+
         style_dict = {}
         if "style_function" not in kwargs:
             if "style" in kwargs:
@@ -1456,7 +1460,7 @@ class Map(folium.Map):
                 if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:
                     kwargs["style_function"] = lambda x: style_dict
                 kwargs.pop("style")
-            else:
+            elif "fill_colors" not in kwargs:
                 style_dict = {
                     # "stroke": True,
                     "color": "#3388ff",
@@ -1469,9 +1473,6 @@ class Map(folium.Map):
                     # "clickable": True,
                 }
                 kwargs["style_function"] = lambda x: style_dict
-
-        if "style_callback" in kwargs:
-            kwargs.pop("style_callback")
 
         if "hover_style" in kwargs:
             kwargs.pop("hover_style")

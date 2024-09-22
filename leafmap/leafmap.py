@@ -2630,10 +2630,10 @@ class Map(ipyleaflet.Map):
         import random
         import requests
 
-        style_callback_only = False
+        # style_callback_only = False
 
-        if fill_colors is not None:
-            style_callback_only = True
+        # if fill_colors is not None:
+        #     style_callback_only = True
 
         try:
             if isinstance(in_geojson, str):
@@ -2670,7 +2670,7 @@ class Map(ipyleaflet.Map):
 
         geom_type = get_geometry_type(data)
 
-        if not style:
+        if style is None and (style_callback is None):
             style = {
                 # "stroke": True,
                 "color": "#3388ff",
@@ -2779,23 +2779,20 @@ class Map(ipyleaflet.Map):
         if fill_colors is not None:
             style_callback = random_color
 
-        if style_callback_only:
-            geojson = ipyleaflet.GeoJSON(
-                data=data,
-                hover_style=hover_style,
-                style_callback=style_callback,
-                name=layer_name,
-            )
-        else:
-            kwargs = {}
-            if style_callback is not None:
-                kwargs["style_callback"] = style_callback
+        if style_callback is None:
             geojson = ipyleaflet.GeoJSON(
                 data=data,
                 style=style,
                 hover_style=hover_style,
                 name=layer_name,
-                **kwargs,
+            )
+        else:
+            geojson = ipyleaflet.GeoJSON(
+                data=data,
+                style=style,
+                hover_style=hover_style,
+                name=layer_name,
+                style_callback=style_callback,
             )
 
         if info_mode == "on_hover":
