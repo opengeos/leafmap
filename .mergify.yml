@@ -9,8 +9,10 @@ pull_request_rules:
           - check-success=test-ubuntu (3.10)
           - check-success=test-ubuntu (3.11)
           - check-success=test-ubuntu (3.12)
+          - check-success=test-ubuntu (3.13)
           - check-success=test-windows (3.12)
           - check-success=macOS-latest (3.12)
+          - check-success=docs-build (3.12)
           # Approval by reviewer at least one maintainer
           # - "#approved-reviews-by>=1"
           - base=master
@@ -25,7 +27,7 @@ pull_request_rules:
           merge:
               method: squash
 
-    - name: information about conflicts pull request
+    - name: Information about conflicts pull request
       conditions:
           # If the requirement are satisfied
           # The bot will trigger conflict process
@@ -33,7 +35,7 @@ pull_request_rules:
       actions:
           comment:
               # Message if there's conflict on pull request
-              message: your pull request are conflict @{{author}}, please fix it !
+              message: Your pull request are in conflict @{{author}}, please fix it!
           label:
               # adding label on pull request if get trigger
               add:
