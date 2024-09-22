@@ -10,7 +10,7 @@ dynamic = [
 ]
 description = "A Python package for geospatial analysis and interactive mapping in a Jupyter environment."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "MIT license"}
 keywords = ["leafmap"]
 classifiers = [
@@ -19,11 +19,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 authors = [{name = "Qiusheng Wu", email = "giswqs@gmail.com"}]
 
@@ -37,6 +37,7 @@ vector = ["geopandas", "osmnx", "pmtiles", "flask", "flask-cors", "lonboard", "m
 pmtiles = ["pmtiles", "flask", "flask-cors"]
 ai = ["geopandas", "osmnx", "localtileserver>=0.10.0", "rastervision", "pytorch-lightning"]
 maplibre = ["geopandas", "h3", "ipyvuetify", "localtileserver", "mapclassify", "maplibre", "pmtiles", "rioxarray", "xarray"]
+gdal = ["gdal", "pyproj"]
 
 [tool]
 [tool.setuptools.packages.find]
@@ -72,6 +73,9 @@ exclude = [
 max-line-length = 88
 
 [tool.setuptools_scm]
+
+[tool.uv]
+find-links = ["https://girder.github.io/large_image_wheels"]
 
 [project.urls]
 Homepage = "https://github.com/opengeos/leafmap"
