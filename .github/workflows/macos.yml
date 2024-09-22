@@ -33,5 +33,13 @@ jobs:
             - name: Install dependencies
               run: uv sync --python ${{ matrix.config.py }}
 
+            - name: Install optional dependencies
+              run: |
+                  uv pip install --find-links https://girder.github.io/large_image_wheels gdal pyproj
+                  uv pip install -r requirements_dev.txt
+
             - name: Test import
-              run: uv run python -c "import leafmap; print('leafmap import successful')"
+              run: |
+                  uv run python -c "import leafmap; print('leafmap import successful')"
+                  uv run python -c "from osgeo import gdal; print('gdal import successful')"
+                  uv run gdalinfo --version
