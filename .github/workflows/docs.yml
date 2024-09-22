@@ -1,18 +1,16 @@
 name: docs
+
 on:
     push:
         branches:
             - master
+
 jobs:
     deploy:
         runs-on: ubuntu-latest
         strategy:
             matrix:
                 python-version: ["3.12"]
-
-        defaults:
-            run:
-                shell: bash -el {0}
 
         env:
             PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
@@ -24,54 +22,40 @@ jobs:
             GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
             EARTHDATA_USERNAME: ${{ secrets.EARTHDATA_USERNAME }}
             EARTHDATA_PASSWORD: ${{ secrets.EARTHDATA_PASSWORD }}
-
         steps:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
-            - name: Setup Python
-              uses: conda-incubator/setup-miniconda@v3
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v2
               with:
-                  auto-activate-base: true
-                  python-version: ${{ matrix.python-version }}
-                  channels: conda-forge,defaults
-                  channel-priority: true
-                  miniconda-version: latest
+                  version: "0.4.12"
+                  enable-cache: true
 
-            - name: Cache dependencies
-              uses: actions/cache@v4
-              with:
-                  path: ~/.cache/pip
-                  key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
-                  restore-keys: |
-                      ${{ runner.os }}-pip-
-
-            - name: Testing conda
-              run: |
-                  conda info
-                  conda list
-
-            - name: Install GDAL
-              run: |
-                  # conda install -c conda-forge mamba --yes
-                  # mamba install -c conda-forge gdal pyproj --yes
-                  pip install --no-cache-dir Cython
-                  pip install --find-links=https://girder.github.io/large_image_wheels --no-cache GDAL
-
-            - name: Test GDAL installation
-              run: |
-                  python -c "from osgeo import gdal"
-                  gdalinfo --version
+            - name: Set up Python ${{ matrix.python-version }}
+              run: uv python install ${{ matrix.python-version }}
 
             - name: Install dependencies
-              run: |
-                  pip install --no-cache-dir Cython PyYAML==6.0.1
-                  pip install -r requirements.txt -r requirements_dev.txt
-                  pip install .
+              run: uv sync --python ${{ matrix.python-version }}
 
-            - name: PKG-TEST
-              run: python -m unittest discover tests/
+            - name: Install optional dependencies
+              run: |
+                  uv pip install --find-links https://girder.github.io/large_image_wheels GDAL pyproj
+                  uv pip install pytest
+                  uv pip install -r requirements_dev.txt
+
+            - name: Test import
+              run: |
+                  uv run python -c "import leafmap; print('leafmap import successful')"
+                  uv run python -c "from osgeo import gdal; print('gdal import successful')"
+                  uv run gdalinfo --version
+
+            - name: Running pytest
+              run: |
+                  uv run pytest . --verbose
 
             - name: Install mkdocs
-              run: pip install -r requirements_docs.txt
-            - run: mkdocs gh-deploy --force
+              run: |
+                  uv pip install -r requirements_docs.txt
+                  uv run mkdocs gh-deploy --force
