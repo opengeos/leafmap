@@ -1,0 +1,43 @@
+name: Linux uv build
+
+on:
+    push:
+        branches: ["master"]
+    pull_request:
+        branches: ["master"]
+
+jobs:
+    template:
+        runs-on: ubuntu-latest
+
+        strategy:
+            fail-fast: false
+            matrix:
+                python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v2
+              with:
+                  version: "0.4.12"
+                  enable-cache: true
+
+            - name: Set up Python ${{ matrix.python-version }}
+              run: uv python install ${{ matrix.python-version }}
+
+            - name: Install dependencies
+              run: uv sync --python ${{ matrix.python-version }} --frozen
+
+            - name: Install optional dependencies
+              run: |
+                  uv pip install pytest
+                  uv pip install -r requirements_dev.txt
+
+            - name: Test import
+              run: python -c "import leafmap; print('leafmap import successful')"
+
+            - name: Running pytest
+              run: |
+                  pytest . --verbose
