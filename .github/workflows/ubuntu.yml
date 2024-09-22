@@ -1,23 +1,26 @@
-name: "TestingLeafmapWindows"
+name: TestingLeafmapUbuntu
 
 on:
     push:
-        branches:
-            - master
+        branches: ["master"]
     pull_request:
-        branches:
-            - master
+        branches: ["master"]
+
 jobs:
-    test-windows:
-        runs-on: windows-latest
+    test-ubuntu:
+        runs-on: ubuntu-latest
+
         strategy:
+            fail-fast: false
             matrix:
-                python-version: ["3.12"]
+                python-version: ["3.9", "3.10", "3.11", "3.12"]
 
         env:
             PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
             USE_FOLIUM: ${{ secrets.USE_FOLIUM }}
             USE_MKDOCS: ${{ secrets.USE_MKDOCS }}
+            HEREMAPS_API_KEY: ${{ secrets.HEREMAPS_API_KEY }}
+            DP_TOKEN: ${{ secrets.DP_TOKEN }}
             MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
             AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -38,6 +41,18 @@ jobs:
             - name: Install dependencies
               run: uv sync --python ${{ matrix.python-version }}
 
+            - name: Install optional dependencies
+              run: |
+                  uv pip install --find-links https://girder.github.io/large_image_wheels gdal pyproj
+                  uv pip install pytest
+                  uv pip install -r requirements_dev.txt
+
             - name: Test import
               run: |
                   uv run python -c "import leafmap; print('leafmap import successful')"
+                  uv run python -c "from osgeo import gdal; print('gdal import successful')"
+                  uv run gdalinfo --version
+
+            - name: Running pytest
+              run: |
+                  uv run pytest . --verbose
