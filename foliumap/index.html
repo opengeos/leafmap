@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.35">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.35f28582.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.06209087.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -8637,6 +8637,10 @@ Map            (<span title="folium.folium.Map">Map</span>)
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
         <span class="c1"># interchangeable parameters between ipyleaflet and folium.</span>
+
+        <span class="k">if</span> <span class="s2">&quot;style_callback&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;style_callback&quot;</span><span class="p">)</span>
+
         <span class="n">style_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">if</span> <span class="s2">&quot;style_function&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">if</span> <span class="s2">&quot;style&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -8644,7 +8648,7 @@ Map            (<span title="folium.folium.Map">Map</span>)
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">style_dict</span>
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="s2">&quot;fill_colors&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                 <span class="n">style_dict</span> <span class="o">=</span> <span class="p">{</span>
                     <span class="c1"># &quot;stroke&quot;: True,</span>
                     <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
@@ -8657,9 +8661,6 @@ Map            (<span title="folium.folium.Map">Map</span>)
                     <span class="c1"># &quot;clickable&quot;: True,</span>
                 <span class="p">}</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">style_dict</span>
-
-        <span class="k">if</span> <span class="s2">&quot;style_callback&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;style_callback&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s2">&quot;hover_style&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;hover_style&quot;</span><span class="p">)</span>
@@ -12226,6 +12227,10 @@ Any value other than "on_hover" or "on_click" will be treated as None. Defaults 
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
     <span class="c1"># interchangeable parameters between ipyleaflet and folium.</span>
+
+    <span class="k">if</span> <span class="s2">&quot;style_callback&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;style_callback&quot;</span><span class="p">)</span>
+
     <span class="n">style_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="s2">&quot;style_function&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="k">if</span> <span class="s2">&quot;style&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
@@ -12233,7 +12238,7 @@ Any value other than "on_hover" or "on_click" will be treated as None. Defaults 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">],</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">style_dict</span>
             <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;style&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="s2">&quot;fill_colors&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">style_dict</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="c1"># &quot;stroke&quot;: True,</span>
                 <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;#3388ff&quot;</span><span class="p">,</span>
@@ -12246,9 +12251,6 @@ Any value other than "on_hover" or "on_click" will be treated as None. Defaults 
                 <span class="c1"># &quot;clickable&quot;: True,</span>
             <span class="p">}</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;style_function&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">style_dict</span>
-
-    <span class="k">if</span> <span class="s2">&quot;style_callback&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;style_callback&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s2">&quot;hover_style&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;hover_style&quot;</span><span class="p">)</span>
