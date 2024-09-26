@@ -92,7 +92,7 @@ else:  # If Google Maps API key is not detected, defaulting to Esri basemaps.
 # Custom WMS tile services.
 WMS_TILES = {
     "FWS NWI Wetlands": {
-        "url": "https://www.fws.gov/wetlands/arcgis/services/Wetlands/MapServer/WMSServer?",
+        "url": "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/services/Wetlands/MapServer/WMSServer?",
         "layers": "1",
         "name": "FWS NWI Wetlands",
         "attribution": "FWS",
@@ -100,7 +100,7 @@ WMS_TILES = {
         "transparent": True,
     },
     "FWS NWI Wetlands Raster": {
-        "url": "https://www.fws.gov/wetlands/arcgis/services/Wetlands_Raster/ImageServer/WMSServer?",
+        "url": "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/services/WetlandsRaster/ImageServer/WMSServer?",
         "layers": "0",
         "name": "FWS NWI Wetlands Raster",
         "attribution": "FWS",
@@ -213,8 +213,16 @@ WMS_TILES = {
     },
     "USGS 3DEP Elevation": {
         "url": "https://elevation.nationalmap.gov/arcgis/services/3DEPElevation/ImageServer/WMSServer?",
-        "layers": "33DEPElevation:Hillshade Elevation Tinted",
+        "layers": "3DEPElevation:Hillshade Elevation Tinted",
         "name": "USGS 3DEP Elevation",
+        "attribution": "USGS",
+        "format": "image/png",
+        "transparent": True,
+    },
+    "USGS 3DEP Elevation Index": {
+        "url": "https://index.nationalmap.gov/arcgis/services/3DEPElevationIndex/MapServer/WMSServer?",
+        "layers": "30",
+        "name": "USGS 3DEP Elevation Index",
         "attribution": "USGS",
         "format": "image/png",
         "transparent": True,
