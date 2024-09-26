@@ -370,6 +370,8 @@ class Map(ipyleaflet.Map):
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
                 self.add(basemap)
                 self.layers[-1].visible = show
+                for param in kwargs:
+                    setattr(self.layers[-1], param, kwargs[param])
                 arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
                 print(f"{basemap} has been already added before.")
