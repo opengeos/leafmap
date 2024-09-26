@@ -14314,7 +14314,7 @@ def get_nhd(
     predicate: str = "intersects",
     sort_attr: Optional[str] = None,
     **kwargs,
-) -> Optional[gpd.GeoDataFrame]:
+) -> Optional["gpd.GeoDataFrame"]:
     """
     Fetches National Hydrography Dataset (NHD) data based on the provided geometry.
 
