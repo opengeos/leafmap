@@ -14304,15 +14304,38 @@ def construct_bbox(
 
 
 def get_nhd(
-    geometry,
-    geo_crs=4326,
-    xy=True,
-    buffer=0.001,
-    dataset="wbd08",
-    predicate="intersects",
-    sort_attr: str | None = None,
+    geometry: Union[
+        "gpd.GeoDataFrame", str, List[float], Tuple[float, float, float, float]
+    ],
+    geo_crs: int = 4326,
+    xy: bool = True,
+    buffer: float = 0.001,
+    dataset: str = "wbd08",
+    predicate: str = "intersects",
+    sort_attr: Optional[str] = None,
     **kwargs,
-):
+) -> Optional[gpd.GeoDataFrame]:
+    """
+    Fetches National Hydrography Dataset (NHD) data based on the provided geometry.
+
+    Args:
+        geometry (Union[gpd.GeoDataFrame, str, List[float], Tuple[float, float, float, float]]):
+            The geometry to query the NHD data. It can be a GeoDataFrame, a file path, or coordinates.
+        geo_crs (int): The coordinate reference system (CRS) of the geometry (default is 4326).
+        xy (bool): Whether to use x, y coordinates (default is True).
+        buffer (float): The buffer distance around the centroid point (default is 0.001 degrees).
+        dataset (str): The NHD dataset to query (default is "wbd08").
+        predicate (str): The spatial predicate to use for the query (default is "intersects").
+        sort_attr (Optional[str]): The attribute to sort the results by (default is None).
+        **kwargs: Additional keyword arguments to pass to the WaterData.bygeom method.
+
+    Returns:
+        Optional[gpd.GeoDataFrame]: The fetched NHD data as a GeoDataFrame, or None if an error occurs.
+
+    Raises:
+        ImportError: If the pynhd package is not installed.
+        ValueError: If the geometry type is unsupported.
+    """
     try:
         import pynhd
     except ImportError:
