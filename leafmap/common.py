@@ -6056,7 +6056,7 @@ def image_metadata(image, **kwargs):
         _, client = get_local_tile_layer(image, return_client=True, **kwargs)
     else:
         client = image
-    return client.metadata()
+    return client.metadata
 
 
 def image_bandcount(image, **kwargs):
@@ -9850,14 +9850,10 @@ def get_3dep_dem(
     try:
         import py3dep
     except ImportError:
-        raise ImportError("py3dep is not installed. Install it with pip install py3dep")
+        print("py3dep is not installed. Installing py3dep...")
+        install_package("py3dep")
 
-    try:
-        import geopandas as gpd
-    except ImportError:
-        raise ImportError(
-            "geopandas is not installed. Install it with pip install geopandas"
-        )
+    import geopandas as gpd
 
     if output is not None and os.path.exists(output) and not overwrite:
         print(f"File {output} already exists. Set overwrite=True to overwrite it")
@@ -9872,14 +9868,12 @@ def get_3dep_dem(
     if output is not None:
         if not output.endswith(".tif"):
             output += ".tif"
-        print(output)
         dem.rio.to_raster(output, **kwargs)
 
         if to_cog:
             image_to_cog(output, output)
 
-    else:
-        return dem
+    return dem
 
 
 def vector_set_crs(source, output=None, crs="EPSG:4326", **kwargs):
@@ -14261,5 +14255,110 @@ def get_overture_data(
     gdf.crs = "EPSG:4326"
     if output is not None:
         gdf.to_file(output)
+
+    return gdf
+
+
+def construct_bbox(
+    *args: Union[float, Tuple[float, float, float, float]],
+    buffer: float = 0.001,
+    crs: str = "EPSG:4326",
+    return_gdf: bool = False,
+) -> Union["Polygon", "gpd.GeoDataFrame"]:
+    """
+    Construct a bounding box (bbox) geometry based on either a centroid point or bbox.
+
+    Args:
+        *args: Coordinates for the geometry.
+            - If 2 arguments are provided, it is interpreted as a centroid (x, y) with a buffer.
+            - If 4 arguments are provided, it is interpreted as a bbox (minx, miny, maxx, maxy).
+        buffer (float): The buffer distance around the centroid point (default is 0.01 degrees).
+        crs (str): The coordinate reference system (default is "EPSG:4326").
+        return_gdf (bool): Whether to return a GeoDataFrame (default is False).
+
+    Returns:
+        shapely.geometry.Polygon: The constructed bounding box (Polygon).
+    """
+    from shapely.geometry import box
+
+    if len(args) == 2:
+        # Case 1: Create a bounding box around the centroid point with a buffer
+        x, y = args
+        minx, miny = x - buffer, y - buffer
+        maxx, maxy = x + buffer, y + buffer
+        geometry = box(minx, miny, maxx, maxy)
+
+    elif len(args) == 4:
+        # Case 2: Create a bounding box directly from the given coordinates
+        geometry = box(args[0], args[1], args[2], args[3])
+
+    else:
+        raise ValueError(
+            "Provide either 2 arguments for centroid (x, y) or 4 arguments for bbox (minx, miny, maxx, maxy)."
+        )
+
+    if return_gdf:
+        return gpd.GeoDataFrame(geometry=[geometry], columns=["geometry"], crs=crs)
+    else:
+        return geometry
+
+
+def get_nhd(
+    geometry: Union[
+        "gpd.GeoDataFrame", str, List[float], Tuple[float, float, float, float]
+    ],
+    geo_crs: int = 4326,
+    xy: bool = True,
+    buffer: float = 0.001,
+    dataset: str = "wbd08",
+    predicate: str = "intersects",
+    sort_attr: Optional[str] = None,
+    **kwargs,
+) -> Optional["gpd.GeoDataFrame"]:
+    """
+    Fetches National Hydrography Dataset (NHD) data based on the provided geometry.
+
+    Args:
+        geometry (Union[gpd.GeoDataFrame, str, List[float], Tuple[float, float, float, float]]):
+            The geometry to query the NHD data. It can be a GeoDataFrame, a file path, or coordinates.
+        geo_crs (int): The coordinate reference system (CRS) of the geometry (default is 4326).
+        xy (bool): Whether to use x, y coordinates (default is True).
+        buffer (float): The buffer distance around the centroid point (default is 0.001 degrees).
+        dataset (str): The NHD dataset to query (default is "wbd08").
+        predicate (str): The spatial predicate to use for the query (default is "intersects").
+        sort_attr (Optional[str]): The attribute to sort the results by (default is None).
+        **kwargs: Additional keyword arguments to pass to the WaterData.bygeom method.
+
+    Returns:
+        Optional[gpd.GeoDataFrame]: The fetched NHD data as a GeoDataFrame, or None if an error occurs.
+
+    Raises:
+        ImportError: If the pynhd package is not installed.
+        ValueError: If the geometry type is unsupported.
+    """
+    try:
+        import pynhd
+    except ImportError:
+        print("The pynhd package is required for this function. Installing...")
+        install_package("pynhd")
+
+    import geopandas as gpd
+    from pynhd import WaterData
+
+    if isinstance(geometry, (list, tuple)):
+        crs = f"EPSG:{geo_crs}"
+        geometry = construct_bbox(*geometry, buffer=buffer, crs=crs, return_gdf=False)
+    elif isinstance(geometry, gpd.GeoDataFrame):
+        geometry = geometry.unary_union
+    elif isinstance(geometry, str):
+        geometry = gpd.read_file(geometry).unary_union
+
+    water_data = WaterData(dataset)
+
+    try:
+        gdf = water_data.bygeom(geometry, geo_crs, xy, predicate, sort_attr, **kwargs)
+    except Exception as e:
+        print(e)
+        gdf = None
 
     return gdf
