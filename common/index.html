@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.36">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.37">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.06209087.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.8c3ca2c6.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -1062,6 +1062,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.common.construct_bbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      construct_bbox()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.common.convert_coordinates" class="md-nav__link">
     <span class="md-ellipsis">
       convert_coordinates()
@@ -1740,6 +1749,15 @@
   <a href="#leafmap.common.get_local_tile_layer" class="md-nav__link">
     <span class="md-ellipsis">
       get_local_tile_layer()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_nhd" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_nhd()
     </span>
   </a>
   
@@ -8097,6 +8115,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.common.construct_bbox" class="md-nav__link">
+    <span class="md-ellipsis">
+      construct_bbox()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.common.convert_coordinates" class="md-nav__link">
     <span class="md-ellipsis">
       convert_coordinates()
@@ -8775,6 +8802,15 @@
   <a href="#leafmap.common.get_local_tile_layer" class="md-nav__link">
     <span class="md-ellipsis">
       get_local_tile_layer()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_nhd" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_nhd()
     </span>
   </a>
   
@@ -15550,6 +15586,126 @@ interval : boolean (default False)
     <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">connection_string</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">engine</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.common.construct_bbox" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">construct_bbox</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="n">return_gdf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.construct_bbox" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Construct a bounding box (bbox) geometry based on either a centroid point or bbox.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>*args</code></td>
+        <td><code>Union[float, Tuple[float, float, float, float]]</code></td>
+        <td><p>Coordinates for the geometry.
+- If 2 arguments are provided, it is interpreted as a centroid (x, y) with a buffer.
+- If 4 arguments are provided, it is interpreted as a bbox (minx, miny, maxx, maxy).</p></td>
+        <td><code>()</code></td>
+      </tr>
+      <tr>
+        <td><code>buffer</code></td>
+        <td><code>float</code></td>
+        <td><p>The buffer distance around the centroid point (default is 0.01 degrees).</p></td>
+        <td><code>0.001</code></td>
+      </tr>
+      <tr>
+        <td><code>crs</code></td>
+        <td><code>str</code></td>
+        <td><p>The coordinate reference system (default is "EPSG:4326").</p></td>
+        <td><code>&#39;EPSG:4326&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>return_gdf</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to return a GeoDataFrame (default is False).</p></td>
+        <td><code>False</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>shapely.geometry.Polygon</code></td>
+      <td><p>The constructed bounding box (Polygon).</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">construct_bbox</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="n">buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">crs</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+    <span class="n">return_gdf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Polygon&quot;</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct a bounding box (bbox) geometry based on either a centroid point or bbox.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *args: Coordinates for the geometry.</span>
+<span class="sd">            - If 2 arguments are provided, it is interpreted as a centroid (x, y) with a buffer.</span>
+<span class="sd">            - If 4 arguments are provided, it is interpreted as a bbox (minx, miny, maxx, maxy).</span>
+<span class="sd">        buffer (float): The buffer distance around the centroid point (default is 0.01 degrees).</span>
+<span class="sd">        crs (str): The coordinate reference system (default is &quot;EPSG:4326&quot;).</span>
+<span class="sd">        return_gdf (bool): Whether to return a GeoDataFrame (default is False).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        shapely.geometry.Polygon: The constructed bounding box (Polygon).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">box</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Case 1: Create a bounding box around the centroid point with a buffer</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="n">minx</span><span class="p">,</span> <span class="n">miny</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">y</span> <span class="o">-</span> <span class="n">buffer</span>
+        <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">y</span> <span class="o">+</span> <span class="n">buffer</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">box</span><span class="p">(</span><span class="n">minx</span><span class="p">,</span> <span class="n">miny</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="c1"># Case 2: Create a bounding box directly from the given coordinates</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">box</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Provide either 2 arguments for centroid (x, y) or 4 arguments for bbox (minx, miny, maxx, maxy).&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_gdf</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">geometry</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">geometry</span>
 </code></pre></div>
         </details>
     </div>
@@ -23946,14 +24102,10 @@ box of form (xmin, ymin, xmax, ymax).</p></td>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">py3dep</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;py3dep is not installed. Install it with pip install py3dep&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;py3dep is not installed. Installing py3dep...&quot;</span><span class="p">)</span>
+        <span class="n">install_package</span><span class="p">(</span><span class="s2">&quot;py3dep&quot;</span><span class="p">)</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;geopandas is not installed. Install it with pip install geopandas&quot;</span>
-        <span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 
     <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2"> already exists. Set overwrite=True to overwrite it&quot;</span><span class="p">)</span>
@@ -23968,14 +24120,12 @@ box of form (xmin, ymin, xmax, ymax).</p></td>
     <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">output</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.tif&quot;</span><span class="p">):</span>
             <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;.tif&quot;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
         <span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">to_raster</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">to_cog</span><span class="p">:</span>
             <span class="n">image_to_cog</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
 
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">dem</span>
+    <span class="k">return</span> <span class="n">dem</span>
 </code></pre></div>
         </details>
     </div>
@@ -25374,6 +25524,184 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
     <span class="c1">#     return tile_layer, bounds</span>
     <span class="c1"># else:</span>
     <span class="c1">#     return tile_layer</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.common.get_nhd" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_nhd</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">geo_crs</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s1">&#39;wbd08&#39;</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="s1">&#39;intersects&#39;</span><span class="p">,</span> <span class="n">sort_attr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.get_nhd" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Fetches National Hydrography Dataset (NHD) data based on the provided geometry.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>geometry</code></td>
+        <td><code>Union[gpd.GeoDataFrame, str, List[float], Tuple[float, float, float, float]]</code></td>
+        <td><p>The geometry to query the NHD data. It can be a GeoDataFrame, a file path, or coordinates.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>geo_crs</code></td>
+        <td><code>int</code></td>
+        <td><p>The coordinate reference system (CRS) of the geometry (default is 4326).</p></td>
+        <td><code>4326</code></td>
+      </tr>
+      <tr>
+        <td><code>xy</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to use x, y coordinates (default is True).</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>buffer</code></td>
+        <td><code>float</code></td>
+        <td><p>The buffer distance around the centroid point (default is 0.001 degrees).</p></td>
+        <td><code>0.001</code></td>
+      </tr>
+      <tr>
+        <td><code>dataset</code></td>
+        <td><code>str</code></td>
+        <td><p>The NHD dataset to query (default is "wbd08").</p></td>
+        <td><code>&#39;wbd08&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>predicate</code></td>
+        <td><code>str</code></td>
+        <td><p>The spatial predicate to use for the query (default is "intersects").</p></td>
+        <td><code>&#39;intersects&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>sort_attr</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>The attribute to sort the results by (default is None).</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the WaterData.bygeom method.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Optional[gpd.GeoDataFrame]</code></td>
+      <td><p>The fetched NHD data as a GeoDataFrame, or None if an error occurs.</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ImportError</code></td>
+        <td><p>If the pynhd package is not installed.</p></td>
+      </tr>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the geometry type is unsupported.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_nhd</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+        <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="p">],</span>
+    <span class="n">geo_crs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">,</span>
+    <span class="n">xy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">buffer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;wbd08&quot;</span><span class="p">,</span>
+    <span class="n">predicate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;intersects&quot;</span><span class="p">,</span>
+    <span class="n">sort_attr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches National Hydrography Dataset (NHD) data based on the provided geometry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometry (Union[gpd.GeoDataFrame, str, List[float], Tuple[float, float, float, float]]):</span>
+<span class="sd">            The geometry to query the NHD data. It can be a GeoDataFrame, a file path, or coordinates.</span>
+<span class="sd">        geo_crs (int): The coordinate reference system (CRS) of the geometry (default is 4326).</span>
+<span class="sd">        xy (bool): Whether to use x, y coordinates (default is True).</span>
+<span class="sd">        buffer (float): The buffer distance around the centroid point (default is 0.001 degrees).</span>
+<span class="sd">        dataset (str): The NHD dataset to query (default is &quot;wbd08&quot;).</span>
+<span class="sd">        predicate (str): The spatial predicate to use for the query (default is &quot;intersects&quot;).</span>
+<span class="sd">        sort_attr (Optional[str]): The attribute to sort the results by (default is None).</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the WaterData.bygeom method.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Optional[gpd.GeoDataFrame]: The fetched NHD data as a GeoDataFrame, or None if an error occurs.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ImportError: If the pynhd package is not installed.</span>
+<span class="sd">        ValueError: If the geometry type is unsupported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">pynhd</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The pynhd package is required for this function. Installing...&quot;</span><span class="p">)</span>
+        <span class="n">install_package</span><span class="p">(</span><span class="s2">&quot;pynhd&quot;</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">from</span> <span class="nn">pynhd</span> <span class="kn">import</span> <span class="n">WaterData</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">geo_crs</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">construct_bbox</span><span class="p">(</span><span class="o">*</span><span class="n">geometry</span><span class="p">,</span> <span class="n">buffer</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">return_gdf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">unary_union</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span><span class="o">.</span><span class="n">unary_union</span>
+
+    <span class="n">water_data</span> <span class="o">=</span> <span class="n">WaterData</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">water_data</span><span class="o">.</span><span class="n">bygeom</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">geo_crs</span><span class="p">,</span> <span class="n">xy</span><span class="p">,</span> <span class="n">predicate</span><span class="p">,</span> <span class="n">sort_attr</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">gdf</span>
 </code></pre></div>
         </details>
     </div>
@@ -29522,7 +29850,7 @@ see https://numpy.org/doc/stable/user/basics.types.html. Defaults to 'uint8'.</p
         <span class="n">_</span><span class="p">,</span> <span class="n">client</span> <span class="o">=</span> <span class="n">get_local_tile_layer</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">return_client</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">image</span>
-    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">metadata</span>
 </code></pre></div>
         </details>
     </div>
@@ -46329,7 +46657,7 @@ meaningful property names.. Defaults to False.</p></td>
     <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.56dfad97.min.js"></script>
+      <script src="../assets/javascripts/bundle.d6f25eb3.min.js"></script>
       
         <script src="../js/timeago.min.js"></script>
       
