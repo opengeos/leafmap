@@ -14362,3 +14362,129 @@ def get_nhd(
         gdf = None
 
     return gdf
+
+
+def get_nwi(
+    geometry: Dict[str, Any],
+    inSR: str = "4326",
+    outSR: str = "3857",
+    spatialRel: str = "esriSpatialRelIntersects",
+    return_geometry: bool = True,
+    outFields: str = "*",
+    output: Optional[str] = None,
+    **kwargs: Any,
+) -> Union["gpd.GeoDataFrame", "pd.DataFrame", Dict[str, str]]:
+    """
+    Query the NWI (National Wetlands Inventory) API using various geometry types.
+    https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer
+
+    Args:
+        geometry (dict): The geometry data (e.g., point, polygon, polyline, multipoint, etc.).
+        inSR (str): The input spatial reference (default is EPSG:4326).
+        outSR (str): The output spatial reference (default is EPSG:3857).
+        spatialRel (str): The spatial relationship (default is "esriSpatialRelIntersects").
+        return_geometry (bool): Whether to return the geometry (default is True).
+        outFields (str): The fields to be returned (default is "*").
+        output (str): The output file path to save the GeoDataFrame (default is None).
+        **kwargs: Additional keyword arguments to pass to the API.
+
+    Returns:
+        gpd.GeoDataFrame: The queried NWI data as a GeoDataFrame.
+    """
+
+    import geopandas as gpd
+    import pandas as pd
+    from shapely.geometry import Polygon
+
+    def detect_geometry_type(geometry):
+        """
+        Automatically detect the geometry type based on the keys in the geometry dictionary.
+
+        Args:
+            geometry (dict): The geometry data (e.g., point, polygon, polyline, multipoint, etc.).
+
+        Returns:
+            str: The detected geometry type (e.g., "esriGeometryPoint", "esriGeometryPolygon").
+        """
+        if "x" in geometry and "y" in geometry:
+            return "esriGeometryPoint"
+        elif (
+            "xmin" in geometry
+            and "ymin" in geometry
+            and "xmax" in geometry
+            and "ymax" in geometry
+        ):
+            return "esriGeometryEnvelope"
+        elif "rings" in geometry:
+            return "esriGeometryPolygon"
+        elif "paths" in geometry:
+            return "esriGeometryPolyline"
+        elif "points" in geometry:
+            return "esriGeometryMultipoint"
+        else:
+            raise ValueError("Unsupported geometry type or invalid geometry structure")
+
+    # Automatically detect the geometry type based on the structure of the geometry
+    geometry_type = detect_geometry_type(geometry)
+
+    # API URL for querying wetlands
+    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer/0/query"
+
+    # Convert geometry to a JSON string (required by the API)
+    geometry_json = json.dumps(geometry)
+
+    # Construct the query parameters
+    params = {
+        "geometry": geometry_json,  # The geometry as a JSON string
+        "geometryType": geometry_type,  # Geometry type (automatically detected)
+        "inSR": inSR,  # Spatial reference system (default is WGS84)
+        "spatialRel": spatialRel,  # Spatial relationship (default is intersects)
+        "outFields": outFields,  # Which fields to return (default is all fields)
+        "returnGeometry": str(
+            return_geometry
+        ).lower(),  # Whether to return the geometry
+        "f": "json",  # Response format
+    }
+
+    for key, value in kwargs.items():
+        params[key] = value
+
+    # Make the GET request
+    response = requests.get(url, params=params)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        data = response.json()  # Return the data as a Python dictionary
+    else:
+        return {"error": f"Request failed with status code {response.status_code}"}
+
+    # Extract the features
+    features = data["features"]
+
+    # Prepare the attribute data and geometries
+    attributes = [feature["attributes"] for feature in features]
+
+    # Create a DataFrame for attributes
+    df = pd.DataFrame(attributes)
+    df.rename(
+        columns={"Shape__Length": "Shape_Length", "Shape__Area": "Shape_Area"},
+        inplace=True,
+    )
+
+    if return_geometry:
+        geometries = [Polygon(feature["geometry"]["rings"][0]) for feature in features]
+        # Create a GeoDataFrame by combining the attributes and geometries
+        gdf = gpd.GeoDataFrame(
+            df,
+            geometry=geometries,
+            crs=f"EPSG:{data['spatialReference']['latestWkid']}",
+        )
+        if outSR != "3857":
+            gdf = gdf.to_crs(outSR)
+
+        if output is not None:
+            gdf.to_file(output)
+
+        return gdf
+    else:
+        return df
