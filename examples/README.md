@@ -116,6 +116,8 @@
 95. Editing vector data interactively ([notebook](https://leafmap.org/notebooks/95_edit_vector))
 96. Batch editing vector data attributes interactively ([notebook](https://leafmap.org/notebooks/96_batch_edit_vector))
 97. Downloading Overture Maps data ([notebook](https://leafmap.org/notebooks/97_overture_data))
+98. Retrieving watershed boundaries from the National Hydrography Dataset (NHD) ([notebook](https://leafmap.org/notebooks/98_watershed))
+99. Retrieving wetland boundaries from the National Wetlands Inventory (NWI) ([notebook](https://leafmap.org/notebooks/99_wetlands))
 
 ## Demo
 
