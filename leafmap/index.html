@@ -1105,6 +1105,15 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.add_nwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_nwi()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#leafmap.leafmap.Map.add_oam_gui" class="md-nav__link">
     <span class="md-ellipsis">
       add_oam_gui()
@@ -6005,6 +6014,48 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/98_watershed/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    98 watershed
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/99_wetlands/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    99 wetlands
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -6331,6 +6382,15 @@
   <a href="#leafmap.leafmap.Map.add_netcdf" class="md-nav__link">
     <span class="md-ellipsis">
       add_netcdf()
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.leafmap.Map.add_nwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_nwi()
     </span>
   </a>
   
@@ -12753,6 +12813,65 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
             <span class="n">zoom_to_layer</span><span class="o">=</span><span class="n">zoom_to_layer</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_nwi</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">],</span>
+        <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">style_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">layer_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Wetlands&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds National Wetlands Inventory (NWI) data to the map.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (Union[str, gpd.GeoDataFrame]): The NWI data to add. It can be a file path or a GeoDataFrame.</span>
+<span class="sd">            add_legend (bool): Whether to add a legend to the map. Defaults to True.</span>
+<span class="sd">            style_callback (Optional[Callable[[dict], dict]]): A callback function to style the features. Defaults to None.</span>
+<span class="sd">            layer_name (str): The name of the layer to add. Defaults to &quot;Wetlands&quot;.</span>
+<span class="sd">            **kwargs: Additional keyword arguments to pass to the add_vector or add_gdf method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">nwi</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Freshwater Forested/Shrub Wetland&quot;</span><span class="p">:</span> <span class="s2">&quot;#008837&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Freshwater Emergent Wetland&quot;</span><span class="p">:</span> <span class="s2">&quot;#7fc31c&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Freshwater Pond&quot;</span><span class="p">:</span> <span class="s2">&quot;#688cc0&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Estuarine and Marine Wetland&quot;</span><span class="p">:</span> <span class="s2">&quot;#66c2a5&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Riverine&quot;</span><span class="p">:</span> <span class="s2">&quot;#0190bf&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Lake&quot;</span><span class="p">:</span> <span class="s2">&quot;#13007c&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Estuarine and Marine Deepwater&quot;</span><span class="p">:</span> <span class="s2">&quot;#007c88&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Other&quot;</span><span class="p">:</span> <span class="s2">&quot;#b28656&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">def</span> <span class="nf">nwi_color</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="n">nwi</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">nwi</span>
+                    <span class="k">else</span> <span class="s2">&quot;gray&quot;</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+                <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">style_callback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">style_callback</span> <span class="o">=</span> <span class="n">nwi_color</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="n">style_callback</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_gdf</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="n">style_callback</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_legend</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Wetland Type&quot;</span><span class="p">,</span> <span class="n">builtin_legend</span><span class="o">=</span><span class="s2">&quot;NWI&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
 
@@ -17392,6 +17511,146 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = f&#39;{os.environ[&#39;JUP
         <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-method">
+
+
+
+<h3 id="leafmap.leafmap.Map.add_nwi" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">add_nwi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s1">&#39;Wetlands&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.leafmap.Map.add_nwi" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents ">
+
+      <p>Adds National Wetlands Inventory (NWI) data to the map.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>Union[str, gpd.GeoDataFrame]</code></td>
+        <td><p>The NWI data to add. It can be a file path or a GeoDataFrame.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>add_legend</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to add a legend to the map. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>style_callback</code></td>
+        <td><code>Optional[Callable[[dict], dict]]</code></td>
+        <td><p>A callback function to style the features. Defaults to None.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>layer_name</code></td>
+        <td><code>str</code></td>
+        <td><p>The name of the layer to add. Defaults to "Wetlands".</p></td>
+        <td><code>&#39;Wetlands&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the add_vector or add_gdf method.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>None</code></td>
+      <td><p>None</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/leafmap.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_nwi</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">],</span>
+    <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">style_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">layer_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Wetlands&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds National Wetlands Inventory (NWI) data to the map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data (Union[str, gpd.GeoDataFrame]): The NWI data to add. It can be a file path or a GeoDataFrame.</span>
+<span class="sd">        add_legend (bool): Whether to add a legend to the map. Defaults to True.</span>
+<span class="sd">        style_callback (Optional[Callable[[dict], dict]]): A callback function to style the features. Defaults to None.</span>
+<span class="sd">        layer_name (str): The name of the layer to add. Defaults to &quot;Wetlands&quot;.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the add_vector or add_gdf method.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">nwi</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;Freshwater Forested/Shrub Wetland&quot;</span><span class="p">:</span> <span class="s2">&quot;#008837&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Freshwater Emergent Wetland&quot;</span><span class="p">:</span> <span class="s2">&quot;#7fc31c&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Freshwater Pond&quot;</span><span class="p">:</span> <span class="s2">&quot;#688cc0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Estuarine and Marine Wetland&quot;</span><span class="p">:</span> <span class="s2">&quot;#66c2a5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Riverine&quot;</span><span class="p">:</span> <span class="s2">&quot;#0190bf&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Lake&quot;</span><span class="p">:</span> <span class="s2">&quot;#13007c&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Estuarine and Marine Deepwater&quot;</span><span class="p">:</span> <span class="s2">&quot;#007c88&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Other&quot;</span><span class="p">:</span> <span class="s2">&quot;#b28656&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">nwi_color</span><span class="p">(</span><span class="n">feature</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">nwi</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">nwi</span>
+                <span class="k">else</span> <span class="s2">&quot;gray&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">style_callback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">style_callback</span> <span class="o">=</span> <span class="n">nwi_color</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_vector</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="n">style_callback</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_gdf</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="n">style_callback</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">add_legend</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Wetland Type&quot;</span><span class="p">,</span> <span class="n">builtin_legend</span><span class="o">=</span><span class="s2">&quot;NWI&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>

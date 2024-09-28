@@ -1773,6 +1773,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.common.get_nwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_nwi()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_nwi_by_huc8" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_nwi_by_huc8()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.common.get_overlap" class="md-nav__link">
     <span class="md-ellipsis">
       get_overlap()
@@ -1830,6 +1848,15 @@
   <a href="#leafmap.common.get_stac_items" class="md-nav__link">
     <span class="md-ellipsis">
       get_stac_items()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_wbd" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_wbd()
     </span>
   </a>
   
@@ -7679,6 +7706,48 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/98_watershed/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    98 watershed
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/99_wetlands/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    99 wetlands
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -8826,6 +8895,24 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.common.get_nwi" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_nwi()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_nwi_by_huc8" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_nwi_by_huc8()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.common.get_overlap" class="md-nav__link">
     <span class="md-ellipsis">
       get_overlap()
@@ -8883,6 +8970,15 @@
   <a href="#leafmap.common.get_stac_items" class="md-nav__link">
     <span class="md-ellipsis">
       get_stac_items()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.get_wbd" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_wbd()
     </span>
   </a>
   
@@ -25863,6 +25959,417 @@ Default to True.</p></td>
 
 
 
+<h2 id="leafmap.common.get_nwi" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_nwi</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">inSR</span><span class="o">=</span><span class="s1">&#39;4326&#39;</span><span class="p">,</span> <span class="n">outSR</span><span class="o">=</span><span class="s1">&#39;3857&#39;</span><span class="p">,</span> <span class="n">spatialRel</span><span class="o">=</span><span class="s1">&#39;esriSpatialRelIntersects&#39;</span><span class="p">,</span> <span class="n">return_geometry</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outFields</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.get_nwi" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Query the NWI (National Wetlands Inventory) API using various geometry types.
+https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>geometry</code></td>
+        <td><code>dict</code></td>
+        <td><p>The geometry data (e.g., point, polygon, polyline, multipoint, etc.).</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>inSR</code></td>
+        <td><code>str</code></td>
+        <td><p>The input spatial reference (default is EPSG:4326).</p></td>
+        <td><code>&#39;4326&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>outSR</code></td>
+        <td><code>str</code></td>
+        <td><p>The output spatial reference (default is EPSG:3857).</p></td>
+        <td><code>&#39;3857&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>spatialRel</code></td>
+        <td><code>str</code></td>
+        <td><p>The spatial relationship (default is "esriSpatialRelIntersects").</p></td>
+        <td><code>&#39;esriSpatialRelIntersects&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>return_geometry</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to return the geometry (default is True).</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>outFields</code></td>
+        <td><code>str</code></td>
+        <td><p>The fields to be returned (default is "*").</p></td>
+        <td><code>&#39;*&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>output</code></td>
+        <td><code>str</code></td>
+        <td><p>The output file path to save the GeoDataFrame (default is None).</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments to pass to the API.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>gpd.GeoDataFrame</code></td>
+      <td><p>The queried NWI data as a GeoDataFrame.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_nwi</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="n">inSR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4326&quot;</span><span class="p">,</span>
+    <span class="n">outSR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;3857&quot;</span><span class="p">,</span>
+    <span class="n">spatialRel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;esriSpatialRelIntersects&quot;</span><span class="p">,</span>
+    <span class="n">return_geometry</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">outFields</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Query the NWI (National Wetlands Inventory) API using various geometry types.</span>
+<span class="sd">    https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometry (dict): The geometry data (e.g., point, polygon, polyline, multipoint, etc.).</span>
+<span class="sd">        inSR (str): The input spatial reference (default is EPSG:4326).</span>
+<span class="sd">        outSR (str): The output spatial reference (default is EPSG:3857).</span>
+<span class="sd">        spatialRel (str): The spatial relationship (default is &quot;esriSpatialRelIntersects&quot;).</span>
+<span class="sd">        return_geometry (bool): Whether to return the geometry (default is True).</span>
+<span class="sd">        outFields (str): The fields to be returned (default is &quot;*&quot;).</span>
+<span class="sd">        output (str): The output file path to save the GeoDataFrame (default is None).</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the API.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gpd.GeoDataFrame: The queried NWI data as a GeoDataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+
+    <span class="k">def</span> <span class="nf">detect_geometry_type</span><span class="p">(</span><span class="n">geometry</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Automatically detect the geometry type based on the structure of the geometry dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;x&quot;</span> <span class="ow">in</span> <span class="n">geometry</span> <span class="ow">and</span> <span class="s2">&quot;y&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryPoint&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="s2">&quot;xmin&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+            <span class="ow">and</span> <span class="s2">&quot;ymin&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+            <span class="ow">and</span> <span class="s2">&quot;xmax&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+            <span class="ow">and</span> <span class="s2">&quot;ymax&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryEnvelope&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;rings&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryPolygon&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;paths&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryPolyline&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;points&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryMultipoint&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported geometry type or invalid geometry structure.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert GeoDataFrame to a dictionary if needed</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="n">_convert_geodataframe_to_esri_format</span><span class="p">(</span><span class="n">geometry</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">geometry_type</span> <span class="o">=</span> <span class="n">detect_geometry_type</span><span class="p">(</span><span class="n">geometry_dict</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">geometry_type</span> <span class="o">=</span> <span class="n">detect_geometry_type</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="n">geometry</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="n">geometry</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid geometry input. Must be a GeoDataFrame or a dictionary.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Convert geometry to a JSON string (required by the API)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">geometry_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">geometry_dict</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">geometry_json</span> <span class="o">=</span> <span class="n">geometry_dict</span>
+    <span class="c1"># API URL for querying wetlands</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer/0/query&quot;</span>
+
+    <span class="c1"># Construct the query parameters</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">geometry_json</span><span class="p">,</span>  <span class="c1"># The geometry as a JSON string</span>
+        <span class="s2">&quot;geometryType&quot;</span><span class="p">:</span> <span class="n">geometry_type</span><span class="p">,</span>  <span class="c1"># Geometry type (automatically detected)</span>
+        <span class="s2">&quot;inSR&quot;</span><span class="p">:</span> <span class="n">inSR</span><span class="p">,</span>  <span class="c1"># Spatial reference system (default is WGS84)</span>
+        <span class="s2">&quot;spatialRel&quot;</span><span class="p">:</span> <span class="n">spatialRel</span><span class="p">,</span>  <span class="c1"># Spatial relationship (default is intersects)</span>
+        <span class="s2">&quot;outFields&quot;</span><span class="p">:</span> <span class="n">outFields</span><span class="p">,</span>  <span class="c1"># Which fields to return (default is all fields)</span>
+        <span class="s2">&quot;returnGeometry&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">return_geometry</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>  <span class="c1"># Whether to return the geometry</span>
+        <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>  <span class="c1"># Response format</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c1"># Make the GET request</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="c1"># Check if the request was successful</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>  <span class="c1"># Return the data as a Python dictionary</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Request failed with status code </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+    <span class="c1"># Extract the features</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Prepare the attribute data and geometries</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+
+    <span class="c1"># Create a DataFrame for attributes</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;Shape__Length&quot;</span><span class="p">:</span> <span class="s2">&quot;Shape_Length&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Shape__Area&quot;</span><span class="p">:</span> <span class="s2">&quot;Shape_Area&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;WETLAND_TYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_geometry</span><span class="p">:</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[</span><span class="n">Polygon</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;rings&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+        <span class="c1"># Create a GeoDataFrame by combining the attributes and geometries</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">geometries</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;spatialReference&#39;</span><span class="p">][</span><span class="s1">&#39;latestWkid&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">outSR</span> <span class="o">!=</span> <span class="s2">&quot;3857&quot;</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">outSR</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">gdf</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">df</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.common.get_nwi_by_huc8" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_nwi_by_huc8</span><span class="p">(</span><span class="n">huc8</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">layer</span><span class="o">=</span><span class="s1">&#39;Wetlands&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.get_nwi_by_huc8" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Fetches National Wetlands Inventory (NWI) data by HUC8 code.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>huc8</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>The HUC8 code to query the NWI data. It must be a
+string of length 8.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>geometry</code></td>
+        <td><code>Optional[Union[gpd.GeoDataFrame, str]]</code></td>
+        <td><p>The geometry to derive
+the HUC8 code. It can be a GeoDataFrame or a file path.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>out_dir</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>The directory to save the downloaded data.
+Defaults to a temporary directory.</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>quiet</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to suppress download progress messages. Defaults to True.</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>layer</code></td>
+        <td><code>str</code></td>
+        <td><p>The layer to fetch from the NWI data. It can be one of the following:
+Wetlands, Watershed, Riparian_Project_Metadata, Wetlands_Historic_Map_Info.
+Defaults to "Wetlands".</p></td>
+        <td><code>&#39;Wetlands&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td></td>
+        <td><p>Additional keyword arguments to pass to the download_file function.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>gpd.GeoDataFrame</code></td>
+      <td><p>The fetched NWI data as a GeoDataFrame.</p></td>
+    </tr>
+  </tbody>
+</table>
+<p><strong>Exceptions:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>ValueError</code></td>
+        <td><p>If the HUC8 code is invalid or the layer is not allowed.</p></td>
+      </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_nwi_by_huc8</span><span class="p">(</span>
+    <span class="n">huc8</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">geometry</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">layer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Wetlands&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fetches National Wetlands Inventory (NWI) data by HUC8 code.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        huc8 (Optional[str]): The HUC8 code to query the NWI data. It must be a</span>
+<span class="sd">            string of length 8.</span>
+<span class="sd">        geometry (Optional[Union[gpd.GeoDataFrame, str]]): The geometry to derive</span>
+<span class="sd">            the HUC8 code. It can be a GeoDataFrame or a file path.</span>
+<span class="sd">        out_dir (Optional[str]): The directory to save the downloaded data.</span>
+<span class="sd">            Defaults to a temporary directory.</span>
+<span class="sd">        quiet (bool): Whether to suppress download progress messages. Defaults to True.</span>
+<span class="sd">        layer (str): The layer to fetch from the NWI data. It can be one of the following:</span>
+<span class="sd">            Wetlands, Watershed, Riparian_Project_Metadata, Wetlands_Historic_Map_Info.</span>
+<span class="sd">            Defaults to &quot;Wetlands&quot;.</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the download_file function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gpd.GeoDataFrame: The fetched NWI data as a GeoDataFrame.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the HUC8 code is invalid or the layer is not allowed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">tempfile</span>
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+
+    <span class="k">if</span> <span class="n">geometry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">wbd</span> <span class="o">=</span> <span class="n">get_wbd</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">return_geometry</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">huc8</span> <span class="o">=</span> <span class="n">wbd</span><span class="p">[</span><span class="s2">&quot;huc8&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">huc8</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">huc8</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid HUC8 code. It must be a string of length 8.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+
+    <span class="n">allowed_layers</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Wetlands&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Watershed&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Riparian_Project_Metadata&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Wetlands_Historic_Map_Info&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Wetlands_Project_Metadata&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="k">if</span> <span class="n">layer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_layers</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid layer. Allowed values are </span><span class="si">{</span><span class="n">allowed_layers</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://documentst.ecosphere.fws.gov/wetlands/downloads/watershed/HU8_</span><span class="si">{</span><span class="n">huc8</span><span class="si">}</span><span class="s2">_Watershed.zip&quot;</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;HU8_</span><span class="si">{</span><span class="n">huc8</span><span class="si">}</span><span class="s2">_Watershed.zip&quot;</span><span class="p">)</span>
+
+    <span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="n">quiet</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;HU8_</span><span class="si">{</span><span class="n">huc8</span><span class="si">}</span><span class="s2">_Watershed&quot;</span><span class="p">)</span>
+
+    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;HU8_</span><span class="si">{</span><span class="n">huc8</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s2">.shp&quot;</span><span class="p">)</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdf</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
 <h2 id="leafmap.common.get_overlap" class="doc doc-heading">
 <code class="highlight language-python"><span class="n">get_overlap</span><span class="p">(</span><span class="n">img1</span><span class="p">,</span> <span class="n">img2</span><span class="p">,</span> <span class="n">overlap</span><span class="p">,</span> <span class="n">out_img1</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">out_img2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">to_cog</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></code>
 
@@ -26958,6 +27465,278 @@ Available parameters can be found at https://github.com/radiantearth/stac-api-sp
     <span class="c1"># items_gdf[&quot;assets_list&quot;] = items_gdf[&quot;assets_list&quot;].astype(str) #specifically for KeplerGL. See https://github.com/keplergl/kepler.gl/issues/602</span>
     <span class="n">items_gdf</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">items_gdf</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.common.get_wbd" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">get_wbd</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">searchText</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inSR</span><span class="o">=</span><span class="s1">&#39;4326&#39;</span><span class="p">,</span> <span class="n">outSR</span><span class="o">=</span><span class="s1">&#39;3857&#39;</span><span class="p">,</span> <span class="n">digit</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">spatialRel</span><span class="o">=</span><span class="s1">&#39;esriSpatialRelIntersects&#39;</span><span class="p">,</span> <span class="n">return_geometry</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">outFields</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.get_wbd" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Query the WBD (Watershed Boundary Dataset) API using various geometry types or a GeoDataFrame.
+https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>geometry</code></td>
+        <td><code>Union[gpd.GeoDataFrame, Dict]</code></td>
+        <td><p>The geometry data (GeoDataFrame or geometry dict).</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>inSR</code></td>
+        <td><code>str</code></td>
+        <td><p>The input spatial reference (default is EPSG:4326).</p></td>
+        <td><code>&#39;4326&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>outSR</code></td>
+        <td><code>str</code></td>
+        <td><p>The output spatial reference (default is EPSG:3857).</p></td>
+        <td><code>&#39;3857&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>digit</code></td>
+        <td><code>int</code></td>
+        <td><p>The digit code for the WBD layer (default is 8).</p></td>
+        <td><code>8</code></td>
+      </tr>
+      <tr>
+        <td><code>spatialRel</code></td>
+        <td><code>str</code></td>
+        <td><p>The spatial relationship (default is "esriSpatialRelIntersects").</p></td>
+        <td><code>&#39;esriSpatialRelIntersects&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>return_geometry</code></td>
+        <td><code>bool</code></td>
+        <td><p>Whether to return the geometry (default is True).</p></td>
+        <td><code>True</code></td>
+      </tr>
+      <tr>
+        <td><code>outFields</code></td>
+        <td><code>str</code></td>
+        <td><p>The fields to be returned (default is "*").</p></td>
+        <td><code>&#39;*&#39;</code></td>
+      </tr>
+      <tr>
+        <td><code>output</code></td>
+        <td><code>Optional[str]</code></td>
+        <td><p>The output file path to save the GeoDataFrame (default is None).</p></td>
+        <td><code>None</code></td>
+      </tr>
+      <tr>
+        <td><code>**kwargs</code></td>
+        <td><code>Any</code></td>
+        <td><p>Additional keyword arguments to pass to the API.</p></td>
+        <td><code>{}</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>gpd.GeoDataFrame or pd.DataFrame</code></td>
+      <td><p>The queried WBD data as a GeoDataFrame or DataFrame.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">get_wbd</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">searchText</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">inSR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;4326&quot;</span><span class="p">,</span>
+    <span class="n">outSR</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;3857&quot;</span><span class="p">,</span>
+    <span class="n">digit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="n">spatialRel</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;esriSpatialRelIntersects&quot;</span><span class="p">,</span>
+    <span class="n">return_geometry</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">outFields</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+    <span class="n">output</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">,</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Query the WBD (Watershed Boundary Dataset) API using various geometry types or a GeoDataFrame.</span>
+<span class="sd">    https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geometry (Union[gpd.GeoDataFrame, Dict]): The geometry data (GeoDataFrame or geometry dict).</span>
+<span class="sd">        inSR (str): The input spatial reference (default is EPSG:4326).</span>
+<span class="sd">        outSR (str): The output spatial reference (default is EPSG:3857).</span>
+<span class="sd">        digit (int): The digit code for the WBD layer (default is 8).</span>
+<span class="sd">        spatialRel (str): The spatial relationship (default is &quot;esriSpatialRelIntersects&quot;).</span>
+<span class="sd">        return_geometry (bool): Whether to return the geometry (default is True).</span>
+<span class="sd">        outFields (str): The fields to be returned (default is &quot;*&quot;).</span>
+<span class="sd">        output (Optional[str]): The output file path to save the GeoDataFrame (default is None).</span>
+<span class="sd">        **kwargs: Additional keyword arguments to pass to the API.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gpd.GeoDataFrame or pd.DataFrame: The queried WBD data as a GeoDataFrame or DataFrame.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+    <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+
+    <span class="k">def</span> <span class="nf">detect_geometry_type</span><span class="p">(</span><span class="n">geometry</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Automatically detect the geometry type based on the structure of the geometry dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;x&quot;</span> <span class="ow">in</span> <span class="n">geometry</span> <span class="ow">and</span> <span class="s2">&quot;y&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryPoint&quot;</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="s2">&quot;xmin&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+            <span class="ow">and</span> <span class="s2">&quot;ymin&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+            <span class="ow">and</span> <span class="s2">&quot;xmax&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+            <span class="ow">and</span> <span class="s2">&quot;ymax&quot;</span> <span class="ow">in</span> <span class="n">geometry</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryEnvelope&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;rings&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryPolygon&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;paths&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryPolyline&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;points&quot;</span> <span class="ow">in</span> <span class="n">geometry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;esriGeometryMultipoint&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported geometry type or invalid geometry structure.&quot;</span><span class="p">)</span>
+
+    <span class="n">allowed_digit_values</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">16</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">digit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_digit_values</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid digit value. Allowed values are </span><span class="si">{</span><span class="n">allowed_digit_values</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">layer</span> <span class="o">=</span> <span class="n">allowed_digit_values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">digit</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Convert GeoDataFrame to a dictionary if needed</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="n">_convert_geodataframe_to_esri_format</span><span class="p">(</span><span class="n">geometry</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">geometry_type</span> <span class="o">=</span> <span class="n">detect_geometry_type</span><span class="p">(</span><span class="n">geometry_dict</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">geometry_type</span> <span class="o">=</span> <span class="n">detect_geometry_type</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="n">geometry</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="n">geometry</span>
+    <span class="k">elif</span> <span class="n">searchText</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid geometry input. Must be a GeoDataFrame or a dictionary.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">geometry_dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">geometry_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Convert geometry to a JSON string (required by the API)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geometry_dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">geometry_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">geometry_dict</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">geometry_json</span> <span class="o">=</span> <span class="n">geometry_dict</span>
+
+        <span class="c1"># Construct the query parameters</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">geometry_json</span><span class="p">,</span>
+            <span class="s2">&quot;geometryType&quot;</span><span class="p">:</span> <span class="n">geometry_type</span><span class="p">,</span>
+            <span class="s2">&quot;inSR&quot;</span><span class="p">:</span> <span class="n">inSR</span><span class="p">,</span>
+            <span class="s2">&quot;spatialRel&quot;</span><span class="p">:</span> <span class="n">spatialRel</span><span class="p">,</span>
+            <span class="s2">&quot;outFields&quot;</span><span class="p">:</span> <span class="n">outFields</span><span class="p">,</span>
+            <span class="s2">&quot;returnGeometry&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">return_geometry</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># API URL for querying the WBD</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/</span><span class="si">{</span><span class="n">layer</span><span class="si">}</span><span class="s2">/query&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Construct the query parameters</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;searchText&quot;</span><span class="p">:</span> <span class="n">searchText</span><span class="p">,</span>
+            <span class="s2">&quot;contains&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;layers&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">layer</span><span class="p">),</span>
+            <span class="s2">&quot;inSR&quot;</span><span class="p">:</span> <span class="n">inSR</span><span class="p">,</span>
+            <span class="s2">&quot;outFields&quot;</span><span class="p">:</span> <span class="n">outFields</span><span class="p">,</span>
+            <span class="s2">&quot;returnGeometry&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">return_geometry</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+            <span class="s2">&quot;f&quot;</span><span class="p">:</span> <span class="s2">&quot;json&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/find&quot;</span>
+
+    <span class="c1"># Add additional keyword arguments</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="c1"># Make the GET request</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Request failed with status code </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">geometry_dict</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Extract features from the API response</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;features&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;spatialReference&#39;</span><span class="p">][</span><span class="s1">&#39;latestWkid&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;results&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;EPSG:</span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;results&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;spatialReference&#39;</span><span class="p">][</span><span class="s1">&#39;latestWkid&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Prepare attribute data and geometries</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;attributes&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Shape__Length&quot;</span><span class="p">:</span> <span class="s2">&quot;Shape_Length&quot;</span><span class="p">,</span> <span class="s2">&quot;Shape__Area&quot;</span><span class="p">:</span> <span class="s2">&quot;Shape_Area&quot;</span><span class="p">},</span>
+        <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Handle geometries</span>
+    <span class="k">if</span> <span class="n">return_geometry</span><span class="p">:</span>
+        <span class="n">geometries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">Polygon</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span><span class="s2">&quot;rings&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="s2">&quot;rings&quot;</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">features</span>
+        <span class="p">]</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">df</span><span class="p">,</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">geometries</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">outSR</span> <span class="o">!=</span> <span class="s2">&quot;3857&quot;</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">outSR</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">output</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">gdf</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">df</span>
 </code></pre></div>
         </details>
     </div>
