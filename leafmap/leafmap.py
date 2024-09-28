@@ -5570,6 +5570,65 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
+    def add_nwi(
+        self,
+        data: Union[str, "gpd.GeoDataFrame"],
+        add_legend: bool = True,
+        style_callback: Optional[Callable[[dict], dict]] = None,
+        layer_name: str = "Wetlands",
+        **kwargs,
+    ) -> None:
+        """
+        Adds National Wetlands Inventory (NWI) data to the map.
+
+        Args:
+            data (Union[str, gpd.GeoDataFrame]): The NWI data to add. It can be a file path or a GeoDataFrame.
+            add_legend (bool): Whether to add a legend to the map. Defaults to True.
+            style_callback (Optional[Callable[[dict], dict]]): A callback function to style the features. Defaults to None.
+            layer_name (str): The name of the layer to add. Defaults to "Wetlands".
+            **kwargs: Additional keyword arguments to pass to the add_vector or add_gdf method.
+
+        Returns:
+            None
+        """
+
+        nwi = {
+            "Freshwater Forested/Shrub Wetland": "#008837",
+            "Freshwater Emergent Wetland": "#7fc31c",
+            "Freshwater Pond": "#688cc0",
+            "Estuarine and Marine Wetland": "#66c2a5",
+            "Riverine": "#0190bf",
+            "Lake": "#13007c",
+            "Estuarine and Marine Deepwater": "#007c88",
+            "Other": "#b28656",
+        }
+
+        def nwi_color(feature):
+            return {
+                "color": "black",
+                "fillColor": (
+                    nwi[feature["properties"]["WETLAND_TY"]]
+                    if feature["properties"]["WETLAND_TY"] in nwi
+                    else "gray"
+                ),
+                "fillOpacity": 0.6,
+                "weight": 1,
+            }
+
+        if style_callback is None:
+            style_callback = nwi_color
+
+        if isinstance(data, str):
+            self.add_vector(
+                data, style_callback=style_callback, layer_name=layer_name, **kwargs
+            )
+        else:
+            self.add_gdf(
+                data, style_callback=style_callback, layer_name=layer_name, **kwargs
+            )
+        if add_legend:
+            self.add_legend(title="Wetland Type", builtin_legend="NWI")
+
 
 # The functions below are outside the Map class.
 

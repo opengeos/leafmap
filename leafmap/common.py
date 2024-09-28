@@ -14521,7 +14521,11 @@ def get_nwi(
     # Create a DataFrame for attributes
     df = pd.DataFrame(attributes)
     df.rename(
-        columns={"Shape__Length": "Shape_Length", "Shape__Area": "Shape_Area"},
+        columns={
+            "Shape__Length": "Shape_Length",
+            "Shape__Area": "Shape_Area",
+            "WETLAND_TYPE": "WETLAND_TY",
+        },
         inplace=True,
     )
 
