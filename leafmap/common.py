@@ -14689,3 +14689,72 @@ def get_wbd(
         return gdf
     else:
         return df
+
+
+def get_nwi_by_huc8(
+    huc8: Optional[str] = None,
+    geometry: Optional[Union["gpd.GeoDataFrame", str]] = None,
+    out_dir: Optional[str] = None,
+    quiet: bool = True,
+    layer: str = "Wetlands",
+    **kwargs,
+) -> "gpd.GeoDataFrame":
+    """
+    Fetches National Wetlands Inventory (NWI) data by HUC8 code.
+
+    Args:
+        huc8 (Optional[str]): The HUC8 code to query the NWI data. It must be a
+            string of length 8.
+        geometry (Optional[Union[gpd.GeoDataFrame, str]]): The geometry to derive
+            the HUC8 code. It can be a GeoDataFrame or a file path.
+        out_dir (Optional[str]): The directory to save the downloaded data.
+            Defaults to a temporary directory.
+        quiet (bool): Whether to suppress download progress messages. Defaults to True.
+        layer (str): The layer to fetch from the NWI data. It can be one of the following:
+            Wetlands, Watershed, Riparian_Project_Metadata, Wetlands_Historic_Map_Info.
+            Defaults to "Wetlands".
+        **kwargs: Additional keyword arguments to pass to the download_file function.
+
+    Returns:
+        gpd.GeoDataFrame: The fetched NWI data as a GeoDataFrame.
+
+    Raises:
+        ValueError: If the HUC8 code is invalid or the layer is not allowed.
+    """
+    import tempfile
+    import geopandas as gpd
+
+    if geometry is not None:
+        wbd = get_wbd(geometry, return_geometry=False)
+        huc8 = wbd["huc8"].values[0]
+
+    if isinstance(huc8, str) and len(huc8) == 8:
+        pass
+    else:
+        raise ValueError("Invalid HUC8 code. It must be a string of length 8.")
+
+    if out_dir is None:
+        out_dir = tempfile.gettempdir()
+
+    allowed_layers = [
+        "Wetlands",
+        "Watershed",
+        "Riparian_Project_Metadata",
+        "Wetlands_Historic_Map_Info",
+        "Wetlands_Project_Metadata",
+    ]
+    if layer not in allowed_layers:
+        raise ValueError(f"Invalid layer. Allowed values are {allowed_layers}")
+
+    url = f"https://documentst.ecosphere.fws.gov/wetlands/downloads/watershed/HU8_{huc8}_Watershed.zip"
+
+    filename = os.path.join(out_dir, f"HU8_{huc8}_Watershed.zip")
+
+    download_file(url, filename, quiet=quiet, **kwargs)
+
+    data_dir = os.path.join(out_dir, f"HU8_{huc8}_Watershed")
+
+    filepath = os.path.join(data_dir, f"HU8_{huc8}_{layer}.shp")
+
+    gdf = gpd.read_file(filepath)
+    return gdf
