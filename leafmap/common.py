@@ -14303,7 +14303,7 @@ def construct_bbox(
         return geometry
 
 
-def get_nhd_wbd(
+def get_nhd(
     geometry: Union[
         "gpd.GeoDataFrame", str, List[float], Tuple[float, float, float, float]
     ],
@@ -14545,7 +14545,8 @@ def get_nwi(
 
 
 def get_wbd(
-    geometry: Union["gpd.GeoDataFrame", Dict[str, Any]],
+    geometry: Union["gpd.GeoDataFrame", Dict[str, Any]] = None,
+    searchText: Optional[str] = None,
     inSR: str = "4326",
     outSR: str = "3857",
     digit: int = 8,
@@ -14600,6 +14601,14 @@ def get_wbd(
         else:
             raise ValueError("Unsupported geometry type or invalid geometry structure.")
 
+    allowed_digit_values = [2, 4, 6, 8, 10, 12, 14, 16]
+    if digit not in allowed_digit_values:
+        raise ValueError(
+            f"Invalid digit value. Allowed values are {allowed_digit_values}"
+        )
+
+    layer = allowed_digit_values.index(digit) + 1
+
     # Convert GeoDataFrame to a dictionary if needed
     if isinstance(geometry, gpd.GeoDataFrame):
         geometry_dict = _convert_geodataframe_to_esri_format(geometry)[0]
@@ -14609,38 +14618,44 @@ def get_wbd(
         geometry_dict = geometry
     elif isinstance(geometry, str):
         geometry_dict = geometry
-    else:
+    elif searchText is None:
         raise ValueError(
             "Invalid geometry input. Must be a GeoDataFrame or a dictionary."
         )
-
-    # Convert geometry to a JSON string (required by the API)
-    if isinstance(geometry_dict, dict):
-        geometry_json = json.dumps(geometry_dict)
     else:
-        geometry_json = geometry_dict
+        geometry_dict = None
 
-    allowed_digit_values = [2, 4, 6, 8, 10, 12, 14, 16]
-    if digit not in allowed_digit_values:
-        raise ValueError(
-            f"Invalid digit value. Allowed values are {allowed_digit_values}"
-        )
+    if geometry_dict is not None:
+        # Convert geometry to a JSON string (required by the API)
+        if isinstance(geometry_dict, dict):
+            geometry_json = json.dumps(geometry_dict)
+        else:
+            geometry_json = geometry_dict
 
-    layer = allowed_digit_values.index(digit) + 1
-
-    # API URL for querying the WBD
-    url = f"https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/{layer}/query"
-
-    # Construct the query parameters
-    params = {
-        "geometry": geometry_json,
-        "geometryType": geometry_type,
-        "inSR": inSR,
-        "spatialRel": spatialRel,
-        "outFields": outFields,
-        "returnGeometry": str(return_geometry).lower(),
-        "f": "json",
-    }
+        # Construct the query parameters
+        params = {
+            "geometry": geometry_json,
+            "geometryType": geometry_type,
+            "inSR": inSR,
+            "spatialRel": spatialRel,
+            "outFields": outFields,
+            "returnGeometry": str(return_geometry).lower(),
+            "f": "json",
+        }
+        # API URL for querying the WBD
+        url = f"https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/{layer}/query"
+    else:
+        # Construct the query parameters
+        params = {
+            "searchText": searchText,
+            "contains": "true",
+            "layers": str(layer),
+            "inSR": inSR,
+            "outFields": outFields,
+            "returnGeometry": str(return_geometry).lower(),
+            "f": "json",
+        }
+        url = f"https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/find"
 
     # Add additional keyword arguments
     for key, value in kwargs.items():
@@ -14654,8 +14669,13 @@ def get_wbd(
 
     data = response.json()
 
-    # Extract features from the API response
-    features = data.get("features", [])
+    if geometry_dict is not None:
+        # Extract features from the API response
+        features = data.get("features", [])
+        crs = f"EPSG:{data['spatialReference']['latestWkid']}"
+    else:
+        features = data.get("results", [])
+        crs = f"EPSG:{data['results'][0]['geometry']['spatialReference']['latestWkid']}"
 
     # Prepare attribute data and geometries
     attributes = [feature["attributes"] for feature in features]
@@ -14678,7 +14698,7 @@ def get_wbd(
         gdf = gpd.GeoDataFrame(
             df,
             geometry=geometries,
-            crs=f"EPSG:{data['spatialReference']['latestWkid']}",
+            crs=crs,
         )
         if outSR != "3857":
             gdf = gdf.to_crs(outSR)
