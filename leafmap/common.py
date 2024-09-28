@@ -14303,7 +14303,7 @@ def construct_bbox(
         return geometry
 
 
-def get_nhd(
+def get_nhd_wbd(
     geometry: Union[
         "gpd.GeoDataFrame", str, List[float], Tuple[float, float, float, float]
     ],
@@ -14364,6 +14364,53 @@ def get_nhd(
     return gdf
 
 
+def _convert_geometry_to_esri_format(geometry):
+    """
+    Convert shapely geometry to ESRI's format for point, polygon, polyline, or multipoint.
+
+    Args:
+        geometry (shapely.geometry.base.BaseGeometry): The shapely geometry to convert.
+
+    Returns:
+        dict: The geometry in ESRI format.
+    """
+    from shapely.geometry import Point, Polygon, LineString, MultiPoint
+
+    if isinstance(geometry, Point):
+        # Convert point to ESRI format
+        return {"x": geometry.x, "y": geometry.y}
+    elif isinstance(geometry, Polygon):
+        # Convert polygon to ESRI format (rings)
+        return {"rings": [list(geometry.exterior.coords)]}
+    elif isinstance(geometry, LineString):
+        # Convert polyline to ESRI format (paths)
+        return {"paths": [list(geometry.coords)]}
+    elif isinstance(geometry, MultiPoint):
+        # Convert multipoint to ESRI format (points)
+        return {"points": [list(point.coords[0]) for point in geometry.geoms]}
+    else:
+        raise ValueError(f"Unsupported geometry type: {type(geometry)}")
+
+
+def _convert_geodataframe_to_esri_format(gdf: "gpd.GeoDataFrame"):
+    """
+    Convert all geometries in a GeoDataFrame to ESRI's format.
+
+    Args:
+        gdf (geopandas.GeoDataFrame): A GeoDataFrame containing geometries.
+
+    Returns:
+        list of dict: A list of geometries in ESRI format.
+    """
+    esri_geometries = []
+
+    for geom in gdf.geometry:
+        esri_format = _convert_geometry_to_esri_format(geom)
+        esri_geometries.append(esri_format)
+
+    return esri_geometries
+
+
 def get_nwi(
     geometry: Dict[str, Any],
     inSR: str = "4326",
@@ -14398,13 +14445,7 @@ def get_nwi(
 
     def detect_geometry_type(geometry):
         """
-        Automatically detect the geometry type based on the keys in the geometry dictionary.
-
-        Args:
-            geometry (dict): The geometry data (e.g., point, polygon, polyline, multipoint, etc.).
-
-        Returns:
-            str: The detected geometry type (e.g., "esriGeometryPoint", "esriGeometryPolygon").
+        Automatically detect the geometry type based on the structure of the geometry dictionary.
         """
         if "x" in geometry and "y" in geometry:
             return "esriGeometryPoint"
@@ -14422,16 +14463,29 @@ def get_nwi(
         elif "points" in geometry:
             return "esriGeometryMultipoint"
         else:
-            raise ValueError("Unsupported geometry type or invalid geometry structure")
+            raise ValueError("Unsupported geometry type or invalid geometry structure.")
 
-    # Automatically detect the geometry type based on the structure of the geometry
-    geometry_type = detect_geometry_type(geometry)
-
-    # API URL for querying wetlands
-    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer/0/query"
+    # Convert GeoDataFrame to a dictionary if needed
+    if isinstance(geometry, gpd.GeoDataFrame):
+        geometry_dict = _convert_geodataframe_to_esri_format(geometry)[0]
+        geometry_type = detect_geometry_type(geometry_dict)
+    elif isinstance(geometry, dict):
+        geometry_type = detect_geometry_type(geometry)
+        geometry_dict = geometry
+    elif isinstance(geometry, str):
+        geometry_dict = geometry
+    else:
+        raise ValueError(
+            "Invalid geometry input. Must be a GeoDataFrame or a dictionary."
+        )
 
     # Convert geometry to a JSON string (required by the API)
-    geometry_json = json.dumps(geometry)
+    if isinstance(geometry_dict, dict):
+        geometry_json = json.dumps(geometry_dict)
+    else:
+        geometry_json = geometry_dict
+    # API URL for querying wetlands
+    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer/0/query"
 
     # Construct the query parameters
     params = {
@@ -14474,6 +14528,153 @@ def get_nwi(
     if return_geometry:
         geometries = [Polygon(feature["geometry"]["rings"][0]) for feature in features]
         # Create a GeoDataFrame by combining the attributes and geometries
+        gdf = gpd.GeoDataFrame(
+            df,
+            geometry=geometries,
+            crs=f"EPSG:{data['spatialReference']['latestWkid']}",
+        )
+        if outSR != "3857":
+            gdf = gdf.to_crs(outSR)
+
+        if output is not None:
+            gdf.to_file(output)
+
+        return gdf
+    else:
+        return df
+
+
+def get_wbd(
+    geometry: Union["gpd.GeoDataFrame", Dict[str, Any]],
+    inSR: str = "4326",
+    outSR: str = "3857",
+    digit: int = 8,
+    spatialRel: str = "esriSpatialRelIntersects",
+    return_geometry: bool = True,
+    outFields: str = "*",
+    output: Optional[str] = None,
+    **kwargs: Any,
+) -> Union["gpd.GeoDataFrame", "pd.DataFrame", Dict[str, str]]:
+    """
+    Query the WBD (Watershed Boundary Dataset) API using various geometry types or a GeoDataFrame.
+    https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer
+
+    Args:
+        geometry (Union[gpd.GeoDataFrame, Dict]): The geometry data (GeoDataFrame or geometry dict).
+        inSR (str): The input spatial reference (default is EPSG:4326).
+        outSR (str): The output spatial reference (default is EPSG:3857).
+        digit (int): The digit code for the WBD layer (default is 8).
+        spatialRel (str): The spatial relationship (default is "esriSpatialRelIntersects").
+        return_geometry (bool): Whether to return the geometry (default is True).
+        outFields (str): The fields to be returned (default is "*").
+        output (Optional[str]): The output file path to save the GeoDataFrame (default is None).
+        **kwargs: Additional keyword arguments to pass to the API.
+
+    Returns:
+        gpd.GeoDataFrame or pd.DataFrame: The queried WBD data as a GeoDataFrame or DataFrame.
+    """
+
+    import geopandas as gpd
+    import pandas as pd
+    from shapely.geometry import Polygon
+
+    def detect_geometry_type(geometry):
+        """
+        Automatically detect the geometry type based on the structure of the geometry dictionary.
+        """
+        if "x" in geometry and "y" in geometry:
+            return "esriGeometryPoint"
+        elif (
+            "xmin" in geometry
+            and "ymin" in geometry
+            and "xmax" in geometry
+            and "ymax" in geometry
+        ):
+            return "esriGeometryEnvelope"
+        elif "rings" in geometry:
+            return "esriGeometryPolygon"
+        elif "paths" in geometry:
+            return "esriGeometryPolyline"
+        elif "points" in geometry:
+            return "esriGeometryMultipoint"
+        else:
+            raise ValueError("Unsupported geometry type or invalid geometry structure.")
+
+    # Convert GeoDataFrame to a dictionary if needed
+    if isinstance(geometry, gpd.GeoDataFrame):
+        geometry_dict = _convert_geodataframe_to_esri_format(geometry)[0]
+        geometry_type = detect_geometry_type(geometry_dict)
+    elif isinstance(geometry, dict):
+        geometry_type = detect_geometry_type(geometry)
+        geometry_dict = geometry
+    elif isinstance(geometry, str):
+        geometry_dict = geometry
+    else:
+        raise ValueError(
+            "Invalid geometry input. Must be a GeoDataFrame or a dictionary."
+        )
+
+    # Convert geometry to a JSON string (required by the API)
+    if isinstance(geometry_dict, dict):
+        geometry_json = json.dumps(geometry_dict)
+    else:
+        geometry_json = geometry_dict
+
+    allowed_digit_values = [2, 4, 6, 8, 10, 12, 14, 16]
+    if digit not in allowed_digit_values:
+        raise ValueError(
+            f"Invalid digit value. Allowed values are {allowed_digit_values}"
+        )
+
+    layer = allowed_digit_values.index(digit) + 1
+
+    # API URL for querying the WBD
+    url = f"https://hydro.nationalmap.gov/arcgis/rest/services/wbd/MapServer/{layer}/query"
+
+    # Construct the query parameters
+    params = {
+        "geometry": geometry_json,
+        "geometryType": geometry_type,
+        "inSR": inSR,
+        "spatialRel": spatialRel,
+        "outFields": outFields,
+        "returnGeometry": str(return_geometry).lower(),
+        "f": "json",
+    }
+
+    # Add additional keyword arguments
+    for key, value in kwargs.items():
+        params[key] = value
+
+    # Make the GET request
+    response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        return {"error": f"Request failed with status code {response.status_code}"}
+
+    data = response.json()
+
+    # Extract features from the API response
+    features = data.get("features", [])
+
+    # Prepare attribute data and geometries
+    attributes = [feature["attributes"] for feature in features]
+    df = pd.DataFrame(attributes)
+    df.rename(
+        columns={"Shape__Length": "Shape_Length", "Shape__Area": "Shape_Area"},
+        inplace=True,
+    )
+
+    # Handle geometries
+    if return_geometry:
+        geometries = [
+            (
+                Polygon(feature["geometry"]["rings"][0])
+                if "rings" in feature["geometry"]
+                else None
+            )
+            for feature in features
+        ]
         gdf = gpd.GeoDataFrame(
             df,
             geometry=geometries,
