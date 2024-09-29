@@ -1449,6 +1449,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.common.find_max_value_coords" class="md-nav__link">
+    <span class="md-ellipsis">
+      find_max_value_coords()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.common.gdb_layer_names" class="md-nav__link">
     <span class="md-ellipsis">
       gdb_layer_names()
@@ -8565,6 +8574,15 @@
   <a href="#leafmap.common.find_files" class="md-nav__link">
     <span class="md-ellipsis">
       find_files()
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.common.find_max_value_coords" class="md-nav__link">
+    <span class="md-ellipsis">
+      find_max_value_coords()
     </span>
   </a>
   
@@ -21219,6 +21237,122 @@ leafmap.download_files(urls, out_dir="models", multi_part=True)</p>
 
     <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">files</span>
+</code></pre></div>
+        </details>
+    </div>
+
+  </div>
+
+
+
+  <div class="doc doc-object doc-function">
+
+
+
+<h2 id="leafmap.common.find_max_value_coords" class="doc doc-heading">
+<code class="highlight language-python"><span class="n">find_max_value_coords</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">band_dix</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dst_crs</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+
+
+<a href="#leafmap.common.find_max_value_coords" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents ">
+
+      <p>Find the coordinates of the pixel with the maximum value in a GeoTIFF file.</p>
+
+<p><strong>Parameters:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Default</th>
+    </tr>
+  </thead>
+  <tbody>
+      <tr>
+        <td><code>geotiff_file</code></td>
+        <td><code>str</code></td>
+        <td><p>Path to the GeoTIFF file.</p></td>
+        <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>band_dix</code></td>
+        <td><code>int</code></td>
+        <td><p>The band index (default is 1).</p></td>
+        <td><code>1</code></td>
+      </tr>
+      <tr>
+        <td><code>dst_crs</code></td>
+        <td><code>str</code></td>
+        <td><p>The destination CRS in EPSG format (e.g., "EPSG:4326").
+                     If None, returns the original x, y coordinates.</p></td>
+        <td><code>None</code></td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Returns:</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>tuple</code></td>
+      <td><p>x, y coordinates of the pixel with the maximum value, and the maximum value.
+       If dst_crs is provided, returns the reprojected coordinates.</p></td>
+    </tr>
+  </tbody>
+</table>
+        <details class="quote">
+          <summary>Source code in <code>leafmap/common.py</code></summary>
+          <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">find_max_value_coords</span><span class="p">(</span>
+    <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">band_dix</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the coordinates of the pixel with the maximum value in a GeoTIFF file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        geotiff_file (str): Path to the GeoTIFF file.</span>
+<span class="sd">        band_dix (int, optional): The band index (default is 1).</span>
+<span class="sd">        dst_crs (str, optional): The destination CRS in EPSG format (e.g., &quot;EPSG:4326&quot;).</span>
+<span class="sd">                                 If None, returns the original x, y coordinates.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: x, y coordinates of the pixel with the maximum value, and the maximum value.</span>
+<span class="sd">               If dst_crs is provided, returns the reprojected coordinates.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">rasterio</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+    <span class="kn">from</span> <span class="nn">rasterio.transform</span> <span class="kn">import</span> <span class="n">xy</span>
+    <span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">Transformer</span>
+
+    <span class="c1"># Open the GeoTIFF file</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="c1"># Read the raster data (assuming band 1)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">band_dix</span><span class="p">)</span>
+
+        <span class="c1"># Find the index of the maximum value</span>
+        <span class="n">max_value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">max_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="c1"># Get the row and column of the pixel with the maximum value</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">max_index</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">col</span><span class="p">,</span> <span class="n">row</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row: </span><span class="si">{</span><span class="n">row</span><span class="si">}</span><span class="s2">, Column: </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the original coordinates (x, y) of the pixel</span>
+
+        <span class="c1"># If a destination CRS is provided, transform the coordinates</span>
+        <span class="k">if</span> <span class="n">dst_crs</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">xy</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span>
+            <span class="n">transformer</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">max_value</span>
 </code></pre></div>
         </details>
     </div>
