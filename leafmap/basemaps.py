@@ -92,12 +92,13 @@ else:  # If Google Maps API key is not detected, defaulting to Esri basemaps.
 # Custom WMS tile services.
 WMS_TILES = {
     "FWS NWI Wetlands": {
-        "url": "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/services/Wetlands/MapServer/WMSServer?",
+        "url": "https://www.fws.gov/wetlandsmapservice/services/Wetlands/MapServer/WMSServer?",
         "layers": "1",
         "name": "FWS NWI Wetlands",
         "attribution": "FWS",
         "format": "image/png",
         "transparent": True,
+        "max_zoom": 30,
     },
     "FWS NWI Wetlands Raster": {
         "url": "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/services/WetlandsRaster/ImageServer/WMSServer?",
