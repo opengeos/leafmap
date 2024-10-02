@@ -9824,7 +9824,7 @@ def get_nhd_basins(
 def get_3dep_dem(
     geometry,
     resolution=30,
-    src_crs="EPSG:4326",
+    src_crs=None,
     output=None,
     dst_crs="EPSG:5070",
     to_cog=False,
@@ -9852,6 +9852,7 @@ def get_3dep_dem(
     except ImportError:
         print("py3dep is not installed. Installing py3dep...")
         install_package("py3dep")
+        import py3dep
 
     import geopandas as gpd
 
@@ -9860,7 +9861,12 @@ def get_3dep_dem(
         return
 
     if isinstance(geometry, gpd.GeoDataFrame):
+        if src_crs is None:
+            src_crs = geometry.crs
         geometry = geometry.geometry.unary_union
+
+    if src_crs is None:
+        src_crs = "EPSG:4326"
 
     dem = py3dep.get_dem(geometry, resolution=resolution, crs=src_crs)
     dem = dem.rio.reproject(dst_crs)
@@ -9871,7 +9877,10 @@ def get_3dep_dem(
         dem.rio.to_raster(output, **kwargs)
 
         if to_cog:
-            image_to_cog(output, output)
+            try:
+                image_to_cog(output, output)
+            except Exception as e:
+                print(e)
 
     return dem
 
@@ -9951,7 +9960,7 @@ def coords_to_vector(coords, output=None, crs="EPSG:4326", **kwargs):
     import geopandas as gpd
     from shapely.geometry import Point
 
-    if not isinstance(coords, list):
+    if not isinstance(coords, (list, tuple)):
         raise TypeError("coords must be a list of coordinates")
 
     if isinstance(coords[0], int) or isinstance(coords[0], float):
