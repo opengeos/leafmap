@@ -410,11 +410,15 @@ Visualize ocean bathymetry in 3D.
 
 [![](https://i.imgur.com/m6NwSWG.png)](https://leafmap.org/maplibre/ocean_bathymetry)
 
+## Use OpenFreeMap vector tiles
+
+Use free vector tiles from OpenFreeMap.
+
+[![](https://github.com/user-attachments/assets/0a9c8cb8-2b7e-4ca5-ba7b-183b8b3f54a6)](https://leafmap.org/maplibre/openfreemap)
+
 ## Visualze Overture data
 
 Visualize Overture Maps data.
-
-[![](https://i.imgur.com/m6NwSWG.png)](https://leafmap.org/maplibre/ocean_bathymetry)
 
 [![](https://github.com/user-attachments/assets/e07986eb-cc5a-4f25-b7e0-bed480a415d3)](https://leafmap.org/maplibre/overture)
 
