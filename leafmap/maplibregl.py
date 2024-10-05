@@ -60,12 +60,12 @@ class Map(MapWidget):
                 counter-clockwise from north. Defaults to 0.
             style (str, optional): The style of the map. It can be a string or a URL.
                 If it is a string, it must be one of the following: "dark-matter",
-                "positron", "voyager", "positron-nolabels", "dark-matter-nolabels",
-                "voyager-nolabels", or "demotiles". If a MapTiler API key is set,
-                you can also use any of the MapTiler styles, such as aquarelle,
-                backdrop, basic, bright, dataviz, landscape, ocean, openstreetmap, outdoor,
-                satellite, streets, toner, topo, winter, etc. If it is a URL, it must point to
-                a MapLibre style JSON. Defaults to "dark-matter".
+                "carto-positron", "voyager", "positron-nolabels", "dark-matter-nolabels",
+                "voyager-nolabels", "demotiles", "liberty", "bright", or "positron".
+                If a MapTiler API key is set, you can also use any of the MapTiler styles,
+                such as aquarelle, backdrop, basic, bright, dataviz, landscape, ocean,
+                openstreetmap, outdoor, satellite, streets, toner, topo, winter, etc.
+                If it is a URL, it must point to a MapLibre style JSON. Defaults to "dark-matter".
             height (str, optional): The height of the map. Defaults to "600px".
             controls (dict, optional): The controls and their positions on the
                 map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.
@@ -78,11 +78,16 @@ class Map(MapWidget):
         """
         carto_basemaps = [
             "dark-matter",
-            "positron",
+            "carto-positron",
             "voyager",
             "positron-nolabels",
             "dark-matter-nolabels",
             "voyager-nolabels",
+        ]
+        openfreemap_basemaps = [
+            "liberty",
+            "bright",
+            "positron",
         ]
         if isinstance(style, str):
 
@@ -102,7 +107,11 @@ class Map(MapWidget):
                 )
 
             elif style.lower() in carto_basemaps:
+                if style.lower() == "carto-positron":
+                    style = "positron"
                 style = construct_carto_basemap_url(style.lower())
+            elif style.lower() in openfreemap_basemaps:
+                style = f"https://tiles.openfreemap.org/styles/{style.lower()}"
             elif style == "demotiles":
                 style = "https://demotiles.maplibre.org/style.json"
             elif "background-" in style:
