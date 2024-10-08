@@ -153,7 +153,7 @@ class Map(lonboard.Map):
                 kwargs["get_fill_color"] = [0, 0, 255, 128]
             layer = SolidPolygonLayer.from_geopandas(gdf, **kwargs)
 
-        self.layers = self.layers + [layer]
+        self.layers = self.layers + (layer,)
 
         if zoom_to_layer:
             try:
@@ -270,7 +270,7 @@ class Map(lonboard.Map):
             PolygonLayer,
             SolidPolygonLayer,
         ]:
-            self.layers = self.layers + [layer]
+            self.layers = self.layers + (layer,)
 
             if zoom_to_layer:
                 from lonboard._viewport import compute_view
