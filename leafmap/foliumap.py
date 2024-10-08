@@ -3121,6 +3121,7 @@ class Map(folium.Map):
     def add_nwi(
         self,
         data: Union[str, "gpd.GeoDataFrame"],
+        col_name: str = "WETLAND_TY",
         add_legend: bool = True,
         style_callback: Optional[Callable[[dict], dict]] = None,
         layer_name: str = "Wetlands",
@@ -3131,6 +3132,7 @@ class Map(folium.Map):
 
         Args:
             data (Union[str, gpd.GeoDataFrame]): The NWI data to add. It can be a file path or a GeoDataFrame.
+            col_name (str): The column name to use for styling. Defaults to "WETLAND_TY".
             add_legend (bool): Whether to add a legend to the map. Defaults to True.
             style_callback (Optional[Callable[[dict], dict]]): A callback function to style the features. Defaults to None.
             layer_name (str): The name of the layer to add. Defaults to "Wetlands".
@@ -3155,8 +3157,8 @@ class Map(folium.Map):
             return {
                 "color": "black",
                 "fillColor": (
-                    nwi[feature["properties"]["WETLAND_TY"]]
-                    if feature["properties"]["WETLAND_TY"] in nwi
+                    nwi[feature["properties"][col_name]]
+                    if feature["properties"][col_name] in nwi
                     else "gray"
                 ),
                 "fillOpacity": 0.6,
