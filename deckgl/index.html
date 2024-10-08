@@ -5588,7 +5588,7 @@ Map            (<span title="lonboard._map.Map">Map</span>)
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
             <span class="n">layer</span> <span class="o">=</span> <span class="n">SolidPolygonLayer</span><span class="o">.</span><span class="n">from_geopandas</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">(</span><span class="n">layer</span><span class="p">,)</span>
 
         <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -5705,7 +5705,7 @@ Map            (<span title="lonboard._map.Map">Map</span>)
             <span class="n">PolygonLayer</span><span class="p">,</span>
             <span class="n">SolidPolygonLayer</span><span class="p">,</span>
         <span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">(</span><span class="n">layer</span><span class="p">,)</span>
 
             <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
                 <span class="kn">from</span> <span class="nn">lonboard._viewport</span> <span class="kn">import</span> <span class="n">compute_view</span>
@@ -6434,7 +6434,7 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;get_fill_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">128</span><span class="p">]</span>
         <span class="n">layer</span> <span class="o">=</span> <span class="n">SolidPolygonLayer</span><span class="o">.</span><span class="n">from_geopandas</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">(</span><span class="n">layer</span><span class="p">,)</span>
 
     <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -6571,7 +6571,7 @@ under the hood. Supported are all schemes provided by mapclassify (e.g.
         <span class="n">PolygonLayer</span><span class="p">,</span>
         <span class="n">SolidPolygonLayer</span><span class="p">,</span>
     <span class="p">]:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">+</span> <span class="p">(</span><span class="n">layer</span><span class="p">,)</span>
 
         <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">lonboard._viewport</span> <span class="kn">import</span> <span class="n">compute_view</span>
