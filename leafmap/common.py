@@ -14254,7 +14254,7 @@ def get_overture_data(
     try:
         from overturemaps import core
     except ImportError:
-        install_package("overture")
+        install_package("overturemaps")
         from overturemaps import core
 
     gdf = core.geodataframe(overture_type, bbox=bbox)
