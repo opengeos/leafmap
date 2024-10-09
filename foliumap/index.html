@@ -10390,6 +10390,7 @@ Map            (<span title="folium.folium.Map">Map</span>)
     <span class="k">def</span> <span class="nf">add_nwi</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">],</span>
+        <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">,</span>
         <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">style_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Wetlands&quot;</span><span class="p">,</span>
@@ -10400,6 +10401,7 @@ Map            (<span title="folium.folium.Map">Map</span>)
 
 <span class="sd">        Args:</span>
 <span class="sd">            data (Union[str, gpd.GeoDataFrame]): The NWI data to add. It can be a file path or a GeoDataFrame.</span>
+<span class="sd">            col_name (str): The column name to use for styling. Defaults to &quot;WETLAND_TY&quot;.</span>
 <span class="sd">            add_legend (bool): Whether to add a legend to the map. Defaults to True.</span>
 <span class="sd">            style_callback (Optional[Callable[[dict], dict]]): A callback function to style the features. Defaults to None.</span>
 <span class="sd">            layer_name (str): The name of the layer to add. Defaults to &quot;Wetlands&quot;.</span>
@@ -10424,8 +10426,8 @@ Map            (<span title="folium.folium.Map">Map</span>)
             <span class="k">return</span> <span class="p">{</span>
                 <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="p">(</span>
-                    <span class="n">nwi</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]]</span>
-                    <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">nwi</span>
+                    <span class="n">nwi</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">col_name</span><span class="p">]]</span>
+                    <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">col_name</span><span class="p">]</span> <span class="ow">in</span> <span class="n">nwi</span>
                     <span class="k">else</span> <span class="s2">&quot;gray&quot;</span>
                 <span class="p">),</span>
                 <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
@@ -14026,7 +14028,7 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = f&#39;{os.environ[&#39;JUP
 
 
 <h3 id="leafmap.foliumap.Map.add_nwi" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">add_nwi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s1">&#39;Wetlands&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">add_nwi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">col_name</span><span class="o">=</span><span class="s1">&#39;WETLAND_TY&#39;</span><span class="p">,</span> <span class="n">add_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">style_callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s1">&#39;Wetlands&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.foliumap.Map.add_nwi" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -14051,6 +14053,12 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = f&#39;{os.environ[&#39;JUP
         <td><code>Union[str, gpd.GeoDataFrame]</code></td>
         <td><p>The NWI data to add. It can be a file path or a GeoDataFrame.</p></td>
         <td><em>required</em></td>
+      </tr>
+      <tr>
+        <td><code>col_name</code></td>
+        <td><code>str</code></td>
+        <td><p>The column name to use for styling. Defaults to "WETLAND_TY".</p></td>
+        <td><code>&#39;WETLAND_TY&#39;</code></td>
       </tr>
       <tr>
         <td><code>add_legend</code></td>
@@ -14098,6 +14106,7 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = f&#39;{os.environ[&#39;JUP
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">add_nwi</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">],</span>
+    <span class="n">col_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">,</span>
     <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">style_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Wetlands&quot;</span><span class="p">,</span>
@@ -14108,6 +14117,7 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = f&#39;{os.environ[&#39;JUP
 
 <span class="sd">    Args:</span>
 <span class="sd">        data (Union[str, gpd.GeoDataFrame]): The NWI data to add. It can be a file path or a GeoDataFrame.</span>
+<span class="sd">        col_name (str): The column name to use for styling. Defaults to &quot;WETLAND_TY&quot;.</span>
 <span class="sd">        add_legend (bool): Whether to add a legend to the map. Defaults to True.</span>
 <span class="sd">        style_callback (Optional[Callable[[dict], dict]]): A callback function to style the features. Defaults to None.</span>
 <span class="sd">        layer_name (str): The name of the layer to add. Defaults to &quot;Wetlands&quot;.</span>
@@ -14132,8 +14142,8 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = f&#39;{os.environ[&#39;JUP
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
             <span class="s2">&quot;fillColor&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">nwi</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]]</span>
-                <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="s2">&quot;WETLAND_TY&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">nwi</span>
+                <span class="n">nwi</span><span class="p">[</span><span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">col_name</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;properties&quot;</span><span class="p">][</span><span class="n">col_name</span><span class="p">]</span> <span class="ow">in</span> <span class="n">nwi</span>
                 <span class="k">else</span> <span class="s2">&quot;gray&quot;</span>
             <span class="p">),</span>
             <span class="s2">&quot;fillOpacity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
