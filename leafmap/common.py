@@ -9220,7 +9220,7 @@ def map_tiles_to_geotiff(
         **kwargs: Additional arguments to pass to gdal.GetDriverByName("GTiff").Create().
 
     """
-
+    import re
     import io
     import math
     import itertools
@@ -9325,7 +9325,18 @@ def map_tiles_to_geotiff(
 
     gdal.UseExceptions()
     web_mercator = osr.SpatialReference()
-    web_mercator.ImportFromEPSG(3857)
+    try:
+        web_mercator.ImportFromEPSG(3857)
+    except RuntimeError as e:
+        # https://github.com/PDAL/PDAL/issues/2544#issuecomment-637995923
+        if "PROJ" in str(e):
+            pattern = r"/[\w/]+"
+            match = re.search(pattern, str(e))
+            if match:
+                file_path = match.group(0)
+                os.environ["PROJ_LIB"] = file_path
+                os.environ["GDAL_DATA"] = file_path.replace("proj", "gdal")
+                web_mercator.ImportFromEPSG(3857)
 
     WKT_3857 = web_mercator.ExportToWkt()
 
