@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.39">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.40">
     
     
       
@@ -32914,7 +32914,7 @@ will be used. Defaults to None.</p></td>
 <span class="sd">        **kwargs: Additional arguments to pass to gdal.GetDriverByName(&quot;GTiff&quot;).Create().</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="kn">import</span> <span class="nn">re</span>
     <span class="kn">import</span> <span class="nn">io</span>
     <span class="kn">import</span> <span class="nn">math</span>
     <span class="kn">import</span> <span class="nn">itertools</span>
@@ -33019,7 +33019,18 @@ will be used. Defaults to None.</p></td>
 
     <span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
     <span class="n">web_mercator</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
-    <span class="n">web_mercator</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">web_mercator</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># https://github.com/PDAL/PDAL/issues/2544#issuecomment-637995923</span>
+        <span class="k">if</span> <span class="s2">&quot;PROJ&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;/[\w/]+&quot;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PROJ_LIB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_path</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GDAL_DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;proj&quot;</span><span class="p">,</span> <span class="s2">&quot;gdal&quot;</span><span class="p">)</span>
+                <span class="n">web_mercator</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
 
     <span class="n">WKT_3857</span> <span class="o">=</span> <span class="n">web_mercator</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">()</span>
 
@@ -33165,7 +33176,7 @@ will be used. Defaults to None.</p></td>
         <span class="n">gtiff</span><span class="o">.</span><span class="n">SetGeoTransform</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="n">xp0</span><span class="p">,</span> <span class="n">xp1</span><span class="p">),</span> <span class="n">pwidth</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">yp0</span><span class="p">,</span> <span class="n">yp1</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">pheight</span><span class="p">))</span>
         <span class="n">gtiff</span><span class="o">.</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">WKT_3857</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">imgbands</span><span class="p">):</span>
-            <span class="n">array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="n">band</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;u8&quot;</span><span class="p">)</span>
+            <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="n">band</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;u8&quot;</span><span class="p">)</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="n">band</span> <span class="o">=</span> <span class="n">gtiff</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">band</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">band</span><span class="o">.</span><span class="n">WriteArray</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
@@ -44231,7 +44242,7 @@ to uncompressed data.</p></td>
 <span class="sd">        **kwargs: Additional arguments to pass to gdal.GetDriverByName(&quot;GTiff&quot;).Create().</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="kn">import</span> <span class="nn">re</span>
     <span class="kn">import</span> <span class="nn">io</span>
     <span class="kn">import</span> <span class="nn">math</span>
     <span class="kn">import</span> <span class="nn">itertools</span>
@@ -44336,7 +44347,18 @@ to uncompressed data.</p></td>
 
     <span class="n">gdal</span><span class="o">.</span><span class="n">UseExceptions</span><span class="p">()</span>
     <span class="n">web_mercator</span> <span class="o">=</span> <span class="n">osr</span><span class="o">.</span><span class="n">SpatialReference</span><span class="p">()</span>
-    <span class="n">web_mercator</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">web_mercator</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># https://github.com/PDAL/PDAL/issues/2544#issuecomment-637995923</span>
+        <span class="k">if</span> <span class="s2">&quot;PROJ&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;/[\w/]+&quot;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PROJ_LIB&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_path</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;GDAL_DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;proj&quot;</span><span class="p">,</span> <span class="s2">&quot;gdal&quot;</span><span class="p">)</span>
+                <span class="n">web_mercator</span><span class="o">.</span><span class="n">ImportFromEPSG</span><span class="p">(</span><span class="mi">3857</span><span class="p">)</span>
 
     <span class="n">WKT_3857</span> <span class="o">=</span> <span class="n">web_mercator</span><span class="o">.</span><span class="n">ExportToWkt</span><span class="p">()</span>
 
@@ -44482,7 +44504,7 @@ to uncompressed data.</p></td>
         <span class="n">gtiff</span><span class="o">.</span><span class="n">SetGeoTransform</span><span class="p">((</span><span class="nb">min</span><span class="p">(</span><span class="n">xp0</span><span class="p">,</span> <span class="n">xp1</span><span class="p">),</span> <span class="n">pwidth</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">yp0</span><span class="p">,</span> <span class="n">yp1</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">pheight</span><span class="p">))</span>
         <span class="n">gtiff</span><span class="o">.</span><span class="n">SetProjection</span><span class="p">(</span><span class="n">WKT_3857</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">imgbands</span><span class="p">):</span>
-            <span class="n">array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="n">band</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;u8&quot;</span><span class="p">)</span>
+            <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">getdata</span><span class="p">(</span><span class="n">band</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;u8&quot;</span><span class="p">)</span>
             <span class="n">array</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="n">band</span> <span class="o">=</span> <span class="n">gtiff</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">band</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">band</span><span class="o">.</span><span class="n">WriteArray</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
