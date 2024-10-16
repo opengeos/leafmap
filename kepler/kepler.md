@@ -1,3 +1,0 @@
-# kepler module
-
-::: leafmap.kepler

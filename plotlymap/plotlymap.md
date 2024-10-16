@@ -1,3 +1,0 @@
-# plotlymap module
-
-::: leafmap.plotlymap

@@ -1,3 +1,0 @@
-# stac module
-
-::: leafmap.stac

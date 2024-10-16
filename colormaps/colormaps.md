@@ -1,3 +1,0 @@
-# colormaps module
-
-::: leafmap.colormaps

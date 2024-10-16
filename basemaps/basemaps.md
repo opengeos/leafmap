@@ -1,3 +1,0 @@
-# basemaps module
-
-::: leafmap.basemaps

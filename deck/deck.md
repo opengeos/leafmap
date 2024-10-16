@@ -1,3 +1,0 @@
-# pydeck module
-
-::: leafmap.deck

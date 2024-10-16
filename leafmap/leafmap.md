@@ -1,4 +1,0 @@
-
-# leafmap module
-
-::: leafmap.leafmap

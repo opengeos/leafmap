@@ -1,3 +1,0 @@
-# deckgl module
-
-::: leafmap.deckgl

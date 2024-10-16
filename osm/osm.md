@@ -1,3 +1,0 @@
-# osm module
-
-::: leafmap.osm
