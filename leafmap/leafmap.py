@@ -2537,6 +2537,7 @@ class Map(ipyleaflet.Map):
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = False,
         encoding: Optional[str] = "utf-8",
+        **kwargs,
     ) -> None:
         """Adds a shapefile to the map.
 
@@ -2555,30 +2556,11 @@ class Map(ipyleaflet.Map):
             FileNotFoundError: The provided shapefile could not be found.
         """
 
-        import glob
+        import geopandas as gpd
 
-        if in_shp.startswith("http") and in_shp.endswith(".zip"):
-            out_dir = os.path.dirname(temp_file_path(".shp"))
-            if not os.path.exists(out_dir):
-                os.makedirs(out_dir)
-            basename = os.path.basename(in_shp)
-            filename = os.path.join(out_dir, basename)
-            download_file(in_shp, filename)
-            files = list(glob.glob(os.path.join(out_dir, "*.shp")))
-            if len(files) > 0:
-                in_shp = files[0]
-            else:
-                raise FileNotFoundError(
-                    "The downloaded zip file does not contain any shapefile in the root directory."
-                )
-        else:
-            in_shp = os.path.abspath(in_shp)
-            if not os.path.exists(in_shp):
-                raise FileNotFoundError("The provided shapefile could not be found.")
-
-        geojson = shp_to_geojson(in_shp, encoding=encoding)
-        self.add_geojson(
-            geojson,
+        gdf = gpd.read_file(in_shp, encoding=encoding)
+        self.add_gdf(
+            gdf,
             layer_name,
             style,
             hover_style,
@@ -2587,6 +2569,7 @@ class Map(ipyleaflet.Map):
             info_mode,
             zoom_to_layer,
             encoding,
+            **kwargs,
         )
 
     def add_geojson(
@@ -2630,12 +2613,9 @@ class Map(ipyleaflet.Map):
         """
         import json
         import random
-        import requests
+        import geopandas as gpd
 
-        # style_callback_only = False
-
-        # if fill_colors is not None:
-        #     style_callback_only = True
+        gdf = None
 
         try:
             if isinstance(in_geojson, str):
@@ -2652,25 +2632,30 @@ class Map(ipyleaflet.Map):
                         with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
-                        in_geojson = github_raw_url(in_geojson)
-                        data = requests.get(in_geojson).json()
-                else:
-                    in_geojson = os.path.abspath(in_geojson)
-                    if not os.path.exists(in_geojson):
-                        raise FileNotFoundError(
-                            "The provided GeoJSON file could not be found."
-                        )
+                        gdf = gpd.read_file(in_geojson, encoding=encoding)
 
-                    with open(in_geojson, encoding=encoding) as f:
-                        data = json.load(f)
+                else:
+                    gdf = gpd.read_file(in_geojson, encoding=encoding)
+
             elif isinstance(in_geojson, dict):
-                data = in_geojson
+                gdf = gpd.GeoDataFrame.from_features(in_geojson)
+            elif isinstance(in_geojson, gpd.GeoDataFrame):
+                gdf = in_geojson
             else:
                 raise TypeError("The input geojson must be a type of str or dict.")
         except Exception as e:
             raise Exception(e)
 
-        geom_type = get_geometry_type(data)
+        if gdf.crs is None:
+            print(
+                f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326."
+            )
+            gdf.crs = "EPSG:4326"
+        elif gdf.crs != "EPSG:4326":
+            gdf = gdf.to_crs("EPSG:4326")
+        data = gdf.__geo_interface__
+
+        geom_type = gdf.geom_type[0]
 
         if style is None and (style_callback is None):
             style = {
@@ -2818,17 +2803,8 @@ class Map(ipyleaflet.Map):
 
         if zoom_to_layer:
             try:
-                import numpy as np
-                import geopandas as gpd
-
-                gdf = gpd.GeoDataFrame.from_features(data)
-                if gdf.crs is None:
-                    gdf.crs = "EPSG:4326"
-                bounds = gdf.to_crs(epsg="4326").bounds
-                west = np.min(bounds["minx"])
-                south = np.min(bounds["miny"])
-                east = np.max(bounds["maxx"])
-                north = np.max(bounds["maxy"])
+                bounds = gdf.total_bounds
+                west, south, east, north = bounds
                 self.fit_bounds([[south, east], [north, west]])
             except Exception as e:
                 print(e)
@@ -2903,10 +2879,8 @@ class Map(ipyleaflet.Map):
             except:
                 pass
 
-        data = gdf_to_geojson(gdf, epsg="4326")
-
         self.add_geojson(
-            data,
+            gdf,
             layer_name,
             style,
             hover_style,
@@ -2917,16 +2891,6 @@ class Map(ipyleaflet.Map):
             encoding,
             **kwargs,
         )
-
-        if zoom_to_layer:
-            import numpy as np
-
-            bounds = gdf.to_crs(epsg="4326").bounds
-            west = np.min(bounds["minx"])
-            south = np.min(bounds["miny"])
-            east = np.max(bounds["maxx"])
-            north = np.max(bounds["maxy"])
-            self.fit_bounds([[south, east], [north, west]])
 
     def add_gdf_from_postgis(
         self,
@@ -2976,6 +2940,7 @@ class Map(ipyleaflet.Map):
         style_callback: Optional[Callable] = None,
         fill_colors: Optional[list[str]] = None,
         info_mode: Optional[str] = "on_hover",
+        **kwargs,
     ) -> None:
         """Adds a KML file to the map.
 
@@ -3018,6 +2983,7 @@ class Map(ipyleaflet.Map):
             style_callback=style_callback,
             fill_colors=fill_colors,
             info_mode=info_mode,
+            **kwargs,
         )
 
     def add_vector(
@@ -3068,55 +3034,29 @@ class Map(ipyleaflet.Map):
             encoding (str, optional): The encoding to use to read the file. Defaults to "utf-8".
 
         """
-        if not filename.startswith("http"):
-            filename = os.path.abspath(filename)
-        else:
-            filename = github_raw_url(filename)
-        ext = os.path.splitext(filename)[1].lower()
-        if ext == ".shp":
-            self.add_shp(
-                filename,
-                layer_name,
-                style,
-                hover_style,
-                style_callback,
-                fill_colors,
-                info_mode,
-                encoding,
-            )
-        elif ext in [".json", ".geojson"]:
-            self.add_geojson(
-                filename,
-                layer_name,
-                style,
-                hover_style,
-                style_callback,
-                fill_colors,
-                info_mode,
-                zoom_to_layer,
-                encoding,
-            )
-        else:
-            geojson = vector_to_geojson(
-                filename,
-                bbox=bbox,
-                mask=mask,
-                rows=rows,
-                epsg="4326",
-                **kwargs,
-            )
+        import fiona
+        import geopandas as gpd
 
-            self.add_geojson(
-                geojson,
-                layer_name,
-                style,
-                hover_style,
-                style_callback,
-                fill_colors,
-                info_mode,
-                zoom_to_layer,
-                encoding,
-            )
+        if isinstance(filename, str) and filename.endswith(".kml"):
+            fiona.drvsupport.supported_drivers["KML"] = "rw"
+            kwargs["driver"] = "KML"
+
+        gdf = gpd.read_file(
+            filename, bbox=bbox, mask=mask, rows=rows, encoding=encoding, **kwargs
+        )
+
+        self.add_gdf(
+            gdf,
+            layer_name,
+            style,
+            hover_style,
+            style_callback,
+            fill_colors,
+            info_mode,
+            zoom_to_layer,
+            encoding,
+            **kwargs,
+        )
 
     def add_xy_data(
         self,
