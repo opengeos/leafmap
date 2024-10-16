@@ -1357,35 +1357,14 @@ class Map(folium.Map):
         Raises:
             FileNotFoundError: The provided shapefile could not be found.
         """
-        import glob
+        import geopandas as gpd
 
-        if in_shp.startswith("http") and in_shp.endswith(".zip"):
-            out_dir = os.path.abspath("./cache/shp")
-            if not os.path.exists(out_dir):
-                os.makedirs(out_dir)
-            basename = os.path.basename(in_shp)
-            filename = os.path.join(out_dir, basename)
-            # download_from_url(in_shp, out_dir=out_dir, verbose=False)
-            download_file(in_shp, filename)
-            files = list(glob.glob(os.path.join(out_dir, "*.shp")))
-            if len(files) > 0:
-                in_shp = files[0]
-            else:
-                raise FileNotFoundError(
-                    "The downloaded zip file does not contain any shapefile in the root directory."
-                )
-        else:
-            in_shp = os.path.abspath(in_shp)
-            if not os.path.exists(in_shp):
-                raise FileNotFoundError("The provided shapefile could not be found.")
-
-        data = shp_to_geojson(in_shp)
-
-        self.add_geojson(
-            data,
-            layer_name=layer_name,
-            info_mode=info_mode,
-            zoom_to_layer=zoom_to_layer,
+        gdf = gpd.read_file(in_shp)
+        self.add_gdf(
+            gdf,
+            layer_name,
+            zoom_to_layer,
+            info_mode,
             **kwargs,
         )
 
@@ -1412,8 +1391,10 @@ class Map(folium.Map):
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
         import json
-        import requests
         import random
+        import geopandas as gpd
+
+        gdf = None
 
         try:
             if isinstance(in_geojson, str):
@@ -1430,23 +1411,28 @@ class Map(folium.Map):
                         with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
-                        in_geojson = github_raw_url(in_geojson)
-                        data = requests.get(in_geojson).json()
-                else:
-                    in_geojson = os.path.abspath(in_geojson)
-                    if not os.path.exists(in_geojson):
-                        raise FileNotFoundError(
-                            "The provided GeoJSON file could not be found."
-                        )
+                        gdf = gpd.read_file(in_geojson, encoding=encoding)
 
-                    with open(in_geojson, encoding=encoding) as f:
-                        data = json.load(f)
+                else:
+                    gdf = gpd.read_file(in_geojson, encoding=encoding)
+
             elif isinstance(in_geojson, dict):
-                data = in_geojson
+                gdf = gpd.GeoDataFrame.from_features(in_geojson)
+            elif isinstance(in_geojson, gpd.GeoDataFrame):
+                gdf = in_geojson
             else:
                 raise TypeError("The input geojson must be a type of str or dict.")
         except Exception as e:
             raise Exception(e)
+
+        if gdf.crs is None:
+            print(
+                f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326."
+            )
+            gdf.crs = "EPSG:4326"
+        elif gdf.crs != "EPSG:4326":
+            gdf = gdf.to_crs("EPSG:4326")
+        data = gdf.__geo_interface__
 
         # interchangeable parameters between ipyleaflet and folium.
 
@@ -1515,7 +1501,7 @@ class Map(folium.Map):
         geojson.add_to(self)
 
         if zoom_to_layer:
-            bounds = get_bounds(data)
+            bounds = bounds = gdf.total_bounds
             self.zoom_to_bounds(bounds)
 
     def add_gdf(
@@ -1540,25 +1526,13 @@ class Map(folium.Map):
             if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
                 gdf[col] = gdf[col].astype(str)
 
-        data = gdf_to_geojson(gdf, epsg="4326")
-
         self.add_geojson(
-            data,
+            gdf,
             layer_name=layer_name,
             info_mode=info_mode,
             zoom_to_layer=zoom_to_layer,
             **kwargs,
         )
-
-        # if zoom_to_layer:
-        #     import numpy as np
-
-        #     bounds = gdf.to_crs(epsg="4326").bounds
-        #     west = np.min(bounds["minx"])
-        #     south = np.min(bounds["miny"])
-        #     east = np.max(bounds["maxx"])
-        #     north = np.max(bounds["maxy"])
-        #     self.fit_bounds([[south, east], [north, west]])
 
     def add_gdf_from_postgis(
         self,
@@ -1626,9 +1600,7 @@ class Map(folium.Map):
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The provided KML could not be found.")
 
-        data = kml_to_geojson(in_kml)
-
-        self.add_geojson(data, layer_name=layer_name, info_mode=info_mode, **kwargs)
+        self.add_vector(in_kml, layer_name, info_mode=info_mode, **kwargs)
 
     def add_vector(
         self,
@@ -1653,31 +1625,33 @@ class Map(folium.Map):
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to True.
 
         """
-        if not filename.startswith("http"):
-            filename = os.path.abspath(filename)
+        import fiona
+        import geopandas as gpd
 
-        ext = os.path.splitext(filename)[1].lower()
-        if ext == ".shp":
-            self.add_shp(filename, layer_name, **kwargs)
-        elif ext in [".json", ".geojson"]:
-            self.add_geojson(filename, layer_name, **kwargs)
-        else:
-            geojson = vector_to_geojson(
+        if isinstance(filename, str) and filename.endswith(".kml"):
+            fiona.drvsupport.supported_drivers["KML"] = "rw"
+            gdf = gpd.read_file(
                 filename,
                 bbox=bbox,
                 mask=mask,
                 rows=rows,
-                epsg="4326",
-                **kwargs,
+                driver="KML",
+            )
+        else:
+            gdf = gpd.read_file(
+                filename,
+                bbox=bbox,
+                mask=mask,
+                rows=rows,
             )
 
-            self.add_geojson(
-                geojson,
-                layer_name,
-                info_mode=info_mode,
-                zoom_to_layer=zoom_to_layer,
-                **kwargs,
-            )
+        self.add_gdf(
+            gdf,
+            layer_name,
+            zoom_to_layer,
+            info_mode,
+            **kwargs,
+        )
 
     def add_planet_by_month(
         self,
