@@ -1440,7 +1440,7 @@ class Map(folium.Map):
             kwargs["style_function"] = kwargs.pop("style_callback")
 
         style_dict = {}
-        if "style_function" not in kwargs:
+        if "style_function" not in kwargs and ("style" not in gdf.columns):
             if "style" in kwargs:
                 style_dict = kwargs["style"]
                 if isinstance(kwargs["style"], dict) and len(kwargs["style"]) > 0:
@@ -1476,7 +1476,7 @@ class Map(folium.Map):
         if "weight" not in style_dict:
             style_dict["weight"] = 2
 
-        if "highlight_function" not in kwargs:
+        if "highlight_function" not in kwargs and ("style" not in gdf.columns):
             kwargs["highlight_function"] = lambda feat: {
                 "weight": style_dict["weight"] + 2,
                 "fillOpacity": 0,
@@ -1490,6 +1490,8 @@ class Map(folium.Map):
                 kwargs.pop("fields")
             else:
                 props = list(data["features"][0]["properties"].keys())
+                if "style" in gdf.columns:
+                    props.remove("style")
             if info_mode == "on_hover":
                 tooltip = folium.GeoJsonTooltip(fields=props)
             elif info_mode == "on_click":
