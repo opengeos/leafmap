@@ -2655,6 +2655,18 @@ class Map(ipyleaflet.Map):
             gdf = gdf.to_crs("EPSG:4326")
         data = gdf.__geo_interface__
 
+        try:
+            first_feature = data["features"][0]
+            if isinstance(first_feature["properties"].get("style"), str):
+                # Loop through the features and update the style
+                for feature in data["features"]:
+                    fstyle = feature["properties"].get("style")
+                    if isinstance(fstyle, str):
+                        feature["properties"]["style"] = json.loads(fstyle)
+        except Exception as e:
+            print(e)
+            pass
+
         geom_type = gdf.geom_type[0]
 
         if style is None and (style_callback is None):
