@@ -2667,7 +2667,7 @@ class Map(ipyleaflet.Map):
             print(e)
             pass
 
-        geom_type = gdf.geom_type[0]
+        geom_type = gdf.reset_index().geom_type[0]
 
         if style is None and (style_callback is None):
             style = {
