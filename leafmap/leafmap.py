@@ -3818,28 +3818,32 @@ class Map(ipyleaflet.Map):
             setattr(self, "pc_collections", get_pc_collections())
 
     def save_draw_features(
-        self, out_file: str, indent: int = 4, crs: Optional[str] = "epsg:4326", **kwargs
+        self, out_file: str, crs: Optional[str] = "EPSG:4326", **kwargs
     ) -> None:
         """Save the draw features to a file.
 
         Args:
             out_file (str): The output file path.
-            indent (int, optional): The indentation level when saving data as a GeoJSON. Defaults to 4.
-            crs (str, optional): The CRS of the output GeoJSON. Defaults to "epsg:4326".
+            crs (str, optional): The CRS of the output GeoJSON. Defaults to "EPSG:4326".
         """
-        import geopandas as gpd
 
-        out_file = check_file_path(out_file)
+        if self.user_rois is not None:
+            import geopandas as gpd
 
-        self.update_draw_features()
-        geojson = {
-            "type": "FeatureCollection",
-            "features": self.draw_features,
-        }
+            out_file = check_file_path(out_file)
 
-        gdf = gpd.GeoDataFrame.from_features(geojson)
-        gdf.crs = "epsg:4326"
-        gdf.to_crs(crs).to_file(out_file, **kwargs)
+            self.update_draw_features()
+            geojson = {
+                "type": "FeatureCollection",
+                "features": self.draw_features,
+            }
+
+            gdf = gpd.GeoDataFrame.from_features(geojson, crs="EPSG:4326")
+            if crs != "EPSG:4326":
+                gdf = gdf.to_crs(crs)
+            gdf.to_file(out_file, **kwargs)
+        else:
+            print("No draw features to save.")
 
     def update_draw_features(self) -> None:
         """Update the draw features by removing features that have been edited and no longer exist."""
