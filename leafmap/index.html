@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
     
     
       
@@ -11083,28 +11083,32 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;pc_collections&quot;</span><span class="p">,</span> <span class="n">get_pc_collections</span><span class="p">())</span>
 
     <span class="k">def</span> <span class="nf">save_draw_features</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">out_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">out_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the draw features to a file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            out_file (str): The output file path.</span>
-<span class="sd">            indent (int, optional): The indentation level when saving data as a GeoJSON. Defaults to 4.</span>
-<span class="sd">            crs (str, optional): The CRS of the output GeoJSON. Defaults to &quot;epsg:4326&quot;.</span>
+<span class="sd">            crs (str, optional): The CRS of the output GeoJSON. Defaults to &quot;EPSG:4326&quot;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 
-        <span class="n">out_file</span> <span class="o">=</span> <span class="n">check_file_path</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_rois</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">update_draw_features</span><span class="p">()</span>
-        <span class="n">geojson</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_features</span><span class="p">,</span>
-        <span class="p">}</span>
+            <span class="n">out_file</span> <span class="o">=</span> <span class="n">check_file_path</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
 
-        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">geojson</span><span class="p">)</span>
-        <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="s2">&quot;epsg:4326&quot;</span>
-        <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_draw_features</span><span class="p">()</span>
+            <span class="n">geojson</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_features</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">geojson</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">crs</span> <span class="o">!=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">:</span>
+                <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
+            <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No draw features to save.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">update_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the draw features by removing features that have been edited and no longer exist.&quot;&quot;&quot;</span>
@@ -24472,7 +24476,7 @@ Defaults to True.</p></td>
 
 
 <h3 id="leafmap.leafmap.Map.save_draw_features" class="doc doc-heading">
-<code class="highlight language-python"><span class="n">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+<code class="highlight language-python"><span class="n">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_file</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;EPSG:4326&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 
 <a href="#leafmap.leafmap.Map.save_draw_features" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -24499,44 +24503,42 @@ Defaults to True.</p></td>
         <td><em>required</em></td>
       </tr>
       <tr>
-        <td><code>indent</code></td>
-        <td><code>int</code></td>
-        <td><p>The indentation level when saving data as a GeoJSON. Defaults to 4.</p></td>
-        <td><code>4</code></td>
-      </tr>
-      <tr>
         <td><code>crs</code></td>
         <td><code>str</code></td>
-        <td><p>The CRS of the output GeoJSON. Defaults to "epsg:4326".</p></td>
-        <td><code>&#39;epsg:4326&#39;</code></td>
+        <td><p>The CRS of the output GeoJSON. Defaults to "EPSG:4326".</p></td>
+        <td><code>&#39;EPSG:4326&#39;</code></td>
       </tr>
   </tbody>
 </table>
         <details class="quote">
           <summary>Source code in <code>leafmap/leafmap.py</code></summary>
           <div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">save_draw_features</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span> <span class="n">out_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:4326&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">out_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save the draw features to a file.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        out_file (str): The output file path.</span>
-<span class="sd">        indent (int, optional): The indentation level when saving data as a GeoJSON. Defaults to 4.</span>
-<span class="sd">        crs (str, optional): The CRS of the output GeoJSON. Defaults to &quot;epsg:4326&quot;.</span>
+<span class="sd">        crs (str, optional): The CRS of the output GeoJSON. Defaults to &quot;EPSG:4326&quot;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 
-    <span class="n">out_file</span> <span class="o">=</span> <span class="n">check_file_path</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_rois</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
 
-    <span class="bp">self</span><span class="o">.</span><span class="n">update_draw_features</span><span class="p">()</span>
-    <span class="n">geojson</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_features</span><span class="p">,</span>
-    <span class="p">}</span>
+        <span class="n">out_file</span> <span class="o">=</span> <span class="n">check_file_path</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
 
-    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">geojson</span><span class="p">)</span>
-    <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="s2">&quot;epsg:4326&quot;</span>
-    <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_draw_features</span><span class="p">()</span>
+        <span class="n">geojson</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_features</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">geojson</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">crs</span> <span class="o">!=</span> <span class="s2">&quot;EPSG:4326&quot;</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">crs</span><span class="p">)</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">out_file</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No draw features to save.&quot;</span><span class="p">)</span>
 </code></pre></div>
         </details>
     </div>
