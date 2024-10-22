@@ -2376,7 +2376,10 @@ class Map(ipyleaflet.Map):
         self.add(tile_layer, index=layer_index)
         if zoom_to_layer:
             self.center = tile_client.center()
-            self.zoom = tile_client.default_zoom
+            try:
+                self.zoom = tile_client.default_zoom
+            except AttributeError:
+                self.zoom = 10
 
         arc_add_layer(tile_layer.url, layer_name, True, 1.0)
 
