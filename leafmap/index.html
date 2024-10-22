@@ -9641,7 +9641,10 @@ Map            (<span title="ipyleaflet.leaflet.Map">Map</span>)
         <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tile_layer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="mi">15</span>
 
         <span class="n">arc_add_layer</span><span class="p">(</span><span class="n">tile_layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">layer_name</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
@@ -16425,7 +16428,10 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
     <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tile_layer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="mi">15</span>
 
     <span class="n">arc_add_layer</span><span class="p">(</span><span class="n">tile_layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">layer_name</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
@@ -19673,7 +19679,10 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
     <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tile_layer</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">zoom_to_layer</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">center</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="n">tile_client</span><span class="o">.</span><span class="n">default_zoom</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">zoom</span> <span class="o">=</span> <span class="mi">15</span>
 
     <span class="n">arc_add_layer</span><span class="p">(</span><span class="n">tile_layer</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">layer_name</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
 
