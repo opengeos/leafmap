@@ -2957,6 +2957,11 @@ def get_local_tile_layer(
     else:
         tile_client = source
 
+    if nodata is None:
+        nodata = get_api_key("NODATA")
+        if isinstance(nodata, str):
+            nodata = float(nodata)
+
     if quiet:
         output = widgets.Output()
         with output:
