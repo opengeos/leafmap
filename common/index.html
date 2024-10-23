@@ -25704,6 +25704,11 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
     <span class="k">else</span><span class="p">:</span>
         <span class="n">tile_client</span> <span class="o">=</span> <span class="n">source</span>
 
+    <span class="k">if</span> <span class="n">nodata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">nodata</span> <span class="o">=</span> <span class="n">get_api_key</span><span class="p">(</span><span class="s2">&quot;NODATA&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodata</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">nodata</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">nodata</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">quiet</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
