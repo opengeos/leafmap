@@ -4604,9 +4604,13 @@ class Map(ipyleaflet.Map):
         from ipyleaflet import CircleMarker, Popup
 
         if isinstance(data, gpd.GeoDataFrame):
+            if data.crs != "EPSG:4326":
+                data = data.to_crs("EPSG:4326")
             geojson_data = data.__geo_interface__
         elif isinstance(data, str):
             data = gpd.read_file(data)
+            if data.crs != "EPSG:4326":
+                data = data.to_crs("EPSG:4326")
             geojson_data = data.__geo_interface__
         elif isinstance(data, dict):
             geojson_data = data
@@ -4814,12 +4818,16 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, str):
             gdf = gpd.read_file(data)
+            if gdf.crs != "EPSG:4326":
+                gdf = gdf.to_crs("EPSG:4326")
             bounds = gdf.total_bounds
             temp_geojson = temp_file_path("geojson")
             gdf.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
         elif isinstance(data, gpd.GeoDataFrame):
+            if data.crs != "EPSG:4326":
+                data = data.to_crs("EPSG:4326")
             bounds = data.total_bounds
             temp_geojson = temp_file_path("geojson")
             data.to_file(temp_geojson, driver="GeoJSON")
@@ -4969,7 +4977,9 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
-    def save_edits(self, filename: str, drop_style: bool = True, **kwargs: Any) -> None:
+    def save_edits(
+        self, filename: str, drop_style: bool = True, crs="EPSG:4326", **kwargs: Any
+    ) -> None:
         """
         Save the edited GeoJSON data to a file.
 
@@ -4977,6 +4987,7 @@ class Map(ipyleaflet.Map):
             filename (str): The name of the file to save the edited GeoJSON data.
             drop_style (bool, optional): Whether to drop the style properties
                 from the GeoJSON data. Defaults to True.
+            crs (str, optional): The CRS of the GeoJSON data. Defaults to "EPSG:4326".
             **kwargs (Any): Additional arguments passed to the GeoDataFrame `to_file` method.
 
         Returns:
@@ -4991,6 +5002,10 @@ class Map(ipyleaflet.Map):
         gdf = gpd.GeoDataFrame.from_features(self._geojson_data)
         if drop_style and "style" in gdf.columns:
             gdf = gdf.drop(columns=["style"])
+            gdf.crs = "EPSG:4326"
+
+        if crs != "EPSG:4326":
+            gdf = gdf.to_crs(crs)
         gdf.to_file(filename, **kwargs)
 
     def batch_edit_points(
@@ -5029,12 +5044,16 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, str):
             gdf = gpd.read_file(data)
+            if gdf.crs != "EPSG:4326":
+                gdf = gdf.to_crs("EPSG:4326")
             bounds = gdf.total_bounds
             temp_geojson = temp_file_path("geojson")
             gdf.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
         elif isinstance(data, gpd.GeoDataFrame):
+            if data.crs != "EPSG:4326":
+                data = data.to_crs("EPSG:4326")
             bounds = data.total_bounds
             temp_geojson = temp_file_path("geojson")
             data.to_file(temp_geojson, driver="GeoJSON")
@@ -5286,12 +5305,16 @@ class Map(ipyleaflet.Map):
         bounds = None
         if isinstance(data, str):
             gdf = gpd.read_file(data)
+            if gdf.crs != "EPSG:4326":
+                gdf = gdf.to_crs("EPSG:4326")
             bounds = gdf.total_bounds
             temp_geojson = temp_file_path("geojson")
             gdf.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
         elif isinstance(data, gpd.GeoDataFrame):
+            if data.crs != "EPSG:4326":
+                data = data.to_crs("EPSG:4326")
             bounds = data.total_bounds
             temp_geojson = temp_file_path("geojson")
             data.to_file(temp_geojson, driver="GeoJSON")
