@@ -897,10 +897,13 @@ def stac_min_max(
 
     values = stats.values()
 
-    min_values = [v["min"] for v in values]
-    max_values = [v["max"] for v in values]
+    try:
+        min_values = [v["min"] for v in values]
+        max_values = [v["max"] for v in values]
 
-    return min(min_values), max(max_values)
+        return min(min_values), max(max_values)
+    except Exception as e:
+        return None, None
 
 
 def stac_info(
