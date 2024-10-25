@@ -1150,7 +1150,10 @@ class Map(ipyleaflet.Map):
             nodata = None
 
         band_names = stac_bands(url, collection, item, titiler_endpoint)
-        indexes = [band_names.index(band) + 1 for band in assets]
+        if assets is not None:
+            indexes = [band_names.index(band) + 1 for band in assets]
+        else:
+            indexes = None
 
         params = {
             "url": url,
