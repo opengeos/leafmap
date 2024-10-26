@@ -14853,3 +14853,18 @@ def find_max_value_coords(
             x, y = transformer.transform(x, y)
 
         return x, y, max_value
+
+
+def read_geojson(data: str, **kwargs: Any) -> Dict[str, Any]:
+    """
+    Fetches and parses a GeoJSON file from a given URL.
+
+    Args:
+        data (str): The URL of the GeoJSON file.
+        **kwargs (Any): Additional keyword arguments to pass to the requests.get() method.
+
+    Returns:
+        Dict[str, Any]: The parsed GeoJSON data.
+    """
+
+    return requests.get(data, **kwargs).json()
