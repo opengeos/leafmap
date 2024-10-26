@@ -3316,7 +3316,7 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
 
     This function generates a URL for accessing a specific MapTiler map style. If an API key is not provided,
     it attempts to retrieve one using a predefined method. If the request to MapTiler fails, it defaults to
-    a "dark-matter" style.
+    a "liberty" style.
 
     Args:
         style (str): The name of the MapTiler style to be accessed. It can be one of the following:
@@ -3326,7 +3326,7 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
             attempts to retrieve the API key using a predefined method. Defaults to None.
 
     Returns:
-        str: The URL for the requested MapTiler style. If the request fails, returns a URL for the "dark-matter" style.
+        str: The URL for the requested MapTiler style. If the request fails, returns a URL for the "liberty" style.
 
     Raises:
         requests.exceptions.RequestException: If the request to the MapTiler API fails.
@@ -3340,9 +3340,9 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
     response = requests.get(url)
     if response.status_code != 200:
         print(
-            "Failed to retrieve the MapTiler style. Defaulting to 'dark-matter' style."
+            "Failed to retrieve the MapTiler style. Defaulting to OpenFreeMap 'liberty' style."
         )
-        url = "dark-matter"
+        url = "https://tiles.openfreemap.org/styles/liberty"
 
     return url
 
