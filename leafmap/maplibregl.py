@@ -109,6 +109,8 @@ class Map(MapWidget):
             elif style.lower() in carto_basemaps:
                 style = construct_carto_basemap_url(style.lower())
             elif style.lower() in openfreemap_basemaps:
+                if style == "positron2":
+                    style = "positron"
                 style = f"https://tiles.openfreemap.org/styles/{style.lower()}"
             elif style == "demotiles":
                 style = "https://demotiles.maplibre.org/style.json"
