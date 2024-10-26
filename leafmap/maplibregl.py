@@ -59,9 +59,9 @@ class Map(MapWidget):
             bearing (float, optional): The bearing of the map. Measured in degrees
                 counter-clockwise from north. Defaults to 0.
             style (str, optional): The style of the map. It can be a string or a URL.
-                If it is a string, it must be one of the following: "dark-matter",
+                If it is a string, it must be one of the following: "dark-matter", "positron",
                 "carto-positron", "voyager", "positron-nolabels", "dark-matter-nolabels",
-                "voyager-nolabels", "demotiles", "liberty", "bright", or "positron".
+                "voyager-nolabels", "demotiles", "liberty", "bright", or "positron2".
                 If a MapTiler API key is set, you can also use any of the MapTiler styles,
                 such as aquarelle, backdrop, basic, bright, dataviz, landscape, ocean,
                 openstreetmap, outdoor, satellite, streets, toner, topo, winter, etc.
@@ -78,7 +78,7 @@ class Map(MapWidget):
         """
         carto_basemaps = [
             "dark-matter",
-            "carto-positron",
+            "positron",
             "voyager",
             "positron-nolabels",
             "dark-matter-nolabels",
@@ -87,7 +87,7 @@ class Map(MapWidget):
         openfreemap_basemaps = [
             "liberty",
             "bright",
-            "positron",
+            "positron2",
         ]
         if isinstance(style, str):
 
@@ -107,8 +107,6 @@ class Map(MapWidget):
                 )
 
             elif style.lower() in carto_basemaps:
-                if style.lower() == "carto-positron":
-                    style = "positron"
                 style = construct_carto_basemap_url(style.lower())
             elif style.lower() in openfreemap_basemaps:
                 style = f"https://tiles.openfreemap.org/styles/{style.lower()}"
