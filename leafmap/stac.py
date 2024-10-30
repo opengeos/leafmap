@@ -562,6 +562,12 @@ def stac_tile(
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
 
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
+
     if url is not None:
         kwargs["url"] = url
     if collection is not None:
@@ -737,6 +743,12 @@ def stac_bounds(
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
 
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
+
     if url is not None:
         kwargs["url"] = url
         response = requests.get(url)
@@ -779,6 +791,13 @@ def stac_center(
     Returns:
         tuple: A tuple representing (longitude, latitude)
     """
+
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
+
     bounds = stac_bounds(url, collection, item, titiler_endpoint, **kwargs)
     center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lon, lat)
     return center
@@ -808,6 +827,12 @@ def stac_bands(
 
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
+
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
 
     if url is not None:
         kwargs["url"] = url
@@ -851,6 +876,12 @@ def stac_stats(
 
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
+
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
 
     if url is not None:
         kwargs["url"] = url
@@ -933,6 +964,12 @@ def stac_info(
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
 
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
+
     if url is not None:
         kwargs["url"] = url
     if collection is not None:
@@ -978,6 +1015,12 @@ def stac_info_geojson(
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
 
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
+
     if url is not None:
         kwargs["url"] = url
     if collection is not None:
@@ -1022,6 +1065,12 @@ def stac_assets(
 
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
+
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
 
     if url is not None:
         kwargs["url"] = url
@@ -1071,6 +1120,12 @@ def stac_pixel_value(
 
     if collection is not None and titiler_endpoint is None:
         titiler_endpoint = "planetary-computer"
+
+    if isinstance(url, pystac.Item):
+        try:
+            url = url.self_href
+        except Exception as e:
+            print(e)
 
     if url is not None:
         kwargs["url"] = url
