@@ -14868,3 +14868,67 @@ def read_geojson(data: str, **kwargs: Any) -> Dict[str, Any]:
     """
 
     return requests.get(data, **kwargs).json()
+
+
+def get_max_pixel_coords(geotiff_path, band_idx=1, roi=None, dst_crs="EPSG:4326"):
+    """
+    Find the geographic coordinates of the maximum pixel value in a GeoTIFF.
+
+    Args:
+        geotiff_path (str): Path to the GeoTIFF file.
+        band_idx (int): Band index to use (default is 1).
+        roi (str): Path to a vector dataset containing the region of interest (default is None).
+        dst_crs (str): Desired output coordinate system in EPSG format (e.g., "EPSG:4326").
+
+    Returns:
+        dict: Maximum pixel value and its geographic coordinates in the specified CRS.
+    """
+    import rasterio
+    import numpy as np
+    import geopandas as gpd
+    from rasterio.warp import transform
+    from rasterio.mask import mask
+    from rasterio.warp import transform, transform_geom
+
+    with rasterio.open(geotiff_path) as dataset:
+        # If ROI is provided, handle potential CRS differences
+        if roi:
+            gdf = gpd.read_file(roi)
+            roi_geojson = gdf.__geo_interface__
+
+            # Reproject ROI to match the raster's CRS if necessary
+            roi_crs = gdf.crs
+            if roi_crs is None:
+                roi_crs = "EPSG:4326"
+            if roi_crs != dataset.crs.to_string():
+                roi_geojson["features"][0]["geometry"] = transform_geom(
+                    roi_crs,
+                    dataset.crs.to_string(),
+                    roi_geojson["features"][0]["geometry"],
+                )
+
+            # Mask the raster using the transformed ROI geometry
+            clipped_band, clipped_transform = mask(
+                dataset, [roi_geojson["features"][0]["geometry"]], crop=True
+            )
+            band = clipped_band[
+                band_idx - 1
+            ]  # Mask returns a 3D array (bands, rows, cols), so select the first band
+            transform_to_use = clipped_transform
+        else:
+            # Use the entire raster
+            band = dataset.read(band_idx)
+            transform_to_use = dataset.transform
+
+        # Find the maximum value and its index
+        max_value = band.max()
+        max_index = np.unravel_index(band.argmax(), band.shape)
+
+        # Convert pixel coordinates to the raster's CRS coordinates
+        original_coords = transform_to_use * (max_index[1], max_index[0])
+
+        # Transform coordinates to the desired CRS
+        src_crs = dataset.crs
+        x, y = transform(src_crs, dst_crs, [original_coords[0]], [original_coords[1]])
+
+    return {"max_value": max_value, "coordinates": (x[0], y[0]), "crs": dst_crs}
