@@ -14868,3 +14868,37 @@ def read_geojson(data: str, **kwargs: Any) -> Dict[str, Any]:
     """
 
     return requests.get(data, **kwargs).json()
+
+
+def get_max_pixel_coords(geotiff_path, band_idx=1, dst_crs="EPSG:4326"):
+    """
+    Find the geographic coordinates of the maximum pixel value in a GeoTIFF.
+
+    Args:
+        geotiff_path (str): Path to the GeoTIFF file.
+        band_idx (int): Band index to use (default is 1).
+        dst_crs (str): Desired output coordinate system in EPSG format (e.g., "EPSG:4326").
+
+    Returns:
+        dict: Maximum pixel value and its geographic coordinates in the specified CRS.
+    """
+    import rasterio
+    import numpy as np
+    from rasterio.warp import transform
+
+    with rasterio.open(geotiff_path) as dataset:
+        # Read the first band (or specify another band if needed)
+        band = dataset.read(band_idx)
+
+        # Find the maximum value and its index
+        max_value = band.max()
+        max_index = np.unravel_index(band.argmax(), band.shape)
+
+        # Convert pixel coordinates to original CRS coordinates
+        original_coords = dataset.transform * (max_index[1], max_index[0])
+
+        # Transform coordinates to the desired CRS
+        src_crs = dataset.crs
+        x, y = transform(src_crs, dst_crs, [original_coords[0]], [original_coords[1]])
+
+    return {"max_value": max_value, "coordinates": (x[0], y[0]), "crs": dst_crs}
