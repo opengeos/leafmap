@@ -14510,7 +14510,7 @@ def get_nwi(
     else:
         geometry_json = geometry_dict
     # API URL for querying wetlands
-    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer/0/query"
+    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0/query"
 
     # Construct the query parameters
     params = {
@@ -14809,52 +14809,6 @@ def get_nwi_by_huc8(
     return gdf
 
 
-def find_max_value_coords(
-    image: str, band_dix: int = 1, dst_crs: Optional[str] = None
-) -> Tuple[Union[float, int], Union[float, int], float]:
-    """
-    Find the coordinates of the pixel with the maximum value in a GeoTIFF file.
-
-    Args:
-        geotiff_file (str): Path to the GeoTIFF file.
-        band_dix (int, optional): The band index (default is 1).
-        dst_crs (str, optional): The destination CRS in EPSG format (e.g., "EPSG:4326").
-                                 If None, returns the original x, y coordinates.
-
-    Returns:
-        tuple: x, y coordinates of the pixel with the maximum value, and the maximum value.
-               If dst_crs is provided, returns the reprojected coordinates.
-    """
-    import rasterio
-    import numpy as np
-    from rasterio.transform import xy
-    from pyproj import Transformer
-
-    # Open the GeoTIFF file
-    with rasterio.open(image) as src:
-        # Read the raster data (assuming band 1)
-        data = src.read(band_dix)
-
-        # Find the index of the maximum value
-        max_value = np.max(data)
-        max_index = np.unravel_index(np.argmax(data), data.shape)
-
-        # Get the row and column of the pixel with the maximum value
-        row, col = max_index
-        x, y = col, row
-        print(f"Row: {row}, Column: {col}")
-
-        # Get the original coordinates (x, y) of the pixel
-
-        # If a destination CRS is provided, transform the coordinates
-        if dst_crs:
-            x, y = xy(src.transform, row, col)
-            transformer = Transformer.from_crs(src.crs, dst_crs, always_xy=True)
-            x, y = transformer.transform(x, y)
-
-        return x, y, max_value
-
-
 def read_geojson(data: str, **kwargs: Any) -> Dict[str, Any]:
     """
     Fetches and parses a GeoJSON file from a given URL.
@@ -14870,7 +14824,15 @@ def read_geojson(data: str, **kwargs: Any) -> Dict[str, Any]:
     return requests.get(data, **kwargs).json()
 
 
-def get_max_pixel_coords(geotiff_path, band_idx=1, roi=None, dst_crs="EPSG:4326"):
+def get_max_pixel_coords(
+    geotiff_path,
+    band_idx=1,
+    roi=None,
+    dst_crs="EPSG:4326",
+    output=None,
+    return_gdf=True,
+    **kwargs,
+):
     """
     Find the geographic coordinates of the maximum pixel value in a GeoTIFF.
 
@@ -14879,6 +14841,8 @@ def get_max_pixel_coords(geotiff_path, band_idx=1, roi=None, dst_crs="EPSG:4326"
         band_idx (int): Band index to use (default is 1).
         roi (str): Path to a vector dataset containing the region of interest (default is None).
         dst_crs (str): Desired output coordinate system in EPSG format (e.g., "EPSG:4326").
+        output (str): Path to save the output GeoDataFrame (default is None).
+        return_gdf (bool): Whether to return a GeoDataFrame (default is True).
 
     Returns:
         dict: Maximum pixel value and its geographic coordinates in the specified CRS.
@@ -14893,7 +14857,16 @@ def get_max_pixel_coords(geotiff_path, band_idx=1, roi=None, dst_crs="EPSG:4326"
     with rasterio.open(geotiff_path) as dataset:
         # If ROI is provided, handle potential CRS differences
         if roi:
-            gdf = gpd.read_file(roi)
+            if isinstance(roi, str):
+                gdf = gpd.read_file(roi)
+            elif isinstance(roi, gpd.GeoDataFrame):
+                gdf = roi
+            elif isinstance(roi, dict):
+                gdf = gpd.GeoDataFrame.from_features([roi])
+            else:
+                raise ValueError(
+                    "Invalid ROI input. Must be a file path or a GeoDataFrame."
+                )
             roi_geojson = gdf.__geo_interface__
 
             # Reproject ROI to match the raster's CRS if necessary
@@ -14931,4 +14904,46 @@ def get_max_pixel_coords(geotiff_path, band_idx=1, roi=None, dst_crs="EPSG:4326"
         src_crs = dataset.crs
         x, y = transform(src_crs, dst_crs, [original_coords[0]], [original_coords[1]])
 
-    return {"max_value": max_value, "coordinates": (x[0], y[0]), "crs": dst_crs}
+        if return_gdf:
+            x_coords = [x[0]]
+            y_coords = [y[0]]
+            # Create a DataFrame
+            df = pd.DataFrame({"x": x_coords, "y": y_coords})
+
+            # Convert the DataFrame to a GeoDataFrame
+            gdf = gpd.GeoDataFrame(
+                df, geometry=gpd.points_from_xy(df.x, df.y), crs=dst_crs
+            )
+
+            if output:
+                gdf.to_file(output, **kwargs)
+
+        else:
+            return {"max_value": max_value, "coordinates": (x[0], y[0]), "crs": dst_crs}
+
+
+def point_to_gdf(x, y, point_crs="EPSG:4326", to_crs="EPSG:4326", **kwargs):
+    """
+    Convert a point to a GeoDataFrame.
+
+    Args:
+        x (float): X coordinate of the point.
+        y (float): Y coordinate of the point.
+        point_crs (str): Coordinate Reference System of the point.
+
+    Returns:
+        gpd.GeoDataFrame: GeoDataFrame containing the point.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    # Create a Point object
+    point = Point(x, y)
+
+    # Convert the Point to a GeoDataFrame
+    gdf = gpd.GeoDataFrame([{"geometry": point}], crs=point_crs)
+
+    if to_crs != point_crs:
+        gdf = gdf.to_crs(to_crs)
+
+    return gdf
