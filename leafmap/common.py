@@ -12353,6 +12353,7 @@ def read_parquet(
             raise ValueError("exclude_columns must be a list or a string.")
         columns = f"{columns} EXCLUDE {exclude}"
 
+    result = None
     if return_type in ["df", "numpy", "arrow", "polars"]:
         if sql is None:
             sql = f"SELECT {columns} FROM '{source}'"
@@ -12378,7 +12379,7 @@ def read_parquet(
             # if src_crs is not None and dst_crs is not None:
             #     geom_sql = f"ST_AsText(ST_Transform(ST_GeomFromWKB({geometry}), '{src_crs}', '{dst_crs}', true)) AS {geometry}"
             # else:
-            geom_sql = f"ST_AsText(ST_GeomFromWKB({geometry})) AS {geometry}"
+            geom_sql = f"ST_AsText(ST_GeomFromWKB(ST_AsWKB({geometry}))) AS {geometry}"
             sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{source}'"
         if limit is not None:
             sql += f" LIMIT {limit}"
