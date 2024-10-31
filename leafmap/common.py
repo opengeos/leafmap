@@ -14920,3 +14920,30 @@ def get_max_pixel_coords(
 
         else:
             return {"max_value": max_value, "coordinates": (x[0], y[0]), "crs": dst_crs}
+
+
+def point_to_gdf(x, y, point_crs="EPSG:4326", to_crs="EPSG:4326", **kwargs):
+    """
+    Convert a point to a GeoDataFrame.
+
+    Args:
+        x (float): X coordinate of the point.
+        y (float): Y coordinate of the point.
+        point_crs (str): Coordinate Reference System of the point.
+
+    Returns:
+        gpd.GeoDataFrame: GeoDataFrame containing the point.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Point
+
+    # Create a Point object
+    point = Point(x, y)
+
+    # Convert the Point to a GeoDataFrame
+    gdf = gpd.GeoDataFrame([{"geometry": point}], crs=point_crs)
+
+    if to_crs != point_crs:
+        gdf = gdf.to_crs(to_crs)
+
+    return gdf
