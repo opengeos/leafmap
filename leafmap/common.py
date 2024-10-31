@@ -14510,7 +14510,7 @@ def get_nwi(
     else:
         geometry_json = geometry_dict
     # API URL for querying wetlands
-    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/FeatureServer/0/query"
+    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0/query"
 
     # Construct the query parameters
     params = {
@@ -14807,52 +14807,6 @@ def get_nwi_by_huc8(
 
     gdf = gpd.read_file(filepath)
     return gdf
-
-
-def find_max_value_coords(
-    image: str, band_dix: int = 1, dst_crs: Optional[str] = None
-) -> Tuple[Union[float, int], Union[float, int], float]:
-    """
-    Find the coordinates of the pixel with the maximum value in a GeoTIFF file.
-
-    Args:
-        geotiff_file (str): Path to the GeoTIFF file.
-        band_dix (int, optional): The band index (default is 1).
-        dst_crs (str, optional): The destination CRS in EPSG format (e.g., "EPSG:4326").
-                                 If None, returns the original x, y coordinates.
-
-    Returns:
-        tuple: x, y coordinates of the pixel with the maximum value, and the maximum value.
-               If dst_crs is provided, returns the reprojected coordinates.
-    """
-    import rasterio
-    import numpy as np
-    from rasterio.transform import xy
-    from pyproj import Transformer
-
-    # Open the GeoTIFF file
-    with rasterio.open(image) as src:
-        # Read the raster data (assuming band 1)
-        data = src.read(band_dix)
-
-        # Find the index of the maximum value
-        max_value = np.max(data)
-        max_index = np.unravel_index(np.argmax(data), data.shape)
-
-        # Get the row and column of the pixel with the maximum value
-        row, col = max_index
-        x, y = col, row
-        print(f"Row: {row}, Column: {col}")
-
-        # Get the original coordinates (x, y) of the pixel
-
-        # If a destination CRS is provided, transform the coordinates
-        if dst_crs:
-            x, y = xy(src.transform, row, col)
-            transformer = Transformer.from_crs(src.crs, dst_crs, always_xy=True)
-            x, y = transformer.transform(x, y)
-
-        return x, y, max_value
 
 
 def read_geojson(data: str, **kwargs: Any) -> Dict[str, Any]:
