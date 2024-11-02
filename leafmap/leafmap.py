@@ -5616,6 +5616,162 @@ class Map(ipyleaflet.Map):
         if add_legend:
             self.add_legend(title="Wetland Type", builtin_legend="NWI")
 
+    def add_nlcd(self, years: list = [2023], add_legend: bool = True, **kwargs) -> None:
+        """
+        Adds National Land Cover Database (NLCD) data to the map.
+
+        Args:
+            years (list): A list of years to add. It can be any of 1985-2023. Defaults to [2023].
+            add_legend (bool): Whether to add a legend to the map. Defaults to True.
+            **kwargs: Additional keyword arguments to pass to the add_cog_layer method.
+
+        Returns:
+            None
+        """
+        allowed_years = list(range(1985, 2024, 1))
+        url = (
+            "https://s3-us-west-2.amazonaws.com/mrlc/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
+        )
+
+        if "colormap" not in kwargs:
+
+            kwargs["colormap"] = {
+                "11": "#466b9f",
+                "12": "#d1def8",
+                "21": "#dec5c5",
+                "22": "#d99282",
+                "23": "#eb0000",
+                "24": "#ab0000",
+                "31": "#b3ac9f",
+                "41": "#68ab5f",
+                "42": "#1c5f2c",
+                "43": "#b5c58f",
+                "51": "#af963c",
+                "52": "#ccb879",
+                "71": "#dfdfc2",
+                "72": "#d1d182",
+                "73": "#a3cc51",
+                "74": "#82ba9e",
+                "81": "#dcd939",
+                "82": "#ab6c28",
+                "90": "#b8d9eb",
+                "95": "#6c9fb8",
+            }
+
+        if "zoom_to_layer" not in kwargs:
+            kwargs["zoom_to_layer"] = False
+
+        for year in years:
+            if year not in allowed_years:
+                raise ValueError(f"Year must be one of {allowed_years}.")
+            year_url = url.format(year)
+            self.add_cog_layer(year_url, name=f"NLCD {year}", **kwargs)
+        if add_legend:
+            self.add_legend(title="NLCD Land Cover Type", builtin_legend="NLCD")
+
+    def add_nlcd_ts(
+        self,
+        left_year: int = 1985,
+        right_layer: int = 2023,
+        widget_width: str = "70px",
+        add_legend: bool = True,
+        add_layer_control: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a time series comparison of NLCD (National Land Cover Database) layers to the map.
+
+        Args:
+            left_year (int, optional): The initial year for the left layer. Defaults to 1985.
+            right_layer (int, optional): The initial year for the right layer. Defaults to 2023.
+            widget_width (str, optional): The width of the dropdown widgets. Defaults to "70px".
+            add_legend (bool, optional): If True, adds a legend to the map. Defaults to True.
+            add_layer_control (bool, optional): If True, adds a layer control to the map. Defaults to True.
+            **kwargs (Any): Additional keyword arguments to pass to the cog_tile function.
+
+        Returns:
+            None
+        """
+
+        allowed_years = list(range(1985, 2024, 1))
+
+        left_widget = widgets.Dropdown(
+            options=allowed_years,
+            value=left_year,
+            style={"description_width": "initial"},
+            layout=widgets.Layout(width=widget_width),
+        )
+        right_widget = widgets.Dropdown(
+            options=allowed_years,
+            value=right_layer,
+            style={"description_width": "initial"},
+            layout=widgets.Layout(width=widget_width),
+        )
+
+        left_control = ipyleaflet.WidgetControl(widget=left_widget, position="topleft")
+        right_control = ipyleaflet.WidgetControl(
+            widget=right_widget, position="topright"
+        )
+
+        self.add(left_control)
+        self.add(right_control)
+
+        url = (
+            "https://s3-us-west-2.amazonaws.com/mrlc/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
+        )
+
+        colormap = {
+            "11": "#466b9f",
+            "12": "#d1def8",
+            "21": "#dec5c5",
+            "22": "#d99282",
+            "23": "#eb0000",
+            "24": "#ab0000",
+            "31": "#b3ac9f",
+            "41": "#68ab5f",
+            "42": "#1c5f2c",
+            "43": "#b5c58f",
+            "51": "#af963c",
+            "52": "#ccb879",
+            "71": "#dfdfc2",
+            "72": "#d1d182",
+            "73": "#a3cc51",
+            "74": "#82ba9e",
+            "81": "#dcd939",
+            "82": "#ab6c28",
+            "90": "#b8d9eb",
+            "95": "#6c9fb8",
+        }
+        left_url = url.format(left_year)
+        right_url = url.format(right_layer)
+        left_tile = cog_tile(left_url, colormap=colormap, **kwargs)
+        right_tile = cog_tile(right_url, colormap=colormap, **kwargs)
+        left_layer = ipyleaflet.TileLayer(url=left_tile, name=f"NLCD {left_year}")
+        right_layer = ipyleaflet.TileLayer(url=right_tile, name=f"NLCD {right_layer}")
+        split_control = ipyleaflet.SplitMapControl(
+            left_layer=left_layer, right_layer=right_layer
+        )
+        self.add(split_control)
+
+        if add_layer_control:
+            self.add_layer_control()
+
+        if add_legend:
+            self.add_legend(title="NLCD Land Cover Type", builtin_legend="NLCD")
+
+        def change_left_year(change):
+            left_tile = cog_tile(url.format(change.new), colormap=colormap, **kwargs)
+            left_layer.url = left_tile
+            left_layer.name = f"NLCD {change.new}"
+
+        def change_right_year(change):
+            right_tile = cog_tile(url.format(change.new), colormap=colormap, **kwargs)
+            right_layer.url = right_tile
+            right_layer.name = f"NLCD {change.new}"
+
+        left_widget.observe(change_left_year, names="value")
+        right_widget.observe(change_right_year, names="value")
+
 
 # The functions below are outside the Map class.
 
