@@ -14948,3 +14948,36 @@ def point_to_gdf(x, y, point_crs="EPSG:4326", to_crs="EPSG:4326", **kwargs):
         gdf = gdf.to_crs(to_crs)
 
     return gdf
+
+
+def download_nlcd(
+    years: List[int], out_dir: str = None, quiet: bool = False, **kwargs: Any
+) -> None:
+    """
+    Downloads NLCD (National Land Cover Database) files for the specified years.
+
+    Args:
+        years (List[int]): A list of years for which to download the NLCD files.
+        out_dir (str, optional): The directory where the downloaded files will be saved.
+            Defaults to the current working directory.
+        quiet (bool, optional): If True, suppresses download progress messages. Defaults to False.
+        **kwargs (Any): Additional keyword arguments to pass to the download_file function.
+
+    Returns:
+        None
+    """
+
+    allow_years = list(range(1985, 2024, 1))
+    url = "https://s3-us-west-2.amazonaws.com/mrlc/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
+    if out_dir is None:
+        out_dir = os.getcwd()
+    elif not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+    for year in years:
+        if year not in allow_years:
+            print(f"Year {year} is not available. Skipping...")
+            continue
+        year_url = url.format(year)
+        basename = os.path.basename(year_url)
+        filepath = os.path.join(out_dir, basename)
+        download_file(year_url, filepath, quiet=quiet, **kwargs)
