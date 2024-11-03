@@ -1855,7 +1855,13 @@ class Map(MapWidget):
                 layer = Layer(**params)
                 self.add_layer(layer)
                 self.set_visibility(params["id"], visible)
-                self.set_opacity(params["id"], opacity)
+                if "paint" in params:
+                    for key in params["paint"]:
+                        if "opacity" in key:
+                            self.set_opacity(params["id"], params["paint"][key])
+                            break
+                    else:
+                        self.set_opacity(params["id"], opacity)
 
                 if tooltip:
                     self.add_tooltip(params["id"], properties, template)

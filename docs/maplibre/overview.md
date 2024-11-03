@@ -236,6 +236,12 @@ Use the draw control to draw features on the map.
 
 [![](https://i.imgur.com/w8UFssd.png)](https://leafmap.org/maplibre/draw_features)
 
+## Visualize fields of the world
+
+Visualize Agricultural Field Boundary Dataset - Field of the World.
+
+[![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fields_of_the_world)
+
 ## Use a fallback image
 
 Use a coalesce expression to display another image when a requested image is not available.
