@@ -13666,7 +13666,8 @@ def execute_maplibre_notebook_dir(
         out_lines = []
         for line in lines:
             if line.strip() == '"m"':
-                out_lines.append(line.replace("m", "m.to_html()"))
+                title = os.path.splitext(basename)[0].replace("_", " ")
+                out_lines.append(line.replace("m", f"m.to_html(title='{title}')"))
             else:
                 out_lines.append(line)
 
