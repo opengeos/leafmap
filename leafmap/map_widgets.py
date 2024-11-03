@@ -204,12 +204,10 @@ class Legend(ipywidgets.VBox):
         """
         import os  # pylint: disable=import-outside-toplevel
         from IPython.display import display  # pylint: disable=import-outside-toplevel
-        import pkg_resources  # pylint: disable=import-outside-toplevel
+        import importlib.resources  # pylint: disable=import-outside-toplevel
         from .legends import builtin_legends  # pylint: disable=import-outside-toplevel
 
-        pkg_dir = os.path.dirname(
-            pkg_resources.resource_filename("leafmap", "leafmap.py")
-        )
+        pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
         legend_template = os.path.join(pkg_dir, "data/template/legend.html")
 
         if not os.path.exists(legend_template):

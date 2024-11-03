@@ -1798,12 +1798,10 @@ class Map(ipyleaflet.Map):
             layer_name (str, optional): Layer name of the legend to be associated with. Defaults to None.
 
         """
-        import pkg_resources
+        import importlib.resources
         from IPython.display import display
 
-        pkg_dir = os.path.dirname(
-            pkg_resources.resource_filename("leafmap", "leafmap.py")
-        )
+        pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
         legend_template = os.path.join(pkg_dir, "data/template/legend.html")
 
         if "min_width" not in kwargs.keys():
