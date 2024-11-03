@@ -2473,9 +2473,9 @@ def get_census_dict(reset=False):
         dict: A dictionary of Census data.
     """
     import json
-    import pkg_resources
+    import importlib.resources
 
-    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+    pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
     census_data = os.path.join(pkg_dir, "data/census_data.json")
 
     if reset:
@@ -6816,10 +6816,10 @@ def create_legend(
         str: The HTML code of the legend.
     """
 
-    import pkg_resources
+    import importlib.resources
     from .legends import builtin_legends
 
-    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+    pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
     legend_template = os.path.join(pkg_dir, "data/template/legend_style.html")
 
     if draggable:
@@ -7097,11 +7097,11 @@ def add_text_to_gif(
     """
     import io
 
-    import pkg_resources
+    import importlib.resources
     from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
     warnings.simplefilter("ignore")
-    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+    pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
     default_font = os.path.join(pkg_dir, "data/fonts/arial.ttf")
 
     in_gif = os.path.abspath(in_gif)
