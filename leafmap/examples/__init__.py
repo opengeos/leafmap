@@ -1,8 +1,8 @@
 import box
 import os
-import pkg_resources
+import importlib.resources
 
-_pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+_pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
 _datasets_path = os.path.join(_pkg_dir, "examples/datasets.txt")
 _baseurl = "https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/"
 

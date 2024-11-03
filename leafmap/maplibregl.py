@@ -2539,12 +2539,10 @@ class Map(MapWidget):
         Returns:
             None
         """
-        import pkg_resources
+        import importlib.resources
         from .legends import builtin_legends
 
-        pkg_dir = os.path.dirname(
-            pkg_resources.resource_filename("leafmap", "leafmap.py")
-        )
+        pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
         legend_template = os.path.join(pkg_dir, "data/template/legend.html")
 
         if not os.path.exists(legend_template):

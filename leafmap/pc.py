@@ -77,9 +77,9 @@ def get_pc_inventory(
     Returns:
         dict: A dictionary of collections and their bands.
     """
-    import pkg_resources
+    import importlib.resources
 
-    pkg_dir = os.path.dirname(pkg_resources.resource_filename("leafmap", "leafmap.py"))
+    pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
     filepath = os.path.join(pkg_dir, "data/pc_inventory.json")
 
     if refresh:
