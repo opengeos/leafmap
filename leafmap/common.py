@@ -3716,13 +3716,14 @@ def image_to_geotiff(image, dst_path, dtype=None, to_cog=True, **kwargs) -> None
         image_to_cog(dst_path, dst_path)
 
 
-def image_to_cog(source, dst_path=None, profile="deflate", **kwargs):
+def image_to_cog(source, dst_path=None, profile="deflate", BIGTIFF=None, **kwargs):
     """Converts an image to a COG file.
 
     Args:
         source (str): A dataset path, URL or rasterio.io.DatasetReader object.
         dst_path (str, optional): An output dataset path or or PathLike object. Defaults to None.
         profile (str, optional): COG profile. More at https://cogeotiff.github.io/rio-cogeo/profile. Defaults to "deflate".
+        BIGTIFF (str, optional): Create a BigTIFF file. Can be "IF_SAFER" or "YES". Defaults to None.
 
     Raises:
         ImportError: If rio-cogeo is not installed.
@@ -3755,7 +3756,8 @@ def image_to_cog(source, dst_path=None, profile="deflate", **kwargs):
     if "dst_kwargs" in kwargs:
         dst_profile.update(kwargs.pop("dst_kwargs"))
 
-    dst_profile["BIGTIFF"] = "IF_NEEDED"
+    if BIGTIFF is not None:
+        dst_profile.update({"BIGTIFF": BIGTIFF})
     cog_translate(source, dst_path, dst_profile, **kwargs)
 
 
