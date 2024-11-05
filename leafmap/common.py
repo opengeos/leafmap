@@ -3754,7 +3754,7 @@ def image_to_cog(source, dst_path=None, profile="deflate", **kwargs):
     dst_profile = cog_profiles.get(profile)
     if "dst_kwargs" in kwargs:
         dst_profile.update(kwargs.pop("dst_kwargs"))
-        
+
     dst_profile["BIGTIFF"] = "IF_NEEDED"
     cog_translate(source, dst_path, dst_profile, **kwargs)
 
