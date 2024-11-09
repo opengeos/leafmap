@@ -2513,6 +2513,7 @@ class Map(MapWidget):
         bg_color: str = "white",
         position: str = "bottom-right",
         builtin_legend: Optional[str] = None,
+        shape_type: str = "rectangle",
         **kwargs: Union[str, int, float],
     ) -> None:
         """
@@ -2534,6 +2535,7 @@ class Map(MapWidget):
             position (str, optional): The position of the legend on the map. Can be one of "top-left",
                 "top-right", "bottom-left", "bottom-right". Defaults to "bottom-right".
             builtin_legend (Optional[str], optional): The name of a built-in legend to use. Defaults to None.
+            shape_type (str, optional): The shape type of the legend items. Can be one of "rectangle", "circle", or "line".
             **kwargs: Additional keyword arguments for future use.
 
         Returns:
@@ -2647,6 +2649,15 @@ class Map(MapWidget):
 
         legend_html = header + content + footer
         legend_text = "".join(legend_html)
+
+        if shape_type == "circle":
+            legend_text = legend_text.replace("width: 30px", "width: 16px")
+            legend_text = legend_text.replace(
+                "border: 1px solid #999;",
+                "border-radius: 50%;\n      border: 1px solid #999;",
+            )
+        elif shape_type == "line":
+            legend_text = legend_text.replace("height: 16px", "height: 3px")
 
         self.add_html(
             legend_text,

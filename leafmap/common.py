@@ -6789,6 +6789,7 @@ def create_legend(
     draggable=True,
     output=None,
     style={},
+    shape_type="rectangle",
 ):
     """Create a legend in HTML format. Reference: https://bit.ly/3oV6vnH
 
@@ -7014,6 +7015,14 @@ def create_legend(
                 content.append(line)
 
     legend_text = "".join(content)
+    if shape_type == "circle":
+        legend_text = legend_text.replace("width: 30px", "width: 16px")
+        legend_text = legend_text.replace(
+            "border: 1px solid #999;",
+            "border-radius: 50%;\n      border: 1px solid #999;",
+        )
+    elif shape_type == "line":
+        legend_text = legend_text.replace("height: 16px", "height: 3px")
 
     if output is not None:
         with open(output, "w") as f:
