@@ -1231,6 +1231,7 @@ class Map(folium.Map):
         position: Optional[str] = "bottomright",
         draggable: Optional[bool] = True,
         style: Optional[Dict] = {},
+        shape_type: Optional[str] = "rectangle",
     ):
         """Adds a customized legend to the map. Reference: https://bit.ly/3oV6vnH.
             If you want to add multiple legends to the map, you need to set the `draggable` argument to False.
@@ -1260,6 +1261,8 @@ class Map(folium.Map):
                     'bottom': '20px',
                     'right': '5px'
                 }
+            shape_type (str, optional): The shape type of the legend item. It can be
+                either "rectangle", "line" or "circle". Defaults to "rectangle".
 
         """
         content = create_legend(
@@ -1272,6 +1275,7 @@ class Map(folium.Map):
             position,
             draggable,
             style=style,
+            shape_type=shape_type,
         )
         if draggable:
             from branca.element import Template, MacroElement
