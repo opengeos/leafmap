@@ -169,6 +169,7 @@ class Legend(ipywidgets.VBox):
         position="bottomright",
         builtin_legend=None,
         add_header=True,
+        shape_type="rectangle",
         widget_args={},
         **kwargs,
     ):
@@ -187,6 +188,7 @@ class Legend(ipywidgets.VBox):
                 to the map. Defaults to None.
             add_header (bool, optional): Whether the legend can be closed or
                 not. Defaults to True.
+            shape_type (str, optional): The shape type of the legend item.
             widget_args (dict, optional): Additional arguments passed to the
                 widget_template() function. Defaults to {}.
 
@@ -273,6 +275,15 @@ class Legend(ipywidgets.VBox):
 
         legend_html = header + content + footer
         legend_text = "".join(legend_html)
+
+        if shape_type == "circle":
+            legend_text = legend_text.replace("width: 30px", "width: 16px")
+            legend_text = legend_text.replace(
+                "border: 1px solid #999;",
+                "border-radius: 50%;\n      border: 1px solid #999;",
+            )
+        elif shape_type == "line":
+            legend_text = legend_text.replace("height: 16px", "height: 3px")
         legend_output = ipywidgets.Output(layout=Legend.__create_layout(**kwargs))
         legend_widget = ipywidgets.HTML(value=legend_text)
 

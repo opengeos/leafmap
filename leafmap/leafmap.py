@@ -1784,6 +1784,7 @@ class Map(ipyleaflet.Map):
         position: Optional[str] = "bottomright",
         builtin_legend: Optional[str] = None,
         layer_name: Optional[str] = None,
+        shape_type: Optional[str] = "rectangle",
         **kwargs,
     ) -> None:
         """Adds a customized basemap to the map.
@@ -1934,6 +1935,15 @@ class Map(ipyleaflet.Map):
 
         legend_html = header + content + footer
         legend_text = "".join(legend_html)
+
+        if shape_type == "circle":
+            legend_text = legend_text.replace("width: 30px", "width: 16px")
+            legend_text = legend_text.replace(
+                "border: 1px solid #999;",
+                "border-radius: 50%;\n      border: 1px solid #999;",
+            )
+        elif shape_type == "line":
+            legend_text = legend_text.replace("height: 16px", "height: 3px")
 
         try:
             legend_output_widget = widgets.Output(
