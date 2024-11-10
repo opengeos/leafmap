@@ -667,8 +667,6 @@ class Map(MapWidget):
             ValueError: If the data is not a URL or a GeoJSON dictionary.
         """
 
-        import os
-
         bounds = None
         geom_type = None
 
@@ -687,7 +685,11 @@ class Map(MapWidget):
             raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
         if name is None:
-            name = "geojson"
+            layer_names = list(self.layer_dict.keys())
+            if "geojson" not in layer_names:
+                name = "geojson"
+            else:
+                name = f"geojson_{random_string()}"
 
         if filter is not None:
             kwargs["filter"] = filter
@@ -2877,7 +2879,7 @@ class Map(MapWidget):
 
     def add_overture_3d_buildings(
         self,
-        release: Optional[str] = "2024-07-22",
+        release: Optional[str] = "2024-10-23",
         style: Optional[Dict[str, Any]] = None,
         values: Optional[List[int]] = None,
         colors: Optional[List[str]] = None,
@@ -2892,7 +2894,7 @@ class Map(MapWidget):
 
         Args:
             release (Optional[str], optional): The release date of the Overture Maps data.
-                Defaults to "2024-07-22". For more info, see
+                Defaults to "2024-10-23". For more info, see
                 https://github.com/OvertureMaps/overture-tiles.
             style (Optional[Dict[str, Any]], optional): The style dictionary for
                 the buildings. Defaults to None.
@@ -2937,8 +2939,8 @@ class Map(MapWidget):
             style = {
                 "layers": [
                     {
-                        "id": "buildings",
-                        "source": "example_source",
+                        "id": "Building",
+                        "source": "buildings",
                         "source-layer": "building",
                         "type": "fill-extrusion",
                         "filter": [
@@ -2957,8 +2959,8 @@ class Map(MapWidget):
                         },
                     },
                     {
-                        "id": "building-parts",
-                        "source": "example_source",
+                        "id": "Building-part",
+                        "source": "buildings",
                         "source-layer": "building_part",
                         "type": "fill-extrusion",
                         "filter": [
@@ -2992,7 +2994,7 @@ class Map(MapWidget):
 
     def add_overture_data(
         self,
-        release: str = "2024-07-22",
+        release: str = "2024-10-23",
         theme: str = "buildings",
         style: Optional[Dict[str, Any]] = None,
         visible: bool = True,
@@ -3005,7 +3007,7 @@ class Map(MapWidget):
 
         Args:
             release (str, optional): The release date of the data. Defaults to
-                "2024-07-22". For more info, see https://github.com/OvertureMaps/overture-tiles
+                "2024-10-23". For more info, see https://github.com/OvertureMaps/overture-tiles
             theme (str, optional): The theme of the data. It can be one of the following:
                 "addresses", "base", "buildings", "divisions", "places", "transportation".
                 Defaults to "buildings".
@@ -3041,7 +3043,7 @@ class Map(MapWidget):
                 "layers": [
                     {
                         "id": "Address",
-                        "source": "example_source",
+                        "source": "addresses",
                         "source-layer": "address",
                         "type": "circle",
                         "paint": {
@@ -3057,7 +3059,7 @@ class Map(MapWidget):
                 "layers": [
                     {
                         "id": "Infrastructure",
-                        "source": "example_source",
+                        "source": "base",
                         "source-layer": "infrastructure",
                         "type": "fill",
                         "paint": {
@@ -3068,7 +3070,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Land",
-                        "source": "example_source",
+                        "source": "base",
                         "source-layer": "land",
                         "type": "fill",
                         "paint": {
@@ -3079,7 +3081,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Land_cover",
-                        "source": "example_source",
+                        "source": "base",
                         "source-layer": "land_cover",
                         "type": "fill",
                         "paint": {
@@ -3090,7 +3092,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Land_use",
-                        "source": "example_source",
+                        "source": "base",
                         "source-layer": "land_use",
                         "type": "fill",
                         "paint": {
@@ -3101,7 +3103,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Water",
-                        "source": "example_source",
+                        "source": "base",
                         "source-layer": "water",
                         "type": "fill",
                         "paint": {
@@ -3116,7 +3118,7 @@ class Map(MapWidget):
                 "layers": [
                     {
                         "id": "Building",
-                        "source": "example_source",
+                        "source": "buildings",
                         "source-layer": "building",
                         "type": "fill",
                         "paint": {
@@ -3127,7 +3129,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Building_part",
-                        "source": "example_source",
+                        "source": "buildings",
                         "source-layer": "building_part",
                         "type": "fill",
                         "paint": {
@@ -3142,7 +3144,7 @@ class Map(MapWidget):
                 "layers": [
                     {
                         "id": "Division",
-                        "source": "example_source",
+                        "source": "divisions",
                         "source-layer": "division",
                         "type": "circle",
                         "paint": {
@@ -3154,7 +3156,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Division_area",
-                        "source": "example_source",
+                        "source": "divisions",
                         "source-layer": "division_area",
                         "type": "fill",
                         "paint": {
@@ -3165,7 +3167,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Division_boundary",
-                        "source": "example_source",
+                        "source": "divisions",
                         "source-layer": "division_boundary",
                         "type": "line",
                         "paint": {
@@ -3179,7 +3181,7 @@ class Map(MapWidget):
                 "layers": [
                     {
                         "id": "Place",
-                        "source": "example_source",
+                        "source": "places",
                         "source-layer": "place",
                         "type": "circle",
                         "paint": {
@@ -3195,7 +3197,7 @@ class Map(MapWidget):
                 "layers": [
                     {
                         "id": "Segment",
-                        "source": "example_source",
+                        "source": "transportation",
                         "source-layer": "segment",
                         "type": "line",
                         "paint": {
@@ -3205,7 +3207,7 @@ class Map(MapWidget):
                     },
                     {
                         "id": "Connector",
-                        "source": "example_source",
+                        "source": "transportation",
                         "source-layer": "connector",
                         "type": "circle",
                         "paint": {
@@ -3230,6 +3232,79 @@ class Map(MapWidget):
             tooltip=tooltip,
             fit_bounds=fit_bounds,
             **kwargs,
+        )
+
+    def add_overture_buildings(
+        self,
+        release: str = "2024-10-23",
+        style: Optional[Dict[str, Any]] = None,
+        type: str = "line",
+        visible: bool = True,
+        opacity: float = 1.0,
+        tooltip: bool = True,
+        fit_bounds: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Add Overture Maps data to the map.
+
+        Args:
+            release (str, optional): The release date of the data. Defaults to
+                "2024-10-23". For more info, see https://github.com/OvertureMaps/overture-tiles
+            style (Optional[Dict[str, Any]], optional): The style dictionary for
+                the data. Defaults to None.
+            type (str, optional): The type of the data. It can be "line" or "fill".
+            visible (bool, optional): Whether the data layer is visible. Defaults to True.
+            opacity (float, optional): The opacity of the data layer. Defaults to 1.0.
+            tooltip (bool, optional): Whether to show tooltips on the data.
+                Defaults to True.
+            fit_bounds (bool, optional): Whether to fit the map bounds to the
+                data layer. Defaults to False.
+            **kwargs (Any): Additional keyword arguments for the paint properties.
+        """
+        url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
+
+        kwargs = replace_underscores_in_keys(kwargs)
+
+        if type == "line":
+            if "line-color" not in kwargs:
+                kwargs["line-color"] = "#ff0000"
+            if "line-width" not in kwargs:
+                kwargs["line-width"] = 1
+            if "line-opacity" not in kwargs:
+                kwargs["line-opacity"] = opacity
+        elif type == "fill":
+            if "fill-color" not in kwargs:
+                kwargs["fill-color"] = "#6ea299"
+            if "fill-opacity" not in kwargs:
+                kwargs["fill-opacity"] = opacity
+
+        if style is None:
+            style = {
+                "layers": [
+                    {
+                        "id": "Building",
+                        "source": "buildings",
+                        "source-layer": "building",
+                        "type": type,
+                        "paint": kwargs,
+                    },
+                    {
+                        "id": "Building_part",
+                        "source": "buildings",
+                        "source-layer": "building_part",
+                        "type": type,
+                        "paint": kwargs,
+                    },
+                ]
+            }
+
+        self.add_pmtiles(
+            url,
+            style=style,
+            visible=visible,
+            opacity=opacity,
+            tooltip=tooltip,
+            fit_bounds=fit_bounds,
         )
 
     def add_video(
