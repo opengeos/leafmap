@@ -13573,6 +13573,27 @@ def replace_hyphens_in_keys(d: Union[Dict, List, Any]) -> Union[Dict, List, Any]
         return d
 
 
+def replace_underscores_in_keys(d: Union[Dict, List, Any]) -> Union[Dict, List, Any]:
+    """
+    Recursively replaces underscores with hyphens in dictionary keys.
+
+    Args:
+        d (Union[Dict, List, Any]): The input dictionary, list or any other data type.
+
+    Returns:
+        Union[Dict, List, Any]: The modified dictionary or list with keys having underscores replaced with hyphens,
+        or the original input if it's not a dictionary or list.
+    """
+    if isinstance(d, dict):
+        return {
+            k.replace("_", "-"): replace_underscores_in_keys(v) for k, v in d.items()
+        }
+    elif isinstance(d, list):
+        return [replace_underscores_in_keys(i) for i in d]
+    else:
+        return d
+
+
 def geojson_bounds(geojson: dict) -> Optional[list]:
     """
     Calculate the bounds of a GeoJSON object.
