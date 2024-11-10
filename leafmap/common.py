@@ -15018,3 +15018,77 @@ def download_nlcd(
         basename = os.path.basename(year_url)
         filepath = os.path.join(out_dir, basename)
         download_file(year_url, filepath, quiet=quiet, **kwargs)
+
+
+def connect_points_as_line(
+    gdf: "GeoDataFrame", sort_column: Optional[str] = None, crs: str = "EPSG:4326"
+) -> "GeoDataFrame":
+    """
+    Connects points in a GeoDataFrame into a single LineString based on a specified sort column
+    or the index if no column is provided. The resulting GeoDataFrame will have the specified CRS.
+
+    Args:
+        gdf (GeoDataFrame): A GeoDataFrame containing point geometries.
+        sort_column (Optional[str]): Column name to sort the points by (e.g., 'timestamp').
+                                     If None, the index is used for sorting. Defaults to None.
+        crs (str): The coordinate reference system (CRS) for the resulting GeoDataFrame.
+                   Defaults to "EPSG:4326".
+
+    Returns:
+        GeoDataFrame: A new GeoDataFrame containing a single LineString geometry that connects
+                      all points in the specified order, with the specified CRS.
+
+    Example:
+        >>> line_gdf = connect_points_as_line(gdf, 'timestamp', crs="EPSG:3857")
+        >>> line_gdf = connect_points_as_line(gdf)  # Uses index and defaults to EPSG:4326
+    """
+    from shapely.geometry import LineString
+    import geopandas as gpd
+
+    # Sort the GeoDataFrame by the specified column or by index if None
+    gdf_sorted = gdf.sort_values(by=sort_column) if sort_column else gdf.sort_index()
+
+    # Extract the point geometries and create a LineString
+    line = LineString(gdf_sorted.geometry.tolist())
+
+    # Create a new GeoDataFrame with the LineString and the specified CRS
+    line_gdf = gpd.GeoDataFrame(geometry=[line], crs=crs)
+
+    return line_gdf
+
+
+def line_to_points(data: str) -> "GeoDataFrame":
+    """
+    Converts a LineString geometry in a GeoDataFrame into individual points.
+
+    Args:
+        line_gdf (GeoDataFrame): A GeoDataFrame containing a LineString geometry.
+
+    Returns:
+        GeoDataFrame: A new GeoDataFrame where each vertex of the LineString is a Point geometry.
+    """
+    import geopandas as gpd
+    from shapely.geometry import Point, LineString
+    from geopandas import GeoDataFrame
+
+    if isinstance(data, str):
+        line_gdf = gpd.read_file(data)
+    elif isinstance(data, GeoDataFrame):
+        line_gdf = data
+    else:
+        raise ValueError("Invalid input. Must be a file path or a GeoDataFrame.")
+
+    # Ensure there is a LineString in the GeoDataFrame
+    if not all(line_gdf.geometry.type == "LineString"):
+        raise ValueError("Input GeoDataFrame must contain only LineString geometries.")
+
+    # Extract the first (and only) LineString from the GeoDataFrame
+    line = line_gdf.geometry.iloc[0]
+
+    # Convert each point in the LineString to a Point geometry
+    points = [Point(coord) for coord in line.coords]
+
+    # Create a new GeoDataFrame with these points
+    points_gdf = gpd.GeoDataFrame(geometry=points, crs=line_gdf.crs)
+
+    return points_gdf

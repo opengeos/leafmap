@@ -315,6 +315,12 @@ Add Google Earth Engine data layers to a map.
 
 [![](https://i.imgur.com/oHQDf79.png)](https://leafmap.org/maplibre/google_earth_engine)
 
+## Visualize GPS Trace Data
+
+Add a GPS trace to a map.
+
+[![](https://github.com/user-attachments/assets/2a669b4d-c43f-4382-bf66-8918b4719b48)](https://leafmap.org/maplibre/gps_trace)
+
 ## Create a heatmap layer
 
 Visualize earthquake frequency by location using a heatmap layer.
