@@ -170,6 +170,8 @@ class Map(MapWidget):
         layer: "Layer",
         before_id: Optional[str] = None,
         name: Optional[str] = None,
+        opacity: float = 1.0,
+        visible: bool = True,
     ) -> None:
         """
         Adds a layer to the map.
@@ -185,6 +187,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             name (str, optional): The name to use as the key to store the layer
                 in the layer dictionary. If None, the layer's ID is used as the key.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
+            visible (bool, optional): Whether the layer is visible by default.
 
         Returns:
             None
@@ -211,12 +215,14 @@ class Map(MapWidget):
 
         self.layer_dict[name] = {
             "layer": layer,
-            "opacity": 1.0,
-            "visible": True,
+            "opacity": opacity,
+            "visible": visible,
             "type": layer.type,
             "color": color,
         }
         super().add_layer(layer, before_id=before_id)
+        self.set_visibility(name, visible)
+        self.set_opacity(name, opacity)
 
     def remove_layer(self, name: str) -> None:
         """
@@ -387,6 +393,7 @@ class Map(MapWidget):
     def add_draw_control(
         self,
         options: Optional[Dict[str, Any]] = None,
+        controls: Optional[Dict[str, Any]] = None,
         position: str = "top-left",
         geojson: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
@@ -401,6 +408,10 @@ class Map(MapWidget):
         Args:
             options (Optional[Dict[str, Any]]): Configuration options for the
                 drawing control. Defaults to None.
+            controls (Optional[Dict[str, Any]]): The drawing controls to enable.
+                Can be one or more of the following: 'polygon', 'line_string',
+                'point', 'trash', 'combine_features', 'uncombine_features'.
+                Defaults to None.
             position (str): The position of the control on the map. Defaults
                 to "top-left".
             geojson (Optional[Dict[str, Any]]): Initial GeoJSON data to load
@@ -412,6 +423,28 @@ class Map(MapWidget):
             None
         """
 
+        from maplibre.plugins import MapboxDrawControls, MapboxDrawOptions
+
+        if isinstance(controls, list):
+            args = {}
+            for control in controls:
+                if control == "polygon":
+                    args["polygon"] = True
+                elif control == "line_string":
+                    args["line_string"] = True
+                elif control == "point":
+                    args["point"] = True
+                elif control == "trash":
+                    args["trash"] = True
+                elif control == "combine_features":
+                    args["combine_features"] = True
+                elif control == "uncombine_features":
+                    args["uncombine_features"] = True
+
+            options = MapboxDrawOptions(
+                display_controls_default=False,
+                controls=MapboxDrawControls(**args),
+            )
         super().add_mapbox_draw(
             options=options, position=position, geojson=geojson, **kwargs
         )
@@ -729,11 +762,10 @@ class Map(MapWidget):
             source=source,
             **kwargs,
         )
-        self.add_layer(layer, before_id=before_id, name=name)
+        self.add_layer(layer, before_id=before_id, name=name, visible=visible)
         self.add_popup(name)
         if fit_bounds and bounds is not None:
             self.fit_bounds(bounds)
-        self.set_visibility(name, visible)
 
         if isinstance(paint, dict) and f"{layer_type}-opacity" in paint:
             self.set_opacity(name, paint[f"{layer_type}-opacity"])
@@ -2808,6 +2840,7 @@ class Map(MapWidget):
         min_zoom: int = 15,
         values: List[int] = [0, 200, 400],
         colors: List[str] = ["lightgray", "royalblue", "lightblue"],
+        **kwargs: Any,
     ) -> None:
         """
         Adds a 3D buildings layer to the map.
@@ -2822,6 +2855,7 @@ class Map(MapWidget):
             values (List[int]): A list of height values (in meters) used for color interpolation. Defaults to [0, 200, 400].
             colors (List[str]): A list of colors corresponding to the 'values' list. Each color is applied to the
                 building height range defined by the 'values'. Defaults to ["lightgray", "royalblue", "lightblue"].
+            **kwargs: Additional keyword arguments to pass to the add_layer method.
 
         Raises:
             ValueError: If the lengths of 'values' and 'colors' lists do not match.
@@ -2875,7 +2909,7 @@ class Map(MapWidget):
             },
         }
         self.add_source("openmaptiles", source)
-        self.add_layer(layer)
+        self.add_layer(layer, **kwargs)
 
     def add_overture_3d_buildings(
         self,
@@ -3407,6 +3441,7 @@ class Map(MapWidget):
         x: str = "longitude",
         y: str = "latitude",
         columns: Optional[List[str]] = None,
+        color_column: Optional[str] = None,
         colormap: Optional[Dict[str, str]] = None,
         radius: int = 5,
         circle_color: Optional[Union[str, List[Any]]] = None,
@@ -3471,12 +3506,22 @@ class Map(MapWidget):
 
         if columns is None:
             if "annotation" in gdf.columns:
-                columns = ["latitude", "longitude", "annotation", "geometry"]
+                if color_column is None:
+                    color_column = "category"
+                gdf[color_column] = gdf["annotation"]
+                columns = [
+                    "latitude",
+                    "longitude",
+                    "annotation",
+                    color_column,
+                    "geometry",
+                ]
                 gdf = gdf[columns]
+                setattr(self, "gdf", gdf)
                 if circle_color is None:
                     circle_color = [
                         "match",
-                        ["get", "annotation"],
+                        ["get", color_column],
                         "doorstep",
                         colormap["doorstep"],
                         "indoor",
