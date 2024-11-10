@@ -3401,6 +3401,115 @@ class Map(MapWidget):
         if add_legend:
             self.add_legend(title="NLCD Land Cover Type", builtin_legend="NLCD")
 
+    def add_gps_trace(
+        self,
+        data: Union[str, List[Dict[str, Any]]],
+        x: str = "longitude",
+        y: str = "latitude",
+        columns: Optional[List[str]] = None,
+        colormap: Optional[Dict[str, str]] = None,
+        radius: int = 5,
+        circle_color: Optional[Union[str, List[Any]]] = None,
+        stroke_color: str = "#ffffff",
+        opacity: float = 1.0,
+        paint: Optional[Dict[str, Any]] = None,
+        name: str = "GPS Trace",
+        add_line: bool = False,
+        sort_column: Optional[str] = None,
+        line_args: Optional[Dict[str, Any]] = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a GPS trace to the map.
+
+        Args:
+            data (Union[str, List[Dict[str, Any]]]): The GPS trace data. It can be a GeoJSON file path or a list of coordinates.
+            x (str, optional): The column name for the x coordinates. Defaults to "longitude".
+            y (str, optional): The column name for the y coordinates. Defaults to "latitude".
+            columns (Optional[List[str]], optional): The list of columns to include in the GeoDataFrame. Defaults to None.
+            colormap (Optional[Dict[str, str]], optional): The colormap for the GPS trace. Defaults to None.
+            radius (int, optional): The radius of the GPS trace points. Defaults to 5.
+            circle_color (Optional[Union[str, List[Any]]], optional): The color of the GPS trace points. Defaults to None.
+            stroke_color (str, optional): The stroke color of the GPS trace points. Defaults to "#ffffff".
+            opacity (float, optional): The opacity of the GPS trace points. Defaults to 1.0.
+            paint (Optional[Dict[str, Any]], optional): The paint properties for the GPS trace points. Defaults to None.
+            name (str, optional): The name of the GPS trace layer. Defaults to "GPS Trace".
+            add_line (bool, optional): If True, adds a line connecting the GPS trace points. Defaults to False.
+            sort_column (Optional[str], optional): The column name to sort the points before connecting them as a line. Defaults to None.
+            line_args (Optional[Dict[str, Any]], optional): Additional arguments for the line layer. Defaults to None.
+            **kwargs (Any): Additional keyword arguments to pass to the add_geojson method.
+
+        Returns:
+            None
+        """
+        import geopandas as gpd
+
+        if isinstance(data, str):
+            gdf = points_from_xy(data, x=x, y=y)
+        elif isinstance(data, gpd.GeoDataFrame):
+            gdf = data
+        else:
+            raise ValueError(
+                "Invalid data type. Use a GeoDataFrame or a list of coordinates."
+            )
+
+        setattr(self, "gps_trace", gdf)
+
+        if add_line:
+            line_gdf = connect_points_as_line(gdf, sort_column=sort_column)
+        else:
+            line_gdf = None
+
+        if colormap is None:
+            colormap = {
+                "doorstep": "#FF0000",  # Red
+                "indoor": "#0000FF",  # Blue
+                "outdoor": "#00FF00",  # Green
+                "parked": "#000000",  # Yellow
+                "selected": "#FFFF00",
+            }
+
+        if columns is None:
+            if "annotation" in gdf.columns:
+                columns = ["latitude", "longitude", "annotation", "geometry"]
+                gdf = gdf[columns]
+                if circle_color is None:
+                    circle_color = [
+                        "match",
+                        ["get", "annotation"],
+                        "doorstep",
+                        colormap["doorstep"],
+                        "indoor",
+                        colormap["indoor"],
+                        "outdoor",
+                        colormap["outdoor"],
+                        "parked",
+                        colormap["parked"],
+                        "selected",
+                        colormap["selected"],
+                        "#CCCCCC",  # Default color if annotation does not match
+                    ]
+
+        if circle_color is None:
+            circle_color = "#3388ff"
+
+        geojson = gdf.__geo_interface__
+
+        if paint is None:
+            paint = {
+                "circle-radius": radius,
+                "circle-color": circle_color,
+                "circle-stroke-color": stroke_color,
+                "circle-stroke-width": 1,
+                "circle-opacity": opacity,
+            }
+
+        if line_gdf is not None:
+            if line_args is None:
+                line_args = {}
+            self.add_gdf(line_gdf, name="GPS Trace Line", **line_args)
+        self.add_geojson(geojson, layer_type="circle", paint=paint, name=name, **kwargs)
+
 
 class Container(v.Container):
 
