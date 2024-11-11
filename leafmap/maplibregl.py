@@ -3953,6 +3953,12 @@ def edit_gps_trace(
             categories = m.gdf["annotation"].value_counts()
             keys = list(colormap.keys())[:-1]
             for index, cat in enumerate(keys):
+
+                fig.axes = [
+                    bq.Axis(scale=x_sc, label="Time"),
+                    bq.Axis(scale=y_sc, orientation="vertical", label=feature.value),
+                ]
+
                 mask = m.gdf["annotation"] == cat
                 scatters[index].x = m.gps_trace.index[mask]
                 scatters[index].y = m.gps_trace[feature.value][mask]
