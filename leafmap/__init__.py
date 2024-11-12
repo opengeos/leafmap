@@ -18,9 +18,22 @@ def _in_colab_shell():
         return False
 
 
+def _in_marimo():
+    """Tests if the code is being executed within a marimo notebook."""
+    try:
+        import marimo
+
+        return marimo.running_in_notebook()
+    except (ImportError, ModuleNotFoundError):
+        # marimo not installed
+        return False
+
+
 def _use_folium():
     """Whether to use the folium or ipyleaflet plotting backend."""
     if os.environ.get("USE_MKDOCS") is not None:
+        return True
+    elif _in_marimo():
         return True
     else:
         return False
