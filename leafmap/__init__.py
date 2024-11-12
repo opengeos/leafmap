@@ -22,6 +22,7 @@ def _in_marimo():
     """Tests if the code is being executed within a marimo notebook."""
     try:
         import marimo
+
         return marimo.running_in_notebook()
     except (ImportError, ModuleNotFoundError):
         # marimo not installed
