@@ -3195,7 +3195,7 @@ def get_palettable(types=None):
     return palettes
 
 
-def points_from_xy(data, x="longitude", y="latitude", z=None, crs=None, **kwargs):
+def points_from_xy(data, x=None, y=None, z=None, crs=None, **kwargs):
     """Create a GeoPandas GeoDataFrame from a csv or Pandas DataFrame containing x, y, z values.
 
     Args:
@@ -3224,6 +3224,28 @@ def points_from_xy(data, x="longitude", y="latitude", z=None, crs=None, **kwargs
             df = pd.read_csv(data, **kwargs)
     else:
         raise TypeError("The data must be a pandas DataFrame or a csv file path.")
+
+    columns = df.columns
+
+    if x is None:
+        if "longitude" in columns:
+            x = "longitude"
+        elif "x" in columns:
+            x = "x"
+        elif "lon" in columns:
+            x = "lon"
+        else:
+            raise ValueError("The x column could not be found.")
+
+    if y is None:
+        if "latitude" in columns:
+            y = "latitude"
+        elif "y" in columns:
+            y = "y"
+        elif "lat" in columns:
+            y = "lat"
+        else:
+            raise ValueError("The y column could not be found.")
 
     gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df[x], df[y], z=z, crs=crs))
 
@@ -15020,12 +15042,16 @@ def download_nlcd(
         download_file(year_url, filepath, quiet=quiet, **kwargs)
 
 
-def connect_points_as_line(
-    gdf: "GeoDataFrame", sort_column: Optional[str] = None, crs: str = "EPSG:4326"
+def connect_points_as_lines(
+    gdf: "GeoDataFrame",
+    sort_column: Optional[str] = None,
+    crs: str = "EPSG:4326",
+    single_line: bool = True,
 ) -> "GeoDataFrame":
     """
-    Connects points in a GeoDataFrame into a single LineString based on a specified sort column
-    or the index if no column is provided. The resulting GeoDataFrame will have the specified CRS.
+    Connects points in a GeoDataFrame into either a single LineString or multiple LineStrings
+    based on a specified sort column or the index if no column is provided. The resulting
+    GeoDataFrame will have the specified CRS.
 
     Args:
         gdf (GeoDataFrame): A GeoDataFrame containing point geometries.
@@ -15033,14 +15059,17 @@ def connect_points_as_line(
                                      If None, the index is used for sorting. Defaults to None.
         crs (str): The coordinate reference system (CRS) for the resulting GeoDataFrame.
                    Defaults to "EPSG:4326".
+        single_line (bool): If True, generates a single LineString connecting all points.
+                            If False, generates multiple LineStrings, each connecting two consecutive points.
+                            Defaults to True.
 
     Returns:
-        GeoDataFrame: A new GeoDataFrame containing a single LineString geometry that connects
-                      all points in the specified order, with the specified CRS.
+        GeoDataFrame: A new GeoDataFrame containing either a single LineString or multiple LineString geometries
+                      based on the single_line parameter, with the specified CRS.
 
     Example:
-        >>> line_gdf = connect_points_as_line(gdf, 'timestamp', crs="EPSG:3857")
-        >>> line_gdf = connect_points_as_line(gdf)  # Uses index and defaults to EPSG:4326
+        >>> line_gdf = connect_points_as_lines(gdf, 'timestamp', crs="EPSG:3857", single_line=True)
+        >>> line_gdf = connect_points_as_lines(gdf, single_line=False)  # Uses index and defaults to EPSG:4326
     """
     from shapely.geometry import LineString
     import geopandas as gpd
@@ -15048,11 +15077,17 @@ def connect_points_as_line(
     # Sort the GeoDataFrame by the specified column or by index if None
     gdf_sorted = gdf.sort_values(by=sort_column) if sort_column else gdf.sort_index()
 
-    # Extract the point geometries and create a LineString
-    line = LineString(gdf_sorted.geometry.tolist())
-
-    # Create a new GeoDataFrame with the LineString and the specified CRS
-    line_gdf = gpd.GeoDataFrame(geometry=[line], crs=crs)
+    if single_line:
+        # Create a single LineString connecting all points
+        line = LineString(gdf_sorted.geometry.tolist())
+        line_gdf = gpd.GeoDataFrame(geometry=[line], crs=crs)
+    else:
+        # Generate LineStrings for each consecutive pair of points
+        lines = [
+            LineString([gdf_sorted.geometry.iloc[i], gdf_sorted.geometry.iloc[i + 1]])
+            for i in range(len(gdf_sorted) - 1)
+        ]
+        line_gdf = gpd.GeoDataFrame(geometry=lines, crs=crs)
 
     return line_gdf
 
