@@ -2174,10 +2174,9 @@ def oam_search(
         GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
     """
 
-    if return_gdf:
-        import pandas as pd
-        from shapely.geometry import Polygon
-        import geopandas as gpd
+    import pandas as pd
+    from shapely.geometry import Polygon
+    import geopandas as gpd
 
     url = "https://api.openaerialmap.org/meta"
     if bbox is not None:

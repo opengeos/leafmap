@@ -6,8 +6,8 @@ import ipywidgets as widgets
 
 import pandas as pd
 from IPython.display import display, HTML
-from .common import *
-from .osm import *
+from . import common
+from . import osm
 from . import examples
 from typing import Optional, Union, Dict
 from pandas import DataFrame
@@ -129,6 +129,7 @@ class Map(keplergl.KeplerGl):
             FileNotFoundError: The provided GeoJSON file could not be found.
             TypeError: The input geojson must be a type of str or dict.
         """
+        import shutil
 
         if "encoding" in kwargs:
             encoding = kwargs["encoding"]
@@ -138,7 +139,7 @@ class Map(keplergl.KeplerGl):
         try:
             if isinstance(in_geojson, str):
                 if in_geojson.startswith("http"):
-                    if is_jupyterlite():
+                    if common.is_jupyterlite():
                         import pyodide
 
                         output = os.path.basename(in_geojson)
@@ -150,7 +151,7 @@ class Map(keplergl.KeplerGl):
                         with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
-                        in_geojson = github_raw_url(in_geojson)
+                        in_geojson = common.github_raw_url(in_geojson)
                         data = requests.get(in_geojson).json()
                 else:
                     in_geojson = os.path.abspath(in_geojson)
@@ -195,7 +196,7 @@ class Map(keplergl.KeplerGl):
             out_dir = os.path.abspath("./cache/shp")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_shp, out_dir=out_dir, verbose=False)
+            common.download_from_url(in_shp, out_dir=out_dir, verbose=False)
             files = list(glob.glob(os.path.join(out_dir, "*.shp")))
             if len(files) > 0:
                 in_shp = files[0]
@@ -208,7 +209,7 @@ class Map(keplergl.KeplerGl):
             if not os.path.exists(in_shp):
                 raise FileNotFoundError("The provided shapefile could not be found.")
 
-        geojson = shp_to_geojson(in_shp)
+        geojson = common.shp_to_geojson(in_shp)
         self.add_geojson(
             geojson,
             layer_name,
@@ -232,7 +233,7 @@ class Map(keplergl.KeplerGl):
 
         """
 
-        data = gdf_to_geojson(gdf, epsg="4326")
+        data = common.gdf_to_geojson(gdf, epsg="4326")
         self.add_geojson(data, layer_name, **kwargs)
         self.load_config(config)
 
@@ -310,7 +311,7 @@ class Map(keplergl.KeplerGl):
             )
             self.load_config(config)
         else:
-            geojson = vector_to_geojson(
+            geojson = common.vector_to_geojson(
                 filename,
                 epsg="4326",
                 **kwargs,
@@ -345,7 +346,9 @@ class Map(keplergl.KeplerGl):
             out_dir = os.path.abspath("./cache")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            download_from_url(in_kml, out_dir=out_dir, unzip=False, verbose=False)
+            common.download_from_url(
+                in_kml, out_dir=out_dir, unzip=False, verbose=False
+            )
             in_kml = os.path.join(out_dir, os.path.basename(in_kml))
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The downloaded kml file could not be found.")
@@ -378,7 +381,7 @@ class Map(keplergl.KeplerGl):
             config (str, optional): Local path or HTTP URL to the config file. Defaults to None.
 
         """
-        gdf = read_postgis(sql, con, **kwargs)
+        gdf = common.read_postgis(sql, con, **kwargs)
         gdf = gdf.to_crs("epsg:4326")
         self.add_gdf(
             gdf,
@@ -410,9 +413,13 @@ class Map(keplergl.KeplerGl):
         if isinstance(self, keplergl.KeplerGl):
             if out_file is None:
                 if os.environ.get("USE_MKDOCS") is not None:
-                    out_file = "../maps/" + "kepler_" + random_string(3) + ".html"
+                    out_file = (
+                        "../maps/" + "kepler_" + common.random_string(3) + ".html"
+                    )
                 else:
-                    out_file = "./cache/" + "kepler_" + random_string(3) + ".html"
+                    out_file = (
+                        "./cache/" + "kepler_" + common.random_string(3) + ".html"
+                    )
             out_dir = os.path.abspath(os.path.dirname(out_file))
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
@@ -420,7 +427,7 @@ class Map(keplergl.KeplerGl):
             output = widgets.Output()
             with output:
                 self.save_to_html(file_name=out_file, read_only=read_only)
-            display_html(src=out_file, width=width, height=height)
+            common.display_html(src=out_file, width=width, height=height)
         else:
             raise TypeError("The provided map is not a kepler.gl map.")
 
@@ -451,7 +458,7 @@ class Map(keplergl.KeplerGl):
                 if not os.path.exists(out_dir):
                     os.makedirs(out_dir)
             else:
-                outfile = os.path.abspath(random_string() + ".html")
+                outfile = os.path.abspath(common.random_string() + ".html")
                 save = False
 
             output = widgets.Output()

@@ -1,8 +1,10 @@
 import os
-from .common import *
-from .osm import *
-from .leafmap import basemaps
+from . import common
 from . import examples
+from . import osm
+from .leafmap import basemaps
+
+from typing import Optional
 
 try:
     import pydeck as pdk
@@ -144,7 +146,7 @@ class Map(pdk.Deck):
                 raise TypeError("gdf must be a GeoPandas GeoDataFrame.")
 
             if layer_name is None:
-                layer_name = "layer_" + random_string(3)
+                layer_name = "layer_" + common.random_string(3)
 
             if "layer_type" == "GeoJsonLayer":
                 if "pickable" not in kwargs:
