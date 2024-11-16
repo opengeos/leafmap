@@ -23,7 +23,13 @@ def osm_gdf_from_address(address: str, tags: Dict, dist: Optional[int] = 1000):
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
-    import osmnx as ox
+
+    try:
+        import osmnx as ox
+    except ImportError:
+        raise ImportError(
+            "osmnx package is required. Please install it using 'pip install osmnx'"
+        )
 
     gdf = ox.features_from_address(address, tags, dist)
     return gdf
@@ -84,7 +90,12 @@ def osm_gdf_from_place(
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
-    import osmnx as ox
+    try:
+        import osmnx as ox
+    except ImportError:
+        raise ImportError(
+            "osmnx package is required. Please install it using 'pip install osmnx'"
+        )
 
     ox.settings.use_cache = True
     ox.settings.log_console = False
@@ -154,7 +165,12 @@ def osm_gdf_from_point(
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
-    import osmnx as ox
+    try:
+        import osmnx as ox
+    except ImportError:
+        raise ImportError(
+            "osmnx package is required. Please install it using 'pip install osmnx'"
+        )
 
     gdf = ox.features_from_point(center_point, tags, dist)
     return gdf
@@ -213,7 +229,12 @@ def osm_gdf_from_polygon(polygon, tags: Dict):
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
-    import osmnx as ox
+    try:
+        import osmnx as ox
+    except ImportError:
+        raise ImportError(
+            "osmnx package is required. Please install it using 'pip install osmnx'"
+        )
 
     gdf = ox.features_from_polygon(polygon, tags)
     return gdf
@@ -265,7 +286,12 @@ def osm_gdf_from_bbox(north: float, south: float, east: float, west: float, tags
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
-    import osmnx as ox
+    try:
+        import osmnx as ox
+    except ImportError:
+        raise ImportError(
+            "osmnx package is required. Please install it using 'pip install osmnx'"
+        )
 
     gdf = ox.features_from_bbox(north, south, east, west, tags)
     return gdf
@@ -328,7 +354,12 @@ def osm_gdf_from_xml(filepath: str, polygon=None, tags: Dict = None):
         GeoDataFrame: A GeoDataFrame of OSM entities.
     """
     check_package("osmnx", "https://osmnx.readthedocs.io/en/stable/#installation")
-    import osmnx as ox
+    try:
+        import osmnx as ox
+    except ImportError:
+        raise ImportError(
+            "osmnx package is required. Please install it using 'pip install osmnx'"
+        )
 
     gdf = ox.features_from_xml(filepath, polygon, tags)
     return gdf

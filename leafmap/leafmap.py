@@ -15,7 +15,13 @@ from . import map_widgets
 from . import osm
 from . import pc
 from . import plot
-from .common import set_api_key, get_api_key, planet_quarterly_tiles
+from .common import (
+    set_api_key,
+    get_api_key,
+    planet_quarterly_tiles,
+    pmtiles_metadata,
+    pmtiles_style,
+)
 from typing import Any, Dict, List, Optional, Tuple, Type, Union, Callable
 
 

@@ -10,7 +10,13 @@ from . import osm
 from . import examples
 from . import map_widgets
 from . import plot
-from .common import set_api_key, get_api_key, planet_quarterly_tiles
+from .common import (
+    set_api_key,
+    get_api_key,
+    planet_quarterly_tiles,
+    pmtiles_metadata,
+    pmtiles_style,
+)
 
 from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
