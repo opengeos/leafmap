@@ -15042,7 +15042,7 @@ def download_nlcd(
         download_file(year_url, filepath, quiet=quiet, **kwargs)
 
 
-def connect_points_as_lines(
+def connect_points_as_line(
     gdf: "GeoDataFrame",
     sort_column: Optional[str] = None,
     crs: str = "EPSG:4326",
@@ -15068,8 +15068,8 @@ def connect_points_as_lines(
                       based on the single_line parameter, with the specified CRS.
 
     Example:
-        >>> line_gdf = connect_points_as_lines(gdf, 'timestamp', crs="EPSG:3857", single_line=True)
-        >>> line_gdf = connect_points_as_lines(gdf, single_line=False)  # Uses index and defaults to EPSG:4326
+        >>> line_gdf = connect_points_as_line(gdf, 'timestamp', crs="EPSG:3857", single_line=True)
+        >>> line_gdf = connect_points_as_line(gdf, single_line=False)  # Uses index and defaults to EPSG:4326
     """
     from shapely.geometry import LineString
     import geopandas as gpd
