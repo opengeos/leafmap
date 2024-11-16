@@ -8,7 +8,7 @@ import ipyleaflet
 import ipywidgets as widgets
 from ipyfilechooser import FileChooser
 from .common import *
-from .pc import *
+from . import pc
 from typing import Optional, Union, Dict, List
 
 

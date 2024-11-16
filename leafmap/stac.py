@@ -1,7 +1,7 @@
 import os
 import pystac
 import requests
-from typing import Optional, Dict, List, Callable, Any, Tuple, Union
+from typing import Optional, Dict, List, Callable, Tuple, Union
 from pandas import DataFrame
 
 

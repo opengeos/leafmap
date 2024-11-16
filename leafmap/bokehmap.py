@@ -425,7 +425,7 @@ class Map:
         import geopandas as gpd
 
         if filename.startswith("http"):
-            filename = common.(filename)
+            filename = common.github_raw_url(filename)
 
         if isinstance(filename, gpd.GeoDataFrame):
             gdf = filename
