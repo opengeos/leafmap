@@ -18,7 +18,7 @@ import pandas as pd
 import whitebox
 import subprocess
 from pathlib import Path
-from typing import Union, List, Dict, Optional, Tuple, TYPE_CHECKING
+from typing import Union, List, Dict, Optional, Tuple, TYPE_CHECKING, Any
 from .stac import *
 
 try:
@@ -1781,19 +1781,18 @@ def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Option
     Returns:
         Optional[str]: The retrieved key, or None if no key was found.
     """
-
     if key is not None:
         return key
-    elif name is not None:
-        if _in_colab_shell():
-            from google.colab import userdata  # pylint: disable=E0611
+    if name is not None:
+        try:
+            if _in_colab_shell():
+                from google.colab import userdata  # pylint: disable=E0611
 
-            try:
                 return userdata.get(name)
-            except:
-                return os.environ.get(name)
-        else:
-            return os.environ.get(name)
+        except Exception:
+            pass
+        return os.environ.get(name)
+    return None
 
 
 def set_api_key(key: str, name: str = "GOOGLE_MAPS_API_KEY"):
@@ -6297,7 +6296,6 @@ def meters_to_lnglat(x, y):
     Returns:
         tuple: A tuple of (longitude, latitude) in decimal degrees.
     """
-    import numpy as np
 
     origin_shift = np.pi * 6378137
     longitude = (x / origin_shift) * 180.0
@@ -6308,26 +6306,42 @@ def meters_to_lnglat(x, y):
     return (longitude, latitude)
 
 
-def bounds_to_xy_range(bounds):
-    """Convert bounds to x and y range to be used as input to bokeh map.
+def bounds_to_xy_range(
+    bounds: Union[
+        List[Union[Tuple[float, float], float]], Tuple[float, float, float, float]
+    ]
+) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+    """
+    Convert bounds to x and y range to be used as input to bokeh map.
 
     Args:
-        bounds (list): A list of bounds in the form [(south, west), (north, east)] or [xmin, ymin, xmax, ymax].
+        bounds (Union[List[Union[Tuple[float, float], float]], Tuple[float, float, float, float]]):
+            A list of bounds in the form [(south, west), (north, east)] or [xmin, ymin, xmax, ymax].
 
     Returns:
-        tuple: A tuple of (x_range, y_range).
+        Tuple[Tuple[float, float], Tuple[float, float]]: A tuple of (x_range, y_range).
     """
-
     if isinstance(bounds, tuple):
-        bounds = list(bounds)
-    elif not isinstance(bounds, list):
-        raise TypeError("bounds must be a list")
-
-    if len(bounds) == 4:
+        if len(bounds) != 4:
+            raise ValueError(
+                "Tuple bounds must have exactly 4 elements (xmin, ymin, xmax, ymax)."
+            )
         west, south, east, north = bounds
-    elif len(bounds) == 2:
-        south, west = bounds[0]
-        north, east = bounds[1]
+    elif isinstance(bounds, list):
+        if len(bounds) == 2 and all(
+            isinstance(coord, tuple) and len(coord) == 2 for coord in bounds
+        ):
+            (south, west), (north, east) = bounds
+        elif len(bounds) == 4 and all(
+            isinstance(coord, (int, float)) for coord in bounds
+        ):
+            west, south, east, north = bounds
+        else:
+            raise ValueError(
+                "List bounds must be in the form [(south, west), (north, east)] or [xmin, ymin, xmax, ymax]."
+            )
+    else:
+        raise TypeError("bounds must be a list or tuple")
 
     xmin, ymin = lnglat_to_meters(west, south)
     xmax, ymax = lnglat_to_meters(east, north)
@@ -6649,6 +6663,9 @@ def vector_area(vector, unit="m2", crs="epsg:3857"):
         gdf = gpd.read_file(vector)
     elif isinstance(vector, gpd.GeoDataFrame):
         gdf = vector
+    else:
+        gdf = None
+        raise ValueError("Invalid input vector.")
 
     area = gdf.to_crs(crs).area.sum()
 
@@ -10096,6 +10113,8 @@ def split_raster(filename, out_dir, tile_size=256, overlap=0, prefix="tile"):
     elif isinstance(tile_size, tuple):
         tile_width = tile_size[0]
         tile_height = tile_size[1]
+    else:
+        raise ValueError("tile_size must be an integer or a tuple of (width, height)")
 
     # Get the size of the input raster
     width = ds.RasterXSize
@@ -10376,6 +10395,8 @@ def install_package(package):
 
     if isinstance(package, str):
         packages = [package]
+    elif isinstance(package, list):
+        packages = package
 
     for package in packages:
         if package.startswith("https"):
@@ -10875,7 +10896,7 @@ def merge_vector(
     quiet: bool = False,
     return_gdf: bool = False,
     **kwargs,
-):
+) -> Optional["gpd.GeoDataFrame"]:
     """
     Merge vector files into a single GeoDataFrame.
 
@@ -11458,8 +11479,6 @@ def mbtiles_to_pmtiles(
     Returns:
         None: The function returns None either upon successful completion or when the pmtiles package is not installed.
 
-    Raises:
-        Any exception raised by pmtiles.convert.mbtiles_to_pmtiles will be propagated up.
     """
 
     import pmtiles.convert as convert
@@ -11984,9 +12003,13 @@ def blend_images(
     Returns:
         numpy.ndarray: The blended image as a NumPy array.
     """
-    import cv2
     import numpy as np
     import matplotlib.pyplot as plt
+
+    try:
+        import cv2
+    except ImportError:
+        raise ImportError("The blend_images function requires the OpenCV library.")
 
     # Resize the images to have the same dimensions
     if isinstance(img1, str):
@@ -13183,11 +13206,11 @@ def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> N
 
     Args:
         strategy (str, optional): The authentication method.
-                "all": (default) try all methods until one works
-                "interactive": enter username and password.
-                "netrc": retrieve username and password from ~/.netrc.
-                "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
-           persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
+            "all": (default) try all methods until one works
+            "interactive": enter username and password.
+            "netrc": retrieve username and password from ~/.netrc.
+            "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
+        persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
         **kwargs: Additional keyword arguments for the earthaccess.login() function.
     """
     try:
@@ -13299,7 +13322,10 @@ def nasa_data_search(
     Returns:
         Union[List[dict], tuple]: The retrieved granules. If return_gdf is True, also returns the resulting GeoDataFrame.
     """
-    import earthaccess
+    try:
+        import earthaccess
+    except ImportError:
+        install_package("earthaccess")
 
     if short_name is not None:
         kwargs["short_name"] = short_name
@@ -14551,6 +14577,7 @@ def get_nwi(
             raise ValueError("Unsupported geometry type or invalid geometry structure.")
 
     # Convert GeoDataFrame to a dictionary if needed
+    geometry_type = None
     if isinstance(geometry, gpd.GeoDataFrame):
         geometry_dict = _convert_geodataframe_to_esri_format(geometry)[0]
         geometry_type = detect_geometry_type(geometry_dict)

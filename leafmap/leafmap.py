@@ -1,27 +1,94 @@
 """Main module."""
 
 import os
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, Callable
+
 import ipyleaflet
-import ipywidgets
+import ipywidgets as widgets
+import pandas as pd
 
 from box import Box
 from IPython.display import display
 from .basemaps import xyz_to_leaflet
-from .common import *
 from .legends import builtin_legends
-from .osm import *
-from .pc import *
+from . import common
 from . import examples
-from .plot import *
 from . import map_widgets
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
+from . import osm
+from . import pc
+from . import plot
+from .common import (
+    add_crs,
+    array_to_image,
+    basemap_xyz_tiles,
+    bbox_to_gdf,
+    cog_bands,
+    cog_bounds,
+    cog_center,
+    cog_tile,
+    convert_lidar,
+    create_legend,
+    csv_to_df,
+    csv_to_geojson,
+    csv_to_shp,
+    download_file,
+    download_from_url,
+    download_ned,
+    filter_bounds,
+    gdf_to_geojson,
+    gedi_download_files,
+    gedi_search,
+    geojson_to_gdf,
+    geojson_to_pmtiles,
+    get_api_key,
+    get_census_dict,
+    get_overture_data,
+    get_wbd,
+    image_comparison,
+    image_to_numpy,
+    map_tiles_to_geotiff,
+    netcdf_to_tif,
+    numpy_to_cog,
+    planet_monthly_tiles,
+    planet_quarterly_tiles,
+    planet_tiles,
+    plot_raster,
+    plot_raster_3d,
+    pmtiles_metadata,
+    pmtiles_style,
+    read_lidar,
+    read_netcdf,
+    read_raster,
+    read_rasters,
+    save_colorbar,
+    search_qms,
+    search_xyz_services,
+    set_api_key,
+    show_html,
+    show_youtube_video,
+    stac_assets,
+    stac_bands,
+    stac_bounds,
+    stac_center,
+    stac_info,
+    stac_search,
+    stac_stats,
+    stac_tile,
+    start_server,
+    vector_to_gif,
+    view_lidar,
+    write_lidar,
+    zonal_stats,
+)
 
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 
 class Map(ipyleaflet.Map):
-    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html. By default, the Map will add OpenStreetMap as the basemap.
+    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map
+    can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html.
+    By default, the Map will add OpenStreetMap as the basemap.
 
     Returns:
         object: ipyleaflet map object.
@@ -147,7 +214,7 @@ class Map(ipyleaflet.Map):
             self.add(draw_control)
             self.draw_control = draw_control
 
-            def handle_draw(target, action, geo_json):
+            def handle_draw(_, action, geo_json):
                 if "style" in geo_json["properties"]:
                     del geo_json["properties"]["style"]
                 self.user_roi = geo_json
@@ -344,7 +411,7 @@ class Map(ipyleaflet.Map):
 
             if isinstance(basemap, str):
                 if basemap.upper() in map_dict:
-                    layer = get_google_map(basemap.upper(), **kwargs)
+                    layer = common.get_google_map(basemap.upper(), **kwargs)
                     layer.visible = show
                     self.add(layer)
                     return
@@ -366,13 +433,13 @@ class Map(ipyleaflet.Map):
                     **kwargs,
                 )
                 self.add(layer)
-                arc_add_layer(url, name)
+                common.arc_add_layer(url, name)
             elif basemap in basemaps and basemaps[basemap].name not in layer_names:
                 self.add(basemap)
                 self.layers[-1].visible = show
                 for param in kwargs:
                     setattr(self.layers[-1], param, kwargs[param])
-                arc_add_layer(basemaps[basemap].url, basemap)
+                common.arc_add_layer(basemaps[basemap].url, basemap)
             elif basemap in basemaps and basemaps[basemap].name in layer_names:
                 print(f"{basemap} has been already added before.")
             else:
@@ -584,7 +651,7 @@ class Map(ipyleaflet.Map):
             )
             self.add(tile_layer, index=layer_index)
 
-            arc_add_layer(url, name, shown, opacity)
+            common.arc_add_layer(url, name, shown, opacity)
 
         except Exception as e:
             print("Failed to add the specified TileLayer.")
@@ -659,7 +726,7 @@ class Map(ipyleaflet.Map):
                 del kwargs["version"]
 
             if style is None:
-                style = pmtiles_style(url)
+                style = common.pmtiles_style(url)
 
             layer = ipyleaflet.PMTilesLayer(
                 url=url,
@@ -671,7 +738,7 @@ class Map(ipyleaflet.Map):
             self.add(layer)
 
             if zoom_to_layer:
-                metadata = pmtiles_metadata(url)
+                metadata = common.pmtiles_metadata(url)
                 bounds = metadata["bounds"]
                 self.zoom_to_bounds(bounds)
         except Exception as e:
@@ -706,7 +773,7 @@ class Map(ipyleaflet.Map):
 
         """
 
-        gdf = osm_gdf_from_geocode(
+        gdf = osm.osm_gdf_from_geocode(
             query, which_result=which_result, by_osmid=by_osmid, buffer_dist=buffer_dist
         )
         geojson = gdf.__geo_interface__
@@ -748,7 +815,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_address(address, tags, dist)
+        gdf = osm.osm_gdf_from_address(address, tags, dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -790,7 +857,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_place(query, tags, which_result, buffer_dist)
+        gdf = osm.osm_gdf_from_place(query, tags, which_result, buffer_dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -830,7 +897,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_point(center_point, tags, dist)
+        gdf = osm.osm_gdf_from_point(center_point, tags, dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -868,7 +935,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_polygon(polygon, tags)
+        gdf = osm.osm_gdf_from_polygon(polygon, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -913,7 +980,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_bbox(north, south, east, west, tags)
+        gdf = osm.osm_gdf_from_bbox(north, south, east, west, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -962,7 +1029,7 @@ class Map(ipyleaflet.Map):
             bounds[0][1],
         )
 
-        gdf = osm_gdf_from_bbox(north, south, east, west, tags)
+        gdf = osm.osm_gdf_from_bbox(north, south, east, west, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -1006,7 +1073,7 @@ class Map(ipyleaflet.Map):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
-        band_names = cog_bands(url, titiler_endpoint)
+        band_names = common.cog_bands(url, titiler_endpoint)
 
         if bands is not None:
             if not isinstance(bands, list):
@@ -1033,17 +1100,17 @@ class Map(ipyleaflet.Map):
             if "colormap" in kwargs:
                 kwargs.pop("colormap")
 
-        tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
-        bounds = cog_bounds(url, titiler_endpoint)
+        tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
+        bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if zoom_to_layer:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+            common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
 
-        vmin, vmax = cog_tile_vmin_vmax(
+        vmin, vmax = common.cog_tile_vmin_vmax(
             url, bands=bands, titiler_endpoint=titiler_endpoint
         )
 
@@ -1120,14 +1187,14 @@ class Map(ipyleaflet.Map):
         if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
             kwargs.pop("colormap_name")
 
-        tile_url = stac_tile(
+        tile_url = common.stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
-        bounds = stac_bounds(url, collection, item, titiler_endpoint)
+        bounds = common.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if fit_bounds:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
-            arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+            common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -1142,14 +1209,16 @@ class Map(ipyleaflet.Map):
             rescale = kwargs["rescale"]
             vmin, vmax = [float(v) for v in rescale.split(",")]
         else:
-            vmin, vmax = stac_min_max(url, collection, item, assets, titiler_endpoint)
+            vmin, vmax = common.stac_min_max(
+                url, collection, item, assets, titiler_endpoint
+            )
 
         if "nodata" in kwargs:
             nodata = kwargs["nodata"]
         else:
             nodata = None
 
-        band_names = stac_bands(url, collection, item, titiler_endpoint)
+        band_names = common.stac_bands(url, collection, item, titiler_endpoint)
         if assets is not None:
             indexes = [band_names.index(band) + 1 for band in assets]
         else:
@@ -1196,9 +1265,9 @@ class Map(ipyleaflet.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
         """
-        tile_url = mosaic_tile(url, titiler_endpoint, **kwargs)
+        tile_url = common.mosaic_tile(url, titiler_endpoint, **kwargs)
 
-        bounds = mosaic_bounds(url, titiler_endpoint)
+        bounds = common.mosaic_bounds(url, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown)
         self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
 
@@ -1438,6 +1507,7 @@ class Map(ipyleaflet.Map):
             None: This function does not return any value.
         """
         import geopandas as gpd
+        import pandas as pd
 
         if (
             isinstance(markers, list)
@@ -1556,8 +1626,8 @@ class Map(ipyleaflet.Map):
                 if left_layer in basemaps.keys():
                     left_layer = get_basemap(left_layer)
                 elif left_layer.startswith("http") and left_layer.endswith(".tif"):
-                    url = cog_tile(left_layer, **left_args)
-                    bbox = cog_bounds(left_layer)
+                    url = common.cog_tile(left_layer, **left_args)
+                    bbox = common.cog_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = ipyleaflet.TileLayer(
                         url=url,
@@ -1566,8 +1636,8 @@ class Map(ipyleaflet.Map):
                         **left_args,
                     )
                 elif left_layer.startswith("http") and left_layer.endswith(".json"):
-                    left_tile_url = stac_tile(left_layer, **left_args)
-                    bbox = stac_bounds(left_layer)
+                    left_tile_url = common.stac_tile(left_layer, **left_args)
+                    bbox = common.stac_bounds(left_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = ipyleaflet.TileLayer(
                         url=left_tile_url,
@@ -1589,13 +1659,13 @@ class Map(ipyleaflet.Map):
                             del left_args["max_native_zoom"]
                         left_layer = geojson_layer(left_layer, **left_args)
                     else:
-                        left_layer, left_client = get_local_tile_layer(
+                        left_layer, left_client = common.get_local_tile_layer(
                             left_layer,
                             tile_format="ipyleaflet",
                             return_client=True,
                             **left_args,
                         )
-                        bounds = image_bounds(left_client)
+                        bounds = common.image_bounds(left_client)
                 else:
                     left_layer = ipyleaflet.TileLayer(
                         url=left_layer,
@@ -1607,9 +1677,9 @@ class Map(ipyleaflet.Map):
                 left_layer, ipyleaflet.GeoJSON
             ):
                 pass
-            elif is_array(left_layer):
-                left_layer = array_to_image(left_layer, **left_array_args)
-                left_layer, _ = get_local_tile_layer(
+            elif common.is_array(left_layer):
+                left_layer = common.array_to_image(left_layer, **left_array_args)
+                left_layer, _ = common.get_local_tile_layer(
                     left_layer,
                     return_client=True,
                     **left_args,
@@ -1623,11 +1693,11 @@ class Map(ipyleaflet.Map):
                 if right_layer in basemaps.keys():
                     right_layer = get_basemap(right_layer)
                 elif right_layer.startswith("http") and right_layer.endswith(".tif"):
-                    url = cog_tile(
+                    url = common.cog_tile(
                         right_layer,
                         **right_args,
                     )
-                    bbox = cog_bounds(right_layer)
+                    bbox = common.cog_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=url,
@@ -1637,8 +1707,8 @@ class Map(ipyleaflet.Map):
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
-                    right_tile_url = stac_tile(right_layer, **left_args)
-                    bbox = stac_bounds(right_layer)
+                    right_tile_url = common.stac_tile(right_layer, **left_args)
+                    bbox = common.stac_bounds(right_layer)
                     bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=right_tile_url,
@@ -1662,13 +1732,13 @@ class Map(ipyleaflet.Map):
                     if right_layer.endswith(".geojson"):
                         right_layer = geojson_layer(right_layer, **right_args)
                     else:
-                        right_layer, right_client = get_local_tile_layer(
+                        right_layer, right_client = common.get_local_tile_layer(
                             right_layer,
                             tile_format="ipyleaflet",
                             return_client=True,
                             **right_args,
                         )
-                        bounds = image_bounds(right_client)
+                        bounds = common.image_bounds(right_client)
                 else:
                     right_layer = ipyleaflet.TileLayer(
                         url=right_layer,
@@ -1680,9 +1750,9 @@ class Map(ipyleaflet.Map):
                 right_layer, ipyleaflet.GeoJSON
             ):
                 pass
-            elif is_array(right_layer):
-                right_layer = array_to_image(right_layer, **right_array_args)
-                right_layer, _ = get_local_tile_layer(
+            elif common.is_array(right_layer):
+                right_layer = common.array_to_image(right_layer, **right_array_args)
+                right_layer, _ = common.get_local_tile_layer(
                     right_layer,
                     return_client=True,
                     **right_args,
@@ -1850,7 +1920,7 @@ class Map(ipyleaflet.Map):
                 return
             elif all(isinstance(item, tuple) for item in colors):
                 try:
-                    colors = [rgb_to_hex(x) for x in colors]
+                    colors = [common.rgb_to_hex(x) for x in colors]
                 except Exception as e:
                     print(e)
             elif all((item.startswith("#") and len(item) == 7) for item in colors):
@@ -1896,7 +1966,7 @@ class Map(ipyleaflet.Map):
                 colors = list(legend_dict.values())
                 if all(isinstance(item, tuple) for item in colors):
                     try:
-                        colors = [rgb_to_hex(x) for x in colors]
+                        colors = [common.rgb_to_hex(x) for x in colors]
                     except Exception as e:
                         print(e)
 
@@ -2207,7 +2277,7 @@ class Map(ipyleaflet.Map):
                 if not os.path.exists(out_dir):
                     os.makedirs(out_dir)
             else:
-                outfile = os.path.abspath(random_string() + ".html")
+                outfile = os.path.abspath(common.random_string() + ".html")
                 save = False
 
             if add_layer_control and self.layer_control is None:
@@ -2275,7 +2345,7 @@ class Map(ipyleaflet.Map):
         if not os.path.exists(work_dir):
             os.makedirs(work_dir)
 
-        screenshot = screen_capture(outfile, monitor)
+        screenshot = common.screen_capture(outfile, monitor)
         self.screenshot = screenshot
 
     def to_streamlit(
@@ -2366,9 +2436,9 @@ class Map(ipyleaflet.Map):
         import xarray as xr
 
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
-            source = array_to_image(source, **array_args)
+            source = common.array_to_image(source, **array_args)
 
-        tile_layer, tile_client = get_local_tile_layer(
+        tile_layer, tile_client = common.get_local_tile_layer(
             source,
             indexes=indexes,
             colormap=colormap,
@@ -2392,7 +2462,7 @@ class Map(ipyleaflet.Map):
             except AttributeError:
                 self.zoom = 15
 
-        arc_add_layer(tile_layer.url, layer_name, True, 1.0)
+        common.arc_add_layer(tile_layer.url, layer_name, True, 1.0)
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -2506,7 +2576,7 @@ class Map(ipyleaflet.Map):
             time (int, optional): Index of time to use. Defaults to 0'.
         """
 
-        tif, vars = netcdf_to_tif(
+        tif, vars = common.netcdf_to_tif(
             filename,
             shift_lon=shift_lon,
             lat=lat,
@@ -2625,6 +2695,7 @@ class Map(ipyleaflet.Map):
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
+        import shutil
         import json
         import random
         import geopandas as gpd
@@ -2634,7 +2705,7 @@ class Map(ipyleaflet.Map):
         try:
             if isinstance(in_geojson, str):
                 if in_geojson.startswith("http"):
-                    if is_jupyterlite():
+                    if common.is_jupyterlite():
                         import pyodide  # pylint: disable=E0401
 
                         output = os.path.basename(in_geojson)
@@ -2944,7 +3015,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
         """
-        gdf = read_postgis(sql, con, **kwargs)
+        gdf = common.read_postgis(sql, con, **kwargs)
         gdf = gdf.to_crs("epsg:4326")
         self.add_gdf(
             gdf,
@@ -2993,7 +3064,7 @@ class Map(ipyleaflet.Map):
             out_dir = os.path.abspath("./cache")
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
-            in_kml = download_file(in_kml)
+            in_kml = common.download_file(in_kml)
             if not os.path.exists(in_kml):
                 raise FileNotFoundError("The downloaded kml file could not be found.")
         else:
@@ -3174,7 +3245,7 @@ class Map(ipyleaflet.Map):
         import warnings
 
         warnings.filterwarnings("ignore")
-        check_package(name="geopandas", URL="https://geopandas.org")
+        common.check_package(name="geopandas", URL="https://geopandas.org")
         import geopandas as gpd
         import fiona
 
@@ -3318,9 +3389,9 @@ class Map(ipyleaflet.Map):
             import geopandas as gpd
 
             gdf = gpd.read_file(data)
-            df = gdf_to_df(gdf)
+            df = common.gdf_to_df(gdf)
 
-        df = points_from_xy(df, x, y)
+        df = common.points_from_xy(df, x, y)
 
         col_names = df.columns.values.tolist()
 
@@ -3486,7 +3557,7 @@ class Map(ipyleaflet.Map):
         self.add(marker_cluster)
 
         if items is not None and add_legend:
-            marker_colors = [check_color(c) for c in marker_colors]
+            marker_colors = [common.check_color(c) for c in marker_colors]
             self.add_legend(
                 title=color_column.title(), colors=marker_colors, labels=items
             )
@@ -3654,7 +3725,9 @@ class Map(ipyleaflet.Map):
         """
         if layer_name is None and "name" in kwargs:
             layer_name = kwargs.pop("name")
-        layer = planet_tile_by_month(year, month, layer_name, api_key, token_name)
+        layer = common.planet_tile_by_month(
+            year, month, layer_name, api_key, token_name
+        )
         self.add(layer)
 
     def add_planet_by_quarter(
@@ -3677,7 +3750,9 @@ class Map(ipyleaflet.Map):
         """
         if layer_name is None and "name" in kwargs:
             layer_name = kwargs.pop("name")
-        layer = planet_tile_by_quarter(year, quarter, layer_name, api_key, token_name)
+        layer = common.planet_tile_by_quarter(
+            year, quarter, layer_name, api_key, token_name
+        )
         self.add(layer)
 
     def add_time_slider(
@@ -3732,13 +3807,13 @@ class Map(ipyleaflet.Map):
         """
         if isinstance(self, ipyleaflet.Map):
             if out_file is None:
-                out_file = "./cache/" + "leafmap_" + random_string(3) + ".html"
+                out_file = "./cache/" + "leafmap_" + common.random_string(3) + ".html"
             out_dir = os.path.abspath(os.path.dirname(out_file))
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
 
             self.to_html(out_file)
-            display_html(out_file, width=width, height=height)
+            common.display_html(out_file, width=width, height=height)
         else:
             raise TypeError("The provided map is not an ipyleaflet map.")
 
@@ -3755,7 +3830,7 @@ class Map(ipyleaflet.Map):
 
         try:
             if census_dict is None:
-                census_dict = get_census_dict()
+                census_dict = common.get_census_dict()
 
             if wms not in census_dict.keys():
                 raise ValueError(
@@ -3829,7 +3904,7 @@ class Map(ipyleaflet.Map):
     def get_pc_collections(self) -> None:
         """Get the list of Microsoft Planetary Computer collections."""
         if not hasattr(self, "pc_collections"):
-            setattr(self, "pc_collections", get_pc_collections())
+            setattr(self, "pc_collections", pc.get_pc_collections())
 
     def save_draw_features(
         self, out_file: str, crs: Optional[str] = "EPSG:4326", **kwargs
@@ -3844,7 +3919,7 @@ class Map(ipyleaflet.Map):
         if self.user_rois is not None:
             import geopandas as gpd
 
-            out_file = check_file_path(out_file)
+            out_file = common.check_file_path(out_file)
 
             self.update_draw_features()
             geojson = {
@@ -3935,11 +4010,11 @@ class Map(ipyleaflet.Map):
             data (dict | str): The data to edit. It can be a GeoJSON dictionary or a file path.
         """
         if isinstance(data, str):
-            check_package("geopandas", "https://geopandas.org")
+            common.check_package("geopandas", "https://geopandas.org")
             import geopandas as gpd
 
             gdf = gpd.read_file(data, **kwargs)
-            geojson = gdf_to_geojson(gdf, epsg=4326, tuple_to_list=True)
+            geojson = common.gdf_to_geojson(gdf, epsg=4326, tuple_to_list=True)
         elif isinstance(data, dict):
             geojson = data
         else:
@@ -3997,7 +4072,7 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, str):
             if data.startswith("http"):
-                data = download_file(data)
+                data = common.download_file(data)
             ds = xr.open_dataset(data)
 
         elif isinstance(data, xr.Dataset):
@@ -4133,7 +4208,7 @@ class Map(ipyleaflet.Map):
 
         """
 
-        gdf, legend_dict = classify(
+        gdf, legend_dict = common.classify(
             data=data,
             column=column,
             cmap=cmap,
@@ -4213,7 +4288,7 @@ class Map(ipyleaflet.Map):
             list: The bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
         """
         if self.user_roi is not None:
-            return geometry_bounds(self.user_roi, decimals=decimals)
+            return common.geometry_bounds(self.user_roi, decimals=decimals)
         else:
             return None
 
@@ -4261,7 +4336,7 @@ class Map(ipyleaflet.Map):
                 else:
                     widget = content
 
-                widget_template(
+                common.widget_template(
                     widget,
                     opened,
                     show_close_button,
@@ -4295,6 +4370,7 @@ class Map(ipyleaflet.Map):
                 "topright", "bottomleft", "bottomright". Defaults to "bottomright".
 
         """
+        import requests
 
         if isinstance(image, str):
             if image.startswith("http"):
@@ -4320,7 +4396,7 @@ class Map(ipyleaflet.Map):
                 "topright", "bottomleft", "bottomright". Defaults to "bottomright".
         """
         # Check if an HTML string contains local images and convert them to base64.
-        html = check_html_string(html)
+        html = common.check_html_string(html)
         self.add_widget(html, position=position, **kwargs)
 
     def add_text(
@@ -4405,7 +4481,7 @@ class Map(ipyleaflet.Map):
             print("Zoom in to search for images")
             return None
 
-        gdf = oam_search(
+        gdf = common.oam_search(
             bbox=bbox, start_date=start_date, end_date=end_date, limit=limit, **kwargs
         )
 
@@ -4573,7 +4649,7 @@ class Map(ipyleaflet.Map):
             return
 
         super().remove(widget)
-        if isinstance(widget, ipywidgets.Widget):
+        if isinstance(widget, widgets.Widget):
             widget.close()
 
     def edit_points(
@@ -4832,7 +4908,7 @@ class Map(ipyleaflet.Map):
             if gdf.crs != "EPSG:4326":
                 gdf = gdf.to_crs("EPSG:4326")
             bounds = gdf.total_bounds
-            temp_geojson = temp_file_path("geojson")
+            temp_geojson = common.temp_file_path("geojson")
             gdf.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
@@ -4840,7 +4916,7 @@ class Map(ipyleaflet.Map):
             if data.crs != "EPSG:4326":
                 data = data.to_crs("EPSG:4326")
             bounds = data.total_bounds
-            temp_geojson = temp_file_path("geojson")
+            temp_geojson = common.temp_file_path("geojson")
             data.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
@@ -5058,7 +5134,7 @@ class Map(ipyleaflet.Map):
             if gdf.crs != "EPSG:4326":
                 gdf = gdf.to_crs("EPSG:4326")
             bounds = gdf.total_bounds
-            temp_geojson = temp_file_path("geojson")
+            temp_geojson = common.temp_file_path("geojson")
             gdf.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
@@ -5066,7 +5142,7 @@ class Map(ipyleaflet.Map):
             if data.crs != "EPSG:4326":
                 data = data.to_crs("EPSG:4326")
             bounds = data.total_bounds
-            temp_geojson = temp_file_path("geojson")
+            temp_geojson = common.temp_file_path("geojson")
             data.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
@@ -5319,7 +5395,7 @@ class Map(ipyleaflet.Map):
             if gdf.crs != "EPSG:4326":
                 gdf = gdf.to_crs("EPSG:4326")
             bounds = gdf.total_bounds
-            temp_geojson = temp_file_path("geojson")
+            temp_geojson = common.temp_file_path("geojson")
             gdf.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
@@ -5327,7 +5403,7 @@ class Map(ipyleaflet.Map):
             if data.crs != "EPSG:4326":
                 data = data.to_crs("EPSG:4326")
             bounds = data.total_bounds
-            temp_geojson = temp_file_path("geojson")
+            temp_geojson = common.temp_file_path("geojson")
             data.to_file(temp_geojson, driver="GeoJSON")
             with open(temp_geojson) as f:
                 data = json.load(f)
@@ -5752,8 +5828,8 @@ class Map(ipyleaflet.Map):
         }
         left_url = url.format(left_year)
         right_url = url.format(right_layer)
-        left_tile = cog_tile(left_url, colormap=colormap, **kwargs)
-        right_tile = cog_tile(right_url, colormap=colormap, **kwargs)
+        left_tile = common.cog_tile(left_url, colormap=colormap, **kwargs)
+        right_tile = common.cog_tile(right_url, colormap=colormap, **kwargs)
         left_layer = ipyleaflet.TileLayer(url=left_tile, name=f"NLCD {left_year}")
         right_layer = ipyleaflet.TileLayer(url=right_tile, name=f"NLCD {right_layer}")
         split_control = ipyleaflet.SplitMapControl(
@@ -5768,12 +5844,16 @@ class Map(ipyleaflet.Map):
             self.add_legend(title="NLCD Land Cover Type", builtin_legend="NLCD")
 
         def change_left_year(change):
-            left_tile = cog_tile(url.format(change.new), colormap=colormap, **kwargs)
+            left_tile = common.cog_tile(
+                url.format(change.new), colormap=colormap, **kwargs
+            )
             left_layer.url = left_tile
             left_layer.name = f"NLCD {change.new}"
 
         def change_right_year(change):
-            right_tile = cog_tile(url.format(change.new), colormap=colormap, **kwargs)
+            right_tile = common.cog_tile(
+                url.format(change.new), colormap=colormap, **kwargs
+            )
             right_layer.url = right_tile
             right_layer.name = f"NLCD {change.new}"
 
@@ -5865,7 +5945,7 @@ def linked_maps(
         ipywidget: A GridspecLayout widget.
     """
 
-    if skip_mkdocs_build():
+    if common.skip_mkdocs_build():
         return
 
     grid = widgets.GridspecLayout(rows, cols, grid_gap="0px")
@@ -5917,14 +5997,14 @@ def linked_maps(
                 layers[index] = get_basemap(layers[index])
             elif isinstance(layers[index], str):
                 if layers[index].startswith("http") and layers[index].endswith(".tif"):
-                    url = cog_tile(layers[index], **layer_args[index])
+                    url = common.cog_tile(layers[index], **layer_args[index])
                     layers[index] = ipyleaflet.TileLayer(
                         url=url,
                         name="Left Layer",
                         attribution=" ",
                     )
                 elif os.path.exists(layers[index]):
-                    layers[index], left_client = get_local_tile_layer(
+                    layers[index], left_client = common.get_local_tile_layer(
                         layers[index],
                         tile_format="ipyleaflet",
                         return_client=True,
@@ -6022,8 +6102,8 @@ def split_map(
             left_layer = get_basemap(left_layer)
         elif isinstance(left_layer, str):
             if left_layer.startswith("http") and left_layer.endswith(".tif"):
-                url = cog_tile(left_layer, **left_args)
-                bbox = cog_bounds(left_layer)
+                url = common.cog_tile(left_layer, **left_args)
+                bbox = common.cog_bounds(left_layer)
                 bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                 left_layer = ipyleaflet.TileLayer(
                     url=url,
@@ -6044,13 +6124,13 @@ def split_map(
                         del left_args["max_native_zoom"]
                     left_layer = geojson_layer(left_layer, **left_args)
                 else:
-                    left_layer, left_client = get_local_tile_layer(
+                    left_layer, left_client = common.get_local_tile_layer(
                         left_layer,
                         tile_format="ipyleaflet",
                         return_client=True,
                         **left_args,
                     )
-                    bounds = image_bounds(left_client)
+                    bounds = common.image_bounds(left_client)
             else:
                 left_layer = ipyleaflet.TileLayer(
                     url=left_layer,
@@ -6071,11 +6151,11 @@ def split_map(
             right_layer = get_basemap(right_layer)
         elif isinstance(right_layer, str):
             if right_layer.startswith("http") and right_layer.endswith(".tif"):
-                url = cog_tile(
+                url = common.cog_tile(
                     right_layer,
                     **right_args,
                 )
-                bbox = cog_bounds(right_layer)
+                bbox = common.cog_bounds(right_layer)
                 bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                 right_layer = ipyleaflet.TileLayer(
                     url=url,
@@ -6096,13 +6176,13 @@ def split_map(
                 if right_layer.endswith(".geojson"):
                     right_layer = geojson_layer(right_layer, **right_args)
                 else:
-                    right_layer, right_client = get_local_tile_layer(
+                    right_layer, right_client = common.get_local_tile_layer(
                         right_layer,
                         tile_format="ipyleaflet",
                         return_client=True,
                         **right_args,
                     )
-                    bounds = image_bounds(right_client)
+                    bounds = common.image_bounds(right_client)
             else:
                 right_layer = ipyleaflet.TileLayer(
                     url=right_layer,
@@ -6154,7 +6234,6 @@ def ts_inspector(
     Returns:
         leafmap.Map: The Map instance.
     """
-    import ipywidgets as widgets
 
     add_zoom = True
     add_fullscreen = True
@@ -6278,7 +6357,7 @@ def geojson_layer(
     try:
         if isinstance(in_geojson, str):
             if in_geojson.startswith("http"):
-                in_geojson = github_raw_url(in_geojson)
+                in_geojson = common.github_raw_url(in_geojson)
                 data = requests.get(in_geojson).json()
             else:
                 in_geojson = os.path.abspath(in_geojson)
@@ -6371,6 +6450,8 @@ def get_basemap(name: str):
                     format=basemap["format"],
                     transparent=basemap["transparent"],
                 )
+            else:
+                layer = None
             return layer
         else:
             raise ValueError(

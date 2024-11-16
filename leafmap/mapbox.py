@@ -2,7 +2,7 @@ import os
 import pathlib
 import anywidget
 import traitlets
-from .common import *
+from . import common
 
 
 class Map(anywidget.AnyWidget):
@@ -11,7 +11,7 @@ class Map(anywidget.AnyWidget):
     _cwd = os.path.dirname(os.path.abspath(__file__))
     _esm = pathlib.Path(os.path.join(_cwd, "javascript", "mapbox.js"))
     _css = pathlib.Path(os.path.join(_cwd, "styles", "mapbox.css"))
-    default_token = get_api_key("MAPBOX_TOKEN")
+    default_token = common.get_api_key("MAPBOX_TOKEN")
     token = traitlets.Unicode(default_token).tag(sync=True)
     center = traitlets.List([-100, 40]).tag(sync=True, o=True)
     zoom = traitlets.Float(1.2).tag(sync=True, o=True)
