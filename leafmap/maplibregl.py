@@ -3,9 +3,12 @@
 
 import os
 import requests
+from typing import Tuple, Dict, Any, Optional, Union, List
+
 import xyzservices
 import geopandas as gpd
 import ipyvuetify as v
+import pandas as pd
 from box import Box
 from maplibre.basemaps import background
 from maplibre.basemaps import construct_carto_basemap_url
@@ -23,8 +26,7 @@ from maplibre.controls import (
 )
 
 from .basemaps import xyz_to_leaflet
-from .common import *
-from typing import Tuple, Dict, Any, Optional
+from . import common
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -198,7 +200,7 @@ class Map(MapWidget):
                 layer["min-zoom"] = layer.pop("minzoom")
             if "maxzoom" in layer:
                 layer["max-zoom"] = layer.pop("maxzoom")
-            layer = replace_top_level_hyphens(layer)
+            layer = common.replace_top_level_hyphens(layer)
             layer = Layer(**layer)
 
         if name is None:
@@ -209,7 +211,7 @@ class Map(MapWidget):
             and f"{layer.type}-color" in layer.paint
             and isinstance(layer.paint[f"{layer.type}-color"], str)
         ):
-            color = check_color(layer.paint[f"{layer.type}-color"])
+            color = common.check_color(layer.paint[f"{layer.type}-color"])
         else:
             color = None
 
@@ -297,7 +299,7 @@ class Map(MapWidget):
             None
         """
 
-        df = read_file(data)
+        df = common.read_file(data)
         if "geometry" in df.columns:
             df = df.drop(columns=["geometry"])
 
@@ -468,6 +470,7 @@ class Map(MapWidget):
         Raises:
             ValueError: If the feature collection is empty.
         """
+        import json
 
         if len(self.draw_feature_collection_all) > 0:
             with open(filepath, "w") as f:
@@ -604,7 +607,7 @@ class Map(MapWidget):
         min_zoom = 0
 
         if isinstance(basemap, str) and basemap.upper() in map_dict:
-            layer = get_google_map(basemap.upper(), **kwargs)
+            layer = common.get_google_map(basemap.upper(), **kwargs)
             url = layer.url
             name = layer.name
             attribution = layer.attribution
@@ -722,7 +725,7 @@ class Map(MapWidget):
             if "geojson" not in layer_names:
                 name = "geojson"
             else:
-                name = f"geojson_{random_string()}"
+                name = f"geojson_{common.random_string()}"
 
         if filter is not None:
             kwargs["filter"] = filter
@@ -1146,10 +1149,12 @@ class Map(MapWidget):
         """
 
         if name is None:
-            name = "COG_" + random_string()
+            name = "COG_" + common.random_string()
 
-        tile_url = cog_tile(url, bands, titiler_endpoint, nodata=nodata, **kwargs)
-        bounds = cog_bounds(url, titiler_endpoint)
+        tile_url = common.cog_tile(
+            url, bands, titiler_endpoint, nodata=nodata, **kwargs
+        )
+        bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
             tile_url, name, attribution, opacity, visible, before_id=before_id
         )
@@ -1219,7 +1224,7 @@ class Map(MapWidget):
         if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
             kwargs.pop("colormap_name")
 
-        tile_url = stac_tile(
+        tile_url = common.stac_tile(
             url,
             collection,
             item,
@@ -1229,7 +1234,7 @@ class Map(MapWidget):
             nodata=nodata,
             **kwargs,
         )
-        bounds = stac_bounds(url, collection, item, titiler_endpoint)
+        bounds = common.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(
             tile_url, name, attribution, opacity, visible, before_id=before_id
         )
@@ -1296,9 +1301,9 @@ class Map(MapWidget):
         import xarray as xr
 
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
-            source = array_to_image(source, **array_args)
+            source = common.array_to_image(source, **array_args)
 
-        tile_layer, tile_client = get_local_tile_layer(
+        tile_layer, tile_client = common.get_local_tile_layer(
             source,
             indexes=indexes,
             colormap=colormap,
@@ -1391,13 +1396,13 @@ class Map(MapWidget):
             html = html.replace(div_before, div_after)
 
         if replace_key or (os.getenv("MAPTILER_REPLACE_KEY") is not None):
-            key_before = get_api_key("MAPTILER_KEY")
-            key_after = get_api_key("MAPTILER_KEY_PUBLIC")
+            key_before = common.get_api_key("MAPTILER_KEY")
+            key_after = common.get_api_key("MAPTILER_KEY_PUBLIC")
             if key_after is not None:
                 html = html.replace(key_before, key_after)
 
         if remove_port:
-            html = remove_port_from_string(html)
+            html = common.common.remove_port_from_string(html)
 
         if output is None:
             output = os.getenv("MAPLIBRE_OUTPUT", None)
@@ -1475,7 +1480,7 @@ class Map(MapWidget):
         Returns:
             None
         """
-        color = check_color(color)
+        color = common.check_color(color)
         super().set_paint_property(
             name, f"{self.layer_dict[name]['layer'].type}-color", color
         )
@@ -1671,7 +1676,7 @@ class Map(MapWidget):
         color = layer.get("paint", {}).get(f"{layer_type}-color", "white")
         if color.startswith("rgba"):
             color = extract_rgb(color)
-        color = check_color(color)
+        color = common.check_color(color)
         color_picker = widgets.ColorPicker(
             concise=True,
             value=color,
@@ -1706,7 +1711,7 @@ class Map(MapWidget):
             color = layer.get("paint", {}).get(f"{layer_type}-color", "white")
             if color.startswith("rgba"):
                 color = extract_rgb(color)
-            color = check_color(color)
+            color = common.check_color(color)
 
             if color:
                 color_picker.value = color
@@ -1868,7 +1873,7 @@ class Map(MapWidget):
             }
 
             if style is None:
-                style = pmtiles_style(url)
+                style = common.pmtiles_style(url)
 
             if "sources" in style:
                 source_name = list(style["sources"].keys())[0]
@@ -1879,7 +1884,7 @@ class Map(MapWidget):
 
             self.add_source(source_name, pmtiles_source)
 
-            style = replace_hyphens_in_keys(style)
+            style = common.replace_hyphens_in_keys(style)
 
             for params in style["layers"]:
 
@@ -1901,7 +1906,7 @@ class Map(MapWidget):
                     self.add_tooltip(params["id"], properties, template)
 
             if fit_bounds:
-                metadata = pmtiles_metadata(url)
+                metadata = common.pmtiles_metadata(url)
                 bounds = metadata["bounds"]  # [minx, miny, maxx, maxy]
                 self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
 
@@ -1997,8 +2002,8 @@ class Map(MapWidget):
         if isinstance(image, str):
             try:
                 if image.startswith("http"):
-                    image = download_file(
-                        image, temp_file_path(image.split(".")[-1]), quiet=True
+                    image = common.download_file(
+                        image, common.temp_file_path(image.split(".")[-1]), quiet=True
                     )
                 if os.path.exists(image):
                     img = Image.open(image)
@@ -2228,7 +2233,7 @@ class Map(MapWidget):
 
         def on_upload(change):
             content = uploader.value[0]["content"]
-            temp_file = temp_file_path(extension=".geojson")
+            temp_file = common.temp_file_path(extension=".geojson")
             with open(temp_file, "wb") as f:
                 f.write(content)
             self.add_geojson(temp_file, **kwargs)
@@ -2322,7 +2327,7 @@ class Map(MapWidget):
         """
 
         if api_key is None:
-            api_key = get_api_key(token)
+            api_key = common.get_api_key(token)
 
         if api_key is None:
             print("An API key is required to use the 3D terrain feature.")
@@ -2386,6 +2391,8 @@ class Map(MapWidget):
                 style = response.json()
             elif isinstance(self._style, dict):
                 style = self._style
+            else:
+                style = {}
             return style
         else:
             return {}
@@ -2534,7 +2541,7 @@ class Map(MapWidget):
             None
         """
         # Check if an HTML string contains local images and convert them to base64.
-        html = check_html_string(html)
+        html = common.check_html_string(html)
         self.add_text(html, position=position, bg_color=bg_color, **kwargs)
 
     def add_legend(
@@ -2598,7 +2605,7 @@ class Map(MapWidget):
                 return
             elif all(isinstance(item, tuple) for item in colors):
                 try:
-                    colors = [rgb_to_hex(x) for x in colors]
+                    colors = [common.rgb_to_hex(x) for x in colors]
                 except Exception as e:
                     print(e)
             elif all((item.startswith("#") and len(item) == 7) for item in colors):
@@ -2644,7 +2651,7 @@ class Map(MapWidget):
                 colors = list(legend_dict.values())
                 if all(isinstance(item, tuple) for item in colors):
                     try:
-                        colors = [rgb_to_hex(x) for x in colors]
+                        colors = [common.rgb_to_hex(x) for x in colors]
                     except Exception as e:
                         print(e)
 
@@ -2756,7 +2763,7 @@ class Map(MapWidget):
         if transparent:
             bg_color = "transparent"
 
-        colorbar = save_colorbar(
+        colorbar = common.save_colorbar(
             None,
             width,
             height,
@@ -2864,7 +2871,7 @@ class Map(MapWidget):
             None
         """
 
-        MAPTILER_KEY = get_api_key("MAPTILER_KEY")
+        MAPTILER_KEY = common.get_api_key("MAPTILER_KEY")
         source = {
             "url": f"https://api.maptiler.com/tiles/v3/tiles.json?key={MAPTILER_KEY}",
             "type": "vector",
@@ -3297,7 +3304,7 @@ class Map(MapWidget):
         """
         url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
 
-        kwargs = replace_underscores_in_keys(kwargs)
+        kwargs = common.replace_underscores_in_keys(kwargs)
 
         if type == "line":
             if "line-color" not in kwargs:
@@ -3480,7 +3487,7 @@ class Map(MapWidget):
         import geopandas as gpd
 
         if isinstance(data, str):
-            gdf = points_from_xy(data, x=x, y=y)
+            gdf = common.points_from_xy(data, x=x, y=y)
         elif isinstance(data, gpd.GeoDataFrame):
             gdf = data
         else:
@@ -3491,7 +3498,7 @@ class Map(MapWidget):
         setattr(self, "gps_trace", gdf)
 
         if add_line:
-            line_gdf = connect_points_as_line(gdf, sort_column=sort_column)
+            line_gdf = common.connect_points_as_line(gdf, sort_column=sort_column)
         else:
             line_gdf = None
 
@@ -3632,7 +3639,7 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
     """
 
     if api_key is None:
-        api_key = get_api_key("MAPTILER_KEY")
+        api_key = common.get_api_key("MAPTILER_KEY")
 
     url = f"https://api.maptiler.com/maps/{style}/style.json?key={api_key}"
 
@@ -3684,7 +3691,7 @@ def maptiler_3d_style(
     """
 
     if api_key is None:
-        api_key = get_api_key(token)
+        api_key = common.get_api_key(token)
 
     if api_key is None:
         print("An API key is required to use the 3D terrain feature.")
@@ -3818,6 +3825,7 @@ def edit_gps_trace(
     from bqplot import LinearScale, Scatter, Figure, PanZoom
     import bqplot as bq
     from ipywidgets import VBox, Button
+    import ipywidgets as widgets
 
     output_csv = os.path.join(
         os.path.dirname(filename), filename.replace(".csv", "_annotated.csv")
