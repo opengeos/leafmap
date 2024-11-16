@@ -7,21 +7,23 @@ import ipywidgets
 from box import Box
 from IPython.display import display
 from .basemaps import xyz_to_leaflet
-from .common import *
 from .legends import builtin_legends
-from .osm import *
-from .pc import *
+from .common import *
+from . import osm
+from . import pc
 from . import examples
 from .plot import *
 from . import map_widgets
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 
 class Map(ipyleaflet.Map):
-    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html. By default, the Map will add OpenStreetMap as the basemap.
+    """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map
+    can be found at https://ipyleaflet.readthedocs.io/en/latest/api_reference/map.html.
+    By default, the Map will add OpenStreetMap as the basemap.
 
     Returns:
         object: ipyleaflet map object.
@@ -147,7 +149,7 @@ class Map(ipyleaflet.Map):
             self.add(draw_control)
             self.draw_control = draw_control
 
-            def handle_draw(target, action, geo_json):
+            def handle_draw(_, action, geo_json):
                 if "style" in geo_json["properties"]:
                     del geo_json["properties"]["style"]
                 self.user_roi = geo_json
@@ -706,7 +708,7 @@ class Map(ipyleaflet.Map):
 
         """
 
-        gdf = osm_gdf_from_geocode(
+        gdf = osm.osm_gdf_from_geocode(
             query, which_result=which_result, by_osmid=by_osmid, buffer_dist=buffer_dist
         )
         geojson = gdf.__geo_interface__
@@ -748,7 +750,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_address(address, tags, dist)
+        gdf = osm.osm_gdf_from_address(address, tags, dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -790,7 +792,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_place(query, tags, which_result, buffer_dist)
+        gdf = osm.osm_gdf_from_place(query, tags, which_result, buffer_dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -830,7 +832,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_point(center_point, tags, dist)
+        gdf = osm.osm_gdf_from_point(center_point, tags, dist)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -868,7 +870,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_polygon(polygon, tags)
+        gdf = osm.osm_gdf_from_polygon(polygon, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -913,7 +915,7 @@ class Map(ipyleaflet.Map):
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
 
         """
-        gdf = osm_gdf_from_bbox(north, south, east, west, tags)
+        gdf = osm.osm_gdf_from_bbox(north, south, east, west, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -962,7 +964,7 @@ class Map(ipyleaflet.Map):
             bounds[0][1],
         )
 
-        gdf = osm_gdf_from_bbox(north, south, east, west, tags)
+        gdf = osm.osm_gdf_from_bbox(north, south, east, west, tags)
         geojson = gdf.__geo_interface__
 
         self.add_geojson(
@@ -6371,6 +6373,8 @@ def get_basemap(name: str):
                     format=basemap["format"],
                     transparent=basemap["transparent"],
                 )
+            else:
+                layer = None
             return layer
         else:
             raise ValueError(
