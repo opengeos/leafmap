@@ -18,7 +18,7 @@ import pandas as pd
 import whitebox
 import subprocess
 from pathlib import Path
-from typing import Union, List, Dict, Optional, Tuple, TYPE_CHECKING
+from typing import Union, List, Dict, Optional, Tuple, TYPE_CHECKING, Any
 from .stac import *
 
 try:
