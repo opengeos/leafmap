@@ -27,7 +27,7 @@ from maplibre.controls import (
 
 from .basemaps import xyz_to_leaflet
 from . import common
-from .common import get_api_key
+from .common import get_api_key, geojson_to_gdf
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
