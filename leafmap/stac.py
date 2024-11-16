@@ -1,7 +1,7 @@
 import os
 import pystac
 import requests
-from typing import Optional, Dict, List, Callable, Any, Tuple, Union
+from typing import Optional, Dict, List, Callable, Tuple, Union
 from pandas import DataFrame
 
 
@@ -2174,10 +2174,9 @@ def oam_search(
         GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
     """
 
-    if return_gdf:
-        import pandas as pd
-        from shapely.geometry import Polygon
-        import geopandas as gpd
+    import pandas as pd
+    from shapely.geometry import Polygon
+    import geopandas as gpd
 
     url = "https://api.openaerialmap.org/meta"
     if bbox is not None:

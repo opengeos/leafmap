@@ -8,7 +8,7 @@ import ipyleaflet
 import ipywidgets as widgets
 from ipyfilechooser import FileChooser
 from .common import *
-from .pc import *
+from . import pc
 from typing import Optional, Union, Dict, List
 
 
@@ -738,7 +738,7 @@ def open_data_widget(m):
 
     raster_options = widgets.VBox()
 
-    def filepath_change(change):
+    def filepath_change(_):
         if file_type.value == "Raster":
             pass
             # if (
@@ -1128,7 +1128,7 @@ def open_raster_gui(m):
     def collection_changed(change):
         if change["new"]:
             if not hasattr(m, "pc_inventory"):
-                setattr(m, "pc_inventory", get_pc_inventory())
+                setattr(m, "pc_inventory", pc.get_pc_inventory())
             col_name = change["new"].split(" - ")[0]
             items.value = m.pc_inventory[col_name]["first_item"]
             band_names = m.pc_inventory[col_name]["bands"]
@@ -1331,10 +1331,10 @@ def open_raster_gui(m):
             palette.options = cog_stac_palettes
             palette.value = None
             add_params.placeholder = add_params_text2
-            collection.options = get_pc_collection_list()
+            collection.options = pc.get_pc_collection_list()
             collection.value = "landsat-8-c2-l2 - Landsat 8 Collection 2 Level-2"
             if not hasattr(m, "pc_inventory"):
-                setattr(m, "pc_inventory", get_pc_inventory())
+                setattr(m, "pc_inventory", pc.get_pc_inventory())
             items.value = "LC08_L2SP_047027_20201204_02_T1"
             assets.value = "SR_B7,SR_B5,SR_B4"
 

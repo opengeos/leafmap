@@ -2,10 +2,11 @@ import os
 import numpy as np
 import pandas as pd
 import ipywidgets as widgets
+from IPython.display import display
 
 from .basemaps import xyz_to_plotly
-from .common import *
-from .osm import *
+from . import common
+from . import osm
 from . import examples
 from typing import Optional, List, Union, Dict, Tuple
 from pandas import DataFrame
@@ -423,8 +424,8 @@ class Map(go.FigureWidget):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
-        tile_url = cog_tile(url, bands, titiler_endpoint, **kwargs)
-        center = cog_center(url, titiler_endpoint)  # (lon, lat)
+        tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
+        center = common.cog_center(url, titiler_endpoint)  # (lon, lat)
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
@@ -454,10 +455,10 @@ class Map(go.FigureWidget):
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
         """
-        tile_url = stac_tile(
+        tile_url = common.stac_tile(
             url, collection, items, assets, bands, titiler_endpoint, **kwargs
         )
-        center = stac_center(url, collection, items, titiler_endpoint)
+        center = common.stac_center(url, collection, items, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
@@ -479,8 +480,8 @@ class Map(go.FigureWidget):
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
         """
-        tile_url = mosaic_tile(url, titiler_endpoint, **kwargs)
-        center = mosaic_info(url, titiler_endpoint)["center"]
+        tile_url = common.mosaic_tile(url, titiler_endpoint, **kwargs)
+        center = common.mosaic_info(url, titiler_endpoint)["center"]
         self.add_tile_layer(tile_url, name, attribution, opacity)
         self.set_center(lon=center[0], lat=center[1], zoom=10)
 
@@ -507,7 +508,7 @@ class Map(go.FigureWidget):
         """
         if name is None:
             name = str(year) + "-" + str(month).zfill(2)
-        tile_url = planet_by_month(year, month, api_key, token_name)
+        tile_url = common.planet_by_month(year, month, api_key, token_name)
         self.add_tile_layer(
             tile_url, name=name, attribution=attribution, opacity=opacity
         )
@@ -535,7 +536,7 @@ class Map(go.FigureWidget):
         """
         if name is None:
             name = str(year) + "-" + "q" + str(quarter)
-        tile_url = planet_by_quarter(year, quarter, api_key, token_name)
+        tile_url = common.planet_by_quarter(year, quarter, api_key, token_name)
         self.add_tile_layer(
             tile_url, name=name, attribution=attribution, opacity=opacity
         )
@@ -578,7 +579,7 @@ class Map(go.FigureWidget):
             z (str, optional): Z value of the data. Defaults to None.
             colorscale (str, optional): Color scale of the data. Defaults to "Viridis".
         """
-        check_package("geopandas")
+        common.check_package("geopandas")
         import json
         import geopandas as gpd
 
@@ -670,7 +671,7 @@ class Map(go.FigureWidget):
         color_continuous_scale: Optional[str] = "Viridis",
         **kwargs,
     ) -> None:
-        check_package("geopandas", "https://geopandas.org")
+        common.check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 
         geojson_url = str(gdf)
@@ -717,7 +718,7 @@ class Map(go.FigureWidget):
             color_col (str, optional): The column name of color. Defaults to None.
         """
 
-        check_package("geopandas", "https://geopandas.org")
+        common.check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 
         if isinstance(gdf, str):
@@ -728,7 +729,7 @@ class Map(go.FigureWidget):
 
         gdf = gdf.to_crs(epsg=4326)
         # geom_type = gdf_geom_type(gdf)
-        center_lon, center_lat = gdf_centroid(gdf)
+        center_lon, center_lat = common.gdf_centroid(gdf)
 
         if isinstance(label_col, str):
             gdf = gdf.set_index(label_col)
