@@ -10896,7 +10896,7 @@ def merge_vector(
     quiet: bool = False,
     return_gdf: bool = False,
     **kwargs,
-):
+) -> Optional["gpd.GeoDataFrame"]:
     """
     Merge vector files into a single GeoDataFrame.
 
@@ -11479,8 +11479,6 @@ def mbtiles_to_pmtiles(
     Returns:
         None: The function returns None either upon successful completion or when the pmtiles package is not installed.
 
-    Raises:
-        Any exception raised by pmtiles.convert.mbtiles_to_pmtiles will be propagated up.
     """
 
     import pmtiles.convert as convert
@@ -13208,11 +13206,11 @@ def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> N
 
     Args:
         strategy (str, optional): The authentication method.
-                "all": (default) try all methods until one works
-                "interactive": enter username and password.
-                "netrc": retrieve username and password from ~/.netrc.
-                "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
-           persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
+            "all": (default) try all methods until one works
+            "interactive": enter username and password.
+            "netrc": retrieve username and password from ~/.netrc.
+            "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
+        persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
         **kwargs: Additional keyword arguments for the earthaccess.login() function.
     """
     try:

@@ -11,6 +11,7 @@ from . import examples
 from . import map_widgets
 from . import plot
 from .common import (
+    download_file,
     set_api_key,
     get_api_key,
     planet_quarterly_tiles,
@@ -234,7 +235,7 @@ class Map(folium.Map):
         show=True,
         zoom_to_layer=True,
         **kwargs,
-    ):
+    ) -> None:
         """
         Adds a PMTiles layer to the map.
 
@@ -3839,7 +3840,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
         show=True,
         control=True,
         **kwargs,
-    ):
+    ) -> None:
         """
         Initializes a PMTilesLayer object.
 

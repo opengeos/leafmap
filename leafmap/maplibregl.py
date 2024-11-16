@@ -27,7 +27,18 @@ from maplibre.controls import (
 
 from .basemaps import xyz_to_leaflet
 from . import common
-from .common import get_api_key, geojson_to_gdf, pmtiles_metadata, pmtiles_style
+from .common import (
+    download_file,
+    geojson_to_pmtiles,
+    get_api_key,
+    get_bounds,
+    geojson_bounds,
+    geojson_to_gdf,
+    pmtiles_metadata,
+    pmtiles_style,
+    stac_assets,
+    start_server,
+)
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -462,8 +473,7 @@ class Map(MapWidget):
 
         Args:
             filepath (str): The path to the file where the GeoJSON data will be saved.
-            **kwargs (Any): Additional keyword arguments to be passed to
-            json.dump for custom serialization.
+            **kwargs (Any): Additional keyword arguments to be passed to json.dump for custom serialization.
 
         Returns:
             None

@@ -16,6 +16,7 @@ from . import osm
 from . import pc
 from . import plot
 from .common import (
+    download_file,
     set_api_key,
     get_api_key,
     planet_quarterly_tiles,
