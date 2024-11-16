@@ -1402,7 +1402,7 @@ class Map(MapWidget):
                 html = html.replace(key_before, key_after)
 
         if remove_port:
-            html = common.common.remove_port_from_string(html)
+            html = common.remove_port_from_string(html)
 
         if output is None:
             output = os.getenv("MAPLIBRE_OUTPUT", None)
