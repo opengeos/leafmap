@@ -718,7 +718,7 @@ class Map(go.FigureWidget):
             color_col (str, optional): The column name of color. Defaults to None.
         """
 
-        common.("geopandas", "https://geopandas.org")
+        common.check_package("geopandas", "https://geopandas.org")
         import geopandas as gpd
 
         if isinstance(gdf, str):
