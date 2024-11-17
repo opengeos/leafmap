@@ -636,7 +636,7 @@ class Map(go.FigureWidget):
             except Exception as other_error:
                 raise ValueError(f"failed load data from {data}: {other_error}")
         elif isinstance(data, pd.DataFrame):
-            df = data.copy()
+            df = data
         else:
             raise ValueError("data must be a DataFrame or a file path.")
 
