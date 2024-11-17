@@ -38,6 +38,7 @@ from .common import (
     pandas_to_geojson,
     pmtiles_metadata,
     pmtiles_style,
+    random_string,
     stac_assets,
     start_server,
 )
@@ -2155,6 +2156,65 @@ class Map(MapWidget):
                 kwargs["layout"]["icon-image"] = id
                 kwargs["layout"]["icon-size"] = icon_size
                 self.add_layer(kwargs)
+
+    def add_symbol(
+        self,
+        image: str,
+        source: str,
+        icon_size: int = 1,
+        symbol_placement: str = "line",
+        minzoom: Optional[float] = None,
+        maxzoom: Optional[float] = None,
+        filter: Optional[Any] = None,
+        name: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a symbol to the map.
+
+        Args:
+            image (str): The URL or local file path to the image.
+            source (str): The source of the symbol.
+            icon_size (int, optional): The size of the symbol. Defaults to 1.
+            symbol_placement (str, optional): The placement of the symbol. Defaults to "line".
+            minzoom (Optional[float], optional): The minimum zoom level for the symbol. Defaults to None.
+            maxzoom (Optional[float], optional): The maximum zoom level for the symbol. Defaults to None.
+            filter (Optional[Any], optional): A filter to apply to the symbol. Defaults to None.
+            name (Optional[str], optional): The name of the symbol layer. Defaults to None.
+            **kwargs (Any): Additional keyword arguments to pass to the layer layout.
+                For more info, see https://maplibre.org/maplibre-style-spec/layers/#symbol
+
+        Returns:
+            None
+        """
+        id = f"image_{common.random_string(3)}"
+        self.add_image(id, image)
+
+        if name is None:
+            name = f"symbol_{common.random_string(3)}"
+
+        layer = {
+            "id": name,
+            "type": "symbol",
+            "source": source,
+            "layout": {
+                "icon-image": id,
+                "icon-size": icon_size,
+                "symbol-placement": symbol_placement,
+            },
+        }
+
+        if minzoom is not None:
+            layer["minzoom"] = minzoom
+        if maxzoom is not None:
+            layer["maxzoom"] = maxzoom
+        if filter is not None:
+            layer["filter"] = filter
+
+        kwargs = common.replace_underscores_in_keys(kwargs)
+        layer["layout"].update(kwargs)
+
+        self.add_layer(layer)
 
     def to_streamlit(
         self,

@@ -40,11 +40,14 @@ from .common import (
     gedi_search,
     geojson_to_gdf,
     geojson_to_pmtiles,
+    get_3dep_dem,
     get_api_key,
     get_census_dict,
     get_overture_data,
+    get_nhd_basins,
     get_wbd,
     image_comparison,
+    image_metadata,
     image_to_numpy,
     map_tiles_to_geotiff,
     netcdf_to_tif,
@@ -75,10 +78,13 @@ from .common import (
     stac_stats,
     stac_tile,
     start_server,
+    vector_set_crs,
     vector_to_gif,
     view_lidar,
     write_lidar,
     zonal_stats,
+    WhiteboxTools,
+    whiteboxgui,
 )
 
 
