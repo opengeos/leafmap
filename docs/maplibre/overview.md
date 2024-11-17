@@ -86,6 +86,12 @@ Add HTML content to the map.
 
 [![](https://i.imgur.com/TgalNOv.png)](https://leafmap.org/maplibre/add_html)
 
+## Add a directional icon to the map
+
+Add a directional icon to streams.
+
+[![](https://github.com/user-attachments/assets/b4082d29-b604-4f52-a7e7-88d15d37c7fc)](https://leafmap.org/maplibre/add_icon)
+
 ## Add an icon to the map
 
 Add an icon to the map from an external URL and use it in a symbol layer.
