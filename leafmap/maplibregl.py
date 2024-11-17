@@ -31,6 +31,7 @@ from .common import (
     download_file,
     find_files,
     execute_maplibre_notebook_dir,
+    generate_index_html,
     geojson_to_pmtiles,
     get_api_key,
     get_bounds,
