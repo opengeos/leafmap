@@ -629,11 +629,22 @@ class Map(go.FigureWidget):
         """
 
         if isinstance(data, str):
-            df = pd.read_csv(data)
+            try:
+                df = pd.read_csv(data)
+            except FileNotFoundError:
+                raise FileNotFoundError(f"file path {data} not found")
+            except Exception as other_error:
+                raise ValueError(f"failed load data from {data}: {other_error}")
         elif isinstance(data, pd.DataFrame):
             df = data
         else:
             raise ValueError("data must be a DataFrame or a file path.")
+
+        for column_data in [latitude, longitude, z]:
+            if column_data not in df.columns:
+                raise KeyError(
+                    f"column {column_data} not found, available columns {', '.join(df.columns)}"
+                )
 
         heatmap = go.Densitymapbox(
             lat=df[latitude],
