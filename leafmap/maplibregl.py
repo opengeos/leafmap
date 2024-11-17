@@ -29,6 +29,7 @@ from .basemaps import xyz_to_leaflet
 from . import common
 from .common import (
     download_file,
+    execute_maplibre_notebook_dir,
     geojson_to_pmtiles,
     get_api_key,
     get_bounds,
