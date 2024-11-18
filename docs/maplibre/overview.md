@@ -435,6 +435,12 @@ Use free vector tiles from OpenFreeMap.
 
 [![](https://github.com/user-attachments/assets/0a9c8cb8-2b7e-4ca5-ba7b-183b8b3f54a6)](https://leafmap.org/maplibre/openfreemap)
 
+## Use OpenStreetMap vector tiles
+
+Use free vector tiles from OpenStreetMap.
+
+[![](https://github.com/user-attachments/assets/af350646-d668-4eeb-a611-8ca270631d2d)](https://leafmap.org/maplibre/openstreetmap)
+
 ## Visualze Overture data
 
 Visualize Overture Maps data.
