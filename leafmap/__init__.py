@@ -2,7 +2,7 @@
 
 __author__ = """Qiusheng Wu"""
 __email__ = "giswqs@gmail.com"
-__version__ = "0.40.1"
+__version__ = "0.41.0"
 
 import os
 from .report import Report
