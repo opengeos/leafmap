@@ -90,7 +90,7 @@ class Map:
             if basemap == "OpenStreetMap":
                 try:
                     fig.add_tile(xyz.OpenStreetMap.Mapnik, retina=True)
-                except:
+                except Exception:
                     from bokeh.tile_providers import get_provider
 
                     fig.add_tile(get_provider(xyz.OpenStreetMap.Mapnik))
@@ -165,7 +165,7 @@ class Map:
         """
         try:
             self.figure.add_tile(tile, **kwargs)
-        except Exception as e:
+        except Exception:
             if "retina" in kwargs.keys():
                 kwargs.pop("retina")
             self.figure.add_tile(tile, **kwargs)
