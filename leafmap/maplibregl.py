@@ -4,6 +4,7 @@
 import os
 import requests
 from typing import Tuple, Dict, Any, Optional, Union, List
+from IPython.display import display
 
 import xyzservices
 import geopandas as gpd
@@ -3881,8 +3882,12 @@ def edit_gps_trace(
     m: Any,
     colormap: Dict[str, str],
     layer_name: str,
+    default_feature: str = "max_signal_strength",
+    rows: int = 11,
     fig_width: str = "1550px",
-    fig_height: str = "400px",
+    fig_height: str = "300px",
+    time_format: str = "%Y-%m-%d %H:%M:%S",
+    **kwargs,
 ) -> Any:
     """
     Edits a GPS trace on the map and allows for annotation and export.
@@ -3899,27 +3904,23 @@ def edit_gps_trace(
         Any: The main widget containing the map and the editing interface.
     """
 
+    from datetime import datetime
     from bqplot import LinearScale, Scatter, Figure, PanZoom
     import bqplot as bq
     from ipywidgets import VBox, Button
     import ipywidgets as widgets
 
-    output_csv = os.path.join(
-        os.path.dirname(filename), filename.replace(".csv", "_annotated.csv")
-    )
-    output_geojson = output_csv.replace(".csv", ".geojson")
-
     output = widgets.Output()
+    download_widget = widgets.Output()
 
     fig_margin = {"top": 20, "bottom": 35, "left": 50, "right": 20}
     x_sc = LinearScale()
     y_sc = LinearScale()
 
     features = sorted(list(m.gps_trace.columns)[1:-3])
-    default_feature = "max_signal_strength"
     default_index = features.index(default_feature)
     feature = widgets.Dropdown(
-        options=features, index=default_index, description="Select feature"
+        options=features, index=default_index, description="Primary"
     )
 
     column = feature.value
@@ -3929,6 +3930,7 @@ def edit_gps_trace(
 
     # Create scatter plots for each annotation category with the appropriate colors and labels
     scatters = []
+    additonal_scatters = []
     for cat, color in colormap.items():
         if (
             cat != "selected"
@@ -3974,18 +3976,21 @@ def edit_gps_trace(
 
     # Callback function to handle selected points with bounds check
     def on_select(*args):
-        # output.clear_output()
         with output:
             selected_idx = []
-            for scatter in scatters:
+            for index, scatter in enumerate(scatters):
                 selected_indices = scatter.selected
                 if selected_indices is not None:
                     selected_indices = [
                         int(i) for i in selected_indices if i < len(scatter.x)
                     ]  # Ensure integer indices
                     selected_x = scatter.x[selected_indices]
-                    selected_y = scatter.y[selected_indices]
+                    # selected_y = scatter.y[selected_indices]
                     selected_idx += selected_x.tolist()
+
+                for scas in additonal_scatters:
+                    scas[index].selected = selected_indices
+
             selected_idx = sorted(list(set(selected_idx)))
             m.gdf.loc[selected_idx, "category"] = "selected"
             m.set_data(layer_name, m.gdf.__geo_interface__)
@@ -4007,6 +4012,21 @@ def edit_gps_trace(
             scatter.selected = (
                 selected_indices  # Highlight points at the specified indices
             )
+
+    # Programmatic selection function based on common x values
+    def select_additional_points_by_common_x(x_values):
+        """
+        Select points based on a common list of x values across all categories.
+        """
+        for scas in additonal_scatters:
+            for scatter in scas:
+                # Find indices of points in the scatter that match the given x values
+                selected_indices = [
+                    i for i, x_val in enumerate(scatter.x) if x_val in x_values
+                ]
+                scatter.selected = (
+                    selected_indices  # Highlight points at the specified indices
+                )
 
     # Function to clear the lasso selection
     def clear_selection(b):
@@ -4074,6 +4094,7 @@ def edit_gps_trace(
                 ]
                 sel_idx = selected.index.tolist()
             select_points_by_common_x(sel_idx)
+            select_additional_points_by_common_x(sel_idx)
             m.set_data(layer_name, points_within_polygons.__geo_interface__)
             if "index_right" in points_within_polygons.columns:
                 points_within_polygons = points_within_polygons.drop(
@@ -4083,6 +4104,9 @@ def edit_gps_trace(
         else:
             for scatter in scatters:
                 scatter.selected = None  # Clear selected points
+            for scas in additonal_scatters:
+                for scatter in scas:
+                    scatter.selected = None
             fig.interaction = selector  # Re-enable the LassoSelector
 
             m.gdf["category"] = m.gdf["annotation"]
@@ -4090,8 +4114,16 @@ def edit_gps_trace(
 
     m.observe(draw_change, names="draw_features_selected")
 
-    widget = widgets.VBox([])
+    widget = widgets.VBox(
+        [],
+    )
     options = ["doorstep", "indoor", "outdoor", "parked"]
+    multi_select = widgets.SelectMultiple(
+        options=features,
+        value=[],
+        description="Secondary",
+        rows=rows,
+    )
     dropdown = widgets.Dropdown(options=options, value=None, description="annotation")
     button_layout = widgets.Layout(width="97px")
     save = widgets.Button(
@@ -4103,9 +4135,85 @@ def edit_gps_trace(
     reset = widgets.Button(
         description="Reset", button_style="primary", layout=button_layout
     )
-    widget.children = [feature, dropdown, widgets.HBox([save, export, reset]), output]
+    widget.children = [
+        feature,
+        multi_select,
+        dropdown,
+        widgets.HBox([save, export, reset]),
+        output,
+        download_widget,
+    ]
+
+    features_widget = widgets.VBox([])
+
+    def features_change(change):
+        if change["new"]:
+            selected_features = multi_select.value
+            children = []
+            additonal_scatters.clear()
+            if selected_features:
+                for selected_feature in selected_features:
+
+                    x = m.gps_trace.index
+                    y = m.gps_trace[selected_feature]
+                    # x_sc = LinearScale()
+                    y_sc2 = LinearScale()
+
+                    # Create scatter plots for each annotation category with the appropriate colors and labels
+                    scatters = []
+                    for cat, color in colormap.items():
+                        if (
+                            cat != "selected"
+                        ):  # Exclude 'selected' from data points (only for highlighting selection)
+                            mask = m.gps_trace[category_column] == cat
+                            scatter = Scatter(
+                                x=x[mask],
+                                y=y[mask],
+                                scales={"x": x_sc, "y": y_sc2},
+                                colors=[color],
+                                marker="circle",
+                                stroke="lightgray",
+                                unselected_style={"opacity": 0.1},
+                                selected_style={"opacity": 1.0},
+                                default_size=48,  # Set a smaller default marker size
+                                display_legend=False,
+                                labels=[cat],  # Add the category label for the legend
+                            )
+                            scatters.append(scatter)
+                    additonal_scatters.append(scatters)
+
+                    # Create the figure and add the scatter plots
+                    fig = Figure(
+                        marks=scatters,
+                        fig_margin=fig_margin,
+                        layout={"width": fig_width, "height": fig_height},
+                    )
+                    fig.axes = [
+                        bq.Axis(scale=x_sc, label="Time"),
+                        bq.Axis(
+                            scale=y_sc2, orientation="vertical", label=selected_feature
+                        ),
+                    ]
+
+                    fig.legend_location = "top-right"
+
+                    # Add LassoSelector interaction
+                    selector = bq.interacts.LassoSelector(
+                        x_scale=x_sc, y_scale=y_sc, marks=scatters
+                    )
+                    fig.interaction = selector
+
+                    # Add PanZoom interaction for zooming and panning
+                    panzoom = PanZoom(scales={"x": [x_sc], "y": [y_sc2]})
+                    fig.interaction = panzoom  # Set PanZoom as the interaction to enable zooming initially
+                    children.append(fig)
+                features_widget.children = children
+
+    multi_select.observe(features_change, names="value")
 
     def on_save_click(b):
+        output.clear_output()
+        download_widget.clear_output()
         m.gdf.loc[m.gdf["category"] == "selected", "annotation"] = dropdown.value
         m.gdf.loc[m.gdf["category"] == "selected", "category"] = dropdown.value
         m.set_data(layer_name, m.gdf.__geo_interface__)
@@ -4116,6 +4224,14 @@ def edit_gps_trace(
             scatters[index].x = m.gps_trace.index[mask]
             scatters[index].y = m.gps_trace[feature.value][mask]
             scatters[index].colors = [colormap[cat]] * categories[cat]
+
+        for idx, scas in enumerate(additonal_scatters):
+            for index, cat in enumerate(keys):
+                mask = m.gdf["annotation"] == cat
+                scas[index].x = m.gps_trace.index[mask]
+                scas[index].y = m.gps_trace[multi_select.value[idx]][mask]
+                scas[index].colors = [colormap[cat]] * categories[cat]
+
         for scatter in scatters:
             scatter.selected = None  # Clear selected points
         fig.interaction = selector  # Re-enable the LassoSelector
@@ -4126,12 +4242,45 @@ def edit_gps_trace(
     save.on_click(on_save_click)
 
     def on_export_click(b):
+        changed_inx = m.gdf[m.gdf["annotation"] != m.gps_trace["annotation"]].index
+        m.gps_trace.loc[changed_inx, "changed_timestamp"] = datetime.now().strftime(
+            time_format
+        )
         m.gps_trace["annotation"] = m.gdf["annotation"]
         gdf = m.gps_trace.drop(columns=["category"])
+
+        out_dir = kwargs.pop("out_dir", os.getcwd())
+        basename = os.path.basename(filename)
+
+        output_csv = os.path.join(out_dir, basename.replace(".csv", "_annotated.csv"))
+        output_geojson = output_csv.replace(".csv", ".geojson")
+
         gdf.to_file(output_geojson)
         gdf.to_csv(output_csv, index=False)
 
+        csv_link = common.create_download_link(
+            output_csv, title="Download ", basename="annotated.csv"
+        )
+        geojson_link = common.create_download_link(
+            output_geojson, title="Download ", basename="annotated.geojson"
+        )
+
+        with output:
+            output.clear_output()
+            display(csv_link)
+        with download_widget:
+            download_widget.clear_output()
+            display(geojson_link)
+
     export.on_click(on_export_click)
+
+    def on_reset_click(b):
+        multi_select.value = []
+        features_widget.children = []
+        output.clear_output()
+        download_widget.clear_output()
+
+    reset.on_click(on_reset_click)
 
     plot_widget = VBox([fig, widgets.HBox([clear_button, toggle_button])])
 
@@ -4151,5 +4300,118 @@ def edit_gps_trace(
         class_="d-flex flex-wrap",
         children=[plot_widget],
     )
-    main_widget = v.Col(children=[row1, row2])
+    row3 = v.Row(
+        class_="d-flex flex-wrap",
+        children=[features_widget],
+    )
+    main_widget = v.Col(children=[row1, row2, row3])
+    return main_widget
+
+
+def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
+    """
+    Creates a widget for uploading and displaying a GPS trace on a map.
+
+    Args:
+        **kwargs: Additional keyword arguments to pass to the edit_gps_trace method.
+
+    Returns:
+        widgets.VBox: The widget containing the GPS trace upload and display interface.
+    """
+
+    import ipywidgets as widgets
+
+    main_widget = widgets.VBox()
+
+    uploader = widgets.FileUpload(
+        accept=".csv",  # Accept GeoJSON files
+        multiple=False,  # Only single file upload
+        description="Open GPS Trace",
+        layout=widgets.Layout(width="180px"),
+        button_style="primary",
+    )
+
+    output = widgets.Output()
+    reset = widgets.Button(description="Reset", button_style="primary")
+
+    def on_reset_clicked(b):
+        main_widget.children = [widgets.HBox([uploader, reset]), output]
+
+    reset.on_click(on_reset_clicked)
+
+    def create_default_map():
+        m = Map(style="liberty", height="610px")
+        m.add_basemap("Satellite")
+        m.add_basemap("OpenStreetMap.Mapnik", visible=False)
+        m.add_overture_buildings(visible=False)
+        return m
+
+    def on_upload(change):
+        if len(uploader.value) > 0:
+            content = uploader.value[0]["content"]
+            filename = common.temp_file_path(extension=".csv")
+            with open(filename, "wb") as f:
+                f.write(content)
+            with output:
+                output.clear_output()
+
+                if "m" in kwargs:
+                    m = kwargs["m"]
+                else:
+                    m = create_default_map()
+
+                if "colormap" in kwargs:
+                    colormap = kwargs.pop("colormap")
+                else:
+                    colormap = {
+                        "doorstep": "#FF0000",  # Red
+                        "indoor": "#0000FF",  # Blue
+                        "outdoor": "#00FF00",  # Green
+                        "parked": "#000000",  # Black
+                        "selected": "#FFFF00",  # Yellow
+                    }
+
+                if "layer_name" in kwargs:
+                    layer_name = kwargs.pop("layer_name")
+                else:
+                    layer_name = "GPS Trace"
+
+                if "icon" in kwargs:
+                    icon = kwargs.pop("icon")
+                else:
+                    icon = "https://i.imgur.com/ZMMvXuT.png"
+
+                m.add_gps_trace(
+                    filename,
+                    radius=4,
+                    add_line=True,
+                    color_column="category",
+                    name=layer_name,
+                )
+                m.add_legend(legend_dict=colormap, shape_type="circle")
+                m.add_layer_control()
+                m.add_draw_control(controls=["polygon", "trash"])
+
+                m.add_symbol(
+                    icon,
+                    source="GPS Trace Line",
+                    icon_size=0.1,
+                    symbol_placement="line",
+                    minzoom=19,
+                )
+
+                edit_widget = edit_gps_trace(
+                    filename, m, colormap, layer_name, **kwargs
+                )
+                main_widget.children = [
+                    widgets.HBox([uploader, reset]),
+                    output,
+                    edit_widget,
+                ]
+                uploader.value = ()
+                uploader._counter = 0
+
+    uploader.observe(on_upload, names="value")
+
+    main_widget.children = [widgets.HBox([uploader, reset]), output]
     return main_widget
