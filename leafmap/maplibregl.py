@@ -4,6 +4,7 @@
 import os
 import requests
 from typing import Tuple, Dict, Any, Optional, Union, List
+from IPython.display import display
 
 import xyzservices
 import geopandas as gpd
@@ -3910,6 +3911,7 @@ def edit_gps_trace(
     import ipywidgets as widgets
 
     output = widgets.Output()
+    download_widget = widgets.Output()
 
     fig_margin = {"top": 20, "bottom": 35, "left": 50, "right": 20}
     x_sc = LinearScale()
@@ -4139,6 +4141,7 @@ def edit_gps_trace(
         dropdown,
         widgets.HBox([save, export, reset]),
         output,
+        download_widget,
     ]
 
     features_widget = widgets.VBox([])
@@ -4209,6 +4212,8 @@ def edit_gps_trace(
     multi_select.observe(features_change, names="value")
 
     def on_save_click(b):
+        output.clear_output()
+        download_widget.clear_output()
         m.gdf.loc[m.gdf["category"] == "selected", "annotation"] = dropdown.value
         m.gdf.loc[m.gdf["category"] == "selected", "category"] = dropdown.value
         m.set_data(layer_name, m.gdf.__geo_interface__)
@@ -4253,11 +4258,27 @@ def edit_gps_trace(
         gdf.to_file(output_geojson)
         gdf.to_csv(output_csv, index=False)
 
+        csv_link = common.create_download_link(
+            output_csv, title="Download ", basename="annotated.csv"
+        )
+        geojson_link = common.create_download_link(
+            output_geojson, title="Download ", basename="annotated.geojson"
+        )
+
+        with output:
+            output.clear_output()
+            display(csv_link)
+        with download_widget:
+            download_widget.clear_output()
+            display(geojson_link)
+
     export.on_click(on_export_click)
 
     def on_reset_click(b):
         multi_select.value = []
         features_widget.children = []
+        output.clear_output()
+        download_widget.clear_output()
 
     reset.on_click(on_reset_click)
 
@@ -4287,18 +4308,15 @@ def edit_gps_trace(
     return main_widget
 
 
-def open_gps_trace(
-    layer_name=None, colormap=None, icon=None, **kwargs: Any
-) -> "widgets.FileUpload":
+def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
     """
-    Creates a file uploader widget to upload a GeoJSON file. When a file is
-    uploaded, it is written to a temporary file and added to the map.
+    Creates a widget for uploading and displaying a GPS trace on a map.
 
     Args:
-        **kwargs: Additional keyword arguments to pass to the add_geojson method.
+        **kwargs: Additional keyword arguments to pass to the edit_gps_trace method.
 
     Returns:
-        widgets.FileUpload: The file uploader widget.
+        widgets.VBox: The widget containing the GPS trace upload and display interface.
     """
 
     import ipywidgets as widgets
@@ -4328,9 +4346,6 @@ def open_gps_trace(
         m.add_overture_buildings(visible=False)
         return m
 
-    if icon is None:
-        icon = "https://i.imgur.com/ZMMvXuT.png"
-
     def on_upload(change):
         if len(uploader.value) > 0:
             content = uploader.value[0]["content"]
@@ -4346,7 +4361,7 @@ def open_gps_trace(
                     m = create_default_map()
 
                 if "colormap" in kwargs:
-                    colormap = kwargs["colormap"]
+                    colormap = kwargs.pop("colormap")
                 else:
                     colormap = {
                         "doorstep": "#FF0000",  # Red
@@ -4357,9 +4372,14 @@ def open_gps_trace(
                     }
 
                 if "layer_name" in kwargs:
-                    layer_name = kwargs["layer_name"]
+                    layer_name = kwargs.pop("layer_name")
                 else:
                     layer_name = "GPS Trace"
+
+                if "icon" in kwargs:
+                    icon = kwargs.pop("icon")
+                else:
+                    icon = "https://i.imgur.com/ZMMvXuT.png"
 
                 m.add_gps_trace(
                     filename,
