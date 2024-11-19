@@ -667,7 +667,7 @@ def download_from_url(
         print("Data downloaded to: {}".format(final_path))
 
 
-def create_download_link(filename, title="Click here to download: "):
+def create_download_link(filename, title="Click here to download: ", basename=None):
     """Downloads a file from voila. Adopted from https://github.com/voila-dashboards/voila/issues/578
 
     Args:
@@ -683,7 +683,8 @@ def create_download_link(filename, title="Click here to download: "):
     data = open(filename, "rb").read()
     b64 = base64.b64encode(data)
     payload = b64.decode()
-    basename = os.path.basename(filename)
+    if basename is None:
+        basename = os.path.basename(filename)
     html = '<a download="{filename}" href="data:text/csv;base64,{payload}" style="color:#0000FF;" target="_blank">{title}</a>'
     html = html.format(payload=payload, title=title + f" {basename}", filename=basename)
     return HTML(html)
