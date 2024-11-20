@@ -2164,8 +2164,8 @@ class Map(MapWidget):
 
     def add_symbol(
         self,
-        image: str,
         source: str,
+        image: str,
         icon_size: int = 1,
         symbol_placement: str = "line",
         minzoom: Optional[float] = None,
@@ -2178,8 +2178,9 @@ class Map(MapWidget):
         Adds a symbol to the map.
 
         Args:
-            image (str): The URL or local file path to the image.
             source (str): The source of the symbol.
+            image (str): The URL or local file path to the image. Default to the arrow image.
+                at https://assets.gishub.org/images/arrow.png.
             icon_size (int, optional): The size of the symbol. Defaults to 1.
             symbol_placement (str, optional): The placement of the symbol. Defaults to "line".
             minzoom (Optional[float], optional): The minimum zoom level for the symbol. Defaults to None.
@@ -2192,6 +2193,7 @@ class Map(MapWidget):
         Returns:
             None
         """
+
         id = f"image_{common.random_string(3)}"
         self.add_image(id, image)
 
@@ -2220,6 +2222,34 @@ class Map(MapWidget):
         layer["layout"].update(kwargs)
 
         self.add_layer(layer)
+
+    def add_arrow(
+        self,
+        source: str,
+        image: Optional[str] = None,
+        icon_size: int = 0.1,
+        minzoom: Optional[float] = 19,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds an arrow symbol to the map.
+
+        Args:
+            source (str): The source layer to which the arrow symbol will be added.
+            image (Optional[str], optional): The URL of the arrow image.
+                Defaults to "https://assets.gishub.org/images/arrow.png".
+            icon_size (int, optional): The size of the icon. Defaults to 0.1.
+            minzoom (Optional[float], optional): The minimum zoom level at which
+                the arrow symbol will be visible. Defaults to 19.
+            **kwargs: Additional keyword arguments to pass to the add_symbol method.
+
+        Returns:
+            None
+        """
+        if image is None:
+            image = "https://assets.gishub.org/images/arrow.png"
+
+        self.add_symbol(source, image, icon_size, minzoom=minzoom, **kwargs)
 
     def to_streamlit(
         self,
@@ -3523,10 +3553,10 @@ class Map(MapWidget):
     def add_gps_trace(
         self,
         data: Union[str, List[Dict[str, Any]]],
-        x: str = "longitude",
-        y: str = "latitude",
+        x: str = None,
+        y: str = None,
         columns: Optional[List[str]] = None,
-        color_column: Optional[str] = None,
+        ann_column: Optional[str] = None,
         colormap: Optional[Dict[str, str]] = None,
         radius: int = 5,
         circle_color: Optional[Union[str, List[Any]]] = None,
@@ -3534,9 +3564,13 @@ class Map(MapWidget):
         opacity: float = 1.0,
         paint: Optional[Dict[str, Any]] = None,
         name: str = "GPS Trace",
-        add_line: bool = False,
+        add_line: bool = True,
         sort_column: Optional[str] = None,
         line_args: Optional[Dict[str, Any]] = None,
+        add_draw_control: bool = True,
+        draw_control_args: Optional[Dict[str, Any]] = None,
+        add_legend: bool = True,
+        legend_args: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -3544,9 +3578,12 @@ class Map(MapWidget):
 
         Args:
             data (Union[str, List[Dict[str, Any]]]): The GPS trace data. It can be a GeoJSON file path or a list of coordinates.
-            x (str, optional): The column name for the x coordinates. Defaults to "longitude".
-            y (str, optional): The column name for the y coordinates. Defaults to "latitude".
+            x (str, optional): The column name for the x coordinates. Defaults to None,
+                which assumes the x coordinates are in the "longitude", "lon", or "x" column.
+            y (str, optional): The column name for the y coordinates. Defaults to None,
+                which assumes the y coordinates are in the "latitude", "lat", or "y" column.
             columns (Optional[List[str]], optional): The list of columns to include in the GeoDataFrame. Defaults to None.
+            ann_column (Optional[str], optional): The column name to use for coloring the GPS trace points. Defaults to None.
             colormap (Optional[Dict[str, str]], optional): The colormap for the GPS trace. Defaults to None.
             radius (int, optional): The radius of the GPS trace points. Defaults to 5.
             circle_color (Optional[Union[str, List[Any]]], optional): The color of the GPS trace points. Defaults to None.
@@ -3554,15 +3591,21 @@ class Map(MapWidget):
             opacity (float, optional): The opacity of the GPS trace points. Defaults to 1.0.
             paint (Optional[Dict[str, Any]], optional): The paint properties for the GPS trace points. Defaults to None.
             name (str, optional): The name of the GPS trace layer. Defaults to "GPS Trace".
-            add_line (bool, optional): If True, adds a line connecting the GPS trace points. Defaults to False.
+            add_line (bool, optional): If True, adds a line connecting the GPS trace points. Defaults to True.
             sort_column (Optional[str], optional): The column name to sort the points before connecting them as a line. Defaults to None.
-            line_args (Optional[Dict[str, Any]], optional): Additional arguments for the line layer. Defaults to None.
             **kwargs (Any): Additional keyword arguments to pass to the add_geojson method.
 
         Returns:
             None
         """
-        import geopandas as gpd
+
+        if add_draw_control:
+            if draw_control_args is None:
+                draw_control_args = {
+                    "controls": ["polygon", "trash"],
+                    "position": "top-right",
+                }
+            self.add_draw_control(**draw_control_args)
 
         if isinstance(data, str):
             gdf = common.points_from_xy(data, x=x, y=y)
@@ -3570,13 +3613,15 @@ class Map(MapWidget):
             gdf = data
         else:
             raise ValueError(
-                "Invalid data type. Use a GeoDataFrame or a list of coordinates."
+                "Invalid data type. Use a GeoDataFrame or a file path to a CSV file."
             )
 
         setattr(self, "gps_trace", gdf)
 
         if add_line:
-            line_gdf = common.connect_points_as_line(gdf, sort_column=sort_column)
+            line_gdf = common.connect_points_as_line(
+                gdf, sort_column=sort_column, single_line=True
+            )
         else:
             line_gdf = None
 
@@ -3589,36 +3634,38 @@ class Map(MapWidget):
                 "selected": "#FFFF00",
             }
 
-        if columns is None:
+        if ann_column is None:
             if "annotation" in gdf.columns:
-                if color_column is None:
-                    color_column = "category"
-                gdf[color_column] = gdf["annotation"]
-                columns = [
-                    "latitude",
-                    "longitude",
-                    "annotation",
-                    color_column,
-                    "geometry",
+                ann_column = "annotation"
+            else:
+                raise ValueError(
+                    "Please specify the ann_column parameter or add an 'annotation' column to the GeoDataFrame."
+                )
+
+        ann_column_bk = f"{ann_column}_bk"
+        gdf[ann_column_bk] = gdf[ann_column]
+
+        if columns is None:
+            columns = [
+                ann_column,
+                ann_column_bk,
+                "geometry",
+            ]
+            gdf = gdf[columns]
+            setattr(self, "gdf", gdf)
+            if circle_color is None:
+                circle_color = circle_color = [
+                    "match",
+                    ["get", ann_column_bk],
                 ]
-                gdf = gdf[columns]
-                setattr(self, "gdf", gdf)
-                if circle_color is None:
-                    circle_color = [
-                        "match",
-                        ["get", color_column],
-                        "doorstep",
-                        colormap["doorstep"],
-                        "indoor",
-                        colormap["indoor"],
-                        "outdoor",
-                        colormap["outdoor"],
-                        "parked",
-                        colormap["parked"],
-                        "selected",
-                        colormap["selected"],
-                        "#CCCCCC",  # Default color if annotation does not match
-                    ]
+                # Add the color matches from the colormap
+                for key, color in colormap.items():
+                    circle_color.extend([key, color])
+
+                # Add the default color
+                circle_color.append(
+                    "#CCCCCC"
+                )  # Default color if annotation does not match
 
         if circle_color is None:
             circle_color = "#3388ff"
@@ -3637,8 +3684,15 @@ class Map(MapWidget):
         if line_gdf is not None:
             if line_args is None:
                 line_args = {}
-            self.add_gdf(line_gdf, name="GPS Trace Line", **line_args)
+            self.add_gdf(line_gdf, name=f"{name} Line", **line_args)
         self.add_geojson(geojson, layer_type="circle", paint=paint, name=name, **kwargs)
+        if add_legend:
+            if legend_args is None:
+                legend_args = {
+                    "legend_dict": colormap,
+                    "shape_type": "circle",
+                }
+            self.add_legend(**legend_args)
 
 
 class Container(v.Container):
@@ -3880,6 +3934,7 @@ def maptiler_3d_style(
 def edit_gps_trace(
     filename: str,
     m: Any,
+    ann_column: str,
     colormap: Dict[str, str],
     layer_name: str,
     default_feature: str = "max_signal_strength",
@@ -3924,7 +3979,8 @@ def edit_gps_trace(
     )
 
     column = feature.value
-    category_column = "annotation"  # Replace with your categorical column name
+    # ann_column = "annotation"  # Replace with your categorical column name
+    ann_column_bk = f"{ann_column}_bk"
     x = m.gps_trace.index
     y = m.gps_trace[column]
 
@@ -3935,7 +3991,7 @@ def edit_gps_trace(
         if (
             cat != "selected"
         ):  # Exclude 'selected' from data points (only for highlighting selection)
-            mask = m.gps_trace[category_column] == cat
+            mask = m.gps_trace[ann_column] == cat
             scatter = Scatter(
                 x=x[mask],
                 y=y[mask],
@@ -3992,7 +4048,7 @@ def edit_gps_trace(
                     scas[index].selected = selected_indices
 
             selected_idx = sorted(list(set(selected_idx)))
-            m.gdf.loc[selected_idx, "category"] = "selected"
+            m.gdf.loc[selected_idx, ann_column_bk] = "selected"
             m.set_data(layer_name, m.gdf.__geo_interface__)
 
     # Register the callback for each scatter plot
@@ -4034,7 +4090,7 @@ def edit_gps_trace(
             scatter.selected = None  # Clear selected points
         fig.interaction = selector  # Re-enable the LassoSelector
 
-        m.gdf["category"] = m.gdf["annotation"]
+        m.gdf[ann_column_bk] = m.gdf[ann_column]
         m.set_data(layer_name, m.gdf.__geo_interface__)
 
     # Button to clear selection and switch between interactions
@@ -4055,7 +4111,7 @@ def edit_gps_trace(
 
     def feature_change(change):
         if change["new"]:
-            categories = m.gdf["annotation"].value_counts()
+            categories = m.gdf[ann_column].value_counts()
             keys = list(colormap.keys())[:-1]
             for index, cat in enumerate(keys):
 
@@ -4064,7 +4120,7 @@ def edit_gps_trace(
                     bq.Axis(scale=y_sc, orientation="vertical", label=feature.value),
                 ]
 
-                mask = m.gdf["annotation"] == cat
+                mask = m.gdf[ann_column] == cat
                 scatters[index].x = m.gps_trace.index[mask]
                 scatters[index].y = m.gps_trace[feature.value][mask]
                 scatters[index].colors = [colormap[cat]] * categories[cat]
@@ -4080,17 +4136,17 @@ def edit_gps_trace(
                 "type": "FeatureCollection",
                 "features": m.draw_features_selected,
             }
-            m.gdf["category"] = m.gdf["annotation"]
+            m.gdf[ann_column_bk] = m.gdf[ann_column]
             gdf_draw = gpd.GeoDataFrame.from_features(features)
             points_within_polygons = gpd.sjoin(
                 m.gdf, gdf_draw, how="left", predicate="within"
             )
             points_within_polygons.loc[
-                points_within_polygons["index_right"].notna(), "category"
+                points_within_polygons["index_right"].notna(), ann_column_bk
             ] = "selected"
             with output:
                 selected = points_within_polygons.loc[
-                    points_within_polygons["category"] == "selected"
+                    points_within_polygons[ann_column_bk] == "selected"
                 ]
                 sel_idx = selected.index.tolist()
             select_points_by_common_x(sel_idx)
@@ -4109,7 +4165,7 @@ def edit_gps_trace(
                     scatter.selected = None
             fig.interaction = selector  # Re-enable the LassoSelector
 
-            m.gdf["category"] = m.gdf["annotation"]
+            m.gdf[ann_column_bk] = m.gdf[ann_column]
             m.set_data(layer_name, m.gdf.__geo_interface__)
 
     m.observe(draw_change, names="draw_features_selected")
@@ -4165,7 +4221,7 @@ def edit_gps_trace(
                         if (
                             cat != "selected"
                         ):  # Exclude 'selected' from data points (only for highlighting selection)
-                            mask = m.gps_trace[category_column] == cat
+                            mask = m.gps_trace[ann_column] == cat
                             scatter = Scatter(
                                 x=x[mask],
                                 y=y[mask],
@@ -4214,20 +4270,20 @@ def edit_gps_trace(
     def on_save_click(b):
         output.clear_output()
         download_widget.clear_output()
-        m.gdf.loc[m.gdf["category"] == "selected", "annotation"] = dropdown.value
-        m.gdf.loc[m.gdf["category"] == "selected", "category"] = dropdown.value
+        m.gdf.loc[m.gdf[ann_column_bk] == "selected", ann_column] = dropdown.value
+        m.gdf.loc[m.gdf[ann_column_bk] == "selected", ann_column_bk] = dropdown.value
         m.set_data(layer_name, m.gdf.__geo_interface__)
-        categories = m.gdf["annotation"].value_counts()
+        categories = m.gdf[ann_column].value_counts()
         keys = list(colormap.keys())[:-1]
         for index, cat in enumerate(keys):
-            mask = m.gdf["annotation"] == cat
+            mask = m.gdf[ann_column] == cat
             scatters[index].x = m.gps_trace.index[mask]
             scatters[index].y = m.gps_trace[feature.value][mask]
             scatters[index].colors = [colormap[cat]] * categories[cat]
 
         for idx, scas in enumerate(additonal_scatters):
             for index, cat in enumerate(keys):
-                mask = m.gdf["annotation"] == cat
+                mask = m.gdf[ann_column] == cat
                 scas[index].x = m.gps_trace.index[mask]
                 scas[index].y = m.gps_trace[multi_select.value[idx]][mask]
                 scas[index].colors = [colormap[cat]] * categories[cat]
@@ -4236,18 +4292,22 @@ def edit_gps_trace(
             scatter.selected = None  # Clear selected points
         fig.interaction = selector  # Re-enable the LassoSelector
 
-        m.gdf["category"] = m.gdf["annotation"]
+        m.gdf[ann_column_bk] = m.gdf[ann_column]
         m.set_data(layer_name, m.gdf.__geo_interface__)
 
     save.on_click(on_save_click)
 
     def on_export_click(b):
-        changed_inx = m.gdf[m.gdf["annotation"] != m.gps_trace["annotation"]].index
+        output.clear_output()
+        download_widget.clear_output()
+        with output:
+            print("Exporting annotated GPS trace...")
+        changed_inx = m.gdf[m.gdf[ann_column] != m.gps_trace[ann_column]].index
         m.gps_trace.loc[changed_inx, "changed_timestamp"] = datetime.now().strftime(
             time_format
         )
-        m.gps_trace["annotation"] = m.gdf["annotation"]
-        gdf = m.gps_trace.drop(columns=["category"])
+        m.gps_trace[ann_column] = m.gdf[ann_column]
+        gdf = m.gps_trace.drop(columns=[ann_column_bk])
 
         out_dir = kwargs.pop("out_dir", os.getcwd())
         basename = os.path.basename(filename)
@@ -4379,7 +4439,12 @@ def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
                 if "icon" in kwargs:
                     icon = kwargs.pop("icon")
                 else:
-                    icon = "https://i.imgur.com/ZMMvXuT.png"
+                    icon = "https://assets.gishub.org/images/arrow.png"
+
+                if "ann_column" in kwargs:
+                    ann_column = kwargs.pop("ann_column")
+                else:
+                    ann_column = "annotation"
 
                 m.add_gps_trace(
                     filename,
@@ -4401,7 +4466,7 @@ def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
                 )
 
                 edit_widget = edit_gps_trace(
-                    filename, m, colormap, layer_name, **kwargs
+                    filename, m, ann_column, colormap, layer_name, **kwargs
                 )
                 main_widget.children = [
                     widgets.HBox([uploader, reset]),
