@@ -2757,11 +2757,9 @@ class Map(MapWidget):
             else:
                 labels = list(legend_dict.keys())
                 colors = list(legend_dict.values())
-                if all(isinstance(item, tuple) for item in colors):
-                    try:
-                        colors = [common.rgb_to_hex(x) for x in colors]
-                    except Exception as e:
-                        print(e)
+                if isinstance(colors[0], tuple) and len(colors[0]) == 2:
+                    labels = [color[0] for color in colors]
+                    colors = [color[1] for color in colors]
 
         allowed_positions = [
             "top-left",
@@ -3634,6 +3632,19 @@ class Map(MapWidget):
                 "selected": "#FFFF00",
             }
 
+        if add_legend:
+            if legend_args is None:
+                legend_args = {
+                    "legend_dict": colormap,
+                    "shape_type": "circle",
+                }
+            self.add_legend(**legend_args)
+
+        if isinstance(list(colormap.values())[0], tuple):
+            keys = list(colormap.keys())
+            values = [value[1] for value in colormap.values()]
+            colormap = dict(zip(keys, values))
+
         if ann_column is None:
             if "annotation" in gdf.columns:
                 ann_column = "annotation"
@@ -3654,13 +3665,13 @@ class Map(MapWidget):
             gdf = gdf[columns]
             setattr(self, "gdf", gdf)
             if circle_color is None:
-                circle_color = circle_color = [
+                circle_color = [
                     "match",
-                    ["get", ann_column_bk],
+                    ["to-string", ["get", ann_column_bk]],
                 ]
                 # Add the color matches from the colormap
                 for key, color in colormap.items():
-                    circle_color.extend([key, color])
+                    circle_color.extend([str(key), color])
 
                 # Add the default color
                 circle_color.append(
@@ -3686,13 +3697,6 @@ class Map(MapWidget):
                 line_args = {}
             self.add_gdf(line_gdf, name=f"{name} Line", **line_args)
         self.add_geojson(geojson, layer_type="circle", paint=paint, name=name, **kwargs)
-        if add_legend:
-            if legend_args is None:
-                legend_args = {
-                    "legend_dict": colormap,
-                    "shape_type": "circle",
-                }
-            self.add_legend(**legend_args)
 
 
 class Container(v.Container):
@@ -3937,7 +3941,7 @@ def edit_gps_trace(
     ann_column: str,
     colormap: Dict[str, str],
     layer_name: str,
-    default_feature: str = "max_signal_strength",
+    default_feature: str = None,
     rows: int = 11,
     fig_width: str = "1550px",
     fig_height: str = "300px",
@@ -3950,10 +3954,15 @@ def edit_gps_trace(
     Args:
         filename (str): The path to the GPS trace CSV file.
         m (Any): The map object containing the GPS trace.
+        ann_column (str): The annotation column in the GPS trace.
         colormap (Dict[str, str]): The colormap for the GPS trace annotations.
         layer_name (str): The name of the GPS trace layer.
+        default_feature (Optional[str], optional): The default feature to display. Defaults to None.
+        rows (int, optional): The number of rows to display in the table. Defaults to 11.
         fig_width (str, optional): The width of the figure. Defaults to "1550px".
-        fig_height (str, optional): The height of the figure. Defaults to "400px".
+        fig_height (str, optional): The height of the figure. Defaults to "300px".
+        time_format (str, optional): The time format for the timestamp. Defaults to "%Y-%m-%d %H:%M:%S".
+        **kwargs: Additional keyword arguments.
 
     Returns:
         Any: The main widget containing the map and the editing interface.
@@ -3973,13 +3982,16 @@ def edit_gps_trace(
     y_sc = LinearScale()
 
     features = sorted(list(m.gps_trace.columns)[1:-3])
+    if "max_signal_strength" in features:
+        default_feature = "max_signal_strength"
+    else:
+        default_feature = features[0]
     default_index = features.index(default_feature)
     feature = widgets.Dropdown(
         options=features, index=default_index, description="Primary"
     )
 
     column = feature.value
-    # ann_column = "annotation"  # Replace with your categorical column name
     ann_column_bk = f"{ann_column}_bk"
     x = m.gps_trace.index
     y = m.gps_trace[column]
@@ -3987,6 +3999,12 @@ def edit_gps_trace(
     # Create scatter plots for each annotation category with the appropriate colors and labels
     scatters = []
     additonal_scatters = []
+
+    if isinstance(list(colormap.values())[0], tuple):
+        keys = list(colormap.keys())
+        values = [value[1] for value in colormap.values()]
+        colormap = dict(zip(keys, values))
+
     for cat, color in colormap.items():
         if (
             cat != "selected"
@@ -4003,7 +4021,7 @@ def edit_gps_trace(
                 selected_style={"opacity": 1.0},
                 default_size=48,  # Set a smaller default marker size
                 display_legend=False,
-                labels=[cat],  # Add the category label for the legend
+                labels=[str(cat)],  # Add the category label for the legend
             )
             scatters.append(scatter)
 
