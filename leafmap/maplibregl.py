@@ -2760,7 +2760,11 @@ class Map(MapWidget):
                 if isinstance(colors[0], tuple) and len(colors[0]) == 2:
                     labels = [color[0] for color in colors]
                     colors = [color[1] for color in colors]
-
+                if all(isinstance(item, tuple) for item in colors):
+                    try:
+                        colors = [common.rgb_to_hex(x) for x in colors]
+                    except Exception as e:
+                        print(e)
         allowed_positions = [
             "top-left",
             "top-right",
@@ -2787,7 +2791,7 @@ class Map(MapWidget):
 
         for index, key in enumerate(labels):
             color = colors[index]
-            if not color.startswith("#"):
+            if isinstance(color, str) and (not color.startswith("#")):
                 color = "#" + color
             item = "      <li><span style='background:{};'></span>{}</li>\n".format(
                 color, key
@@ -3640,7 +3644,10 @@ class Map(MapWidget):
                 }
             self.add_legend(**legend_args)
 
-        if isinstance(list(colormap.values())[0], tuple):
+        if (
+            isinstance(list(colormap.values())[0], tuple)
+            and len(list(colormap.values())[0]) == 2
+        ):
             keys = list(colormap.keys())
             values = [value[1] for value in colormap.values()]
             colormap = dict(zip(keys, values))
