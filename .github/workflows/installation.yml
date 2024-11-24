@@ -27,7 +27,7 @@ jobs:
               run: uv python install ${{ matrix.python-version }}
 
             - name: Install dependencies
-              run: uv sync --python ${{ matrix.python-version }}
+              run: uv sync --python ${{ matrix.python-version }} --prerelease=allow
 
             - name: Test import
               run: uv run python -c "import leafmap; print('leafmap import successful')"
