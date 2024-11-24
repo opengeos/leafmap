@@ -3953,6 +3953,7 @@ def edit_gps_trace(
     fig_width: str = "1550px",
     fig_height: str = "300px",
     time_format: str = "%Y-%m-%d %H:%M:%S",
+    webGL: bool = False,
     **kwargs,
 ) -> Any:
     """
@@ -3969,6 +3970,7 @@ def edit_gps_trace(
         fig_width (str, optional): The width of the figure. Defaults to "1550px".
         fig_height (str, optional): The height of the figure. Defaults to "300px".
         time_format (str, optional): The time format for the timestamp. Defaults to "%Y-%m-%d %H:%M:%S".
+        webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
         **kwargs: Additional keyword arguments.
 
     Returns:
@@ -3976,10 +3978,15 @@ def edit_gps_trace(
     """
 
     from datetime import datetime
-    from bqplot import LinearScale, Scatter, Figure, PanZoom
+    from bqplot import LinearScale, Figure, PanZoom
     import bqplot as bq
     from ipywidgets import VBox, Button
     import ipywidgets as widgets
+
+    if webGL:
+        from bqplot_gl import ScatterGL as Scatter
+    else:
+        from bqplot import Scatter
 
     output = widgets.Output()
     download_widget = widgets.Output()
