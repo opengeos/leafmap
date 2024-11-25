@@ -3953,6 +3953,8 @@ def edit_gps_trace(
     fig_width: str = "1550px",
     fig_height: str = "300px",
     time_format: str = "%Y-%m-%d %H:%M:%S",
+    stroke_color: str = "lightgray",
+    circle_size: int = 48,
     webGL: bool = False,
     **kwargs,
 ) -> Any:
@@ -3970,6 +3972,8 @@ def edit_gps_trace(
         fig_width (str, optional): The width of the figure. Defaults to "1550px".
         fig_height (str, optional): The height of the figure. Defaults to "300px".
         time_format (str, optional): The time format for the timestamp. Defaults to "%Y-%m-%d %H:%M:%S".
+        stroke_color (str, optional): The stroke color of the GPS trace points. Defaults to "lightgray".
+        circle_size (int, optional): The size of the GPS trace points. Defaults to 48.
         webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
         **kwargs: Additional keyword arguments.
 
@@ -4035,10 +4039,10 @@ def edit_gps_trace(
                 scales={"x": x_sc, "y": y_sc},
                 colors=[color],
                 marker="circle",
-                stroke="lightgray",
+                stroke=stroke_color,
                 unselected_style={"opacity": 0.1},
                 selected_style={"opacity": 1.0},
-                default_size=48,  # Set a smaller default marker size
+                default_size=circle_size,  # Set a smaller default marker size
                 display_legend=False,
                 labels=[str(cat)],  # Add the category label for the legend
             )
@@ -4241,6 +4245,7 @@ def edit_gps_trace(
 
     def features_change(change):
         if change["new"]:
+
             selected_features = multi_select.value
             children = []
             additonal_scatters.clear()
@@ -4255,6 +4260,7 @@ def edit_gps_trace(
                     # Create scatter plots for each annotation category with the appropriate colors and labels
                     scatters = []
                     for cat, color in colormap.items():
+
                         if (
                             cat != "selected"
                         ):  # Exclude 'selected' from data points (only for highlighting selection)
@@ -4265,12 +4271,14 @@ def edit_gps_trace(
                                 scales={"x": x_sc, "y": y_sc2},
                                 colors=[color],
                                 marker="circle",
-                                stroke="lightgray",
+                                stroke=stroke_color,
                                 unselected_style={"opacity": 0.1},
                                 selected_style={"opacity": 1.0},
-                                default_size=48,  # Set a smaller default marker size
+                                default_size=circle_size,  # Set a smaller default marker size
                                 display_legend=False,
-                                labels=[cat],  # Add the category label for the legend
+                                labels=[
+                                    str(cat)
+                                ],  # Add the category label for the legend
                             )
                             scatters.append(scatter)
                     additonal_scatters.append(scatters)
@@ -4284,7 +4292,9 @@ def edit_gps_trace(
                     fig.axes = [
                         bq.Axis(scale=x_sc, label="Time"),
                         bq.Axis(
-                            scale=y_sc2, orientation="vertical", label=selected_feature
+                            scale=y_sc2,
+                            orientation="vertical",
+                            label=selected_feature,
                         ),
                     ]
 
