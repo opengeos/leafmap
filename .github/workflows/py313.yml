@@ -39,7 +39,7 @@ jobs:
               run: uv python install ${{ matrix.python-version }}
 
             - name: Install dependencies
-              run: uv sync --python ${{ matrix.python-version }} --prerelease=allow
+              run: uv pip install -r pyproject.toml --prerelease=allow
 
             - name: Test import
               run: |
