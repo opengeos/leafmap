@@ -3629,10 +3629,6 @@ class Map(MapWidget):
 
         if colormap is None:
             colormap = {
-                "doorstep": "#FF0000",  # Red
-                "indoor": "#0000FF",  # Blue
-                "outdoor": "#00FF00",  # Green
-                "parked": "#000000",  # Yellow
                 "selected": "#FFFF00",
             }
 
@@ -3949,6 +3945,7 @@ def edit_gps_trace(
     colormap: Dict[str, str],
     layer_name: str,
     default_feature: str = None,
+    ann_options: Optional[List[str]] = None,
     rows: int = 11,
     fig_width: str = "1550px",
     fig_height: str = "300px",
@@ -3968,6 +3965,7 @@ def edit_gps_trace(
         colormap (Dict[str, str]): The colormap for the GPS trace annotations.
         layer_name (str): The name of the GPS trace layer.
         default_feature (Optional[str], optional): The default feature to display. Defaults to None.
+        ann_options (Optional[List[str]], optional): The annotation options for the dropdown. Defaults to None.
         rows (int, optional): The number of rows to display in the table. Defaults to 11.
         fig_width (str, optional): The width of the figure. Defaults to "1550px".
         fig_height (str, optional): The height of the figure. Defaults to "300px".
@@ -4214,14 +4212,18 @@ def edit_gps_trace(
     widget = widgets.VBox(
         [],
     )
-    options = ["doorstep", "indoor", "outdoor", "parked"]
+    if ann_options is None:
+        ann_options = list(colormap.keys())
+
     multi_select = widgets.SelectMultiple(
         options=features,
         value=[],
         description="Secondary",
         rows=rows,
     )
-    dropdown = widgets.Dropdown(options=options, value=None, description="annotation")
+    dropdown = widgets.Dropdown(
+        options=ann_options, value=None, description="annotation"
+    )
     button_layout = widgets.Layout(width="97px")
     save = widgets.Button(
         description="Save", button_style="primary", layout=button_layout
@@ -4471,10 +4473,6 @@ def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
                     colormap = kwargs.pop("colormap")
                 else:
                     colormap = {
-                        "doorstep": "#FF0000",  # Red
-                        "indoor": "#0000FF",  # Blue
-                        "outdoor": "#00FF00",  # Green
-                        "parked": "#000000",  # Black
                         "selected": "#FFFF00",  # Yellow
                     }
 
