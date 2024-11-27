@@ -3969,6 +3969,7 @@ def edit_gps_trace(
     circle_size: int = 48,
     webGL: bool = False,
     download: bool = False,
+    sync_plots: bool = False,
     **kwargs,
 ) -> Any:
     """
@@ -3990,6 +3991,7 @@ def edit_gps_trace(
         circle_size (int, optional): The size of the GPS trace points. Defaults to 48.
         webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
         download (bool, optional): Whether to generate links for downloading the edited GPS traces. Defaults to False.
+        sync_plots (bool, optional): Whether to synchronize the zoom and pan of the plots. Defaults to False.
         **kwargs: Additional keyword arguments.
 
     Returns:
@@ -4018,6 +4020,8 @@ def edit_gps_trace(
     fig_margin = {"top": 20, "bottom": 35, "left": 50, "right": 20}
     x_sc = LinearScale()
     y_sc = LinearScale()
+
+    setattr(m, "_x_sc", x_sc)
 
     features = sorted(list(m.gps_trace.columns)[1:-3])
     if "max_signal_strength" in features:
@@ -4274,7 +4278,10 @@ def edit_gps_trace(
 
                     x = m.gps_trace.index
                     y = m.gps_trace[selected_feature]
-                    # x_sc = LinearScale()
+                    if sync_plots:
+                        x_sc = m._x_sc
+                    else:
+                        x_sc = LinearScale()
                     y_sc2 = LinearScale()
 
                     # Create scatter plots for each annotation category with the appropriate colors and labels
