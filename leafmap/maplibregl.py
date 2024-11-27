@@ -3964,10 +3964,11 @@ def edit_gps_trace(
     rows: int = 11,
     fig_width: str = "1550px",
     fig_height: str = "300px",
-    time_format: str = "%Y-%m-%dT%H:%M:%S",
+    time_format: str = "%Y%m%dT%H%M%S",
     stroke_color: str = "lightgray",
     circle_size: int = 48,
     webGL: bool = False,
+    download: bool = False,
     **kwargs,
 ) -> Any:
     """
@@ -3988,6 +3989,7 @@ def edit_gps_trace(
         stroke_color (str, optional): The stroke color of the GPS trace points. Defaults to "lightgray".
         circle_size (int, optional): The size of the GPS trace points. Defaults to 48.
         webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
+        download (bool, optional): Whether to generate links for downloading the edited GPS traces. Defaults to False.
         **kwargs: Additional keyword arguments.
 
     Returns:
@@ -4373,28 +4375,39 @@ def edit_gps_trace(
         m.gps_trace[ann_column] = m.gdf[ann_column]
         gdf = m.gps_trace.drop(columns=[ann_column_bk])
 
-        out_dir = kwargs.pop("out_dir", os.getcwd())
+        out_dir = os.path.dirname(filename)
         basename = os.path.basename(filename)
+        current_time = datetime.now().strftime(time_format)
 
-        output_csv = os.path.join(out_dir, basename.replace(".csv", "_annotated.csv"))
+        output_csv = os.path.join(
+            out_dir, basename.replace(".csv", f"_edited_{current_time}.csv")
+        )
         output_geojson = output_csv.replace(".csv", ".geojson")
 
         gdf.to_file(output_geojson)
         gdf.to_csv(output_csv, index=False)
 
-        csv_link = common.create_download_link(
-            output_csv, title="Download ", basename="annotated.csv"
-        )
-        geojson_link = common.create_download_link(
-            output_geojson, title="Download ", basename="annotated.geojson"
-        )
+        if download:
+            csv_link = common.create_download_link(
+                output_csv, title="Download ", basename=os.path.basename(output_csv)
+            )
+            geojson_link = common.create_download_link(
+                output_geojson,
+                title="Download ",
+                basename=os.path.basename(output_geojson),
+            )
 
-        with output:
-            output.clear_output()
-            display(csv_link)
-        with download_widget:
-            download_widget.clear_output()
-            display(geojson_link)
+            with output:
+                output.clear_output()
+                display(csv_link)
+            with download_widget:
+                download_widget.clear_output()
+                display(geojson_link)
+        else:
+            with output:
+                output.clear_output()
+                print(f"Saved CSV: {os.path.basename(output_csv)}")
+                print(f"Saved GeoJSON: {os.path.basename(output_geojson)}")
 
     export.on_click(on_export_click)
 
