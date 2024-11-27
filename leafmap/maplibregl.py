@@ -3607,6 +3607,11 @@ class Map(MapWidget):
             name (str, optional): The name of the GPS trace layer. Defaults to "GPS Trace".
             add_line (bool, optional): If True, adds a line connecting the GPS trace points. Defaults to True.
             sort_column (Optional[str], optional): The column name to sort the points before connecting them as a line. Defaults to None.
+            line_args (Optional[Dict[str, Any]], optional): Additional keyword arguments for the add_gdf method for the line layer. Defaults to None.
+            add_draw_control (bool, optional): If True, adds a draw control to the map. Defaults to True.
+            draw_control_args (Optional[Dict[str, Any]], optional): Additional keyword arguments for the add_draw_control method. Defaults to None.
+            add_legend (bool, optional): If True, adds a legend to the map. Defaults to True.
+            legend_args (Optional[Dict[str, Any]], optional): Additional keyword arguments for the add_legend method. Defaults to None.
             **kwargs (Any): Additional keyword arguments to pass to the add_geojson method.
 
         Returns:
@@ -3618,7 +3623,7 @@ class Map(MapWidget):
         if add_draw_control:
             if draw_control_args is None:
                 draw_control_args = {
-                    "controls": ["polygon", "trash"],
+                    "controls": ["polygon", "point", "trash"],
                     "position": "top-right",
                 }
             self.add_draw_control(**draw_control_args)
@@ -4220,27 +4225,42 @@ def edit_gps_trace(
                 "type": "FeatureCollection",
                 "features": m.draw_features_selected,
             }
+            geom_type = features["features"][0]["geometry"]["type"]
             m.gdf[ann_column_edited] = m.gdf[ann_column]
             gdf_draw = gpd.GeoDataFrame.from_features(features)
-            points_within_polygons = gpd.sjoin(
-                m.gdf, gdf_draw, how="left", predicate="within"
-            )
-            points_within_polygons.loc[
-                points_within_polygons["index_right"].notna(), ann_column_edited
-            ] = "selected"
-            with output:
-                selected = points_within_polygons.loc[
-                    points_within_polygons[ann_column_edited] == "selected"
-                ]
-                sel_idx = selected.index.tolist()
-            select_points_by_common_x(sel_idx)
-            select_additional_points_by_common_x(sel_idx)
-            m.set_data(layer_name, points_within_polygons.__geo_interface__)
-            if "index_right" in points_within_polygons.columns:
-                points_within_polygons = points_within_polygons.drop(
-                    columns=["index_right"]
+            # Select points within the drawn polygon
+            if geom_type == "Polygon":
+                points_within_polygons = gpd.sjoin(
+                    m.gdf, gdf_draw, how="left", predicate="within"
                 )
-            m.gdf = points_within_polygons
+                points_within_polygons.loc[
+                    points_within_polygons["index_right"].notna(), ann_column_edited
+                ] = "selected"
+                with output:
+                    selected = points_within_polygons.loc[
+                        points_within_polygons[ann_column_edited] == "selected"
+                    ]
+                    sel_idx = selected.index.tolist()
+                select_points_by_common_x(sel_idx)
+                select_additional_points_by_common_x(sel_idx)
+                m.set_data(layer_name, points_within_polygons.__geo_interface__)
+                if "index_right" in points_within_polygons.columns:
+                    points_within_polygons = points_within_polygons.drop(
+                        columns=["index_right"]
+                    )
+                m.gdf = points_within_polygons
+            # Select the nearest point to the drawn point
+            elif geom_type == "Point":
+                single_point = gdf_draw.geometry.iloc[0]
+                m.gdf["distance"] = m.gdf.geometry.distance(single_point)
+                nearest_index = m.gdf["distance"].idxmin()
+                sel_idx = [nearest_index]
+                m.gdf.loc[sel_idx, ann_column_edited] = "selected"
+                select_points_by_common_x(sel_idx)
+                select_additional_points_by_common_x(sel_idx)
+                m.set_data(layer_name, m.gdf.__geo_interface__)
+                m.gdf = m.gdf.drop(columns=["distance"])
+
         else:
             for scatter in scatters:
                 scatter.selected = None  # Clear selected points
