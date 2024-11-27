@@ -3613,6 +3613,8 @@ class Map(MapWidget):
             None
         """
 
+        from pathlib import Path
+
         if add_draw_control:
             if draw_control_args is None:
                 draw_control_args = {
@@ -3620,6 +3622,12 @@ class Map(MapWidget):
                     "position": "top-right",
                 }
             self.add_draw_control(**draw_control_args)
+
+        if isinstance(data, Path):
+            if data.exists():
+                data = str(data)
+            else:
+                raise FileNotFoundError(f"File not found: {data}")
 
         if isinstance(data, str):
             gdf = common.points_from_xy(data, x=x, y=y)
@@ -3999,6 +4007,7 @@ def edit_gps_trace(
         Any: The main widget containing the map and the editing interface.
     """
 
+    from pathlib import Path
     from datetime import datetime
     from bqplot import LinearScale, Figure, PanZoom
     import bqplot as bq
@@ -4014,6 +4023,12 @@ def edit_gps_trace(
             )
     else:
         from bqplot import Scatter
+
+    if isinstance(filename, Path):
+        if filename.exists():
+            filename = str(filename)
+        else:
+            raise FileNotFoundError(f"File not found: {filename}")
 
     output = widgets.Output()
     download_widget = widgets.Output()
