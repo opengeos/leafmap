@@ -10,6 +10,7 @@ import xyzservices
 import geopandas as gpd
 import ipyvuetify as v
 import pandas as pd
+import ipywidgets as widgets
 from box import Box
 from maplibre.basemaps import background
 from maplibre.basemaps import construct_carto_basemap_url
@@ -584,6 +585,7 @@ class Map(MapWidget):
     def add_basemap(
         self,
         basemap: Union[str, xyzservices.TileProvider] = None,
+        layer_name: Optional[str] = None,
         opacity: float = 1.0,
         visible: bool = True,
         attribution: Optional[str] = None,
@@ -673,10 +675,16 @@ class Map(MapWidget):
             tile_size=256,
             **kwargs,
         )
-        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+
+        if layer_name is None:
+            if name == "OpenStreetMap.Mapnik":
+                layer_name = "OpenStreetMap"
+            else:
+                layer_name = name
+        layer = Layer(id=layer_name, source=raster_source, type=LayerType.RASTER)
         self.add_layer(layer)
-        self.set_opacity(name, opacity)
-        self.set_visibility(name, visible)
+        self.set_opacity(layer_name, opacity)
+        self.set_visibility(layer_name, visible)
 
     def add_geojson(
         self,
@@ -1569,8 +1577,6 @@ class Map(MapWidget):
             ipywidgets.Widget: The layer widget.
         """
 
-        import ipywidgets as widgets
-
         layer_names = list(self.layer_dict.keys())
         if name is None:
             name = layer_names[-1]
@@ -1654,8 +1660,6 @@ class Map(MapWidget):
         Returns:
             ipywidgets.Widget: The layer widget.
         """
-
-        import ipywidgets as widgets
 
         layer_ids = list(self.style_dict.keys())
         layer_ids.sort()
@@ -1775,8 +1779,6 @@ class Map(MapWidget):
         Returns:
             ipywidgets.Widget: The layer widget.
         """
-
-        import ipywidgets as widgets
 
         layer_names = [
             basemaps[basemap]["name"]
@@ -2331,7 +2333,7 @@ class Map(MapWidget):
         """
         super().add_call("rotateTo", bearing, options, **kwargs)
 
-    def open_geojson(self, **kwargs: Any) -> "widgets.FileUpload":
+    def open_geojson(self, **kwargs: Any) -> widgets.FileUpload:
         """
         Creates a file uploader widget to upload a GeoJSON file. When a file is
         uploaded, it is written to a temporary file and added to the map.
@@ -2342,8 +2344,6 @@ class Map(MapWidget):
         Returns:
             widgets.FileUpload: The file uploader widget.
         """
-
-        import ipywidgets as widgets
 
         uploader = widgets.FileUpload(
             accept=".geojson",  # Accept GeoJSON files
@@ -3715,10 +3715,13 @@ class Map(MapWidget):
             paint = {
                 "circle-radius": radius,
                 "circle-color": circle_color,
-                "circle-stroke-color": stroke_color,
                 "circle-stroke-width": 1,
                 "circle-opacity": opacity,
             }
+            if stroke_color is None:
+                paint["circle-stroke-color"] = circle_color
+            else:
+                paint["circle-stroke-color"] = stroke_color
 
         if line_gdf is not None:
             if line_args is None:
@@ -4016,8 +4019,6 @@ def edit_gps_trace(
     from datetime import datetime
     from bqplot import LinearScale, Figure, PanZoom
     import bqplot as bq
-    from ipywidgets import VBox, Button
-    import ipywidgets as widgets
 
     if webGL:
         try:
@@ -4183,7 +4184,7 @@ def edit_gps_trace(
         m.set_data(layer_name, m.gdf.__geo_interface__)
 
     # Button to clear selection and switch between interactions
-    clear_button = Button(description="Clear Selection", button_style="primary")
+    clear_button = widgets.Button(description="Clear Selection", button_style="primary")
     clear_button.on_click(clear_selection)
 
     # Toggle between LassoSelector and PanZoom interactions
@@ -4195,7 +4196,9 @@ def edit_gps_trace(
             fig.interaction = selector  # Switch back to LassoSelector
             button.description = "Enable Zoom/Pan"
 
-    toggle_button = Button(description="Enable Zoom/Pan", button_style="primary")
+    toggle_button = widgets.Button(
+        description="Enable Zoom/Pan", button_style="primary"
+    )
     toggle_button.on_click(toggle_interaction)
 
     def feature_change(change):
@@ -4473,7 +4476,7 @@ def edit_gps_trace(
 
     reset.on_click(on_reset_click)
 
-    plot_widget = VBox([fig, widgets.HBox([clear_button, toggle_button])])
+    plot_widget = widgets.VBox([fig, widgets.HBox([clear_button, toggle_button])])
 
     left_col_layout = v.Col(
         cols=9, children=[m], class_="pa-1"  # padding for consistent spacing
@@ -4499,7 +4502,7 @@ def edit_gps_trace(
     return main_widget
 
 
-def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
+def open_gps_trace(**kwargs: Any) -> widgets.VBox:
     """
     Creates a widget for uploading and displaying a GPS trace on a map.
 
@@ -4509,8 +4512,6 @@ def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
     Returns:
         widgets.VBox: The widget containing the GPS trace upload and display interface.
     """
-
-    import ipywidgets as widgets
 
     main_widget = widgets.VBox()
 
@@ -4582,7 +4583,7 @@ def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
                 )
                 m.add_legend(legend_dict=colormap, shape_type="circle")
                 m.add_layer_control()
-                m.add_draw_control(controls=["polygon", "trash"])
+                m.add_draw_control(controls=["polygon", "point", "trash"])
 
                 m.add_symbol(
                     icon,
@@ -4606,4 +4607,139 @@ def open_gps_trace(**kwargs: Any) -> "widgets.VBox":
     uploader.observe(on_upload, names="value")
 
     main_widget.children = [widgets.HBox([uploader, reset]), output]
+    return main_widget
+
+
+def open_gps_traces(
+    filepaths,
+    dirname: str = None,
+    widget_width: str = "500px",
+    columns: List[str] = None,
+    ann_column: str = None,
+    colormap: Dict[str, str] = None,
+    layer_name: str = "GPS Trace",
+    default_features: Optional[List[str]] = None,
+    ann_options: Optional[List[str]] = None,
+    rows: int = 11,
+    fig_width: str = "1550px",
+    fig_height: str = "300px",
+    time_format: str = "%Y%m%dT%H%M%S",
+    radius: int = 4,
+    stroke_color: str = "lightgray",
+    circle_size: int = 48,
+    webGL: bool = False,
+    download: bool = False,
+    sync_plots: bool = False,
+    add_layer_args: Dict[str, Any] = None,
+    arrow_args: Dict[str, Any] = None,
+    **kwargs: Any,
+) -> widgets.VBox:
+    """
+    Creates a widget for uploading and displaying multiple GPS traces on a map.
+
+    Args:
+        filepaths (List[str]): A list of file paths to the GPS traces.
+        dirname (str, optional): The directory name for the GPS traces. Defaults to None.
+        widget_width (str, optional): The width of the dropdown file path widget. Defaults to "500px".
+        columns (List[str], optional): The columns to display in the GPS trace popup. Defaults to None.
+        ann_column (str): The annotation column in the GPS trace.
+        colormap (Dict[str, str]): The colormap for the GPS trace annotations.
+        layer_name (str): The name of the GPS trace layer.
+        default_features (Optional[str], optional): The default features to display.
+            The first numerical column will be used if None. Defaults to None.
+        ann_options (Optional[List[str]], optional): The annotation options for the dropdown. Defaults to None.
+        rows (int, optional): The number of rows to display in the table. Defaults to 11.
+        fig_width (str, optional): The width of the figure. Defaults to "1550px".
+        fig_height (str, optional): The height of the figure. Defaults to "300px".
+        time_format (str, optional): The time format for the timestamp. Defaults to "%Y-%m-%d %H:%M:%S".
+        stroke_color (str, optional): The stroke color of the GPS trace points. Defaults to "lightgray".
+        circle_size (int, optional): The size of the GPS trace points. Defaults to 48.
+        webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
+        download (bool, optional): Whether to generate links for downloading the edited GPS traces. Defaults to False.
+        sync_plots (bool, optional): Whether to synchronize the zoom and pan of the plots. Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the edit_gps_trace method.
+
+    Returns:
+        widgets.VBox: The widget containing the GPS traces upload and display interface.
+    """
+
+    main_widget = widgets.VBox()
+    output = widgets.Output()
+
+    if add_layer_args is None:
+        add_layer_args = {}
+
+    if arrow_args is None:
+        arrow_args = {}
+
+    filepath_widget = widgets.Dropdown(
+        value=None,
+        options=filepaths,
+        description="Select file path:",
+        style={"description_width": "initial"},
+        layout=widgets.Layout(width=widget_width),
+    )
+
+    def create_default_map():
+        m = Map(style="liberty")
+        m.add_basemap("Satellite")
+        m.add_basemap("OpenStreetMap.Mapnik", visible=True)
+        m.add_overture_buildings(visible=True)
+        return m
+
+    def on_change(change):
+        if change["new"]:
+            filepath = change["new"]
+            with output:
+                if dirname is not None:
+                    filepath = os.path.join(dirname, filepath)
+
+                if "m" in kwargs:
+                    m = kwargs["m"]
+                else:
+                    m = create_default_map()
+
+                if "add_line" not in add_layer_args:
+                    add_layer_args["add_line"] = True
+
+                m.add_gps_trace(
+                    filepath,
+                    columns=columns,
+                    radius=radius,
+                    ann_column=ann_column,
+                    colormap=colormap,
+                    stroke_color=stroke_color,
+                    name=layer_name,
+                    **add_layer_args,
+                )
+                m.add_layer_control()
+
+                m.add_arrow(source=f"{layer_name} Line", **arrow_args)
+                edit_widget = edit_gps_trace(
+                    filepath,
+                    m,
+                    ann_column,
+                    colormap,
+                    layer_name,
+                    default_features,
+                    ann_options,
+                    rows,
+                    fig_width,
+                    fig_height,
+                    time_format,
+                    stroke_color,
+                    circle_size,
+                    webGL,
+                    download,
+                    sync_plots,
+                    **kwargs,
+                )
+
+            main_widget.children = [filepath_widget, edit_widget, output]
+
+    filepath_widget.observe(on_change, names="value")
+
+    main_widget.children = [filepath_widget, output]
+    filepath_widget.value = filepaths[0]
+
     return main_widget
