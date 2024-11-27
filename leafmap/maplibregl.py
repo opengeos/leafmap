@@ -547,7 +547,9 @@ class Map(MapWidget):
         """
         self.add_call("setZoom", zoom)
 
-    def fit_bounds(self, bounds: List[Tuple[float, float]]) -> None:
+    def fit_bounds(
+        self, bounds: List[Tuple[float, float]], options: Dict = None
+    ) -> None:
         """
         Adjusts the viewport of the map to fit the specified geographical bounds
             in the format of [[lon_min, lat_min], [lon_max, lat_max]] or
@@ -562,16 +564,22 @@ class Map(MapWidget):
                         should be visible in the viewport. Each point is a list of two
                         numbers representing the longitude and latitude. For example,
                         [[32.958984, -5.353521],[43.50585, 5.615985]]
+            options (dict, optional): Additional options for fitting the bounds.
+                See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/FitBoundsOptions/.
 
         Returns:
             None
         """
 
+        if options is None:
+            options = {}
+
         if isinstance(bounds, list):
             if len(bounds) == 4 and all(isinstance(i, (int, float)) for i in bounds):
                 bounds = [[bounds[0], bounds[1]], [bounds[2], bounds[3]]]
 
-        self.add_call("fitBounds", bounds)
+        options["animate"] = options.get("animate", True)
+        self.add_call("fitBounds", bounds, options)
 
     def add_basemap(
         self,
@@ -681,6 +689,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        fit_bounds_options: Dict = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -712,6 +721,9 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
+            fit_bounds_options (dict, optional): Additional options for fitting the bounds.
+                See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/FitBoundsOptions
+                for more information.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://maplibre.org/maplibre-style-spec/layers/ for more info.
 
@@ -787,7 +799,7 @@ class Map(MapWidget):
         self.add_layer(layer, before_id=before_id, name=name, visible=visible)
         self.add_popup(name)
         if fit_bounds and bounds is not None:
-            self.fit_bounds(bounds)
+            self.fit_bounds(bounds, fit_bounds_options)
 
         if isinstance(paint, dict) and f"{layer_type}-opacity" in paint:
             self.set_opacity(name, paint[f"{layer_type}-opacity"])
@@ -3699,6 +3711,9 @@ class Map(MapWidget):
             if line_args is None:
                 line_args = {}
             self.add_gdf(line_gdf, name=f"{name} Line", **line_args)
+
+        if "fit_bounds_options" not in kwargs:
+            kwargs["fit_bounds_options"] = {"animate": False}
         self.add_geojson(geojson, layer_type="circle", paint=paint, name=name, **kwargs)
 
 
@@ -3949,7 +3964,7 @@ def edit_gps_trace(
     rows: int = 11,
     fig_width: str = "1550px",
     fig_height: str = "300px",
-    time_format: str = "%Y-%m-%d %H:%M:%S",
+    time_format: str = "%Y-%m-%dT%H:%M:%S",
     stroke_color: str = "lightgray",
     circle_size: int = 48,
     webGL: bool = False,
