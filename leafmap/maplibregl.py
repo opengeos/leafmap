@@ -3676,33 +3676,33 @@ class Map(MapWidget):
                     "Please specify the ann_column parameter or add an 'annotation' column to the GeoDataFrame."
                 )
 
-        ann_column_bk = f"{ann_column}_bk"
-        gdf[ann_column_bk] = gdf[ann_column]
+        ann_column_edited = f"{ann_column}_edited"
+        gdf[ann_column_edited] = gdf[ann_column]
 
         if columns is None:
             columns = [
                 ann_column,
-                ann_column_bk,
+                ann_column_edited,
                 "geometry",
             ]
-            gdf = gdf[columns]
-            setattr(self, "gdf", gdf)
-            if circle_color is None:
-                circle_color = [
-                    "match",
-                    ["to-string", ["get", ann_column_bk]],
-                ]
-                # Add the color matches from the colormap
-                for key, color in colormap.items():
-                    circle_color.extend([str(key), color])
 
-                # Add the default color
-                circle_color.append(
-                    "#CCCCCC"
-                )  # Default color if annotation does not match
-
+        if ann_column_edited not in columns:
+            columns.append(ann_column_edited)
+        if "geometry" not in columns:
+            columns.append("geometry")
+        gdf = gdf[columns]
+        setattr(self, "gdf", gdf)
         if circle_color is None:
-            circle_color = "#3388ff"
+            circle_color = [
+                "match",
+                ["to-string", ["get", ann_column_edited]],
+            ]
+            # Add the color matches from the colormap
+            for key, color in colormap.items():
+                circle_color.extend([str(key), color])
+
+            # Add the default color
+            circle_color.append("#CCCCCC")  # Default color if annotation does not match
 
         geojson = gdf.__geo_interface__
 
@@ -4057,7 +4057,7 @@ def edit_gps_trace(
     )
 
     column = feature.value
-    ann_column_bk = f"{ann_column}_bk"
+    ann_column_edited = f"{ann_column}_edited"
     x = m.gps_trace.index
     y = m.gps_trace[column]
 
@@ -4131,7 +4131,7 @@ def edit_gps_trace(
                     scas[index].selected = selected_indices
 
             selected_idx = sorted(list(set(selected_idx)))
-            m.gdf.loc[selected_idx, ann_column_bk] = "selected"
+            m.gdf.loc[selected_idx, ann_column_edited] = "selected"
             m.set_data(layer_name, m.gdf.__geo_interface__)
 
     # Register the callback for each scatter plot
@@ -4174,7 +4174,7 @@ def edit_gps_trace(
         fig.interaction = panzoom
         fig.interaction = selector  # Re-enable the LassoSelector
 
-        m.gdf[ann_column_bk] = m.gdf[ann_column]
+        m.gdf[ann_column_edited] = m.gdf[ann_column]
         m.set_data(layer_name, m.gdf.__geo_interface__)
 
     # Button to clear selection and switch between interactions
@@ -4220,17 +4220,17 @@ def edit_gps_trace(
                 "type": "FeatureCollection",
                 "features": m.draw_features_selected,
             }
-            m.gdf[ann_column_bk] = m.gdf[ann_column]
+            m.gdf[ann_column_edited] = m.gdf[ann_column]
             gdf_draw = gpd.GeoDataFrame.from_features(features)
             points_within_polygons = gpd.sjoin(
                 m.gdf, gdf_draw, how="left", predicate="within"
             )
             points_within_polygons.loc[
-                points_within_polygons["index_right"].notna(), ann_column_bk
+                points_within_polygons["index_right"].notna(), ann_column_edited
             ] = "selected"
             with output:
                 selected = points_within_polygons.loc[
-                    points_within_polygons[ann_column_bk] == "selected"
+                    points_within_polygons[ann_column_edited] == "selected"
                 ]
                 sel_idx = selected.index.tolist()
             select_points_by_common_x(sel_idx)
@@ -4249,7 +4249,7 @@ def edit_gps_trace(
                     scatter.selected = None
             fig.interaction = selector  # Re-enable the LassoSelector
 
-            m.gdf[ann_column_bk] = m.gdf[ann_column]
+            m.gdf[ann_column_edited] = m.gdf[ann_column]
             m.set_data(layer_name, m.gdf.__geo_interface__)
 
     m.observe(draw_change, names="draw_features_selected")
@@ -4368,8 +4368,10 @@ def edit_gps_trace(
     def on_save_click(b):
         output.clear_output()
         download_widget.clear_output()
-        m.gdf.loc[m.gdf[ann_column_bk] == "selected", ann_column] = dropdown.value
-        m.gdf.loc[m.gdf[ann_column_bk] == "selected", ann_column_bk] = dropdown.value
+        m.gdf.loc[m.gdf[ann_column_edited] == "selected", ann_column] = dropdown.value
+        m.gdf.loc[m.gdf[ann_column_edited] == "selected", ann_column_edited] = (
+            dropdown.value
+        )
         m.set_data(layer_name, m.gdf.__geo_interface__)
         categories = m.gdf[ann_column].value_counts()
         keys = list(colormap.keys())[:-1]
@@ -4390,7 +4392,7 @@ def edit_gps_trace(
             scatter.selected = None  # Clear selected points
         fig.interaction = selector  # Re-enable the LassoSelector
 
-        m.gdf[ann_column_bk] = m.gdf[ann_column]
+        m.gdf[ann_column_edited] = m.gdf[ann_column]
         m.set_data(layer_name, m.gdf.__geo_interface__)
 
     save.on_click(on_save_click)
@@ -4405,7 +4407,7 @@ def edit_gps_trace(
             time_format
         )
         m.gps_trace[ann_column] = m.gdf[ann_column]
-        gdf = m.gps_trace.drop(columns=[ann_column_bk])
+        gdf = m.gps_trace.drop(columns=[ann_column_edited])
 
         out_dir = os.path.dirname(filename)
         basename = os.path.basename(filename)
