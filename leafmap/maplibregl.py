@@ -4672,6 +4672,9 @@ def open_gps_traces(
     if arrow_args is None:
         arrow_args = {}
 
+    filepaths = [
+        str(filepath) for filepath in filepaths
+    ]  # Support pathlib.Path objects
     filepath_widget = widgets.Dropdown(
         value=None,
         options=filepaths,
