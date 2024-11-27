@@ -4144,6 +4144,7 @@ def edit_gps_trace(
     def clear_selection(b):
         for scatter in scatters:
             scatter.selected = None  # Clear selected points
+        fig.interaction = panzoom
         fig.interaction = selector  # Re-enable the LassoSelector
 
         m.gdf[ann_column_bk] = m.gdf[ann_column]
