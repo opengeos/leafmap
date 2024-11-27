@@ -3959,7 +3959,7 @@ def edit_gps_trace(
     ann_column: str,
     colormap: Dict[str, str],
     layer_name: str,
-    default_feature: str = None,
+    default_features: Optional[List[str]] = None,
     ann_options: Optional[List[str]] = None,
     rows: int = 11,
     fig_width: str = "1550px",
@@ -3981,7 +3981,8 @@ def edit_gps_trace(
         ann_column (str): The annotation column in the GPS trace.
         colormap (Dict[str, str]): The colormap for the GPS trace annotations.
         layer_name (str): The name of the GPS trace layer.
-        default_feature (Optional[str], optional): The default feature to display. Defaults to None.
+        default_features (Optional[str], optional): The default features to display.
+            The first numerical column will be used if None. Defaults to None.
         ann_options (Optional[List[str]], optional): The annotation options for the dropdown. Defaults to None.
         rows (int, optional): The number of rows to display in the table. Defaults to 11.
         fig_width (str, optional): The width of the figure. Defaults to "1550px".
@@ -4023,12 +4024,19 @@ def edit_gps_trace(
 
     setattr(m, "_x_sc", x_sc)
 
-    features = sorted(list(m.gps_trace.columns)[1:-3])
-    if "max_signal_strength" in features:
-        default_feature = "max_signal_strength"
-    else:
-        default_feature = features[0]
-    default_index = features.index(default_feature)
+    features = sorted(list(m.gps_trace.columns))
+    if "geometry" in features:
+        features.remove("geometry")
+
+    # Use the first numerical column as the default feature
+    if default_features is None:
+        dtypes = m.gps_trace.dtypes
+        for index, dtype in enumerate(dtypes):
+            if "float64" in str(dtype):
+                default_features = [features[index]]
+                break
+
+    default_index = features.index(default_features[0])
     feature = widgets.Dropdown(
         options=features, index=default_index, description="Primary"
     )
@@ -4340,6 +4348,7 @@ def edit_gps_trace(
                 features_widget.children = children
 
     multi_select.observe(features_change, names="value")
+    multi_select.value = default_features[1:]
 
     def on_save_click(b):
         output.clear_output()
