@@ -3732,6 +3732,200 @@ class Map(MapWidget):
             kwargs["fit_bounds_options"] = {"animate": False}
         self.add_geojson(geojson, layer_type="circle", paint=paint, name=name, **kwargs)
 
+    def add_data(
+        self,
+        data: Union[str, pd.DataFrame, "gpd.GeoDataFrame"],
+        column: str,
+        cmap: Optional[str] = None,
+        colors: Optional[str] = None,
+        labels: Optional[str] = None,
+        scheme: Optional[str] = "Quantiles",
+        k: int = 5,
+        add_legend: Optional[bool] = True,
+        legend_title: Optional[bool] = None,
+        legend_position: Optional[str] = "bottom-right",
+        legend_kwds: Optional[dict] = None,
+        classification_kwds: Optional[dict] = None,
+        legend_args: Optional[dict] = None,
+        layer_type: Optional[str] = None,
+        extrude: Optional[bool] = False,
+        scale_factor: Optional[float] = 1.0,
+        filter: Optional[Dict] = None,
+        paint: Optional[Dict] = None,
+        name: Optional[str] = None,
+        fit_bounds: bool = True,
+        visible: bool = True,
+        opacity: float = 1.0,
+        before_id: Optional[str] = None,
+        source_args: Dict = {},
+        **kwargs: Any,
+    ) -> None:
+        """Add vector data to the map with a variety of classification schemes.
+
+        Args:
+            data (str | pd.DataFrame | gpd.GeoDataFrame): The data to classify.
+                It can be a filepath to a vector dataset, a pandas dataframe, or
+                a geopandas geodataframe.
+            column (str): The column to classify.
+            cmap (str, optional): The name of a colormap recognized by matplotlib. Defaults to None.
+            colors (list, optional): A list of colors to use for the classification. Defaults to None.
+            labels (list, optional): A list of labels to use for the legend. Defaults to None.
+            scheme (str, optional): Name of a choropleth classification scheme (requires mapclassify).
+                Name of a choropleth classification scheme (requires mapclassify).
+                A mapclassify.MapClassifier object will be used
+                under the hood. Supported are all schemes provided by mapclassify (e.g.
+                'BoxPlot', 'EqualInterval', 'FisherJenks', 'FisherJenksSampled',
+                'HeadTailBreaks', 'JenksCaspall', 'JenksCaspallForced',
+                'JenksCaspallSampled', 'MaxP', 'MaximumBreaks',
+                'NaturalBreaks', 'Quantiles', 'Percentiles', 'StdMean',
+                'UserDefined'). Arguments can be passed in classification_kwds.
+            k (int, optional): Number of classes (ignored if scheme is None or if
+                column is categorical). Default to 5.
+            add_legend (bool, optional): Whether to add a legend to the map. Defaults to True.
+            legend_title (str, optional): The title of the legend. Defaults to None.
+            legend_position (str, optional): The position of the legend. Can be 'top-left',
+                'top-right', 'bottom-left', or 'bottom-right'. Defaults to 'bottom-right'.
+            legend_kwds (dict, optional): Keyword arguments to pass to :func:`matplotlib.pyplot.legend`
+                or `matplotlib.pyplot.colorbar`. Defaults to None.
+                Keyword arguments to pass to :func:`matplotlib.pyplot.legend` or
+                Additional accepted keywords when `scheme` is specified:
+                fmt : string
+                    A formatting specification for the bin edges of the classes in the
+                    legend. For example, to have no decimals: ``{"fmt": "{:.0f}"}``.
+                labels : list-like
+                    A list of legend labels to override the auto-generated labblels.
+                    Needs to have the same number of elements as the number of
+                    classes (`k`).
+                interval : boolean (default False)
+                    An option to control brackets from mapclassify legend.
+                    If True, open/closed interval brackets are shown in the legend.
+            classification_kwds (dict, optional): Keyword arguments to pass to mapclassify.
+                Defaults to None.
+            legend_args (dict, optional): Additional keyword arguments for the add_legend method. Defaults to None.
+            layer_type (str, optional): The type of layer to add. Can be 'circle', 'line', or 'fill'. Defaults to None.
+            filter (dict, optional): The filter to apply to the layer. If None,
+                no filter is applied.
+            paint (dict, optional): The paint properties to apply to the layer.
+                If None, no paint properties are applied.
+            name (str, optional): The name of the layer. If None, a random name
+                is generated.
+            fit_bounds (bool, optional): Whether to adjust the viewport of the
+                map to fit the bounds of the GeoJSON data. Defaults to True.
+            visible (bool, optional): Whether the layer is visible or not.
+                Defaults to True.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
+            source_args (dict, optional): Additional keyword arguments that are
+                passed to the GeoJSONSource class.
+            **kwargs: Additional keyword arguments to pass to the GeoJSON class, such as
+                fields, which can be a list of column names to be included in the popup.
+
+        """
+
+        gdf, legend_dict = common.classify(
+            data=data,
+            column=column,
+            cmap=cmap,
+            colors=colors,
+            labels=labels,
+            scheme=scheme,
+            k=k,
+            legend_kwds=legend_kwds,
+            classification_kwds=classification_kwds,
+        )
+
+        if legend_title is None:
+            legend_title = column
+
+        geom_type = gdf.geometry.iloc[0].geom_type
+
+        if geom_type == "Point" or geom_type == "MultiPoint":
+            layer_type = "circle"
+            if paint is None:
+                paint = {
+                    "circle-color": ["get", "color"],
+                    "circle-radius": 5,
+                    "circle-stroke-color": "#ffffff",
+                    "circle-stroke-width": 1,
+                    "circle-opacity": opacity,
+                }
+        elif geom_type == "LineString" or geom_type == "MultiLineString":
+            layer_type = "line"
+            if paint is None:
+                paint = {
+                    "line-color": ["get", "color"],
+                    "line-width": 2,
+                    "line-opacity": opacity,
+                }
+        elif geom_type == "Polygon" or geom_type == "MultiPolygon":
+            if extrude:
+                layer_type = "fill-extrusion"
+                if paint is None:
+                    # Initialize the interpolate format
+                    paint = {
+                        "fill-extrusion-color": [
+                            "interpolate",
+                            ["linear"],
+                            ["get", column],
+                        ]
+                    }
+
+                    # Parse the dictionary and append range and color values
+                    for range_str, color in legend_dict.items():
+                        # Extract the upper bound from the range string
+                        upper_bound = float(range_str.split(",")[-1].strip(" ]"))
+                        # Add to the formatted output
+                        paint["fill-extrusion-color"].extend([upper_bound, color])
+
+                    # Scale down the extrusion height
+                    paint["fill-extrusion-height"] = [
+                        "interpolate",
+                        ["linear"],
+                        ["get", column],
+                    ]
+
+                    # Add scaled values dynamically
+                    for range_str in legend_dict.keys():
+                        upper_bound = float(range_str.split(",")[-1].strip(" ]"))
+                        scaled_value = upper_bound / scale_factor  # Apply scaling
+                        paint["fill-extrusion-height"].extend(
+                            [upper_bound, scaled_value]
+                        )
+
+            else:
+
+                layer_type = "fill"
+                if paint is None:
+                    paint = {
+                        "fill-color": ["get", "color"],
+                        "fill-opacity": opacity,
+                        "fill-outline-color": "#ffffff",
+                    }
+        else:
+            raise ValueError("Geometry type not recognized.")
+
+        self.add_gdf(
+            gdf,
+            layer_type,
+            filter,
+            paint,
+            name,
+            fit_bounds,
+            visible,
+            before_id,
+            source_args,
+            **kwargs,
+        )
+        if legend_args is None:
+            legend_args = {}
+        if add_legend:
+            self.add_legend(
+                title=legend_title,
+                legend_dict=legend_dict,
+                position=legend_position,
+                **legend_args,
+            )
+
 
 class Container(v.Container):
 
