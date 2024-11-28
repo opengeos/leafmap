@@ -182,6 +182,12 @@ Use the upcase and downcase expressions to change the case of labels.
 
 [![](https://i.imgur.com/FzGOovv.png)](https://leafmap.org/maplibre/change_case_of_labels)
 
+## Create choropleth maps
+
+Create choropleth maps with a variety of classification schemes.
+
+[![](https://github.com/user-attachments/assets/35ca3e17-956e-4d88-9e24-7e94c9e322f8)](https://leafmap.org/maplibre/change_case_of_labels)
+
 ## Cloud Optimized GeoTIFF (COG)
 
 Visualize Cloud Optimized GeoTIFF (COG) files with TiTiler.
