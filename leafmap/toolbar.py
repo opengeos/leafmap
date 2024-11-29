@@ -6775,6 +6775,13 @@ def nasa_opera_gui(
         layout=widgets.Layout(width=widget_width, padding=padding),
     )
 
+    layer = widgets.Dropdown(
+        value=None,
+        description="Layer:",
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
     buttons = widgets.ToggleButtons(
         value=None,
         options=["Search", "Display", "Reset", "Close"],
@@ -6803,6 +6810,7 @@ def nasa_opera_gui(
         widgets.HBox([max_items, bbox]),
         widgets.HBox([start_date, end_date]),
         dataset,
+        layer,
         buttons,
         output,
     ]
@@ -6927,6 +6935,25 @@ def nasa_opera_gui(
 
                             setattr(m, "_NASA_DATA_GDF", gdf)
                             setattr(m, "_NASA_DATA_RESULTS", results)
+
+                            if short_name.value == "OPERA_L3_DSWX-HLS_V1":
+                                layer.options = [
+                                    "B01_WTR: Water classification",
+                                    "B02_BWTR: Binary water",
+                                    "B03_CONF: Confidence",
+                                    "B04_DIAG: Diagnostic layer",
+                                    "B05_WTR-1: Interpretation of diagnostic layer",
+                                    "B06_WTR-2: Interpreted layer refined using land cover",
+                                    "B07_LAND: Land cover classification",
+                                    "B08_SHAD: Terrain shadow layer",
+                                    "B09_CLOUD: Input HLS Fmask cloud classification",
+                                    "B10_DEM: Digital elevation model",
+                                ]
+                                layer.value = "B01_WTR: Water classification"
+                            else:
+                                layer.options = []
+                                layer.value = None
+
                             output.clear_output()
 
                     except Exception as e:
@@ -6935,13 +6962,20 @@ def nasa_opera_gui(
         elif change["new"] == "Display":
             output.clear_output()
             with output:
-                print("Loading...")
-                links = m._NASA_DATA_RESULTS[
-                    dataset.options.index(dataset.value)
-                ].data_links()
-                ds = xr.open_dataset(links[0], engine="rasterio")
-                image = array_to_image(ds["band_data"])
-                m.add_raster(image, zoom_to_layer=False)
+                if (
+                    short_name.value == "OPERA_L3_DSWX-HLS_V1"
+                    and dataset.value is not None
+                ):
+                    print("Loading...")
+                    links = m._NASA_DATA_RESULTS[
+                        dataset.options.index(dataset.value)
+                    ].data_links()
+                    ds = xr.open_dataset(links[layer.index], engine="rasterio")
+                    image = array_to_image(ds["band_data"])
+                    name_prefix = dataset.value.split("_")[4][:8]
+                    name_suffix = layer.value.split(":")[0][4:]
+                    layer_name = f"{name_prefix}_{name_suffix}"
+                    m.add_raster(image, zoom_to_layer=False, layer_name=layer_name)
                 output.clear_output()
 
         elif change["new"] == "Reset":
@@ -6955,6 +6989,8 @@ def nasa_opera_gui(
             end_date.value = None
             dataset.options = []
             dataset.value = None
+            layer.options = []
+            layer.value = None
             output.clear_output()
 
             if "Footprints" in m.get_layer_names():
