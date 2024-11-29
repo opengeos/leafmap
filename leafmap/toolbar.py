@@ -6641,10 +6641,15 @@ def nasa_opera_gui(
     import rasterio as rio
     from rasterio.session import AWSSession
     import xarray as xr
+    import matplotlib.pyplot as plt
 
     widget_width = "400px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
+
+    colormaps = plt.colormaps()
+    cmap_options = [cmap for cmap in colormaps if (len(cmap) < 20 and cmap.islower())]
+    cmap_options.sort()
 
     if not hasattr(m, "_NASA_DATA"):
 
@@ -6779,7 +6784,15 @@ def nasa_opera_gui(
         value=None,
         description="Layer:",
         style=style,
-        layout=widgets.Layout(width=widget_width, padding=padding),
+        layout=widgets.Layout(width="200px", padding=padding),
+    )
+
+    palette = widgets.Dropdown(
+        options=cmap_options,
+        value="tab10",
+        description="Colormap:",
+        style=style,
+        layout=widgets.Layout(width="200px", padding=padding),
     )
 
     buttons = widgets.ToggleButtons(
@@ -6796,6 +6809,8 @@ def nasa_opera_gui(
         ].values[0]
         dataset.value = None
         dataset.options = []
+        layer.value = None
+        layer.options = []
 
     short_name.observe(change_dataset, "value")
 
@@ -6810,7 +6825,7 @@ def nasa_opera_gui(
         widgets.HBox([max_items, bbox]),
         widgets.HBox([start_date, end_date]),
         dataset,
-        layer,
+        widgets.HBox([layer, palette]),
         buttons,
         output,
     ]
@@ -6936,20 +6951,10 @@ def nasa_opera_gui(
                             setattr(m, "_NASA_DATA_GDF", gdf)
                             setattr(m, "_NASA_DATA_RESULTS", results)
 
-                            if short_name.value == "OPERA_L3_DSWX-HLS_V1":
-                                layer.options = [
-                                    "B01_WTR: Water classification",
-                                    "B02_BWTR: Binary water",
-                                    "B03_CONF: Confidence",
-                                    "B04_DIAG: Diagnostic layer",
-                                    "B05_WTR-1: Interpretation of diagnostic layer",
-                                    "B06_WTR-2: Interpreted layer refined using land cover",
-                                    "B07_LAND: Land cover classification",
-                                    "B08_SHAD: Terrain shadow layer",
-                                    "B09_CLOUD: Input HLS Fmask cloud classification",
-                                    "B10_DEM: Digital elevation model",
-                                ]
-                                layer.value = "B01_WTR: Water classification"
+                            if len(m._NASA_DATA_RESULTS) > 0:
+                                links = m._NASA_DATA_RESULTS[0].data_links()
+                                layer.options = [link.split("_")[-1] for link in links]
+                                layer.value = layer.options[0]
                             else:
                                 layer.options = []
                                 layer.value = None
@@ -6962,20 +6967,26 @@ def nasa_opera_gui(
         elif change["new"] == "Display":
             output.clear_output()
             with output:
-                if (
-                    short_name.value == "OPERA_L3_DSWX-HLS_V1"
-                    and dataset.value is not None
-                ):
-                    print("Loading...")
-                    links = m._NASA_DATA_RESULTS[
-                        dataset.options.index(dataset.value)
-                    ].data_links()
-                    ds = xr.open_dataset(links[layer.index], engine="rasterio")
-                    image = array_to_image(ds["band_data"])
-                    name_prefix = dataset.value.split("_")[4][:8]
-                    name_suffix = layer.value.split(":")[0][4:]
-                    layer_name = f"{name_prefix}_{name_suffix}"
-                    m.add_raster(image, zoom_to_layer=False, layer_name=layer_name)
+                print("Loading...")
+                links = m._NASA_DATA_RESULTS[
+                    dataset.options.index(dataset.value)
+                ].data_links()
+                ds = xr.open_dataset(links[layer.index], engine="rasterio")
+                setattr(m, "_NASA_DATA_DS", ds)
+                da = ds["band_data"]
+                nodata = os.environ.get("NODATA", 0)
+                da = da.fillna(nodata)
+                image = array_to_image(da)
+                name_prefix = dataset.value.split("_")[4][:8]
+                name_suffix = layer.value.split(".")[0]
+                layer_name = f"{name_prefix}_{name_suffix}"
+                m.add_raster(
+                    image,
+                    zoom_to_layer=True,
+                    colormap=palette.value,
+                    nodata=nodata,
+                    layer_name=layer_name,
+                )
                 output.clear_output()
 
         elif change["new"] == "Reset":
@@ -6991,6 +7002,7 @@ def nasa_opera_gui(
             dataset.value = None
             layer.options = []
             layer.value = None
+            palette.value = "tab10"
             output.clear_output()
 
             if "Footprints" in m.get_layer_names():
