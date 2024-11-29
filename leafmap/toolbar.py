@@ -6637,6 +6637,10 @@ def nasa_opera_gui(
     """
     import pandas as pd
     from datetime import datetime
+    import boto3
+    import rasterio as rio
+    from rasterio.session import AWSSession
+    import xarray as xr
 
     widget_width = "400px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
@@ -6671,6 +6675,31 @@ def nasa_opera_gui(
         setattr(m, "_NASA_DATA", df)
         names = df["ShortName"].tolist()
         setattr(m, "_NASA_DATA_NAMES", names)
+
+    # Generates the temporary
+    s3_cred_endpoint = "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+
+    def get_temp_creds():
+        temp_creds_url = s3_cred_endpoint
+        return requests.get(temp_creds_url).json()
+
+    temp_creds_req = get_temp_creds()
+
+    session = boto3.Session(
+        aws_access_key_id=temp_creds_req["accessKeyId"],
+        aws_secret_access_key=temp_creds_req["secretAccessKey"],
+        aws_session_token=temp_creds_req["sessionToken"],
+        region_name="us-west-2",
+    )
+
+    rio_env = rio.Env(
+        AWSSession(session),
+        GDAL_DISABLE_READDIR_ON_OPEN="EMPTY_DIR",
+        CPL_VSIL_CURL_ALLOWED_EXTENSIONS="TIF, TIFF",
+        GDAL_HTTP_COOKIEFILE=os.path.expanduser("~/cookies.txt"),
+        GDAL_HTTP_COOKIEJAR=os.path.expanduser("~/cookies.txt"),
+    )
+    rio_env.__enter__()
 
     default_title = m._NASA_DATA[m._NASA_DATA["ShortName"] == default_dataset][
         "EntryTitle"
@@ -6906,7 +6935,14 @@ def nasa_opera_gui(
         elif change["new"] == "Display":
             output.clear_output()
             with output:
-                print("To be implemented...")
+                print("Loading...")
+                links = m._NASA_DATA_RESULTS[
+                    dataset.options.index(dataset.value)
+                ].data_links()
+                ds = xr.open_dataset(links[0], engine="rasterio")
+                image = array_to_image(ds["band_data"])
+                m.add_raster(image, zoom_to_layer=False)
+                output.clear_output()
 
         elif change["new"] == "Reset":
             short_name.options = m._NASA_DATA_NAMES
