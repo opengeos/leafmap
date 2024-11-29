@@ -233,6 +233,10 @@ class Map(ipyleaflet.Map):
                     from .toolbar import nasa_data_gui
 
                     nasa_data_gui(self, **kwargs)
+                elif obj == "NASA_OPERA":
+                    from .toolbar import nasa_opera_gui
+
+                    nasa_opera_gui(self, **kwargs)
                 elif obj == "inspector":
                     from .toolbar import inspector_gui
 

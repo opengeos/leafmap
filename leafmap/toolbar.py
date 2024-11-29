@@ -6615,3 +6615,337 @@ def nasa_data_gui(
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
+
+
+def nasa_opera_gui(
+    m,
+    position: Optional[str] = "topright",
+    opened: Optional[bool] = True,
+    default_dataset: Optional[str] = "OPERA_L3_DSWX-HLS_V1",
+    **kwargs,
+):
+    """Search NASA Earth data interactive
+
+    Args:
+        m (leafmap.Map, optional): The leaflet Map object. Defaults to None.
+        position (str, optional): The position of the widget. Defaults to "topright".
+        opened (bool, optional): Whether to open the widget. Defaults to True.
+        default_dataset (str, optional): The default dataset. Defaults to "OPERA_L3_DSWX-HLS_V1".
+
+    Returns:
+        ipywidgets: The tool GUI widget.
+    """
+    import pandas as pd
+    from datetime import datetime
+
+    widget_width = "400px"
+    padding = "0px 0px 0px 5px"  # upper, right, bottom, left
+    style = {"description_width": "initial"}
+
+    if not hasattr(m, "_NASA_DATA"):
+
+        data = {
+            "ShortName": [
+                "OPERA_L2_CSLC-S1-STATIC_V1",
+                "OPERA_L2_CSLC-S1_V1",
+                "OPERA_L2_RTC-S1-STATIC_V1",
+                "OPERA_L2_RTC-S1_V1",
+                "OPERA_L3_DIST-ALERT-HLS_V1",
+                "OPERA_L3_DIST-ANN-HLS_V1",
+                "OPERA_L3_DSWX-HLS_V1",
+                "OPERA_L3_DSWX-S1_V1",
+            ],
+            "EntryTitle": [
+                "OPERA Coregistered Single-Look Complex from Sentinel-1 Static Layers validated product (Version 1)",
+                "OPERA Coregistered Single-Look Complex from Sentinel-1 validated product (Version 1)",
+                "OPERA Radiometric Terrain Corrected SAR Backscatter from Sentinel-1 Static Layers validated product (Version 1)",
+                "OPERA Radiometric Terrain Corrected SAR Backscatter from Sentinel-1 validated product (Version 1)",
+                "OPERA Land Surface Disturbance Alert from Harmonized Landsat Sentinel-2 product (Version 1)",
+                "OPERA Land Surface Disturbance Annual from Harmonized Landsat Sentinel-2 product (Version 1)",
+                "OPERA Dynamic Surface Water Extent from Harmonized Landsat Sentinel-2 product (Version 1)",
+                "OPERA Dynamic Surface Water Extent from Sentinel-1 (Version 1)",
+            ],
+        }
+
+        df = pd.DataFrame(data)
+        setattr(m, "_NASA_DATA", df)
+        names = df["ShortName"].tolist()
+        setattr(m, "_NASA_DATA_NAMES", names)
+
+    default_title = m._NASA_DATA[m._NASA_DATA["ShortName"] == default_dataset][
+        "EntryTitle"
+    ].values[0]
+
+    output = widgets.Output(
+        layout=widgets.Layout(width=widget_width, padding=padding, overflow="auto")
+    )
+
+    toolbar_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Search NASA Earth data",
+        icon="search",
+        layout=widgets.Layout(width="28px", height="28px", padding="0px 0px 0px 4px"),
+    )
+
+    close_button = widgets.ToggleButton(
+        value=False,
+        tooltip="Close the tool",
+        icon="times",
+        button_style="primary",
+        layout=widgets.Layout(height="28px", width="28px", padding="0px 0px 0px 4px"),
+    )
+
+    short_name = widgets.Dropdown(
+        options=m._NASA_DATA_NAMES,
+        value=default_dataset,
+        description="Short Name:",
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
+    title = widgets.Text(
+        value=default_title,
+        description="Title:",
+        style=style,
+        disabled=True,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
+    max_items = widgets.IntText(
+        value=50,
+        description="Max items:",
+        style=style,
+        layout=widgets.Layout(width="125px", padding=padding),
+    )
+
+    bbox = widgets.Text(
+        value="",
+        description="Bounding box:",
+        placeholder="xmin, ymin, xmax, ymax",
+        style=style,
+        layout=widgets.Layout(width="271px", padding=padding),
+    )
+
+    start_date = widgets.DatePicker(
+        description="Start date:",
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width="198px", padding=padding),
+    )
+    end_date = widgets.DatePicker(
+        description="End date:",
+        disabled=False,
+        style=style,
+        layout=widgets.Layout(width="198px", padding=padding),
+    )
+
+    dataset = widgets.Dropdown(
+        value=None,
+        description="Dataset:",
+        style=style,
+        layout=widgets.Layout(width=widget_width, padding=padding),
+    )
+
+    buttons = widgets.ToggleButtons(
+        value=None,
+        options=["Search", "Display", "Reset", "Close"],
+        tooltips=["Get Items", "Display Image", "Reset", "Close"],
+        button_style="primary",
+    )
+    buttons.style.button_width = "65px"
+
+    def change_dataset(change):
+        title.value = m._NASA_DATA[m._NASA_DATA["ShortName"] == short_name.value][
+            "EntryTitle"
+        ].values[0]
+        dataset.value = None
+        dataset.options = []
+
+    short_name.observe(change_dataset, "value")
+
+    toolbar_widget = widgets.VBox()
+    toolbar_widget.children = [toolbar_button]
+    toolbar_header = widgets.HBox()
+    toolbar_header.children = [close_button, toolbar_button]
+    toolbar_footer = widgets.VBox()
+    toolbar_footer.children = [
+        short_name,
+        title,
+        widgets.HBox([max_items, bbox]),
+        widgets.HBox([start_date, end_date]),
+        dataset,
+        buttons,
+        output,
+    ]
+
+    toolbar_event = ipyevents.Event(
+        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+    )
+
+    def handle_toolbar_event(event):
+        if event["type"] == "mouseenter":
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        elif event["type"] == "mouseleave":
+            if not toolbar_button.value:
+                toolbar_widget.children = [toolbar_button]
+                toolbar_button.value = False
+                close_button.value = False
+
+    toolbar_event.on_dom_event(handle_toolbar_event)
+
+    def toolbar_btn_click(change):
+        if change["new"]:
+            close_button.value = False
+            toolbar_widget.children = [toolbar_header, toolbar_footer]
+        else:
+            if not close_button.value:
+                toolbar_widget.children = [toolbar_button]
+
+    toolbar_button.observe(toolbar_btn_click, "value")
+
+    def close_btn_click(change):
+        if change["new"]:
+            toolbar_button.value = False
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+    close_button.observe(close_btn_click, "value")
+
+    def button_clicked(change):
+        if change["new"] == "Search":
+            with output:
+                output.clear_output()
+                with output:
+                    print("Searching...")
+
+                    if bbox.value.strip() == "":
+                        if m.user_roi_bounds() is not None:
+                            bounds = tuple(m.user_roi_bounds())
+                        else:
+                            bounds = (
+                                m.bounds[0][1],
+                                m.bounds[0][0],
+                                m.bounds[1][1],
+                                m.bounds[1][0],
+                            )
+                    else:
+                        bounds = tuple(map(float, bbox.value.split(",")))
+                        if len(bounds) != 4:
+                            print("Please provide a valid bounding box.")
+                            bounds = None
+
+                    if start_date.value is not None and end_date.value is not None:
+                        date_range = (str(start_date.value), str(end_date.value))
+                    elif start_date.value is not None:
+                        date_range = (
+                            str(start_date.value),
+                            datetime.today().strftime("%Y-%m-%d"),
+                        )
+                    else:
+                        date_range = None
+
+                    output.clear_output(wait=True)
+                    try:
+                        results, gdf = nasa_data_search(
+                            count=max_items.value,
+                            short_name=short_name.value,
+                            bbox=bounds,
+                            temporal=date_range,
+                            return_gdf=True,
+                        )
+
+                        if len(results) > 0:
+                            if "Footprints" in m.get_layer_names():
+                                m.remove(m.find_layer("Footprints"))
+                            if (
+                                hasattr(m, "_NASA_DATA_CTRL")
+                                and m._NASA_DATA_CTRL in m.controls
+                            ):
+                                m.remove(m._NASA_DATA_CTRL)
+
+                            style = {
+                                # "stroke": True,
+                                "color": "#3388ff",
+                                "weight": 2,
+                                "opacity": 1,
+                                "fill": True,
+                                "fillColor": "#3388ff",
+                                "fillOpacity": 0.1,
+                            }
+
+                            hover_style = {
+                                "weight": style["weight"] + 2,
+                                "fillOpacity": 0,
+                                "color": "yellow",
+                            }
+
+                            m.add_gdf(
+                                gdf,
+                                layer_name="Footprints",
+                                info_mode="on_click",
+                                zoom_to_layer=False,
+                                style=style,
+                                hover_style=hover_style,
+                            )
+                            setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
+
+                            dataset.options = gdf["native-id"].values.tolist()
+                            dataset.value = dataset.options[0]
+
+                            setattr(m, "_NASA_DATA_GDF", gdf)
+                            setattr(m, "_NASA_DATA_RESULTS", results)
+                            output.clear_output()
+
+                    except Exception as e:
+                        print(e)
+
+        elif change["new"] == "Display":
+            output.clear_output()
+            with output:
+                print("To be implemented...")
+
+        elif change["new"] == "Reset":
+            short_name.options = m._NASA_DATA_NAMES
+            short_name.value = default_dataset
+            title.value = default_title
+            max_items.value = 50
+            bbox.value = ""
+            bbox.placeholder = "xmin, ymin, xmax, ymax"
+            start_date.value = None
+            end_date.value = None
+            dataset.options = []
+            dataset.value = None
+            output.clear_output()
+
+            if "Footprints" in m.get_layer_names():
+                m.remove(m.find_layer("Footprints"))
+            if hasattr(m, "_NASA_DATA_CTRL") and m._NASA_DATA_CTRL in m.controls:
+                m.remove(m._NASA_DATA_CTRL)
+
+        elif change["new"] == "Close":
+            if m is not None:
+                m.toolbar_reset()
+                if m.tool_control is not None and m.tool_control in m.controls:
+                    m.remove_control(m.tool_control)
+                    m.tool_control = None
+            toolbar_widget.close()
+
+        buttons.value = None
+
+    buttons.observe(button_clicked, "value")
+
+    toolbar_button.value = opened
+    if m is not None:
+        toolbar_control = ipyleaflet.WidgetControl(
+            widget=toolbar_widget, position=position
+        )
+
+        if toolbar_control not in m.controls:
+            m.add(toolbar_control)
+            m.tool_control = toolbar_control
+    else:
+        return toolbar_widget
