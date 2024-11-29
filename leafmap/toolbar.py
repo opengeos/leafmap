@@ -6531,11 +6531,30 @@ def nasa_data_gui(
                                 and m._NASA_DATA_CTRL in m.controls
                             ):
                                 m.remove(m._NASA_DATA_CTRL)
+
+                            style = {
+                                # "stroke": True,
+                                "color": "#3388ff",
+                                "weight": 2,
+                                "opacity": 1,
+                                "fill": True,
+                                "fillColor": "#3388ff",
+                                "fillOpacity": 0.1,
+                            }
+
+                            hover_style = {
+                                "weight": style["weight"] + 2,
+                                "fillOpacity": 0,
+                                "color": "yellow",
+                            }
+
                             m.add_gdf(
                                 gdf,
                                 layer_name="Footprints",
                                 info_mode="on_click",
                                 zoom_to_layer=False,
+                                style=style,
+                                hover_style=hover_style,
                             )
                             setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
 
@@ -6544,6 +6563,7 @@ def nasa_data_gui(
 
                             setattr(m, "_NASA_DATA_GDF", gdf)
                             setattr(m, "_NASA_DATA_RESULTS", results)
+                            output.clear_output()
 
                     except Exception as e:
                         print(e)
