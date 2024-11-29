@@ -6971,23 +6971,33 @@ def nasa_opera_gui(
                 links = m._NASA_DATA_RESULTS[
                     dataset.options.index(dataset.value)
                 ].data_links()
-                ds = xr.open_dataset(links[layer.index], engine="rasterio")
-                setattr(m, "_NASA_DATA_DS", ds)
-                da = ds["band_data"]
-                nodata = os.environ.get("NODATA", 0)
-                da = da.fillna(nodata)
-                image = array_to_image(da)
-                name_prefix = dataset.value.split("_")[4][:8]
-                name_suffix = layer.value.split(".")[0]
-                layer_name = f"{name_prefix}_{name_suffix}"
-                m.add_raster(
-                    image,
-                    zoom_to_layer=True,
-                    colormap=palette.value,
-                    nodata=nodata,
-                    layer_name=layer_name,
-                )
-                output.clear_output()
+                link = links[layer.index]
+                try:
+                    if link.endswith(".tif"):
+                        ds = xr.open_dataset(link, engine="rasterio")
+                        setattr(m, "_NASA_DATA_DS", ds)
+                        da = ds["band_data"]
+                        nodata = os.environ.get("NODATA", 0)
+                        da = da.fillna(nodata)
+                        image = array_to_image(da)
+                        setattr(m, "_NASA_DATA_IMAGE", image)
+                        name_prefix = dataset.value.split("_")[4][:8]
+                        name_suffix = layer.value.split(".")[0]
+                        layer_name = f"{name_prefix}_{name_suffix}"
+                        m.add_raster(
+                            image,
+                            zoom_to_layer=True,
+                            colormap=palette.value,
+                            nodata=nodata,
+                            layer_name=layer_name,
+                        )
+                        output.clear_output()
+                    else:
+                        output.clear_output()
+                        print("Only GeoTIFF files are supported.")
+                except Exception as e:
+                    output.clear_output()
+                    print(e)
 
         elif change["new"] == "Reset":
             short_name.options = m._NASA_DATA_NAMES
