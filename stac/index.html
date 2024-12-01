@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.46">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.47">
     
     
       
@@ -11926,7 +11926,8 @@ unmarshalling errors. Defaults to None.</p></td>
 
     <span class="k">if</span> <span class="n">mosaic_json</span><span class="p">:</span>
         <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">titiler_endpoint</span><span class="si">}</span><span class="s2">/mosaicjson/tilejson.json&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">kwargs</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">titiler_endpoint</span><span class="si">}</span><span class="s2">/mosaicjson/</span><span class="si">{</span><span class="n">TileMatrixSetId</span><span class="si">}</span><span class="s2">/tilejson.json&quot;</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">titiler_endpoint</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
