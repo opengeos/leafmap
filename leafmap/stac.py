@@ -704,7 +704,8 @@ def stac_tile(
 
     if mosaic_json:
         r = requests.get(
-            f"{titiler_endpoint}/mosaicjson/tilejson.json", params=kwargs
+            f"{titiler_endpoint}/mosaicjson/{TileMatrixSetId}/tilejson.json",
+            params=kwargs,
         ).json()
     else:
         if isinstance(titiler_endpoint, str):
