@@ -2866,8 +2866,8 @@ def inspector_gui(
                     with output:
                         output.clear_output()
                         print(e)
-                        bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
-                        m.zoom_to_bounds(bounds)
+                        # bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
+                        # m.zoom_to_bounds(bounds)
 
             m.default_style = {"cursor": "crosshair"}
 
@@ -6981,8 +6981,9 @@ def nasa_opera_gui(
                         da = da.fillna(nodata)
                         image = array_to_image(da)
                         setattr(m, "_NASA_DATA_IMAGE", image)
-                        name_prefix = dataset.value.split("_")[4][:8]
-                        name_suffix = layer.value.split(".")[0]
+                        name_prefix = layer.value.split(".")[0]
+                        items = dataset.value.split("_")
+                        name_suffix = items[3] + "_" + items[4][:8] + "_" + items[6]
                         layer_name = f"{name_prefix}_{name_suffix}"
                         m.add_raster(
                             image,
