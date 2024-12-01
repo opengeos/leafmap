@@ -4180,6 +4180,7 @@ def edit_gps_trace(
     webGL: bool = False,
     download: bool = False,
     sync_plots: bool = False,
+    column_widths: Optional[List[int]] = (9, 3),
     **kwargs,
 ) -> Any:
     """
@@ -4203,6 +4204,7 @@ def edit_gps_trace(
         webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
         download (bool, optional): Whether to generate links for downloading the edited GPS traces. Defaults to False.
         sync_plots (bool, optional): Whether to synchronize the zoom and pan of the plots. Defaults to False.
+        column_widths (Optional[List[int]], optional): The column widths for the output widget. Defaults to (9, 3).
         **kwargs: Additional keyword arguments.
 
     Returns:
@@ -4673,10 +4675,12 @@ def edit_gps_trace(
     plot_widget = widgets.VBox([fig, widgets.HBox([clear_button, toggle_button])])
 
     left_col_layout = v.Col(
-        cols=9, children=[m], class_="pa-1"  # padding for consistent spacing
+        cols=column_widths[0],
+        children=[m],
+        class_="pa-1",  # padding for consistent spacing
     )
     right_col_layout = v.Col(
-        cols=3,
+        cols=column_widths[1],
         children=[widget],
         class_="pa-1",  # padding for consistent spacing
     )
@@ -4824,8 +4828,10 @@ def open_gps_traces(
     webGL: bool = False,
     download: bool = False,
     sync_plots: bool = False,
+    column_widths: Optional[List[int]] = (9, 3),
     add_layer_args: Dict[str, Any] = None,
     arrow_args: Dict[str, Any] = None,
+    map_height: str = "600px",
     **kwargs: Any,
 ) -> widgets.VBox:
     """
@@ -4851,6 +4857,10 @@ def open_gps_traces(
         webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
         download (bool, optional): Whether to generate links for downloading the edited GPS traces. Defaults to False.
         sync_plots (bool, optional): Whether to synchronize the zoom and pan of the plots. Defaults to False.
+        column_widths (Optional[List[int]], optional): The column widths for the output widget. Defaults to (9, 3).
+        add_layer_args (Dict[str, Any], optional): Additional keyword arguments to pass to the add_gps_trace method. Defaults to None.
+        arrow_args (Dict[str, Any], optional): Additional keyword arguments to pass to the add_arrow method. Defaults to None.
+        map_height (str, optional): The height of the map. Defaults to "600px".
         **kwargs: Additional keyword arguments to pass to the edit_gps_trace method.
 
     Returns:
@@ -4878,7 +4888,7 @@ def open_gps_traces(
     )
 
     def create_default_map():
-        m = Map(style="liberty")
+        m = Map(style="liberty", height=map_height)
         m.add_basemap("Satellite")
         m.add_basemap("OpenStreetMap.Mapnik", visible=True)
         m.add_overture_buildings(visible=True)
@@ -4892,7 +4902,7 @@ def open_gps_traces(
                     filepath = os.path.join(dirname, filepath)
 
                 if "m" in kwargs:
-                    m = kwargs["m"]
+                    m = kwargs.pop("m")
                 else:
                     m = create_default_map()
 
@@ -4929,6 +4939,7 @@ def open_gps_traces(
                     webGL,
                     download,
                     sync_plots,
+                    column_widths,
                     **kwargs,
                 )
 
