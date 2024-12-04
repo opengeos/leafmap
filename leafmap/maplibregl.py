@@ -4642,12 +4642,12 @@ def edit_gps_trace(
 
         if download:
             csv_link = common.create_download_link(
-                output_csv, title="Download ", basename=os.path.basename(output_csv)
+                output_csv, title="Download ", basename=output_csv.split("_")[-1]
             )
             geojson_link = common.create_download_link(
                 output_geojson,
                 title="Download ",
-                basename=os.path.basename(output_geojson),
+                basename=output_geojson.split("_")[-1],
             )
 
             with output:
@@ -4700,11 +4700,53 @@ def edit_gps_trace(
     return main_widget
 
 
-def open_gps_trace(**kwargs: Any) -> widgets.VBox:
+def open_gps_trace(
+    columns: List[str] = None,
+    ann_column: str = None,
+    colormap: Dict[str, str] = None,
+    layer_name: str = "GPS Trace",
+    default_features: Optional[List[str]] = None,
+    ann_options: Optional[List[str]] = None,
+    rows: int = 11,
+    fig_width: str = "1550px",
+    fig_height: str = "300px",
+    time_format: str = "%Y%m%dT%H%M%S",
+    radius: int = 4,
+    stroke_color: str = "lightgray",
+    circle_size: int = 48,
+    webGL: bool = False,
+    download: bool = False,
+    sync_plots: bool = False,
+    column_widths: Optional[List[int]] = (9, 3),
+    add_layer_args: Dict[str, Any] = None,
+    arrow_args: Dict[str, Any] = None,
+    map_height: str = "600px",
+    **kwargs: Any,
+) -> widgets.VBox:
     """
     Creates a widget for uploading and displaying a GPS trace on a map.
 
     Args:
+        columns (List[str], optional): The columns to display in the GPS trace popup. Defaults to None.
+        ann_column (str): The annotation column in the GPS trace.
+        colormap (Dict[str, str]): The colormap for the GPS trace annotations.
+        layer_name (str): The name of the GPS trace layer.
+        default_features (Optional[str], optional): The default features to display.
+            The first numerical column will be used if None. Defaults to None.
+        ann_options (Optional[List[str]], optional): The annotation options for the dropdown. Defaults to None.
+        rows (int, optional): The number of rows to display in the table. Defaults to 11.
+        fig_width (str, optional): The width of the figure. Defaults to "1550px".
+        fig_height (str, optional): The height of the figure. Defaults to "300px".
+        time_format (str, optional): The time format for the timestamp. Defaults to "%Y-%m-%d %H:%M:%S".
+        stroke_color (str, optional): The stroke color of the GPS trace points. Defaults to "lightgray".
+        circle_size (int, optional): The size of the GPS trace points. Defaults to 48.
+        webGL (bool, optional): Whether to use WebGL (bqplot-gl) for rendering. Defaults to False.
+        download (bool, optional): Whether to generate links for downloading the edited GPS traces. Defaults to False.
+        sync_plots (bool, optional): Whether to synchronize the zoom and pan of the plots. Defaults to False.
+        column_widths (Optional[List[int]], optional): The column widths for the output widget. Defaults to (9, 3).
+        add_layer_args (Dict[str, Any], optional): Additional keyword arguments to pass to the add_gps_trace method. Defaults to None.
+        arrow_args (Dict[str, Any], optional): Additional keyword arguments to pass to the add_arrow method. Defaults to None.
+        map_height (str, optional): The height of the map. Defaults to "600px".
         **kwargs: Additional keyword arguments to pass to the edit_gps_trace method.
 
     Returns:
@@ -4712,6 +4754,13 @@ def open_gps_trace(**kwargs: Any) -> widgets.VBox:
     """
 
     main_widget = widgets.VBox()
+    output = widgets.Output()
+
+    if add_layer_args is None:
+        add_layer_args = {}
+
+    if arrow_args is None:
+        arrow_args = {}
 
     uploader = widgets.FileUpload(
         accept=".csv",  # Accept GeoJSON files
@@ -4721,7 +4770,6 @@ def open_gps_trace(**kwargs: Any) -> widgets.VBox:
         button_style="primary",
     )
 
-    output = widgets.Output()
     reset = widgets.Button(description="Reset", button_style="primary")
 
     def on_reset_clicked(b):
@@ -4730,70 +4778,66 @@ def open_gps_trace(**kwargs: Any) -> widgets.VBox:
     reset.on_click(on_reset_clicked)
 
     def create_default_map():
-        m = Map(style="liberty", height="610px")
+        m = Map(style="liberty", height=map_height)
         m.add_basemap("Satellite")
-        m.add_basemap("OpenStreetMap.Mapnik", visible=False)
-        m.add_overture_buildings(visible=False)
+        m.add_basemap("OpenStreetMap.Mapnik", visible=True)
+        m.add_overture_buildings(visible=True)
         return m
 
     def on_upload(change):
         if len(uploader.value) > 0:
             content = uploader.value[0]["content"]
-            filename = common.temp_file_path(extension=".csv")
-            with open(filename, "wb") as f:
+            filepath = common.temp_file_path(extension=".csv")
+            with open(filepath, "wb") as f:
                 f.write(content)
             with output:
                 output.clear_output()
 
                 if "m" in kwargs:
-                    m = kwargs["m"]
+                    m = kwargs.pop("m")
                 else:
                     m = create_default_map()
 
-                if "colormap" in kwargs:
-                    colormap = kwargs.pop("colormap")
-                else:
-                    colormap = {
-                        "selected": "#FFFF00",  # Yellow
-                    }
+                if "add_line" not in add_layer_args:
+                    add_layer_args["add_line"] = True
 
-                if "layer_name" in kwargs:
-                    layer_name = kwargs.pop("layer_name")
-                else:
-                    layer_name = "GPS Trace"
+                try:
+                    m.add_gps_trace(
+                        filepath,
+                        columns=columns,
+                        radius=radius,
+                        ann_column=ann_column,
+                        colormap=colormap,
+                        stroke_color=stroke_color,
+                        name=layer_name,
+                        **add_layer_args,
+                    )
+                    m.add_layer_control()
 
-                if "icon" in kwargs:
-                    icon = kwargs.pop("icon")
-                else:
-                    icon = "https://assets.gishub.org/images/arrow.png"
-
-                if "ann_column" in kwargs:
-                    ann_column = kwargs.pop("ann_column")
-                else:
-                    ann_column = "annotation"
-
-                m.add_gps_trace(
-                    filename,
-                    radius=4,
-                    add_line=True,
-                    color_column="category",
-                    name=layer_name,
-                )
-                m.add_legend(legend_dict=colormap, shape_type="circle")
-                m.add_layer_control()
-                m.add_draw_control(controls=["polygon", "point", "trash"])
-
-                m.add_symbol(
-                    icon,
-                    source="GPS Trace Line",
-                    icon_size=0.1,
-                    symbol_placement="line",
-                    minzoom=19,
-                )
-
-                edit_widget = edit_gps_trace(
-                    filename, m, ann_column, colormap, layer_name, **kwargs
-                )
+                    m.add_arrow(source=f"{layer_name} Line", **arrow_args)
+                    edit_widget = edit_gps_trace(
+                        filepath,
+                        m,
+                        ann_column,
+                        colormap,
+                        layer_name,
+                        default_features,
+                        ann_options,
+                        rows,
+                        fig_width,
+                        fig_height,
+                        time_format,
+                        stroke_color,
+                        circle_size,
+                        webGL,
+                        download,
+                        sync_plots,
+                        column_widths,
+                        **kwargs,
+                    )
+                except Exception as e:
+                    print(f"Error: {e}")
+                    edit_widget = widgets.VBox()
                 main_widget.children = [
                     widgets.HBox([uploader, reset]),
                     output,
@@ -4909,39 +4953,43 @@ def open_gps_traces(
                 if "add_line" not in add_layer_args:
                     add_layer_args["add_line"] = True
 
-                m.add_gps_trace(
-                    filepath,
-                    columns=columns,
-                    radius=radius,
-                    ann_column=ann_column,
-                    colormap=colormap,
-                    stroke_color=stroke_color,
-                    name=layer_name,
-                    **add_layer_args,
-                )
-                m.add_layer_control()
+                try:
+                    m.add_gps_trace(
+                        filepath,
+                        columns=columns,
+                        radius=radius,
+                        ann_column=ann_column,
+                        colormap=colormap,
+                        stroke_color=stroke_color,
+                        name=layer_name,
+                        **add_layer_args,
+                    )
+                    m.add_layer_control()
 
-                m.add_arrow(source=f"{layer_name} Line", **arrow_args)
-                edit_widget = edit_gps_trace(
-                    filepath,
-                    m,
-                    ann_column,
-                    colormap,
-                    layer_name,
-                    default_features,
-                    ann_options,
-                    rows,
-                    fig_width,
-                    fig_height,
-                    time_format,
-                    stroke_color,
-                    circle_size,
-                    webGL,
-                    download,
-                    sync_plots,
-                    column_widths,
-                    **kwargs,
-                )
+                    m.add_arrow(source=f"{layer_name} Line", **arrow_args)
+                    edit_widget = edit_gps_trace(
+                        filepath,
+                        m,
+                        ann_column,
+                        colormap,
+                        layer_name,
+                        default_features,
+                        ann_options,
+                        rows,
+                        fig_width,
+                        fig_height,
+                        time_format,
+                        stroke_color,
+                        circle_size,
+                        webGL,
+                        download,
+                        sync_plots,
+                        column_widths,
+                        **kwargs,
+                    )
+                except Exception as e:
+                    print(f"Error: {e}")
+                    edit_widget = widgets.VBox()
 
             main_widget.children = [filepath_widget, edit_widget, output]
 
