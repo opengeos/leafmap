@@ -10193,46 +10193,80 @@ def split_raster(filename, out_dir, tile_size=256, overlap=0, prefix="tile"):
 
 
 def merge_rasters(
-    input_dir,
-    output,
-    input_pattern="*.tif",
-    output_format="GTiff",
-    output_nodata=None,
-    output_options=["COMPRESS=DEFLATE"],
+    input_dir_or_files: Union[str, List[str]],
+    output: str,
+    input_pattern: str = "*.tif",
+    output_format: str = "GTiff",
+    output_nodata: float = None,
+    output_options: list = None,
+    **kwargs,
 ):
-    """Merge a directory of rasters into a single raster.
+    """
+    Merge a directory of rasters or a list of file paths into a single raster.
 
     Args:
-        input_dir (str): The path to the input directory.
+        input_dir_or_files (Union[str, List[str]]): The path to the input directory or a list of file paths.
         output (str): The path to the output raster.
-        input_pattern (str, optional): The pattern to match the input files. Defaults to "*.tif".
-        output_format (str, optional): The output format. Defaults to "GTiff".
-        output_nodata (float, optional): The output nodata value. Defaults to None.
-        output_options (list, optional): A list of output options. Defaults to ["COMPRESS=DEFLATE"].
+        input_pattern (str, optional): The glob pattern to match input files if a directory is provided. Defaults to "*.tif".
+        output_format (str, optional): The output raster format. Defaults to "GTiff".
+        output_nodata (float, optional): The nodata value for the output raster. Defaults to None.
+        output_options (list, optional): A list of creation options for the output raster. Defaults to ["COMPRESS=DEFLATE"].
+        **kwargs: Additional arguments to pass to gdal.WarpOptions.
 
     Raises:
-        ImportError: Raised if GDAL is not installed.
+        ImportError: If GDAL is not installed.
+        ValueError: If no input files are found.
     """
-
     import glob
 
+    if output_options is None:
+        output_options = ["COMPRESS=DEFLATE"]
+
     try:
-        from osgeo import gdal
-    except ImportError:
+        from osgeo import gdal  # Ensure GDAL is available
+    except ImportError as e:
         raise ImportError(
             "GDAL is required to use this function. Install it with `conda install gdal -c conda-forge`"
-        )
-    # Get a list of all the input files
-    input_files = glob.glob(os.path.join(input_dir, input_pattern))
+        ) from e
 
-    # Merge the input files into a single output file
-    gdal.Warp(
-        output,
-        input_files,
+    # Get a list of input files
+    if isinstance(input_dir_or_files, str):  # It's a directory
+        input_files = glob.glob(os.path.join(input_dir_or_files, input_pattern))
+    elif isinstance(input_dir_or_files, list):  # It's a list of file paths
+        input_files = input_dir_or_files
+    else:
+        raise ValueError(
+            "input_dir_or_files must be a directory path (str) or a list of file paths (List[str])."
+        )
+
+    # Check if files are found
+    if not input_files:
+        raise ValueError(
+            "No input files found. Please check the directory or file paths provided."
+        )
+
+    # Configure warp options
+    warp_options = gdal.WarpOptions(
         format=output_format,
         dstNodata=output_nodata,
-        options=output_options,
+        creationOptions=output_options,
+        **kwargs,
     )
+
+    # Perform the raster merge
+    print(f"Merging {len(input_files)} rasters into '{output}'...")
+    result = gdal.Warp(
+        destNameOrDestDS=output,
+        srcDSOrSrcDSTab=input_files,
+        options=warp_options,
+    )
+
+    # Check for success
+    if result is None:
+        raise RuntimeError(
+            "Raster merge failed. Please check your inputs and parameters."
+        )
+    print(f"Raster merge completed successfully: {output}")
 
 
 def get_geometry_type(in_geojson: Union[str, Dict]) -> str:
