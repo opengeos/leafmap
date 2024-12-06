@@ -3931,6 +3931,93 @@ class Map(MapWidget):
                 **legend_args,
             )
 
+    def add_mapillary(
+        self,
+        minzoom: int = 6,
+        maxzoom: int = 14,
+        sequence_lyr_name: str = "sequence",
+        image_lyr_name: str = "image",
+        sequence_paint: dict = None,
+        image_paint: dict = None,
+        image_minzoom: int = 17,
+        add_popup: bool = True,
+        access_token: str = None,
+    ) -> None:
+        """
+        Adds Mapillary layers to the map.
+
+        Args:
+            minzoom (int): Minimum zoom level for the Mapillary tiles. Defaults to 6.
+            maxzoom (int): Maximum zoom level for the Mapillary tiles. Defaults to 14.
+            sequence_lyr_name (str): Name of the sequence layer. Defaults to "sequence".
+            image_lyr_name (str): Name of the image layer. Defaults to "image".
+            sequence_paint (dict, optional): Paint properties for the sequence layer. Defaults to None.
+            image_paint (dict, optional): Paint properties for the image layer. Defaults to None.
+            image_minzoom (int): Minimum zoom level for the image layer. Defaults to 17.
+            add_popup (bool): Whether to add popups to the layers. Defaults to True.
+            access_token (str, optional): Access token for Mapillary API. Defaults to None.
+
+        Raises:
+            ValueError: If no access token is provided.
+
+        Returns:
+            None
+        """
+
+        if access_token is None:
+            access_token = common.get_api_key("MAPILLARY_API_KEY")
+
+        if access_token is None:
+            raise ValueError("An access token is required to use Mapillary.")
+
+        url = f"https://tiles.mapillary.com/maps/vtp/mly1_public/2/{{z}}/{{x}}/{{y}}?access_token={access_token}"
+
+        source = {
+            "type": "vector",
+            "tiles": [url],
+            "minzoom": minzoom,
+            "maxzoom": maxzoom,
+        }
+        self.add_source("mapillary", source)
+
+        if sequence_paint is None:
+            sequence_paint = {
+                "line-opacity": 0.6,
+                "line-color": "#35AF6D",
+                "line-width": 2,
+            }
+        if image_paint is None:
+            image_paint = {
+                "circle-radius": 4,
+                "circle-color": "#3388ff",
+                "circle-stroke-color": "#ffffff",
+                "circle-stroke-width": 1,
+            }
+
+        sequence_lyr = {
+            "id": sequence_lyr_name,
+            "type": "line",
+            "source": "mapillary",
+            "source-layer": "sequence",
+            "layout": {"line-cap": "round", "line-join": "round"},
+            "paint": sequence_paint,
+        }
+        image_lyr = {
+            "id": image_lyr_name,
+            "type": "circle",
+            "source": "mapillary",
+            "source-layer": "image",
+            "paint": image_paint,
+            "minzoom": image_minzoom,
+        }
+
+        first_symbol_id = self.find_first_symbol_layer()["id"]
+        self.add_layer(sequence_lyr, name=sequence_lyr_name, before_id=first_symbol_id)
+        self.add_layer(image_lyr, name=image_lyr_name, before_id=first_symbol_id)
+        if add_popup:
+            self.add_popup(sequence_lyr_name)
+            self.add_popup(image_lyr_name)
+
 
 class Container(v.Container):
 
