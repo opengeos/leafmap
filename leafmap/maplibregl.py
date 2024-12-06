@@ -3635,7 +3635,12 @@ class Map(MapWidget):
                 raise FileNotFoundError(f"File not found: {data}")
 
         if isinstance(data, str):
+            tmp_file = os.path.splitext(data)[0] + "_tmp.csv"
             gdf = common.points_from_xy(data, x=x, y=y)
+            # If the temporary file exists, read the annotations from it
+            if os.path.exists(tmp_file):
+                df = pd.read_csv(tmp_file)
+                gdf[ann_column] = df[ann_column]
         elif isinstance(data, gpd.GeoDataFrame):
             gdf = data
         else:
@@ -4587,6 +4592,7 @@ def edit_gps_trace(
     def on_save_click(b):
         output.clear_output()
         download_widget.clear_output()
+
         m.gdf.loc[m.gdf[ann_column_edited] == "selected", ann_column] = dropdown.value
         m.gdf.loc[m.gdf[ann_column_edited] == "selected", ann_column_edited] = (
             dropdown.value
@@ -4613,6 +4619,10 @@ def edit_gps_trace(
 
         m.gdf[ann_column_edited] = m.gdf[ann_column]
         m.set_data(layer_name, m.gdf.__geo_interface__)
+
+        # Save the annotation to a temporary file
+        temp_file = os.path.splitext(filename)[0] + "_tmp.csv"
+        m.gdf[[ann_column]].to_csv(temp_file, index=False)
 
     save.on_click(on_save_click)
 
@@ -4661,6 +4671,11 @@ def edit_gps_trace(
                 output.clear_output()
                 print(f"Saved CSV: {os.path.basename(output_csv)}")
                 print(f"Saved GeoJSON: {os.path.basename(output_geojson)}")
+
+        # Remove the temporary file if it exists
+        tmp_file = os.path.splitext(filename)[0] + "_tmp.csv"
+        if os.path.exists(tmp_file):
+            os.remove(tmp_file)
 
     export.on_click(on_export_click)
 
