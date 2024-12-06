@@ -411,6 +411,12 @@ Add a third-party raster source to the map.
 
 [![](https://i.imgur.com/GX7reQP.png)](https://leafmap.org/maplibre/map_tiles)
 
+## Visualize Mapillary data
+
+Visualize Mapillary vector tiles on a map.
+
+[![image](https://github.com/user-attachments/assets/db9fac4f-4d67-4ccb-8f2d-06d665bdd521)](https://leafmap.org/maplibre/mapillary)
+
 ## Use MapTiler styles
 
 Use MapTiler styles to customize the look of your map.
