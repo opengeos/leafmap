@@ -4018,6 +4018,103 @@ class Map(MapWidget):
             self.add_popup(sequence_lyr_name)
             self.add_popup(image_lyr_name)
 
+    def create_mapillary_widget(
+        self,
+        lon: Optional[float] = None,
+        lat: Optional[float] = None,
+        radius: float = 0.00005,
+        bbox: Optional[Union[str, List[float]]] = None,
+        image_id: Optional[str] = None,
+        style: str = "classic",
+        width: int = 560,
+        height: int = 600,
+        frame_border: int = 0,
+        link: bool = True,
+        container: bool = True,
+        column_widths: List[int] = [8, 1],
+        **kwargs: Any,
+    ) -> Union[widgets.HTML, v.Row]:
+        """
+        Creates a Mapillary widget.
+
+        Args:
+            lon (Optional[float]): Longitude of the location. Defaults to None.
+            lat (Optional[float]): Latitude of the location. Defaults to None.
+            radius (float): Search radius for Mapillary images. Defaults to 0.00005.
+            bbox (Optional[Union[str, List[float]]]): Bounding box for the search. Defaults to None.
+            image_id (Optional[str]): ID of the Mapillary image. Defaults to None.
+            style (str): Style of the Mapillary image. Defaults to "classic".
+            width (int): Width of the iframe. Defaults to 560.
+            height (int): Height of the iframe. Defaults to 600.
+            frame_border (int): Frame border of the iframe. Defaults to 0.
+            link (bool): Whether to link the widget to map clicks. Defaults to True.
+            container (bool): Whether to return the widget in a container. Defaults to True.
+            column_widths (List[int]): Widths of the columns in the container. Defaults to [8, 1].
+            **kwargs: Additional keyword arguments for the widget.
+
+        Returns:
+            Union[widgets.HTML, v.Row]: The Mapillary widget or a container with the widget.
+        """
+
+        if image_id is None:
+            if lon is None or lat is None:
+                if len(self.center) > 0:
+                    lon = self.center["lng"]
+                    lat = self.center["lat"]
+                else:
+                    lon = 0
+                    lat = 0
+            image_ids = common.search_mapillary_images(lon, lat, radius, bbox, limit=1)
+            if len(image_ids) > 0:
+                image_id = image_ids[0]
+
+        if image_id is None:
+            widget = widgets.HTML()
+        else:
+            widget = common.get_mapillary_image_widget(
+                image_id, style, width, height, frame_border, **kwargs
+            )
+
+        if link:
+
+            def log_lng_lat(lng_lat):
+                lon = lng_lat.new["lng"]
+                lat = lng_lat.new["lat"]
+                image_id = common.search_mapillary_images(
+                    lon, lat, radius=radius, limit=1
+                )
+                if len(image_id) > 0:
+                    content = f"""
+                    <iframe
+                        src="https://www.mapillary.com/embed?image_key={image_id[0]}&style={style}"
+                        height="{height}"
+                        width="{width}"
+                        frameborder="{frame_border}">
+                    </iframe>
+                    """
+                    widget.value = content
+
+            self.observe(log_lng_lat, names="clicked")
+
+        if container:
+            left_col_layout = v.Col(
+                cols=column_widths[0],
+                children=[self],
+                class_="pa-1",  # padding for consistent spacing
+            )
+            right_col_layout = v.Col(
+                cols=column_widths[1],
+                children=[widget],
+                class_="pa-1",  # padding for consistent spacing
+            )
+            row = v.Row(
+                children=[left_col_layout, right_col_layout],
+            )
+            return row
+        else:
+
+            return widget
+
 
 class Container(v.Container):
 
@@ -5101,3 +5198,27 @@ def open_gps_traces(
     filepath_widget.value = filepaths[0]
 
     return main_widget
+
+
+class MapWidget(v.Row):
+
+    def __init__(self, left_obj, right_obj, column_widths=(5, 1), **kwargs):
+
+        self.left_obj = left_obj
+        self.right_obj = right_obj
+
+        left_col_layout = v.Col(
+            cols=column_widths[0],
+            children=[left_obj],
+            class_="pa-1",  # padding for consistent spacing
+        )
+        right_col_layout = v.Col(
+            cols=column_widths[1],
+            children=[right_obj],
+            class_="pa-1",  # padding for consistent spacing
+        )
+
+        # if "class_" not in kwargs:
+        #     kwargs["class_"] = "d-flex flex-wrap"
+
+        super().__init__(children=[left_col_layout, right_col_layout], **kwargs)
