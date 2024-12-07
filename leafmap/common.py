@@ -15355,3 +15355,210 @@ def plot_actual_vs_predicted(
         return fig
     else:
         fig.show()
+
+
+def search_mapillary_images(
+    lon: Optional[float] = None,
+    lat: Optional[float] = None,
+    radius: float = 0.00005,
+    bbox: Optional[Union[str, List[float]]] = None,
+    limit: int = 2000,
+    access_token: Optional[str] = None,
+) -> List[str]:
+    """
+    Retrieves Mapillary image IDs near the specified test point within a bounding box.
+
+    Args:
+        lon (float, optional): Longitude of the test point. Defaults to None.
+        lat (float, optional): Latitude of the test point. Defaults to None.
+        radius (float, optional): Radius to create the bounding box. Defaults to 0.00005.
+        bbox (Union[str, List[float]], optional): Bounding box coordinates. Defaults to None.
+        limit (int, optional): Maximum number of image IDs to retrieve. Defaults to 2000.
+        access_token (str, optional): Mapillary API access token. Defaults to None.
+
+    Returns:
+        List[str]: JSON response from the Mapillary API containing image IDs.
+    """
+
+    if access_token is None:
+        access_token = get_api_key("MAPILLARY_API_KEY")
+
+    if access_token is None:
+        raise ValueError(
+            "Mapillary API access token is required. Set it using the 'access_token' parameter."
+        )
+
+    metadata_endpoint = "https://graph.mapillary.com"
+    headers = {"Authorization": f"OAuth {access_token}"}
+
+    if bbox is None:
+        if lon is None or lat is None:
+            raise ValueError("Longitude and latitude are required.")
+        bbox = f"{lon - radius},{lat - radius},{lon + radius},{lat + radius}"
+    else:
+        if isinstance(bbox, list):
+            bbox = ",".join(str(x) for x in bbox)
+
+    # Construct the bounding box for the API call
+    url_imagesearch = f"{metadata_endpoint}/images?fields=id&bbox={bbox}&limit={limit}"
+
+    try:
+        response = requests.get(url_imagesearch, headers=headers)
+        response.raise_for_status()  # Raise an HTTPError for bad responses
+        return [image["id"] for image in response.json()["data"]]
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        return []
+
+
+def get_mapillary_image_widget(
+    image_id: str,
+    style: str = "photo",
+    width: int = 800,
+    height: int = 600,
+    frame_border: int = 0,
+    **kwargs: Any,
+) -> widgets.HTML:
+    """
+    Creates an iframe widget to display a Mapillary image.
+
+    Args:
+        image_id (str): The ID of the Mapillary image.
+        style (str): The style of the image. Can be "photo", "classic", "split". Defaults to "photo".
+        width (int): The width of the iframe. Defaults to 800.
+        height (int): The height of the iframe. Defaults to 600.
+        frame_border (int): The frame border of the iframe. Defaults to 0.
+        **kwargs: Additional keyword arguments for the widget.
+
+    Returns:
+        widgets.HTML: An iframe widget displaying the Mapillary image.
+    """
+
+    content = f"""
+    <iframe
+        src="https://www.mapillary.com/embed?image_key={image_id}&style={style}"
+        height="{height}"
+        width="{width}"
+        frameborder="{frame_border}">
+    </iframe>
+    """
+
+    # Create an iframe widget
+    iframe = widgets.HTML(value=content, placeholder="Mapillary Image", **kwargs)
+
+    return iframe
+
+
+def get_mapillary_image_url(
+    image_id: str,
+    resolution: str = "original",
+    access_token: Optional[str] = None,
+    **kwargs: Any,
+) -> Optional[str]:
+    """
+    Retrieves the URL of a Mapillary image.
+
+    Args:
+        image_id (str): The ID of the Mapillary image.
+        resolution (str): The resolution of the image. Can be 256, 1024, 2048, or original.
+            Defaults to "original".
+        access_token (str, optional): The access token for the Mapillary API. Defaults to None.
+        **kwargs: Additional keyword arguments for the request.
+
+    Raises:
+        ValueError: If no access token is provided.
+
+    Returns:
+        Optional[str]: The URL of the Mapillary image, or None if an error occurs.
+    """
+    if access_token is None:
+        access_token = get_api_key("MAPILLARY_API_KEY")
+
+    if access_token is None:
+        raise ValueError(
+            "Mapillary API access token is required. Set it using the 'access_token' parameter."
+        )
+
+        # API URL
+    url = f"https://graph.mapillary.com/{image_id}"
+
+    # Fields to retrieve
+    fields = f"thumb_{resolution}_url"
+
+    # Request parameters
+    params = {"fields": fields, "access_token": access_token}
+
+    # Fetch the data
+    response = requests.get(url, params=params, **kwargs)
+
+    # Check the response
+    if response.status_code == 200:
+        data = response.json()
+        image_url = data.get(fields)
+        return image_url
+    else:
+        print(f"Error {response.status_code}: {response.text}")
+        return None
+
+
+def download_mapillary_image(
+    image_id: str,
+    output: Optional[str] = None,
+    resolution: str = "original",
+    access_token: Optional[str] = None,
+    quiet: bool = True,
+    **kwargs: Any,
+) -> None:
+    """
+    Downloads a Mapillary image.
+
+    Args:
+        image_id (str): The ID of the Mapillary image.
+        output (str, optional): The output file path. Defaults to None.
+        resolution (str): The resolution of the image. Can be 256, 1024, 2048, or original.
+            Defaults to "original".
+        access_token (str, optional): The access token for the Mapillary API. Defaults to None.
+        quiet (bool): Whether to suppress output. Defaults to True.
+        **kwargs: Additional keyword arguments for the download.
+
+    Returns:
+        None
+    """
+
+    image_url = get_mapillary_image_url(
+        image_id, resolution=resolution, access_token=access_token
+    )
+    if output is None:
+
+        output = f"{image_id}.jpg"
+    download_file(image_url, output, quiet=quiet, **kwargs)
+
+
+def download_mapillary_images(
+    image_ids: List[str],
+    output_dir: Optional[str] = None,
+    resolution: str = "original",
+    **kwargs: Any,
+) -> None:
+    """
+    Downloads multiple Mapillary images.
+
+    Args:
+        image_ids (List[str]): A list of Mapillary image IDs.
+        output_dir (str, optional): The directory to save the images. Defaults
+            to the current working directory.
+        resolution (str): The resolution of the images. Defaults to "original".
+        **kwargs: Additional keyword arguments for the download.
+
+    Returns:
+        None
+    """
+    if output_dir is None:
+        output_dir = os.getcwd()
+
+    for index, image_id in enumerate(image_ids):
+        output = os.path.join(output_dir, f"{image_id}.jpg")
+        print(f"Downloading {index + 1}/{len(image_ids)}: {image_id}.jpg ...")
+        download_mapillary_image(
+            image_id=image_id, output=output, resolution=resolution, **kwargs
+        )
