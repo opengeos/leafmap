@@ -3696,6 +3696,9 @@ class Map(MapWidget):
                 "geometry",
             ]
 
+        if ann_column not in columns:
+            columns.append(ann_column)
+
         if ann_column_edited not in columns:
             columns.append(ann_column_edited)
         if "geometry" not in columns:
