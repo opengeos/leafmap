@@ -113,6 +113,8 @@
 99. Retrieving wetland boundaries from the National Wetlands Inventory (NWI) ([notebook](https://leafmap.org/notebooks/99_wetlands))
 100. Visualizing the National Land Cover Database (NLCD) data products with Leafmap ([notebook](https://leafmap.org/notebooks/100_nlcd))
 101. Searching and Visualizing NASA OPERA Data Products Interactively ([notebook](https://leafmap.org/notebooks/101_nasa_opera))
+102. Mapping Overture Buildings and Foursquare Places with Leafmap + Fused ([notebook](https://leafmap.org/notebooks/102_fused))
+103. Applying a custom colormap to a raster dataset ([notebook](https://leafmap.org/notebooks/103_raster_colormap))
 
 ## Demo
 

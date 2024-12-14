@@ -10475,6 +10475,7 @@ def array_to_memory_file(
     crs: str = None,
     transform: tuple = None,
     driver="COG",
+    colormap: dict = None,
     **kwargs,
 ):
     """Convert a NumPy array to a memory file.
@@ -10488,8 +10489,9 @@ def array_to_memory_file(
         cellsize (float, optional): The cell size of the array if source is not provided. Defaults to None.
         crs (str, optional): The coordinate reference system of the array if source is not provided. Defaults to None.
         transform (tuple, optional): The affine transformation matrix if source is not provided.
-            Can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361). Defaults to None
+            Can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361). Defaults to None.
         driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
+        colormap (dict, optional): A dictionary defining the colormap (value: (R, G, B, A)).
         **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
 
     Returns:
@@ -10510,8 +10512,7 @@ def array_to_memory_file(
             )
         if hasattr(array, "rio"):
             if hasattr(array.rio, "crs"):
-                if array.rio.crs is not None:
-                    crs = array.rio.crs
+                crs = array.rio.crs
             if transform is None and hasattr(array.rio, "transform"):
                 transform = array.rio.transform()
         elif source is None:
@@ -10575,7 +10576,6 @@ def array_to_memory_file(
 
     # Convert the array to the best dtype
     array = array.astype(dtype)
-
     # Define the GeoTIFF metadata
     metadata = {
         "driver": driver,
@@ -10601,12 +10601,15 @@ def array_to_memory_file(
 
     if array.ndim == 2:
         dst.write(array, 1)
+        if colormap:
+            dst.write_colormap(1, colormap)
     elif array.ndim == 3:
         for i in range(array.shape[2]):
             dst.write(array[:, :, i], i + 1)
+            if colormap:
+                dst.write_colormap(i + 1, colormap)
 
     dst.close()
-
     # Read the dataset from memory
     dataset_reader = rasterio.open(dst.name, mode="r")
 
@@ -10624,6 +10627,7 @@ def array_to_image(
     crs: str = None,
     transform: tuple = None,
     driver: str = "COG",
+    colormap: dict = None,
     **kwargs,
 ) -> str:
     """Save a NumPy array as a GeoTIFF using the projection information from an existing GeoTIFF file.
@@ -10640,6 +10644,7 @@ def array_to_image(
         transform (tuple, optional): The affine transformation matrix, can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361).
             Defaults to None.
         driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
+        colormap (dict, optional): A dictionary defining the colormap (value: (R, G, B, A)).
         **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
     """
 
@@ -10660,6 +10665,7 @@ def array_to_image(
             crs=crs,
             transform=transform,
             driver=driver,
+            colormap=colormap,
             **kwargs,
         )
 
@@ -10688,7 +10694,9 @@ def array_to_image(
             array.rio.to_raster(
                 output, driver=driver, compress=compress, dtype=dtype, **kwargs
             )
-            return
+            if colormap:
+                write_image_colormap(output, colormap, output)
+            return output
 
     if array.ndim == 3 and transpose:
         array = np.transpose(array, (1, 2, 0))
@@ -10771,14 +10779,18 @@ def array_to_image(
         metadata["compress"] = compress
 
     metadata.update(**kwargs)
-
     # Create a new GeoTIFF file and write the array to it
     with rasterio.open(output, "w", **metadata) as dst:
         if array.ndim == 2:
             dst.write(array, 1)
+            if colormap:
+                dst.write_colormap(1, colormap)
         elif array.ndim == 3:
             for i in range(array.shape[2]):
                 dst.write(array[:, :, i], i + 1)
+                if colormap:
+                    dst.write_colormap(i + 1, colormap)
+    return output
 
 
 def images_to_tiles(
@@ -15563,3 +15575,121 @@ def download_mapillary_images(
         download_mapillary_image(
             image_id=image_id, output=output, resolution=resolution, **kwargs
         )
+
+
+def get_image_colormap(image, index=1):
+    """
+    Retrieve the colormap from an image.
+
+    Args:
+        image (str, rasterio.io.DatasetReader, rioxarray.DataArray):
+            The input image. It can be:
+            - A file path to a raster image (string).
+            - A rasterio dataset.
+            - A rioxarray DataArray.
+        index (int): The band index to retrieve the colormap from (default is 1).
+
+    Returns:
+        dict: A dictionary representing the colormap (value: (R, G, B, A)), or None if no colormap is found.
+
+    Raises:
+        ValueError: If the input image type is unsupported.
+    """
+    import rasterio
+    import rioxarray
+    import xarray as xr
+
+    dataset = None
+
+    if isinstance(image, str):  # File path
+        with rasterio.open(image) as ds:
+            return ds.colormap(index) if ds.count > 0 else None
+    elif isinstance(image, rasterio.io.DatasetReader):  # rasterio dataset
+        dataset = image
+    elif isinstance(image, xr.DataArray) or isinstance(image, xr.Dataset):
+        source = image.encoding.get("source")
+        if source:
+            with rasterio.open(source) as ds:
+                return ds.colormap(index) if ds.count > 0 else None
+        else:
+            raise ValueError(
+                "Cannot extract colormap: DataArray does not have a source."
+            )
+    else:
+        raise ValueError(
+            "Unsupported input type. Provide a file path, rasterio dataset, or rioxarray DataArray."
+        )
+
+    if dataset:
+        return dataset.colormap(index) if dataset.count > 0 else None
+
+
+def write_image_colormap(image, colormap, output_path=None):
+    """
+    Apply or update a colormap to a raster image.
+
+    Args:
+        image (str, rasterio.io.DatasetReader, rioxarray.DataArray):
+            The input image. It can be:
+            - A file path to a raster image (string).
+            - A rasterio dataset.
+            - A rioxarray DataArray.
+        colormap (dict): A dictionary defining the colormap (value: (R, G, B, A)).
+        output_path (str, optional): Path to save the updated raster image.
+            If None, the original file is updated in-memory.
+
+    Returns:
+        str: Path to the updated raster image.
+
+    Raises:
+        ValueError: If the input image type is unsupported.
+    """
+    import rasterio
+    import rioxarray
+    import xarray as xr
+
+    dataset = None
+    src_profile = None
+    src_data = None
+
+    if isinstance(image, str):  # File path
+        with rasterio.open(image) as ds:
+            dataset = ds
+            src_profile = ds.profile
+            src_data = ds.read(1)  # Assuming single-band
+    elif isinstance(image, rasterio.io.DatasetReader):  # rasterio dataset
+        dataset = image
+        src_profile = dataset.profile
+        src_data = dataset.read(1)  # Assuming single-band
+    elif isinstance(image, xr.DataArray):  # rioxarray DataArray
+        source = image.encoding.get("source")
+        if source:
+            with rasterio.open(source) as ds:
+                dataset = ds
+                src_profile = ds.profile
+                src_data = ds.read(1)  # Assuming single-band
+        else:
+            raise ValueError("Cannot apply colormap: DataArray does not have a source.")
+    else:
+        raise ValueError(
+            "Unsupported input type. Provide a file path, rasterio dataset, or rioxarray DataArray."
+        )
+
+    # Ensure the dataset is single-band
+    if dataset.count != 1:
+        raise ValueError(
+            "Colormaps can only be applied to single-band raster datasets."
+        )
+
+    # Update the profile and colormap
+    src_profile.update(dtype=src_data.dtype, count=1)
+
+    if not output_path:
+        output_path = "output_with_colormap.tif"
+
+    # Write the updated dataset with the colormap
+    with rasterio.open(output_path, "w", **src_profile) as dst:
+        dst.write(src_data, 1)
+        dst.write_colormap(1, colormap)
+
+    return output_path
