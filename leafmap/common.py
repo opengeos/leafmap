@@ -10512,7 +10512,8 @@ def array_to_memory_file(
             )
         if hasattr(array, "rio"):
             if hasattr(array.rio, "crs"):
-                crs = array.rio.crs
+                if array.rio.crs is not None:
+                    crs = array.rio.crs
             if transform is None and hasattr(array.rio, "transform"):
                 transform = array.rio.transform()
         elif source is None:
