@@ -6789,7 +6789,7 @@ def nasa_opera_gui(
 
     palette = widgets.Dropdown(
         options=cmap_options,
-        value="tab10",
+        value=None,
         description="Colormap:",
         style=style,
         layout=widgets.Layout(width="200px", padding=padding),
@@ -6979,7 +6979,11 @@ def nasa_opera_gui(
                         da = ds["band_data"]
                         nodata = os.environ.get("NODATA", 0)
                         da = da.fillna(nodata)
-                        image = array_to_image(da)
+                        try:
+                            colormap = get_image_colormap(ds)
+                        except Exception as e:
+                            colormap = None
+                        image = array_to_image(da, colormap=colormap)
                         setattr(m, "_NASA_DATA_IMAGE", image)
                         name_prefix = layer.value.split(".")[0]
                         items = dataset.value.split("_")
@@ -7013,7 +7017,7 @@ def nasa_opera_gui(
             dataset.value = None
             layer.options = []
             layer.value = None
-            palette.value = "tab10"
+            palette.value = None
             output.clear_output()
 
             if "Footprints" in m.get_layer_names():
