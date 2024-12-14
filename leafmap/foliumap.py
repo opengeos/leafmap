@@ -609,12 +609,15 @@ class Map(folium.Map):
             layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
             array_args (dict, optional): Additional arguments to pass to `array_to_image`. Defaults to {}.
         """
-
+        import sys
         import numpy as np
         import xarray as xr
 
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
             source = common.array_to_image(source, **array_args)
+
+        if "google.colab" in sys.modules:
+            kwargs["cors_all"] = True
 
         tile_layer, tile_client = common.get_local_tile_layer(
             source,
@@ -2557,6 +2560,13 @@ class Map(folium.Map):
             left_array_args (dict, optional): The arguments for array_to_image for the left layer. Defaults to {}.
             right_array_args (dict, optional): The arguments for array_to_image for the right layer. Defaults to {}.
         """
+        import sys
+
+        if "google.colab" in sys.modules:
+            client_args = {"cors_all": True}
+        else:
+            client_args = {"cors_all": False}
+
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 30
         if "max_native_zoom" not in left_args:
@@ -2618,6 +2628,7 @@ class Map(folium.Map):
                         left_layer,
                         tile_format="folium",
                         return_client=True,
+                        client_args=client_args,
                         **left_args,
                     )
                     bounds = common.image_bounds(left_client)
@@ -2640,6 +2651,7 @@ class Map(folium.Map):
                     left_layer,
                     return_client=True,
                     tile_format="folium",
+                    client_args=client_args,
                     **left_args,
                 )
             else:
@@ -2679,6 +2691,7 @@ class Map(folium.Map):
                         right_layer,
                         tile_format="folium",
                         return_client=True,
+                        client_args=client_args,
                         **right_args,
                     )
                     bounds = common.image_bounds(right_client)
@@ -2700,6 +2713,7 @@ class Map(folium.Map):
                     right_layer,
                     return_client=True,
                     tile_format="folium",
+                    client_args=client_args,
                     **right_args,
                 )
             else:
