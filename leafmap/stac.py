@@ -2,7 +2,7 @@ import os
 import pystac
 import requests
 from typing import Optional, Dict, List, Callable, Tuple, Union
-from pandas import DataFrame
+import pandas as pd
 
 
 class TitilerEndpoint:
@@ -1509,7 +1509,7 @@ def stac_search_to_gdf(search, **kwargs):
     return gdf
 
 
-def stac_search_to_df(search, **kwargs) -> DataFrame:
+def stac_search_to_df(search, **kwargs) -> pd.DataFrame:
     """Convert STAC search result to a DataFrame.
 
     Args:
@@ -1883,7 +1883,7 @@ def maxar_all_items(
             if child_id == child_ids[0]:
                 gdf = items
             else:
-                gdf = gdf.append(items)
+                gdf = pd.concat([gdf, items], ignore_index=True)
         else:
             if child_id == child_ids[0]:
                 items_all = items
@@ -2175,7 +2175,6 @@ def oam_search(
         GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
     """
 
-    import pandas as pd
     from shapely.geometry import Polygon
     import geopandas as gpd
 
