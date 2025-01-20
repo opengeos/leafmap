@@ -2962,6 +2962,9 @@ def get_local_tile_layer(
         if isinstance(nodata, str):
             nodata = float(nodata)
 
+    if isinstance(colormap, str):
+        colormap = colormap.lower()
+
     if quiet:
         output = widgets.Output()
         with output:
