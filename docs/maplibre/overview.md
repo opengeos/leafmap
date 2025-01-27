@@ -212,6 +212,14 @@ Utilize and refine data from the MapTiler Countries to create a Choropleth map o
 
 [![](https://i.imgur.com/k1d6k9I.png)](https://leafmap.org/maplibre/countries_filter)
 
+
+## Create vector data
+
+Create vector data interactively on a map.
+
+[![image](https://github.com/user-attachments/assets/70518d0a-d78e-4e21-94ab-2c18a9fa8f64)
+](https://leafmap.org/maplibre/create_vector)
+
 ## Customize marker icon image
 
 Use the icon-image property to change the icon image of a marker.
