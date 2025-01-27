@@ -3157,7 +3157,7 @@ class Map(MapWidget):
 
     def add_overture_data(
         self,
-        release: str = "2024-10-23",
+        release: str = "2024-12-18",
         theme: str = "buildings",
         style: Optional[Dict[str, Any]] = None,
         visible: bool = True,
@@ -3170,7 +3170,7 @@ class Map(MapWidget):
 
         Args:
             release (str, optional): The release date of the data. Defaults to
-                "2024-10-23". For more info, see https://github.com/OvertureMaps/overture-tiles
+                "2024-12-28". For more info, see https://github.com/OvertureMaps/overture-tiles
             theme (str, optional): The theme of the data. It can be one of the following:
                 "addresses", "base", "buildings", "divisions", "places", "transportation".
                 Defaults to "buildings".
@@ -3399,7 +3399,7 @@ class Map(MapWidget):
 
     def add_overture_buildings(
         self,
-        release: str = "2024-10-23",
+        release: str = "2024-12-18",
         style: Optional[Dict[str, Any]] = None,
         type: str = "line",
         visible: bool = True,
@@ -3412,7 +3412,7 @@ class Map(MapWidget):
 
         Args:
             release (str, optional): The release date of the data. Defaults to
-                "2024-10-23". For more info, see https://github.com/OvertureMaps/overture-tiles
+                "2024-12-18". For more info, see https://github.com/OvertureMaps/overture-tiles
             style (Optional[Dict[str, Any]], optional): The style dictionary for
                 the data. Defaults to None.
             type (str, optional): The type of the data. It can be "line" or "fill".
@@ -5200,6 +5200,223 @@ def open_gps_traces(
     main_widget.children = [filepath_widget, output]
     filepath_widget.value = filepaths[0]
 
+    return main_widget
+
+
+def create_vector_data(
+    m: Optional[Map] = None,
+    properties: Optional[Dict[str, List[Any]]] = None,
+    time_format: str = "%Y%m%dT%H%M%S",
+    column_widths: Optional[List[int]] = (9, 3),
+    map_height: str = "600px",
+    out_dir: Optional[str] = None,
+    filename_prefix: str = "",
+    file_ext: str = "geojson",
+    **kwargs: Any,
+) -> widgets.VBox:
+    """Generates a widget-based interface for creating and managing vector data on a map.
+
+    This function creates an interactive widget interface that allows users to draw features
+    (points, lines, polygons) on a map, assign properties to these features, and export them
+    as GeoJSON files. The interface includes a map, a sidebar for property management, and
+    buttons for saving, exporting, and resetting the data.
+
+    Args:
+        m (Map, optional): An existing Map object. If not provided, a default map with
+            basemaps and drawing controls will be created. Defaults to None.
+        properties (Dict[str, List[Any]], optional): A dictionary where keys are property names
+            and values are lists of possible values for each property. These properties can be
+            assigned to the drawn features. Defaults to None.
+        time_format (str, optional): The format string for the timestamp used in the exported
+            filename. Defaults to "%Y%m%dT%H%M%S".
+        column_widths (Optional[List[int]], optional): A list of two integers specifying the
+            relative widths of the map and sidebar columns. Defaults to (9, 3).
+        map_height (str, optional): The height of the map widget. Defaults to "600px".
+        out_dir (str, optional): The directory where the exported GeoJSON files will be saved.
+            If not provided, the current working directory is used. Defaults to None.
+        filename_prefix (str, optional): A prefix to be added to the exported filename.
+            Defaults to "".
+        file_ext (str, optional): The file extension for the exported file. Defaults to "geojson".
+        **kwargs (Any): Additional keyword arguments that may be passed to the function.
+
+    Returns:
+        widgets.VBox: A vertical box widget containing the map, sidebar, and control buttons.
+
+    Example:
+        >>> properties = {
+        ...     "Type": ["Residential", "Commercial", "Industrial"],
+        ...     "Area": [100, 200, 300],
+        ... }
+        >>> widget = create_vector_data(properties=properties)
+        >>> display(widget)  # Display the widget in a Jupyter notebook
+    """
+    from datetime import datetime
+
+    main_widget = widgets.VBox()
+    output = widgets.Output()
+
+    if out_dir is None:
+        out_dir = os.getcwd()
+
+    def create_default_map():
+        m = Map(style="liberty", height=map_height)
+        m.add_basemap("Satellite")
+        m.add_basemap("OpenStreetMap.Mapnik", visible=True)
+        m.add_overture_buildings(visible=True)
+        m.add_overture_data(theme="transportation")
+        m.add_layer_control()
+        m.add_draw_control(
+            controls=["point", "polygon", "line_string", "trash"], position="top-right"
+        )
+        return m
+
+    if m is None:
+        m = create_default_map()
+
+    setattr(m, "draw_features", {})
+
+    sidebar_widget = widgets.VBox()
+
+    prop_widgets = widgets.VBox()
+
+    if isinstance(properties, dict):
+        for key, values in properties.items():
+
+            if isinstance(values, list) or isinstance(values, tuple):
+                prop_widget = widgets.Dropdown(
+                    options=values,
+                    # value=None,
+                    description=key,
+                )
+                prop_widgets.children += (prop_widget,)
+            elif isinstance(values, int):
+                prop_widget = widgets.IntText(
+                    value=values,
+                    description=key,
+                )
+                prop_widgets.children += (prop_widget,)
+            elif isinstance(values, float):
+                prop_widget = widgets.FloatText(
+                    value=values,
+                    description=key,
+                )
+                prop_widgets.children += (prop_widget,)
+            else:
+                prop_widget = widgets.Text(
+                    value=values,
+                    description=key,
+                )
+                prop_widgets.children += (prop_widget,)
+
+    def draw_change(lng_lat):
+        if lng_lat.new:
+            if len(m.draw_features_selected) > 0:
+                feature_id = m.draw_features_selected[0]["id"]
+                if feature_id not in m.draw_features:
+                    m.draw_features[feature_id] = {}
+                    for key, values in properties.items():
+                        if isinstance(values, list) or isinstance(values, tuple):
+                            m.draw_features[feature_id][key] = values[0]
+                        else:
+                            m.draw_features[feature_id][key] = values
+                else:
+                    for prop_widget in prop_widgets.children:
+                        key = prop_widget.description
+                        prop_widget.value = m.draw_features[feature_id][key]
+
+        else:
+            for prop_widget in prop_widgets.children:
+                key = prop_widget.description
+                if isinstance(properties[key], list) or isinstance(
+                    properties[key], tuple
+                ):
+                    prop_widget.value = properties[key][0]
+                else:
+                    prop_widget.value = properties[key]
+
+    m.observe(draw_change, names="draw_features_selected")
+
+    button_layout = widgets.Layout(width="97px")
+    save = widgets.Button(
+        description="Save", button_style="primary", layout=button_layout
+    )
+    export = widgets.Button(
+        description="Export", button_style="primary", layout=button_layout
+    )
+    reset = widgets.Button(
+        description="Reset", button_style="primary", layout=button_layout
+    )
+
+    def on_save_click(b):
+
+        if len(m.draw_features_selected) > 0:
+            feature_id = m.draw_features_selected[0]["id"]
+            for prop_widget in prop_widgets.children:
+                key = prop_widget.description
+                m.draw_features[feature_id][key] = prop_widget.value
+        else:
+            with output:
+                output.clear_output()
+                print("Please select a feature to save.")
+
+    save.on_click(on_save_click)
+
+    def on_export_click(b):
+        current_time = datetime.now().strftime(time_format)
+        filename = os.path.join(out_dir, f"{filename_prefix}{current_time}.{file_ext}")
+
+        for index, feature in enumerate(m.draw_feature_collection_all["features"]):
+            feature_id = feature["id"]
+            if feature_id in m.draw_features:
+                m.draw_feature_collection_all["features"][index]["properties"] = (
+                    m.draw_features[feature_id]
+                )
+
+        gdf = gpd.GeoDataFrame.from_features(
+            m.draw_feature_collection_all, crs="EPSG:4326"
+        )
+        gdf.to_file(filename)
+        with output:
+
+            print(f"Exported: {filename}")
+
+    export.on_click(on_export_click)
+
+    def on_reset_click(b):
+        output.clear_output()
+        for prop_widget in prop_widgets.children:
+            description = prop_widget.description
+            if description in properties:
+                if isinstance(properties[description], list) or isinstance(
+                    properties[description], tuple
+                ):
+                    prop_widget.value = properties[description][0]
+                else:
+                    prop_widget.value = properties[description]
+
+    reset.on_click(on_reset_click)
+
+    sidebar_widget.children = [
+        prop_widgets,
+        widgets.HBox([save, export, reset]),
+        output,
+    ]
+
+    left_col_layout = v.Col(
+        cols=column_widths[0],
+        children=[m],
+        class_="pa-1",  # padding for consistent spacing
+    )
+    right_col_layout = v.Col(
+        cols=column_widths[1],
+        children=[sidebar_widget],
+        class_="pa-1",  # padding for consistent spacing
+    )
+    row1 = v.Row(
+        class_="d-flex flex-wrap",
+        children=[left_col_layout, right_col_layout],
+    )
+    main_widget = v.Col(children=[row1])
     return main_widget
 
 
