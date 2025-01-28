@@ -3940,6 +3940,7 @@ class Map(MapWidget):
         maxzoom: int = 14,
         sequence_lyr_name: str = "sequence",
         image_lyr_name: str = "image",
+        before_id: str = None,
         sequence_paint: dict = None,
         image_paint: dict = None,
         image_minzoom: int = 17,
@@ -3954,6 +3955,7 @@ class Map(MapWidget):
             maxzoom (int): Maximum zoom level for the Mapillary tiles. Defaults to 14.
             sequence_lyr_name (str): Name of the sequence layer. Defaults to "sequence".
             image_lyr_name (str): Name of the image layer. Defaults to "image".
+            before_id (str): The ID of an existing layer to insert the new layer before. Defaults to None.
             sequence_paint (dict, optional): Paint properties for the sequence layer. Defaults to None.
             image_paint (dict, optional): Paint properties for the image layer. Defaults to None.
             image_minzoom (int): Minimum zoom level for the image layer. Defaults to 17.
@@ -4014,9 +4016,8 @@ class Map(MapWidget):
             "minzoom": image_minzoom,
         }
 
-        first_symbol_id = self.find_first_symbol_layer()["id"]
-        self.add_layer(sequence_lyr, name=sequence_lyr_name, before_id=first_symbol_id)
-        self.add_layer(image_lyr, name=image_lyr_name, before_id=first_symbol_id)
+        self.add_layer(sequence_lyr, name=sequence_lyr_name, before_id=before_id)
+        self.add_layer(image_lyr, name=image_lyr_name, before_id=before_id)
         if add_popup:
             self.add_popup(sequence_lyr_name)
             self.add_popup(image_lyr_name)
@@ -4046,8 +4047,7 @@ class Map(MapWidget):
             radius (float): Search radius for Mapillary images. Defaults to 0.00005.
             bbox (Optional[Union[str, List[float]]]): Bounding box for the search. Defaults to None.
             image_id (Optional[str]): ID of the Mapillary image. Defaults to None.
-            style (str): Style of the Mapillary image. Defaults to "classic".
-            width (int): Width of the iframe. Defaults to 560.
+            style (str): Style of the Mapillary image. Can be "classic", "photo", and "split". Defaults to "classic".
             height (int): Height of the iframe. Defaults to 600.
             frame_border (int): Frame border of the iframe. Defaults to 0.
             link (bool): Whether to link the widget to map clicks. Defaults to True.
@@ -4061,9 +4061,11 @@ class Map(MapWidget):
 
         if image_id is None:
             if lon is None or lat is None:
-                if len(self.center) > 0:
-                    lon = self.center["lng"]
-                    lat = self.center["lat"]
+                if "center" in self.view_state:
+                    center = self.view_state
+                    if len(center) > 0:
+                        lon = center["lng"]
+                        lat = center["lat"]
                 else:
                     lon = 0
                     lat = 0
@@ -4096,6 +4098,8 @@ class Map(MapWidget):
                     </iframe>
                     """
                     widget.value = content
+                else:
+                    widget.value = "No Mapillary image found."
 
             self.observe(log_lng_lat, names="clicked")
 
@@ -5212,6 +5216,12 @@ def create_vector_data(
     out_dir: Optional[str] = None,
     filename_prefix: str = "",
     file_ext: str = "geojson",
+    add_mapillary: bool = False,
+    style: str = "photo",
+    radius: float = 0.00005,
+    width: int = 300,
+    height: int = 420,
+    frame_border: int = 0,
     **kwargs: Any,
 ) -> widgets.VBox:
     """Generates a widget-based interface for creating and managing vector data on a map.
@@ -5237,6 +5247,16 @@ def create_vector_data(
         filename_prefix (str, optional): A prefix to be added to the exported filename.
             Defaults to "".
         file_ext (str, optional): The file extension for the exported file. Defaults to "geojson".
+        add_mapillary (bool, optional): Whether to add a Mapillary image widget that displays the
+            nearest image to the clicked point on the map. Defaults to False.
+        style (str, optional): The style of the Mapillary image widget. Can be "classic", "photo",
+            or "split". Defaults to "photo".
+        radius (float, optional): The radius (in degrees) used to search for the nearest Mapillary
+            image. Defaults to 0.00005 degrees.
+        width (int, optional): The width of the Mapillary image widget. Defaults to 300.
+        height (int, optional): The height of the Mapillary image widget. Defaults to 420.
+        frame_border (int, optional): The width of the frame border for the Mapillary image widget.
+            Defaults to 0.
         **kwargs (Any): Additional keyword arguments that may be passed to the function.
 
     Returns:
@@ -5278,6 +5298,8 @@ def create_vector_data(
     sidebar_widget = widgets.VBox()
 
     prop_widgets = widgets.VBox()
+
+    image_widget = widgets.HTML()
 
     if isinstance(properties, dict):
         for key, values in properties.items():
@@ -5336,6 +5358,26 @@ def create_vector_data(
 
     m.observe(draw_change, names="draw_features_selected")
 
+    def log_lng_lat(lng_lat):
+        lon = lng_lat.new["lng"]
+        lat = lng_lat.new["lat"]
+        image_id = common.search_mapillary_images(lon, lat, radius=radius, limit=1)
+        if len(image_id) > 0:
+            content = f"""
+            <iframe
+                src="https://www.mapillary.com/embed?image_key={image_id[0]}&style={style}"
+                height="{height}"
+                width="{width}"
+                frameborder="{frame_border}">
+            </iframe>
+            """
+            image_widget.value = content
+        else:
+            image_widget.value = "No Mapillary image found."
+
+    if add_mapillary:
+        m.observe(log_lng_lat, names="clicked")
+
     button_layout = widgets.Layout(width="97px")
     save = widgets.Button(
         description="Save", button_style="primary", layout=button_layout
@@ -5349,6 +5391,7 @@ def create_vector_data(
 
     def on_save_click(b):
 
+        output.clear_output()
         if len(m.draw_features_selected) > 0:
             feature_id = m.draw_features_selected[0]["id"]
             for prop_widget in prop_widgets.children:
@@ -5400,6 +5443,7 @@ def create_vector_data(
         prop_widgets,
         widgets.HBox([save, export, reset]),
         output,
+        image_widget,
     ]
 
     left_col_layout = v.Col(
