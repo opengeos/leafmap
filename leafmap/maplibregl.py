@@ -4098,6 +4098,8 @@ class Map(MapWidget):
                     </iframe>
                     """
                     widget.value = content
+                else:
+                    widget.value = "No Mapillary image found."
 
             self.observe(log_lng_lat, names="clicked")
 
