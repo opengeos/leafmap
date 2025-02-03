@@ -1,5 +1,4 @@
-"""Module for dealing with the toolbar.
-"""
+"""Module for dealing with the toolbar."""
 
 import math
 import os
