@@ -1,5 +1,4 @@
-"""This module contains some common functions for both folium and ipyleaflet.
-"""
+"""This module contains some common functions for both folium and ipyleaflet."""
 
 import csv
 import json
@@ -6313,7 +6312,7 @@ def meters_to_lnglat(x, y):
 def bounds_to_xy_range(
     bounds: Union[
         List[Union[Tuple[float, float], float]], Tuple[float, float, float, float]
-    ]
+    ],
 ) -> Tuple[Tuple[float, float], Tuple[float, float]]:
     """
     Convert bounds to x and y range to be used as input to bokeh map.

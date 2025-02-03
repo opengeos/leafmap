@@ -1,6 +1,4 @@
-"""A module for Microsoft Planetary Computer (PC).
-
-"""
+"""A module for Microsoft Planetary Computer (PC)."""
 
 import json
 import os

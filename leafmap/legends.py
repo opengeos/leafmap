@@ -1,5 +1,4 @@
-"""Module of sample legends for some commonly used geospatial datasets.
-"""
+"""Module of sample legends for some commonly used geospatial datasets."""
 
 # Land Cover datasets in Earth Engine https://developers.google.com/earth-engine/datasets/tags/landcover
 builtin_legends = {
