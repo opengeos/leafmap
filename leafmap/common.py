@@ -13252,7 +13252,7 @@ def h5_to_gdf(
     return gdf
 
 
-def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> None:
+def nasa_data_login(strategy: str = "all", persist: bool = True, **kwargs) -> None:
     """Logs in to NASA Earthdata.
 
     Args:
@@ -13261,7 +13261,7 @@ def nasa_data_login(strategy: str = "all", persist: bool = False, **kwargs) -> N
             "interactive": enter username and password.
             "netrc": retrieve username and password from ~/.netrc.
             "environment": retrieve username and password from $EARTHDATA_USERNAME and $EARTHDATA_PASSWORD.
-        persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to False.
+        persist (bool, optional): Whether to persist credentials in a .netrc file. Defaults to True.
         **kwargs: Additional keyword arguments for the earthaccess.login() function.
     """
     try:
