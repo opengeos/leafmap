@@ -2381,7 +2381,7 @@ class Map(ipyleaflet.Map):
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
             source = common.array_to_image(source, **array_args)
 
-        tile_layer, tile_client = common.get_local_tile_layer(
+        tile_layer = common.get_local_tile_layer(
             source,
             indexes=indexes,
             colormap=colormap,
@@ -2392,10 +2392,11 @@ class Map(ipyleaflet.Map):
             attribution=attribution,
             layer_name=layer_name,
             client_args=client_args,
-            return_client=True,
+            return_client=False,
             **kwargs,
         )
         tile_layer.visible = visible
+        tile_client = tile_layer.tile_server
 
         self.add(tile_layer, index=layer_index)
         if zoom_to_layer:
@@ -2434,6 +2435,7 @@ class Map(ipyleaflet.Map):
             "type": "LOCAL",
         }
         self.cog_layer_dict[layer_name] = params
+        self.tile_client = tile_client
 
     add_local_tile = add_raster
 
