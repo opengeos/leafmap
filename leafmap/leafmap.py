@@ -2814,6 +2814,7 @@ class Map(ipyleaflet.Map):
                 style=style,
                 hover_style=hover_style,
                 name=layer_name,
+                **kwargs,
             )
         else:
             geojson = ipyleaflet.GeoJSON(
@@ -2822,6 +2823,7 @@ class Map(ipyleaflet.Map):
                 hover_style=hover_style,
                 name=layer_name,
                 style_callback=style_callback,
+                **kwargs,
             )
 
         if info_mode == "on_hover":
