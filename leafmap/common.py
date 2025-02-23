@@ -2951,11 +2951,6 @@ def get_local_tile_layer(
         else:
             layer_name = "LocalTile_" + random_string(3)
 
-    if isinstance(source, str) or isinstance(source, rasterio.io.DatasetReader):
-        tile_client = TileClient(source, port=port, debug=debug, **client_args)
-    else:
-        tile_client = source
-
     if nodata is None:
         nodata = get_api_key("NODATA")
         if isinstance(nodata, str):
@@ -2969,7 +2964,7 @@ def get_local_tile_layer(
         with output:
             if tile_format == "ipyleaflet":
                 tile_layer = get_leaflet_tile_layer(
-                    tile_client,
+                    source,
                     port=port,
                     debug=debug,
                     indexes=indexes,
@@ -2983,7 +2978,7 @@ def get_local_tile_layer(
                 )
             else:
                 tile_layer = get_folium_tile_layer(
-                    tile_client,
+                    source,
                     port=port,
                     debug=debug,
                     indexes=indexes,
@@ -2999,7 +2994,7 @@ def get_local_tile_layer(
     else:
         if tile_format == "ipyleaflet":
             tile_layer = get_leaflet_tile_layer(
-                tile_client,
+                source,
                 port=port,
                 debug=debug,
                 indexes=indexes,
@@ -3013,7 +3008,7 @@ def get_local_tile_layer(
             )
         else:
             tile_layer = get_folium_tile_layer(
-                tile_client,
+                source,
                 port=port,
                 debug=debug,
                 indexes=indexes,
@@ -3028,22 +3023,9 @@ def get_local_tile_layer(
             )
 
     if return_client:
-        return tile_layer, tile_client
+        return tile_layer, tile_layer.tile_server
     else:
         return tile_layer
-
-    # center = tile_client.center()
-    # bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
-    # bounds = (bounds[2], bounds[0], bounds[3], bounds[1])  # [minx, miny, maxx, maxy]
-
-    # if get_center and get_bounds:
-    #     return tile_layer, center, bounds
-    # elif get_center:
-    #     return tile_layer, center
-    # elif get_bounds:
-    #     return tile_layer, bounds
-    # else:
-    #     return tile_layer
 
 
 def get_palettable(types=None):
