@@ -1,6 +1,6 @@
 FROM jupyter/scipy-notebook:latest
 RUN mamba install -c conda-forge leafmap geopandas "localtileserver>=0.10.0" osmnx -y && \
-    pip install -U leafmap jsonschema==4.18.0 lonboard h5py && \
+    pip install -U leafmap jsonschema==4.18.0 jupyter-server-proxy==4.4.0 xarray lonboard h5py && \
     fix-permissions "${CONDA_DIR}" && \
     fix-permissions "/home/${NB_USER}"
 
@@ -11,6 +11,7 @@ COPY /examples/data ./examples/data
 COPY /examples/README.md ./examples/README.md
 
 ENV PROJ_LIB='/opt/conda/share/proj'
+ENV LOCALTILESERVER_CLIENT_PREFIX='proxy/{port}'
 
 USER root
 RUN chown -R ${NB_UID} ${HOME}
