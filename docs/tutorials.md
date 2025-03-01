@@ -116,6 +116,7 @@
 102. Mapping Overture Buildings and Foursquare Places with Leafmap + Fused ([notebook](https://leafmap.org/notebooks/102_fused))
 103. Applying a custom colormap to a raster dataset ([notebook](https://leafmap.org/notebooks/103_raster_colormap))
 104. Plotting point data with custom styles ([notebook](https://leafmap.org/notebooks/104_point_style))
+105. Visualizing vector data with time attributes ([notebook](https://leafmap.org/notebooks/105_vector_time_slider))
 
 ## Demo
 
