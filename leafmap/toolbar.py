@@ -7047,3 +7047,202 @@ def nasa_opera_gui(
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
+
+
+def time_slider_for_gdf(
+    m,
+    gdf: "gpd.GeoDataFrame",
+    time_columns: Optional[List[str]] = None,
+    labels: Optional[List[str]] = None,
+    time_interval: Optional[int] = 1,
+    position: Optional[str] = "bottomright",
+    slider_length: Optional[str] = "150px",
+    zoom_to_layer: Optional[bool] = False,
+    style: Optional[Dict] = None,
+    **kwargs,
+):
+    """Adds a time slider to the map for visualizing vector time series data.
+
+    Args:
+        m: The leafmap.Map object
+        gdf: The GeoDataFrame with time series data stored as color codes in columns
+        time_columns (list, optional): List of column names containing the time series data (e.g., dates)
+        labels (list, optional): The list of labels to be used for the time series. Defaults to time_columns.
+        time_interval (int, optional): Time interval in seconds. Defaults to 1.
+        position (str, optional): Position to place the time slider. Defaults to "bottomright".
+        slider_length (str, optional): Length of the time slider. Defaults to "150px".
+        zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
+        style (dict, optional): Base style for the GeoJSON layer. Defaults to None.
+    """
+    import time
+    import threading
+    import ipywidgets as widgets
+    from ipyleaflet import WidgetControl
+
+    # Set default style if not provided
+    if style is None:
+        style = {
+            "weight": 1,
+            "opacity": 1,
+            "fillOpacity": 1.0,
+        }
+
+    # Extract time columns if not provided
+    if time_columns is None:
+        # Assuming time columns are in YYYY-MM-DD format
+        time_columns = [
+            col
+            for col in gdf.columns
+            if isinstance(col, str)
+            and col.split("-")[0].isdigit()
+            and len(col.split("-")) == 3
+        ]
+        time_columns.sort()  # Sort chronologically
+
+    if len(time_columns) == 0:
+        raise ValueError("No time columns found in the GeoDataFrame")
+
+    # Use time_columns as labels if not provided
+    if labels is None:
+        labels = time_columns
+
+    if len(labels) != len(time_columns):
+        raise ValueError("The length of labels is not equal to that of time_columns")
+
+    # Add the GeoJSON layer to the map with the first time column
+    initial_style_callback = lambda feat: {
+        "fillColor": feat["properties"][time_columns[0]]
+    }
+
+    # Check if we already have a GeoJSON layer
+    geojson_layer = None
+    for layer in m.layers:
+        if hasattr(layer, "style_callback"):
+            geojson_layer = layer
+            break
+
+    # If no GeoJSON layer found, add one
+    if geojson_layer is None:
+        if hasattr(m, "add_gdf"):  # For leafmap
+            m.add_gdf(
+                gdf,
+                style=style,
+                style_callback=initial_style_callback,
+                zoom_to_layer=zoom_to_layer,
+                **kwargs,
+            )
+
+            # Get the added layer (usually the last one added)
+            for layer in reversed(m.layers):
+                if hasattr(layer, "style_callback"):
+                    geojson_layer = layer
+                    break
+        else:
+            raise ValueError("Map object must support add_gdf method")
+
+    # Create slider widget
+    slider = widgets.IntSlider(
+        min=1,
+        max=len(time_columns),
+        value=1,
+        readout=False,
+        continuous_update=False,
+        layout=widgets.Layout(width=slider_length),
+    )
+
+    # Create label widget
+    label = widgets.Label(
+        value=labels[0], layout=widgets.Layout(padding="0px 5px 0px 5px")
+    )
+
+    # Create control buttons
+    play_btn = widgets.Button(
+        icon="play",
+        tooltip="Play the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    pause_btn = widgets.Button(
+        icon="pause",
+        tooltip="Pause the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    close_btn = widgets.Button(
+        icon="times",
+        tooltip="Close the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width="32px"),
+    )
+
+    play_chk = widgets.Checkbox(value=False)
+
+    # Assemble widget
+    slider_widget = widgets.HBox([label, slider, play_btn, pause_btn, close_btn])
+
+    # Play button click handler
+    def play_click(b):
+        play_chk.value = True
+
+        def work(slider):
+            while play_chk.value:
+                if slider.value < len(time_columns):
+                    slider.value += 1
+                else:
+                    slider.value = 1
+                time.sleep(time_interval)
+
+        thread = threading.Thread(target=work, args=(slider,))
+        thread.start()
+
+    # Pause button click handler
+    def pause_click(b):
+        play_chk.value = False
+
+    play_btn.on_click(play_click)
+    pause_btn.on_click(pause_click)
+
+    # Slider change handler
+    def slider_changed(change):
+        m.default_style = {"cursor": "wait"}
+        index = slider.value - 1
+        current_column = time_columns[index]
+        label.value = labels[index]
+
+        # Update the style_callback to use the current time column
+        if geojson_layer is not None:
+            geojson_layer.style_callback = lambda feat: {
+                "fillColor": feat["properties"][current_column]
+            }
+            # geojson_layer.redraw()
+
+        m.default_style = {"cursor": "default"}
+
+    slider.observe(slider_changed, "value")
+
+    # Close button click handler
+    def close_click(b):
+        play_chk.value = False
+
+        if hasattr(m, "toolbar_reset"):
+            m.toolbar_reset()
+
+        if (
+            hasattr(m, "slider_ctrl")
+            and m.slider_ctrl is not None
+            and m.slider_ctrl in m.controls
+        ):
+            m.remove_control(m.slider_ctrl)
+
+        slider_widget.close()
+
+    close_btn.on_click(close_click)
+
+    # Add the control to the map
+    slider_ctrl = WidgetControl(widget=slider_widget, position=position)
+    m.add_control(slider_ctrl)
+    m.slider_ctrl = slider_ctrl  # Store reference to the control
+
+    return geojson_layer
