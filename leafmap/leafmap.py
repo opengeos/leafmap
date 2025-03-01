@@ -2936,6 +2936,33 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
+    def add_gdf_time_slider(
+        self,
+        gdf: "gpd.GeoDataFrame",
+        time_columns: Optional[List[str]] = None,
+        labels: Optional[List[str]] = None,
+        time_interval: Optional[int] = 1,
+        position: Optional[str] = "bottomright",
+        slider_length: Optional[str] = "150px",
+        zoom_to_layer: Optional[bool] = False,
+        style: Optional[Dict] = None,
+        **kwargs,
+    ):
+        from .toolbar import time_slider_for_gdf
+
+        time_slider_for_gdf(
+            self,
+            gdf,
+            time_columns,
+            labels,
+            time_interval,
+            position,
+            slider_length,
+            zoom_to_layer,
+            style,
+            **kwargs,
+        )
+
     def add_gdf_from_postgis(
         self,
         sql: str,
