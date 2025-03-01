@@ -15678,3 +15678,204 @@ def write_image_colormap(image, colormap, output_path=None):
         dst.write_colormap(1, colormap)
 
     return output_path
+
+
+def color_code_dataframe(
+    data: Union[str, pd.DataFrame, "gpd.GeoDataFrame"], legend_dict: Dict[str, str]
+) -> Union[pd.DataFrame, "gpd.GeoDataFrame"]:
+    """Converts values in a dataframe to color codes based on a legend dictionary.
+
+    This function takes a dataframe (or path to a dataframe) and a legend dictionary
+    and returns a new dataframe with values replaced by their corresponding color codes.
+    It supports both numeric range legends and categorical legends.
+
+    Args:
+        data: Input data source, can be:
+            - Path to a CSV file or geospatial file
+            - pandas DataFrame
+            - geopandas GeoDataFrame
+        legend_dict: Dictionary mapping values to colors, can be:
+            - Numeric ranges ("[ 100000, 200000]") mapped to color codes
+            - Categorical values ("low", "medium") mapped to color codes
+            - Can include a "Nodata" key for None/NaN values
+
+    Returns:
+        A new dataframe with values replaced by color codes, preserving the
+        input data type (DataFrame or GeoDataFrame)
+
+    Raises:
+        TypeError: If the input data type is not supported
+        ValueError: If the file format is not supported
+
+    Examples:
+        >>> # Example with numeric ranges
+        >>> range_legend = {
+        ...     "[ 0, 200000]": "#daeaf6",
+        ...     "(200001, 400000]": "#9ecae1",
+        ...     "Nodata": "#f0f0f0"
+        ... }
+        >>> color_df = color_code_dataframe("housing_data.csv", range_legend)
+
+        >>> # Example with categorical values
+        >>> cat_legend = {
+        ...     "low": "#daeaf6",
+        ...     "medium": "#9ecae1",
+        ...     "high": "#2171b5",
+        ...     "Nodata": "#f0f0f0"
+        ... }
+        >>> df = pd.DataFrame({"Risk": ["low", "medium", "high", None]})
+        >>> color_df = color_code_dataframe(df, cat_legend)
+    """
+    import re
+
+    # Handle different input types
+    if isinstance(data, str):
+        # Input is a path to a file
+        path = Path(data)
+        if path.suffix.lower() == ".csv":
+            df = pd.read_csv(data)
+        elif path.suffix.lower() in [".geojson", ".shp"]:
+            df = gpd.read_file(data)
+        else:
+            raise ValueError(f"Unsupported file format: {path.suffix}")
+    elif isinstance(data, pd.DataFrame):
+        # Input is already a pandas DataFrame
+        df = data.copy()
+    elif isinstance(data, gpd.GeoDataFrame):
+        # Input is a GeoDataFrame
+        df = data.copy()
+    else:
+        raise TypeError("Input must be a file path, pandas DataFrame, or GeoDataFrame")
+
+    # Determine legend type: numeric ranges or categorical
+    # Exclude "Nodata" key from this check
+    legend_without_nodata = {
+        k: v
+        for k, v in legend_dict.items()
+        if k != "Nodata" and not isinstance(k, str) or k.lower() != "nodata"
+    }
+    is_range_legend = any(
+        "[" in key or "(" in key for key in legend_without_nodata.keys()
+    )
+
+    # Get the "Nodata" color if provided
+    nodata_keys = ["Nodata", "nodata", "NODATA", "NoData"]
+    nodata_color = None
+    for key in nodata_keys:
+        if key in legend_dict:
+            nodata_color = legend_dict[key]
+            break
+
+    # Function to get color based on numeric value and range legend
+    def get_color_for_numeric(value: Any) -> Optional[str]:
+        """Maps a numeric value to a color based on the range legend.
+
+        Args:
+            value: The value to map to a color
+
+        Returns:
+            The corresponding color code or None if no match is found
+        """
+        if pd.isna(value) or value is None:
+            return nodata_color
+
+        if not isinstance(value, (int, float)):
+            return nodata_color
+
+        for range_str, color in legend_dict.items():
+            # Skip the Nodata entry
+            if isinstance(range_str, str) and range_str.lower() == "nodata":
+                continue
+
+            # Parse the range string like "[ 182913, 357522]" or "( 357522, 415584]"
+            match = re.search(r"[\[\(]\s*(\d+),\s*(\d+)[\]\)]", range_str)
+            if not match:
+                continue
+
+            lower_bound = int(match.group(1))
+            upper_bound = int(match.group(2))
+            lower_inclusive = range_str.startswith("[")
+            upper_inclusive = range_str.endswith("]")
+
+            # Check if the value is within the range
+            above_lower = (
+                value >= lower_bound if lower_inclusive else value > lower_bound
+            )
+            below_upper = (
+                value <= upper_bound if upper_inclusive else value < upper_bound
+            )
+
+            if above_lower and below_upper:
+                return color
+
+        return None
+
+    # Function to get color based on categorical value
+    def get_color_for_categorical(value: Any) -> Optional[str]:
+        """Maps a categorical value to a color.
+
+        Args:
+            value: The value to map to a color
+
+        Returns:
+            The corresponding color code or None if no match is found
+        """
+        if pd.isna(value) or value is None:
+            return nodata_color
+
+        # Convert to string for comparison
+        str_value = str(value).lower()
+
+        # Try direct matching
+        if str_value in legend_dict:
+            return legend_dict[str_value]
+
+        # Try case-insensitive matching
+        for cat, color in legend_dict.items():
+            if isinstance(cat, str) and cat.lower() == "nodata":
+                continue
+
+            if isinstance(cat, str) and cat.lower() == str_value:
+                return color
+
+        return None
+
+    # Select appropriate color mapping function
+    get_color = get_color_for_numeric if is_range_legend else get_color_for_categorical
+
+    # Identify columns to process
+    if is_range_legend:
+        # For numeric ranges, look for numeric columns and date-formatted columns
+        columns_to_process: List[str] = []
+        for col in df.columns:
+            # Check if column name matches date pattern
+            if isinstance(col, str) and re.match(r"^\d{4}-\d{2}-\d{2}$", col):
+                columns_to_process.append(col)
+                continue
+
+            # Check if column contains numbers
+            if pd.api.types.is_numeric_dtype(df[col]):
+                # Exclude columns that are likely IDs or categorical codes
+                if not (
+                    col.lower().endswith("id")
+                    or "code" in col.lower()
+                    or "fips" in col.lower()
+                ):
+                    columns_to_process.append(col)
+    else:
+        # For categorical legend, look for object or category columns
+        columns_to_process: List[str] = []
+        for col in df.columns:
+            if pd.api.types.is_object_dtype(
+                df[col]
+            ) or pd.api.types.is_categorical_dtype(df[col]):
+                columns_to_process.append(col)
+            # Also check if numeric columns might contain discrete categories
+            elif pd.api.types.is_numeric_dtype(df[col]) and df[col].nunique() < 10:
+                columns_to_process.append(col)
+
+    # Replace each value with its corresponding color
+    for col in columns_to_process:
+        df[col] = df[col].apply(get_color)
+
+    return df
