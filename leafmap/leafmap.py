@@ -6291,7 +6291,7 @@ def ts_inspector(
 
 def geojson_layer(
     in_geojson: Union[str, Dict],
-    layer_name: Optional[str] = "Untitled",
+    layer_name: Optional[str] = "GeoJSON",
     style: Optional[dict] = {},
     hover_style: Optional[dict] = {},
     style_callback: Optional[Callable] = None,
@@ -6305,7 +6305,7 @@ def geojson_layer(
         in_geojson (str | dict): The file path or http URL to the input
             GeoJSON or a dictionary containing the geojson.
         layer_name (str, optional): The layer name to be used.. Defaults to
-            "Untitled".
+            "GeoJSON".
         style (dict, optional): A dictionary specifying the style to be used.
             Defaults to {}.
         hover_style (dict, optional): Hover style dictionary. Defaults to {}.
