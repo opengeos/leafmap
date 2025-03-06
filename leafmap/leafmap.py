@@ -1527,6 +1527,8 @@ class Map(ipyleaflet.Map):
             widget_layout (dict, optional): The layout for the widget. Defaults to None.
             draggable (bool, optional): Whether the split map is draggable. Defaults to True.
         """
+        import geopandas as gpd
+
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 30
         if "max_native_zoom" not in left_args:
@@ -1627,6 +1629,13 @@ class Map(ipyleaflet.Map):
                     return_client=True,
                     **left_args,
                 )
+            elif isinstance(left_layer, gpd.GeoDataFrame):
+                left_layer = left_layer.to_crs("EPSG:4326").__geo_interface__
+                if "max_zoom" in left_args:
+                    del left_args["max_zoom"]
+                if "max_native_zoom" in left_args:
+                    del left_args["max_native_zoom"]
+                left_layer = geojson_layer(left_layer, **left_args)
             else:
                 raise ValueError(
                     f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
@@ -1700,6 +1709,13 @@ class Map(ipyleaflet.Map):
                     return_client=True,
                     **right_args,
                 )
+            elif isinstance(right_layer, gpd.GeoDataFrame):
+                right_layer = right_layer.to_crs("EPSG:4326").__geo_interface__
+                if "max_zoom" in right_args:
+                    del right_args["max_zoom"]
+                if "max_native_zoom" in right_args:
+                    del right_args["max_native_zoom"]
+                right_layer = geojson_layer(right_layer, **right_args)
             else:
                 raise ValueError(
                     f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
@@ -2677,9 +2693,9 @@ class Map(ipyleaflet.Map):
             raise Exception(e)
 
         if gdf.crs is None:
-            print(
-                f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326."
-            )
+            # print(
+            #     f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326."
+            # )
             gdf.crs = "EPSG:4326"
         elif gdf.crs != "EPSG:4326":
             gdf = gdf.to_crs("EPSG:4326")
@@ -6362,7 +6378,7 @@ def geojson_layer(
         raise Exception(e)
 
     if gdf.crs is None:
-        print(f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326.")
+        # print(f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326.")
         gdf.crs = "EPSG:4326"
     elif gdf.crs != "EPSG:4326":
         gdf = gdf.to_crs("EPSG:4326")
