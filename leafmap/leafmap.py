@@ -6290,82 +6290,123 @@ def ts_inspector(
 
 
 def geojson_layer(
-    in_geojson: Union[str, dict],
-    layer_name: str = "Untitled",
+    in_geojson: Union[str, Dict],
+    layer_name: Optional[str] = "Untitled",
     style: Optional[dict] = {},
     hover_style: Optional[dict] = {},
     style_callback: Optional[Callable] = None,
     fill_colors: Optional[list[str]] = None,
     encoding: Optional[str] = "utf-8",
+    **kwargs,
 ) -> None:
     """Adds a GeoJSON file to the map.
 
     Args:
-        in_geojson (str | dict): The file path or http URL to the input GeoJSON
-            or a dictionary containing the geojson.
-        layer_name (str, optional): The layer name to be used.. Defaults to "Untitled".
-        style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+        in_geojson (str | dict): The file path or http URL to the input
+            GeoJSON or a dictionary containing the geojson.
+        layer_name (str, optional): The layer name to be used.. Defaults to
+            "Untitled".
+        style (dict, optional): A dictionary specifying the style to be used.
+            Defaults to {}.
         hover_style (dict, optional): Hover style dictionary. Defaults to {}.
-        style_callback (function, optional): Styling function that is called for
-            each feature, and should return the feature style. This styling
-            function takes the feature as argument. Defaults to None.
-        fill_colors (list, optional): The random colors to use for filling polygons.
-            Defaults to ["black"].
-        info_mode (str, optional): Displays the attributes by either on_hover or
-            on_click. Any value other than "on_hover" or "on_click" will be
-            treated as None. Defaults to "on_hover".
-        encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+        style_callback (function, optional): Styling function that is called
+            for each feature, and should return the feature style. This
+            styling function takes the feature as argument. Defaults to None.
+        fill_colors (list, optional): The random colors to use for filling
+            polygons. Defaults to ["black"].
+        info_mode (str, optional): Displays the attributes by either on_hover
+            or on_click. Any value other than "on_hover" or "on_click" will
+            be treated as None. Defaults to "on_hover".
+        zoom_to_layer (bool, optional): Whether to zoom to the layer after
+            adding it to the map. Defaults to False.
+        encoding (str, optional): The encoding of the GeoJSON file. Defaults
+            to "utf-8".
 
     Raises:
         FileNotFoundError: The provided GeoJSON file could not be found.
     """
+    import shutil
     import json
     import random
-    import requests
+    import geopandas as gpd
 
-    style_callback_only = False
-
-    if len(style) == 0 and style_callback is not None:
-        style_callback_only = True
+    gdf = None
 
     try:
         if isinstance(in_geojson, str):
             if in_geojson.startswith("http"):
-                in_geojson = common.github_raw_url(in_geojson)
-                data = requests.get(in_geojson).json()
-            else:
-                in_geojson = os.path.abspath(in_geojson)
-                if not os.path.exists(in_geojson):
-                    raise FileNotFoundError(
-                        "The provided GeoJSON file could not be found."
-                    )
+                if common.is_jupyterlite():
+                    import pyodide  # pylint: disable=E0401
 
-                with open(in_geojson, encoding=encoding) as f:
-                    data = json.load(f)
+                    output = os.path.basename(in_geojson)
+
+                    output = os.path.abspath(output)
+                    obj = pyodide.http.open_url(in_geojson)
+                    with open(output, "w") as fd:
+                        shutil.copyfileobj(obj, fd)
+                    with open(output, "r") as fd:
+                        data = json.load(fd)
+                else:
+                    gdf = gpd.read_file(in_geojson, encoding=encoding)
+
+            else:
+                gdf = gpd.read_file(in_geojson, encoding=encoding)
+
         elif isinstance(in_geojson, dict):
-            data = in_geojson
+            gdf = gpd.GeoDataFrame.from_features(in_geojson)
+        elif isinstance(in_geojson, gpd.GeoDataFrame):
+            gdf = in_geojson
         else:
             raise TypeError("The input geojson must be a type of str or dict.")
     except Exception as e:
         raise Exception(e)
 
-    if not style:
+    if gdf.crs is None:
+        print(f"Warning: The dataset does not have a CRS defined. Assuming EPSG:4326.")
+        gdf.crs = "EPSG:4326"
+    elif gdf.crs != "EPSG:4326":
+        gdf = gdf.to_crs("EPSG:4326")
+    data = gdf.__geo_interface__
+
+    try:
+        first_feature = data["features"][0]
+        if isinstance(first_feature["properties"].get("style"), str):
+            # Loop through the features and update the style
+            for feature in data["features"]:
+                fstyle = feature["properties"].get("style")
+                if isinstance(fstyle, str):
+                    feature["properties"]["style"] = json.loads(fstyle)
+    except Exception as e:
+        print(e)
+        pass
+
+    geom_type = gdf.reset_index().geom_type[0]
+
+    if style is None and (style_callback is None):
         style = {
             # "stroke": True,
-            "color": "#000000",
-            "weight": 1,
+            "color": "#3388ff",
+            "weight": 2,
             "opacity": 1,
-            # "fill": True,
-            # "fillColor": "#ffffff",
-            "fillOpacity": 0.1,
+            "fill": True,
+            "fillColor": "#3388ff",
+            "fillOpacity": 0.2,
             # "dashArray": "9"
             # "clickable": True,
         }
+
+        if geom_type in ["LineString", "MultiLineString"]:
+            style["fill"] = False
+
     elif "weight" not in style:
         style["weight"] = 1
 
     if not hover_style:
-        hover_style = {"weight": style["weight"] + 1, "fillOpacity": 0.5}
+        hover_style = {
+            "weight": style["weight"] + 2,
+            "fillOpacity": 0,
+            "color": "yellow",
+        }
 
     def random_color(feature):
         return {
@@ -6373,23 +6414,25 @@ def geojson_layer(
             "fillColor": random.choice(fill_colors),
         }
 
-    if style_callback is None:
+    if fill_colors is not None:
         style_callback = random_color
 
-    if style_callback_only:
+    if style_callback is None:
         geojson = ipyleaflet.GeoJSON(
             data=data,
+            style=style,
             hover_style=hover_style,
-            style_callback=style_callback,
             name=layer_name,
+            **kwargs,
         )
     else:
         geojson = ipyleaflet.GeoJSON(
             data=data,
             style=style,
             hover_style=hover_style,
-            style_callback=style_callback,
             name=layer_name,
+            style_callback=style_callback,
+            **kwargs,
         )
 
     return geojson
