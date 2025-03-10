@@ -39,7 +39,15 @@ theme:
 
 plugins:
     - search
-    - mkdocstrings
+    - mkdocstrings:
+          handlers:
+              python:
+                  selection:
+                      docstring_style: google
+                  rendering:
+                      show_root_heading: true
+                      show_source: false
+
     - git-revision-date
     - git-revision-date-localized:
           enable_creation_date: true
