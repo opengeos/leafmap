@@ -3056,7 +3056,7 @@ class Map(MapWidget):
 
         Args:
             release (Optional[str], optional): The release date of the Overture Maps data.
-                Defaults to "2024-10-23". For more info, see
+                Defaults to the latest release. For more info, see
                 https://github.com/OvertureMaps/overture-tiles.
             style (Optional[Dict[str, Any]], optional): The style dictionary for
                 the buildings. Defaults to None.

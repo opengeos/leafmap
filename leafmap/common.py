@@ -15881,9 +15881,12 @@ def color_code_dataframe(
     return df
 
 
-def get_overture_latest_release():
+def get_overture_latest_release(patch=False) -> str:
     """
     Retrieves the value of the 'latest' key from the Overture Maps release JSON file.
+
+    Args:
+        patch (bool): If True, returns the full version string (e.g., "2025-02-19.0").
 
     Returns:
         str: The value of the 'latest' key from the releases.json file.
@@ -15900,7 +15903,12 @@ def get_overture_latest_release():
         response.raise_for_status()  # Raise an exception for HTTP errors
 
         data = response.json()
-        latest_release = data.get("latest")
+        if patch:
+            latest_release = data.get("latest")
+        else:
+            latest_release = data.get("latest").split(".")[
+                0
+            ]  # Extract the version number
 
         if latest_release is None:
             raise KeyError("The 'latest' key was not found in the releases.json file")
