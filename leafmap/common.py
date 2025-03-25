@@ -15884,29 +15884,29 @@ def color_code_dataframe(
 def get_overture_latest_release():
     """
     Retrieves the value of the 'latest' key from the Overture Maps release JSON file.
-    
+
     Returns:
         str: The value of the 'latest' key from the releases.json file.
-        
+
     Raises:
         requests.RequestException: If there's an issue with the HTTP request.
         KeyError: If the 'latest' key is not found in the JSON data.
         json.JSONDecodeError: If the response cannot be parsed as JSON.
     """
     url = "https://labs.overturemaps.org/data/releases.json"
-    
+
     try:
         response = requests.get(url)
         response.raise_for_status()  # Raise an exception for HTTP errors
-        
+
         data = response.json()
         latest_release = data.get("latest")
-        
+
         if latest_release is None:
             raise KeyError("The 'latest' key was not found in the releases.json file")
-            
+
         return latest_release
-        
+
     except requests.RequestException as e:
         print(f"Error making the request: {e}")
         raise
