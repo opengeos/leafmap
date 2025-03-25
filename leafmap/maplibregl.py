@@ -3041,7 +3041,7 @@ class Map(MapWidget):
 
     def add_overture_3d_buildings(
         self,
-        release: Optional[str] = "2024-10-23",
+        release: Optional[str] = None,
         style: Optional[Dict[str, Any]] = None,
         values: Optional[List[int]] = None,
         colors: Optional[List[str]] = None,
@@ -3056,7 +3056,7 @@ class Map(MapWidget):
 
         Args:
             release (Optional[str], optional): The release date of the Overture Maps data.
-                Defaults to "2024-10-23". For more info, see
+                Defaults to the latest release. For more info, see
                 https://github.com/OvertureMaps/overture-tiles.
             style (Optional[Dict[str, Any]], optional): The style dictionary for
                 the buildings. Defaults to None.
@@ -3078,6 +3078,10 @@ class Map(MapWidget):
         Raises:
             ValueError: If the length of values and colors lists are not the same.
         """
+
+        if release is None:
+            release = common.get_overture_latest_release()
+
         url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
 
         if template == "simple":
@@ -3156,7 +3160,7 @@ class Map(MapWidget):
 
     def add_overture_data(
         self,
-        release: str = "2024-12-18",
+        release: str = None,
         theme: str = "buildings",
         style: Optional[Dict[str, Any]] = None,
         visible: bool = True,
@@ -3186,6 +3190,8 @@ class Map(MapWidget):
         Raises:
             ValueError: If the theme is not one of the allowed themes.
         """
+        if release is None:
+            release = common.get_overture_latest_release()
 
         allowed_themes = [
             "addresses",
@@ -3398,7 +3404,7 @@ class Map(MapWidget):
 
     def add_overture_buildings(
         self,
-        release: str = "2024-12-18",
+        release: str = None,
         style: Optional[Dict[str, Any]] = None,
         type: str = "line",
         visible: bool = True,
@@ -3423,6 +3429,9 @@ class Map(MapWidget):
                 data layer. Defaults to False.
             **kwargs (Any): Additional keyword arguments for the paint properties.
         """
+        if release is None:
+            release = common.get_overture_latest_release()
+
         url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
 
         kwargs = common.replace_underscores_in_keys(kwargs)
