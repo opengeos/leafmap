@@ -3160,7 +3160,7 @@ class Map(MapWidget):
 
     def add_overture_data(
         self,
-        release: str = "2024-12-18",
+        release: str = None,
         theme: str = "buildings",
         style: Optional[Dict[str, Any]] = None,
         visible: bool = True,
@@ -3190,6 +3190,8 @@ class Map(MapWidget):
         Raises:
             ValueError: If the theme is not one of the allowed themes.
         """
+        if release is None:
+            release = common.get_overture_latest_release()
 
         allowed_themes = [
             "addresses",
