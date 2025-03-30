@@ -12757,6 +12757,114 @@ def get_vector_column_names(input_vector, db_con=None):
     return [desc[0] for desc in db_con.description]
 
 
+def get_parquet_geometry_column(input_parquet: str, db_con=None) -> str:
+    """
+    Retrieves the geometry column name from a Parquet file.
+
+    This function checks for the presence of a geometry column in the input Parquet file.
+    It looks for columns named "geometry" or "geom" and returns the first match.
+
+    Args:
+        input_parquet (str): The path to the input Parquet file.
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+
+    Returns:
+        str: The name of the geometry column ("geometry" or "geom").
+
+    Raises:
+        ValueError: If no recognized geometry column is found in the input Parquet file.
+
+    Example:
+        >>> geometry_column = get_parquet_geometry_column("data.parquet")
+        >>> print(geometry_column)
+        "geometry"
+    """
+    column_names = get_vector_column_names(input_parquet, db_con=db_con)
+    if "geometry" in column_names:
+        return "geometry"
+    elif "geom" in column_names:
+        return "geom"
+    else:
+        raise ValueError(
+            f"The input vector file does not contain a recognized geometry column. "
+            f"Available columns: {column_names}. Please ensure the vector file has a 'geometry' or 'geom' column."
+        )
+
+
+def get_vector_metadata(input_vector, db_con=None):
+    """
+    Retrieves metadata for a vector file.
+
+    This function uses DuckDB with the spatial extension to extract metadata
+    about the layers in the input vector file.
+
+    Args:
+        input_vector (str): The path to the input vector file.
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+
+    Returns:
+        dict: A dictionary containing metadata about the vector file.
+
+    Raises:
+        ValueError: If the input vector file does not exist.
+
+    Example:
+        >>> metadata = get_vector_metadata("data.gpkg")
+        >>> print(metadata)
+        {'geometry_fields': [{'name': 'geom', 'crs': {'auth_name': 'EPSG', 'auth_code': '4326'}}], ...}
+    """
+    import duckdb
+
+    if db_con is None:
+        db_con = duckdb.connect()
+
+    db_con.execute("INSTALL spatial;")
+    db_con.execute("LOAD spatial;")
+
+    if not os.path.exists(input_vector):
+        raise ValueError(f"Input vector file does not exist: {input_vector}")
+
+    query = f"SELECT * FROM ST_Read_Meta('{input_vector}')"
+    df = db_con.execute(query).fetch_df()
+    meta = df["layers"][0][0]
+    return meta
+
+
+def get_vector_crs(input_vector, db_con=None, return_epsg=False):
+    """
+    Retrieves the Coordinate Reference System (CRS) of a vector file.
+
+    This function extracts the CRS information from the metadata of the input vector file.
+
+    Args:
+        input_vector (str): The path to the input vector file.
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+        return_epsg (bool): Whether to return the EPSG code of the CRS. Defaults to False.
+
+    Returns:
+        Union[dict, int]: The CRS information as a dictionary or the EPSG code as an integer.
+
+    Raises:
+        ValueError: If the CRS information is not available in the input vector file.
+
+    Example:
+        >>> crs = get_vector_crs("data.gpkg", return_epsg=True)
+        >>> print(crs)
+        4326
+    """
+    metadata = get_vector_metadata(input_vector, db_con=db_con)
+    crs = metadata["geometry_fields"][0]["crs"]
+    if return_epsg:
+        if crs["auth_name"] == "EPSG" and len(crs["auth_code"]) > 0:
+            return int(crs["auth_code"])  # Return the EPSG code if available
+        else:
+            raise ValueError(
+                f"CRS information is not available in the input vector file: {input_vector}. "
+            )
+    else:
+        return crs
+
+
 def split_parquet_by_geometries(
     input_parquet,
     output_dir,
@@ -12851,6 +12959,7 @@ def split_parquet_by_geometries(
 
         con.execute(query)
 
+    con.close()
     print("Done!")
 
 
@@ -12872,31 +12981,25 @@ def parquet_to_gdf(
     db_con.execute("INSTALL spatial;")
     db_con.execute("LOAD spatial;")
 
-    column_names = get_vector_column_names(input_parquet, db_con=db_con)
-    geometry = "geometry"
-    if "geometry" not in column_names:
-        if "geom" in column_names:
-            geometry = "geom"  # Fallback to geom if geometry is not available
-        else:
-            raise ValueError(
-                f"The input Parquet file does not contain a geometry column. Available columns: {column_names}"
-            )
+    geometry = get_parquet_geometry_column(input_parquet, db_con=db_con)
+    geom_sql = f"ST_AsText(ST_GeomFromWKB(ST_AsWKB({geometry}))) AS {geometry}"
 
     if columns is None:
-        columns = column_names
-        columns.remove(geometry)  # Remove geometry from the list of columns to select
+        columns = "*"
 
     if isinstance(columns, list):
         # Join the columns into a string for SQL query
-        columns = ", ".join([col for col in column_names if col != geometry])
+        columns = ", ".join([col for col in columns])
+        sql = f"SELECT {columns}, {geom_sql} FROM '{input_parquet}'"
+    else:
 
-    geom_sql = f"ST_AsText(ST_GeomFromWKB(ST_AsWKB({geometry}))) AS {geometry}"
-    sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{input_parquet}'"
+        sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{input_parquet}'"
     if limit is not None:
         sql += f" LIMIT {limit}"
 
-    df = db_con.sql(sql, **kwargs).df()
-    gdf = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs)
+    df = db_con.sql(sql).df()
+    gdf = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs, **kwargs)
+    db_con.close()
     return gdf
 
 
