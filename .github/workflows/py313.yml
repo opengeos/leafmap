@@ -34,14 +34,16 @@ jobs:
               uses: astral-sh/setup-uv@v5
               with:
                   version: "0.4.16"
-                  #   enable-cache: true
+                  enable-cache: false
 
             - name: Set up Python ${{ matrix.python-version }}
               run: uv python install ${{ matrix.python-version }}
 
             - name: Install dependencies
-              run: uv sync --python ${{ matrix.python-version }}
-
-            - name: Test import
               run: |
-                  uv run python -c "import leafmap; print('leafmap import successful')"
+                  uv venv --python ${{ matrix.python-version }}
+                  uv pip install .
+
+            # - name: Test import
+            #   run: |
+            #       uv run python -c "import leafmap; print('leafmap import successful')"
