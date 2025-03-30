@@ -12330,6 +12330,679 @@ def vector_to_parquet(
     gdf.to_parquet(output, **kwargs)
 
 
+def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs):
+    """
+    Converts all vector files in a directory to Parquet format in batch.
+
+    Args:
+        input_dir (str): The directory containing the input vector files.
+        output_dir (str, optional): The directory to save the converted Parquet files.
+            If not provided, the input directory will be used. Defaults to None.
+        file_ext (str): The file extension of the input vector files (e.g., ".geojson"). Defaults to ".geojson".
+        **kwargs: Additional keyword arguments to be passed to the glob.glob function for file matching.
+
+    Returns:
+        None
+
+    Example:
+        >>> vector_to_parquet_batch("input_directory", "output_directory", ".geojson")
+    """
+    import glob
+    import duckdb
+
+    # Set output directory
+    if output_dir is None:
+        output_dir = input_dir
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Initialize DuckDB connection
+    conn = duckdb.connect(database=":memory:")
+
+    # Install and load required extensions
+    conn.execute("INSTALL spatial")
+    conn.execute("LOAD spatial")
+
+    # Get all GeoJSON files in the input directory
+    files = glob.glob(os.path.join(input_dir, f"*.{file_ext.lstrip('.')}"), **kwargs)
+
+    # Process each file
+    for index, file in enumerate(files):
+        # Get base filename without extension
+        base_name = os.path.basename(file)
+        file_name_without_ext = os.path.splitext(base_name)[0]
+
+        # Define output path
+        parquet_file = os.path.join(output_dir, f"{file_name_without_ext}.parquet")
+
+        print(f"Converting {index + 1}/{len(files)}: {base_name} to Parquet...")
+
+        try:
+            # Execute the conversion
+            conn.execute(
+                f"""
+                COPY (
+                    SELECT * FROM ST_Read('{file}')
+                ) TO '{parquet_file}' (FORMAT PARQUET)
+            """
+            )
+        except Exception as e:
+            print(f"Error converting {base_name}: {str(e)}")
+
+    # Close connection
+    conn.close()
+    print("All conversions complete!")
+
+
+def vector_to_gpkg_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs):
+    """
+    Converts all vector files in a directory to GeoPackage format in batch.
+
+    Args:
+        input_dir (str): The directory containing the input vector files.
+        output_dir (str, optional): The directory to save the converted GeoPackage files.
+            If not provided, the input directory will be used. Defaults to None.
+        file_ext (str): The file extension of the input vector files (e.g., ".geojson"). Defaults to ".geojson".
+        **kwargs: Additional keyword arguments to be passed to the glob.glob function for file matching.
+
+    Returns:
+        None
+
+    Example:
+        >>> vector_to_gpkg_batch("input_directory", "output_directory", ".geojson")
+    """
+    import glob
+    import duckdb
+
+    # Set output directory
+    if output_dir is None:
+        output_dir = input_dir
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Initialize DuckDB connection
+    conn = duckdb.connect(database=":memory:")
+
+    # Install and load required extensions
+    conn.execute("INSTALL spatial")
+    conn.execute("LOAD spatial")
+
+    # Get all GeoJSON files in the input directory
+    files = glob.glob(os.path.join(input_dir, f"*.{file_ext.lstrip('.')}"), **kwargs)
+
+    # Process each file
+    for index, file in enumerate(files):
+        # Get base filename without extension
+        base_name = os.path.basename(file)
+        file_name_without_ext = os.path.splitext(base_name)[0]
+
+        # Define output path
+        gpkg_file = os.path.join(output_dir, f"{file_name_without_ext}.gpkg")
+
+        print(f"Converting {index + 1}/{len(files)}: {base_name} to GeoPackage...")
+
+        try:
+            # Execute the conversion
+            conn.execute(
+                f"""
+                COPY (
+                    SELECT * FROM ST_Read('{file}')
+                ) TO '{gpkg_file}' (FORMAT GDAL, DRIVER 'GPKG')
+            """
+            )
+        except Exception as e:
+            print(f"Error converting {base_name}: {str(e)}")
+
+    # Close connection
+    conn.close()
+    print("All conversions complete!")
+
+
+def vector_to_geojson_batch(input_dir, output_dir=None, file_ext=".shp", **kwargs):
+    """
+    Converts all vector files in a directory to GeoJSON format in batch.
+
+    Args:
+        input_dir (str): The directory containing the input vector files.
+        output_dir (str, optional): The directory to save the converted GeoPackage files.
+            If not provided, the input directory will be used. Defaults to None.
+        file_ext (str): The file extension of the input vector files (e.g., ".shp"). Defaults to ".shp".
+        **kwargs: Additional keyword arguments to be passed to the glob.glob function for file matching.
+
+    Returns:
+        None
+
+    Example:
+        >>> vector_to_geojson_batch("input_directory", "output_directory", ".shp")
+    """
+    import glob
+    import duckdb
+
+    # Set output directory
+    if output_dir is None:
+        output_dir = input_dir
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Initialize DuckDB connection
+    conn = duckdb.connect(database=":memory:")
+
+    # Install and load required extensions
+    conn.execute("INSTALL spatial")
+    conn.execute("LOAD spatial")
+
+    # Get all GeoJSON files in the input directory
+    files = glob.glob(os.path.join(input_dir, f"*.{file_ext.lstrip('.')}"), **kwargs)
+
+    # Process each file
+    for index, file in enumerate(files):
+        # Get base filename without extension
+        base_name = os.path.basename(file)
+        file_name_without_ext = os.path.splitext(base_name)[0]
+
+        # Define output path
+        gpkg_file = os.path.join(output_dir, f"{file_name_without_ext}.geojson")
+
+        print(f"Converting {index + 1}/{len(files)}: {base_name} to GeoJSON...")
+
+        try:
+            # Execute the conversion
+            conn.execute(
+                f"""
+                COPY (
+                    SELECT * FROM ST_Read('{file}')
+                ) TO '{gpkg_file}' (FORMAT GDAL, DRIVER 'GeoJSON')
+            """
+            )
+        except Exception as e:
+            print(f"Error converting {base_name}: {str(e)}")
+
+    # Close connection
+    conn.close()
+    print("All conversions complete!")
+
+
+def geojsonl_to_parquet_batch(
+    input_dir,
+    output_dir,
+    batch_size=50,
+    file_ext=".json",
+    filename_predix="batch_",
+    **kwargs,
+):
+    """
+    Convert JSON Lines files to multiple GeoParquet files, with each GeoParquet file
+    containing data from a specified number of JSON Lines files.
+
+    Args:
+        input_dir (str): Directory containing JSON Lines files to convert
+        output_dir (str): Directory for output GeoParquet files
+        batch_size (int, optional): Number of JSON Lines files to combine in each GeoParquet file.
+                                    Defaults to 50.
+        file_ext (str, optional): File extension of the input files. Defaults to ".json".
+        filename_predix (str, optional): Prefix for the output GeoParquet files. Defaults to "batch_".
+        **kwargs: Additional keyword arguments to pass to the `to_parquet` function of GeoDataFrame.
+
+    """
+    import geopandas as gpd
+    from shapely.geometry import shape
+    import glob
+    import math
+
+    if not os.path.exists(input_dir):
+        raise FileNotFoundError(f"Input directory not found: {input_dir}")
+
+    # Get all JSON files
+    json_files = glob.glob(os.path.join(input_dir, f"*.{file_ext.lstrip('.')}"))
+
+    if not json_files:
+        raise ValueError(f"No JSON files found in {input_dir}")
+
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Calculate number of output files
+    num_files = len(json_files)
+    num_batches = math.ceil(num_files / batch_size)
+
+    print(
+        f"Processing {num_files} JSON Lines files into {num_batches} GeoParquet files"
+    )
+
+    # Track statistics
+    processed_files = 0
+    processed_records = 0
+    failed_files = 0
+    successful_parquets = 0
+
+    # Process files in batches
+    for batch_num in range(num_batches):
+        print(f"\nProcessing batch {batch_num+1}/{num_batches}")
+
+        # Generate output filename
+        output_file = os.path.join(
+            output_dir, f"{filename_predix}{batch_num+1:04d}.parquet"
+        )
+        if os.path.exists(output_file):
+            print(f"Output file already exists: {output_file}")
+            continue
+
+        start_idx = batch_num * batch_size
+        end_idx = min(start_idx + batch_size, num_files)
+        batch_files = json_files[start_idx:end_idx]
+
+        records = []
+
+        for file_path in batch_files:
+            try:
+                file_records = 0
+
+                # Process the file line by line (JSON Lines format)
+                with open(file_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        if line.strip():  # Skip empty lines
+                            try:
+                                data = json.loads(line)
+
+                                # Create a record with properties and geometry
+                                record = {}
+
+                                # Extract all properties except geometry
+                                for key, value in data.items():
+                                    if key != "geometry":
+                                        record[key] = value
+
+                                # Handle geometry
+                                if "geometry" in data:
+                                    # Convert the geometry to a Shapely object
+                                    record["geometry"] = shape(data["geometry"])
+                                else:
+                                    continue  # Skip records without geometry
+
+                                records.append(record)
+                                file_records += 1
+                            except json.JSONDecodeError as e:
+                                print(
+                                    f"Error decoding JSON in file {file_path}: {str(e)}"
+                                )
+                                continue  # Skip invalid JSON lines
+                            except Exception as e:
+                                print(
+                                    f"Error processing record in file {file_path}: {str(e)}"
+                                )
+                                continue  # Skip problematic records
+
+                # print(f"Processed {file_records} records from {file_path}")
+                processed_records += file_records
+                processed_files += 1
+
+            except Exception as e:
+                print(f"Error processing file {file_path}: {str(e)}")
+                failed_files += 1
+
+        if not records:
+            print(f"No valid records found in batch {batch_num+1}")
+            continue
+
+        # Create a GeoDataFrame with the correct CRS
+        gdf = gpd.GeoDataFrame(records, geometry="geometry", crs="EPSG:4326")
+
+        # Write to GeoParquet
+        gdf.to_parquet(output_file, index=False, **kwargs)
+        successful_parquets += 1
+
+        # Print summary for this batch
+        print(f"Created GeoParquet file {batch_num+1}/{num_batches}: {output_file}")
+        print(f"  - Number of features: {len(gdf)}")
+        print(f"  - Columns: {list(gdf.columns)}")
+        if len(gdf) > 0:
+            print(
+                f"  - First record attributes: {[k for k in gdf.iloc[0].keys() if k != 'geometry']}"
+            )
+
+    # Print final summary
+    print(f"\nSummary:")
+    print(f"Total files processed: {processed_files} of {num_files}")
+    print(f"Failed files: {failed_files}")
+    print(f"Total records processed: {processed_records}")
+    print(f"GeoParquet files created: {successful_parquets}")
+
+
+def extract_parquet_by_bbox(
+    input_parquet, bbox, output_file, geometry="geometry", driver="PARQUET"
+):
+    """
+    Extract buildings that intersect with a specific bounding box in San Diego.
+
+    Uses DuckDB with spatial extension to query buildings that intersect with
+    a bounding box and saves the results to a Parquet file.
+
+    Args:
+        input_parquet_pattern (str): Pattern for input Parquet files (e.g. '*.parquet')
+        output_parquet_path (str): Output file path for resulting Parquet file
+
+    Returns:
+        None: The function writes the results to the output_parquet_path
+    """
+    import duckdb
+
+    # Connect to DuckDB
+    conn = duckdb.connect()
+
+    # Install and load spatial extension
+    conn.execute("INSTALL spatial")
+    conn.execute("LOAD spatial")
+
+    if driver.upper() == "PARQUET":
+        fmt = "FORMAT PARQUET"
+    else:
+        fmt = f"FORMAT GDAL, DRIVER '{driver}'"
+
+    # Run the query
+    query = f"""
+    COPY (
+        WITH bbox AS (
+            SELECT ST_MakeEnvelope({bbox[0]}, {bbox[1]}, {bbox[2]}, {bbox[3]}) AS geom2
+        )
+
+        SELECT * FROM '{input_parquet}'
+        WHERE
+            ST_Intersects(
+                {geometry},
+                (SELECT geom2 FROM bbox)
+            )
+    ) TO '{output_file}' ({fmt})
+    """
+
+    # Execute the query
+    conn.execute(query)
+
+    # Close the connection
+    conn.close()
+
+
+def get_vector_column_names(input_vector, db_con=None):
+    """
+    Retrieves the column names from a DuckDB table.
+
+    Args:
+        input_vecotr (str): The path to the input vector file (e.g., a Parquet or GeoPackage file).
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+
+    Returns:
+        List[str]: A list of column names from the specified table.
+
+    Raises:
+        duckdb.CatalogException: If the table does not exist.
+    """
+    import duckdb
+
+    if db_con is None:
+        db_con = duckdb.connect()
+
+    db_con.execute("INSTALL spatial;")
+    db_con.execute("LOAD spatial;")
+
+    if not os.path.exists(input_vector):
+        raise ValueError(f"Input vector file does not exist: {input_vector}")
+
+    if input_vector.endswith(".parquet"):
+        query = f"SELECT * FROM '{input_vector}' LIMIT 0"
+    else:
+        query = f"SELECT * FROM ST_Read('{input_vector}') LIMIT 0"
+    db_con.execute(query)
+    return [desc[0] for desc in db_con.description]
+
+
+def get_parquet_geometry_column(input_parquet: str, db_con=None) -> str:
+    """
+    Retrieves the geometry column name from a Parquet file.
+
+    This function checks for the presence of a geometry column in the input Parquet file.
+    It looks for columns named "geometry" or "geom" and returns the first match.
+
+    Args:
+        input_parquet (str): The path to the input Parquet file.
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+
+    Returns:
+        str: The name of the geometry column ("geometry" or "geom").
+
+    Raises:
+        ValueError: If no recognized geometry column is found in the input Parquet file.
+
+    Example:
+        >>> geometry_column = get_parquet_geometry_column("data.parquet")
+        >>> print(geometry_column)
+        "geometry"
+    """
+    column_names = get_vector_column_names(input_parquet, db_con=db_con)
+    if "geometry" in column_names:
+        return "geometry"
+    elif "geom" in column_names:
+        return "geom"
+    else:
+        raise ValueError(
+            f"The input vector file does not contain a recognized geometry column. "
+            f"Available columns: {column_names}. Please ensure the vector file has a 'geometry' or 'geom' column."
+        )
+
+
+def get_vector_metadata(input_vector, db_con=None):
+    """
+    Retrieves metadata for a vector file.
+
+    This function uses DuckDB with the spatial extension to extract metadata
+    about the layers in the input vector file.
+
+    Args:
+        input_vector (str): The path to the input vector file.
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+
+    Returns:
+        dict: A dictionary containing metadata about the vector file.
+
+    Raises:
+        ValueError: If the input vector file does not exist.
+
+    Example:
+        >>> metadata = get_vector_metadata("data.gpkg")
+        >>> print(metadata)
+        {'geometry_fields': [{'name': 'geom', 'crs': {'auth_name': 'EPSG', 'auth_code': '4326'}}], ...}
+    """
+    import duckdb
+
+    if db_con is None:
+        db_con = duckdb.connect()
+
+    db_con.execute("INSTALL spatial;")
+    db_con.execute("LOAD spatial;")
+
+    if not os.path.exists(input_vector):
+        raise ValueError(f"Input vector file does not exist: {input_vector}")
+
+    query = f"SELECT * FROM ST_Read_Meta('{input_vector}')"
+    df = db_con.execute(query).fetch_df()
+    meta = df["layers"][0][0]
+    return meta
+
+
+def get_vector_crs(input_vector, db_con=None, return_epsg=False):
+    """
+    Retrieves the Coordinate Reference System (CRS) of a vector file.
+
+    This function extracts the CRS information from the metadata of the input vector file.
+
+    Args:
+        input_vector (str): The path to the input vector file.
+        db_con (duckdb.Connection, optional): An existing DuckDB connection. If None, a new connection will be created.
+        return_epsg (bool): Whether to return the EPSG code of the CRS. Defaults to False.
+
+    Returns:
+        Union[dict, int]: The CRS information as a dictionary or the EPSG code as an integer.
+
+    Raises:
+        ValueError: If the CRS information is not available in the input vector file.
+
+    Example:
+        >>> crs = get_vector_crs("data.gpkg", return_epsg=True)
+        >>> print(crs)
+        4326
+    """
+    metadata = get_vector_metadata(input_vector, db_con=db_con)
+    crs = metadata["geometry_fields"][0]["crs"]
+    if return_epsg:
+        if crs["auth_name"] == "EPSG" and len(crs["auth_code"]) > 0:
+            return int(crs["auth_code"])  # Return the EPSG code if available
+        else:
+            raise ValueError(
+                f"CRS information is not available in the input vector file: {input_vector}. "
+            )
+    else:
+        return crs
+
+
+def split_parquet_by_geometries(
+    input_parquet,
+    output_dir,
+    input_vector,
+    column,
+    filename_prefix="",
+    filename_suffix="",
+    driver="PARQUET",
+    verbose=True,
+):
+    """
+    Split a Parquet file containing geometries based on intersection with features from a vector file.
+
+    Args:
+        input_parquet (str): Path to the input Parquet file containing geometries.
+        output_dir (str): Directory to save the split files.
+        input_vector (str): Path to the vector file containing geometries to split by.
+        column (str): Column name in the vector file to use for splitting.
+        filename_prefix (str): Prefix for output filenames.
+        filename_suffix (str): Suffix for output filenames.
+        driver (str): Output format driver (e.g., "PARQUET", "GPKG").
+        verbose (bool): Whether to print progress information.
+        **kwargs: Additional arguments.
+
+    Raises:
+        ParserException: If there's a syntax error in the SQL query.
+    """
+    import duckdb
+
+    # Connect to DuckDB
+    con = duckdb.connect()
+
+    # Load spatial extension
+    con.execute("INSTALL spatial;")
+    con.execute("LOAD spatial;")
+
+    if driver.upper() == "PARQUET":
+        fmt = "FORMAT PARQUET"
+    else:
+        fmt = f"FORMAT GDAL, DRIVER '{driver}'"
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    if input_vector.endswith(".parquet"):
+        read_str = f"'{input_vector}'"
+    else:
+        read_str = f"ST_Read('{input_vector}')"
+
+    # Get all state IDs from the parquet file
+    state_ids = con.execute(
+        f"""
+        SELECT {column} FROM {read_str}
+        """
+    ).fetchall()
+
+    state_ids.sort()
+
+    geometry = "geometry"
+
+    column_names = get_vector_column_names(input_vector, db_con=con)
+    if "geometry" not in column_names:
+        if "geom" in column_names:
+            geometry = "geom"  # Fallback to geom if geometry is not available
+        else:
+            raise ValueError(
+                f"The input vector file does not contain a geometry column. Available columns: {column_names}"
+            )
+
+    # Loop through each state and save buildings
+    for index, (state_id,) in enumerate(state_ids):
+        if verbose:
+            print(
+                f"Processing {index + 1}/{len(state_ids)}: Extracting geometries for '{state_id}'..."
+            )
+
+        output_path = os.path.join(
+            output_dir, f"{filename_prefix}{state_id}{filename_suffix}.{driver.lower()}"
+        )
+
+        # Use proper path formatting
+        query = f"""
+        COPY (
+            WITH bbox AS (
+                SELECT {geometry} AS geom2
+                FROM {read_str}
+                WHERE {column} = '{state_id}'
+            )
+            SELECT * FROM '{input_parquet}'
+            WHERE ST_Intersects({geometry}, (SELECT geom2 FROM bbox))
+        ) TO '{output_path}' ({fmt});
+        """
+
+        con.execute(query)
+
+    con.close()
+    print("Done!")
+
+
+def parquet_to_gdf(
+    input_parquet,
+    db_con=None,
+    src_crs="EPSG:4326",
+    dst_crs="EPSG:4326",
+    columns=None,
+    limit=None,
+    **kwargs,
+):
+
+    import duckdb
+
+    if db_con is None:
+        db_con = duckdb.connect()
+
+    db_con.execute("INSTALL spatial;")
+    db_con.execute("LOAD spatial;")
+
+    geometry = get_parquet_geometry_column(input_parquet, db_con=db_con)
+    geom_sql = f"ST_AsText(ST_GeomFromWKB(ST_AsWKB({geometry}))) AS {geometry}"
+
+    if columns is None:
+        columns = "*"
+
+    if isinstance(columns, list):
+        # Join the columns into a string for SQL query
+        columns = ", ".join([col for col in columns])
+        sql = f"SELECT {columns}, {geom_sql} FROM '{input_parquet}'"
+    else:
+
+        sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{input_parquet}'"
+    if limit is not None:
+        sql += f" LIMIT {limit}"
+
+    df = db_con.sql(sql).df()
+    gdf = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs, **kwargs)
+    db_con.close()
+    return gdf
+
+
 def df_to_gdf(df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
