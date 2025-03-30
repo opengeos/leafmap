@@ -12707,11 +12707,11 @@ def extract_parquet_by_bbox(
         WITH bbox AS (
             SELECT ST_MakeEnvelope({bbox[0]}, {bbox[1]}, {bbox[2]}, {bbox[3]}) AS geom2
         )
-        
+
         SELECT * FROM '{input_parquet}'
-        WHERE 
+        WHERE
             ST_Intersects(
-                {geometry}, 
+                {geometry},
                 (SELECT geom2 FROM bbox)
             )
     ) TO '{output_file}' ({fmt})
