@@ -8689,6 +8689,7 @@ def zonal_stats(
 
     import geopandas as gpd
     import rasterio
+    import xarray as xr
 
     try:
         import rasterstats
@@ -8708,6 +8709,9 @@ def zonal_stats(
             nodata = raster.nodata
             array = raster.read(band_num, masked=True)
             raster_crs = raster.crs
+        elif isinstance(raster, xr.DataArray):
+            array = raster
+            raster_crs = raster.rio.crs
         else:
             array = raster
 
