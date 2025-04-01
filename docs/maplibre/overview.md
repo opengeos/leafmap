@@ -186,7 +186,7 @@ Use the upcase and downcase expressions to change the case of labels.
 
 Create choropleth maps with a variety of classification schemes.
 
-[![](https://github.com/user-attachments/assets/35ca3e17-956e-4d88-9e24-7e94c9e322f8)](https://leafmap.org/maplibre/change_case_of_labels)
+[![](https://github.com/user-attachments/assets/35ca3e17-956e-4d88-9e24-7e94c9e322f8)](https://leafmap.org/maplibre/choropleth)
 
 ## Cloud Optimized GeoTIFF (COG)
 
@@ -211,7 +211,6 @@ Use setPaintProperty to change a layer's fill color.
 Utilize and refine data from the MapTiler Countries to create a Choropleth map of the US states.
 
 [![](https://i.imgur.com/k1d6k9I.png)](https://leafmap.org/maplibre/countries_filter)
-
 
 ## Create vector data
 
