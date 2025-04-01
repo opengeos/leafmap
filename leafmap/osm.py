@@ -293,7 +293,7 @@ def osm_gdf_from_bbox(north: float, south: float, east: float, west: float, tags
             "osmnx package is required. Please install it using 'pip install osmnx'"
         )
 
-    gdf = ox.features_from_bbox(north, south, east, west, tags)
+    gdf = ox.features_from_bbox(north=north, south=south, east=east, west=west, tags=tags)
     return gdf
 
 
