@@ -263,7 +263,9 @@ class Map(MapWidget):
         if name in self.layer_dict:
             self.layer_dict.pop(name)
 
-    def add_deck_layers(self, layers: list[dict], tooltip: str | dict = None) -> None:
+    def add_deck_layers(
+        self, layers: list[dict], tooltip: Union[str, dict] = None
+    ) -> None:
         """Add Deck.GL layers to the layer stack
 
         Args:
