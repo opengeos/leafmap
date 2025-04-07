@@ -1479,6 +1479,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.edit_vector_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      edit_vector_data
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.maplibregl.maptiler_3d_style" class="md-nav__link">
     <span class="md-ellipsis">
       maptiler_3d_style
@@ -2951,6 +2960,29 @@
   
   <span class="md-ellipsis">
     Draw features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/edit_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Edit vector
     
   </span>
   
@@ -7217,6 +7249,15 @@
   <a href="#leafmap.maplibregl.edit_gps_trace" class="md-nav__link">
     <span class="md-ellipsis">
       edit_gps_trace
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.edit_vector_data" class="md-nav__link">
+    <span class="md-ellipsis">
+      edit_vector_data
     </span>
   </a>
   
@@ -35614,6 +35655,1002 @@ The first numerical column will be used if None. Defaults to None.</p>
         <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">features_widget</span><span class="p">],</span>
     <span class="p">)</span>
     <span class="n">main_widget</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">row1</span><span class="p">,</span> <span class="n">row2</span><span class="p">,</span> <span class="n">row3</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">main_widget</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="leafmap.maplibregl.edit_vector_data" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">edit_vector_data</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">T%H%M%S&#39;</span><span class="p">,</span> <span class="n">column_widths</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">map_height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">file_ext</span><span class="o">=</span><span class="s1">&#39;geojson&#39;</span><span class="p">,</span> <span class="n">add_mapillary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;photo&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">5e-05</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">420</span><span class="p">,</span> <span class="n">frame_border</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="n">fit_bounds_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#leafmap.maplibregl.edit_vector_data" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Generates a widget-based interface for creating and managing vector data on a map.</p>
+<p>This function creates an interactive widget interface that allows users to draw features
+(points, lines, polygons) on a map, assign properties to these features, and export them
+as GeoJSON files. The interface includes a map, a sidebar for property management, and
+buttons for saving, exporting, and resetting the data.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>m</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Map (leafmap.maplibregl.Map)" href="#leafmap.maplibregl.Map">Map</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>An existing Map object. If not provided, a default map with
+basemaps and drawing controls will be created. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>filename</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> or <span title="geopandas.GeoDataFrame">GeoDataFrame</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The path to a GeoJSON file or a GeoDataFrame
+containing the vector data to be edited. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>properties</code>
+            </td>
+            <td>
+                  <code><span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="typing.List">List</span>[<span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary where keys are property names
+and values are lists of possible values for each property. These properties can be
+assigned to the drawn features. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>time_format</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The format string for the timestamp used in the exported
+filename. Defaults to "%Y%m%dT%H%M%S".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;%Y%m%dT%H%M%S&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>column_widths</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[<span title="int">int</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of two integers specifying the
+relative widths of the map and sidebar columns. Defaults to (9, 3).</p>
+              </div>
+            </td>
+            <td>
+                  <code>(9, 3)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>map_height</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The height of the map widget. Defaults to "600px".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;600px&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>out_dir</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The directory where the exported GeoJSON files will be saved.
+If not provided, the current working directory is used. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>filename_prefix</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A prefix to be added to the exported filename.
+Defaults to "".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>file_ext</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The file extension for the exported file. Defaults to "geojson".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;geojson&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>add_mapillary</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to add a Mapillary image widget that displays the
+nearest image to the clicked point on the map. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>style</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The style of the Mapillary image widget. Can be "classic", "photo",
+or "split". Defaults to "photo".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;photo&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>radius</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The radius (in degrees) used to search for the nearest Mapillary
+image. Defaults to 0.00005 degrees.</p>
+              </div>
+            </td>
+            <td>
+                  <code>5e-05</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>width</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The width of the Mapillary image widget. Defaults to 300.</p>
+              </div>
+            </td>
+            <td>
+                  <code>300</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>height</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The height of the Mapillary image widget. Defaults to 420.</p>
+              </div>
+            </td>
+            <td>
+                  <code>420</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>frame_border</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The width of the frame border for the Mapillary image widget.
+Defaults to 0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>controls</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.List">List</span>[<span title="str">str</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The drawing controls to be added to the map.
+Defaults to ["point", "polygon", "line_string", "trash"].</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>position</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The position of the drawing controls on the map. Defaults to "top-right".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;top-right&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional keyword arguments that may be passed to the function.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ipywidgets.VBox">VBox</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>widgets.VBox: A vertical box widget containing the map, sidebar, and control buttons.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5477</span>
+<span class="normal">5478</span>
+<span class="normal">5479</span>
+<span class="normal">5480</span>
+<span class="normal">5481</span>
+<span class="normal">5482</span>
+<span class="normal">5483</span>
+<span class="normal">5484</span>
+<span class="normal">5485</span>
+<span class="normal">5486</span>
+<span class="normal">5487</span>
+<span class="normal">5488</span>
+<span class="normal">5489</span>
+<span class="normal">5490</span>
+<span class="normal">5491</span>
+<span class="normal">5492</span>
+<span class="normal">5493</span>
+<span class="normal">5494</span>
+<span class="normal">5495</span>
+<span class="normal">5496</span>
+<span class="normal">5497</span>
+<span class="normal">5498</span>
+<span class="normal">5499</span>
+<span class="normal">5500</span>
+<span class="normal">5501</span>
+<span class="normal">5502</span>
+<span class="normal">5503</span>
+<span class="normal">5504</span>
+<span class="normal">5505</span>
+<span class="normal">5506</span>
+<span class="normal">5507</span>
+<span class="normal">5508</span>
+<span class="normal">5509</span>
+<span class="normal">5510</span>
+<span class="normal">5511</span>
+<span class="normal">5512</span>
+<span class="normal">5513</span>
+<span class="normal">5514</span>
+<span class="normal">5515</span>
+<span class="normal">5516</span>
+<span class="normal">5517</span>
+<span class="normal">5518</span>
+<span class="normal">5519</span>
+<span class="normal">5520</span>
+<span class="normal">5521</span>
+<span class="normal">5522</span>
+<span class="normal">5523</span>
+<span class="normal">5524</span>
+<span class="normal">5525</span>
+<span class="normal">5526</span>
+<span class="normal">5527</span>
+<span class="normal">5528</span>
+<span class="normal">5529</span>
+<span class="normal">5530</span>
+<span class="normal">5531</span>
+<span class="normal">5532</span>
+<span class="normal">5533</span>
+<span class="normal">5534</span>
+<span class="normal">5535</span>
+<span class="normal">5536</span>
+<span class="normal">5537</span>
+<span class="normal">5538</span>
+<span class="normal">5539</span>
+<span class="normal">5540</span>
+<span class="normal">5541</span>
+<span class="normal">5542</span>
+<span class="normal">5543</span>
+<span class="normal">5544</span>
+<span class="normal">5545</span>
+<span class="normal">5546</span>
+<span class="normal">5547</span>
+<span class="normal">5548</span>
+<span class="normal">5549</span>
+<span class="normal">5550</span>
+<span class="normal">5551</span>
+<span class="normal">5552</span>
+<span class="normal">5553</span>
+<span class="normal">5554</span>
+<span class="normal">5555</span>
+<span class="normal">5556</span>
+<span class="normal">5557</span>
+<span class="normal">5558</span>
+<span class="normal">5559</span>
+<span class="normal">5560</span>
+<span class="normal">5561</span>
+<span class="normal">5562</span>
+<span class="normal">5563</span>
+<span class="normal">5564</span>
+<span class="normal">5565</span>
+<span class="normal">5566</span>
+<span class="normal">5567</span>
+<span class="normal">5568</span>
+<span class="normal">5569</span>
+<span class="normal">5570</span>
+<span class="normal">5571</span>
+<span class="normal">5572</span>
+<span class="normal">5573</span>
+<span class="normal">5574</span>
+<span class="normal">5575</span>
+<span class="normal">5576</span>
+<span class="normal">5577</span>
+<span class="normal">5578</span>
+<span class="normal">5579</span>
+<span class="normal">5580</span>
+<span class="normal">5581</span>
+<span class="normal">5582</span>
+<span class="normal">5583</span>
+<span class="normal">5584</span>
+<span class="normal">5585</span>
+<span class="normal">5586</span>
+<span class="normal">5587</span>
+<span class="normal">5588</span>
+<span class="normal">5589</span>
+<span class="normal">5590</span>
+<span class="normal">5591</span>
+<span class="normal">5592</span>
+<span class="normal">5593</span>
+<span class="normal">5594</span>
+<span class="normal">5595</span>
+<span class="normal">5596</span>
+<span class="normal">5597</span>
+<span class="normal">5598</span>
+<span class="normal">5599</span>
+<span class="normal">5600</span>
+<span class="normal">5601</span>
+<span class="normal">5602</span>
+<span class="normal">5603</span>
+<span class="normal">5604</span>
+<span class="normal">5605</span>
+<span class="normal">5606</span>
+<span class="normal">5607</span>
+<span class="normal">5608</span>
+<span class="normal">5609</span>
+<span class="normal">5610</span>
+<span class="normal">5611</span>
+<span class="normal">5612</span>
+<span class="normal">5613</span>
+<span class="normal">5614</span>
+<span class="normal">5615</span>
+<span class="normal">5616</span>
+<span class="normal">5617</span>
+<span class="normal">5618</span>
+<span class="normal">5619</span>
+<span class="normal">5620</span>
+<span class="normal">5621</span>
+<span class="normal">5622</span>
+<span class="normal">5623</span>
+<span class="normal">5624</span>
+<span class="normal">5625</span>
+<span class="normal">5626</span>
+<span class="normal">5627</span>
+<span class="normal">5628</span>
+<span class="normal">5629</span>
+<span class="normal">5630</span>
+<span class="normal">5631</span>
+<span class="normal">5632</span>
+<span class="normal">5633</span>
+<span class="normal">5634</span>
+<span class="normal">5635</span>
+<span class="normal">5636</span>
+<span class="normal">5637</span>
+<span class="normal">5638</span>
+<span class="normal">5639</span>
+<span class="normal">5640</span>
+<span class="normal">5641</span>
+<span class="normal">5642</span>
+<span class="normal">5643</span>
+<span class="normal">5644</span>
+<span class="normal">5645</span>
+<span class="normal">5646</span>
+<span class="normal">5647</span>
+<span class="normal">5648</span>
+<span class="normal">5649</span>
+<span class="normal">5650</span>
+<span class="normal">5651</span>
+<span class="normal">5652</span>
+<span class="normal">5653</span>
+<span class="normal">5654</span>
+<span class="normal">5655</span>
+<span class="normal">5656</span>
+<span class="normal">5657</span>
+<span class="normal">5658</span>
+<span class="normal">5659</span>
+<span class="normal">5660</span>
+<span class="normal">5661</span>
+<span class="normal">5662</span>
+<span class="normal">5663</span>
+<span class="normal">5664</span>
+<span class="normal">5665</span>
+<span class="normal">5666</span>
+<span class="normal">5667</span>
+<span class="normal">5668</span>
+<span class="normal">5669</span>
+<span class="normal">5670</span>
+<span class="normal">5671</span>
+<span class="normal">5672</span>
+<span class="normal">5673</span>
+<span class="normal">5674</span>
+<span class="normal">5675</span>
+<span class="normal">5676</span>
+<span class="normal">5677</span>
+<span class="normal">5678</span>
+<span class="normal">5679</span>
+<span class="normal">5680</span>
+<span class="normal">5681</span>
+<span class="normal">5682</span>
+<span class="normal">5683</span>
+<span class="normal">5684</span>
+<span class="normal">5685</span>
+<span class="normal">5686</span>
+<span class="normal">5687</span>
+<span class="normal">5688</span>
+<span class="normal">5689</span>
+<span class="normal">5690</span>
+<span class="normal">5691</span>
+<span class="normal">5692</span>
+<span class="normal">5693</span>
+<span class="normal">5694</span>
+<span class="normal">5695</span>
+<span class="normal">5696</span>
+<span class="normal">5697</span>
+<span class="normal">5698</span>
+<span class="normal">5699</span>
+<span class="normal">5700</span>
+<span class="normal">5701</span>
+<span class="normal">5702</span>
+<span class="normal">5703</span>
+<span class="normal">5704</span>
+<span class="normal">5705</span>
+<span class="normal">5706</span>
+<span class="normal">5707</span>
+<span class="normal">5708</span>
+<span class="normal">5709</span>
+<span class="normal">5710</span>
+<span class="normal">5711</span>
+<span class="normal">5712</span>
+<span class="normal">5713</span>
+<span class="normal">5714</span>
+<span class="normal">5715</span>
+<span class="normal">5716</span>
+<span class="normal">5717</span>
+<span class="normal">5718</span>
+<span class="normal">5719</span>
+<span class="normal">5720</span>
+<span class="normal">5721</span>
+<span class="normal">5722</span>
+<span class="normal">5723</span>
+<span class="normal">5724</span>
+<span class="normal">5725</span>
+<span class="normal">5726</span>
+<span class="normal">5727</span>
+<span class="normal">5728</span>
+<span class="normal">5729</span>
+<span class="normal">5730</span>
+<span class="normal">5731</span>
+<span class="normal">5732</span>
+<span class="normal">5733</span>
+<span class="normal">5734</span>
+<span class="normal">5735</span>
+<span class="normal">5736</span>
+<span class="normal">5737</span>
+<span class="normal">5738</span>
+<span class="normal">5739</span>
+<span class="normal">5740</span>
+<span class="normal">5741</span>
+<span class="normal">5742</span>
+<span class="normal">5743</span>
+<span class="normal">5744</span>
+<span class="normal">5745</span>
+<span class="normal">5746</span>
+<span class="normal">5747</span>
+<span class="normal">5748</span>
+<span class="normal">5749</span>
+<span class="normal">5750</span>
+<span class="normal">5751</span>
+<span class="normal">5752</span>
+<span class="normal">5753</span>
+<span class="normal">5754</span>
+<span class="normal">5755</span>
+<span class="normal">5756</span>
+<span class="normal">5757</span>
+<span class="normal">5758</span>
+<span class="normal">5759</span>
+<span class="normal">5760</span>
+<span class="normal">5761</span>
+<span class="normal">5762</span>
+<span class="normal">5763</span>
+<span class="normal">5764</span>
+<span class="normal">5765</span>
+<span class="normal">5766</span>
+<span class="normal">5767</span>
+<span class="normal">5768</span>
+<span class="normal">5769</span>
+<span class="normal">5770</span>
+<span class="normal">5771</span>
+<span class="normal">5772</span>
+<span class="normal">5773</span>
+<span class="normal">5774</span>
+<span class="normal">5775</span>
+<span class="normal">5776</span>
+<span class="normal">5777</span>
+<span class="normal">5778</span>
+<span class="normal">5779</span>
+<span class="normal">5780</span>
+<span class="normal">5781</span>
+<span class="normal">5782</span>
+<span class="normal">5783</span>
+<span class="normal">5784</span>
+<span class="normal">5785</span>
+<span class="normal">5786</span>
+<span class="normal">5787</span>
+<span class="normal">5788</span>
+<span class="normal">5789</span>
+<span class="normal">5790</span>
+<span class="normal">5791</span>
+<span class="normal">5792</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
+    <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">time_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">T%H%M%S&quot;</span><span class="p">,</span>
+    <span class="n">column_widths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="n">map_height</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;600px&quot;</span><span class="p">,</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">filename_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">file_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;geojson&quot;</span><span class="p">,</span>
+    <span class="n">add_mapillary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;photo&quot;</span><span class="p">,</span>
+    <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.00005</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">420</span><span class="p">,</span>
+    <span class="n">frame_border</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">controls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span>
+    <span class="n">fit_bounds_options</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates a widget-based interface for creating and managing vector data on a map.</span>
+
+<span class="sd">    This function creates an interactive widget interface that allows users to draw features</span>
+<span class="sd">    (points, lines, polygons) on a map, assign properties to these features, and export them</span>
+<span class="sd">    as GeoJSON files. The interface includes a map, a sidebar for property management, and</span>
+<span class="sd">    buttons for saving, exporting, and resetting the data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        m (Map, optional): An existing Map object. If not provided, a default map with</span>
+<span class="sd">            basemaps and drawing controls will be created. Defaults to None.</span>
+<span class="sd">        filename (str or gpd.GeoDataFrame): The path to a GeoJSON file or a GeoDataFrame</span>
+<span class="sd">            containing the vector data to be edited. Defaults to None.</span>
+<span class="sd">        properties (Dict[str, List[Any]], optional): A dictionary where keys are property names</span>
+<span class="sd">            and values are lists of possible values for each property. These properties can be</span>
+<span class="sd">            assigned to the drawn features. Defaults to None.</span>
+<span class="sd">        time_format (str, optional): The format string for the timestamp used in the exported</span>
+<span class="sd">            filename. Defaults to &quot;%Y%m%dT%H%M%S&quot;.</span>
+<span class="sd">        column_widths (Optional[List[int]], optional): A list of two integers specifying the</span>
+<span class="sd">            relative widths of the map and sidebar columns. Defaults to (9, 3).</span>
+<span class="sd">        map_height (str, optional): The height of the map widget. Defaults to &quot;600px&quot;.</span>
+<span class="sd">        out_dir (str, optional): The directory where the exported GeoJSON files will be saved.</span>
+<span class="sd">            If not provided, the current working directory is used. Defaults to None.</span>
+<span class="sd">        filename_prefix (str, optional): A prefix to be added to the exported filename.</span>
+<span class="sd">            Defaults to &quot;&quot;.</span>
+<span class="sd">        file_ext (str, optional): The file extension for the exported file. Defaults to &quot;geojson&quot;.</span>
+<span class="sd">        add_mapillary (bool, optional): Whether to add a Mapillary image widget that displays the</span>
+<span class="sd">            nearest image to the clicked point on the map. Defaults to False.</span>
+<span class="sd">        style (str, optional): The style of the Mapillary image widget. Can be &quot;classic&quot;, &quot;photo&quot;,</span>
+<span class="sd">            or &quot;split&quot;. Defaults to &quot;photo&quot;.</span>
+<span class="sd">        radius (float, optional): The radius (in degrees) used to search for the nearest Mapillary</span>
+<span class="sd">            image. Defaults to 0.00005 degrees.</span>
+<span class="sd">        width (int, optional): The width of the Mapillary image widget. Defaults to 300.</span>
+<span class="sd">        height (int, optional): The height of the Mapillary image widget. Defaults to 420.</span>
+<span class="sd">        frame_border (int, optional): The width of the frame border for the Mapillary image widget.</span>
+<span class="sd">            Defaults to 0.</span>
+<span class="sd">        controls (Optional[List[str]], optional): The drawing controls to be added to the map.</span>
+<span class="sd">            Defaults to [&quot;point&quot;, &quot;polygon&quot;, &quot;line_string&quot;, &quot;trash&quot;].</span>
+<span class="sd">        position (str, optional): The position of the drawing controls on the map. Defaults to &quot;top-right&quot;.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments that may be passed to the function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        widgets.VBox: A vertical box widget containing the map, sidebar, and control buttons.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+    <span class="n">main_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">controls</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">controls</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="s2">&quot;polygon&quot;</span><span class="p">,</span> <span class="s2">&quot;line_string&quot;</span><span class="p">,</span> <span class="s2">&quot;trash&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.parquet&quot;</span><span class="p">,</span> <span class="s2">&quot;.pq&quot;</span><span class="p">,</span> <span class="s2">&quot;.geoparquet&quot;</span><span class="p">]:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;filename must be a string or a GeoDataFrame.&quot;</span><span class="p">)</span>
+
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">create_default_map</span><span class="p">():</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;liberty&quot;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">map_height</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">&quot;Satellite&quot;</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">&quot;OpenStreetMap.Mapnik&quot;</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_overture_buildings</span><span class="p">(</span><span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_overture_data</span><span class="p">(</span><span class="n">theme</span><span class="o">=</span><span class="s2">&quot;transportation&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span>
+
+    <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">create_default_map</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">properties</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">dtypes</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">dtypes</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dtypes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;object&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">gdf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">nunique</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+                        <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;int32&quot;</span><span class="p">:</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;float64&quot;</span><span class="p">:</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">elif</span> <span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;bool&quot;</span><span class="p">:</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">properties</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]]</span>
+    <span class="n">geojson</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">get_bounds</span><span class="p">(</span><span class="n">geojson</span><span class="p">)</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">add_draw_control</span><span class="p">(</span>
+        <span class="n">controls</span><span class="o">=</span><span class="n">controls</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+        <span class="n">geojson</span><span class="o">=</span><span class="n">geojson</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">fit_bounds_options</span><span class="p">)</span>
+
+    <span class="n">draw_features</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">draw_feature</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">draw_feature</span><span class="p">[</span><span class="n">prop</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">prop</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">draw_feature</span><span class="p">[</span><span class="n">prop</span><span class="p">]</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="n">prop</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">draw_features</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="n">draw_feature</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s2">&quot;draw_features&quot;</span><span class="p">,</span> <span class="n">draw_features</span><span class="p">)</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">draw_feature_collection_all</span> <span class="o">=</span> <span class="n">geojson</span>
+
+    <span class="n">sidebar_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">()</span>
+
+    <span class="n">prop_widgets</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">()</span>
+
+    <span class="n">image_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                <span class="n">prop_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+                    <span class="n">options</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+                    <span class="c1"># value=None,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="p">(</span><span class="n">prop_widget</span><span class="p">,)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="n">prop_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntText</span><span class="p">(</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="p">(</span><span class="n">prop_widget</span><span class="p">,)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="n">prop_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatText</span><span class="p">(</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="p">(</span><span class="n">prop_widget</span><span class="p">,)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">prop_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">key</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span> <span class="o">+=</span> <span class="p">(</span><span class="n">prop_widget</span><span class="p">,)</span>
+
+    <span class="k">def</span> <span class="nf">draw_change</span><span class="p">(</span><span class="n">lng_lat</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lng_lat</span><span class="o">.</span><span class="n">new</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+                <span class="n">feature_id</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">feature_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">:</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+                            <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">prop_widget</span> <span class="ow">in</span> <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">prop_widget</span><span class="o">.</span><span class="n">description</span>
+                        <span class="n">prop_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">][</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">prop_widget</span> <span class="ow">in</span> <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">prop_widget</span><span class="o">.</span><span class="n">description</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">tuple</span>
+                <span class="p">):</span>
+                    <span class="n">prop_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">prop_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="n">m</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">draw_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;draw_features_selected&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">log_lng_lat</span><span class="p">(</span><span class="n">lng_lat</span><span class="p">):</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">lng_lat</span><span class="o">.</span><span class="n">new</span><span class="p">[</span><span class="s2">&quot;lng&quot;</span><span class="p">]</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">lng_lat</span><span class="o">.</span><span class="n">new</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">]</span>
+        <span class="n">image_id</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">search_mapillary_images</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_id</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;iframe</span>
+<span class="s2">                src=&quot;https://www.mapillary.com/embed?image_key=</span><span class="si">{</span><span class="n">image_id</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&amp;style=</span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="s2">                height=&quot;</span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="s2">                width=&quot;</span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="s2">                frameborder=&quot;</span><span class="si">{</span><span class="n">frame_border</span><span class="si">}</span><span class="s2">&quot;&gt;</span>
+<span class="s2">            &lt;/iframe&gt;</span>
+<span class="s2">            &quot;&quot;&quot;</span>
+            <span class="n">image_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;No Mapillary image found.&quot;</span>
+
+    <span class="k">if</span> <span class="n">add_mapillary</span><span class="p">:</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">log_lng_lat</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;clicked&quot;</span><span class="p">)</span>
+
+    <span class="n">button_layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;97px&quot;</span><span class="p">)</span>
+    <span class="n">save</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Save&quot;</span><span class="p">,</span> <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span>
+    <span class="p">)</span>
+    <span class="n">export</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Export&quot;</span><span class="p">,</span> <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span>
+    <span class="p">)</span>
+    <span class="n">reset</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reset&quot;</span><span class="p">,</span> <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">button_layout</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_save_click</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+
+        <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">feature_id</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">prop_widget</span> <span class="ow">in</span> <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">prop_widget</span><span class="o">.</span><span class="n">description</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">prop_widget</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Faeature saved.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please select a feature to save.&quot;</span><span class="p">)</span>
+
+    <span class="n">save</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">on_save_click</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_export_click</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">time_format</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename_prefix</span><span class="si">}{</span><span class="n">current_time</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">file_ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">feature</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">]):</span>
+            <span class="n">feature_id</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">feature_id</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">[</span><span class="s2">&quot;features&quot;</span><span class="p">][</span><span class="n">index</span><span class="p">][</span><span class="s2">&quot;properties&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">draw_features</span><span class="p">[</span><span class="n">feature_id</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">draw_feature_collection_all</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
+        <span class="p">)</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exported: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">export</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">on_export_click</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">on_reset_click</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">prop_widget</span> <span class="ow">in</span> <span class="n">prop_widgets</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">prop_widget</span><span class="o">.</span><span class="n">description</span>
+            <span class="k">if</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">properties</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">properties</span><span class="p">[</span><span class="n">description</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span>
+                    <span class="n">properties</span><span class="p">[</span><span class="n">description</span><span class="p">],</span> <span class="nb">tuple</span>
+                <span class="p">):</span>
+                    <span class="n">prop_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="n">description</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">prop_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">properties</span><span class="p">[</span><span class="n">description</span><span class="p">]</span>
+
+    <span class="n">reset</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">on_reset_click</span><span class="p">)</span>
+
+    <span class="n">sidebar_widget</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">prop_widgets</span><span class="p">,</span>
+        <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">save</span><span class="p">,</span> <span class="n">export</span><span class="p">,</span> <span class="n">reset</span><span class="p">]),</span>
+        <span class="n">output</span><span class="p">,</span>
+        <span class="n">image_widget</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">left_col_layout</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+        <span class="n">cols</span><span class="o">=</span><span class="n">column_widths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+        <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;pa-1&quot;</span><span class="p">,</span>  <span class="c1"># padding for consistent spacing</span>
+    <span class="p">)</span>
+    <span class="n">right_col_layout</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span>
+        <span class="n">cols</span><span class="o">=</span><span class="n">column_widths</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">sidebar_widget</span><span class="p">],</span>
+        <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;pa-1&quot;</span><span class="p">,</span>  <span class="c1"># padding for consistent spacing</span>
+    <span class="p">)</span>
+    <span class="n">row1</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">Row</span><span class="p">(</span>
+        <span class="n">class_</span><span class="o">=</span><span class="s2">&quot;d-flex flex-wrap&quot;</span><span class="p">,</span>
+        <span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">left_col_layout</span><span class="p">,</span> <span class="n">right_col_layout</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">main_widget</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">Col</span><span class="p">(</span><span class="n">children</span><span class="o">=</span><span class="p">[</span><span class="n">row1</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">main_widget</span>
 </code></pre></div></td></tr></table></div>
             </details>
