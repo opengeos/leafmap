@@ -255,6 +255,12 @@ Use the draw control to draw features on the map.
 
 [![](https://i.imgur.com/w8UFssd.png)](https://leafmap.org/maplibre/draw_features)
 
+## Edit vector data interactively
+
+Edit existing vector data interactively on a map.
+
+[![](https://github.com/user-attachments/assets/c86f78ee-1f50-418e-981e-b01fe61b2b53)](https://leafmap.org/maplibre/edit_vector)
+
 ## Use a fallback image
 
 Use a coalesce expression to display another image when a requested image is not available.
