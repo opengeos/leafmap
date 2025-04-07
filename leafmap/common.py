@@ -16601,3 +16601,167 @@ def get_overture_latest_release(patch=False) -> str:
     except KeyError as e:
         print(f"Key error: {e}")
         raise
+
+
+def set_proj_lib_path(verbose=False):
+    """
+    Set the PROJ_LIB and GDAL_DATA environment variables based on the current conda environment.
+
+    This function attempts to locate and set the correct paths for PROJ_LIB and GDAL_DATA
+    by checking multiple possible locations within the conda environment structure.
+
+    Args:
+        verbose (bool): If True, print additional information during the process.
+
+    Returns:
+        bool: True if both paths were set successfully, False otherwise.
+    """
+    import sys
+
+    try:
+        from rasterio.env import set_gdal_config
+
+        # Get conda environment path
+        conda_env_path = os.environ.get("CONDA_PREFIX") or sys.prefix
+
+        # Define possible paths for PROJ_LIB
+        possible_proj_paths = [
+            os.path.join(conda_env_path, "share", "proj"),
+            os.path.join(conda_env_path, "Library", "share", "proj"),
+            os.path.join(conda_env_path, "Library", "share"),
+        ]
+
+        # Define possible paths for GDAL_DATA
+        possible_gdal_paths = [
+            os.path.join(conda_env_path, "share", "gdal"),
+            os.path.join(conda_env_path, "Library", "share", "gdal"),
+            os.path.join(conda_env_path, "Library", "data", "gdal"),
+            os.path.join(conda_env_path, "Library", "share"),
+        ]
+
+        # Set PROJ_LIB environment variable
+        proj_set = False
+        for proj_path in possible_proj_paths:
+            if os.path.exists(proj_path) and os.path.isdir(proj_path):
+                # Verify it contains projection data
+                if os.path.exists(os.path.join(proj_path, "proj.db")):
+                    os.environ["PROJ_LIB"] = proj_path
+                    if verbose:
+                        print(f"PROJ_LIB set to: {proj_path}")
+                    proj_set = True
+                    break
+
+        # Set GDAL_DATA environment variable
+        gdal_set = False
+        for gdal_path in possible_gdal_paths:
+            if os.path.exists(gdal_path) and os.path.isdir(gdal_path):
+                # Verify it contains the header.dxf file or other critical GDAL files
+                if os.path.exists(
+                    os.path.join(gdal_path, "header.dxf")
+                ) or os.path.exists(os.path.join(gdal_path, "gcs.csv")):
+                    os.environ["GDAL_DATA"] = gdal_path
+                    if verbose:
+                        print(f"GDAL_DATA set to: {gdal_path}")
+                    gdal_set = True
+                    break
+
+        # If paths still not found, try a last-resort approach
+        if not proj_set or not gdal_set:
+            # Try a deep search in the conda environment
+            for root, dirs, files in os.walk(conda_env_path):
+                if not gdal_set and "header.dxf" in files:
+                    os.environ["GDAL_DATA"] = root
+                    if verbose:
+                        print(f"GDAL_DATA set to: {root} (deep search)")
+                    gdal_set = True
+
+                if not proj_set and "proj.db" in files:
+                    os.environ["PROJ_LIB"] = root
+                    if verbose:
+                        print(f"PROJ_LIB set to: {root} (deep search)")
+                    proj_set = True
+
+                if proj_set and gdal_set:
+                    break
+
+        set_gdal_config("PROJ_LIB", os.environ["PROJ_LIB"])
+        set_gdal_config("GDAL_DATA", os.environ["GDAL_DATA"])
+
+    except Exception as e:
+        print(f"Error setting projection library paths: {e}")
+        return
+
+
+def read_vector(source, layer=None, **kwargs):
+    """Reads vector data from various formats including GeoParquet.
+
+    This function dynamically determines the file type based on extension
+    and reads it into a GeoDataFrame. It supports both local files and HTTP/HTTPS URLs.
+
+    Args:
+        source: String path to the vector file or URL.
+        layer: String or integer specifying which layer to read from multi-layer
+            files (only applicable for formats like GPKG, GeoJSON, etc.).
+            Defaults to None.
+        **kwargs: Additional keyword arguments to pass to the underlying reader.
+
+    Returns:
+        geopandas.GeoDataFrame: A GeoDataFrame containing the vector data.
+
+    Raises:
+        ValueError: If the file format is not supported or source cannot be accessed.
+
+    Examples:
+        Read a local shapefile
+        >>> gdf = read_vector("path/to/data.shp")
+        >>>
+        Read a GeoParquet file from URL
+        >>> gdf = read_vector("https://example.com/data.parquet")
+        >>>
+        Read a specific layer from a GeoPackage
+        >>> gdf = read_vector("path/to/data.gpkg", layer="layer_name")
+    """
+
+    import urllib.parse
+
+    import fiona
+
+    # Determine if source is a URL or local file
+    parsed_url = urllib.parse.urlparse(source)
+    is_url = parsed_url.scheme in ["http", "https"]
+
+    # If it's a local file, check if it exists
+    if not is_url and not os.path.exists(source):
+        raise ValueError(f"File does not exist: {source}")
+
+    # Get file extension
+    _, ext = os.path.splitext(source)
+    ext = ext.lower()
+
+    # Handle GeoParquet files
+    if ext in [".parquet", ".pq", ".geoparquet"]:
+        return gpd.read_parquet(source, **kwargs)
+
+    # Handle common vector formats
+    if ext in [".shp", ".geojson", ".json", ".gpkg", ".gml", ".kml", ".gpx"]:
+        # For formats that might have multiple layers
+        if ext in [".gpkg", ".gml"] and layer is not None:
+            return gpd.read_file(source, layer=layer, **kwargs)
+        return gpd.read_file(source, **kwargs)
+
+    # Try to use fiona to identify valid layers for formats that might have them
+    # Only attempt this for local files as fiona.listlayers might not work with URLs
+    if layer is None and ext in [".gpkg", ".gml"] and not is_url:
+        try:
+            layers = fiona.listlayers(source)
+            if layers:
+                return gpd.read_file(source, layer=layers[0], **kwargs)
+        except Exception:
+            # If listing layers fails, we'll fall through to the generic read attempt
+            pass
+
+    # For other formats or when layer listing fails, attempt to read using GeoPandas
+    try:
+        return gpd.read_file(source, **kwargs)
+    except Exception as e:
+        raise ValueError(f"Could not read from source '{source}': {str(e)}")
