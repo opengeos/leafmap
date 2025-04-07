@@ -5547,7 +5547,14 @@ def edit_vector_data(
         controls = ["point", "polygon", "line_string", "trash"]
 
     if isinstance(filename, str):
-        gdf = gpd.read_file(filename)
+        _, ext = os.path.splitext(filename)
+        ext = ext.lower()
+        if ext in [".parquet", ".pq", ".geoparquet"]:
+            gdf = gpd.read_parquet(filename)
+        else:
+            gdf = gpd.read_file(filename)
+    elif isinstance(filename, dict):
+        gdf = gpd.GeoDataFrame.from_features(filename, crs="EPSG:4326")
     elif isinstance(filename, gpd.GeoDataFrame):
         gdf = filename
     else:

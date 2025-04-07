@@ -16690,3 +16690,78 @@ def set_proj_lib_path(verbose=False):
     except Exception as e:
         print(f"Error setting projection library paths: {e}")
         return
+
+
+def read_vector(source, layer=None, **kwargs):
+    """Reads vector data from various formats including GeoParquet.
+
+    This function dynamically determines the file type based on extension
+    and reads it into a GeoDataFrame. It supports both local files and HTTP/HTTPS URLs.
+
+    Args:
+        source: String path to the vector file or URL.
+        layer: String or integer specifying which layer to read from multi-layer
+            files (only applicable for formats like GPKG, GeoJSON, etc.).
+            Defaults to None.
+        **kwargs: Additional keyword arguments to pass to the underlying reader.
+
+    Returns:
+        geopandas.GeoDataFrame: A GeoDataFrame containing the vector data.
+
+    Raises:
+        ValueError: If the file format is not supported or source cannot be accessed.
+
+    Examples:
+        Read a local shapefile
+        >>> gdf = read_vector("path/to/data.shp")
+        >>>
+        Read a GeoParquet file from URL
+        >>> gdf = read_vector("https://example.com/data.parquet")
+        >>>
+        Read a specific layer from a GeoPackage
+        >>> gdf = read_vector("path/to/data.gpkg", layer="layer_name")
+    """
+
+    import urllib.parse
+
+    import fiona
+
+    # Determine if source is a URL or local file
+    parsed_url = urllib.parse.urlparse(source)
+    is_url = parsed_url.scheme in ["http", "https"]
+
+    # If it's a local file, check if it exists
+    if not is_url and not os.path.exists(source):
+        raise ValueError(f"File does not exist: {source}")
+
+    # Get file extension
+    _, ext = os.path.splitext(source)
+    ext = ext.lower()
+
+    # Handle GeoParquet files
+    if ext in [".parquet", ".pq", ".geoparquet"]:
+        return gpd.read_parquet(source, **kwargs)
+
+    # Handle common vector formats
+    if ext in [".shp", ".geojson", ".json", ".gpkg", ".gml", ".kml", ".gpx"]:
+        # For formats that might have multiple layers
+        if ext in [".gpkg", ".gml"] and layer is not None:
+            return gpd.read_file(source, layer=layer, **kwargs)
+        return gpd.read_file(source, **kwargs)
+
+    # Try to use fiona to identify valid layers for formats that might have them
+    # Only attempt this for local files as fiona.listlayers might not work with URLs
+    if layer is None and ext in [".gpkg", ".gml"] and not is_url:
+        try:
+            layers = fiona.listlayers(source)
+            if layers:
+                return gpd.read_file(source, layer=layers[0], **kwargs)
+        except Exception:
+            # If listing layers fails, we'll fall through to the generic read attempt
+            pass
+
+    # For other formats or when layer listing fails, attempt to read using GeoPandas
+    try:
+        return gpd.read_file(source, **kwargs)
+    except Exception as e:
+        raise ValueError(f"Could not read from source '{source}': {str(e)}")
