@@ -1,5 +1,6 @@
 """The maplibregl module provides the Map class for creating interactive maps using the maplibre.ipywidget module."""
 
+import logging
 import os
 import requests
 from typing import Tuple, Dict, Any, Optional, Union, List
@@ -11,6 +12,9 @@ import ipyvuetify as v
 import pandas as pd
 import ipywidgets as widgets
 from box import Box
+
+logging.getLogger("maplibre").setLevel(logging.ERROR)
+
 from maplibre.basemaps import background
 from maplibre.basemaps import construct_carto_basemap_url
 from maplibre.ipywidget import MapWidget
