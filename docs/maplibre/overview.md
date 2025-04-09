@@ -334,6 +334,12 @@ Add a GeoPandas GeoDataFrame to a map.
 
 [![](https://i.imgur.com/CQHcD7N.png)](https://leafmap.org/maplibre/geopandas)
 
+## Globe Projection
+
+Use globe projection to visualize a 3D globe.
+
+[![](https://github.com/user-attachments/assets/d8d1ba3b-1e69-45ca-93c2-0d696c269b01)](https://leafmap.org/maplibre/globe_projection)
+
 ## Google Earth Engine
 
 Add Google Earth Engine data layers to a map.
