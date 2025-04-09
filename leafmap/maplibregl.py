@@ -23,6 +23,7 @@ from maplibre.controls import (
     GeolocateControl,
     NavigationControl,
     AttributionControl,
+    GlobeControl,
     Marker,
 )
 
@@ -44,6 +45,7 @@ from .common import (
     pmtiles_style,
     random_string,
     read_geojson,
+    read_vector,
     stac_assets,
     start_server,
 )
@@ -67,6 +69,7 @@ class Map(MapWidget):
             "fullscreen": "top-right",
             "scale": "bottom-left",
         },
+        projection: str = "mercator",
         **kwargs: Any,
     ) -> None:
         """
@@ -174,6 +177,20 @@ class Map(MapWidget):
         for layer in self.get_style_layers():
             self.style_dict[layer["id"]] = layer
         self.source_dict = {}
+
+        if projection.lower() == "globe":
+            self.add_globe_control()
+            self.set_projection(
+                type=[
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+                    10,
+                    "vertical-perspective",
+                    12,
+                    "mercator",
+                ]
+            )
 
     def show(self) -> None:
         """Displays the map."""
@@ -401,6 +418,8 @@ class Map(MapWidget):
                 control = NavigationControl(**kwargs)
             elif control == "attribution":
                 control = AttributionControl(**kwargs)
+            elif control == "globe":
+                control = GlobeControl(**kwargs)
             elif control == "draw":
                 self.add_draw_control(position=position, **kwargs)
             elif control == "layers":
@@ -472,6 +491,24 @@ class Map(MapWidget):
         super().add_mapbox_draw(
             options=options, position=position, geojson=geojson, **kwargs
         )
+
+    def add_globe_control(self, position: str = "top-right", **kwargs: Any) -> None:
+        """
+        Adds a globe control to the map.
+
+        This method adds a globe control to the map, allowing users to switch
+        between 2D and 3D views. The position of the control can be customized.
+
+        Args:
+            position (str): The position of the control on the map. Defaults
+                to "top-right".
+            **kwargs (Any): Additional keyword arguments to be passed to the
+                globe control.
+
+        Returns:
+            None
+        """
+        self.add_control(GlobeControl(), position=position, **kwargs)
 
     def save_draw_features(self, filepath: str, indent=4, **kwargs) -> None:
         """
