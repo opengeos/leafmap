@@ -16725,6 +16725,7 @@ def read_vector(source, layer=None, **kwargs):
     import urllib.parse
 
     import fiona
+    import geopandas as gpd
 
     # Determine if source is a URL or local file
     parsed_url = urllib.parse.urlparse(source)
