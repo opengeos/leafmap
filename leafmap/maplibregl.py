@@ -426,6 +426,7 @@ class Map(MapWidget):
                 control = GlobeControl(**kwargs)
             elif control == "draw":
                 self.add_draw_control(position=position, **kwargs)
+                return
             elif control == "layers":
                 self.add_layer_control(position=position, **kwargs)
                 return
