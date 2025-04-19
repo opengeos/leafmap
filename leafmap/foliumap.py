@@ -167,12 +167,12 @@ class Map(folium.Map):
             plugins.Fullscreen().add_to(self)
 
         if "draw_control" not in kwargs:
-            kwargs["draw_control"] = True
+            kwargs["draw_control"] = False
         if kwargs["draw_control"]:
             plugins.Draw(export=kwargs.get("draw_export")).add_to(self)
 
         if "measure_control" not in kwargs:
-            kwargs["measure_control"] = True
+            kwargs["measure_control"] = False
         if kwargs["measure_control"]:
             plugins.MeasureControl(position="bottomleft").add_to(self)
 
