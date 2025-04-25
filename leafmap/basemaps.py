@@ -475,7 +475,7 @@ def xyz_to_bokeh():
     """
     from bokeh.models import WMTSTileSource
 
-    bokeh_dict = {}
+    bokeh_dict: Dict[str, WMTSTileSource] = {}
 
     for key, tile_info in XYZ_TILES.items():
         if "url" not in tile_info or "attribution" not in tile_info:
