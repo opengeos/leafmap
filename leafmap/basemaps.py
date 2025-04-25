@@ -21,7 +21,6 @@ More WMS basemaps can be found at the following websites:
 import collections
 import os
 from typing import Dict, Any
-from bokeh.models import WMTSTileSource
 import requests
 import folium
 import ipyleaflet
@@ -468,7 +467,7 @@ def xyz_to_plotly():
     return plotly_dict
 
 
-def xyz_to_bokeh() -> Dict[str, WMTSTileSource]:
+def xyz_to_bokeh():
     """Convert xyz tile services to bokeh tile layers.
 
     Returns:
