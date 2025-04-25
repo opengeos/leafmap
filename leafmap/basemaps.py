@@ -480,7 +480,9 @@ def xyz_to_bokeh() -> Dict[str, WMTSTileSource]:
 
     for key, tile_info in XYZ_TILES.items():
         if "url" not in tile_info or "attribution" not in tile_info:
-            raise ValueError(f"Invalid tile configuration for key {key}. Missing 'url' or attribution.")
+            raise ValueError(
+                f"Invalid tile configuration for key {key}. Missing 'url' or attribution."
+            )
 
         url: str = tile_info["url"]
         attribution: str = tile_info["attribution"]
@@ -488,7 +490,7 @@ def xyz_to_bokeh() -> Dict[str, WMTSTileSource]:
         tile_options: Dict[str, Any] = {
             "url": url,
             "attribution": attribution,
-            "id": None, # explicit set id to None if not require
+            "id": None,  # explicit set id to None if not require
         }
 
         bokeh_dict[key] = WMTSTileSource(**tile_options)
