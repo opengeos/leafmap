@@ -20,6 +20,8 @@ More WMS basemaps can be found at the following websites:
 
 import collections
 import os
+from typing import Dict, Any
+from bokeh.models import WMTSTileSource
 import requests
 import folium
 import ipyleaflet
@@ -466,7 +468,7 @@ def xyz_to_plotly():
     return plotly_dict
 
 
-def xyz_to_bokeh():
+def xyz_to_bokeh() -> Dict[str, WMTSTileSource]:
     """Convert xyz tile services to bokeh tile layers.
 
     Returns:
@@ -476,24 +478,19 @@ def xyz_to_bokeh():
 
     bokeh_dict = {}
 
-    for key in XYZ_TILES:
-        url = XYZ_TILES[key]["url"]
-        attribution = XYZ_TILES[key]["attribution"]
-        tile_options = {
-            "url": url,
-            "attribution": attribution,
-        }
-        bokeh_dict[key] = WMTSTileSource(**tile_options)
+    for key, tile_info in XYZ_TILES.items():
+        if "url" not in tile_info or "attribution" not in tile_info:
+            raise ValueError(f"Invalid tile configuration for key {key}. Missing 'url' or attribution.")
 
-    xyz_dict = get_xyz_dict()
-    for item in xyz_dict:
-        url = xyz_dict[item].build_url()
-        attribution = xyz_dict[item].attribution
-        key = xyz_dict[item].name
-        tile_options = {
+        url: str = tile_info["url"]
+        attribution: str = tile_info["attribution"]
+
+        tile_options: Dict[str, Any] = {
             "url": url,
             "attribution": attribution,
+            "id": None, # explicit set id to None if not require
         }
+
         bokeh_dict[key] = WMTSTileSource(**tile_options)
 
     return bokeh_dict
