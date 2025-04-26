@@ -4426,14 +4426,16 @@ class Map(ipyleaflet.Map):
 
         self.add_html(text, position=position, **kwargs)
 
-    def add_bbox(self,
-                 bbox: Union[List[float], Tuple[float, float, float, float], Sequence[float]],
-                 layer_name: str = "Bounding Box",
-                 color: str = "blue",
-                 fill_color: Optional[str] = None,
-                 fill_opacity: float = 0.1,
-                 weight: int = 2,
-                 **kwargs) -> None:
+    def add_bbox(
+        self,
+        bbox: Union[List[float], Tuple[float, float, float, float], Sequence[float]],
+        layer_name: str = "Bounding Box",
+        color: str = "blue",
+        fill_color: Optional[str] = None,
+        fill_opacity: float = 0.1,
+        weight: int = 2,
+        **kwargs,
+    ) -> None:
         """
         Add a bbox defined by [x_min, y_min, x_max, y_max] to the map.
 
@@ -4471,7 +4473,9 @@ class Map(ipyleaflet.Map):
             raise ValueError(f"bbox coordinates must be valid numbers. Error {e}.")
 
         if x_min > x_max or y_min > y_max:
-            raise ValueError("x_min must be less than or equal to x_max and y_min must be less than or equal to y_max.")
+            raise ValueError(
+                "x_min must be less than or equal to x_max and y_min must be less than or equal to y_max."
+            )
 
         # define the 4 (+ closing point) corners in counter-clockwise order [longitude, latitude].
         coordinates = [
