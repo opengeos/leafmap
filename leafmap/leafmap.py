@@ -1,7 +1,7 @@
 """Main module."""
 
 import os
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, Callable
+from typing import Any, Dict, List, Optional, Tuple, Type, Union, Callable, Sequence
 
 import ipyleaflet
 import ipywidgets as widgets
@@ -4425,6 +4425,89 @@ class Map(ipyleaflet.Map):
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)
+
+    def add_bbox(self,
+                 bbox: Union[List[float], Tuple[float, float, float, float], Sequence[float]],
+                 layer_name: str = "Bounding Box",
+                 color: str = "blue",
+                 fill_color: Optional[str] = None,
+                 fill_opacity: float = 0.1,
+                 weight: int = 2,
+                 **kwargs) -> None:
+        """
+        Add a bbox defined by [x_min, y_min, x_max, y_max] to the map.
+
+        Args:
+            bbox: A list or tuple containing four numbers representing the
+                  bounding box: [x_min, y_min, x_max, y_max]. Assumed to be
+                  in longitude/latitude coordinates.
+            layer_name: The name to assign to the GeoJSON layer.
+                        Defaults to "Bounding Box".
+            color: The color of the bounding box outline (stroke).
+                   Defaults to "blue".
+            fill_color: The fill color of the bounding box. If None, the box
+                        will not be filled. Defaults to None.
+            fill_opacity: The opacity of the fill color (only used if
+                          fill_color is provided). Value should be between
+                          0.0 and 1.0. Defaults to 0.1.
+            weight: The thickness of the bounding box outline (stroke).
+                    Defaults to 2.
+            **kwargs: Additional keyword arguments to pass directly to the
+                      underlying `add_geojson` method (e.g., `popup`,
+                      `tooltip`, `hover_style`).
+        Raises:
+            ValueError: If `bbox` is not a list or tuple of exactly four numbers,
+                        if the coordinates cannot be converted to floats, or if
+                        x_min > x_max or y_min > y_max.
+        """
+        if not isinstance(bbox, (list, tuple)) or len(bbox) != 4:
+            raise ValueError(
+                "bbox must be a list or tuple of four numbers [minx, miny, maxx, maxy]"
+            )
+
+        try:
+            x_min, y_min, x_max, y_max = map(float, bbox)
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"bbox coordinates must be valid numbers. Error {e}.")
+
+        if x_min > x_max or y_min > y_max:
+            raise ValueError("x_min must be less than or equal to x_max and y_min must be less than or equal to y_max.")
+
+        # define the 4 (+ closing point) corners in counter-clockwise order [longitude, latitude].
+        coordinates = [
+            [
+                [x_min, y_min],  # bottom-left
+                [x_max, y_min],  # bottom-right
+                [x_max, y_max],  # top-right
+                [x_min, y_max],  # top-left
+                [x_min, y_min],
+            ]
+        ]
+
+        # create a FeatureCollection (required by add_geojson).
+        geojson_data = {
+            "type": "FeatureCollection",
+            "features": [
+                # add the bbox feature.
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {"type": "Polygon", "coordinates": coordinates},
+                }
+            ],
+        }
+
+        style = {
+            "stroke": True,
+            "color": color,
+            "weight": weight,
+            "opacity": 1,
+            "fillColor": fill_color if fill_color else color,
+            "fillOpacity": fill_opacity if fill_color else 0,
+            "fill": fill_color is not None,
+        }
+
+        self.add_geojson(geojson_data, style=style, layer_name=layer_name, **kwargs)
 
     def get_bbox(self) -> list:
         """Get the bounds of the map as a list of [(]minx, miny, maxx, maxy].
