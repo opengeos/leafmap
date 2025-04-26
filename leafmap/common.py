@@ -9353,7 +9353,7 @@ def map_tiles_to_geotiff(
         zoom_level = math.log2(initial_resolution / resolution)
 
         return int(zoom_level)
-    
+
     def zoom_level_to_resolution(zoom):
         """
         Convert map zoom level to resolution in meters for Web Mercator (EPSG:3857) tiles.
@@ -9362,7 +9362,7 @@ def map_tiles_to_geotiff(
 
         # Calculate resolution
         resolution_m = initial_resolution / (2**zoom)
-        
+
         return resolution_m
 
     if isinstance(bbox, list) and len(bbox) == 4:
@@ -9374,10 +9374,10 @@ def map_tiles_to_geotiff(
 
     if (zoom is None) and (resolution is None):
         raise ValueError("Either zoom or resolution must be provided")
-    
+
     elif (zoom is not None) and (resolution is not None):
         raise ValueError("Only one of zoom or resolution can be provided")
-    
+
     elif (zoom is None) and (resolution is not None):
         zoom = resolution_to_zoom_level(resolution)
     else:
@@ -9541,10 +9541,7 @@ def map_tiles_to_geotiff(
             **kwargs,
         )
 
-        gtiff.SetMetadata({
-            "ZOOM_LEVEL": str(zoom),
-            "RESOLUTION_M": str(resolution)
-        })
+        gtiff.SetMetadata({"ZOOM_LEVEL": str(zoom), "RESOLUTION_M": str(resolution)})
 
         xp0, yp0 = from4326_to3857(lat0, lon0)
         xp1, yp1 = from4326_to3857(lat1, lon1)
@@ -9566,10 +9563,7 @@ def map_tiles_to_geotiff(
     try:
         draw_tile(source, south, west, north, east, zoom, output, quiet, **kwargs)
         if crs.upper() != "EPSG:3857":
-            reproject(image=output,
-                      output=output,
-                      dst_crs=crs,
-                      to_cog=to_cog)
+            reproject(image=output, output=output, dst_crs=crs, to_cog=to_cog)
         elif to_cog:
             image_to_cog(source=output, dst_path=output)
     except Exception as e:
