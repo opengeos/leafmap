@@ -9340,17 +9340,30 @@ def map_tiles_to_geotiff(
             'source must be one of "OpenStreetMap", "ROADMAP", "SATELLITE", "TERRAIN", "HYBRID", or a URL'
         )
 
+    # Web Mercator tile size in meters at zoom level 0
+    MERCATOR_ZOOM_0_RESOLUTION_M = 156543.03392804097
+
     def resolution_to_zoom_level(resolution):
         """
         Convert map resolution in meters to zoom level for Web Mercator (EPSG:3857) tiles.
         """
-        # Web Mercator tile size in meters at zoom level 0
-        initial_resolution = 156543.03392804097
+        initial_resolution = MERCATOR_ZOOM_0_RESOLUTION_M
 
         # Calculate the zoom level
         zoom_level = math.log2(initial_resolution / resolution)
 
         return int(zoom_level)
+
+    def zoom_level_to_resolution(zoom):
+        """
+        Convert map zoom level to resolution in meters for Web Mercator (EPSG:3857) tiles.
+        """
+        initial_resolution = MERCATOR_ZOOM_0_RESOLUTION_M
+
+        # Calculate resolution
+        resolution_m = initial_resolution / (2**zoom)
+
+        return resolution_m
 
     if isinstance(bbox, list) and len(bbox) == 4:
         west, south, east, north = bbox
@@ -9359,13 +9372,17 @@ def map_tiles_to_geotiff(
             "bbox must be a list of 4 coordinates in the format of [xmin, ymin, xmax, ymax]"
         )
 
-    if zoom is None and resolution is None:
+    if (zoom is None) and (resolution is None):
         raise ValueError("Either zoom or resolution must be provided")
-    elif zoom is not None and resolution is not None:
+
+    elif (zoom is not None) and (resolution is not None):
         raise ValueError("Only one of zoom or resolution can be provided")
 
-    if resolution is not None:
+    elif (zoom is None) and (resolution is not None):
         zoom = resolution_to_zoom_level(resolution)
+    else:
+        # condition: (resolution is None) and (zoom is not None):
+        resolution = zoom_level_to_resolution(zoom)
 
     EARTH_EQUATORIAL_RADIUS = 6378137.0
 
@@ -9523,6 +9540,9 @@ def map_tiles_to_geotiff(
             gdal.GDT_Byte,
             **kwargs,
         )
+
+        gtiff.SetMetadata({"ZOOM_LEVEL": str(zoom), "RESOLUTION_M": str(resolution)})
+
         xp0, yp0 = from4326_to3857(lat0, lon0)
         xp1, yp1 = from4326_to3857(lat1, lon1)
         pwidth = abs(xp1 - xp0) / img.size[0]
@@ -9543,9 +9563,9 @@ def map_tiles_to_geotiff(
     try:
         draw_tile(source, south, west, north, east, zoom, output, quiet, **kwargs)
         if crs.upper() != "EPSG:3857":
-            reproject(output, output, crs, to_cog=to_cog)
+            reproject(image=output, output=output, dst_crs=crs, to_cog=to_cog)
         elif to_cog:
-            image_to_cog(output, output)
+            image_to_cog(source=output, dst_path=output)
     except Exception as e:
         raise Exception(e)
 
