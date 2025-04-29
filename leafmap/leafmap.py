@@ -2398,7 +2398,7 @@ class Map(ipyleaflet.Map):
             source = common.array_to_image(source, **array_args)
 
         # handle duplicate input layer names.
-        if hasattr(self, 'cog_layer_dict'):
+        if hasattr(self, "cog_layer_dict"):
             if layer_name in self.cog_layer_dict:
                 base_name = layer_name
                 suffix = 1
