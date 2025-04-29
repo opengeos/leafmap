@@ -2397,6 +2397,15 @@ class Map(ipyleaflet.Map):
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
             source = common.array_to_image(source, **array_args)
 
+        # handle duplicate input layer names.
+        if hasattr(self, "cog_layer_dict"):
+            if layer_name in self.cog_layer_dict:
+                base_name = layer_name
+                suffix = 1
+                while f"{base_name}_{suffix}" in self.cog_layer_dict:
+                    suffix += 1
+                layer_name = f"{base_name}_{suffix}"
+
         tile_layer = common.get_local_tile_layer(
             source,
             indexes=indexes,
