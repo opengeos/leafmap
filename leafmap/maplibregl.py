@@ -55,6 +55,7 @@ from .common import (
 )
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
+MapWidget._use_message_queue = False
 
 
 class Map(MapWidget):
@@ -74,7 +75,6 @@ class Map(MapWidget):
             "scale": "bottom-left",
         },
         projection: str = "mercator",
-        use_message_queue: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -101,8 +101,6 @@ class Map(MapWidget):
                 map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.
             projection (str, optional): The projection of the map. It can be
                 "mercator" or "globe". Defaults to "mercator".
-            use_message_queue (bool, optional): Whether to use the message queue
-                for rendering the map. Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the MapOptions class.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/
                 for more information.
@@ -168,8 +166,6 @@ class Map(MapWidget):
         )
 
         super().__init__(map_options, height=height)
-        if use_message_queue:
-            super().use_message_queue()
 
         for control, position in controls.items():
             self.add_control(control, position)
