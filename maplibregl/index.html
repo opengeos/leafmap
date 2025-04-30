@@ -11523,7 +11523,13 @@
 <span class="normal">4172</span>
 <span class="normal">4173</span>
 <span class="normal">4174</span>
-<span class="normal">4175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">MapWidget</span><span class="p">):</span>
+<span class="normal">4175</span>
+<span class="normal">4176</span>
+<span class="normal">4177</span>
+<span class="normal">4178</span>
+<span class="normal">4179</span>
+<span class="normal">4180</span>
+<span class="normal">4181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">MapWidget</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Map class inherits from the MapWidget class of the maplibre.ipywidget module.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -11540,6 +11546,7 @@
             <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span>
         <span class="p">},</span>
         <span class="n">projection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mercator&quot;</span><span class="p">,</span>
+        <span class="n">use_message_queue</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -11564,6 +11571,10 @@
 <span class="sd">            height (str, optional): The height of the map. Defaults to &quot;600px&quot;.</span>
 <span class="sd">            controls (dict, optional): The controls and their positions on the</span>
 <span class="sd">                map. Defaults to {&quot;fullscreen&quot;: &quot;top-right&quot;, &quot;scale&quot;: &quot;bottom-left&quot;}.</span>
+<span class="sd">            projection (str, optional): The projection of the map. It can be</span>
+<span class="sd">                &quot;mercator&quot; or &quot;globe&quot;. Defaults to &quot;mercator&quot;.</span>
+<span class="sd">            use_message_queue (bool, optional): Whether to use the message queue</span>
+<span class="sd">                for rendering the map. Defaults to False.</span>
 <span class="sd">            **kwargs: Additional keyword arguments that are passed to the MapOptions class.</span>
 <span class="sd">                See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/</span>
 <span class="sd">                for more information.</span>
@@ -11629,7 +11640,8 @@
         <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">map_options</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">use_message_queue</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">use_message_queue</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">use_message_queue</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">control</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">controls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
@@ -15658,7 +15670,7 @@
 
 
 <h3 id="leafmap.maplibregl.Map.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;dark-matter&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;navigation&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;fullscreen&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom-left&#39;</span><span class="p">},</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;mercator&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;dark-matter&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">controls</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;navigation&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;fullscreen&#39;</span><span class="p">:</span> <span class="s1">&#39;top-right&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom-left&#39;</span><span class="p">},</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;mercator&#39;</span><span class="p">,</span> <span class="n">use_message_queue</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#leafmap.maplibregl.Map.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -15800,6 +15812,40 @@ map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.</p>
             </td>
             <td>
                   <code>{&#39;navigation&#39;: &#39;top-right&#39;, &#39;fullscreen&#39;: &#39;top-right&#39;, &#39;scale&#39;: &#39;bottom-left&#39;}</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>projection</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The projection of the map. It can be
+"mercator" or "globe". Defaults to "mercator".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;mercator&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>use_message_queue</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to use the message queue
+for rendering the map. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -15983,7 +16029,13 @@ for more information.</p>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">center</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
     <span class="n">zoom</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
@@ -15997,6 +16049,7 @@ for more information.</p>
         <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom-left&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="n">projection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mercator&quot;</span><span class="p">,</span>
+    <span class="n">use_message_queue</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -16021,6 +16074,10 @@ for more information.</p>
 <span class="sd">        height (str, optional): The height of the map. Defaults to &quot;600px&quot;.</span>
 <span class="sd">        controls (dict, optional): The controls and their positions on the</span>
 <span class="sd">            map. Defaults to {&quot;fullscreen&quot;: &quot;top-right&quot;, &quot;scale&quot;: &quot;bottom-left&quot;}.</span>
+<span class="sd">        projection (str, optional): The projection of the map. It can be</span>
+<span class="sd">            &quot;mercator&quot; or &quot;globe&quot;. Defaults to &quot;mercator&quot;.</span>
+<span class="sd">        use_message_queue (bool, optional): Whether to use the message queue</span>
+<span class="sd">            for rendering the map. Defaults to False.</span>
 <span class="sd">        **kwargs: Additional keyword arguments that are passed to the MapOptions class.</span>
 <span class="sd">            See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/</span>
 <span class="sd">            for more information.</span>
@@ -16086,7 +16143,8 @@ for more information.</p>
     <span class="p">)</span>
 
     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">map_options</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">height</span><span class="p">)</span>
-    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">use_message_queue</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">use_message_queue</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">use_message_queue</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">control</span><span class="p">,</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">controls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="n">control</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
@@ -16285,13 +16343,7 @@ building height range defined by the 'values'. Defaults to ["lightgray", "royalb
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3009</span>
-<span class="normal">3010</span>
-<span class="normal">3011</span>
-<span class="normal">3012</span>
-<span class="normal">3013</span>
-<span class="normal">3014</span>
-<span class="normal">3015</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3015</span>
 <span class="normal">3016</span>
 <span class="normal">3017</span>
 <span class="normal">3018</span>
@@ -16360,7 +16412,13 @@ building height range defined by the 'values'. Defaults to ["lightgray", "royalb
 <span class="normal">3081</span>
 <span class="normal">3082</span>
 <span class="normal">3083</span>
-<span class="normal">3084</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_3d_buildings</span><span class="p">(</span>
+<span class="normal">3084</span>
+<span class="normal">3085</span>
+<span class="normal">3086</span>
+<span class="normal">3087</span>
+<span class="normal">3088</span>
+<span class="normal">3089</span>
+<span class="normal">3090</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_3d_buildings</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;buildings&quot;</span><span class="p">,</span>
     <span class="n">min_zoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
@@ -16688,13 +16746,7 @@ building height range defined by the 'values'. Defaults to ["lightgray", "royalb
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">315</span>
 <span class="normal">316</span>
 <span class="normal">317</span>
 <span class="normal">318</span>
@@ -16763,7 +16815,13 @@ building height range defined by the 'values'. Defaults to ["lightgray", "royalb
 <span class="normal">381</span>
 <span class="normal">382</span>
 <span class="normal">383</span>
-<span class="normal">384</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_arc_layer</span><span class="p">(</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
+<span class="normal">389</span>
+<span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_arc_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
     <span class="n">src_lon</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -16981,13 +17039,7 @@ the arrow symbol will be visible. Defaults to 19.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2283</span>
-<span class="normal">2284</span>
-<span class="normal">2285</span>
-<span class="normal">2286</span>
-<span class="normal">2287</span>
-<span class="normal">2288</span>
-<span class="normal">2289</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2289</span>
 <span class="normal">2290</span>
 <span class="normal">2291</span>
 <span class="normal">2292</span>
@@ -17007,7 +17059,13 @@ the arrow symbol will be visible. Defaults to 19.</p>
 <span class="normal">2306</span>
 <span class="normal">2307</span>
 <span class="normal">2308</span>
-<span class="normal">2309</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_arrow</span><span class="p">(</span>
+<span class="normal">2309</span>
+<span class="normal">2310</span>
+<span class="normal">2311</span>
+<span class="normal">2312</span>
+<span class="normal">2313</span>
+<span class="normal">2314</span>
+<span class="normal">2315</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_arrow</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -17208,13 +17266,7 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">628</span>
-<span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">634</span>
 <span class="normal">635</span>
 <span class="normal">636</span>
 <span class="normal">637</span>
@@ -17310,7 +17362,13 @@ not an instance of TileProvider, and not a key from the basemaps dictionary.</p>
 <span class="normal">727</span>
 <span class="normal">728</span>
 <span class="normal">729</span>
-<span class="normal">730</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span>
+<span class="normal">730</span>
+<span class="normal">731</span>
+<span class="normal">732</span>
+<span class="normal">733</span>
+<span class="normal">734</span>
+<span class="normal">735</span>
+<span class="normal">736</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">basemap</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -17626,13 +17684,7 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1185</span>
-<span class="normal">1186</span>
-<span class="normal">1187</span>
-<span class="normal">1188</span>
-<span class="normal">1189</span>
-<span class="normal">1190</span>
-<span class="normal">1191</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1191</span>
 <span class="normal">1192</span>
 <span class="normal">1193</span>
 <span class="normal">1194</span>
@@ -17685,7 +17737,13 @@ and https://cogeotiff.github.io/rio-tiler/colormap/.
 <span class="normal">1241</span>
 <span class="normal">1242</span>
 <span class="normal">1243</span>
-<span class="normal">1244</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_cog_layer</span><span class="p">(</span>
+<span class="normal">1244</span>
+<span class="normal">1245</span>
+<span class="normal">1246</span>
+<span class="normal">1247</span>
+<span class="normal">1248</span>
+<span class="normal">1249</span>
+<span class="normal">1250</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_cog_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -18095,13 +18153,7 @@ label, and orientation.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2876</span>
-<span class="normal">2877</span>
-<span class="normal">2878</span>
-<span class="normal">2879</span>
-<span class="normal">2880</span>
-<span class="normal">2881</span>
-<span class="normal">2882</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2882</span>
 <span class="normal">2883</span>
 <span class="normal">2884</span>
 <span class="normal">2885</span>
@@ -18173,7 +18225,13 @@ label, and orientation.</p>
 <span class="normal">2951</span>
 <span class="normal">2952</span>
 <span class="normal">2953</span>
-<span class="normal">2954</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_colorbar</span><span class="p">(</span>
+<span class="normal">2954</span>
+<span class="normal">2955</span>
+<span class="normal">2956</span>
+<span class="normal">2957</span>
+<span class="normal">2958</span>
+<span class="normal">2959</span>
+<span class="normal">2960</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_colorbar</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">3.0</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span>
@@ -18391,13 +18449,7 @@ following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution".</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">392</span>
 <span class="normal">393</span>
 <span class="normal">394</span>
 <span class="normal">395</span>
@@ -18444,7 +18496,13 @@ following: 'scale', 'fullscreen', 'geolocate', 'navigation', "attribution".</p>
 <span class="normal">436</span>
 <span class="normal">437</span>
 <span class="normal">438</span>
-<span class="normal">439</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_control</span><span class="p">(</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span>
+<span class="normal">445</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_control</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">control</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -18921,13 +18979,7 @@ fields, which can be a list of column names to be included in the popup.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3795</span>
-<span class="normal">3796</span>
-<span class="normal">3797</span>
-<span class="normal">3798</span>
-<span class="normal">3799</span>
-<span class="normal">3800</span>
-<span class="normal">3801</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3801</span>
 <span class="normal">3802</span>
 <span class="normal">3803</span>
 <span class="normal">3804</span>
@@ -19113,7 +19165,13 @@ fields, which can be a list of column names to be included in the popup.</p>
 <span class="normal">3984</span>
 <span class="normal">3985</span>
 <span class="normal">3986</span>
-<span class="normal">3987</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span>
+<span class="normal">3987</span>
+<span class="normal">3988</span>
+<span class="normal">3989</span>
+<span class="normal">3990</span>
+<span class="normal">3991</span>
+<span class="normal">3992</span>
+<span class="normal">3993</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_data</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="s2">&quot;gpd.GeoDataFrame&quot;</span><span class="p">],</span>
     <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -19376,13 +19434,7 @@ or a dictionary where keys are layer ids and values are mustache template string
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">293</span>
 <span class="normal">294</span>
 <span class="normal">295</span>
 <span class="normal">296</span>
@@ -19396,7 +19448,13 @@ or a dictionary where keys are layer ids and values are mustache template string
 <span class="normal">304</span>
 <span class="normal">305</span>
 <span class="normal">306</span>
-<span class="normal">307</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_deck_layers</span><span class="p">(</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_deck_layers</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">layers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">tooltip</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add Deck.GL layers to the layer stack</span>
@@ -19567,13 +19625,7 @@ drawing control.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
-<span class="normal">447</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">447</span>
 <span class="normal">448</span>
 <span class="normal">449</span>
 <span class="normal">450</span>
@@ -19624,7 +19676,13 @@ drawing control.</p>
 <span class="normal">495</span>
 <span class="normal">496</span>
 <span class="normal">497</span>
-<span class="normal">498</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_draw_control</span><span class="p">(</span>
+<span class="normal">498</span>
+<span class="normal">499</span>
+<span class="normal">500</span>
+<span class="normal">501</span>
+<span class="normal">502</span>
+<span class="normal">503</span>
+<span class="normal">504</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_draw_control</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">controls</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -19908,13 +19966,7 @@ the new layer should be inserted.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1096</span>
-<span class="normal">1097</span>
-<span class="normal">1098</span>
-<span class="normal">1099</span>
-<span class="normal">1100</span>
-<span class="normal">1101</span>
-<span class="normal">1102</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1102</span>
 <span class="normal">1103</span>
 <span class="normal">1104</span>
 <span class="normal">1105</span>
@@ -19995,7 +20047,13 @@ the new layer should be inserted.</p>
 <span class="normal">1180</span>
 <span class="normal">1181</span>
 <span class="normal">1182</span>
-<span class="normal">1183</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_ee_layer</span><span class="p">(</span>
+<span class="normal">1183</span>
+<span class="normal">1184</span>
+<span class="normal">1185</span>
+<span class="normal">1186</span>
+<span class="normal">1187</span>
+<span class="normal">1188</span>
+<span class="normal">1189</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_ee_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ee_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">vis_params</span><span class="o">=</span><span class="p">{},</span>
@@ -20335,13 +20393,7 @@ passed to the GeoJSONSource class.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">927</span>
-<span class="normal">928</span>
-<span class="normal">929</span>
-<span class="normal">930</span>
-<span class="normal">931</span>
-<span class="normal">932</span>
-<span class="normal">933</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">933</span>
 <span class="normal">934</span>
 <span class="normal">935</span>
 <span class="normal">936</span>
@@ -20393,7 +20445,13 @@ passed to the GeoJSONSource class.</p>
 <span class="normal">982</span>
 <span class="normal">983</span>
 <span class="normal">984</span>
-<span class="normal">985</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+<span class="normal">985</span>
+<span class="normal">986</span>
+<span class="normal">987</span>
+<span class="normal">988</span>
+<span class="normal">989</span>
+<span class="normal">990</span>
+<span class="normal">991</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">gdf</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
     <span class="n">layer_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -20729,13 +20787,7 @@ See https://maplibre.org/maplibre-style-spec/layers/ for more info.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">732</span>
-<span class="normal">733</span>
-<span class="normal">734</span>
-<span class="normal">735</span>
-<span class="normal">736</span>
-<span class="normal">737</span>
-<span class="normal">738</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">738</span>
 <span class="normal">739</span>
 <span class="normal">740</span>
 <span class="normal">741</span>
@@ -20855,7 +20907,13 @@ See https://maplibre.org/maplibre-style-spec/layers/ for more info.</p>
 <span class="normal">855</span>
 <span class="normal">856</span>
 <span class="normal">857</span>
-<span class="normal">858</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
+<span class="normal">858</span>
+<span class="normal">859</span>
+<span class="normal">860</span>
+<span class="normal">861</span>
+<span class="normal">862</span>
+<span class="normal">863</span>
+<span class="normal">864</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span>
     <span class="n">layer_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -21078,13 +21136,7 @@ globe control.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">500</span>
-<span class="normal">501</span>
-<span class="normal">502</span>
-<span class="normal">503</span>
-<span class="normal">504</span>
-<span class="normal">505</span>
-<span class="normal">506</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">506</span>
 <span class="normal">507</span>
 <span class="normal">508</span>
 <span class="normal">509</span>
@@ -21094,7 +21146,13 @@ globe control.</p>
 <span class="normal">513</span>
 <span class="normal">514</span>
 <span class="normal">515</span>
-<span class="normal">516</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_globe_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">516</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span>
+<span class="normal">521</span>
+<span class="normal">522</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_globe_control</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;top-right&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds a globe control to the map.</span>
 
@@ -21493,13 +21551,7 @@ which assumes the y coordinates are in the "latitude", "lat", or "y" column.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3619</span>
-<span class="normal">3620</span>
-<span class="normal">3621</span>
-<span class="normal">3622</span>
-<span class="normal">3623</span>
-<span class="normal">3624</span>
-<span class="normal">3625</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3625</span>
 <span class="normal">3626</span>
 <span class="normal">3627</span>
 <span class="normal">3628</span>
@@ -21667,7 +21719,13 @@ which assumes the y coordinates are in the "latitude", "lat", or "y" column.</p>
 <span class="normal">3790</span>
 <span class="normal">3791</span>
 <span class="normal">3792</span>
-<span class="normal">3793</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gps_trace</span><span class="p">(</span>
+<span class="normal">3793</span>
+<span class="normal">3794</span>
+<span class="normal">3795</span>
+<span class="normal">3796</span>
+<span class="normal">3797</span>
+<span class="normal">3798</span>
+<span class="normal">3799</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gps_trace</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]],</span>
     <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -21971,13 +22029,7 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2681</span>
-<span class="normal">2682</span>
-<span class="normal">2683</span>
-<span class="normal">2684</span>
-<span class="normal">2685</span>
-<span class="normal">2686</span>
-<span class="normal">2687</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2687</span>
 <span class="normal">2688</span>
 <span class="normal">2689</span>
 <span class="normal">2690</span>
@@ -21998,7 +22050,13 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 <span class="normal">2705</span>
 <span class="normal">2706</span>
 <span class="normal">2707</span>
-<span class="normal">2708</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_html</span><span class="p">(</span>
+<span class="normal">2708</span>
+<span class="normal">2709</span>
+<span class="normal">2710</span>
+<span class="normal">2711</span>
+<span class="normal">2712</span>
+<span class="normal">2713</span>
+<span class="normal">2714</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_html</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">html</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">bg_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;white&quot;</span><span class="p">,</span>
@@ -22202,13 +22260,7 @@ Can be one of 'top-right', 'top-left', 'bottom-right', 'bottom-left'.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2126</span>
-<span class="normal">2127</span>
-<span class="normal">2128</span>
-<span class="normal">2129</span>
-<span class="normal">2130</span>
-<span class="normal">2131</span>
-<span class="normal">2132</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2132</span>
 <span class="normal">2133</span>
 <span class="normal">2134</span>
 <span class="normal">2135</span>
@@ -22296,7 +22348,13 @@ Can be one of 'top-right', 'top-left', 'bottom-right', 'bottom-left'.</p>
 <span class="normal">2217</span>
 <span class="normal">2218</span>
 <span class="normal">2219</span>
-<span class="normal">2220</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_image</span><span class="p">(</span>
+<span class="normal">2220</span>
+<span class="normal">2221</span>
+<span class="normal">2222</span>
+<span class="normal">2223</span>
+<span class="normal">2224</span>
+<span class="normal">2225</span>
+<span class="normal">2226</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_image</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -22537,13 +22595,7 @@ in the layer dictionary. If None, the layer's ID is used as the key.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">217</span>
 <span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
@@ -22594,7 +22646,13 @@ in the layer dictionary. If None, the layer's ID is used as the key.</p>
 <span class="normal">265</span>
 <span class="normal">266</span>
 <span class="normal">267</span>
-<span class="normal">268</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">layer</span><span class="p">:</span> <span class="s2">&quot;Layer&quot;</span><span class="p">,</span>
     <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -22798,13 +22856,7 @@ or "bottom-right". Defaults to "top-left".</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2956</span>
-<span class="normal">2957</span>
-<span class="normal">2958</span>
-<span class="normal">2959</span>
-<span class="normal">2960</span>
-<span class="normal">2961</span>
-<span class="normal">2962</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2962</span>
 <span class="normal">2963</span>
 <span class="normal">2964</span>
 <span class="normal">2965</span>
@@ -22849,7 +22901,13 @@ or "bottom-right". Defaults to "top-left".</p>
 <span class="normal">3004</span>
 <span class="normal">3005</span>
 <span class="normal">3006</span>
-<span class="normal">3007</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_layer_control</span><span class="p">(</span>
+<span class="normal">3007</span>
+<span class="normal">3008</span>
+<span class="normal">3009</span>
+<span class="normal">3010</span>
+<span class="normal">3011</span>
+<span class="normal">3012</span>
+<span class="normal">3013</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_layer_control</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">layer_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">theme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
@@ -23127,13 +23185,7 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2710</span>
-<span class="normal">2711</span>
-<span class="normal">2712</span>
-<span class="normal">2713</span>
-<span class="normal">2714</span>
-<span class="normal">2715</span>
-<span class="normal">2716</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2716</span>
 <span class="normal">2717</span>
 <span class="normal">2718</span>
 <span class="normal">2719</span>
@@ -23291,7 +23343,13 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 <span class="normal">2871</span>
 <span class="normal">2872</span>
 <span class="normal">2873</span>
-<span class="normal">2874</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_legend</span><span class="p">(</span>
+<span class="normal">2874</span>
+<span class="normal">2875</span>
+<span class="normal">2876</span>
+<span class="normal">2877</span>
+<span class="normal">2878</span>
+<span class="normal">2879</span>
+<span class="normal">2880</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_legend</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Legend&quot;</span><span class="p">,</span>
     <span class="n">legend_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -23699,13 +23757,7 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3989</span>
-<span class="normal">3990</span>
-<span class="normal">3991</span>
-<span class="normal">3992</span>
-<span class="normal">3993</span>
-<span class="normal">3994</span>
-<span class="normal">3995</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3995</span>
 <span class="normal">3996</span>
 <span class="normal">3997</span>
 <span class="normal">3998</span>
@@ -23785,7 +23837,13 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 <span class="normal">4072</span>
 <span class="normal">4073</span>
 <span class="normal">4074</span>
-<span class="normal">4075</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_mapillary</span><span class="p">(</span>
+<span class="normal">4075</span>
+<span class="normal">4076</span>
+<span class="normal">4077</span>
+<span class="normal">4078</span>
+<span class="normal">4079</span>
+<span class="normal">4080</span>
+<span class="normal">4081</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_mapillary</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">minzoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">6</span><span class="p">,</span>
     <span class="n">maxzoom</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
@@ -23999,13 +24057,7 @@ customize the marker. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1992</span>
-<span class="normal">1993</span>
-<span class="normal">1994</span>
-<span class="normal">1995</span>
-<span class="normal">1996</span>
-<span class="normal">1997</span>
-<span class="normal">1998</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1998</span>
 <span class="normal">1999</span>
 <span class="normal">2000</span>
 <span class="normal">2001</span>
@@ -24024,7 +24076,13 @@ customize the marker. Defaults to None.</p>
 <span class="normal">2014</span>
 <span class="normal">2015</span>
 <span class="normal">2016</span>
-<span class="normal">2017</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_marker</span><span class="p">(</span>
+<span class="normal">2017</span>
+<span class="normal">2018</span>
+<span class="normal">2019</span>
+<span class="normal">2020</span>
+<span class="normal">2021</span>
+<span class="normal">2022</span>
+<span class="normal">2023</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_marker</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">marker</span><span class="p">:</span> <span class="n">Marker</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">lng_lat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[],</span>
@@ -24157,13 +24215,7 @@ customize the marker. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3566</span>
-<span class="normal">3567</span>
-<span class="normal">3568</span>
-<span class="normal">3569</span>
-<span class="normal">3570</span>
-<span class="normal">3571</span>
-<span class="normal">3572</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3572</span>
 <span class="normal">3573</span>
 <span class="normal">3574</span>
 <span class="normal">3575</span>
@@ -24208,7 +24260,13 @@ customize the marker. Defaults to None.</p>
 <span class="normal">3614</span>
 <span class="normal">3615</span>
 <span class="normal">3616</span>
-<span class="normal">3617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_nlcd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2023</span><span class="p">],</span> <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">3617</span>
+<span class="normal">3618</span>
+<span class="normal">3619</span>
+<span class="normal">3620</span>
+<span class="normal">3621</span>
+<span class="normal">3622</span>
+<span class="normal">3623</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_nlcd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">years</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2023</span><span class="p">],</span> <span class="n">add_legend</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds National Land Cover Database (NLCD) data to the map.</span>
 
@@ -24474,13 +24532,7 @@ buildings layer. Defaults to False.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3086</span>
-<span class="normal">3087</span>
-<span class="normal">3088</span>
-<span class="normal">3089</span>
-<span class="normal">3090</span>
-<span class="normal">3091</span>
-<span class="normal">3092</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3092</span>
 <span class="normal">3093</span>
 <span class="normal">3094</span>
 <span class="normal">3095</span>
@@ -24591,7 +24643,13 @@ buildings layer. Defaults to False.</p>
 <span class="normal">3200</span>
 <span class="normal">3201</span>
 <span class="normal">3202</span>
-<span class="normal">3203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_overture_3d_buildings</span><span class="p">(</span>
+<span class="normal">3203</span>
+<span class="normal">3204</span>
+<span class="normal">3205</span>
+<span class="normal">3206</span>
+<span class="normal">3207</span>
+<span class="normal">3208</span>
+<span class="normal">3209</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_overture_3d_buildings</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">release</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -24878,13 +24936,7 @@ data layer. Defaults to False.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3449</span>
-<span class="normal">3450</span>
-<span class="normal">3451</span>
-<span class="normal">3452</span>
-<span class="normal">3453</span>
-<span class="normal">3454</span>
-<span class="normal">3455</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3455</span>
 <span class="normal">3456</span>
 <span class="normal">3457</span>
 <span class="normal">3458</span>
@@ -24952,7 +25004,13 @@ data layer. Defaults to False.</p>
 <span class="normal">3520</span>
 <span class="normal">3521</span>
 <span class="normal">3522</span>
-<span class="normal">3523</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_overture_buildings</span><span class="p">(</span>
+<span class="normal">3523</span>
+<span class="normal">3524</span>
+<span class="normal">3525</span>
+<span class="normal">3526</span>
+<span class="normal">3527</span>
+<span class="normal">3528</span>
+<span class="normal">3529</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_overture_buildings</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -25221,13 +25279,7 @@ data layer. Defaults to False.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3205</span>
-<span class="normal">3206</span>
-<span class="normal">3207</span>
-<span class="normal">3208</span>
-<span class="normal">3209</span>
-<span class="normal">3210</span>
-<span class="normal">3211</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3211</span>
 <span class="normal">3212</span>
 <span class="normal">3213</span>
 <span class="normal">3214</span>
@@ -25463,7 +25515,13 @@ data layer. Defaults to False.</p>
 <span class="normal">3444</span>
 <span class="normal">3445</span>
 <span class="normal">3446</span>
-<span class="normal">3447</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_overture_data</span><span class="p">(</span>
+<span class="normal">3447</span>
+<span class="normal">3448</span>
+<span class="normal">3449</span>
+<span class="normal">3450</span>
+<span class="normal">3451</span>
+<span class="normal">3452</span>
+<span class="normal">3453</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_overture_data</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">release</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">theme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;buildings&quot;</span><span class="p">,</span>
@@ -25943,13 +26001,7 @@ See https://docs.mapbox.com/style-spec/reference/layers/ for more info.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1902</span>
-<span class="normal">1903</span>
-<span class="normal">1904</span>
-<span class="normal">1905</span>
-<span class="normal">1906</span>
-<span class="normal">1907</span>
-<span class="normal">1908</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1908</span>
 <span class="normal">1909</span>
 <span class="normal">1910</span>
 <span class="normal">1911</span>
@@ -26031,7 +26083,13 @@ See https://docs.mapbox.com/style-spec/reference/layers/ for more info.</p>
 <span class="normal">1987</span>
 <span class="normal">1988</span>
 <span class="normal">1989</span>
-<span class="normal">1990</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_pmtiles</span><span class="p">(</span>
+<span class="normal">1990</span>
+<span class="normal">1991</span>
+<span class="normal">1992</span>
+<span class="normal">1993</span>
+<span class="normal">1994</span>
+<span class="normal">1995</span>
+<span class="normal">1996</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_pmtiles</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">style</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -26402,13 +26460,7 @@ localtileserver.TileClient. Defaults to { "cors_all": False }.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1326</span>
-<span class="normal">1327</span>
-<span class="normal">1328</span>
-<span class="normal">1329</span>
-<span class="normal">1330</span>
-<span class="normal">1331</span>
-<span class="normal">1332</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1332</span>
 <span class="normal">1333</span>
 <span class="normal">1334</span>
 <span class="normal">1335</span>
@@ -26492,7 +26544,13 @@ localtileserver.TileClient. Defaults to { "cors_all": False }.</p>
 <span class="normal">1413</span>
 <span class="normal">1414</span>
 <span class="normal">1415</span>
-<span class="normal">1416</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_raster</span><span class="p">(</span>
+<span class="normal">1416</span>
+<span class="normal">1417</span>
+<span class="normal">1418</span>
+<span class="normal">1419</span>
+<span class="normal">1420</span>
+<span class="normal">1421</span>
+<span class="normal">1422</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_raster</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">source</span><span class="p">,</span>
     <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -26675,19 +26733,19 @@ localtileserver.TileClient. Defaults to { "cors_all": False }.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">544</span>
-<span class="normal">545</span>
-<span class="normal">546</span>
-<span class="normal">547</span>
-<span class="normal">548</span>
-<span class="normal">549</span>
-<span class="normal">550</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">550</span>
 <span class="normal">551</span>
 <span class="normal">552</span>
 <span class="normal">553</span>
 <span class="normal">554</span>
 <span class="normal">555</span>
-<span class="normal">556</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">556</span>
+<span class="normal">557</span>
+<span class="normal">558</span>
+<span class="normal">559</span>
+<span class="normal">560</span>
+<span class="normal">561</span>
+<span class="normal">562</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adds a source to the map.</span>
 
@@ -27003,13 +27061,7 @@ bands, use something like <code>rescale=["164,223","130,211","99,212"]</code>.</
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1246</span>
-<span class="normal">1247</span>
-<span class="normal">1248</span>
-<span class="normal">1249</span>
-<span class="normal">1250</span>
-<span class="normal">1251</span>
-<span class="normal">1252</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1252</span>
 <span class="normal">1253</span>
 <span class="normal">1254</span>
 <span class="normal">1255</span>
@@ -27081,7 +27133,13 @@ bands, use something like <code>rescale=["164,223","130,211","99,212"]</code>.</
 <span class="normal">1321</span>
 <span class="normal">1322</span>
 <span class="normal">1323</span>
-<span class="normal">1324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_stac_layer</span><span class="p">(</span>
+<span class="normal">1324</span>
+<span class="normal">1325</span>
+<span class="normal">1326</span>
+<span class="normal">1327</span>
+<span class="normal">1328</span>
+<span class="normal">1329</span>
+<span class="normal">1330</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_stac_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">collection</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -27366,13 +27424,7 @@ For more info, see https://maplibre.org/maplibre-style-spec/layers/#symbol</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2222</span>
-<span class="normal">2223</span>
-<span class="normal">2224</span>
-<span class="normal">2225</span>
-<span class="normal">2226</span>
-<span class="normal">2227</span>
-<span class="normal">2228</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2228</span>
 <span class="normal">2229</span>
 <span class="normal">2230</span>
 <span class="normal">2231</span>
@@ -27425,7 +27477,13 @@ For more info, see https://maplibre.org/maplibre-style-spec/layers/#symbol</p>
 <span class="normal">2278</span>
 <span class="normal">2279</span>
 <span class="normal">2280</span>
-<span class="normal">2281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_symbol</span><span class="p">(</span>
+<span class="normal">2281</span>
+<span class="normal">2282</span>
+<span class="normal">2283</span>
+<span class="normal">2284</span>
+<span class="normal">2285</span>
+<span class="normal">2286</span>
+<span class="normal">2287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_symbol</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -27694,13 +27752,7 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2631</span>
-<span class="normal">2632</span>
-<span class="normal">2633</span>
-<span class="normal">2634</span>
-<span class="normal">2635</span>
-<span class="normal">2636</span>
-<span class="normal">2637</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2637</span>
 <span class="normal">2638</span>
 <span class="normal">2639</span>
 <span class="normal">2640</span>
@@ -27742,7 +27794,13 @@ To make the background half transparent, set this to "rgba(255, 255, 255, 0.5)".
 <span class="normal">2676</span>
 <span class="normal">2677</span>
 <span class="normal">2678</span>
-<span class="normal">2679</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_text</span><span class="p">(</span>
+<span class="normal">2679</span>
+<span class="normal">2680</span>
+<span class="normal">2681</span>
+<span class="normal">2682</span>
+<span class="normal">2683</span>
+<span class="normal">2684</span>
+<span class="normal">2685</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_text</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">fontsize</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
@@ -27989,13 +28047,7 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 987</span>
-<span class="normal"> 988</span>
-<span class="normal"> 989</span>
-<span class="normal"> 990</span>
-<span class="normal"> 991</span>
-<span class="normal"> 992</span>
-<span class="normal"> 993</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 993</span>
 <span class="normal"> 994</span>
 <span class="normal"> 995</span>
 <span class="normal"> 996</span>
@@ -28038,7 +28090,13 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 <span class="normal">1033</span>
 <span class="normal">1034</span>
 <span class="normal">1035</span>
-<span class="normal">1036</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_tile_layer</span><span class="p">(</span>
+<span class="normal">1036</span>
+<span class="normal">1037</span>
+<span class="normal">1038</span>
+<span class="normal">1039</span>
+<span class="normal">1040</span>
+<span class="normal">1041</span>
+<span class="normal">1042</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_tile_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Tile Layer&quot;</span><span class="p">,</span>
@@ -28344,13 +28402,7 @@ passed to the GeoJSONSource class.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">860</span>
-<span class="normal">861</span>
-<span class="normal">862</span>
-<span class="normal">863</span>
-<span class="normal">864</span>
-<span class="normal">865</span>
-<span class="normal">866</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">866</span>
 <span class="normal">867</span>
 <span class="normal">868</span>
 <span class="normal">869</span>
@@ -28409,7 +28461,13 @@ passed to the GeoJSONSource class.</p>
 <span class="normal">922</span>
 <span class="normal">923</span>
 <span class="normal">924</span>
-<span class="normal">925</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
+<span class="normal">925</span>
+<span class="normal">926</span>
+<span class="normal">927</span>
+<span class="normal">928</span>
+<span class="normal">929</span>
+<span class="normal">930</span>
+<span class="normal">931</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">],</span>
     <span class="n">layer_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -28604,13 +28662,7 @@ will be added on top. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3525</span>
-<span class="normal">3526</span>
-<span class="normal">3527</span>
-<span class="normal">3528</span>
-<span class="normal">3529</span>
-<span class="normal">3530</span>
-<span class="normal">3531</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">3531</span>
 <span class="normal">3532</span>
 <span class="normal">3533</span>
 <span class="normal">3534</span>
@@ -28643,7 +28695,13 @@ will be added on top. Defaults to None.</p>
 <span class="normal">3561</span>
 <span class="normal">3562</span>
 <span class="normal">3563</span>
-<span class="normal">3564</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_video</span><span class="p">(</span>
+<span class="normal">3564</span>
+<span class="normal">3565</span>
+<span class="normal">3566</span>
+<span class="normal">3567</span>
+<span class="normal">3568</span>
+<span class="normal">3569</span>
+<span class="normal">3570</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_video</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">urls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">coordinates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
@@ -28913,13 +28971,7 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1038</span>
-<span class="normal">1039</span>
-<span class="normal">1040</span>
-<span class="normal">1041</span>
-<span class="normal">1042</span>
-<span class="normal">1043</span>
-<span class="normal">1044</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1044</span>
 <span class="normal">1045</span>
 <span class="normal">1046</span>
 <span class="normal">1047</span>
@@ -28969,7 +29021,13 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 <span class="normal">1091</span>
 <span class="normal">1092</span>
 <span class="normal">1093</span>
-<span class="normal">1094</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_wms_layer</span><span class="p">(</span>
+<span class="normal">1094</span>
+<span class="normal">1095</span>
+<span class="normal">1096</span>
+<span class="normal">1097</span>
+<span class="normal">1098</span>
+<span class="normal">1099</span>
+<span class="normal">1100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_wms_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">layers</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -29278,13 +29336,7 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4077</span>
-<span class="normal">4078</span>
-<span class="normal">4079</span>
-<span class="normal">4080</span>
-<span class="normal">4081</span>
-<span class="normal">4082</span>
-<span class="normal">4083</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4083</span>
 <span class="normal">4084</span>
 <span class="normal">4085</span>
 <span class="normal">4086</span>
@@ -29376,7 +29428,13 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 <span class="normal">4172</span>
 <span class="normal">4173</span>
 <span class="normal">4174</span>
-<span class="normal">4175</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_mapillary_widget</span><span class="p">(</span>
+<span class="normal">4175</span>
+<span class="normal">4176</span>
+<span class="normal">4177</span>
+<span class="normal">4178</span>
+<span class="normal">4179</span>
+<span class="normal">4180</span>
+<span class="normal">4181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_mapillary_widget</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">lon</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">lat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -29520,18 +29578,18 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2618</span>
-<span class="normal">2619</span>
-<span class="normal">2620</span>
-<span class="normal">2621</span>
-<span class="normal">2622</span>
-<span class="normal">2623</span>
-<span class="normal">2624</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2624</span>
 <span class="normal">2625</span>
 <span class="normal">2626</span>
 <span class="normal">2627</span>
 <span class="normal">2628</span>
-<span class="normal">2629</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_first_symbol_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="normal">2629</span>
+<span class="normal">2630</span>
+<span class="normal">2631</span>
+<span class="normal">2632</span>
+<span class="normal">2633</span>
+<span class="normal">2634</span>
+<span class="normal">2635</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_first_symbol_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the first symbol layer in the map&#39;s current style.</span>
 
@@ -29619,13 +29677,7 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2584</span>
-<span class="normal">2585</span>
-<span class="normal">2586</span>
-<span class="normal">2587</span>
-<span class="normal">2588</span>
-<span class="normal">2589</span>
-<span class="normal">2590</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2590</span>
 <span class="normal">2591</span>
 <span class="normal">2592</span>
 <span class="normal">2593</span>
@@ -29633,7 +29685,13 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 <span class="normal">2595</span>
 <span class="normal">2596</span>
 <span class="normal">2597</span>
-<span class="normal">2598</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_style_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="normal">2598</span>
+<span class="normal">2599</span>
+<span class="normal">2600</span>
+<span class="normal">2601</span>
+<span class="normal">2602</span>
+<span class="normal">2603</span>
+<span class="normal">2604</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">find_style_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Searches for a style layer in the map&#39;s current style by its ID and returns it if found.</span>
 
@@ -29749,13 +29807,7 @@ See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/FitBoundsOptions/.
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">594</span>
-<span class="normal">595</span>
-<span class="normal">596</span>
-<span class="normal">597</span>
-<span class="normal">598</span>
-<span class="normal">599</span>
-<span class="normal">600</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">600</span>
 <span class="normal">601</span>
 <span class="normal">602</span>
 <span class="normal">603</span>
@@ -29781,7 +29833,13 @@ See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/FitBoundsOptions/.
 <span class="normal">623</span>
 <span class="normal">624</span>
 <span class="normal">625</span>
-<span class="normal">626</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_bounds</span><span class="p">(</span>
+<span class="normal">626</span>
+<span class="normal">627</span>
+<span class="normal">628</span>
+<span class="normal">629</span>
+<span class="normal">630</span>
+<span class="normal">631</span>
+<span class="normal">632</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_bounds</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -29973,13 +30031,7 @@ essential and not affected by prefers-reduced-motion. Defaults to True.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2019</span>
-<span class="normal">2020</span>
-<span class="normal">2021</span>
-<span class="normal">2022</span>
-<span class="normal">2023</span>
-<span class="normal">2024</span>
-<span class="normal">2025</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2025</span>
 <span class="normal">2026</span>
 <span class="normal">2027</span>
 <span class="normal">2028</span>
@@ -30009,7 +30061,13 @@ essential and not affected by prefers-reduced-motion. Defaults to True.</p>
 <span class="normal">2052</span>
 <span class="normal">2053</span>
 <span class="normal">2054</span>
-<span class="normal">2055</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fly_to</span><span class="p">(</span>
+<span class="normal">2055</span>
+<span class="normal">2056</span>
+<span class="normal">2057</span>
+<span class="normal">2058</span>
+<span class="normal">2059</span>
+<span class="normal">2060</span>
+<span class="normal">2061</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fly_to</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -30090,13 +30148,7 @@ essential and not affected by prefers-reduced-motion. Defaults to True.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2544</span>
-<span class="normal">2545</span>
-<span class="normal">2546</span>
-<span class="normal">2547</span>
-<span class="normal">2548</span>
-<span class="normal">2549</span>
-<span class="normal">2550</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2550</span>
 <span class="normal">2551</span>
 <span class="normal">2552</span>
 <span class="normal">2553</span>
@@ -30107,7 +30159,13 @@ essential and not affected by prefers-reduced-motion. Defaults to True.</p>
 <span class="normal">2558</span>
 <span class="normal">2559</span>
 <span class="normal">2560</span>
-<span class="normal">2561</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="normal">2561</span>
+<span class="normal">2562</span>
+<span class="normal">2563</span>
+<span class="normal">2564</span>
+<span class="normal">2565</span>
+<span class="normal">2566</span>
+<span class="normal">2567</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the style of the map.</span>
 
@@ -30170,13 +30228,7 @@ essential and not affected by prefers-reduced-motion. Defaults to True.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2563</span>
-<span class="normal">2564</span>
-<span class="normal">2565</span>
-<span class="normal">2566</span>
-<span class="normal">2567</span>
-<span class="normal">2568</span>
-<span class="normal">2569</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2569</span>
 <span class="normal">2570</span>
 <span class="normal">2571</span>
 <span class="normal">2572</span>
@@ -30189,7 +30241,13 @@ essential and not affected by prefers-reduced-motion. Defaults to True.</p>
 <span class="normal">2579</span>
 <span class="normal">2580</span>
 <span class="normal">2581</span>
-<span class="normal">2582</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_style_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">2582</span>
+<span class="normal">2583</span>
+<span class="normal">2584</span>
+<span class="normal">2585</span>
+<span class="normal">2586</span>
+<span class="normal">2587</span>
+<span class="normal">2588</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">get_style_layers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_ids</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the names of the basemap layers.</span>
 
@@ -30304,13 +30362,7 @@ see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#jumpto</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2449</span>
-<span class="normal">2450</span>
-<span class="normal">2451</span>
-<span class="normal">2452</span>
-<span class="normal">2453</span>
-<span class="normal">2454</span>
-<span class="normal">2455</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2455</span>
 <span class="normal">2456</span>
 <span class="normal">2457</span>
 <span class="normal">2458</span>
@@ -30319,7 +30371,13 @@ see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#jumpto</p>
 <span class="normal">2461</span>
 <span class="normal">2462</span>
 <span class="normal">2463</span>
-<span class="normal">2464</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">jump_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2464</span>
+<span class="normal">2465</span>
+<span class="normal">2466</span>
+<span class="normal">2467</span>
+<span class="normal">2468</span>
+<span class="normal">2469</span>
+<span class="normal">2470</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">jump_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Jumps the map to a specified location.</span>
 
@@ -30410,13 +30468,7 @@ see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#jumpto</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1613</span>
-<span class="normal">1614</span>
-<span class="normal">1615</span>
-<span class="normal">1616</span>
-<span class="normal">1617</span>
-<span class="normal">1618</span>
-<span class="normal">1619</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1619</span>
 <span class="normal">1620</span>
 <span class="normal">1621</span>
 <span class="normal">1622</span>
@@ -30492,7 +30544,13 @@ see https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#jumpto</p>
 <span class="normal">1692</span>
 <span class="normal">1693</span>
 <span class="normal">1694</span>
-<span class="normal">1695</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">1695</span>
+<span class="normal">1696</span>
+<span class="normal">1697</span>
+<span class="normal">1698</span>
+<span class="normal">1699</span>
+<span class="normal">1700</span>
+<span class="normal">1701</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a layer widget for changing the visibility and opacity of a layer.</span>
 
 <span class="sd">    Args:</span>
@@ -30652,13 +30710,7 @@ uploaded, it is written to a temporary file and added to the map.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2379</span>
-<span class="normal">2380</span>
-<span class="normal">2381</span>
-<span class="normal">2382</span>
-<span class="normal">2383</span>
-<span class="normal">2384</span>
-<span class="normal">2385</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2385</span>
 <span class="normal">2386</span>
 <span class="normal">2387</span>
 <span class="normal">2388</span>
@@ -30679,7 +30731,13 @@ uploaded, it is written to a temporary file and added to the map.</p>
 <span class="normal">2403</span>
 <span class="normal">2404</span>
 <span class="normal">2405</span>
-<span class="normal">2406</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_geojson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">:</span>
+<span class="normal">2406</span>
+<span class="normal">2407</span>
+<span class="normal">2408</span>
+<span class="normal">2409</span>
+<span class="normal">2410</span>
+<span class="normal">2411</span>
+<span class="normal">2412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_geojson</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a file uploader widget to upload a GeoJSON file. When a file is</span>
 <span class="sd">    uploaded, it is written to a temporary file and added to the map.</span>
@@ -30818,13 +30876,7 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2408</span>
-<span class="normal">2409</span>
-<span class="normal">2410</span>
-<span class="normal">2411</span>
-<span class="normal">2412</span>
-<span class="normal">2413</span>
-<span class="normal">2414</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2414</span>
 <span class="normal">2415</span>
 <span class="normal">2416</span>
 <span class="normal">2417</span>
@@ -30839,7 +30891,13 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 <span class="normal">2426</span>
 <span class="normal">2427</span>
 <span class="normal">2428</span>
-<span class="normal">2429</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">pan_to</span><span class="p">(</span>
+<span class="normal">2429</span>
+<span class="normal">2430</span>
+<span class="normal">2431</span>
+<span class="normal">2432</span>
+<span class="normal">2433</span>
+<span class="normal">2434</span>
+<span class="normal">2435</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">pan_to</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">lnglat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
@@ -30938,13 +30996,7 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">270</span>
-<span class="normal">271</span>
-<span class="normal">272</span>
-<span class="normal">273</span>
-<span class="normal">274</span>
-<span class="normal">275</span>
-<span class="normal">276</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">276</span>
 <span class="normal">277</span>
 <span class="normal">278</span>
 <span class="normal">279</span>
@@ -30953,7 +31005,13 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 <span class="normal">282</span>
 <span class="normal">283</span>
 <span class="normal">284</span>
-<span class="normal">285</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">remove_layer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Removes a layer from the map.</span>
 
@@ -31081,13 +31139,7 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2358</span>
-<span class="normal">2359</span>
-<span class="normal">2360</span>
-<span class="normal">2361</span>
-<span class="normal">2362</span>
-<span class="normal">2363</span>
-<span class="normal">2364</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2364</span>
 <span class="normal">2365</span>
 <span class="normal">2366</span>
 <span class="normal">2367</span>
@@ -31100,7 +31152,13 @@ For more information, see https://maplibre.org/maplibre-gl-js/docs/API/classes/M
 <span class="normal">2374</span>
 <span class="normal">2375</span>
 <span class="normal">2376</span>
-<span class="normal">2377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">rotate_to</span><span class="p">(</span>
+<span class="normal">2377</span>
+<span class="normal">2378</span>
+<span class="normal">2379</span>
+<span class="normal">2380</span>
+<span class="normal">2381</span>
+<span class="normal">2382</span>
+<span class="normal">2383</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">rotate_to</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">bearing</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -31238,13 +31296,7 @@ file will not be created.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">518</span>
-<span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
-<span class="normal">523</span>
-<span class="normal">524</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">524</span>
 <span class="normal">525</span>
 <span class="normal">526</span>
 <span class="normal">527</span>
@@ -31262,7 +31314,13 @@ file will not be created.</p>
 <span class="normal">539</span>
 <span class="normal">540</span>
 <span class="normal">541</span>
-<span class="normal">542</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">542</span>
+<span class="normal">543</span>
+<span class="normal">544</span>
+<span class="normal">545</span>
+<span class="normal">546</span>
+<span class="normal">547</span>
+<span class="normal">548</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_draw_features</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Saves the drawn features to a file.</span>
 
@@ -31398,13 +31456,7 @@ level is not changed.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">558</span>
-<span class="normal">559</span>
-<span class="normal">560</span>
-<span class="normal">561</span>
-<span class="normal">562</span>
-<span class="normal">563</span>
-<span class="normal">564</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">564</span>
 <span class="normal">565</span>
 <span class="normal">566</span>
 <span class="normal">567</span>
@@ -31418,7 +31470,13 @@ level is not changed.</p>
 <span class="normal">575</span>
 <span class="normal">576</span>
 <span class="normal">577</span>
-<span class="normal">578</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_center</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">lat</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets the center of the map.</span>
 
@@ -31532,13 +31590,7 @@ level is not changed.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1552</span>
-<span class="normal">1553</span>
-<span class="normal">1554</span>
-<span class="normal">1555</span>
-<span class="normal">1556</span>
-<span class="normal">1557</span>
-<span class="normal">1558</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1558</span>
 <span class="normal">1559</span>
 <span class="normal">1560</span>
 <span class="normal">1561</span>
@@ -31549,7 +31601,13 @@ level is not changed.</p>
 <span class="normal">1566</span>
 <span class="normal">1567</span>
 <span class="normal">1568</span>
-<span class="normal">1569</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1569</span>
+<span class="normal">1570</span>
+<span class="normal">1571</span>
+<span class="normal">1572</span>
+<span class="normal">1573</span>
+<span class="normal">1574</span>
+<span class="normal">1575</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">color</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the color of a layer.</span>
 
@@ -31676,13 +31734,7 @@ level is not changed.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1531</span>
-<span class="normal">1532</span>
-<span class="normal">1533</span>
-<span class="normal">1534</span>
-<span class="normal">1535</span>
-<span class="normal">1536</span>
-<span class="normal">1537</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1537</span>
 <span class="normal">1538</span>
 <span class="normal">1539</span>
 <span class="normal">1540</span>
@@ -31695,7 +31747,13 @@ level is not changed.</p>
 <span class="normal">1547</span>
 <span class="normal">1548</span>
 <span class="normal">1549</span>
-<span class="normal">1550</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_layout_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1550</span>
+<span class="normal">1551</span>
+<span class="normal">1552</span>
+<span class="normal">1553</span>
+<span class="normal">1554</span>
+<span class="normal">1555</span>
+<span class="normal">1556</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_layout_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the layout property of a layer.</span>
 
@@ -31808,13 +31866,7 @@ level is not changed.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1571</span>
-<span class="normal">1572</span>
-<span class="normal">1573</span>
-<span class="normal">1574</span>
-<span class="normal">1575</span>
-<span class="normal">1576</span>
-<span class="normal">1577</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1577</span>
 <span class="normal">1578</span>
 <span class="normal">1579</span>
 <span class="normal">1580</span>
@@ -31832,7 +31884,13 @@ level is not changed.</p>
 <span class="normal">1592</span>
 <span class="normal">1593</span>
 <span class="normal">1594</span>
-<span class="normal">1595</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1595</span>
+<span class="normal">1596</span>
+<span class="normal">1597</span>
+<span class="normal">1598</span>
+<span class="normal">1599</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the opacity of a layer.</span>
 
@@ -31950,13 +32008,7 @@ level is not changed.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1509</span>
-<span class="normal">1510</span>
-<span class="normal">1511</span>
-<span class="normal">1512</span>
-<span class="normal">1513</span>
-<span class="normal">1514</span>
-<span class="normal">1515</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1515</span>
 <span class="normal">1516</span>
 <span class="normal">1517</span>
 <span class="normal">1518</span>
@@ -31970,7 +32022,13 @@ level is not changed.</p>
 <span class="normal">1526</span>
 <span class="normal">1527</span>
 <span class="normal">1528</span>
-<span class="normal">1529</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_paint_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1529</span>
+<span class="normal">1530</span>
+<span class="normal">1531</span>
+<span class="normal">1532</span>
+<span class="normal">1533</span>
+<span class="normal">1534</span>
+<span class="normal">1535</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_paint_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prop</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the opacity of a layer.</span>
 
@@ -32087,13 +32145,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2431</span>
-<span class="normal">2432</span>
-<span class="normal">2433</span>
-<span class="normal">2434</span>
-<span class="normal">2435</span>
-<span class="normal">2436</span>
-<span class="normal">2437</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2437</span>
 <span class="normal">2438</span>
 <span class="normal">2439</span>
 <span class="normal">2440</span>
@@ -32103,7 +32155,13 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 <span class="normal">2444</span>
 <span class="normal">2445</span>
 <span class="normal">2446</span>
-<span class="normal">2447</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_pitch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pitch</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2447</span>
+<span class="normal">2448</span>
+<span class="normal">2449</span>
+<span class="normal">2450</span>
+<span class="normal">2451</span>
+<span class="normal">2452</span>
+<span class="normal">2453</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_pitch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pitch</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets the pitch of the map.</span>
 
@@ -32213,13 +32271,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1597</span>
-<span class="normal">1598</span>
-<span class="normal">1599</span>
-<span class="normal">1600</span>
-<span class="normal">1601</span>
-<span class="normal">1602</span>
-<span class="normal">1603</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1603</span>
 <span class="normal">1604</span>
 <span class="normal">1605</span>
 <span class="normal">1606</span>
@@ -32227,7 +32279,13 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 <span class="normal">1608</span>
 <span class="normal">1609</span>
 <span class="normal">1610</span>
-<span class="normal">1611</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">1611</span>
+<span class="normal">1612</span>
+<span class="normal">1613</span>
+<span class="normal">1614</span>
+<span class="normal">1615</span>
+<span class="normal">1616</span>
+<span class="normal">1617</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the visibility of a layer.</span>
 
@@ -32319,19 +32377,19 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">586</span>
 <span class="normal">587</span>
 <span class="normal">588</span>
 <span class="normal">589</span>
 <span class="normal">590</span>
 <span class="normal">591</span>
-<span class="normal">592</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
+<span class="normal">598</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">set_zoom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Sets the zoom level of the map.</span>
 
@@ -32366,9 +32424,9 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Displays the map.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
@@ -32446,13 +32504,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1697</span>
-<span class="normal">1698</span>
-<span class="normal">1699</span>
-<span class="normal">1700</span>
-<span class="normal">1701</span>
-<span class="normal">1702</span>
-<span class="normal">1703</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1703</span>
 <span class="normal">1704</span>
 <span class="normal">1705</span>
 <span class="normal">1706</span>
@@ -32563,7 +32615,13 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 <span class="normal">1811</span>
 <span class="normal">1812</span>
 <span class="normal">1813</span>
-<span class="normal">1814</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">style_layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="normal">1814</span>
+<span class="normal">1815</span>
+<span class="normal">1816</span>
+<span class="normal">1817</span>
+<span class="normal">1818</span>
+<span class="normal">1819</span>
+<span class="normal">1820</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">style_layer_interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a layer widget for changing the visibility and opacity of a style layer.</span>
 
 <span class="sd">    Args:</span>
@@ -32890,13 +32948,7 @@ Defaults to False.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1418</span>
-<span class="normal">1419</span>
-<span class="normal">1420</span>
-<span class="normal">1421</span>
-<span class="normal">1422</span>
-<span class="normal">1423</span>
-<span class="normal">1424</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1424</span>
 <span class="normal">1425</span>
 <span class="normal">1426</span>
 <span class="normal">1427</span>
@@ -32979,7 +33031,13 @@ Defaults to False.</p>
 <span class="normal">1504</span>
 <span class="normal">1505</span>
 <span class="normal">1506</span>
-<span class="normal">1507</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
+<span class="normal">1507</span>
+<span class="normal">1508</span>
+<span class="normal">1509</span>
+<span class="normal">1510</span>
+<span class="normal">1511</span>
+<span class="normal">1512</span>
+<span class="normal">1513</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">output</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;My Awesome Map&quot;</span><span class="p">,</span>
@@ -33223,13 +33281,7 @@ function.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2311</span>
-<span class="normal">2312</span>
-<span class="normal">2313</span>
-<span class="normal">2314</span>
-<span class="normal">2315</span>
-<span class="normal">2316</span>
-<span class="normal">2317</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2317</span>
 <span class="normal">2318</span>
 <span class="normal">2319</span>
 <span class="normal">2320</span>
@@ -33268,7 +33320,13 @@ function.</p>
 <span class="normal">2353</span>
 <span class="normal">2354</span>
 <span class="normal">2355</span>
-<span class="normal">2356</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_streamlit</span><span class="p">(</span>
+<span class="normal">2356</span>
+<span class="normal">2357</span>
+<span class="normal">2358</span>
+<span class="normal">2359</span>
+<span class="normal">2360</span>
+<span class="normal">2361</span>
+<span class="normal">2362</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_streamlit</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -33425,13 +33483,7 @@ https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#zoomto</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2600</span>
-<span class="normal">2601</span>
-<span class="normal">2602</span>
-<span class="normal">2603</span>
-<span class="normal">2604</span>
-<span class="normal">2605</span>
-<span class="normal">2606</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">2606</span>
 <span class="normal">2607</span>
 <span class="normal">2608</span>
 <span class="normal">2609</span>
@@ -33441,7 +33493,13 @@ https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/#zoomto</p>
 <span class="normal">2613</span>
 <span class="normal">2614</span>
 <span class="normal">2615</span>
-<span class="normal">2616</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">zoom_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">2616</span>
+<span class="normal">2617</span>
+<span class="normal">2618</span>
+<span class="normal">2619</span>
+<span class="normal">2620</span>
+<span class="normal">2621</span>
+<span class="normal">2622</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">zoom_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zoom</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Zooms the map to a specified zoom level.</span>
 
@@ -33588,13 +33646,7 @@ attempts to retrieve the API key using a predefined method. Defaults to None.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4231</span>
-<span class="normal">4232</span>
-<span class="normal">4233</span>
-<span class="normal">4234</span>
-<span class="normal">4235</span>
-<span class="normal">4236</span>
-<span class="normal">4237</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4237</span>
 <span class="normal">4238</span>
 <span class="normal">4239</span>
 <span class="normal">4240</span>
@@ -33622,7 +33674,13 @@ attempts to retrieve the API key using a predefined method. Defaults to None.</p
 <span class="normal">4262</span>
 <span class="normal">4263</span>
 <span class="normal">4264</span>
-<span class="normal">4265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="normal">4265</span>
+<span class="normal">4266</span>
+<span class="normal">4267</span>
+<span class="normal">4268</span>
+<span class="normal">4269</span>
+<span class="normal">4270</span>
+<span class="normal">4271</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a URL for a MapTiler style with an optional API key.</span>
 
@@ -33988,13 +34046,7 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5262</span>
-<span class="normal">5263</span>
-<span class="normal">5264</span>
-<span class="normal">5265</span>
-<span class="normal">5266</span>
-<span class="normal">5267</span>
-<span class="normal">5268</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5268</span>
 <span class="normal">5269</span>
 <span class="normal">5270</span>
 <span class="normal">5271</span>
@@ -34242,7 +34294,13 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
 <span class="normal">5513</span>
 <span class="normal">5514</span>
 <span class="normal">5515</span>
-<span class="normal">5516</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_vector_data</span><span class="p">(</span>
+<span class="normal">5516</span>
+<span class="normal">5517</span>
+<span class="normal">5518</span>
+<span class="normal">5519</span>
+<span class="normal">5520</span>
+<span class="normal">5521</span>
+<span class="normal">5522</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_vector_data</span><span class="p">(</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">T%H%M%S&quot;</span><span class="p">,</span>
@@ -34845,13 +34903,7 @@ The first numerical column will be used if None. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4414</span>
-<span class="normal">4415</span>
-<span class="normal">4416</span>
-<span class="normal">4417</span>
-<span class="normal">4418</span>
-<span class="normal">4419</span>
-<span class="normal">4420</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4420</span>
 <span class="normal">4421</span>
 <span class="normal">4422</span>
 <span class="normal">4423</span>
@@ -35389,7 +35441,13 @@ The first numerical column will be used if None. Defaults to None.</p>
 <span class="normal">4955</span>
 <span class="normal">4956</span>
 <span class="normal">4957</span>
-<span class="normal">4958</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_gps_trace</span><span class="p">(</span>
+<span class="normal">4958</span>
+<span class="normal">4959</span>
+<span class="normal">4960</span>
+<span class="normal">4961</span>
+<span class="normal">4962</span>
+<span class="normal">4963</span>
+<span class="normal">4964</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_gps_trace</span><span class="p">(</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">ann_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -36299,13 +36357,7 @@ Defaults to ["point", "polygon", "line_string", "trash"].</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5519</span>
-<span class="normal">5520</span>
-<span class="normal">5521</span>
-<span class="normal">5522</span>
-<span class="normal">5523</span>
-<span class="normal">5524</span>
-<span class="normal">5525</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5525</span>
 <span class="normal">5526</span>
 <span class="normal">5527</span>
 <span class="normal">5528</span>
@@ -36614,7 +36666,13 @@ Defaults to ["point", "polygon", "line_string", "trash"].</p>
 <span class="normal">5831</span>
 <span class="normal">5832</span>
 <span class="normal">5833</span>
-<span class="normal">5834</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
+<span class="normal">5834</span>
+<span class="normal">5835</span>
+<span class="normal">5836</span>
+<span class="normal">5837</span>
+<span class="normal">5838</span>
+<span class="normal">5839</span>
+<span class="normal">5840</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -37147,13 +37205,7 @@ webp, png, jpg. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4268</span>
-<span class="normal">4269</span>
-<span class="normal">4270</span>
-<span class="normal">4271</span>
-<span class="normal">4272</span>
-<span class="normal">4273</span>
-<span class="normal">4274</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4274</span>
 <span class="normal">4275</span>
 <span class="normal">4276</span>
 <span class="normal">4277</span>
@@ -37290,7 +37342,13 @@ webp, png, jpg. Defaults to None.</p>
 <span class="normal">4408</span>
 <span class="normal">4409</span>
 <span class="normal">4410</span>
-<span class="normal">4411</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">maptiler_3d_style</span><span class="p">(</span>
+<span class="normal">4411</span>
+<span class="normal">4412</span>
+<span class="normal">4413</span>
+<span class="normal">4414</span>
+<span class="normal">4415</span>
+<span class="normal">4416</span>
+<span class="normal">4417</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">maptiler_3d_style</span><span class="p">(</span>
     <span class="n">style</span><span class="o">=</span><span class="s2">&quot;satellite&quot;</span><span class="p">,</span>
     <span class="n">exaggeration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
@@ -37815,13 +37873,7 @@ The first numerical column will be used if None. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4961</span>
-<span class="normal">4962</span>
-<span class="normal">4963</span>
-<span class="normal">4964</span>
-<span class="normal">4965</span>
-<span class="normal">4966</span>
-<span class="normal">4967</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4967</span>
 <span class="normal">4968</span>
 <span class="normal">4969</span>
 <span class="normal">4970</span>
@@ -37964,7 +38016,13 @@ The first numerical column will be used if None. Defaults to None.</p>
 <span class="normal">5107</span>
 <span class="normal">5108</span>
 <span class="normal">5109</span>
-<span class="normal">5110</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_trace</span><span class="p">(</span>
+<span class="normal">5110</span>
+<span class="normal">5111</span>
+<span class="normal">5112</span>
+<span class="normal">5113</span>
+<span class="normal">5114</span>
+<span class="normal">5115</span>
+<span class="normal">5116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_trace</span><span class="p">(</span>
     <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">ann_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">colormap</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -38543,13 +38601,7 @@ The first numerical column will be used if None. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5113</span>
-<span class="normal">5114</span>
-<span class="normal">5115</span>
-<span class="normal">5116</span>
-<span class="normal">5117</span>
-<span class="normal">5118</span>
-<span class="normal">5119</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5119</span>
 <span class="normal">5120</span>
 <span class="normal">5121</span>
 <span class="normal">5122</span>
@@ -38689,7 +38741,13 @@ The first numerical column will be used if None. Defaults to None.</p>
 <span class="normal">5256</span>
 <span class="normal">5257</span>
 <span class="normal">5258</span>
-<span class="normal">5259</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_traces</span><span class="p">(</span>
+<span class="normal">5259</span>
+<span class="normal">5260</span>
+<span class="normal">5261</span>
+<span class="normal">5262</span>
+<span class="normal">5263</span>
+<span class="normal">5264</span>
+<span class="normal">5265</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_traces</span><span class="p">(</span>
     <span class="n">filepaths</span><span class="p">,</span>
     <span class="n">dirname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">widget_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;500px&quot;</span><span class="p">,</span>
