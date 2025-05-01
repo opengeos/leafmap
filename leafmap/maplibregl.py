@@ -55,7 +55,6 @@ from .common import (
 )
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
-MapWidget._use_message_queue = False
 
 
 class Map(MapWidget):
@@ -75,6 +74,7 @@ class Map(MapWidget):
             "scale": "bottom-left",
         },
         projection: str = "mercator",
+        use_message_queue: bool = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -101,6 +101,12 @@ class Map(MapWidget):
                 map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.
             projection (str, optional): The projection of the map. It can be
                 "mercator" or "globe". Defaults to "mercator".
+            use_message_queue (bool, optional): Whether to use the message queue.
+                Defaults to None. If None, it will check the environment variable
+                "USE_MESSAGE_QUEUE". If it is set to "True", it will use the message queue, which
+                is needed to export the map to HTML. If it is set to "False", it will not use the message
+                queue, which is needed to display the map multiple times in the same notebook.
+            kwargs (Any): Additional keyword arguments that are passed to the MapOptions class.
             **kwargs: Additional keyword arguments that are passed to the MapOptions class.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/
                 for more information.
@@ -166,6 +172,9 @@ class Map(MapWidget):
         )
 
         super().__init__(map_options, height=height)
+        if use_message_queue is None:
+            use_message_queue = os.environ.get("USE_MESSAGE_QUEUE", False)
+        self.use_message_queue(use_message_queue)
 
         for control, position in controls.items():
             self.add_control(control, position)
