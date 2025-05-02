@@ -10714,8 +10714,20 @@ def array_to_image(
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    if not output.endswith(".tif"):
+    ext = os.path.splitext(output)[-1].lower()
+    if ext == "":
         output += ".tif"
+        driver = "COG"
+    elif ext == ".png":
+        driver = "PNG"
+    elif ext == ".jpg" or ext == ".jpeg":
+        driver = "JPEG"
+    elif ext == ".jp2":
+        driver = "JP2OpenJPEG"
+    elif ext == ".tiff":
+        driver = "GTiff"
+    else:
+        driver = "COG"
 
     if source is not None:
         with rasterio.open(source) as src:
