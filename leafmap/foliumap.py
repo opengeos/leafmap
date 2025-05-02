@@ -70,6 +70,7 @@ from .common import (
     stac_stats,
     stac_tile,
     start_server,
+    st_download_button,
     vector_to_gif,
     view_lidar,
     write_lidar,
