@@ -10796,7 +10796,7 @@ def array_to_image(
         metadata["count"] = 1
     elif array.ndim == 3:
         metadata["count"] = array.shape[2]
-    if compress is not None:
+    if compress is not None and (driver in ["GTiff", "COG"]):
         metadata["compress"] = compress
 
     metadata.update(**kwargs)
