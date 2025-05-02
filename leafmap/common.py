@@ -2694,6 +2694,9 @@ def st_download_button(
         import streamlit as st
         import pandas as pd
 
+        if key is None:
+            key = random_string(6)
+
         if isinstance(data, str):
             if file_name is None:
                 file_name = data.split("/")[-1]
