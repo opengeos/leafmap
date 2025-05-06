@@ -5436,10 +5436,14 @@ def create_vector_data(
             """
             image_widget.value = content
         else:
-            image_widget.value = "No Mapillary image found."
+            image_widget.value = ""
 
     if add_mapillary:
         m.observe(log_lng_lat, names="clicked")
+
+    filename_widget = widgets.Text(
+        description="Filename:", placeholder="filename.geojson"
+    )
 
     button_layout = widgets.Layout(width="97px")
     save = widgets.Button(
@@ -5468,8 +5472,16 @@ def create_vector_data(
     save.on_click(on_save_click)
 
     def on_export_click(b):
+        output.clear_output()
         current_time = datetime.now().strftime(time_format)
-        filename = os.path.join(out_dir, f"{filename_prefix}{current_time}.{file_ext}")
+        if filename_widget.value:
+            filename = filename_widget.value
+            if not filename.endswith(f".{file_ext}"):
+                filename = f"{filename}.{file_ext}"
+        else:
+            filename = os.path.join(
+                out_dir, f"{filename_prefix}{current_time}.{file_ext}"
+            )
 
         for index, feature in enumerate(m.draw_feature_collection_all["features"]):
             feature_id = feature["id"]
@@ -5504,6 +5516,7 @@ def create_vector_data(
 
     sidebar_widget.children = [
         prop_widgets,
+        filename_widget,
         widgets.HBox([save, export, reset]),
         output,
         image_widget,
