@@ -1062,9 +1062,12 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
 
-        vmin, vmax = common.cog_tile_vmin_vmax(
-            url, bands=bands, titiler_endpoint=titiler_endpoint
-        )
+        try:
+            vmin, vmax = common.cog_tile_vmin_vmax(
+                url, bands=bands, titiler_endpoint=titiler_endpoint
+            )
+        except Exception:
+            vmin, vmax = None, None
 
         if "colormap_name" in kwargs:
             colormap = kwargs["colormap_name"]
@@ -1092,6 +1095,10 @@ class Map(ipyleaflet.Map):
             "layer_name": name,
             "type": "COG",
         }
+        if vmin is None and vmax is None:
+            params.pop("vmin")
+            params.pop("vmax")
+
         self.cog_layer_dict[name] = params
 
     def add_cog_mosaic(self, **kwargs) -> None:
@@ -5834,9 +5841,7 @@ class Map(ipyleaflet.Map):
             None
         """
         allowed_years = list(range(1985, 2024, 1))
-        url = (
-            "https://s3-us-west-2.amazonaws.com/mrlc/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
-        )
+        url = "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
 
         if "colormap" not in kwargs:
 
