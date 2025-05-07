@@ -1,18 +1,67 @@
-FROM jupyter/scipy-notebook:latest
-RUN mamba install -c conda-forge leafmap geopandas "localtileserver>=0.10.0" osmnx -y && \
-    pip install -U leafmap jsonschema==4.18.0 jupyter-server-proxy==4.4.0 xarray lonboard h5py && \
-    fix-permissions "${CONDA_DIR}" && \
-    fix-permissions "/home/${NB_USER}"
+FROM quay.io/jupyter/base-notebook:latest
 
-RUN mkdir ./examples
-COPY /docs/notebooks ./examples/notebooks
-COPY /docs/workshops ./examples/workshops
-COPY /examples/data ./examples/data
-COPY /examples/README.md ./examples/README.md
+# -------------------------------------------------------
+# 1. Install system-level packages (minimal, just git)
+# -------------------------------------------------------
+USER root
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
 
-ENV PROJ_LIB='/opt/conda/share/proj'
+# -------------------------------------------------------
+# 2. Install geospatial Python packages via conda (base env)
+# -------------------------------------------------------
+RUN mamba install -n base -c conda-forge \
+    gdal \
+    proj \
+    geos \
+    rasterio \
+    pyproj \
+    fiona \
+    localtileserver \
+    geopandas \
+    rioxarray \
+    maplibre \
+    pmtiles \
+    flask \
+    flask-cors \
+    tippecanoe \
+    jupyter-server-proxy -y && \
+    fix-permissions "${CONDA_DIR}"
+
+# -------------------------------------------------------
+# 3. Environment variables
+# -------------------------------------------------------
+ENV PROJ_LIB=/opt/conda/share/proj
+ENV GDAL_DATA=/opt/conda/share/gdal
 ENV LOCALTILESERVER_CLIENT_PREFIX='proxy/{port}'
 
-USER root
-RUN chown -R ${NB_UID} ${HOME}
-USER ${NB_USER}
+# -------------------------------------------------------
+# 4. Copy source code (do this *after* package installs to improve caching)
+# -------------------------------------------------------
+COPY . /home/jovyan/leafmap
+WORKDIR /home/jovyan/leafmap
+
+
+# -------------------------------------------------------
+# 5. Build and install leafmap from source
+# -------------------------------------------------------
+# Prevent setuptools_scm issues if .git is missing
+ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_LEAFMAP=0.0.0
+
+RUN rm -rf /home/jovyan/leafmap/leafmap.egg-info && \
+    pip install . && \
+    mkdir -p /home/jovyan/work && \
+    fix-permissions /home/jovyan
+
+# -------------------------------------------------------
+# 6. Set back to default user
+# -------------------------------------------------------
+WORKDIR /home/jovyan
+USER jovyan
+
+
+# -------------------------------------------------------
+# 7. Run the docker container
+# -------------------------------------------------------
+# docker run -it -p 8888:8888 -v $(pwd):/home/jovyan/work giswqs/leafmap:latest
