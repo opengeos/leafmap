@@ -16801,3 +16801,38 @@ def read_vector(source, layer=None, **kwargs):
         return gpd.read_file(source, **kwargs)
     except Exception as e:
         raise ValueError(f"Could not read from source '{source}': {str(e)}")
+
+
+def json_to_geojson(input_path: str, output_path: str) -> None:
+    """
+    Converts a JSON file to a GeoJSON file.
+
+    Args:
+        input_path (str): The file path to the input JSON file.
+        output_path (str): The file path to save the output GeoJSON file.
+
+    Raises:
+        FileNotFoundError: If the input file does not exist.
+        ValueError: If the input JSON file is not properly formatted.
+    """
+    # Load the input JSON file
+    with open(input_path, "r") as f:
+        data = json.load(f)
+
+    # Wrap each item as a GeoJSON feature
+    features = []
+    for item in data:
+        feature = {
+            "type": "Feature",
+            "geometry": item.get("geometry"),
+            "properties": item.get("properties", {}),
+            "id": item.get("id"),
+        }
+        features.append(feature)
+
+    # Build the GeoJSON FeatureCollection
+    geojson = {"type": "FeatureCollection", "features": features}
+
+    # Save the GeoJSON file
+    with open(output_path, "w") as f:
+        json.dump(geojson, f, indent=2)
