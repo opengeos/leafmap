@@ -5399,25 +5399,13 @@ def create_vector_data(
                 feature_id = m.draw_features_selected[0]["id"]
                 if feature_id not in m.draw_features:
                     m.draw_features[feature_id] = {}
-                    for key, values in properties.items():
-                        if isinstance(values, list) or isinstance(values, tuple):
-                            m.draw_features[feature_id][key] = values[0]
-                        else:
-                            m.draw_features[feature_id][key] = values
+                    for prop_widget in prop_widgets.children:
+                        key = prop_widget.description
+                        m.draw_features[feature_id][key] = prop_widget.value
                 else:
                     for prop_widget in prop_widgets.children:
                         key = prop_widget.description
                         prop_widget.value = m.draw_features[feature_id][key]
-
-        else:
-            for prop_widget in prop_widgets.children:
-                key = prop_widget.description
-                if isinstance(properties[key], list) or isinstance(
-                    properties[key], tuple
-                ):
-                    prop_widget.value = properties[key][0]
-                else:
-                    prop_widget.value = properties[key]
 
     m.observe(draw_change, names="draw_features_selected")
 
