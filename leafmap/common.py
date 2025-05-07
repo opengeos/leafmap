@@ -2694,6 +2694,9 @@ def st_download_button(
         import streamlit as st
         import pandas as pd
 
+        if key is None:
+            key = random_string(6)
+
         if isinstance(data, str):
             if file_name is None:
                 file_name = data.split("/")[-1]
@@ -10714,8 +10717,20 @@ def array_to_image(
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    if not output.endswith(".tif"):
+    ext = os.path.splitext(output)[-1].lower()
+    if ext == "":
         output += ".tif"
+        driver = "COG"
+    elif ext == ".png":
+        driver = "PNG"
+    elif ext == ".jpg" or ext == ".jpeg":
+        driver = "JPEG"
+    elif ext == ".jp2":
+        driver = "JP2OpenJPEG"
+    elif ext == ".tiff":
+        driver = "GTiff"
+    else:
+        driver = "COG"
 
     if source is not None:
         with rasterio.open(source) as src:
@@ -10784,7 +10799,7 @@ def array_to_image(
         metadata["count"] = 1
     elif array.ndim == 3:
         metadata["count"] = array.shape[2]
-    if compress is not None:
+    if compress is not None and (driver in ["GTiff", "COG"]):
         metadata["compress"] = compress
 
     metadata.update(**kwargs)

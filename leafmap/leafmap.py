@@ -997,6 +997,7 @@ class Map(ipyleaflet.Map):
         titiler_endpoint=None,
         zoom_to_layer=True,
         layer_index=None,
+        overwrite=False,
         **kwargs,
     ) -> None:
         """Adds a COG TileLayer to the map.
@@ -1011,6 +1012,7 @@ class Map(ipyleaflet.Map):
             titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
             zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
             layer_index (int, optional): The index at which to add the layer. Defaults to None.
+            overwrite (bool, optional): Whether to overwrite the layer if it already exists. Defaults to False.
             **kwargs: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
@@ -1045,6 +1047,13 @@ class Map(ipyleaflet.Map):
 
         tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
         bounds = common.cog_bounds(url, titiler_endpoint)
+
+        name = self._check_layer_name(name, overwrite=overwrite)
+        if overwrite and name in self.get_layer_names():
+            layer = self.find_layer(name)
+            if layer is not None:
+                self.remove_layer(layer)
+
         self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if zoom_to_layer:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
@@ -1053,9 +1062,12 @@ class Map(ipyleaflet.Map):
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
 
-        vmin, vmax = common.cog_tile_vmin_vmax(
-            url, bands=bands, titiler_endpoint=titiler_endpoint
-        )
+        try:
+            vmin, vmax = common.cog_tile_vmin_vmax(
+                url, bands=bands, titiler_endpoint=titiler_endpoint
+            )
+        except Exception:
+            vmin, vmax = None, None
 
         if "colormap_name" in kwargs:
             colormap = kwargs["colormap_name"]
@@ -1083,6 +1095,10 @@ class Map(ipyleaflet.Map):
             "layer_name": name,
             "type": "COG",
         }
+        if vmin is None and vmax is None:
+            params.pop("vmin")
+            params.pop("vmax")
+
         self.cog_layer_dict[name] = params
 
     def add_cog_mosaic(self, **kwargs) -> None:
@@ -2349,6 +2365,33 @@ class Map(ipyleaflet.Map):
         for tool in toolbar_grid.children:
             tool.value = False
 
+    def _check_layer_name(self, layer_name: str, overwrite: bool = False) -> str:
+        """Checks and ensures the uniqueness of a layer name.
+
+        If the provided layer name already exists in the map, this function appends
+        a numeric suffix to make it unique unless `overwrite` is set to True.
+
+        Args:
+            layer_name (str): The name of the layer to check.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name. Defaults to False.
+
+        Returns:
+            str: A unique layer name.
+        """
+        names = self.get_layer_names()
+        if layer_name in names:
+            if not overwrite:
+                base_name = layer_name
+                suffix = 1
+                while f"{base_name}_{suffix}" in names:
+                    suffix += 1
+                layer_name = f"{base_name}_{suffix}"
+                return layer_name
+            else:
+                return layer_name
+        else:
+            return layer_name
+
     def add_raster(
         self,
         source: str,
@@ -2365,6 +2408,7 @@ class Map(ipyleaflet.Map):
         opacity: Optional[float] = 1.0,
         array_args: Optional[Dict] = {},
         client_args: Optional[Dict] = {"cors_all": False},
+        overwrite: Optional[bool] = False,
         **kwargs,
     ) -> None:
         """Add a local raster dataset to the map.
@@ -2390,6 +2434,7 @@ class Map(ipyleaflet.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             array_args (dict, optional): Additional arguments to pass to `array_to_memory_file` when reading the raster. Defaults to {}.
             client_args (dict, optional): Additional arguments to pass to localtileserver.TileClient. Defaults to { "cors_all": False }.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name. Defaults to False.
         """
         import numpy as np
         import xarray as xr
@@ -2413,6 +2458,12 @@ class Map(ipyleaflet.Map):
         )
         tile_layer.visible = visible
         tile_client = tile_layer.tile_server
+        tile_layer.name = self._check_layer_name(layer_name, overwrite=overwrite)
+
+        if overwrite and layer_name in self.get_layer_names():
+            layer = self.find_layer(tile_layer.name)
+            if layer is not None:
+                self.remove(layer)
 
         self.add(tile_layer, index=layer_index)
         if zoom_to_layer:
@@ -2422,7 +2473,7 @@ class Map(ipyleaflet.Map):
             except AttributeError:
                 self.zoom = 15
 
-        common.arc_add_layer(tile_layer.url, layer_name, True, 1.0)
+        common.arc_add_layer(tile_layer.url, tile_layer.name, True, 1.0)
 
         if not hasattr(self, "cog_layer_dict"):
             self.cog_layer_dict = {}
@@ -2446,11 +2497,11 @@ class Map(ipyleaflet.Map):
             "nodata": nodata,
             "colormap": colormap,
             "opacity": opacity,
-            "layer_name": layer_name,
+            "layer_name": tile_layer.name,
             "filename": tile_client.filename,
             "type": "LOCAL",
         }
-        self.cog_layer_dict[layer_name] = params
+        self.cog_layer_dict[tile_layer.name] = params
         self.tile_client = tile_client
 
     add_local_tile = add_raster
@@ -5790,9 +5841,7 @@ class Map(ipyleaflet.Map):
             None
         """
         allowed_years = list(range(1985, 2024, 1))
-        url = (
-            "https://s3-us-west-2.amazonaws.com/mrlc/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
-        )
+        url = "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
 
         if "colormap" not in kwargs:
 

@@ -74,6 +74,7 @@ class Map(MapWidget):
             "scale": "bottom-left",
         },
         projection: str = "mercator",
+        use_message_queue: bool = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -98,6 +99,14 @@ class Map(MapWidget):
             height (str, optional): The height of the map. Defaults to "600px".
             controls (dict, optional): The controls and their positions on the
                 map. Defaults to {"fullscreen": "top-right", "scale": "bottom-left"}.
+            projection (str, optional): The projection of the map. It can be
+                "mercator" or "globe". Defaults to "mercator".
+            use_message_queue (bool, optional): Whether to use the message queue.
+                Defaults to None. If None, it will check the environment variable
+                "USE_MESSAGE_QUEUE". If it is set to "True", it will use the message queue, which
+                is needed to export the map to HTML. If it is set to "False", it will not use the message
+                queue, which is needed to display the map multiple times in the same notebook.
+            kwargs (Any): Additional keyword arguments that are passed to the MapOptions class.
             **kwargs: Additional keyword arguments that are passed to the MapOptions class.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/
                 for more information.
@@ -163,7 +172,9 @@ class Map(MapWidget):
         )
 
         super().__init__(map_options, height=height)
-        super().use_message_queue()
+        if use_message_queue is None:
+            use_message_queue = os.environ.get("USE_MESSAGE_QUEUE", False)
+        self.use_message_queue(use_message_queue)
 
         for control, position in controls.items():
             self.add_control(control, position)
@@ -5388,25 +5399,13 @@ def create_vector_data(
                 feature_id = m.draw_features_selected[0]["id"]
                 if feature_id not in m.draw_features:
                     m.draw_features[feature_id] = {}
-                    for key, values in properties.items():
-                        if isinstance(values, list) or isinstance(values, tuple):
-                            m.draw_features[feature_id][key] = values[0]
-                        else:
-                            m.draw_features[feature_id][key] = values
+                    for prop_widget in prop_widgets.children:
+                        key = prop_widget.description
+                        m.draw_features[feature_id][key] = prop_widget.value
                 else:
                     for prop_widget in prop_widgets.children:
                         key = prop_widget.description
                         prop_widget.value = m.draw_features[feature_id][key]
-
-        else:
-            for prop_widget in prop_widgets.children:
-                key = prop_widget.description
-                if isinstance(properties[key], list) or isinstance(
-                    properties[key], tuple
-                ):
-                    prop_widget.value = properties[key][0]
-                else:
-                    prop_widget.value = properties[key]
 
     m.observe(draw_change, names="draw_features_selected")
 
@@ -5425,10 +5424,14 @@ def create_vector_data(
             """
             image_widget.value = content
         else:
-            image_widget.value = "No Mapillary image found."
+            image_widget.value = ""
 
     if add_mapillary:
         m.observe(log_lng_lat, names="clicked")
+
+    filename_widget = widgets.Text(
+        description="Filename:", placeholder="filename.geojson"
+    )
 
     button_layout = widgets.Layout(width="97px")
     save = widgets.Button(
@@ -5457,8 +5460,16 @@ def create_vector_data(
     save.on_click(on_save_click)
 
     def on_export_click(b):
+        output.clear_output()
         current_time = datetime.now().strftime(time_format)
-        filename = os.path.join(out_dir, f"{filename_prefix}{current_time}.{file_ext}")
+        if filename_widget.value:
+            filename = filename_widget.value
+            if not filename.endswith(f".{file_ext}"):
+                filename = f"{filename}.{file_ext}"
+        else:
+            filename = os.path.join(
+                out_dir, f"{filename_prefix}{current_time}.{file_ext}"
+            )
 
         for index, feature in enumerate(m.draw_feature_collection_all["features"]):
             feature_id = feature["id"]
@@ -5493,6 +5504,7 @@ def create_vector_data(
 
     sidebar_widget.children = [
         prop_widgets,
+        filename_widget,
         widgets.HBox([save, export, reset]),
         output,
         image_widget,
