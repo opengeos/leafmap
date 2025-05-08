@@ -33764,7 +33764,7 @@ attempts to retrieve the API key using a predefined method. Defaults to None.</p
 
 
 <h2 id="leafmap.maplibregl.create_vector_data" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create_vector_data</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">T%H%M%S&#39;</span><span class="p">,</span> <span class="n">column_widths</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">map_height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">file_ext</span><span class="o">=</span><span class="s1">&#39;geojson&#39;</span><span class="p">,</span> <span class="n">add_mapillary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;photo&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">5e-05</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">420</span><span class="p">,</span> <span class="n">frame_border</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create_vector_data</span><span class="p">(</span><span class="n">m</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_format</span><span class="o">=</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">T%H%M%S&#39;</span><span class="p">,</span> <span class="n">column_widths</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">map_height</span><span class="o">=</span><span class="s1">&#39;600px&#39;</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filename_prefix</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">file_ext</span><span class="o">=</span><span class="s1">&#39;geojson&#39;</span><span class="p">,</span> <span class="n">add_mapillary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;photo&#39;</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">5e-05</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">420</span><span class="p">,</span> <span class="n">frame_border</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
 <a href="#leafmap.maplibregl.create_vector_data" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -34022,6 +34022,22 @@ Defaults to 0.</p>
             </td>
             <td>
                   <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>download</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to generate a download link for the exported file.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -34340,7 +34356,12 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
 <span class="normal">5525</span>
 <span class="normal">5526</span>
 <span class="normal">5527</span>
-<span class="normal">5528</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_vector_data</span><span class="p">(</span>
+<span class="normal">5528</span>
+<span class="normal">5529</span>
+<span class="normal">5530</span>
+<span class="normal">5531</span>
+<span class="normal">5532</span>
+<span class="normal">5533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_vector_data</span><span class="p">(</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">T%H%M%S&quot;</span><span class="p">,</span>
@@ -34355,6 +34376,7 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
     <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">420</span><span class="p">,</span>
     <span class="n">frame_border</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generates a widget-based interface for creating and managing vector data on a map.</span>
@@ -34390,6 +34412,7 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
 <span class="sd">        height (int, optional): The height of the Mapillary image widget. Defaults to 420.</span>
 <span class="sd">        frame_border (int, optional): The width of the frame border for the Mapillary image widget.</span>
 <span class="sd">            Defaults to 0.</span>
+<span class="sd">        download (bool, optional): Whether to generate a download link for the exported file.</span>
 <span class="sd">        **kwargs (Any): Additional keyword arguments that may be passed to the function.</span>
 
 <span class="sd">    Returns:</span>
@@ -34553,8 +34576,11 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
         <span class="p">)</span>
         <span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
-
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exported: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">download</span><span class="p">:</span>
+                <span class="n">download_link</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">create_download_link</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Download&quot;</span><span class="p">)</span>
+                <span class="n">display</span><span class="p">(</span><span class="n">download_link</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exported: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">export</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">on_export_click</span><span class="p">)</span>
 
@@ -36398,12 +36424,7 @@ Defaults to ["point", "polygon", "line_string", "trash"].</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5531</span>
-<span class="normal">5532</span>
-<span class="normal">5533</span>
-<span class="normal">5534</span>
-<span class="normal">5535</span>
-<span class="normal">5536</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5536</span>
 <span class="normal">5537</span>
 <span class="normal">5538</span>
 <span class="normal">5539</span>
@@ -36713,7 +36734,12 @@ Defaults to ["point", "polygon", "line_string", "trash"].</p>
 <span class="normal">5843</span>
 <span class="normal">5844</span>
 <span class="normal">5845</span>
-<span class="normal">5846</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
+<span class="normal">5846</span>
+<span class="normal">5847</span>
+<span class="normal">5848</span>
+<span class="normal">5849</span>
+<span class="normal">5850</span>
+<span class="normal">5851</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
