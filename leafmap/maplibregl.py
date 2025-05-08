@@ -5285,6 +5285,7 @@ def create_vector_data(
     width: int = 300,
     height: int = 420,
     frame_border: int = 0,
+    download: bool = True,
     **kwargs: Any,
 ) -> widgets.VBox:
     """Generates a widget-based interface for creating and managing vector data on a map.
@@ -5320,6 +5321,7 @@ def create_vector_data(
         height (int, optional): The height of the Mapillary image widget. Defaults to 420.
         frame_border (int, optional): The width of the frame border for the Mapillary image widget.
             Defaults to 0.
+        download (bool, optional): Whether to generate a download link for the exported file.
         **kwargs (Any): Additional keyword arguments that may be passed to the function.
 
     Returns:
@@ -5483,8 +5485,11 @@ def create_vector_data(
         )
         gdf.to_file(filename)
         with output:
-
-            print(f"Exported: {filename}")
+            if download:
+                download_link = common.create_download_link(filename, title="Download")
+                display(download_link)
+            else:
+                print(f"Exported: {os.path.basename(filename)}")
 
     export.on_click(on_export_click)
 
