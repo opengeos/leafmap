@@ -489,7 +489,6 @@ def xyz_to_bokeh():
         tile_options: Dict[str, Any] = {
             "url": url,
             "attribution": attribution,
-            "id": None,  # explicit set id to None if not require
         }
 
         bokeh_dict[key] = WMTSTileSource(**tile_options)
