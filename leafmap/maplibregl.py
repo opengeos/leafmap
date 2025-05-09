@@ -5286,6 +5286,7 @@ def create_vector_data(
     height: int = 420,
     frame_border: int = 0,
     download: bool = True,
+    layer_name: str = "Drawn Features",
     **kwargs: Any,
 ) -> widgets.VBox:
     """Generates a widget-based interface for creating and managing vector data on a map.
@@ -5346,7 +5347,6 @@ def create_vector_data(
     def create_default_map():
         m = Map(style="liberty", height=map_height)
         m.add_basemap("Satellite")
-        m.add_basemap("OpenStreetMap.Mapnik", visible=True)
         m.add_overture_buildings(visible=True)
         m.add_overture_data(theme="transportation")
         m.add_layer_control()
@@ -5408,6 +5408,33 @@ def create_vector_data(
                     for prop_widget in prop_widgets.children:
                         key = prop_widget.description
                         prop_widget.value = m.draw_features[feature_id][key]
+
+        for index, feature in enumerate(m.draw_feature_collection_all["features"]):
+            feature_id = feature["id"]
+            if feature_id in m.draw_features:
+                m.draw_feature_collection_all["features"][index]["properties"] = (
+                    m.draw_features[feature_id]
+                )
+
+        if layer_name not in m.layer_dict.keys():
+
+            paint = {
+                "circle-radius": 10,
+                "circle-color": "#ff0000",
+                "circle-opacity": 0.5,
+                "circle-stroke-color": "#ffffff",
+                "circle-stroke-width": 1,
+            }
+
+            m.add_geojson(
+                m.draw_feature_collection_all,
+                layer_type="circle",
+                name=layer_name,
+                paint=paint,
+                fit_bounds=False,
+            )
+        else:
+            m.set_data(layer_name, m.draw_feature_collection_all)
 
     m.observe(draw_change, names="draw_features_selected")
 
