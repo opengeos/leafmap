@@ -802,14 +802,16 @@ class Map(MapWidget):
         if isinstance(data, str):
             if os.path.isfile(data) or data.startswith("http"):
                 data = gpd.read_file(data).__geo_interface__
-                bounds = get_bounds(data)
+                if fit_bounds:
+                    bounds = get_bounds(data)
                 source = GeoJSONSource(data=data, **source_args)
             else:
                 raise ValueError("The data must be a URL or a GeoJSON dictionary.")
         elif isinstance(data, dict):
             source = GeoJSONSource(data=data, **source_args)
 
-            bounds = get_bounds(data)
+            if fit_bounds:
+                bounds = get_bounds(data)
         else:
             raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
@@ -5286,7 +5288,8 @@ def create_vector_data(
     height: int = 420,
     frame_border: int = 0,
     download: bool = True,
-    layer_name: str = "Drawn Features",
+    name: str = None,
+    paint: Dict[str, Any] = None,
     **kwargs: Any,
 ) -> widgets.VBox:
     """Generates a widget-based interface for creating and managing vector data on a map.
@@ -5323,7 +5326,13 @@ def create_vector_data(
         frame_border (int, optional): The width of the frame border for the Mapillary image widget.
             Defaults to 0.
         download (bool, optional): Whether to generate a download link for the exported file.
-        **kwargs (Any): Additional keyword arguments that may be passed to the function.
+            Defaults to True.
+        name (str, optional): The name of the drawn feature layer to be added to the map.
+            Defaults to None.
+        paint (Dict[str, Any], optional): A dictionary specifying the paint properties for the
+            drawn features. This can include properties like "circle-radius", "circle-color",
+            "circle-opacity", "circle-stroke-color", and "circle-stroke-width". Defaults to None.
+        **kwargs (Any): Additional keyword arguments that may be passed to the add_geojson method.
 
     Returns:
         widgets.VBox: A vertical box widget containing the map, sidebar, and control buttons.
@@ -5343,6 +5352,15 @@ def create_vector_data(
 
     if out_dir is None:
         out_dir = os.getcwd()
+
+    if paint is None:
+        paint = {
+            "circle-radius": 6,
+            "circle-color": "#FFFF00",
+            "circle-opacity": 1.0,
+            "circle-stroke-color": "#000000",
+            "circle-stroke-width": 1,
+        }
 
     def create_default_map():
         m = Map(style="liberty", height=map_height)
@@ -5372,7 +5390,6 @@ def create_vector_data(
             if isinstance(values, list) or isinstance(values, tuple):
                 prop_widget = widgets.Dropdown(
                     options=values,
-                    # value=None,
                     description=key,
                 )
                 prop_widgets.children += (prop_widget,)
@@ -5416,25 +5433,21 @@ def create_vector_data(
                     m.draw_features[feature_id]
                 )
 
-        if layer_name not in m.layer_dict.keys():
+        if isinstance(name, str):
 
-            paint = {
-                "circle-radius": 10,
-                "circle-color": "#ff0000",
-                "circle-opacity": 0.5,
-                "circle-stroke-color": "#ffffff",
-                "circle-stroke-width": 1,
-            }
+            if name not in m.layer_dict.keys():
 
-            m.add_geojson(
-                m.draw_feature_collection_all,
-                layer_type="circle",
-                name=layer_name,
-                paint=paint,
-                fit_bounds=False,
-            )
-        else:
-            m.set_data(layer_name, m.draw_feature_collection_all)
+                m.add_geojson(
+                    m.draw_feature_collection_all,
+                    layer_type="circle",
+                    name=name,
+                    paint=paint,
+                    fit_bounds=False,
+                    **kwargs,
+                )
+
+            else:
+                m.set_data(name, m.draw_feature_collection_all)
 
     m.observe(draw_change, names="draw_features_selected")
 
