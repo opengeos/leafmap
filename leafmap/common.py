@@ -14474,6 +14474,7 @@ def execute_maplibre_notebook_dir(
     recursive: bool = False,
     keep_notebook: bool = False,
     index_html: bool = True,
+    ignore_files: Optional[List[str]] = None,
 ) -> None:
     """
     Executes Jupyter notebooks found in a specified directory, optionally replacing API keys and deleting HTML outputs.
@@ -14487,6 +14488,7 @@ def execute_maplibre_notebook_dir(
         recursive (bool, optional): If True, searches for notebooks in the input directory recursively. Defaults to False.
         keep_notebook (bool, optional): If True, keeps the executed notebooks in the output directory. Defaults to False.
         index_html (bool, optional): If True, generates an index.html file in the output directory listing all files. Defaults to True.
+        ignore_files (list, optional): A list of notebook files to ignore during execution. Defaults to None.
 
     Returns:
         None
@@ -14504,9 +14506,17 @@ def execute_maplibre_notebook_dir(
         for file in html_files:
             os.remove(file)
 
+    if ignore_files is not None:
+        ignore_files = [os.path.join(in_dir, f) for f in ignore_files]
+
     files = find_files(in_dir, "*.ipynb", recursive=recursive)
     for index, file in enumerate(files):
         print(f"Processing {index + 1}/{len(files)}: {file} ...")
+
+        if ignore_files is not None and file in ignore_files:
+            print(f"Skipping {file} ...")
+            continue
+
         basename = os.path.basename(file)
         out_file = os.path.join(out_dir, basename)
         shutil.copy(file, out_file)
