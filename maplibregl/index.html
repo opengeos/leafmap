@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.12">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.13">
     
     
       
@@ -30,7 +30,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.2afb09e1.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -1036,6 +1036,15 @@
   <a href="#leafmap.maplibregl.Map.add_image" class="md-nav__link">
     <span class="md-ellipsis">
       add_image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_labels
     </span>
   </a>
   
@@ -2394,6 +2403,29 @@
   
   <span class="md-ellipsis">
     Add image generated
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/add_labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Add labels
     
   </span>
   
@@ -6844,6 +6876,15 @@
   <a href="#leafmap.maplibregl.Map.add_image" class="md-nav__link">
     <span class="md-ellipsis">
       add_image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.maplibregl.Map.add_labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_labels
     </span>
   </a>
   
@@ -11536,7 +11577,100 @@
 <span class="normal">4185</span>
 <span class="normal">4186</span>
 <span class="normal">4187</span>
-<span class="normal">4188</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">MapWidget</span><span class="p">):</span>
+<span class="normal">4188</span>
+<span class="normal">4189</span>
+<span class="normal">4190</span>
+<span class="normal">4191</span>
+<span class="normal">4192</span>
+<span class="normal">4193</span>
+<span class="normal">4194</span>
+<span class="normal">4195</span>
+<span class="normal">4196</span>
+<span class="normal">4197</span>
+<span class="normal">4198</span>
+<span class="normal">4199</span>
+<span class="normal">4200</span>
+<span class="normal">4201</span>
+<span class="normal">4202</span>
+<span class="normal">4203</span>
+<span class="normal">4204</span>
+<span class="normal">4205</span>
+<span class="normal">4206</span>
+<span class="normal">4207</span>
+<span class="normal">4208</span>
+<span class="normal">4209</span>
+<span class="normal">4210</span>
+<span class="normal">4211</span>
+<span class="normal">4212</span>
+<span class="normal">4213</span>
+<span class="normal">4214</span>
+<span class="normal">4215</span>
+<span class="normal">4216</span>
+<span class="normal">4217</span>
+<span class="normal">4218</span>
+<span class="normal">4219</span>
+<span class="normal">4220</span>
+<span class="normal">4221</span>
+<span class="normal">4222</span>
+<span class="normal">4223</span>
+<span class="normal">4224</span>
+<span class="normal">4225</span>
+<span class="normal">4226</span>
+<span class="normal">4227</span>
+<span class="normal">4228</span>
+<span class="normal">4229</span>
+<span class="normal">4230</span>
+<span class="normal">4231</span>
+<span class="normal">4232</span>
+<span class="normal">4233</span>
+<span class="normal">4234</span>
+<span class="normal">4235</span>
+<span class="normal">4236</span>
+<span class="normal">4237</span>
+<span class="normal">4238</span>
+<span class="normal">4239</span>
+<span class="normal">4240</span>
+<span class="normal">4241</span>
+<span class="normal">4242</span>
+<span class="normal">4243</span>
+<span class="normal">4244</span>
+<span class="normal">4245</span>
+<span class="normal">4246</span>
+<span class="normal">4247</span>
+<span class="normal">4248</span>
+<span class="normal">4249</span>
+<span class="normal">4250</span>
+<span class="normal">4251</span>
+<span class="normal">4252</span>
+<span class="normal">4253</span>
+<span class="normal">4254</span>
+<span class="normal">4255</span>
+<span class="normal">4256</span>
+<span class="normal">4257</span>
+<span class="normal">4258</span>
+<span class="normal">4259</span>
+<span class="normal">4260</span>
+<span class="normal">4261</span>
+<span class="normal">4262</span>
+<span class="normal">4263</span>
+<span class="normal">4264</span>
+<span class="normal">4265</span>
+<span class="normal">4266</span>
+<span class="normal">4267</span>
+<span class="normal">4268</span>
+<span class="normal">4269</span>
+<span class="normal">4270</span>
+<span class="normal">4271</span>
+<span class="normal">4272</span>
+<span class="normal">4273</span>
+<span class="normal">4274</span>
+<span class="normal">4275</span>
+<span class="normal">4276</span>
+<span class="normal">4277</span>
+<span class="normal">4278</span>
+<span class="normal">4279</span>
+<span class="normal">4280</span>
+<span class="normal">4281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">MapWidget</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Map class inherits from the MapWidget class of the maplibre.ipywidget module.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -15665,6 +15799,99 @@
         <span class="k">else</span><span class="p">:</span>
 
             <span class="k">return</span> <span class="n">widget</span>
+
+    <span class="k">def</span> <span class="nf">add_labels</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">text_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
+        <span class="n">text_anchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+        <span class="n">text_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="n">min_zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">paint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a label layer to the map.</span>
+
+<span class="sd">        This method adds a label layer to the map using the specified source and column for text values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source (Union[str, Dict[str, Any]]): The data source for the labels. It can be a GeoJSON file path</span>
+<span class="sd">                or a dictionary containing GeoJSON data.</span>
+<span class="sd">            column (str): The column name in the source data to use for the label text.</span>
+<span class="sd">            name (Optional[str]): The name of the label layer. If None, a random name is generated. Defaults to None.</span>
+<span class="sd">            text_size (int): The size of the label text. Defaults to 14.</span>
+<span class="sd">            text_anchor (str): The anchor position of the text. Can be &quot;center&quot;, &quot;left&quot;, &quot;right&quot;, etc. Defaults to &quot;center&quot;.</span>
+<span class="sd">            text_color (str): The color of the label text. Defaults to &quot;black&quot;.</span>
+<span class="sd">            min_zoom (Optional[float]): The minimum zoom level at which the labels are visible. Defaults to None.</span>
+<span class="sd">            max_zoom (Optional[float]): The maximum zoom level at which the labels are visible. Defaults to None.</span>
+<span class="sd">            layout (Optional[Dict[str, Any]]): Additional layout properties for the label layer. Defaults to None.</span>
+<span class="sd">                For more information, refer to https://maplibre.org/maplibre-style-spec/layers/#symbol.</span>
+<span class="sd">            paint (Optional[Dict[str, Any]]): Additional paint properties for the label layer. Defaults to None.</span>
+<span class="sd">            before_id (Optional[str]): The ID of an existing layer before which the new layer should be inserted. Defaults to None.</span>
+<span class="sd">            opacity (float): The opacity of the label layer. Defaults to 1.0.</span>
+<span class="sd">            visible (bool): Whether the label layer is visible by default. Defaults to True.</span>
+<span class="sd">            **kwargs (Any): Additional keyword arguments to customize the label layer.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;label_source_</span><span class="si">{</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">gdf</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">read_vector</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+            <span class="n">geojson</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">geojson</span> <span class="o">=</span> <span class="n">source</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+            <span class="n">geojson</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">__geo_interface__</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid source type. Use a GeoDataFrame, a file path to a GeoJSON file, or a dictionary.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">source</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;geojson&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">geojson</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">layout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;text-field&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="n">column</span><span class="p">],</span>
+                <span class="s2">&quot;text-size&quot;</span><span class="p">:</span> <span class="n">text_size</span><span class="p">,</span>
+                <span class="s2">&quot;text-anchor&quot;</span><span class="p">:</span> <span class="n">text_anchor</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">paint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">paint</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;text-color&quot;</span><span class="p">:</span> <span class="n">text_color</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="n">layer</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_labels&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="n">layout</span><span class="p">,</span>
+            <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="n">paint</span><span class="p">,</span>
+            <span class="s2">&quot;min_zoom&quot;</span><span class="p">:</span> <span class="n">min_zoom</span><span class="p">,</span>
+            <span class="s2">&quot;max_zoom&quot;</span><span class="p">:</span> <span class="n">max_zoom</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span>
+            <span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="n">visible</span>
+        <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
               </details>
 
@@ -22496,6 +22723,476 @@ Can be one of 'top-right', 'top-left', 'bottom-right', 'bottom-left'.</p>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">][</span><span class="s2">&quot;icon-image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">id</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;layout&quot;</span><span class="p">][</span><span class="s2">&quot;icon-size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="leafmap.maplibregl.Map.add_labels" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">add_labels</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">text_size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">text_anchor</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">text_color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">min_zoom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_zoom</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">paint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#leafmap.maplibregl.Map.add_labels" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Adds a label layer to the map.</p>
+<p>This method adds a label layer to the map using the specified source and column for text values.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>source</code>
+            </td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="str">str</span>, <span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The data source for the labels. It can be a GeoJSON file path
+or a dictionary containing GeoJSON data.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>column</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The column name in the source data to use for the label text.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the label layer. If None, a random name is generated. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>text_size</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The size of the label text. Defaults to 14.</p>
+              </div>
+            </td>
+            <td>
+                  <code>14</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>text_anchor</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The anchor position of the text. Can be "center", "left", "right", etc. Defaults to "center".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;center&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>text_color</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The color of the label text. Defaults to "black".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;black&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>min_zoom</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The minimum zoom level at which the labels are visible. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_zoom</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The maximum zoom level at which the labels are visible. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>layout</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional layout properties for the label layer. Defaults to None.
+For more information, refer to https://maplibre.org/maplibre-style-spec/layers/#symbol.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>paint</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="typing.Dict">Dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional paint properties for the label layer. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>before_id</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="str">str</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of an existing layer before which the new layer should be inserted. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>opacity</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The opacity of the label layer. Defaults to 1.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>visible</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the label layer is visible by default. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional keyword arguments to customize the label layer.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>None</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4190</span>
+<span class="normal">4191</span>
+<span class="normal">4192</span>
+<span class="normal">4193</span>
+<span class="normal">4194</span>
+<span class="normal">4195</span>
+<span class="normal">4196</span>
+<span class="normal">4197</span>
+<span class="normal">4198</span>
+<span class="normal">4199</span>
+<span class="normal">4200</span>
+<span class="normal">4201</span>
+<span class="normal">4202</span>
+<span class="normal">4203</span>
+<span class="normal">4204</span>
+<span class="normal">4205</span>
+<span class="normal">4206</span>
+<span class="normal">4207</span>
+<span class="normal">4208</span>
+<span class="normal">4209</span>
+<span class="normal">4210</span>
+<span class="normal">4211</span>
+<span class="normal">4212</span>
+<span class="normal">4213</span>
+<span class="normal">4214</span>
+<span class="normal">4215</span>
+<span class="normal">4216</span>
+<span class="normal">4217</span>
+<span class="normal">4218</span>
+<span class="normal">4219</span>
+<span class="normal">4220</span>
+<span class="normal">4221</span>
+<span class="normal">4222</span>
+<span class="normal">4223</span>
+<span class="normal">4224</span>
+<span class="normal">4225</span>
+<span class="normal">4226</span>
+<span class="normal">4227</span>
+<span class="normal">4228</span>
+<span class="normal">4229</span>
+<span class="normal">4230</span>
+<span class="normal">4231</span>
+<span class="normal">4232</span>
+<span class="normal">4233</span>
+<span class="normal">4234</span>
+<span class="normal">4235</span>
+<span class="normal">4236</span>
+<span class="normal">4237</span>
+<span class="normal">4238</span>
+<span class="normal">4239</span>
+<span class="normal">4240</span>
+<span class="normal">4241</span>
+<span class="normal">4242</span>
+<span class="normal">4243</span>
+<span class="normal">4244</span>
+<span class="normal">4245</span>
+<span class="normal">4246</span>
+<span class="normal">4247</span>
+<span class="normal">4248</span>
+<span class="normal">4249</span>
+<span class="normal">4250</span>
+<span class="normal">4251</span>
+<span class="normal">4252</span>
+<span class="normal">4253</span>
+<span class="normal">4254</span>
+<span class="normal">4255</span>
+<span class="normal">4256</span>
+<span class="normal">4257</span>
+<span class="normal">4258</span>
+<span class="normal">4259</span>
+<span class="normal">4260</span>
+<span class="normal">4261</span>
+<span class="normal">4262</span>
+<span class="normal">4263</span>
+<span class="normal">4264</span>
+<span class="normal">4265</span>
+<span class="normal">4266</span>
+<span class="normal">4267</span>
+<span class="normal">4268</span>
+<span class="normal">4269</span>
+<span class="normal">4270</span>
+<span class="normal">4271</span>
+<span class="normal">4272</span>
+<span class="normal">4273</span>
+<span class="normal">4274</span>
+<span class="normal">4275</span>
+<span class="normal">4276</span>
+<span class="normal">4277</span>
+<span class="normal">4278</span>
+<span class="normal">4279</span>
+<span class="normal">4280</span>
+<span class="normal">4281</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_labels</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">text_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="n">text_anchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span>
+    <span class="n">text_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="n">min_zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_zoom</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">layout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">paint</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">before_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adds a label layer to the map.</span>
+
+<span class="sd">    This method adds a label layer to the map using the specified source and column for text values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        source (Union[str, Dict[str, Any]]): The data source for the labels. It can be a GeoJSON file path</span>
+<span class="sd">            or a dictionary containing GeoJSON data.</span>
+<span class="sd">        column (str): The column name in the source data to use for the label text.</span>
+<span class="sd">        name (Optional[str]): The name of the label layer. If None, a random name is generated. Defaults to None.</span>
+<span class="sd">        text_size (int): The size of the label text. Defaults to 14.</span>
+<span class="sd">        text_anchor (str): The anchor position of the text. Can be &quot;center&quot;, &quot;left&quot;, &quot;right&quot;, etc. Defaults to &quot;center&quot;.</span>
+<span class="sd">        text_color (str): The color of the label text. Defaults to &quot;black&quot;.</span>
+<span class="sd">        min_zoom (Optional[float]): The minimum zoom level at which the labels are visible. Defaults to None.</span>
+<span class="sd">        max_zoom (Optional[float]): The maximum zoom level at which the labels are visible. Defaults to None.</span>
+<span class="sd">        layout (Optional[Dict[str, Any]]): Additional layout properties for the label layer. Defaults to None.</span>
+<span class="sd">            For more information, refer to https://maplibre.org/maplibre-style-spec/layers/#symbol.</span>
+<span class="sd">        paint (Optional[Dict[str, Any]]): Additional paint properties for the label layer. Defaults to None.</span>
+<span class="sd">        before_id (Optional[str]): The ID of an existing layer before which the new layer should be inserted. Defaults to None.</span>
+<span class="sd">        opacity (float): The opacity of the label layer. Defaults to 1.0.</span>
+<span class="sd">        visible (bool): Whether the label layer is visible by default. Defaults to True.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments to customize the label layer.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;label_source_</span><span class="si">{</span><span class="n">common</span><span class="o">.</span><span class="n">random_string</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">read_vector</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="n">geojson</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">__geo_interface__</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">geojson</span> <span class="o">=</span> <span class="n">source</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
+        <span class="n">geojson</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">__geo_interface__</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid source type. Use a GeoDataFrame, a file path to a GeoJSON file, or a dictionary.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">source</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;geojson&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">geojson</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_source</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">layout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;text-field&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="n">column</span><span class="p">],</span>
+            <span class="s2">&quot;text-size&quot;</span><span class="p">:</span> <span class="n">text_size</span><span class="p">,</span>
+            <span class="s2">&quot;text-anchor&quot;</span><span class="p">:</span> <span class="n">text_anchor</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">paint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">paint</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;text-color&quot;</span><span class="p">:</span> <span class="n">text_color</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="n">layer</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">_labels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;symbol&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;layout&quot;</span><span class="p">:</span> <span class="n">layout</span><span class="p">,</span>
+        <span class="s2">&quot;paint&quot;</span><span class="p">:</span> <span class="n">paint</span><span class="p">,</span>
+        <span class="s2">&quot;min_zoom&quot;</span><span class="p">:</span> <span class="n">min_zoom</span><span class="p">,</span>
+        <span class="s2">&quot;max_zoom&quot;</span><span class="p">:</span> <span class="n">max_zoom</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_layer</span><span class="p">(</span>
+        <span class="n">layer</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="n">visible</span>
+    <span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -33693,41 +34390,41 @@ attempts to retrieve the API key using a predefined method. Defaults to None.</p
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4244</span>
-<span class="normal">4245</span>
-<span class="normal">4246</span>
-<span class="normal">4247</span>
-<span class="normal">4248</span>
-<span class="normal">4249</span>
-<span class="normal">4250</span>
-<span class="normal">4251</span>
-<span class="normal">4252</span>
-<span class="normal">4253</span>
-<span class="normal">4254</span>
-<span class="normal">4255</span>
-<span class="normal">4256</span>
-<span class="normal">4257</span>
-<span class="normal">4258</span>
-<span class="normal">4259</span>
-<span class="normal">4260</span>
-<span class="normal">4261</span>
-<span class="normal">4262</span>
-<span class="normal">4263</span>
-<span class="normal">4264</span>
-<span class="normal">4265</span>
-<span class="normal">4266</span>
-<span class="normal">4267</span>
-<span class="normal">4268</span>
-<span class="normal">4269</span>
-<span class="normal">4270</span>
-<span class="normal">4271</span>
-<span class="normal">4272</span>
-<span class="normal">4273</span>
-<span class="normal">4274</span>
-<span class="normal">4275</span>
-<span class="normal">4276</span>
-<span class="normal">4277</span>
-<span class="normal">4278</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4337</span>
+<span class="normal">4338</span>
+<span class="normal">4339</span>
+<span class="normal">4340</span>
+<span class="normal">4341</span>
+<span class="normal">4342</span>
+<span class="normal">4343</span>
+<span class="normal">4344</span>
+<span class="normal">4345</span>
+<span class="normal">4346</span>
+<span class="normal">4347</span>
+<span class="normal">4348</span>
+<span class="normal">4349</span>
+<span class="normal">4350</span>
+<span class="normal">4351</span>
+<span class="normal">4352</span>
+<span class="normal">4353</span>
+<span class="normal">4354</span>
+<span class="normal">4355</span>
+<span class="normal">4356</span>
+<span class="normal">4357</span>
+<span class="normal">4358</span>
+<span class="normal">4359</span>
+<span class="normal">4360</span>
+<span class="normal">4361</span>
+<span class="normal">4362</span>
+<span class="normal">4363</span>
+<span class="normal">4364</span>
+<span class="normal">4365</span>
+<span class="normal">4366</span>
+<span class="normal">4367</span>
+<span class="normal">4368</span>
+<span class="normal">4369</span>
+<span class="normal">4370</span>
+<span class="normal">4371</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">construct_maptiler_style</span><span class="p">(</span><span class="n">style</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a URL for a MapTiler style with an optional API key.</span>
 
@@ -34145,100 +34842,7 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5275</span>
-<span class="normal">5276</span>
-<span class="normal">5277</span>
-<span class="normal">5278</span>
-<span class="normal">5279</span>
-<span class="normal">5280</span>
-<span class="normal">5281</span>
-<span class="normal">5282</span>
-<span class="normal">5283</span>
-<span class="normal">5284</span>
-<span class="normal">5285</span>
-<span class="normal">5286</span>
-<span class="normal">5287</span>
-<span class="normal">5288</span>
-<span class="normal">5289</span>
-<span class="normal">5290</span>
-<span class="normal">5291</span>
-<span class="normal">5292</span>
-<span class="normal">5293</span>
-<span class="normal">5294</span>
-<span class="normal">5295</span>
-<span class="normal">5296</span>
-<span class="normal">5297</span>
-<span class="normal">5298</span>
-<span class="normal">5299</span>
-<span class="normal">5300</span>
-<span class="normal">5301</span>
-<span class="normal">5302</span>
-<span class="normal">5303</span>
-<span class="normal">5304</span>
-<span class="normal">5305</span>
-<span class="normal">5306</span>
-<span class="normal">5307</span>
-<span class="normal">5308</span>
-<span class="normal">5309</span>
-<span class="normal">5310</span>
-<span class="normal">5311</span>
-<span class="normal">5312</span>
-<span class="normal">5313</span>
-<span class="normal">5314</span>
-<span class="normal">5315</span>
-<span class="normal">5316</span>
-<span class="normal">5317</span>
-<span class="normal">5318</span>
-<span class="normal">5319</span>
-<span class="normal">5320</span>
-<span class="normal">5321</span>
-<span class="normal">5322</span>
-<span class="normal">5323</span>
-<span class="normal">5324</span>
-<span class="normal">5325</span>
-<span class="normal">5326</span>
-<span class="normal">5327</span>
-<span class="normal">5328</span>
-<span class="normal">5329</span>
-<span class="normal">5330</span>
-<span class="normal">5331</span>
-<span class="normal">5332</span>
-<span class="normal">5333</span>
-<span class="normal">5334</span>
-<span class="normal">5335</span>
-<span class="normal">5336</span>
-<span class="normal">5337</span>
-<span class="normal">5338</span>
-<span class="normal">5339</span>
-<span class="normal">5340</span>
-<span class="normal">5341</span>
-<span class="normal">5342</span>
-<span class="normal">5343</span>
-<span class="normal">5344</span>
-<span class="normal">5345</span>
-<span class="normal">5346</span>
-<span class="normal">5347</span>
-<span class="normal">5348</span>
-<span class="normal">5349</span>
-<span class="normal">5350</span>
-<span class="normal">5351</span>
-<span class="normal">5352</span>
-<span class="normal">5353</span>
-<span class="normal">5354</span>
-<span class="normal">5355</span>
-<span class="normal">5356</span>
-<span class="normal">5357</span>
-<span class="normal">5358</span>
-<span class="normal">5359</span>
-<span class="normal">5360</span>
-<span class="normal">5361</span>
-<span class="normal">5362</span>
-<span class="normal">5363</span>
-<span class="normal">5364</span>
-<span class="normal">5365</span>
-<span class="normal">5366</span>
-<span class="normal">5367</span>
-<span class="normal">5368</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5368</span>
 <span class="normal">5369</span>
 <span class="normal">5370</span>
 <span class="normal">5371</span>
@@ -34443,7 +35047,100 @@ display(widget)  # Display the widget in a Jupyter notebook</p>
 <span class="normal">5570</span>
 <span class="normal">5571</span>
 <span class="normal">5572</span>
-<span class="normal">5573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_vector_data</span><span class="p">(</span>
+<span class="normal">5573</span>
+<span class="normal">5574</span>
+<span class="normal">5575</span>
+<span class="normal">5576</span>
+<span class="normal">5577</span>
+<span class="normal">5578</span>
+<span class="normal">5579</span>
+<span class="normal">5580</span>
+<span class="normal">5581</span>
+<span class="normal">5582</span>
+<span class="normal">5583</span>
+<span class="normal">5584</span>
+<span class="normal">5585</span>
+<span class="normal">5586</span>
+<span class="normal">5587</span>
+<span class="normal">5588</span>
+<span class="normal">5589</span>
+<span class="normal">5590</span>
+<span class="normal">5591</span>
+<span class="normal">5592</span>
+<span class="normal">5593</span>
+<span class="normal">5594</span>
+<span class="normal">5595</span>
+<span class="normal">5596</span>
+<span class="normal">5597</span>
+<span class="normal">5598</span>
+<span class="normal">5599</span>
+<span class="normal">5600</span>
+<span class="normal">5601</span>
+<span class="normal">5602</span>
+<span class="normal">5603</span>
+<span class="normal">5604</span>
+<span class="normal">5605</span>
+<span class="normal">5606</span>
+<span class="normal">5607</span>
+<span class="normal">5608</span>
+<span class="normal">5609</span>
+<span class="normal">5610</span>
+<span class="normal">5611</span>
+<span class="normal">5612</span>
+<span class="normal">5613</span>
+<span class="normal">5614</span>
+<span class="normal">5615</span>
+<span class="normal">5616</span>
+<span class="normal">5617</span>
+<span class="normal">5618</span>
+<span class="normal">5619</span>
+<span class="normal">5620</span>
+<span class="normal">5621</span>
+<span class="normal">5622</span>
+<span class="normal">5623</span>
+<span class="normal">5624</span>
+<span class="normal">5625</span>
+<span class="normal">5626</span>
+<span class="normal">5627</span>
+<span class="normal">5628</span>
+<span class="normal">5629</span>
+<span class="normal">5630</span>
+<span class="normal">5631</span>
+<span class="normal">5632</span>
+<span class="normal">5633</span>
+<span class="normal">5634</span>
+<span class="normal">5635</span>
+<span class="normal">5636</span>
+<span class="normal">5637</span>
+<span class="normal">5638</span>
+<span class="normal">5639</span>
+<span class="normal">5640</span>
+<span class="normal">5641</span>
+<span class="normal">5642</span>
+<span class="normal">5643</span>
+<span class="normal">5644</span>
+<span class="normal">5645</span>
+<span class="normal">5646</span>
+<span class="normal">5647</span>
+<span class="normal">5648</span>
+<span class="normal">5649</span>
+<span class="normal">5650</span>
+<span class="normal">5651</span>
+<span class="normal">5652</span>
+<span class="normal">5653</span>
+<span class="normal">5654</span>
+<span class="normal">5655</span>
+<span class="normal">5656</span>
+<span class="normal">5657</span>
+<span class="normal">5658</span>
+<span class="normal">5659</span>
+<span class="normal">5660</span>
+<span class="normal">5661</span>
+<span class="normal">5662</span>
+<span class="normal">5663</span>
+<span class="normal">5664</span>
+<span class="normal">5665</span>
+<span class="normal">5666</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_vector_data</span><span class="p">(</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">time_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">T%H%M%S&quot;</span><span class="p">,</span>
@@ -35090,100 +35787,7 @@ The first numerical column will be used if None. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4427</span>
-<span class="normal">4428</span>
-<span class="normal">4429</span>
-<span class="normal">4430</span>
-<span class="normal">4431</span>
-<span class="normal">4432</span>
-<span class="normal">4433</span>
-<span class="normal">4434</span>
-<span class="normal">4435</span>
-<span class="normal">4436</span>
-<span class="normal">4437</span>
-<span class="normal">4438</span>
-<span class="normal">4439</span>
-<span class="normal">4440</span>
-<span class="normal">4441</span>
-<span class="normal">4442</span>
-<span class="normal">4443</span>
-<span class="normal">4444</span>
-<span class="normal">4445</span>
-<span class="normal">4446</span>
-<span class="normal">4447</span>
-<span class="normal">4448</span>
-<span class="normal">4449</span>
-<span class="normal">4450</span>
-<span class="normal">4451</span>
-<span class="normal">4452</span>
-<span class="normal">4453</span>
-<span class="normal">4454</span>
-<span class="normal">4455</span>
-<span class="normal">4456</span>
-<span class="normal">4457</span>
-<span class="normal">4458</span>
-<span class="normal">4459</span>
-<span class="normal">4460</span>
-<span class="normal">4461</span>
-<span class="normal">4462</span>
-<span class="normal">4463</span>
-<span class="normal">4464</span>
-<span class="normal">4465</span>
-<span class="normal">4466</span>
-<span class="normal">4467</span>
-<span class="normal">4468</span>
-<span class="normal">4469</span>
-<span class="normal">4470</span>
-<span class="normal">4471</span>
-<span class="normal">4472</span>
-<span class="normal">4473</span>
-<span class="normal">4474</span>
-<span class="normal">4475</span>
-<span class="normal">4476</span>
-<span class="normal">4477</span>
-<span class="normal">4478</span>
-<span class="normal">4479</span>
-<span class="normal">4480</span>
-<span class="normal">4481</span>
-<span class="normal">4482</span>
-<span class="normal">4483</span>
-<span class="normal">4484</span>
-<span class="normal">4485</span>
-<span class="normal">4486</span>
-<span class="normal">4487</span>
-<span class="normal">4488</span>
-<span class="normal">4489</span>
-<span class="normal">4490</span>
-<span class="normal">4491</span>
-<span class="normal">4492</span>
-<span class="normal">4493</span>
-<span class="normal">4494</span>
-<span class="normal">4495</span>
-<span class="normal">4496</span>
-<span class="normal">4497</span>
-<span class="normal">4498</span>
-<span class="normal">4499</span>
-<span class="normal">4500</span>
-<span class="normal">4501</span>
-<span class="normal">4502</span>
-<span class="normal">4503</span>
-<span class="normal">4504</span>
-<span class="normal">4505</span>
-<span class="normal">4506</span>
-<span class="normal">4507</span>
-<span class="normal">4508</span>
-<span class="normal">4509</span>
-<span class="normal">4510</span>
-<span class="normal">4511</span>
-<span class="normal">4512</span>
-<span class="normal">4513</span>
-<span class="normal">4514</span>
-<span class="normal">4515</span>
-<span class="normal">4516</span>
-<span class="normal">4517</span>
-<span class="normal">4518</span>
-<span class="normal">4519</span>
-<span class="normal">4520</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4520</span>
 <span class="normal">4521</span>
 <span class="normal">4522</span>
 <span class="normal">4523</span>
@@ -35634,7 +36238,100 @@ The first numerical column will be used if None. Defaults to None.</p>
 <span class="normal">4968</span>
 <span class="normal">4969</span>
 <span class="normal">4970</span>
-<span class="normal">4971</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_gps_trace</span><span class="p">(</span>
+<span class="normal">4971</span>
+<span class="normal">4972</span>
+<span class="normal">4973</span>
+<span class="normal">4974</span>
+<span class="normal">4975</span>
+<span class="normal">4976</span>
+<span class="normal">4977</span>
+<span class="normal">4978</span>
+<span class="normal">4979</span>
+<span class="normal">4980</span>
+<span class="normal">4981</span>
+<span class="normal">4982</span>
+<span class="normal">4983</span>
+<span class="normal">4984</span>
+<span class="normal">4985</span>
+<span class="normal">4986</span>
+<span class="normal">4987</span>
+<span class="normal">4988</span>
+<span class="normal">4989</span>
+<span class="normal">4990</span>
+<span class="normal">4991</span>
+<span class="normal">4992</span>
+<span class="normal">4993</span>
+<span class="normal">4994</span>
+<span class="normal">4995</span>
+<span class="normal">4996</span>
+<span class="normal">4997</span>
+<span class="normal">4998</span>
+<span class="normal">4999</span>
+<span class="normal">5000</span>
+<span class="normal">5001</span>
+<span class="normal">5002</span>
+<span class="normal">5003</span>
+<span class="normal">5004</span>
+<span class="normal">5005</span>
+<span class="normal">5006</span>
+<span class="normal">5007</span>
+<span class="normal">5008</span>
+<span class="normal">5009</span>
+<span class="normal">5010</span>
+<span class="normal">5011</span>
+<span class="normal">5012</span>
+<span class="normal">5013</span>
+<span class="normal">5014</span>
+<span class="normal">5015</span>
+<span class="normal">5016</span>
+<span class="normal">5017</span>
+<span class="normal">5018</span>
+<span class="normal">5019</span>
+<span class="normal">5020</span>
+<span class="normal">5021</span>
+<span class="normal">5022</span>
+<span class="normal">5023</span>
+<span class="normal">5024</span>
+<span class="normal">5025</span>
+<span class="normal">5026</span>
+<span class="normal">5027</span>
+<span class="normal">5028</span>
+<span class="normal">5029</span>
+<span class="normal">5030</span>
+<span class="normal">5031</span>
+<span class="normal">5032</span>
+<span class="normal">5033</span>
+<span class="normal">5034</span>
+<span class="normal">5035</span>
+<span class="normal">5036</span>
+<span class="normal">5037</span>
+<span class="normal">5038</span>
+<span class="normal">5039</span>
+<span class="normal">5040</span>
+<span class="normal">5041</span>
+<span class="normal">5042</span>
+<span class="normal">5043</span>
+<span class="normal">5044</span>
+<span class="normal">5045</span>
+<span class="normal">5046</span>
+<span class="normal">5047</span>
+<span class="normal">5048</span>
+<span class="normal">5049</span>
+<span class="normal">5050</span>
+<span class="normal">5051</span>
+<span class="normal">5052</span>
+<span class="normal">5053</span>
+<span class="normal">5054</span>
+<span class="normal">5055</span>
+<span class="normal">5056</span>
+<span class="normal">5057</span>
+<span class="normal">5058</span>
+<span class="normal">5059</span>
+<span class="normal">5060</span>
+<span class="normal">5061</span>
+<span class="normal">5062</span>
+<span class="normal">5063</span>
+<span class="normal">5064</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_gps_trace</span><span class="p">(</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">ann_column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -36544,100 +37241,7 @@ Defaults to ["point", "polygon", "line_string", "trash"].</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5576</span>
-<span class="normal">5577</span>
-<span class="normal">5578</span>
-<span class="normal">5579</span>
-<span class="normal">5580</span>
-<span class="normal">5581</span>
-<span class="normal">5582</span>
-<span class="normal">5583</span>
-<span class="normal">5584</span>
-<span class="normal">5585</span>
-<span class="normal">5586</span>
-<span class="normal">5587</span>
-<span class="normal">5588</span>
-<span class="normal">5589</span>
-<span class="normal">5590</span>
-<span class="normal">5591</span>
-<span class="normal">5592</span>
-<span class="normal">5593</span>
-<span class="normal">5594</span>
-<span class="normal">5595</span>
-<span class="normal">5596</span>
-<span class="normal">5597</span>
-<span class="normal">5598</span>
-<span class="normal">5599</span>
-<span class="normal">5600</span>
-<span class="normal">5601</span>
-<span class="normal">5602</span>
-<span class="normal">5603</span>
-<span class="normal">5604</span>
-<span class="normal">5605</span>
-<span class="normal">5606</span>
-<span class="normal">5607</span>
-<span class="normal">5608</span>
-<span class="normal">5609</span>
-<span class="normal">5610</span>
-<span class="normal">5611</span>
-<span class="normal">5612</span>
-<span class="normal">5613</span>
-<span class="normal">5614</span>
-<span class="normal">5615</span>
-<span class="normal">5616</span>
-<span class="normal">5617</span>
-<span class="normal">5618</span>
-<span class="normal">5619</span>
-<span class="normal">5620</span>
-<span class="normal">5621</span>
-<span class="normal">5622</span>
-<span class="normal">5623</span>
-<span class="normal">5624</span>
-<span class="normal">5625</span>
-<span class="normal">5626</span>
-<span class="normal">5627</span>
-<span class="normal">5628</span>
-<span class="normal">5629</span>
-<span class="normal">5630</span>
-<span class="normal">5631</span>
-<span class="normal">5632</span>
-<span class="normal">5633</span>
-<span class="normal">5634</span>
-<span class="normal">5635</span>
-<span class="normal">5636</span>
-<span class="normal">5637</span>
-<span class="normal">5638</span>
-<span class="normal">5639</span>
-<span class="normal">5640</span>
-<span class="normal">5641</span>
-<span class="normal">5642</span>
-<span class="normal">5643</span>
-<span class="normal">5644</span>
-<span class="normal">5645</span>
-<span class="normal">5646</span>
-<span class="normal">5647</span>
-<span class="normal">5648</span>
-<span class="normal">5649</span>
-<span class="normal">5650</span>
-<span class="normal">5651</span>
-<span class="normal">5652</span>
-<span class="normal">5653</span>
-<span class="normal">5654</span>
-<span class="normal">5655</span>
-<span class="normal">5656</span>
-<span class="normal">5657</span>
-<span class="normal">5658</span>
-<span class="normal">5659</span>
-<span class="normal">5660</span>
-<span class="normal">5661</span>
-<span class="normal">5662</span>
-<span class="normal">5663</span>
-<span class="normal">5664</span>
-<span class="normal">5665</span>
-<span class="normal">5666</span>
-<span class="normal">5667</span>
-<span class="normal">5668</span>
-<span class="normal">5669</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5669</span>
 <span class="normal">5670</span>
 <span class="normal">5671</span>
 <span class="normal">5672</span>
@@ -36859,7 +37463,100 @@ Defaults to ["point", "polygon", "line_string", "trash"].</p>
 <span class="normal">5888</span>
 <span class="normal">5889</span>
 <span class="normal">5890</span>
-<span class="normal">5891</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
+<span class="normal">5891</span>
+<span class="normal">5892</span>
+<span class="normal">5893</span>
+<span class="normal">5894</span>
+<span class="normal">5895</span>
+<span class="normal">5896</span>
+<span class="normal">5897</span>
+<span class="normal">5898</span>
+<span class="normal">5899</span>
+<span class="normal">5900</span>
+<span class="normal">5901</span>
+<span class="normal">5902</span>
+<span class="normal">5903</span>
+<span class="normal">5904</span>
+<span class="normal">5905</span>
+<span class="normal">5906</span>
+<span class="normal">5907</span>
+<span class="normal">5908</span>
+<span class="normal">5909</span>
+<span class="normal">5910</span>
+<span class="normal">5911</span>
+<span class="normal">5912</span>
+<span class="normal">5913</span>
+<span class="normal">5914</span>
+<span class="normal">5915</span>
+<span class="normal">5916</span>
+<span class="normal">5917</span>
+<span class="normal">5918</span>
+<span class="normal">5919</span>
+<span class="normal">5920</span>
+<span class="normal">5921</span>
+<span class="normal">5922</span>
+<span class="normal">5923</span>
+<span class="normal">5924</span>
+<span class="normal">5925</span>
+<span class="normal">5926</span>
+<span class="normal">5927</span>
+<span class="normal">5928</span>
+<span class="normal">5929</span>
+<span class="normal">5930</span>
+<span class="normal">5931</span>
+<span class="normal">5932</span>
+<span class="normal">5933</span>
+<span class="normal">5934</span>
+<span class="normal">5935</span>
+<span class="normal">5936</span>
+<span class="normal">5937</span>
+<span class="normal">5938</span>
+<span class="normal">5939</span>
+<span class="normal">5940</span>
+<span class="normal">5941</span>
+<span class="normal">5942</span>
+<span class="normal">5943</span>
+<span class="normal">5944</span>
+<span class="normal">5945</span>
+<span class="normal">5946</span>
+<span class="normal">5947</span>
+<span class="normal">5948</span>
+<span class="normal">5949</span>
+<span class="normal">5950</span>
+<span class="normal">5951</span>
+<span class="normal">5952</span>
+<span class="normal">5953</span>
+<span class="normal">5954</span>
+<span class="normal">5955</span>
+<span class="normal">5956</span>
+<span class="normal">5957</span>
+<span class="normal">5958</span>
+<span class="normal">5959</span>
+<span class="normal">5960</span>
+<span class="normal">5961</span>
+<span class="normal">5962</span>
+<span class="normal">5963</span>
+<span class="normal">5964</span>
+<span class="normal">5965</span>
+<span class="normal">5966</span>
+<span class="normal">5967</span>
+<span class="normal">5968</span>
+<span class="normal">5969</span>
+<span class="normal">5970</span>
+<span class="normal">5971</span>
+<span class="normal">5972</span>
+<span class="normal">5973</span>
+<span class="normal">5974</span>
+<span class="normal">5975</span>
+<span class="normal">5976</span>
+<span class="normal">5977</span>
+<span class="normal">5978</span>
+<span class="normal">5979</span>
+<span class="normal">5980</span>
+<span class="normal">5981</span>
+<span class="normal">5982</span>
+<span class="normal">5983</span>
+<span class="normal">5984</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">edit_vector_data</span><span class="p">(</span>
     <span class="n">m</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Map</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">properties</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -37392,100 +38089,7 @@ webp, png, jpg. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4281</span>
-<span class="normal">4282</span>
-<span class="normal">4283</span>
-<span class="normal">4284</span>
-<span class="normal">4285</span>
-<span class="normal">4286</span>
-<span class="normal">4287</span>
-<span class="normal">4288</span>
-<span class="normal">4289</span>
-<span class="normal">4290</span>
-<span class="normal">4291</span>
-<span class="normal">4292</span>
-<span class="normal">4293</span>
-<span class="normal">4294</span>
-<span class="normal">4295</span>
-<span class="normal">4296</span>
-<span class="normal">4297</span>
-<span class="normal">4298</span>
-<span class="normal">4299</span>
-<span class="normal">4300</span>
-<span class="normal">4301</span>
-<span class="normal">4302</span>
-<span class="normal">4303</span>
-<span class="normal">4304</span>
-<span class="normal">4305</span>
-<span class="normal">4306</span>
-<span class="normal">4307</span>
-<span class="normal">4308</span>
-<span class="normal">4309</span>
-<span class="normal">4310</span>
-<span class="normal">4311</span>
-<span class="normal">4312</span>
-<span class="normal">4313</span>
-<span class="normal">4314</span>
-<span class="normal">4315</span>
-<span class="normal">4316</span>
-<span class="normal">4317</span>
-<span class="normal">4318</span>
-<span class="normal">4319</span>
-<span class="normal">4320</span>
-<span class="normal">4321</span>
-<span class="normal">4322</span>
-<span class="normal">4323</span>
-<span class="normal">4324</span>
-<span class="normal">4325</span>
-<span class="normal">4326</span>
-<span class="normal">4327</span>
-<span class="normal">4328</span>
-<span class="normal">4329</span>
-<span class="normal">4330</span>
-<span class="normal">4331</span>
-<span class="normal">4332</span>
-<span class="normal">4333</span>
-<span class="normal">4334</span>
-<span class="normal">4335</span>
-<span class="normal">4336</span>
-<span class="normal">4337</span>
-<span class="normal">4338</span>
-<span class="normal">4339</span>
-<span class="normal">4340</span>
-<span class="normal">4341</span>
-<span class="normal">4342</span>
-<span class="normal">4343</span>
-<span class="normal">4344</span>
-<span class="normal">4345</span>
-<span class="normal">4346</span>
-<span class="normal">4347</span>
-<span class="normal">4348</span>
-<span class="normal">4349</span>
-<span class="normal">4350</span>
-<span class="normal">4351</span>
-<span class="normal">4352</span>
-<span class="normal">4353</span>
-<span class="normal">4354</span>
-<span class="normal">4355</span>
-<span class="normal">4356</span>
-<span class="normal">4357</span>
-<span class="normal">4358</span>
-<span class="normal">4359</span>
-<span class="normal">4360</span>
-<span class="normal">4361</span>
-<span class="normal">4362</span>
-<span class="normal">4363</span>
-<span class="normal">4364</span>
-<span class="normal">4365</span>
-<span class="normal">4366</span>
-<span class="normal">4367</span>
-<span class="normal">4368</span>
-<span class="normal">4369</span>
-<span class="normal">4370</span>
-<span class="normal">4371</span>
-<span class="normal">4372</span>
-<span class="normal">4373</span>
-<span class="normal">4374</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4374</span>
 <span class="normal">4375</span>
 <span class="normal">4376</span>
 <span class="normal">4377</span>
@@ -37535,7 +38139,100 @@ webp, png, jpg. Defaults to None.</p>
 <span class="normal">4421</span>
 <span class="normal">4422</span>
 <span class="normal">4423</span>
-<span class="normal">4424</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">maptiler_3d_style</span><span class="p">(</span>
+<span class="normal">4424</span>
+<span class="normal">4425</span>
+<span class="normal">4426</span>
+<span class="normal">4427</span>
+<span class="normal">4428</span>
+<span class="normal">4429</span>
+<span class="normal">4430</span>
+<span class="normal">4431</span>
+<span class="normal">4432</span>
+<span class="normal">4433</span>
+<span class="normal">4434</span>
+<span class="normal">4435</span>
+<span class="normal">4436</span>
+<span class="normal">4437</span>
+<span class="normal">4438</span>
+<span class="normal">4439</span>
+<span class="normal">4440</span>
+<span class="normal">4441</span>
+<span class="normal">4442</span>
+<span class="normal">4443</span>
+<span class="normal">4444</span>
+<span class="normal">4445</span>
+<span class="normal">4446</span>
+<span class="normal">4447</span>
+<span class="normal">4448</span>
+<span class="normal">4449</span>
+<span class="normal">4450</span>
+<span class="normal">4451</span>
+<span class="normal">4452</span>
+<span class="normal">4453</span>
+<span class="normal">4454</span>
+<span class="normal">4455</span>
+<span class="normal">4456</span>
+<span class="normal">4457</span>
+<span class="normal">4458</span>
+<span class="normal">4459</span>
+<span class="normal">4460</span>
+<span class="normal">4461</span>
+<span class="normal">4462</span>
+<span class="normal">4463</span>
+<span class="normal">4464</span>
+<span class="normal">4465</span>
+<span class="normal">4466</span>
+<span class="normal">4467</span>
+<span class="normal">4468</span>
+<span class="normal">4469</span>
+<span class="normal">4470</span>
+<span class="normal">4471</span>
+<span class="normal">4472</span>
+<span class="normal">4473</span>
+<span class="normal">4474</span>
+<span class="normal">4475</span>
+<span class="normal">4476</span>
+<span class="normal">4477</span>
+<span class="normal">4478</span>
+<span class="normal">4479</span>
+<span class="normal">4480</span>
+<span class="normal">4481</span>
+<span class="normal">4482</span>
+<span class="normal">4483</span>
+<span class="normal">4484</span>
+<span class="normal">4485</span>
+<span class="normal">4486</span>
+<span class="normal">4487</span>
+<span class="normal">4488</span>
+<span class="normal">4489</span>
+<span class="normal">4490</span>
+<span class="normal">4491</span>
+<span class="normal">4492</span>
+<span class="normal">4493</span>
+<span class="normal">4494</span>
+<span class="normal">4495</span>
+<span class="normal">4496</span>
+<span class="normal">4497</span>
+<span class="normal">4498</span>
+<span class="normal">4499</span>
+<span class="normal">4500</span>
+<span class="normal">4501</span>
+<span class="normal">4502</span>
+<span class="normal">4503</span>
+<span class="normal">4504</span>
+<span class="normal">4505</span>
+<span class="normal">4506</span>
+<span class="normal">4507</span>
+<span class="normal">4508</span>
+<span class="normal">4509</span>
+<span class="normal">4510</span>
+<span class="normal">4511</span>
+<span class="normal">4512</span>
+<span class="normal">4513</span>
+<span class="normal">4514</span>
+<span class="normal">4515</span>
+<span class="normal">4516</span>
+<span class="normal">4517</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">maptiler_3d_style</span><span class="p">(</span>
     <span class="n">style</span><span class="o">=</span><span class="s2">&quot;satellite&quot;</span><span class="p">,</span>
     <span class="n">exaggeration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">tile_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
@@ -38060,100 +38757,7 @@ The first numerical column will be used if None. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">4974</span>
-<span class="normal">4975</span>
-<span class="normal">4976</span>
-<span class="normal">4977</span>
-<span class="normal">4978</span>
-<span class="normal">4979</span>
-<span class="normal">4980</span>
-<span class="normal">4981</span>
-<span class="normal">4982</span>
-<span class="normal">4983</span>
-<span class="normal">4984</span>
-<span class="normal">4985</span>
-<span class="normal">4986</span>
-<span class="normal">4987</span>
-<span class="normal">4988</span>
-<span class="normal">4989</span>
-<span class="normal">4990</span>
-<span class="normal">4991</span>
-<span class="normal">4992</span>
-<span class="normal">4993</span>
-<span class="normal">4994</span>
-<span class="normal">4995</span>
-<span class="normal">4996</span>
-<span class="normal">4997</span>
-<span class="normal">4998</span>
-<span class="normal">4999</span>
-<span class="normal">5000</span>
-<span class="normal">5001</span>
-<span class="normal">5002</span>
-<span class="normal">5003</span>
-<span class="normal">5004</span>
-<span class="normal">5005</span>
-<span class="normal">5006</span>
-<span class="normal">5007</span>
-<span class="normal">5008</span>
-<span class="normal">5009</span>
-<span class="normal">5010</span>
-<span class="normal">5011</span>
-<span class="normal">5012</span>
-<span class="normal">5013</span>
-<span class="normal">5014</span>
-<span class="normal">5015</span>
-<span class="normal">5016</span>
-<span class="normal">5017</span>
-<span class="normal">5018</span>
-<span class="normal">5019</span>
-<span class="normal">5020</span>
-<span class="normal">5021</span>
-<span class="normal">5022</span>
-<span class="normal">5023</span>
-<span class="normal">5024</span>
-<span class="normal">5025</span>
-<span class="normal">5026</span>
-<span class="normal">5027</span>
-<span class="normal">5028</span>
-<span class="normal">5029</span>
-<span class="normal">5030</span>
-<span class="normal">5031</span>
-<span class="normal">5032</span>
-<span class="normal">5033</span>
-<span class="normal">5034</span>
-<span class="normal">5035</span>
-<span class="normal">5036</span>
-<span class="normal">5037</span>
-<span class="normal">5038</span>
-<span class="normal">5039</span>
-<span class="normal">5040</span>
-<span class="normal">5041</span>
-<span class="normal">5042</span>
-<span class="normal">5043</span>
-<span class="normal">5044</span>
-<span class="normal">5045</span>
-<span class="normal">5046</span>
-<span class="normal">5047</span>
-<span class="normal">5048</span>
-<span class="normal">5049</span>
-<span class="normal">5050</span>
-<span class="normal">5051</span>
-<span class="normal">5052</span>
-<span class="normal">5053</span>
-<span class="normal">5054</span>
-<span class="normal">5055</span>
-<span class="normal">5056</span>
-<span class="normal">5057</span>
-<span class="normal">5058</span>
-<span class="normal">5059</span>
-<span class="normal">5060</span>
-<span class="normal">5061</span>
-<span class="normal">5062</span>
-<span class="normal">5063</span>
-<span class="normal">5064</span>
-<span class="normal">5065</span>
-<span class="normal">5066</span>
-<span class="normal">5067</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5067</span>
 <span class="normal">5068</span>
 <span class="normal">5069</span>
 <span class="normal">5070</span>
@@ -38209,7 +38813,100 @@ The first numerical column will be used if None. Defaults to None.</p>
 <span class="normal">5120</span>
 <span class="normal">5121</span>
 <span class="normal">5122</span>
-<span class="normal">5123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_trace</span><span class="p">(</span>
+<span class="normal">5123</span>
+<span class="normal">5124</span>
+<span class="normal">5125</span>
+<span class="normal">5126</span>
+<span class="normal">5127</span>
+<span class="normal">5128</span>
+<span class="normal">5129</span>
+<span class="normal">5130</span>
+<span class="normal">5131</span>
+<span class="normal">5132</span>
+<span class="normal">5133</span>
+<span class="normal">5134</span>
+<span class="normal">5135</span>
+<span class="normal">5136</span>
+<span class="normal">5137</span>
+<span class="normal">5138</span>
+<span class="normal">5139</span>
+<span class="normal">5140</span>
+<span class="normal">5141</span>
+<span class="normal">5142</span>
+<span class="normal">5143</span>
+<span class="normal">5144</span>
+<span class="normal">5145</span>
+<span class="normal">5146</span>
+<span class="normal">5147</span>
+<span class="normal">5148</span>
+<span class="normal">5149</span>
+<span class="normal">5150</span>
+<span class="normal">5151</span>
+<span class="normal">5152</span>
+<span class="normal">5153</span>
+<span class="normal">5154</span>
+<span class="normal">5155</span>
+<span class="normal">5156</span>
+<span class="normal">5157</span>
+<span class="normal">5158</span>
+<span class="normal">5159</span>
+<span class="normal">5160</span>
+<span class="normal">5161</span>
+<span class="normal">5162</span>
+<span class="normal">5163</span>
+<span class="normal">5164</span>
+<span class="normal">5165</span>
+<span class="normal">5166</span>
+<span class="normal">5167</span>
+<span class="normal">5168</span>
+<span class="normal">5169</span>
+<span class="normal">5170</span>
+<span class="normal">5171</span>
+<span class="normal">5172</span>
+<span class="normal">5173</span>
+<span class="normal">5174</span>
+<span class="normal">5175</span>
+<span class="normal">5176</span>
+<span class="normal">5177</span>
+<span class="normal">5178</span>
+<span class="normal">5179</span>
+<span class="normal">5180</span>
+<span class="normal">5181</span>
+<span class="normal">5182</span>
+<span class="normal">5183</span>
+<span class="normal">5184</span>
+<span class="normal">5185</span>
+<span class="normal">5186</span>
+<span class="normal">5187</span>
+<span class="normal">5188</span>
+<span class="normal">5189</span>
+<span class="normal">5190</span>
+<span class="normal">5191</span>
+<span class="normal">5192</span>
+<span class="normal">5193</span>
+<span class="normal">5194</span>
+<span class="normal">5195</span>
+<span class="normal">5196</span>
+<span class="normal">5197</span>
+<span class="normal">5198</span>
+<span class="normal">5199</span>
+<span class="normal">5200</span>
+<span class="normal">5201</span>
+<span class="normal">5202</span>
+<span class="normal">5203</span>
+<span class="normal">5204</span>
+<span class="normal">5205</span>
+<span class="normal">5206</span>
+<span class="normal">5207</span>
+<span class="normal">5208</span>
+<span class="normal">5209</span>
+<span class="normal">5210</span>
+<span class="normal">5211</span>
+<span class="normal">5212</span>
+<span class="normal">5213</span>
+<span class="normal">5214</span>
+<span class="normal">5215</span>
+<span class="normal">5216</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_trace</span><span class="p">(</span>
     <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">ann_column</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">colormap</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -38788,100 +39485,7 @@ The first numerical column will be used if None. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5126</span>
-<span class="normal">5127</span>
-<span class="normal">5128</span>
-<span class="normal">5129</span>
-<span class="normal">5130</span>
-<span class="normal">5131</span>
-<span class="normal">5132</span>
-<span class="normal">5133</span>
-<span class="normal">5134</span>
-<span class="normal">5135</span>
-<span class="normal">5136</span>
-<span class="normal">5137</span>
-<span class="normal">5138</span>
-<span class="normal">5139</span>
-<span class="normal">5140</span>
-<span class="normal">5141</span>
-<span class="normal">5142</span>
-<span class="normal">5143</span>
-<span class="normal">5144</span>
-<span class="normal">5145</span>
-<span class="normal">5146</span>
-<span class="normal">5147</span>
-<span class="normal">5148</span>
-<span class="normal">5149</span>
-<span class="normal">5150</span>
-<span class="normal">5151</span>
-<span class="normal">5152</span>
-<span class="normal">5153</span>
-<span class="normal">5154</span>
-<span class="normal">5155</span>
-<span class="normal">5156</span>
-<span class="normal">5157</span>
-<span class="normal">5158</span>
-<span class="normal">5159</span>
-<span class="normal">5160</span>
-<span class="normal">5161</span>
-<span class="normal">5162</span>
-<span class="normal">5163</span>
-<span class="normal">5164</span>
-<span class="normal">5165</span>
-<span class="normal">5166</span>
-<span class="normal">5167</span>
-<span class="normal">5168</span>
-<span class="normal">5169</span>
-<span class="normal">5170</span>
-<span class="normal">5171</span>
-<span class="normal">5172</span>
-<span class="normal">5173</span>
-<span class="normal">5174</span>
-<span class="normal">5175</span>
-<span class="normal">5176</span>
-<span class="normal">5177</span>
-<span class="normal">5178</span>
-<span class="normal">5179</span>
-<span class="normal">5180</span>
-<span class="normal">5181</span>
-<span class="normal">5182</span>
-<span class="normal">5183</span>
-<span class="normal">5184</span>
-<span class="normal">5185</span>
-<span class="normal">5186</span>
-<span class="normal">5187</span>
-<span class="normal">5188</span>
-<span class="normal">5189</span>
-<span class="normal">5190</span>
-<span class="normal">5191</span>
-<span class="normal">5192</span>
-<span class="normal">5193</span>
-<span class="normal">5194</span>
-<span class="normal">5195</span>
-<span class="normal">5196</span>
-<span class="normal">5197</span>
-<span class="normal">5198</span>
-<span class="normal">5199</span>
-<span class="normal">5200</span>
-<span class="normal">5201</span>
-<span class="normal">5202</span>
-<span class="normal">5203</span>
-<span class="normal">5204</span>
-<span class="normal">5205</span>
-<span class="normal">5206</span>
-<span class="normal">5207</span>
-<span class="normal">5208</span>
-<span class="normal">5209</span>
-<span class="normal">5210</span>
-<span class="normal">5211</span>
-<span class="normal">5212</span>
-<span class="normal">5213</span>
-<span class="normal">5214</span>
-<span class="normal">5215</span>
-<span class="normal">5216</span>
-<span class="normal">5217</span>
-<span class="normal">5218</span>
-<span class="normal">5219</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">5219</span>
 <span class="normal">5220</span>
 <span class="normal">5221</span>
 <span class="normal">5222</span>
@@ -38934,7 +39538,100 @@ The first numerical column will be used if None. Defaults to None.</p>
 <span class="normal">5269</span>
 <span class="normal">5270</span>
 <span class="normal">5271</span>
-<span class="normal">5272</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_traces</span><span class="p">(</span>
+<span class="normal">5272</span>
+<span class="normal">5273</span>
+<span class="normal">5274</span>
+<span class="normal">5275</span>
+<span class="normal">5276</span>
+<span class="normal">5277</span>
+<span class="normal">5278</span>
+<span class="normal">5279</span>
+<span class="normal">5280</span>
+<span class="normal">5281</span>
+<span class="normal">5282</span>
+<span class="normal">5283</span>
+<span class="normal">5284</span>
+<span class="normal">5285</span>
+<span class="normal">5286</span>
+<span class="normal">5287</span>
+<span class="normal">5288</span>
+<span class="normal">5289</span>
+<span class="normal">5290</span>
+<span class="normal">5291</span>
+<span class="normal">5292</span>
+<span class="normal">5293</span>
+<span class="normal">5294</span>
+<span class="normal">5295</span>
+<span class="normal">5296</span>
+<span class="normal">5297</span>
+<span class="normal">5298</span>
+<span class="normal">5299</span>
+<span class="normal">5300</span>
+<span class="normal">5301</span>
+<span class="normal">5302</span>
+<span class="normal">5303</span>
+<span class="normal">5304</span>
+<span class="normal">5305</span>
+<span class="normal">5306</span>
+<span class="normal">5307</span>
+<span class="normal">5308</span>
+<span class="normal">5309</span>
+<span class="normal">5310</span>
+<span class="normal">5311</span>
+<span class="normal">5312</span>
+<span class="normal">5313</span>
+<span class="normal">5314</span>
+<span class="normal">5315</span>
+<span class="normal">5316</span>
+<span class="normal">5317</span>
+<span class="normal">5318</span>
+<span class="normal">5319</span>
+<span class="normal">5320</span>
+<span class="normal">5321</span>
+<span class="normal">5322</span>
+<span class="normal">5323</span>
+<span class="normal">5324</span>
+<span class="normal">5325</span>
+<span class="normal">5326</span>
+<span class="normal">5327</span>
+<span class="normal">5328</span>
+<span class="normal">5329</span>
+<span class="normal">5330</span>
+<span class="normal">5331</span>
+<span class="normal">5332</span>
+<span class="normal">5333</span>
+<span class="normal">5334</span>
+<span class="normal">5335</span>
+<span class="normal">5336</span>
+<span class="normal">5337</span>
+<span class="normal">5338</span>
+<span class="normal">5339</span>
+<span class="normal">5340</span>
+<span class="normal">5341</span>
+<span class="normal">5342</span>
+<span class="normal">5343</span>
+<span class="normal">5344</span>
+<span class="normal">5345</span>
+<span class="normal">5346</span>
+<span class="normal">5347</span>
+<span class="normal">5348</span>
+<span class="normal">5349</span>
+<span class="normal">5350</span>
+<span class="normal">5351</span>
+<span class="normal">5352</span>
+<span class="normal">5353</span>
+<span class="normal">5354</span>
+<span class="normal">5355</span>
+<span class="normal">5356</span>
+<span class="normal">5357</span>
+<span class="normal">5358</span>
+<span class="normal">5359</span>
+<span class="normal">5360</span>
+<span class="normal">5361</span>
+<span class="normal">5362</span>
+<span class="normal">5363</span>
+<span class="normal">5364</span>
+<span class="normal">5365</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">open_gps_traces</span><span class="p">(</span>
     <span class="n">filepaths</span><span class="p">,</span>
     <span class="n">dirname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">widget_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;500px&quot;</span><span class="p">,</span>
@@ -39187,10 +39884,10 @@ The first numerical column will be used if None. Defaults to None.</p>
     
     
       
-      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
         <script src="../js/timeago.min.js"></script>
       
