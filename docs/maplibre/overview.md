@@ -108,7 +108,7 @@ Add an icon to the map that was generated at runtime.
 
 Add labels from vector data to the map.
 
-[![image](https://github.com/user-attachments/assets/f2fd827c-406f-4738-b659-882fca9d29b1)](https://leafmap.org/maplibre/add_labels)
+[![image](https://github.com/user-attachments/assets/f71924c3-dd9a-4a34-9748-909b9fd941c1)](https://leafmap.org/maplibre/add_labels)
 
 ## Add a legend to the map
 
@@ -447,6 +447,12 @@ Visualize Mapillary vector tiles on a map.
 Use MapTiler styles to customize the look of your map.
 
 [![](https://i.imgur.com/0CKEFBx.png)](https://leafmap.org/maplibre/maptiler_styles)
+
+## Visualize the Military Grid Reference System (MGRS)
+
+visualize the Military Grid Reference System (MGRS) on a map.
+
+[![image](https://github.com/user-attachments/assets/f2fd827c-406f-4738-b659-882fca9d29b1)](https://leafmap.org/maplibre/MGRS)
 
 ## Get coordinates of the mouse pointer
 
