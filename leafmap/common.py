@@ -10961,7 +10961,7 @@ def get_solar_data(
 
 def merge_vector(
     files: Union[str, List[str]],
-    output: str,
+    output: str = None,
     crs: str = None,
     ext: str = "geojson",
     recursive: bool = False,
@@ -11006,16 +11006,19 @@ def merge_vector(
         gdf = gpd.read_file(filename, **kwargs)
         if crs is None:
             crs = gdf.crs
+        else:
+            gdf = gdf.to_crs(crs)
         gdfs.append(gdf)
 
     if not quiet:
         print("Merging GeoDataFrames ...")
     gdf = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True), crs=crs)
 
-    if not quiet:
-        print(f"Saving merged file to {output} ...")
-    gdf.to_file(output)
-    print(f"Saved merged file to {output}")
+    if output is not None:
+        if not quiet:
+            print(f"Saving merged file to {output} ...")
+        gdf.to_file(output)
+        print(f"Saved merged file to {output}")
 
     if return_gdf:
         return gdf
@@ -11559,7 +11562,7 @@ def mbtiles_to_pmtiles(
 
 
 def vector_to_pmtiles(
-    source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
+    source_path: str, target_path: str, max_zoom: int = 15, name: str = None, **kwargs
 ) -> None:
     """
     Converts a vector file to PMTiles format.
@@ -11579,10 +11582,29 @@ def vector_to_pmtiles(
     """
     if not target_path.endswith(".pmtiles"):
         raise ValueError("Error: target file must be a .pmtiles file.")
-    mbtiles = target_path.replace(".pmtiles", ".mbtiles")
-    vector_to_mbtiles(source_path, mbtiles, max_zoom=max_zoom, name=name, **kwargs)
-    mbtiles_to_pmtiles(mbtiles, target_path)
-    os.remove(mbtiles)
+    import subprocess
+
+    command = [
+        "ogr2ogr",
+        "-skipfailures",
+        "-f",
+        "PMTiles",
+        "-dsco",
+        f"MAXZOOM={max_zoom}",
+        target_path,
+        source_path,
+    ]
+
+    if name:
+        command.extend([f"NAME={name}"])
+
+    for key, value in kwargs.items():
+        command.extend([f"{key.upper()}={value}"])
+
+    try:
+        subprocess.run(command, check=True)
+    except subprocess.CalledProcessError as e:
+        raise e
 
 
 def geojson_to_pmtiles(

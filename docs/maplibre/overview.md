@@ -104,6 +104,12 @@ Add an icon to the map that was generated at runtime.
 
 [![](https://i.imgur.com/qWWlnAm.png)](https://leafmap.org/maplibre/add_image_generated)
 
+## Add labels to the map
+
+Add labels from vector data to the map.
+
+[![image](https://github.com/user-attachments/assets/f2fd827c-406f-4738-b659-882fca9d29b1)](https://leafmap.org/maplibre/add_labels)
+
 ## Add a legend to the map
 
 Add a custom legend to the map.
