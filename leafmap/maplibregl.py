@@ -4187,6 +4187,99 @@ class Map(MapWidget):
 
             return widget
 
+    def add_labels(
+        self,
+        source: Union[str, Dict[str, Any]],
+        column: str,
+        name: Optional[str] = None,
+        text_size: int = 14,
+        text_anchor: str = "center",
+        text_color: str = "black",
+        min_zoom: Optional[float] = None,
+        max_zoom: Optional[float] = None,
+        layout: Optional[Dict[str, Any]] = None,
+        paint: Optional[Dict[str, Any]] = None,
+        before_id: Optional[str] = None,
+        opacity: float = 1.0,
+        visible: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a label layer to the map.
+
+        This method adds a label layer to the map using the specified source and column for text values.
+
+        Args:
+            source (Union[str, Dict[str, Any]]): The data source for the labels. It can be a GeoJSON file path
+                or a dictionary containing GeoJSON data.
+            column (str): The column name in the source data to use for the label text.
+            name (Optional[str]): The name of the label layer. If None, a random name is generated. Defaults to None.
+            text_size (int): The size of the label text. Defaults to 14.
+            text_anchor (str): The anchor position of the text. Can be "center", "left", "right", etc. Defaults to "center".
+            text_color (str): The color of the label text. Defaults to "black".
+            min_zoom (Optional[float]): The minimum zoom level at which the labels are visible. Defaults to None.
+            max_zoom (Optional[float]): The maximum zoom level at which the labels are visible. Defaults to None.
+            layout (Optional[Dict[str, Any]]): Additional layout properties for the label layer. Defaults to None.
+                For more information, refer to https://maplibre.org/maplibre-style-spec/layers/#symbol.
+            paint (Optional[Dict[str, Any]]): Additional paint properties for the label layer. Defaults to None.
+            before_id (Optional[str]): The ID of an existing layer before which the new layer should be inserted. Defaults to None.
+            opacity (float): The opacity of the label layer. Defaults to 1.0.
+            visible (bool): Whether the label layer is visible by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments to customize the label layer.
+
+        Returns:
+            None
+        """
+
+        if name is None:
+            name = f"label_source_{common.random_string(3)}"
+
+        if isinstance(source, str):
+            gdf = common.read_vector(source)
+            geojson = gdf.__geo_interface__
+        elif isinstance(source, dict):
+            geojson = source
+        elif isinstance(source, gpd.GeoDataFrame):
+            geojson = source.__geo_interface__
+        else:
+            raise ValueError(
+                "Invalid source type. Use a GeoDataFrame, a file path to a GeoJSON file, or a dictionary."
+            )
+
+        source = {
+            "type": "geojson",
+            "data": geojson,
+        }
+
+        self.add_source(name, source)
+
+        if layout is None:
+            layout = {
+                "text-field": ["get", column],
+                "text-size": text_size,
+                "text-anchor": text_anchor,
+            }
+
+        if paint is None:
+            paint = {
+                "text-color": text_color,
+            }
+
+        layer = {
+            "id": f"{name}_labels",
+            "type": "symbol",
+            "source": name,
+            "layout": layout,
+            "paint": paint,
+            "min_zoom": min_zoom,
+            "max_zoom": max_zoom,
+            **kwargs,
+        }
+
+        self.add_layer(
+            layer, before_id=before_id, name=name, opacity=opacity, visible=visible
+        )
+
 
 class Container(v.Container):
 
