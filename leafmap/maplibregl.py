@@ -76,6 +76,7 @@ class Map(MapWidget):
         projection: str = "mercator",
         use_message_queue: bool = None,
         add_sidebar: bool = True,
+        sidebar_args: Optional[Dict] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -107,6 +108,12 @@ class Map(MapWidget):
                 "USE_MESSAGE_QUEUE". If it is set to "True", it will use the message queue, which
                 is needed to export the map to HTML. If it is set to "False", it will not use the message
                 queue, which is needed to display the map multiple times in the same notebook.
+            add_sidebar (bool, optional): Whether to add a sidebar to the map.
+                Defaults to True. If True, the map will be displayed in a sidebar.
+            sidebar_args (dict, optional): The arguments for the sidebar. It can
+                be a dictionary with the following keys: "sidebar_visible", "min_width",
+                "max_width", and "sidebar_content". Defaults to None. If None, it will
+                use the default values for the sidebar.
             kwargs (Any): Additional keyword arguments that are passed to the MapOptions class.
             **kwargs: Additional keyword arguments that are passed to the MapOptions class.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/
@@ -208,23 +215,87 @@ class Map(MapWidget):
                 ]
             )
 
+        if sidebar_args is None:
+            sidebar_args = {}
+        self.sidebar_args = sidebar_args
         if add_sidebar:
             self._ipython_display_ = self._patched_display
 
-    def show(self) -> None:
-        """Displays the map."""
-        return Container(self)
+    def show(
+        self,
+        sidebar_visible: bool = False,
+        min_width: int = 250,
+        max_width: int = 300,
+        sidebar_content: Optional[Any] = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Displays the map with an optional sidebar.
 
-    def _repr_html_(self, **kwargs):
-        """Displays the map."""
+        Args:
+            sidebar_visible (bool): Whether the sidebar is visible. Defaults to False.
+            min_width (int): Minimum width of the sidebar in pixels. Defaults to 250.
+            max_width (int): Maximum width of the sidebar in pixels. Defaults to 300.
+            sidebar_content (Optional[Any]): Content to display in the sidebar. Defaults to None.
+            **kwargs (Any): Additional keyword arguments.
+
+        Returns:
+            None
+        """
+        return Container(
+            self,
+            sidebar_visible=sidebar_visible,
+            min_width=min_width,
+            max_width=max_width,
+            sidebar_content=sidebar_content,
+            **kwargs,
+        )
+
+    def _repr_html_(self, **kwargs: Any) -> None:
+        """
+        Displays the map in an IPython environment.
+
+        Args:
+            **kwargs (Any): Additional keyword arguments.
+
+        Returns:
+            None
+        """
 
         filename = os.environ.get("MAPLIBRE_OUTPUT", None)
         replace_key = os.environ.get("MAPTILER_REPLACE_KEY", False)
         if filename is not None:
             self.to_html(filename, replace_key=replace_key)
 
-    def _patched_display(self, *args, **kwargs):
-        display(Container(host_map=self))
+    def _patched_display(
+        self,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Displays the map in an IPython environment with a patched display method.
+
+        Args:
+            **kwargs (Any): Additional keyword arguments.
+
+        Returns:
+            None
+        """
+
+        sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+        min_width = self.sidebar_args.get("min_width", 250)
+        max_width = self.sidebar_args.get("max_width", 300)
+        sidebar_content = self.sidebar_args.get("sidebar_content", None)
+
+        display(
+            Container(
+                host_map=self,
+                sidebar_visible=sidebar_visible,
+                min_width=min_width,
+                max_width=max_width,
+                sidebar_content=sidebar_content,
+                **kwargs,
+            )
+        )
 
     def add_layer(
         self,
