@@ -75,6 +75,7 @@ class Map(MapWidget):
         },
         projection: str = "mercator",
         use_message_queue: bool = None,
+        add_sidebar: bool = True,
         **kwargs: Any,
     ) -> None:
         """
@@ -207,6 +208,9 @@ class Map(MapWidget):
                 ]
             )
 
+        if add_sidebar:
+            self._ipython_display_ = self._patched_display
+
     def show(self) -> None:
         """Displays the map."""
         return Container(self)
@@ -218,6 +222,9 @@ class Map(MapWidget):
         replace_key = os.environ.get("MAPTILER_REPLACE_KEY", False)
         if filename is not None:
             self.to_html(filename, replace_key=replace_key)
+
+    def _patched_display(self, *args, **kwargs):
+        display(Container(host_map=self))
 
     def add_layer(
         self,
@@ -4282,56 +4289,75 @@ class Map(MapWidget):
 
 
 class Container(v.Container):
+    def __init__(
+        self,
+        host_map=None,
+        sidebar_visible=False,
+        min_width=250,
+        max_width=300,
+        sidebar_content=None,
+        *args,
+        **kwargs,
+    ):
+        self.sidebar_visible = sidebar_visible
+        self.min_width = min_width
+        self.max_width = max_width
 
-    def __init__(self, host_map=None, *args, **kwargs):
-
-        # Create the left column with the map
-        left_col_layout = v.Col(
-            cols=11, children=[], class_="pa-1"  # padding for consistent spacing
+        # Create map container (left panel)
+        self.map_container = v.Col(
+            class_="pa-1",
+            style_="flex-grow: 1; flex-shrink: 1; flex-basis: 0;",
         )
         if host_map is not None:
-            left_col_layout.children = [host_map]
+            self.map_container.children = [host_map]
+        else:
+            self.map_container.children = [self.create_map()]
 
-        # Create the right column with some output
-        right_col_layout = v.Col(
-            cols=1,
-            children=[v.Card(children=[v.CardText(children=["Output Content"])])],
-            class_="pa-1",  # padding for consistent spacing
+        # Sidebar content fallback
+        if sidebar_content is None:
+            self.sidebar_content = v.Card(
+                children=[v.CardText(children=["Sidebar content"])]
+            )
+        else:
+            self.sidebar_content = sidebar_content
+
+        # Toggle button
+        self.btn = v.Btn(
+            icon=True,
+            children=[v.Icon(children=["mdi-layers"])],
+            style_="width: 48px; height: 48px; min-width: 48px;",
+        )
+        self.btn.on_event("click", self.toggle_sidebar)
+
+        # Sidebar column (right panel)
+        self.sidebar = v.Col(class_="pa-1")
+        self.update_sidebar_content()
+
+        # Main row layout
+        self.row = v.Row(
+            class_="d-flex flex-nowrap",
+            children=[self.map_container, self.sidebar],
         )
 
-        # Create a toggle button with an icon
-        btn = v.Btn(
-            children=[
-                v.Icon(left=False, children=["mdi-layers"]),
-            ],
-            # class_='ma-1',
-            v_model=False,
-        )
+        super().__init__(fluid=True, children=[self.row], *args, **kwargs)
 
-        # Create the button toggle
-        toggle = v.BtnToggle(v_model="toggle_exclusive", children=[btn])
+    def create_map(self):
 
-        # Function to change column widths
-        def change_column_widths(*args, **kwargs):
-            if toggle.v_model == 0:
-                left_col_layout.cols = 10
-                right_col_layout.cols = 2
-            else:
-                left_col_layout.cols = 11
-                right_col_layout.cols = 1
+        return Map(center=[20, 0], zoom=2)
 
-        # Observe changes in the v_model of the toggle button
-        toggle.on_event("change", change_column_widths)
+    def toggle_sidebar(self, *args, **kwargs):
+        self.sidebar_visible = not self.sidebar_visible
+        self.update_sidebar_content()
 
-        # Update the right column to include the toggle button
-        right_col_layout.children = [toggle]
-        row = v.Row(
-            class_="d-flex flex-wrap",
-            children=[left_col_layout, right_col_layout],
-            *args,
-            **kwargs,
-        )
-        super().__init__(fluid=True, children=[row])
+    def update_sidebar_content(self):
+        if self.sidebar_visible:
+            self.sidebar.children = [self.btn, self.sidebar_content]
+            self.sidebar.style_ = (
+                f"min-width: {self.min_width}px; max-width: {self.max_width}px;"
+            )
+        else:
+            self.sidebar.children = [self.btn]
+            self.sidebar.style_ = "width: 48px; min-width: 48px; max-width: 48px;"
 
 
 def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
