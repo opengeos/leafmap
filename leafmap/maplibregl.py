@@ -76,6 +76,7 @@ class Map(MapWidget):
         projection: str = "mercator",
         use_message_queue: bool = None,
         add_sidebar: bool = True,
+        sidebar_visible: bool = False,
         sidebar_args: Optional[Dict] = None,
         **kwargs: Any,
     ) -> None:
@@ -110,6 +111,7 @@ class Map(MapWidget):
                 queue, which is needed to display the map multiple times in the same notebook.
             add_sidebar (bool, optional): Whether to add a sidebar to the map.
                 Defaults to True. If True, the map will be displayed in a sidebar.
+            sidebar_visible (bool, optional): Whether the sidebar is visible. Defaults to False.
             sidebar_args (dict, optional): The arguments for the sidebar. It can
                 be a dictionary with the following keys: "sidebar_visible", "min_width",
                 "max_width", and "sidebar_content". Defaults to None. If None, it will
@@ -217,6 +219,8 @@ class Map(MapWidget):
 
         if sidebar_args is None:
             sidebar_args = {}
+        if "sidebar_visible" not in sidebar_args:
+            sidebar_args["sidebar_visible"] = sidebar_visible
         self.sidebar_args = sidebar_args
         self.layer_manager = None
         self.container = None
@@ -286,8 +290,8 @@ class Map(MapWidget):
         sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
         min_width = self.sidebar_args.get("min_width", 360)
         max_width = self.sidebar_args.get("max_width", 360)
-        expand = self.sidebar_args.get("expand", True)
-        self.layer_manager = LayerManagerWidget(self, expand=expand)
+        expanded = self.sidebar_args.get("expanded", True)
+        self.layer_manager = LayerManagerWidget(self, expanded=expanded)
         container = Container(
             host_map=self,
             sidebar_visible=sidebar_visible,
@@ -332,6 +336,17 @@ class Map(MapWidget):
         """
         if self.container is not None:
             self.container.remove_from_sidebar(widget)
+
+    def set_sidebar_width(self, min_width: int = None, max_width: int = None) -> None:
+        """
+        Dynamically updates the sidebar's minimum and maximum width.
+
+        Args:
+            min_width (int, optional): New minimum width in pixels. If None, keep current.
+            max_width (int, optional): New maximum width in pixels. If None, keep current.
+        """
+        if self.container is not None:
+            self.container.set_sidebar_width(min_width, max_width)
 
     def add_layer(
         self,
@@ -4553,6 +4568,20 @@ class Container(v.Container):
             child for child in self.sidebar_content_box.children if child != widget
         )
 
+    def set_sidebar_width(self, min_width: int = None, max_width: int = None) -> None:
+        """
+        Dynamically updates the sidebar's minimum and maximum width.
+
+        Args:
+            min_width (int, optional): New minimum width in pixels. If None, keep current.
+            max_width (int, optional): New maximum width in pixels. If None, keep current.
+        """
+        if min_width is not None:
+            self.min_width = min_width
+        if max_width is not None:
+            self.max_width = max_width
+        self.update_sidebar_content()
+
 
 def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
     """
@@ -6246,7 +6275,34 @@ class MapWidget(v.Row):
 
 
 class LayerManagerWidget(v.ExpansionPanels):
-    def __init__(self, m, expand=True, *args, **kwargs):
+    """
+    A widget for managing map layers.
+
+    This widget provides controls for toggling the visibility, adjusting the opacity,
+    and removing layers from a map. It also includes a master toggle to turn all layers
+    on or off.
+
+    Attributes:
+        m (Map): The map object to manage layers for.
+        layer_items (Dict[str, Dict[str, widgets.Widget]]): A dictionary mapping layer names
+            to their corresponding control widgets (checkbox and slider).
+        _building (bool): A flag indicating whether the widget is currently being built.
+        master_toggle (widgets.Checkbox): A checkbox to toggle all layers on or off.
+        layers_box (widgets.VBox): A container for individual layer controls.
+    """
+
+    def __init__(
+        self, m: Any, expanded: bool = True, *args: Any, **kwargs: Any
+    ) -> None:
+        """
+        Initializes the LayerManagerWidget.
+
+        Args:
+            m (Any): The map object to manage layers for.
+            expanded (bool): Whether the expansion panel should be expanded by default. Defaults to True.
+            *args (Any): Additional positional arguments for the parent class.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+        """
         self.m = m
         self.layer_items = {}
         self._building = False
@@ -6266,7 +6322,10 @@ class LayerManagerWidget(v.ExpansionPanels):
             children=[
                 v.ExpansionPanelHeader(
                     style_="height: 40px; min-height: 40px;",
-                    children=[v.Icon(children=["mdi-layers"])],
+                    children=[
+                        v.Icon(children=["mdi-layers"]),
+                        v.Html(tag="span", children=["Layers"], class_="ml-2"),
+                    ],
                 ),
                 v.ExpansionPanelContent(
                     children=[widgets.VBox([self.master_toggle, self.layers_box])]
@@ -6274,14 +6333,20 @@ class LayerManagerWidget(v.ExpansionPanels):
             ]
         )
 
-        if expand:
+        if expanded:
             super().__init__(
                 children=[panel], v_model=[0], multiple=True, *args, **kwargs
             )
         else:
             super().__init__(children=[panel], multiple=True, *args, **kwargs)
 
-    def build_layer_controls(self):
+    def build_layer_controls(self) -> None:
+        """
+        Builds the controls for individual layers.
+
+        This method creates checkboxes for toggling visibility, sliders for adjusting opacity,
+        and buttons for removing layers.
+        """
         self._building = True
         self.layer_items.clear()
         rows = []
@@ -6353,18 +6418,135 @@ class LayerManagerWidget(v.ExpansionPanels):
         self.layers_box.children = rows
         self._building = False
 
-    def toggle_all_layers(self, change):
+    def toggle_all_layers(self, change: Dict[str, Any]) -> None:
+        """
+        Toggles the visibility of all layers.
+
+        Args:
+            change (Dict[str, Any]): The change event from the master toggle checkbox.
+        """
         if self._building:
             return
         for name, controls in self.layer_items.items():
             controls["checkbox"].value = change["new"]
 
-    def set_layer_visibility(self, name, visible):
+    def set_layer_visibility(self, name: str, visible: bool) -> None:
+        """
+        Sets the visibility of a specific layer.
+
+        Args:
+            name (str): The name of the layer.
+            visible (bool): Whether the layer should be visible.
+        """
         self.m.set_visibility(name, visible)
 
-    def set_layer_opacity(self, name, opacity):
+    def set_layer_opacity(self, name: str, opacity: float) -> None:
+        """
+        Sets the opacity of a specific layer.
+
+        Args:
+            name (str): The name of the layer.
+            opacity (float): The opacity value (0 to 1).
+        """
         self.m.set_opacity(name, opacity)
 
-    def refresh(self):
+    def refresh(self) -> None:
+        """
+        Rebuilds the UI to reflect the current layers in the map.
+        """
         """Rebuild the UI to reflect current layers in the map."""
         self.build_layer_controls()
+
+
+class CustomWidget(v.ExpansionPanels):
+    """
+    A custom expansion panel widget with dynamic widget management.
+
+    This widget allows for the creation of an expandable panel with a customizable header
+    and dynamic content. Widgets can be added, removed, or replaced in the content box.
+
+    Attributes:
+        content_box (widgets.VBox): A container for holding the widgets displayed in the panel.
+        panel (v.ExpansionPanel): The main expansion panel containing the header and content.
+    """
+
+    def __init__(
+        self,
+        icon: str = "mdi-tools",
+        label: str = "My Tools",
+        widget: Optional[Union[widgets.Widget, List[widgets.Widget]]] = None,
+        expanded: bool = True,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initializes the CustomWidget.
+
+        Args:
+            icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            label (str): Text label for the header.
+            widget (Optional[Union[widgets.Widget, List[widgets.Widget]]]): Initial widget(s) to display in the content box.
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            *args (Any): Additional positional arguments for the parent class.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+        """
+        # Wrap content in a mutable VBox
+        self.content_box = widgets.VBox()
+        if widget:
+            if isinstance(widget, (list, tuple)):
+                self.content_box.children = widget
+            else:
+                self.content_box.children = [widget]
+
+        # Create the expansion panel
+        self.panel = v.ExpansionPanel(
+            children=[
+                v.ExpansionPanelHeader(
+                    style_="height: 40px; min-height: 40px;",
+                    children=[
+                        v.Icon(children=[icon]),
+                        v.Html(tag="span", children=[label], class_="ml-2"),
+                    ],
+                ),
+                v.ExpansionPanelContent(
+                    children=[self.content_box],
+                ),
+            ]
+        )
+
+        super().__init__(
+            children=[self.panel],
+            v_model=[0] if expanded else [],
+            multiple=True,
+            *args,
+            **kwargs,
+        )
+
+    def add_widget(self, widget: widgets.Widget) -> None:
+        """
+        Adds a widget to the content box.
+
+        Args:
+            widget (widgets.Widget): The widget to add to the content box.
+        """
+        self.content_box.children += (widget,)
+
+    def remove_widget(self, widget: widgets.Widget) -> None:
+        """
+        Removes a widget from the content box.
+
+        Args:
+            widget (widgets.Widget): The widget to remove from the content box.
+        """
+        self.content_box.children = tuple(
+            w for w in self.content_box.children if w != widget
+        )
+
+    def set_widgets(self, widgets_list: List[widgets.Widget]) -> None:
+        """
+        Replaces all widgets in the content box.
+
+        Args:
+            widgets_list (List[widgets.Widget]): A list of widgets to set as the content of the content box.
+        """
+        self.content_box.children = widgets_list
