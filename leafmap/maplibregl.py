@@ -224,8 +224,8 @@ class Map(MapWidget):
     def show(
         self,
         sidebar_visible: bool = False,
-        min_width: int = 250,
-        max_width: int = 300,
+        min_width: int = 360,
+        max_width: int = 360,
         sidebar_content: Optional[Any] = None,
         **kwargs: Any,
     ) -> None:
@@ -282,8 +282,8 @@ class Map(MapWidget):
         """
 
         sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
-        min_width = self.sidebar_args.get("min_width", 250)
-        max_width = self.sidebar_args.get("max_width", 300)
+        min_width = self.sidebar_args.get("min_width", 360)
+        max_width = self.sidebar_args.get("max_width", 360)
         sidebar_content = self.sidebar_args.get("sidebar_content", None)
 
         display(
@@ -4364,9 +4364,10 @@ class Container(v.Container):
         self,
         host_map=None,
         sidebar_visible=False,
-        min_width=250,
-        max_width=300,
+        min_width=360,
+        max_width=360,
         sidebar_content=None,
+        icon="mdi-wrench",
         *args,
         **kwargs,
     ):
@@ -4395,7 +4396,7 @@ class Container(v.Container):
         # Toggle button
         self.btn = v.Btn(
             icon=True,
-            children=[v.Icon(children=["mdi-layers"])],
+            children=[v.Icon(children=[icon])],
             style_="width: 48px; height: 48px; min-width: 48px;",
         )
         self.btn.on_event("click", self.toggle_sidebar)
@@ -6120,3 +6121,128 @@ class MapWidget(v.Row):
         #     kwargs["class_"] = "d-flex flex-wrap"
 
         super().__init__(children=[left_col_layout, right_col_layout], **kwargs)
+
+
+class LayerManagerWidget(v.ExpansionPanels):
+    def __init__(self, m, expand=True, *args, **kwargs):
+        self.m = m
+        self.layer_items = {}
+        self._building = False
+
+        # Master toggle
+        style = {"description_width": "initial"}
+        self.master_toggle = widgets.Checkbox(
+            value=True, description="All layers on/off", style=style
+        )
+        self.master_toggle.observe(self.toggle_all_layers, names="value")
+
+        # Build individual layer rows
+        self.layers_box = widgets.VBox()
+        self.build_layer_controls()
+
+        panel = v.ExpansionPanel(
+            children=[
+                v.ExpansionPanelHeader(
+                    style_="height: 40px; min-height: 40px;",
+                    children=[v.Icon(children=["mdi-layers"])],
+                ),
+                v.ExpansionPanelContent(
+                    children=[widgets.VBox([self.master_toggle, self.layers_box])]
+                ),
+            ]
+        )
+
+        if expand:
+            super().__init__(
+                children=[panel], v_model=[0], multiple=True, *args, **kwargs
+            )
+        else:
+            super().__init__(children=[panel], multiple=True, *args, **kwargs)
+
+    def build_layer_controls(self):
+        self._building = True
+        self.layer_items.clear()
+        rows = []
+
+        style = {"description_width": "initial"}
+        padding = "0px 5px 0px 5px"
+
+        for name, info in list(self.m.layer_dict.items()):
+            if name == "background":
+                continue
+
+            visible = info.get("visible", True)
+            opacity = info.get("opacity", 1.0)
+
+            checkbox = widgets.Checkbox(value=visible, description=name, style=style)
+
+            slider = widgets.FloatSlider(
+                value=opacity,
+                min=0,
+                max=1,
+                step=0.01,
+                readout=False,
+                tooltip="Change layer opacity",
+                layout=widgets.Layout(width="150px", padding=padding),
+            )
+
+            settings = widgets.Button(
+                icon="gear",
+                tooltip="Change layer style",
+                layout=widgets.Layout(width="38px", height="25px", padding=padding),
+            )
+
+            remove = widgets.Button(
+                icon="times",
+                tooltip="Remove layer",
+                layout=widgets.Layout(width="38px", height="25px", padding=padding),
+            )
+
+            def on_visibility_change(change, layer_name=name):
+                self.set_layer_visibility(layer_name, change["new"])
+
+            def on_opacity_change(change, layer_name=name):
+                self.set_layer_opacity(layer_name, change["new"])
+
+            def on_remove_clicked(btn, layer_name=name, row_ref=None):
+                self.m.remove_layer(layer_name)
+                if row_ref in self.layers_box.children:
+                    self.layers_box.children = tuple(
+                        c for c in self.layers_box.children if c != row_ref
+                    )
+                self.layer_items.pop(layer_name, None)
+
+            checkbox.observe(on_visibility_change, names="value")
+            slider.observe(on_opacity_change, names="value")
+
+            row = widgets.HBox(
+                [checkbox, slider, settings, remove], layout=widgets.Layout()
+            )
+
+            remove.on_click(
+                lambda btn, r=row, n=name: on_remove_clicked(
+                    btn, layer_name=n, row_ref=r
+                )
+            )
+
+            rows.append(row)
+            self.layer_items[name] = {"checkbox": checkbox, "slider": slider}
+
+        self.layers_box.children = rows
+        self._building = False
+
+    def toggle_all_layers(self, change):
+        if self._building:
+            return
+        for name, controls in self.layer_items.items():
+            controls["checkbox"].value = change["new"]
+
+    def set_layer_visibility(self, name, visible):
+        self.m.set_visibility(name, visible)
+
+    def set_layer_opacity(self, name, opacity):
+        self.m.set_opacity(name, opacity)
+
+    def refresh(self):
+        """Rebuild the UI to reflect current layers in the map."""
+        self.build_layer_controls()
