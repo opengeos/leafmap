@@ -218,6 +218,8 @@ class Map(MapWidget):
         if sidebar_args is None:
             sidebar_args = {}
         self.sidebar_args = sidebar_args
+        self.layer_manager = None
+        self.container = None
         if add_sidebar:
             self._ipython_display_ = self._patched_display
 
@@ -284,18 +286,52 @@ class Map(MapWidget):
         sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
         min_width = self.sidebar_args.get("min_width", 360)
         max_width = self.sidebar_args.get("max_width", 360)
-        sidebar_content = self.sidebar_args.get("sidebar_content", None)
-
-        display(
-            Container(
-                host_map=self,
-                sidebar_visible=sidebar_visible,
-                min_width=min_width,
-                max_width=max_width,
-                sidebar_content=sidebar_content,
-                **kwargs,
-            )
+        expand = self.sidebar_args.get("expand", True)
+        self.layer_manager = LayerManagerWidget(self, expand=expand)
+        container = Container(
+            host_map=self,
+            sidebar_visible=sidebar_visible,
+            min_width=min_width,
+            max_width=max_width,
+            sidebar_content=[self.layer_manager],
+            **kwargs,
         )
+        self.container = container
+
+        display(container)
+
+    def set_sidebar_content(
+        self, content: Union[widgets.VBox, List[widgets.Widget]]
+    ) -> None:
+        """
+        Replaces all content in the sidebar (except the toggle button).
+
+        Args:
+            content (Union[widgets.VBox, List[widgets.Widget]]): The new content for the sidebar.
+        """
+
+        if self.container is not None:
+            self.container.set_sidebar_content(content)
+
+    def add_to_sidebar(self, widget: widgets.Widget) -> None:
+        """
+        Appends a widget to the sidebar content.
+
+        Args:
+            widget (widgets.Widget): The widget to add to the sidebar.
+        """
+        if self.container is not None:
+            self.container.add_to_sidebar(widget)
+
+    def remove_from_sidebar(self, widget: widgets.Widget) -> None:
+        """
+        Removes a widget from the sidebar content.
+
+        Args:
+            widget (widgets.Widget): The widget to remove from the sidebar.
+        """
+        if self.container is not None:
+            self.container.remove_from_sidebar(widget)
 
     def add_layer(
         self,
@@ -356,6 +392,9 @@ class Map(MapWidget):
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
+        if self.layer_manager is not None:
+            self.layer_manager.refresh()
+
     def remove_layer(self, name: str) -> None:
         """
         Removes a layer from the map.
@@ -372,6 +411,9 @@ class Map(MapWidget):
         super().add_call("removeLayer", name)
         if name in self.layer_dict:
             self.layer_dict.pop(name)
+
+        if self.layer_manager is not None:
+            self.layer_manager.refresh()
 
     def add_deck_layers(
         self, layers: list[dict], tooltip: Union[str, dict] = None
@@ -4360,52 +4402,80 @@ class Map(MapWidget):
 
 
 class Container(v.Container):
+    """
+    A container widget for displaying a map with an optional sidebar.
+
+    This class creates a layout with a map on the left and a sidebar on the right.
+    The sidebar can be toggled on or off and can display additional content.
+
+    Attributes:
+        sidebar_visible (bool): Whether the sidebar is visible.
+        min_width (int): Minimum width of the sidebar in pixels.
+        max_width (int): Maximum width of the sidebar in pixels.
+        map_container (v.Col): The container for the map.
+        sidebar_content_box (widgets.VBox): The container for the sidebar content.
+        toggle_icon (v.Icon): The icon for the toggle button.
+        toggle_btn (v.Btn): The button to toggle the sidebar.
+        sidebar (v.Col): The container for the sidebar.
+        row (v.Row): The main layout row containing the map and sidebar.
+    """
+
     def __init__(
         self,
-        host_map=None,
-        sidebar_visible=False,
-        min_width=360,
-        max_width=360,
-        sidebar_content=None,
-        icon="mdi-wrench",
-        *args,
-        **kwargs,
-    ):
+        host_map: Optional[Any] = None,
+        sidebar_visible: bool = True,
+        min_width: int = 250,
+        max_width: int = 300,
+        sidebar_content: Optional[Union[widgets.VBox, List[widgets.Widget]]] = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initializes the Container widget.
+
+        Args:
+            host_map (Optional[Any]): The map object to display in the container. Defaults to None.
+            sidebar_visible (bool): Whether the sidebar is visible. Defaults to True.
+            min_width (int): Minimum width of the sidebar in pixels. Defaults to 250.
+            max_width (int): Maximum width of the sidebar in pixels. Defaults to 300.
+            sidebar_content (Optional[Union[widgets.VBox, List[widgets.Widget]]]):
+                The content to display in the sidebar. Defaults to None.
+            *args (Any): Additional positional arguments for the parent class.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+        """
         self.sidebar_visible = sidebar_visible
         self.min_width = min_width
         self.max_width = max_width
 
-        # Create map container (left panel)
+        # Map display container (left column)
         self.map_container = v.Col(
             class_="pa-1",
             style_="flex-grow: 1; flex-shrink: 1; flex-basis: 0;",
         )
-        if host_map is not None:
-            self.map_container.children = [host_map]
-        else:
-            self.map_container.children = [self.create_map()]
+        self.map_container.children = [host_map or self.create_map()]
 
-        # Sidebar content fallback
-        if sidebar_content is None:
-            self.sidebar_content = v.Card(
-                children=[v.CardText(children=["Sidebar content"])]
-            )
-        else:
-            self.sidebar_content = sidebar_content
+        # Sidebar content container (mutable VBox)
+        self.sidebar_content_box = widgets.VBox()
+        if sidebar_content:
+            self.set_sidebar_content(sidebar_content)
 
         # Toggle button
-        self.btn = v.Btn(
+        if sidebar_visible:
+            self.toggle_icon = v.Icon(children=["mdi-chevron-right"])
+        else:
+            self.toggle_icon = v.Icon(children=["mdi-chevron-left"])  # default icon
+        self.toggle_btn = v.Btn(
             icon=True,
-            children=[v.Icon(children=[icon])],
+            children=[self.toggle_icon],
             style_="width: 48px; height: 48px; min-width: 48px;",
         )
-        self.btn.on_event("click", self.toggle_sidebar)
+        self.toggle_btn.on_event("click", self.toggle_sidebar)
 
-        # Sidebar column (right panel)
+        # Sidebar (right column)
         self.sidebar = v.Col(class_="pa-1")
         self.update_sidebar_content()
 
-        # Main row layout
+        # Main layout row
         self.row = v.Row(
             class_="d-flex flex-nowrap",
             children=[self.map_container, self.sidebar],
@@ -4413,23 +4483,75 @@ class Container(v.Container):
 
         super().__init__(fluid=True, children=[self.row], *args, **kwargs)
 
-    def create_map(self):
+    def create_map(self) -> Any:
+        """
+        Creates a default map object.
 
+        Returns:
+            Any: A default map object.
+        """
         return Map(center=[20, 0], zoom=2)
 
-    def toggle_sidebar(self, *args, **kwargs):
+    def toggle_sidebar(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Toggles the visibility of the sidebar.
+
+        Args:
+            *args (Any): Additional positional arguments.
+            **kwargs (Any): Additional keyword arguments.
+        """
         self.sidebar_visible = not self.sidebar_visible
+        self.toggle_icon.children = [
+            "mdi-chevron-right" if self.sidebar_visible else "mdi-chevron-left"
+        ]
         self.update_sidebar_content()
 
-    def update_sidebar_content(self):
+    def update_sidebar_content(self) -> None:
+        """
+        Updates the content and style of the sidebar based on its visibility.
+        """
         if self.sidebar_visible:
-            self.sidebar.children = [self.btn, self.sidebar_content]
+            self.sidebar.children = [self.toggle_btn, self.sidebar_content_box]
             self.sidebar.style_ = (
                 f"min-width: {self.min_width}px; max-width: {self.max_width}px;"
             )
         else:
-            self.sidebar.children = [self.btn]
+            self.sidebar.children = [self.toggle_btn]
             self.sidebar.style_ = "width: 48px; min-width: 48px; max-width: 48px;"
+
+    def set_sidebar_content(
+        self, content: Union[widgets.VBox, List[widgets.Widget]]
+    ) -> None:
+        """
+        Replaces all content in the sidebar (except the toggle button).
+
+        Args:
+            content (Union[widgets.VBox, List[widgets.Widget]]): The new content for the sidebar.
+        """
+        if isinstance(content, (list, tuple)):
+            self.sidebar_content_box.children = content
+        else:
+            self.sidebar_content_box.children = [content]
+
+    def add_to_sidebar(self, widget: widgets.Widget) -> None:
+        """
+        Appends a widget to the sidebar content.
+
+        Args:
+            widget (widgets.Widget): The widget to add to the sidebar.
+        """
+        self.sidebar_content_box.children += (widget,)
+
+    def remove_from_sidebar(self, widget: widgets.Widget) -> None:
+        """
+        Removes a widget from the sidebar content.
+
+        Args:
+            widget (widgets.Widget): The widget to remove from the sidebar.
+        """
+        self.sidebar_content_box.children = tuple(
+            child for child in self.sidebar_content_box.children if child != widget
+        )
 
 
 def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
