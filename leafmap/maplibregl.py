@@ -6292,7 +6292,16 @@ class LayerManagerWidget(v.ExpansionPanels):
     """
 
     def __init__(
-        self, m: Any, expanded: bool = True, *args: Any, **kwargs: Any
+        self,
+        m: Any,
+        expanded: bool = True,
+        height: str = "40px",
+        layer_icon: str = "mdi-layers",
+        close_icon: str = "mdi-close",
+        label="Layers",
+        background_color: str = "#f5f5f5",
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the LayerManagerWidget.
@@ -6300,6 +6309,11 @@ class LayerManagerWidget(v.ExpansionPanels):
         Args:
             m (Any): The map object to manage layers for.
             expanded (bool): Whether the expansion panel should be expanded by default. Defaults to True.
+            height (str): The height of the header. Defaults to "40px".
+            layer_icon (str): The icon for the layer manager. Defaults to "mdi-layers".
+            close_icon (str): The icon for the close button. Defaults to "mdi-close".
+            label (str): The label for the layer manager. Defaults to "Layers".
+            background_color (str): The background color of the header. Defaults to "#f5f5f5".
             *args (Any): Additional positional arguments for the parent class.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
@@ -6318,15 +6332,37 @@ class LayerManagerWidget(v.ExpansionPanels):
         self.layers_box = widgets.VBox()
         self.build_layer_controls()
 
+        # Close icon button
+        close_btn = v.Btn(
+            icon=True,
+            small=True,
+            class_="ma-0",
+            style_="min-width: 24px; width: 24px;",
+            children=[v.Icon(children=[close_icon])],
+        )
+        close_btn.on_event("click", self._handle_close)
+
+        header = v.ExpansionPanelHeader(
+            style_=f"height: {height}; min-height: {height}; background-color: {background_color};",
+            children=[
+                v.Row(
+                    align="center",
+                    class_="d-flex flex-grow-1 align-center",
+                    children=[
+                        v.Icon(children=[layer_icon], class_="ml-1"),
+                        v.Spacer(),  # push title to center
+                        v.Html(tag="span", children=[label], class_="text-subtitle-2"),
+                        v.Spacer(),  # push close to right
+                        close_btn,
+                        v.Spacer(),
+                    ],
+                )
+            ],
+        )
+
         panel = v.ExpansionPanel(
             children=[
-                v.ExpansionPanelHeader(
-                    style_="height: 40px; min-height: 40px;",
-                    children=[
-                        v.Icon(children=["mdi-layers"]),
-                        v.Html(tag="span", children=["Layers"], class_="ml-2"),
-                    ],
-                ),
+                header,
                 v.ExpansionPanelContent(
                     children=[widgets.VBox([self.master_toggle, self.layers_box])]
                 ),
@@ -6339,6 +6375,12 @@ class LayerManagerWidget(v.ExpansionPanels):
             )
         else:
             super().__init__(children=[panel], multiple=True, *args, **kwargs)
+
+    def _handle_close(self, widget=None, event=None, data=None):
+        """Calls the on_close callback if provided."""
+
+        self.m.remove_from_sidebar(self)
+        self.on_close()
 
     def build_layer_controls(self) -> None:
         """
@@ -6472,10 +6514,14 @@ class CustomWidget(v.ExpansionPanels):
 
     def __init__(
         self,
-        icon: str = "mdi-tools",
-        label: str = "My Tools",
         widget: Optional[Union[widgets.Widget, List[widgets.Widget]]] = None,
+        widget_icon: str = "mdi-tools",
+        close_icon: str = "mdi-close",
+        label: str = "My Tools",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
         expanded: bool = True,
+        host_map: Optional[Any] = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -6483,34 +6529,57 @@ class CustomWidget(v.ExpansionPanels):
         Initializes the CustomWidget.
 
         Args:
-            icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
-            label (str): Text label for the header.
             widget (Optional[Union[widgets.Widget, List[widgets.Widget]]]): Initial widget(s) to display in the content box.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             *args (Any): Additional positional arguments for the parent class.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         # Wrap content in a mutable VBox
         self.content_box = widgets.VBox()
+        self.host_map = host_map
         if widget:
             if isinstance(widget, (list, tuple)):
                 self.content_box.children = widget
             else:
                 self.content_box.children = [widget]
 
-        # Create the expansion panel
+        # Close icon button
+        close_btn = v.Btn(
+            icon=True,
+            small=True,
+            class_="ma-0",
+            style_="min-width: 24px; width: 24px;",
+            children=[v.Icon(children=[close_icon])],
+        )
+        close_btn.on_event("click", self._handle_close)
+
+        header = v.ExpansionPanelHeader(
+            style_=f"height: {height}; min-height: {height}; background-color: {background_color};",
+            children=[
+                v.Row(
+                    align="center",
+                    class_="d-flex flex-grow-1 align-center",
+                    children=[
+                        v.Icon(children=[widget_icon], class_="ml-1"),
+                        v.Spacer(),  # push title to center
+                        v.Html(tag="span", children=[label], class_="text-subtitle-2"),
+                        v.Spacer(),  # push close to right
+                        close_btn,
+                        v.Spacer(),
+                    ],
+                )
+            ],
+        )
+
         self.panel = v.ExpansionPanel(
             children=[
-                v.ExpansionPanelHeader(
-                    style_="height: 40px; min-height: 40px;",
-                    children=[
-                        v.Icon(children=[icon]),
-                        v.Html(tag="span", children=[label], class_="ml-2"),
-                    ],
-                ),
-                v.ExpansionPanelContent(
-                    children=[self.content_box],
-                ),
+                header,
+                v.ExpansionPanelContent(children=[self.content_box]),
             ]
         )
 
@@ -6521,6 +6590,13 @@ class CustomWidget(v.ExpansionPanels):
             *args,
             **kwargs,
         )
+
+    def _handle_close(self, widget=None, event=None, data=None):
+        """Calls the on_close callback if provided."""
+
+        if self.host_map is not None:
+            self.host_map.remove_from_sidebar(self)
+        self.on_close()
 
     def add_widget(self, widget: widgets.Widget) -> None:
         """
