@@ -6634,6 +6634,7 @@ def nasa_opera_gui(
     Returns:
         ipywidgets: The tool GUI widget.
     """
+    import earthaccess
     import pandas as pd
     from datetime import datetime
     import boto3
@@ -6680,14 +6681,15 @@ def nasa_opera_gui(
         names = df["ShortName"].tolist()
         setattr(m, "_NASA_DATA_NAMES", names)
 
-    # Generates the temporary
-    s3_cred_endpoint = "https://archive.podaac.earthdata.nasa.gov/s3credentials"
+    # # Generates the temporary
+    # s3_cred_endpoint = "https://archive.podaac.earthdata.nasa.gov/s3credentials"
 
-    def get_temp_creds():
-        temp_creds_url = s3_cred_endpoint
-        return requests.get(temp_creds_url).json()
+    # def get_temp_creds():
+    #     temp_creds_url = s3_cred_endpoint
+    #     return requests.get(temp_creds_url).json()
 
-    temp_creds_req = get_temp_creds()
+    # temp_creds_req = get_temp_creds()
+    temp_creds_req = earthaccess.get_s3_credentials(daac="PODAAC")
 
     session = boto3.Session(
         aws_access_key_id=temp_creds_req["accessKeyId"],
@@ -7037,7 +7039,7 @@ def nasa_opera_gui(
     buttons.observe(button_clicked, "value")
 
     toolbar_button.value = opened
-    if m is not None:
+    if m is not None and hasattr(m, "controls"):
         toolbar_control = ipyleaflet.WidgetControl(
             widget=toolbar_widget, position=position
         )
