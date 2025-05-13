@@ -526,6 +526,12 @@ Initialize a map with pitch and bearing camera options.
 
 [![](https://i.imgur.com/onKRYXz.png)](https://leafmap.org/maplibre/set_pitch_bearing)
 
+## Add a sidebar widget
+
+Create a sidebar widget to display the layer manager and custom widgets.
+
+[![image](https://github.com/user-attachments/assets/50250de3-fb3c-49d9-921c-b80c8f32ccb5)](https://leafmap.org/maplibre/sidebar)
+
 ## Visualize SpatioTemporal Asset Catalog (STAC)
 
 Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.

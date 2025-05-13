@@ -257,6 +257,42 @@ class Map(MapWidget):
             **kwargs,
         )
 
+    def creater_container(
+        self,
+        sidebar_visible: bool = False,
+        min_width: int = 360,
+        max_width: int = 360,
+        expanded: bool = True,
+        **kwargs: Any,
+    ):
+        """
+        Creates a container widget for the map with an optional sidebar.
+
+        This method initializes a `LayerManagerWidget` and a `Container` widget to display the map
+        alongside a sidebar. The sidebar can be customized with visibility, width, and additional content.
+
+        Args:
+            sidebar_visible (bool): Whether the sidebar is visible. Defaults to False.
+            min_width (int): Minimum width of the sidebar in pixels. Defaults to 360.
+            max_width (int): Maximum width of the sidebar in pixels. Defaults to 360.
+            expanded (bool): Whether the `LayerManagerWidget` is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments passed to the `Container` widget.
+
+        Returns:
+            Container: The created container widget with the map and sidebar.
+        """
+        self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+        container = Container(
+            host_map=self,
+            sidebar_visible=sidebar_visible,
+            min_width=min_width,
+            max_width=max_width,
+            sidebar_content=[self.layer_manager],
+            **kwargs,
+        )
+        self.container = container
+        return container
+
     def _repr_html_(self, **kwargs: Any) -> None:
         """
         Displays the map in an IPython environment.
@@ -287,20 +323,23 @@ class Map(MapWidget):
             None
         """
 
-        sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
-        min_width = self.sidebar_args.get("min_width", 360)
-        max_width = self.sidebar_args.get("max_width", 360)
-        expanded = self.sidebar_args.get("expanded", True)
-        self.layer_manager = LayerManagerWidget(self, expanded=expanded)
-        container = Container(
-            host_map=self,
-            sidebar_visible=sidebar_visible,
-            min_width=min_width,
-            max_width=max_width,
-            sidebar_content=[self.layer_manager],
-            **kwargs,
-        )
-        self.container = container
+        if self.container is not None:
+            container = self.container
+        else:
+            sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+            min_width = self.sidebar_args.get("min_width", 360)
+            max_width = self.sidebar_args.get("max_width", 360)
+            expanded = self.sidebar_args.get("expanded", True)
+            self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+            container = Container(
+                host_map=self,
+                sidebar_visible=sidebar_visible,
+                min_width=min_width,
+                max_width=max_width,
+                sidebar_content=[self.layer_manager],
+                **kwargs,
+            )
+            self.container = container
 
         display(container)
 
@@ -317,15 +356,44 @@ class Map(MapWidget):
         if self.container is not None:
             self.container.set_sidebar_content(content)
 
-    def add_to_sidebar(self, widget: widgets.Widget) -> None:
+    def add_to_sidebar(
+        self,
+        widget: widgets.Widget,
+        add_header: bool = True,
+        widget_icon: str = "mdi-tools",
+        close_icon: str = "mdi-close",
+        label: str = "My Tools",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
         """
         Appends a widget to the sidebar content.
 
         Args:
-            widget (widgets.Widget): The widget to add to the sidebar.
+            widget (Optional[Union[widgets.Widget, List[widgets.Widget]]]): Initial widget(s) to display in the content box.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the parent class.
         """
         if self.container is not None:
-            self.container.add_to_sidebar(widget)
+            self.container.add_to_sidebar(
+                widget,
+                add_header=add_header,
+                widget_icon=widget_icon,
+                close_icon=close_icon,
+                label=label,
+                background_color=background_color,
+                height=height,
+                expanded=expanded,
+                host_map=self,
+                **kwargs,
+            )
 
     def remove_from_sidebar(self, widget: widgets.Widget) -> None:
         """
@@ -2367,6 +2435,67 @@ class Map(MapWidget):
                 kwargs["layout"]["icon-size"] = icon_size
                 self.add_layer(kwargs)
 
+    def add_image_to_sidebar(
+        self,
+        image: Union[str, Dict] = None,
+        width: int = None,
+        height: int = None,
+        add_header: bool = True,
+        widget_icon: str = "mdi-image",
+        close_icon: str = "mdi-close",
+        label: str = "Image",
+        background_color: str = "#f5f5f5",
+        header_height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """Add an image to the map.
+
+        Args:
+            id (str): The layer ID of the image.
+            image (Union[str, Dict, np.ndarray]): The URL or local file path to
+                the image, or a dictionary containing image data, or a numpy
+                array representing the image.
+            width (int, optional): The width of the image. Defaults to None.
+            height (int, optional): The height of the image. Defaults to None.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            header_height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+
+        Returns:
+            None
+        """
+
+        style = ""
+        if isinstance(width, int):
+            style += f"width: {width}px; "
+        elif isinstance(width, str) and width.endswith("px"):
+            style += f"width: {width}; "
+        if isinstance(height, int):
+            style += f"height: {height}px; "
+        elif isinstance(height, str) and height.endswith("px"):
+            style += f"height: {height}; "
+
+        if style == "":
+            html = f'<img src="{image}">'
+        else:
+            html = f'<img src="{image}" style="{style}">'
+        self.add_html_to_sidebar(
+            html,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            header_height=header_height,
+            expanded=expanded,
+            **kwargs,
+        )
+
     def add_symbol(
         self,
         source: str,
@@ -2826,6 +2955,49 @@ class Map(MapWidget):
         control = InfoBoxControl(content=text, css_text=css_text)
         self.add_control(control, position=position)
 
+    def add_text_to_sidebar(
+        self,
+        text: str,
+        add_header: bool = True,
+        widget_icon: str = "mdi-format-text",
+        close_icon: str = "mdi-close",
+        label: str = "Text",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        widget_args: Optional[Dict] = None,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds text to the sidebar.
+
+        Args:
+            text (str): The text to add to the sidebar.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+        """
+
+        if widget_args is None:
+            widget_args = {}
+        widget = widgets.Label(text, **widget_args)
+
+        self.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            **kwargs,
+        )
+
     def add_html(
         self,
         html: str,
@@ -2854,6 +3026,52 @@ class Map(MapWidget):
         # Check if an HTML string contains local images and convert them to base64.
         html = common.check_html_string(html)
         self.add_text(html, position=position, bg_color=bg_color, **kwargs)
+
+    def add_html_to_sidebar(
+        self,
+        html: str,
+        add_header: bool = True,
+        widget_icon: str = "mdi-language-html5",
+        close_icon: str = "mdi-close",
+        label: str = "HTML",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Add HTML content to the map.
+
+        This method allows for the addition of arbitrary HTML content to the sidebar, which can be used to display
+        custom information or controls.
+
+        Args:
+            html (str): The HTML content to add.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+
+        Returns:
+            None
+        """
+        # Check if an HTML string contains local images and convert them to base64.
+        html = common.check_html_string(html)
+        widget = widgets.HTML(html)
+        self.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            **kwargs,
+        )
 
     def add_legend(
         self,
@@ -3021,6 +3239,73 @@ class Map(MapWidget):
             **kwargs,
         )
 
+    def add_legend_to_sidebar(
+        self,
+        title: str = "Legend",
+        legend_dict: Optional[Dict[str, str]] = None,
+        labels: Optional[List[str]] = None,
+        colors: Optional[List[str]] = None,
+        builtin_legend: Optional[str] = None,
+        shape_type: str = "rectangle",
+        add_header: bool = True,
+        widget_icon: str = "mdi-view-sequential",
+        close_icon: str = "mdi-close",
+        label: str = "Legend",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a legend to the map.
+
+        This method allows for the addition of a legend to the map. The legend can be customized with a title,
+        labels, colors, and more. A built-in legend can also be specified.
+
+        Args:
+            title (str, optional): The title of the legend. Defaults to "Legend".
+            legend_dict (Optional[Dict[str, str]], optional): A dictionary with legend items as keys and colors as values.
+                If provided, `labels` and `colors` will be ignored. Defaults to None.
+            labels (Optional[List[str]], optional): A list of legend labels. Defaults to None.
+            colors (Optional[List[str]], optional): A list of colors corresponding to the labels. Defaults to None.
+            builtin_legend (Optional[str], optional): The name of a built-in legend to use. Defaults to None.
+            shape_type (str, optional): The shape type of the legend items. Can be one of "rectangle", "circle", or "line".
+            add_header (bool, optional): If True, adds a header to the legend. Defaults to True.
+            widget_icon (str, optional): The icon for the legend widget. Defaults to "mdi-view-sequential".
+            close_icon (str, optional): The icon for the close button. Defaults to "mdi-close".
+            label (str, optional): The label for the legend widget. Defaults to "Legend".
+            background_color (str, optional): The background color of the legend widget. Defaults to "#f5f5f5".
+            height (str, optional): The height of the legend widget. Defaults to "40px".
+            expanded (bool, optional): If True, the legend widget is expanded by default. Defaults to True.
+            **kwargs: Additional keyword arguments for future use.
+
+        Returns:
+            None
+        """
+        from .map_widgets import Legend
+
+        legend = Legend(
+            title=title,
+            legend_dict=legend_dict,
+            keys=labels,
+            colors=colors,
+            builtin_legend=builtin_legend,
+            shape_type=shape_type,
+            add_header=False,
+        )
+
+        self.add_to_sidebar(
+            legend,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            **kwargs,
+        )
+
     def add_colorbar(
         self,
         width: Optional[float] = 3.0,
@@ -3100,6 +3385,107 @@ class Map(MapWidget):
         html = f'<img src="{colorbar}">'
 
         self.add_html(html, bg_color=bg_color, position=position, **kwargs)
+
+    def add_colorbar_to_sidebar(
+        self,
+        width: Optional[float] = 3.0,
+        height: Optional[float] = 0.2,
+        vmin: Optional[float] = 0,
+        vmax: Optional[float] = 1.0,
+        palette: Optional[List[str]] = None,
+        vis_params: Optional[Dict[str, Union[str, float, int]]] = None,
+        cmap: Optional[str] = "gray",
+        discrete: Optional[bool] = False,
+        label: Optional[str] = None,
+        label_size: Optional[int] = 10,
+        label_weight: Optional[str] = "normal",
+        tick_size: Optional[int] = 8,
+        bg_color: Optional[str] = "white",
+        orientation: Optional[str] = "horizontal",
+        dpi: Optional[Union[str, float]] = "figure",
+        transparent: Optional[bool] = False,
+        add_header: bool = True,
+        widget_icon: str = "mdi-format-color-fill",
+        close_icon: str = "mdi-close",
+        header_label: str = "Colorbar",
+        header_color: str = "#f5f5f5",
+        header_height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> str:
+        """
+        Add a colorbar to the sidebar.
+
+        This function uses matplotlib to generate a colorbar, saves it as a PNG file, and adds it to the map using
+        the Map.add_html_to_sidebar() method. The colorbar can be customized in various ways including its size, color palette,
+        label, and orientation.
+
+        Args:
+            width (Optional[float]): Width of the colorbar in inches. Defaults to 3.0.
+            height (Optional[float]): Height of the colorbar in inches. Defaults to 0.2.
+            vmin (Optional[float]): Minimum value of the colorbar. Defaults to 0.
+            vmax (Optional[float]): Maximum value of the colorbar. Defaults to 1.0.
+            palette (Optional[List[str]]): List of colors or a colormap name for the colorbar. Defaults to None.
+            vis_params (Optional[Dict[str, Union[str, float, int]]]): Visualization parameters as a dictionary.
+            cmap (Optional[str]): Matplotlib colormap name. Defaults to "gray".
+            discrete (Optional[bool]): Whether to create a discrete colorbar. Defaults to False.
+            label (Optional[str]): Label for the colorbar. Defaults to None.
+            label_size (Optional[int]): Font size for the colorbar label. Defaults to 10.
+            label_weight (Optional[str]): Font weight for the colorbar label. Defaults to "normal".
+            tick_size (Optional[int]): Font size for the colorbar tick labels. Defaults to 8.
+            bg_color (Optional[str]): Background color for the colorbar. Defaults to "white".
+            orientation (Optional[str]): Orientation of the colorbar ("vertical" or "horizontal"). Defaults to "horizontal".
+            dpi (Optional[Union[str, float]]): Resolution in dots per inch. If 'figure', uses the figure's dpi value. Defaults to "figure".
+            transparent (Optional[bool]): Whether the background is transparent. Defaults to False.
+            add_header (bool): If True, adds a header to the colorbar. Defaults to True.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+
+        Returns:
+            str: Path to the generated colorbar image.
+        """
+        if transparent:
+            bg_color = "transparent"
+
+        colorbar = common.save_colorbar(
+            None,
+            width,
+            height,
+            vmin,
+            vmax,
+            palette,
+            vis_params,
+            cmap,
+            discrete,
+            label,
+            label_size,
+            label_weight,
+            tick_size,
+            bg_color,
+            orientation,
+            dpi,
+            transparent,
+            show_colorbar=False,
+        )
+
+        html = f'<img src="{colorbar}">'
+
+        self.add_html_to_sidebar(
+            html,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=header_label,
+            background_color=header_color,
+            height=header_height,
+            expanded=expanded,
+            **kwargs,
+        )
 
     def add_layer_control(
         self,
@@ -3710,6 +4096,52 @@ class Map(MapWidget):
             "source": "video_source",
         }
         self.add_layer(layer, before_id=before_id)
+
+    def add_video_to_sidebar(
+        self,
+        src: str,
+        width: int = 600,
+        add_header: bool = True,
+        widget_icon: str = "mdi-video",
+        close_icon: str = "mdi-close",
+        label: str = "Video",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ):
+        """
+        Adds a video to the sidebar.
+
+        Args:
+            src (str): The URL of the video to be added.
+            width (int): Width of the video in pixels. Defaults to 600.
+            add_header (bool): If True, adds a header to the video. Defaults to True.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            **kwargs (Any): Additional keyword arguments for the parent class.
+        """
+        video_html = f"""
+        <video width="{width}" controls>
+        <source src="{src}" type="video/mp4">
+        Your browser does not support the video tag.
+        </video>
+        """
+        self.add_html_to_sidebar(
+            video_html,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            **kwargs,
+        )
 
     def add_nlcd(self, years: list = [2023], add_legend: bool = True, **kwargs) -> None:
         """
@@ -4461,6 +4893,7 @@ class Container(v.Container):
         self.sidebar_visible = sidebar_visible
         self.min_width = min_width
         self.max_width = max_width
+        self.host_map = host_map
 
         # Map display container (left column)
         self.map_container = v.Col(
@@ -4485,6 +4918,38 @@ class Container(v.Container):
             style_="width: 48px; height: 48px; min-width: 48px;",
         )
         self.toggle_btn.on_event("click", self.toggle_sidebar)
+
+        # Settings icon
+        self.settings_icon = v.Icon(children=["mdi-cog"])
+        self.settings_btn = v.Btn(
+            icon=True,
+            children=[self.settings_icon],
+            style_="width: 36px; height: 36px;",
+        )
+        self.settings_btn.on_event("click", self.toggle_width_slider)
+
+        # Sidebar controls row (toggle + settings)
+        self.sidebar_controls = v.Row(
+            class_="ma-0 pa-0", children=[self.toggle_btn, self.settings_btn]
+        )
+
+        # Sidebar width slider (initially hidden)
+        self.width_slider = widgets.IntSlider(
+            value=self.max_width,
+            min=200,
+            max=1000,
+            step=10,
+            description="Width:",
+            continuous_update=True,
+        )
+        self.width_slider.observe(self.on_width_change, names="value")
+
+        self.settings_widget = CustomWidget(
+            self.width_slider,
+            widget_icon="mdi-cog",
+            label="Sidebar Settings",
+            host_map=self.host_map,
+        )
 
         # Sidebar (right column)
         self.sidebar = v.Col(class_="pa-1")
@@ -4523,10 +4988,24 @@ class Container(v.Container):
 
     def update_sidebar_content(self) -> None:
         """
-        Updates the content and style of the sidebar based on its visibility.
+        Updates the content of the sidebar based on its visibility.
+        If the sidebar is visible, it displays the toggle button and the sidebar content.
+        If the sidebar is hidden, it only displays the toggle button.
         """
         if self.sidebar_visible:
-            self.sidebar.children = [self.toggle_btn, self.sidebar_content_box]
+            # Header row: toggle on the left, settings on the right
+            header_row = v.Row(
+                class_="ma-0 pa-0",
+                align="center",
+                justify="space-between",
+                children=[self.toggle_btn, self.settings_btn],
+            )
+
+            children = [header_row]
+
+            children.append(self.sidebar_content_box)
+
+            self.sidebar.children = children
             self.sidebar.style_ = (
                 f"min-width: {self.min_width}px; max-width: {self.max_width}px;"
             )
@@ -4548,13 +5027,47 @@ class Container(v.Container):
         else:
             self.sidebar_content_box.children = [content]
 
-    def add_to_sidebar(self, widget: widgets.Widget) -> None:
+    def add_to_sidebar(
+        self,
+        widget: widgets.Widget,
+        add_header: bool = True,
+        widget_icon: str = "mdi-tools",
+        close_icon: str = "mdi-close",
+        label: str = "My Tools",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        host_map: Optional[Any] = None,
+        **kwargs: Any,
+    ) -> None:
         """
         Appends a widget to the sidebar content.
 
         Args:
-            widget (widgets.Widget): The widget to add to the sidebar.
+            widget (Optional[Union[widgets.Widget, List[widgets.Widget]]]): Initial widget(s) to display in the content box.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
+            expanded (bool): Whether the panel is expanded by default. Defaults to True.
+            *args (Any): Additional positional arguments for the parent class.
+            **kwargs (Any): Additional keyword arguments for the parent class.
         """
+
+        if add_header:
+            widget = CustomWidget(
+                widget,
+                widget_icon=widget_icon,
+                close_icon=close_icon,
+                label=label,
+                background_color=background_color,
+                height=height,
+                expanded=expanded,
+                host_map=host_map,
+                **kwargs,
+            )
+
         self.sidebar_content_box.children += (widget,)
 
     def remove_from_sidebar(self, widget: widgets.Widget) -> None:
@@ -4581,6 +5094,15 @@ class Container(v.Container):
         if max_width is not None:
             self.max_width = max_width
         self.update_sidebar_content()
+
+    def toggle_width_slider(self, *args: Any) -> None:
+
+        if self.settings_widget not in self.sidebar_content_box.children:
+            self.add_to_sidebar(self.settings_widget, add_header=False)
+
+    def on_width_change(self, change: dict) -> None:
+        new_width = change["new"]
+        self.set_sidebar_width(min_width=new_width, max_width=new_width)
 
 
 def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
@@ -6292,7 +6814,16 @@ class LayerManagerWidget(v.ExpansionPanels):
     """
 
     def __init__(
-        self, m: Any, expanded: bool = True, *args: Any, **kwargs: Any
+        self,
+        m: Any,
+        expanded: bool = True,
+        height: str = "40px",
+        layer_icon: str = "mdi-layers",
+        close_icon: str = "mdi-close",
+        label="Layers",
+        background_color: str = "#f5f5f5",
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """
         Initializes the LayerManagerWidget.
@@ -6300,6 +6831,11 @@ class LayerManagerWidget(v.ExpansionPanels):
         Args:
             m (Any): The map object to manage layers for.
             expanded (bool): Whether the expansion panel should be expanded by default. Defaults to True.
+            height (str): The height of the header. Defaults to "40px".
+            layer_icon (str): The icon for the layer manager. Defaults to "mdi-layers".
+            close_icon (str): The icon for the close button. Defaults to "mdi-close".
+            label (str): The label for the layer manager. Defaults to "Layers".
+            background_color (str): The background color of the header. Defaults to "#f5f5f5".
             *args (Any): Additional positional arguments for the parent class.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
@@ -6318,15 +6854,37 @@ class LayerManagerWidget(v.ExpansionPanels):
         self.layers_box = widgets.VBox()
         self.build_layer_controls()
 
+        # Close icon button
+        close_btn = v.Btn(
+            icon=True,
+            small=True,
+            class_="ma-0",
+            style_="min-width: 24px; width: 24px;",
+            children=[v.Icon(children=[close_icon])],
+        )
+        close_btn.on_event("click", self._handle_close)
+
+        header = v.ExpansionPanelHeader(
+            style_=f"height: {height}; min-height: {height}; background-color: {background_color};",
+            children=[
+                v.Row(
+                    align="center",
+                    class_="d-flex flex-grow-1 align-center",
+                    children=[
+                        v.Icon(children=[layer_icon], class_="ml-1"),
+                        v.Spacer(),  # push title to center
+                        v.Html(tag="span", children=[label], class_="text-subtitle-2"),
+                        v.Spacer(),  # push close to right
+                        close_btn,
+                        v.Spacer(),
+                    ],
+                )
+            ],
+        )
+
         panel = v.ExpansionPanel(
             children=[
-                v.ExpansionPanelHeader(
-                    style_="height: 40px; min-height: 40px;",
-                    children=[
-                        v.Icon(children=["mdi-layers"]),
-                        v.Html(tag="span", children=["Layers"], class_="ml-2"),
-                    ],
-                ),
+                header,
                 v.ExpansionPanelContent(
                     children=[widgets.VBox([self.master_toggle, self.layers_box])]
                 ),
@@ -6339,6 +6897,12 @@ class LayerManagerWidget(v.ExpansionPanels):
             )
         else:
             super().__init__(children=[panel], multiple=True, *args, **kwargs)
+
+    def _handle_close(self, widget=None, event=None, data=None):
+        """Calls the on_close callback if provided."""
+
+        self.m.remove_from_sidebar(self)
+        self.on_close()
 
     def build_layer_controls(self) -> None:
         """
@@ -6472,10 +7036,14 @@ class CustomWidget(v.ExpansionPanels):
 
     def __init__(
         self,
-        icon: str = "mdi-tools",
-        label: str = "My Tools",
         widget: Optional[Union[widgets.Widget, List[widgets.Widget]]] = None,
+        widget_icon: str = "mdi-tools",
+        close_icon: str = "mdi-close",
+        label: str = "My Tools",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
         expanded: bool = True,
+        host_map: Optional[Any] = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -6483,34 +7051,57 @@ class CustomWidget(v.ExpansionPanels):
         Initializes the CustomWidget.
 
         Args:
-            icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
-            label (str): Text label for the header.
             widget (Optional[Union[widgets.Widget, List[widgets.Widget]]]): Initial widget(s) to display in the content box.
+            widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            label (str): Text label for the header. Defaults to "My Tools".
+            height (str): Height of the header. Defaults to "40px".
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             *args (Any): Additional positional arguments for the parent class.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         # Wrap content in a mutable VBox
         self.content_box = widgets.VBox()
+        self.host_map = host_map
         if widget:
             if isinstance(widget, (list, tuple)):
                 self.content_box.children = widget
             else:
                 self.content_box.children = [widget]
 
-        # Create the expansion panel
+        # Close icon button
+        close_btn = v.Btn(
+            icon=True,
+            small=True,
+            class_="ma-0",
+            style_="min-width: 24px; width: 24px;",
+            children=[v.Icon(children=[close_icon])],
+        )
+        close_btn.on_event("click", self._handle_close)
+
+        header = v.ExpansionPanelHeader(
+            style_=f"height: {height}; min-height: {height}; background-color: {background_color};",
+            children=[
+                v.Row(
+                    align="center",
+                    class_="d-flex flex-grow-1 align-center",
+                    children=[
+                        v.Icon(children=[widget_icon], class_="ml-1"),
+                        v.Spacer(),  # push title to center
+                        v.Html(tag="span", children=[label], class_="text-subtitle-2"),
+                        v.Spacer(),  # push close to right
+                        close_btn,
+                        v.Spacer(),
+                    ],
+                )
+            ],
+        )
+
         self.panel = v.ExpansionPanel(
             children=[
-                v.ExpansionPanelHeader(
-                    style_="height: 40px; min-height: 40px;",
-                    children=[
-                        v.Icon(children=[icon]),
-                        v.Html(tag="span", children=[label], class_="ml-2"),
-                    ],
-                ),
-                v.ExpansionPanelContent(
-                    children=[self.content_box],
-                ),
+                header,
+                v.ExpansionPanelContent(children=[self.content_box]),
             ]
         )
 
@@ -6521,6 +7112,13 @@ class CustomWidget(v.ExpansionPanels):
             *args,
             **kwargs,
         )
+
+    def _handle_close(self, widget=None, event=None, data=None):
+        """Calls the on_close callback if provided."""
+
+        if self.host_map is not None:
+            self.host_map.remove_from_sidebar(self)
+        self.on_close()
 
     def add_widget(self, widget: widgets.Widget) -> None:
         """
