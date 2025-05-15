@@ -6962,11 +6962,17 @@ def nasa_opera_gui(
 
                             if len(m._NASA_DATA_RESULTS) > 0:
                                 all_links = m._NASA_DATA_RESULTS[0].data_links()
-                                tif_links = [link for link in all_links if link.endswith(".tif")]                      
+                                tif_links = [
+                                    link for link in all_links if link.endswith(".tif")
+                                ]
                                 if tif_links:
                                     links = tif_links
                                 else:
-                                    links = [link for link in all_links if link.endswith(".h5")]
+                                    links = [
+                                        link
+                                        for link in all_links
+                                        if link.endswith(".h5")
+                                    ]
                                 layer.options = [link.split("_")[-1] for link in links]
                                 layer.value = layer.options[0]
                             else:
@@ -6996,7 +7002,11 @@ def nasa_opera_gui(
                         try:
                             ds = xr.open_dataset(link, engine="rasterio")
                         except Exception as e:
-                            f = open_file(link, earthdata_username=username, earthdata_password=password)
+                            f = open_file(
+                                link,
+                                earthdata_username=username,
+                                earthdata_password=password,
+                            )
                             ds = xr.open_dataset(f, engine="rasterio")
                         setattr(m, "_NASA_DATA_DS", ds)
                         da = ds["band_data"]
@@ -7021,15 +7031,18 @@ def nasa_opera_gui(
                         )
                         output.clear_output()
                     elif link.endswith(".h5"):
-                        f = open_file(link, earthdata_username=username,
-                                      earthdata_password=password)
+                        f = open_file(
+                            link,
+                            earthdata_username=username,
+                            earthdata_password=password,
+                        )
                         ds = xr.open_dataset(f, group="data")
                         setattr(m, "_NASA_DATA_DS", ds)
                         da = ds["VV"]
                         subset = da.isel(
                             x_coordinates=slice(None, None, 1000),
-                            y_coordinates=slice(None, None, 1000)
-                            )
+                            y_coordinates=slice(None, None, 1000),
+                        )
                         subset_mag = np.abs(subset)
                         nodata = os.environ.get("NODATA", 0)
                         subset_mag = subset_mag.fillna(nodata)
