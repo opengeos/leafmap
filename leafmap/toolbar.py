@@ -7046,7 +7046,7 @@ def nasa_opera_gui(
                         subset_mag = np.abs(subset)
                         nodata = os.environ.get("NODATA", 0)
                         subset_mag = subset_mag.fillna(nodata)
-                        crs = f"EPSG:{ds["projection"].attrs['epsg_code']}"
+                        crs = f"EPSG:{ds['projection'].attrs['epsg_code']}"
                         try:
                             colormap = get_image_colormap(ds)
                         except Exception as e:
