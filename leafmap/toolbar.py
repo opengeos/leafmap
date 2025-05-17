@@ -6621,6 +6621,7 @@ def nasa_opera_gui(
     position: Optional[str] = "topright",
     opened: Optional[bool] = True,
     default_dataset: Optional[str] = "OPERA_L3_DSWX-HLS_V1",
+    backend: Optional[str] = "ipyleaflet",
     **kwargs,
 ):
     """Search NASA Earth data interactive
@@ -6630,6 +6631,7 @@ def nasa_opera_gui(
         position (str, optional): The position of the widget. Defaults to "topright".
         opened (bool, optional): Whether to open the widget. Defaults to True.
         default_dataset (str, optional): The default dataset. Defaults to "OPERA_L3_DSWX-HLS_V1".
+        backend (str, optional): The backend to use. Defaults to "ipyleaflet".
 
     Returns:
         ipywidgets: The tool GUI widget.
@@ -7107,7 +7109,7 @@ def nasa_opera_gui(
     buttons.observe(button_clicked, "value")
 
     toolbar_button.value = opened
-    if m is not None and hasattr(m, "controls"):
+    if m is not None and hasattr(m, "controls") and backend == "ipyleaflet":
         toolbar_control = ipyleaflet.WidgetControl(
             widget=toolbar_widget, position=position
         )
@@ -7115,6 +7117,8 @@ def nasa_opera_gui(
         if toolbar_control not in m.controls:
             m.add(toolbar_control)
             m.tool_control = toolbar_control
+    elif backend == "maplibre":
+        return toolbar_footer
     else:
         return toolbar_widget
 

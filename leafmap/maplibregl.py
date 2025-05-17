@@ -44,6 +44,8 @@ from .common import (
     get_overture_data,
     geojson_bounds,
     geojson_to_gdf,
+    nasa_data_login,
+    nasa_data_download,
     pandas_to_geojson,
     pmtiles_metadata,
     pmtiles_style,
@@ -72,6 +74,7 @@ class Map(MapWidget):
             "navigation": "top-right",
             "fullscreen": "top-right",
             "scale": "bottom-left",
+            "globe": "top-right",
         },
         projection: str = "mercator",
         use_message_queue: bool = None,
@@ -186,8 +189,10 @@ class Map(MapWidget):
             use_message_queue = os.environ.get("USE_MESSAGE_QUEUE", False)
         self.use_message_queue(use_message_queue)
 
+        self.controls = {}
         for control, position in controls.items():
             self.add_control(control, position)
+            self.controls[control] = position
 
         self.layer_dict = {}
         self.layer_dict["background"] = {
@@ -203,7 +208,7 @@ class Map(MapWidget):
             self.style_dict[layer["id"]] = layer
         self.source_dict = {}
 
-        if projection.lower() == "globe":
+        if projection.lower() == "globe" and ("globe" not in self.controls):
             self.add_globe_control()
             self.set_projection(
                 type=[
@@ -381,19 +386,20 @@ class Map(MapWidget):
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
-        if self.container is not None:
-            self.container.add_to_sidebar(
-                widget,
-                add_header=add_header,
-                widget_icon=widget_icon,
-                close_icon=close_icon,
-                label=label,
-                background_color=background_color,
-                height=height,
-                expanded=expanded,
-                host_map=self,
-                **kwargs,
-            )
+        if self.container is None:
+            self.creater_container()
+        self.container.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            host_map=self,
+            **kwargs,
+        )
 
     def remove_from_sidebar(self, widget: widgets.Widget) -> None:
         """
@@ -413,8 +419,33 @@ class Map(MapWidget):
             min_width (int, optional): New minimum width in pixels. If None, keep current.
             max_width (int, optional): New maximum width in pixels. If None, keep current.
         """
-        if self.container is not None:
-            self.container.set_sidebar_width(min_width, max_width)
+        if self.container is None:
+            self.creater_container()
+        self.container.set_sidebar_width(min_width, max_width)
+
+    def add(self, obj: Union[str, Any], **kwargs) -> None:
+        """
+        Adds a widget or layer to the map based on the type of obj.
+
+        If obj is a string and equals "NASA_OPERA", it adds a NASA OPERA data GUI widget to the sidebar.
+        Otherwise, it attempts to add obj as a layer to the map.
+
+        Args:
+            obj (Union[str, Any]): The object to add to the map. Can be a string or any other type.
+            **kwargs (Any): Additional keyword arguments to pass to the widget or layer constructor.
+
+        Returns:
+            None
+        """
+        if isinstance(obj, str):
+            if obj.upper() == "NASA_OPERA":
+                from .toolbar import nasa_opera_gui
+
+                widget = nasa_opera_gui(self, backend="maplibre", **kwargs)
+                self.add_to_sidebar(
+                    widget, widget_icon="mdi-satellite-variant", label="NASA OPERA"
+                )
+                self.set_sidebar_width(min_width=460)
 
     def add_layer(
         self,
@@ -626,6 +657,9 @@ class Map(MapWidget):
 
         if isinstance(control, str):
             control = control.lower()
+            if control in self.controls:
+                return
+
             if control == "scale":
                 control = ScaleControl(**kwargs)
             elif control == "fullscreen":
@@ -727,7 +761,8 @@ class Map(MapWidget):
         Returns:
             None
         """
-        self.add_control(GlobeControl(), position=position, **kwargs)
+        if "globe" not in self.controls:
+            self.add_control(GlobeControl(), position=position, **kwargs)
 
     def save_draw_features(self, filepath: str, indent=4, **kwargs) -> None:
         """
