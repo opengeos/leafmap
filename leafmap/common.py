@@ -14129,6 +14129,7 @@ def nasa_data_download(
     out_dir: Optional[str] = None,
     provider: Optional[str] = None,
     threads: int = 8,
+    keywords: Optional[List[str]] = None,
 ) -> None:
     """Downloads NASA Earthdata granules.
 
@@ -14137,15 +14138,33 @@ def nasa_data_download(
         out_dir (str, optional): The output directory where the granules will be downloaded. Defaults to None (current directory).
         provider (str, optional): The provider of the granules.
         threads (int, optional): The number of threads to use for downloading. Defaults to 8.
+        keywords (List[str], optional): The keywords to filter the granules. Defaults to None.
     """
     import earthaccess
 
     if os.environ.get("USE_MKDOCS") is not None:
         return
 
-    earthaccess.download(
-        granules, local_path=out_dir, provider=provider, threads=threads
-    )
+    if keywords is None:
+
+        earthaccess.download(
+            granules, local_path=out_dir, provider=provider, threads=threads
+        )
+    else:
+
+        # Collect file URLs that match any keyword
+        filtered_links = []
+        for granule in granules:
+            for url in granule.data_links():
+                if any(keyword in url for keyword in keywords):
+                    filtered_links.append(url)
+
+        if filtered_links:
+            earthaccess.download(
+                filtered_links, local_path=out_dir, provider=provider, threads=threads
+            )
+        else:
+            print("No files found with the specified keywords.")
 
 
 def nasa_datasets(keyword=None, df=None, return_short_name=False):

@@ -6642,6 +6642,9 @@ def nasa_opera_gui(
     from rasterio.session import AWSSession
     import xarray as xr
     import matplotlib.pyplot as plt
+    from pathlib import Path
+    from opera_utils.disp._remote import open_file
+    import netrc
 
     widget_width = "400px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
@@ -6706,6 +6709,11 @@ def nasa_opera_gui(
         GDAL_HTTP_COOKIEJAR=os.path.expanduser("~/cookies.txt"),
     )
     rio_env.__enter__()
+
+    # Parse credentials from the netrc file for ASF access
+    netrc_file = Path.home() / ".netrc"
+    auths = netrc.netrc(netrc_file)
+    username, _, password = auths.authenticators("urs.earthdata.nasa.gov")
 
     default_title = m._NASA_DATA[m._NASA_DATA["ShortName"] == default_dataset][
         "EntryTitle"
@@ -6953,7 +6961,18 @@ def nasa_opera_gui(
                             setattr(m, "_NASA_DATA_RESULTS", results)
 
                             if len(m._NASA_DATA_RESULTS) > 0:
-                                links = m._NASA_DATA_RESULTS[0].data_links()
+                                all_links = m._NASA_DATA_RESULTS[0].data_links()
+                                tif_links = [
+                                    link for link in all_links if link.endswith(".tif")
+                                ]
+                                if tif_links:
+                                    links = tif_links
+                                else:
+                                    links = [
+                                        link
+                                        for link in all_links
+                                        if link.endswith(".h5")
+                                    ]
                                 layer.options = [link.split("_")[-1] for link in links]
                                 layer.value = layer.options[0]
                             else:
@@ -6969,22 +6988,71 @@ def nasa_opera_gui(
             output.clear_output()
             with output:
                 print("Loading...")
-                links = m._NASA_DATA_RESULTS[
+                all_links = m._NASA_DATA_RESULTS[
                     dataset.options.index(dataset.value)
                 ].data_links()
+                tif_links = [link for link in all_links if link.endswith(".tif")]
+                if tif_links:
+                    links = tif_links
+                else:
+                    links = [link for link in all_links if link.endswith(".h5")]
                 link = links[layer.index]
                 try:
                     if link.endswith(".tif"):
-                        ds = xr.open_dataset(link, engine="rasterio")
+                        try:
+                            ds = xr.open_dataset(link, engine="rasterio")
+                        except Exception as e:
+                            f = open_file(
+                                link,
+                                earthdata_username=username,
+                                earthdata_password=password,
+                            )
+                            ds = xr.open_dataset(f, engine="rasterio")
                         setattr(m, "_NASA_DATA_DS", ds)
                         da = ds["band_data"]
-                        nodata = os.environ.get("NODATA", 0)
+                        nodata = da.rio.encoded_nodata
                         da = da.fillna(nodata)
                         try:
                             colormap = get_image_colormap(ds)
                         except Exception as e:
                             colormap = None
                         image = array_to_image(da, colormap=colormap)
+                        setattr(m, "_NASA_DATA_IMAGE", image)
+                        name_prefix = layer.value.split(".")[0]
+                        items = dataset.value.split("_")
+                        name_suffix = items[3] + "_" + items[4][:8] + "_" + items[6]
+                        layer_name = f"{name_prefix}_{name_suffix}"
+                        m.add_raster(
+                            image,
+                            zoom_to_layer=True,
+                            colormap=palette.value,
+                            nodata=nodata,
+                            layer_name=layer_name,
+                        )
+                        output.clear_output()
+                    elif link.endswith(".h5"):
+                        os.makedirs("data", exist_ok=True)
+                        file_path = os.path.join("data", os.path.basename(link))
+                        if not os.path.exists(file_path):
+                            with output:
+                                output.clear_output()
+                                print("Downloading data...")
+                                nasa_data_download(link, out_dir="data")
+                        output.clear_output()
+
+                        ds = xr.open_dataset(file_path, group="data")
+                        setattr(m, "_NASA_DATA_DS", ds)
+                        da = ds["VV"]
+                        nodata = os.environ.get("NODATA", np.nan)
+                        crs = f"EPSG:{ds['projection'].attrs['epsg_code']}"
+                        try:
+                            colormap = get_image_colormap(ds)
+                        except Exception as e:
+                            colormap = None
+                        with output:
+                            print("Loading data...")
+                        image = array_to_image(da, crs=crs, colormap=colormap)
+                        output.clear_output()
                         setattr(m, "_NASA_DATA_IMAGE", image)
                         name_prefix = layer.value.split(".")[0]
                         items = dataset.value.split("_")
