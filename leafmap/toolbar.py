@@ -7031,27 +7031,28 @@ def nasa_opera_gui(
                         )
                         output.clear_output()
                     elif link.endswith(".h5"):
-                        f = open_file(
-                            link,
-                            earthdata_username=username,
-                            earthdata_password=password,
-                        )
-                        ds = xr.open_dataset(f, group="data")
+                        os.makedirs("data", exist_ok=True)
+                        file_path = os.path.join("data", os.path.basename(link))
+                        if not os.path.exists(file_path):
+                            with output:
+                                output.clear_output()
+                                print("Downloading data...")
+                                nasa_data_download(link, out_dir="data")
+                        output.clear_output()
+
+                        ds = xr.open_dataset(file_path, group="data")
                         setattr(m, "_NASA_DATA_DS", ds)
                         da = ds["VV"]
-                        subset = da.isel(
-                            x_coordinates=slice(None, None, 1000),
-                            y_coordinates=slice(None, None, 1000),
-                        )
-                        subset_mag = np.abs(subset)
-                        nodata = os.environ.get("NODATA", 0)
-                        subset_mag = subset_mag.fillna(nodata)
+                        nodata = os.environ.get("NODATA", np.nan)
                         crs = f"EPSG:{ds['projection'].attrs['epsg_code']}"
                         try:
                             colormap = get_image_colormap(ds)
                         except Exception as e:
                             colormap = None
-                        image = array_to_image(subset_mag, crs=crs, colormap=colormap)
+                        with output:
+                            print("Loading data...")
+                        image = array_to_image(da, crs=crs, colormap=colormap)
+                        output.clear_output()
                         setattr(m, "_NASA_DATA_IMAGE", image)
                         name_prefix = layer.value.split(".")[0]
                         items = dataset.value.split("_")
