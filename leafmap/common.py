@@ -2902,6 +2902,9 @@ def get_local_tile_layer(
     if "bands" in kwargs:
         indexes = kwargs.pop("bands")
 
+    for key in client_args:
+        kwargs[key] = client_args[key]
+
     # Make it compatible with binder and JupyterHub
     if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
@@ -3029,6 +3032,142 @@ def get_local_tile_layer(
         return tile_layer, tile_layer.tile_server
     else:
         return tile_layer
+
+
+def get_local_tile_url(
+    source,
+    port="default",
+    indexes=None,
+    colormap=None,
+    vmin=None,
+    vmax=None,
+    nodata=None,
+    client_args={"cors_all": False},
+    return_client=False,
+    **kwargs,
+):
+    """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
+        If you are using this function in JupyterHub on a remote server and the raster does not render properly, try
+        running the following two lines before calling this function:
+
+        import os
+        os.environ['LOCALTILESERVER_CLIENT_PREFIX'] = 'proxy/{port}'
+
+    Args:
+        source (str): The path to the GeoTIFF file or the URL of the Cloud Optimized GeoTIFF.
+        port (str, optional): The port to use for the server. Defaults to "default".
+        indexes (int, optional): The band(s) to use. Band indexing starts at 1. Defaults to None.
+        colormap (str, optional): The name of the colormap from `matplotlib` to use when plotting a single band. See https://matplotlib.org/stable/gallery/color/colormap_reference.html. Default is greyscale.
+        vmin (float, optional): The minimum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+        vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
+        nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
+        client_args (dict, optional): Additional arguments to pass to the TileClient. Defaults to {}.
+        return_client (bool, optional): If True, the tile client will be returned. Defaults to False.
+
+    Returns:
+        ipyleaflet.TileLayer | folium.TileLayer: An ipyleaflet.TileLayer or folium.TileLayer.
+    """
+    import rasterio
+
+    check_package(
+        "localtileserver", URL="https://github.com/banesullivan/localtileserver"
+    )
+
+    # Handle legacy localtileserver kwargs
+    if "cmap" in kwargs:
+        warnings.warn(
+            "`cmap` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`."
+        )
+    if "palette" in kwargs:
+        warnings.warn(
+            "`palette` is a deprecated keyword argument for get_local_tile_layer. Please use `colormap`."
+        )
+    if "band" in kwargs or "bands" in kwargs:
+        warnings.warn(
+            "`band` and `bands` are deprecated keyword arguments for get_local_tile_layer. Please use `indexes`."
+        )
+    if "projection" in kwargs:
+        warnings.warn(
+            "`projection` is a deprecated keyword argument for get_local_tile_layer and will be ignored."
+        )
+    if "style" in kwargs:
+        warnings.warn(
+            "`style` is a deprecated keyword argument for get_local_tile_layer and will be ignored."
+        )
+
+    if "max_zoom" not in kwargs:
+        kwargs["max_zoom"] = 30
+    if "max_native_zoom" not in kwargs:
+        kwargs["max_native_zoom"] = 30
+    if "cmap" in kwargs:
+        colormap = kwargs.pop("cmap")
+    if "palette" in kwargs:
+        colormap = kwargs.pop("palette")
+    if "band" in kwargs:
+        indexes = kwargs.pop("band")
+    if "bands" in kwargs:
+        indexes = kwargs.pop("bands")
+
+    for key in client_args:
+        kwargs[key] = client_args[key]
+
+    # Make it compatible with binder and JupyterHub
+    if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+            f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
+        )
+
+    if is_studio_lab():
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+            f"studiolab/default/jupyter/proxy/{{port}}"
+        )
+    elif is_on_aws():
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
+    elif "prefix" in kwargs:
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
+        kwargs.pop("prefix")
+
+    from localtileserver import TileClient
+
+    # if "show_loading" not in kwargs:
+    #     kwargs["show_loading"] = False
+
+    if isinstance(source, str):
+        if not source.startswith("http"):
+            if source.startswith("~"):
+                source = os.path.expanduser(source)
+
+        else:
+            source = github_raw_url(source)
+    elif isinstance(source, TileClient) or isinstance(
+        source, rasterio.io.DatasetReader
+    ):
+        pass
+
+    else:
+        raise ValueError("The source must either be a string or TileClient")
+
+    if nodata is None:
+        nodata = get_api_key("NODATA")
+        if isinstance(nodata, str):
+            nodata = float(nodata)
+
+    if isinstance(colormap, str):
+        colormap = colormap.lower()
+
+    client = TileClient(source, port=port, **client_args)
+    url = client.get_tile_url(
+        indexes=indexes,
+        colormap=colormap,
+        vmin=vmin,
+        vmax=vmax,
+        nodata=nodata,
+    )
+
+    if return_client:
+        return url, client
+    else:
+        return url
 
 
 def get_palettable(types=None):

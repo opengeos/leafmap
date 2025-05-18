@@ -296,6 +296,7 @@ class Map(MapWidget):
             **kwargs,
         )
         self.container = container
+        self.container.sidebar_widgets["Layers"] = self.layer_manager
         return container
 
     def _repr_html_(self, **kwargs: Any) -> None:
@@ -344,6 +345,7 @@ class Map(MapWidget):
                 sidebar_content=[self.layer_manager],
                 **kwargs,
             )
+            self.container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
 
         display(container)
@@ -401,15 +403,18 @@ class Map(MapWidget):
             **kwargs,
         )
 
-    def remove_from_sidebar(self, widget: widgets.Widget) -> None:
+    def remove_from_sidebar(
+        self, widget: widgets.Widget = None, name: str = None
+    ) -> None:
         """
         Removes a widget from the sidebar content.
 
         Args:
             widget (widgets.Widget): The widget to remove from the sidebar.
+            name (str): The name of the widget to remove from the sidebar.
         """
         if self.container is not None:
-            self.container.remove_from_sidebar(widget)
+            self.container.remove_from_sidebar(widget, name)
 
     def set_sidebar_width(self, min_width: int = None, max_width: int = None) -> None:
         """
@@ -422,6 +427,16 @@ class Map(MapWidget):
         if self.container is None:
             self.creater_container()
         self.container.set_sidebar_width(min_width, max_width)
+
+    @property
+    def sidebar_widgets(self) -> Dict[str, widgets.Widget]:
+        """
+        Returns a dictionary of widgets currently in the sidebar.
+
+        Returns:
+            Dict[str, widgets.Widget]: A dictionary where keys are the labels of the widgets and values are the widgets themselves.
+        """
+        return self.container.sidebar_widgets
 
     def add(self, obj: Union[str, Any], **kwargs) -> None:
         """
@@ -690,7 +705,7 @@ class Map(MapWidget):
         self,
         options: Optional[Dict[str, Any]] = None,
         controls: Optional[Dict[str, Any]] = None,
-        position: str = "top-left",
+        position: str = "top-right",
         geojson: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
@@ -709,7 +724,7 @@ class Map(MapWidget):
                 'point', 'trash', 'combine_features', 'uncombine_features'.
                 Defaults to None.
             position (str): The position of the control on the map. Defaults
-                to "top-left".
+                to "top-right".
             geojson (Optional[Dict[str, Any]]): Initial GeoJSON data to load
                 into the drawing control. Defaults to None.
             **kwargs (Any): Additional keyword arguments to be passed to the
@@ -1582,7 +1597,6 @@ class Map(MapWidget):
         vmin=None,
         vmax=None,
         nodata=None,
-        attribution="Localtileserver",
         name="Raster",
         before_id=None,
         fit_bounds=True,
@@ -1633,10 +1647,16 @@ class Map(MapWidget):
         import numpy as np
         import xarray as xr
 
+        if "zoom_to_layer" in kwargs:
+            fit_bounds = kwargs.pop("zoom_to_layer")
+
+        if "layer_name" in kwargs:
+            name = kwargs.pop("layer_name")
+
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
             source = common.array_to_image(source, **array_args)
 
-        tile_layer, tile_client = common.get_local_tile_layer(
+        url, tile_client = common.get_local_tile_url(
             source,
             indexes=indexes,
             colormap=colormap,
@@ -1644,19 +1664,16 @@ class Map(MapWidget):
             vmax=vmax,
             nodata=nodata,
             opacity=opacity,
-            attribution=attribution,
-            layer_name=name,
             client_args=client_args,
             return_client=True,
             **kwargs,
         )
 
         self.add_tile_layer(
-            tile_layer.url,
+            url,
             name=name,
             opacity=opacity,
             visible=visible,
-            attribution=attribution,
             before_id=before_id,
         )
 
@@ -4882,6 +4899,62 @@ class Map(MapWidget):
             layer, before_id=before_id, name=name, opacity=opacity, visible=visible
         )
 
+    @property
+    def user_roi(self) -> Optional[dict]:
+        """Gets the first user-drawn ROI feature.
+
+        Returns:
+            Optional[dict]: The first user-drawn ROI feature or None if no features are drawn.
+        """
+        if len(self.draw_features_created) > 0:
+            return self.draw_features_created[0]
+        else:
+            return None
+
+    @property
+    def user_rois(self) -> list:
+        """Gets all user-drawn ROI features.
+
+        Returns:
+            list: A list of all user-drawn ROI features.
+        """
+        return self.draw_feature_collection_all
+
+    def user_roi_bounds(self, decimals: int = 4) -> Optional[list]:
+        """Gets the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
+
+        Args:
+            decimals (int, optional): The number of decimals to round the coordinates to. Defaults to 4.
+
+        Returns:
+            Optional[list]: The bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy), or None if no ROI is drawn.
+        """
+        if self.user_roi is not None:
+            return common.geometry_bounds(self.user_roi, decimals=decimals)
+        else:
+            return None
+
+    @property
+    def bounds(self) -> tuple:
+        """Gets the bounds of the map view state.
+
+        Returns:
+            tuple: A tuple of two tuples, each containing (lat, lng) coordinates for the southwest and northeast corners of the map view.
+        """
+        sw = self.view_state["bounds"]["_sw"]
+        ne = self.view_state["bounds"]["_ne"]
+        coords = ((sw["lat"], sw["lng"]), (ne["lat"], ne["lng"]))
+        return coords
+
+    def get_layer_names(self) -> list:
+        """Gets layer names as a list.
+
+        Returns:
+            list: A list of layer names.
+        """
+        layer_names = list(self.layer_dict.keys())
+        return layer_names
+
 
 class Container(v.Container):
     """
@@ -4929,6 +5002,7 @@ class Container(v.Container):
         self.min_width = min_width
         self.max_width = max_width
         self.host_map = host_map
+        self.sidebar_widgets = {}
 
         # Map display container (left column)
         self.map_container = v.Col(
@@ -5090,6 +5164,9 @@ class Container(v.Container):
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
 
+        if label in self.sidebar_widgets:
+            self.remove_from_sidebar(name=label)
+
         if add_header:
             widget = CustomWidget(
                 widget,
@@ -5104,14 +5181,27 @@ class Container(v.Container):
             )
 
         self.sidebar_content_box.children += (widget,)
+        self.sidebar_widgets[label] = widget
 
-    def remove_from_sidebar(self, widget: widgets.Widget) -> None:
+    def remove_from_sidebar(
+        self, widget: widgets.Widget = None, name: str = None
+    ) -> None:
         """
         Removes a widget from the sidebar content.
 
         Args:
             widget (widgets.Widget): The widget to remove from the sidebar.
+            name (str): The name of the widget to remove from the sidebar.
         """
+        key = None
+        for key, value in self.sidebar_widgets.items():
+            if value == widget or key == name:
+                if widget is None:
+                    widget = self.sidebar_widgets[key]
+                break
+
+        if key is not None and key in self.sidebar_widgets:
+            self.sidebar_widgets.pop(key)
         self.sidebar_content_box.children = tuple(
             child for child in self.sidebar_content_box.children if child != widget
         )

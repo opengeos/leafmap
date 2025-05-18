@@ -6923,12 +6923,16 @@ def nasa_opera_gui(
 
                         if len(results) > 0:
                             if "Footprints" in m.get_layer_names():
-                                m.remove(m.find_layer("Footprints"))
-                            if (
-                                hasattr(m, "_NASA_DATA_CTRL")
-                                and m._NASA_DATA_CTRL in m.controls
-                            ):
-                                m.remove(m._NASA_DATA_CTRL)
+                                if backend == "ipyleaflet":
+                                    m.remove(m.find_layer("Footprints"))
+                                else:
+                                    m.remove_layer("Footprints")
+                            if backend == "ipyleaflet":
+                                if (
+                                    hasattr(m, "_NASA_DATA_CTRL")
+                                    and m._NASA_DATA_CTRL in m.controls
+                                ):
+                                    m.remove(m._NASA_DATA_CTRL)
 
                             style = {
                                 # "stroke": True,
@@ -6946,15 +6950,23 @@ def nasa_opera_gui(
                                 "color": "yellow",
                             }
 
-                            m.add_gdf(
-                                gdf,
-                                layer_name="Footprints",
-                                info_mode="on_click",
-                                zoom_to_layer=False,
-                                style=style,
-                                hover_style=hover_style,
-                            )
-                            setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
+                            if backend == "ipyleaflet":
+                                m.add_gdf(
+                                    gdf,
+                                    layer_name="Footprints",
+                                    info_mode="on_click",
+                                    zoom_to_layer=False,
+                                    style=style,
+                                    hover_style=hover_style,
+                                )
+                            else:
+                                m.add_gdf(
+                                    gdf,
+                                    name="Footprints",
+                                )
+                                m.set_opacity("Footprints", 0.05)
+                            if backend == "ipyleaflet":
+                                setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
 
                             dataset.options = gdf["native-id"].values.tolist()
                             dataset.value = dataset.options[0]
@@ -7031,6 +7043,7 @@ def nasa_opera_gui(
                             nodata=nodata,
                             layer_name=layer_name,
                         )
+
                         output.clear_output()
                     elif link.endswith(".h5"):
                         os.makedirs("data", exist_ok=True)
@@ -7067,6 +7080,7 @@ def nasa_opera_gui(
                             nodata=nodata,
                             layer_name=layer_name,
                         )
+
                         output.clear_output()
                     else:
                         output.clear_output()
@@ -7098,10 +7112,13 @@ def nasa_opera_gui(
 
         elif change["new"] == "Close":
             if m is not None:
-                m.toolbar_reset()
-                if m.tool_control is not None and m.tool_control in m.controls:
-                    m.remove_control(m.tool_control)
-                    m.tool_control = None
+                if backend == "ipyleaflet":
+                    m.toolbar_reset()
+                    if m.tool_control is not None and m.tool_control in m.controls:
+                        m.remove_control(m.tool_control)
+                        m.tool_control = None
+                else:
+                    m.remove_from_sidebar(name="NASA OPERA")
             toolbar_widget.close()
 
         buttons.value = None
