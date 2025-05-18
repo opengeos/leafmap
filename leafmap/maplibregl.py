@@ -345,7 +345,7 @@ class Map(MapWidget):
                 sidebar_content=[self.layer_manager],
                 **kwargs,
             )
-            self.container.sidebar_widgets["Layers"] = self.layer_manager
+            container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
 
         display(container)
@@ -469,6 +469,7 @@ class Map(MapWidget):
         name: Optional[str] = None,
         opacity: float = 1.0,
         visible: bool = True,
+        overwrite: bool = False,
     ) -> None:
         """
         Adds a layer to the map.
@@ -486,6 +487,8 @@ class Map(MapWidget):
                 in the layer dictionary. If None, the layer's ID is used as the key.
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             visible (bool, optional): Whether the layer is visible by default.
+            overwrite (bool, optional): If True, the function will return the
+                original name even if it exists in the list. Defaults to False.
 
         Returns:
             None
@@ -500,6 +503,8 @@ class Map(MapWidget):
 
         if name is None:
             name = layer.id
+
+        name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
 
         if (
             "paint" in layer.to_dict()
@@ -1005,6 +1010,7 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         source_args: Dict = {},
         fit_bounds_options: Dict = None,
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1039,6 +1045,8 @@ class Map(MapWidget):
             fit_bounds_options (dict, optional): Additional options for fitting the bounds.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/FitBoundsOptions
                 for more information.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://maplibre.org/maplibre-style-spec/layers/ for more info.
 
@@ -1113,7 +1121,9 @@ class Map(MapWidget):
             source=source,
             **kwargs,
         )
-        self.add_layer(layer, before_id=before_id, name=name, visible=visible)
+        self.add_layer(
+            layer, before_id=before_id, name=name, visible=visible, overwrite=overwrite
+        )
         self.add_popup(name)
         if fit_bounds and bounds is not None:
             self.fit_bounds(bounds, fit_bounds_options)
@@ -1134,6 +1144,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1163,6 +1174,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
 
         Returns:
@@ -1187,6 +1200,7 @@ class Map(MapWidget):
             visible=visible,
             before_id=before_id,
             source_args=source_args,
+            overwrite=overwrite,
             **kwargs,
         )
 
@@ -1201,6 +1215,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1226,6 +1241,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
 
         Returns:
@@ -1247,6 +1264,7 @@ class Map(MapWidget):
             visible=visible,
             before_id=before_id,
             source_args=source_args,
+            overwrite=overwrite,
             **kwargs,
         )
 
@@ -1260,6 +1278,7 @@ class Map(MapWidget):
         tile_size: int = 256,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1283,6 +1302,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the RasterTileSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
 
@@ -1297,7 +1318,7 @@ class Map(MapWidget):
             **source_args,
         )
         layer = Layer(id=name, source=raster_source, type=LayerType.RASTER, **kwargs)
-        self.add_layer(layer, before_id=before_id, name=name)
+        self.add_layer(layer, before_id=before_id, name=name, overwrite=overwrite)
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
@@ -1313,6 +1334,7 @@ class Map(MapWidget):
         tile_size: int = 256,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1338,6 +1360,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the RasterTileSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
 
@@ -1356,6 +1380,7 @@ class Map(MapWidget):
             tile_size=tile_size,
             before_id=before_id,
             source_args=source_args,
+            overwrite=overwrite,
             **kwargs,
         )
 
@@ -1370,6 +1395,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         ee_initialize: bool = False,
+        overwrite: bool = False,
         **kwargs,
     ) -> None:
         """
@@ -1391,6 +1417,9 @@ class Map(MapWidget):
             before_id (str, optional): The ID of an existing layer before which
                 the new layer should be inserted.
             ee_initialize (bool, optional): Whether to initialize the Earth Engine
+                account. Default is False.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments to be passed to the underlying
                 `add_tile_layer` method.
 
@@ -1418,6 +1447,7 @@ class Map(MapWidget):
                     opacity=opacity,
                     visible=visible,
                     before_id=before_id,
+                    overwrite=overwrite,
                     **kwargs,
                 )
             else:
@@ -1439,6 +1469,7 @@ class Map(MapWidget):
                     opacity=opacity,
                     visible=visible,
                     before_id=before_id,
+                    overwrite=overwrite,
                     **kwargs,
                 )
             except Exception as e:
@@ -1460,6 +1491,7 @@ class Map(MapWidget):
         titiler_endpoint: str = None,
         fit_bounds: bool = True,
         before_id: Optional[str] = None,
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1485,6 +1517,8 @@ class Map(MapWidget):
                 Defaults to "https://titiler.xyz".
             fit_bounds (bool, optional): Whether to adjust the viewport of
                 the map to fit the bounds of the layer. Defaults to True.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Arbitrary keyword arguments, including bidx, expression,
                 nodata, unscale, resampling, rescale, color_formula, colormap,
                     colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
@@ -1504,7 +1538,13 @@ class Map(MapWidget):
         )
         bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
-            tile_url, name, attribution, opacity, visible, before_id=before_id
+            tile_url,
+            name,
+            attribution,
+            opacity,
+            visible,
+            before_id=before_id,
+            overwrite=overwrite,
         )
         if fit_bounds:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
@@ -1524,6 +1564,7 @@ class Map(MapWidget):
         visible: bool = True,
         fit_bounds: bool = True,
         before_id: Optional[str] = None,
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1558,6 +1599,8 @@ class Map(MapWidget):
                 be zoomed to the layer extent. Defaults to True.
             before_id (str, optional): The ID of an existing layer before which
                 the new layer should be inserted.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Arbitrary keyword arguments, including bidx, expression,
                 nodata, unscale, resampling, rescale, color_formula, colormap,
                 colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
@@ -1584,7 +1627,13 @@ class Map(MapWidget):
         )
         bounds = common.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(
-            tile_url, name, attribution, opacity, visible, before_id=before_id
+            tile_url,
+            name,
+            attribution,
+            opacity,
+            visible,
+            before_id=before_id,
+            overwrite=overwrite,
         )
         if fit_bounds:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
@@ -1604,6 +1653,7 @@ class Map(MapWidget):
         opacity=1.0,
         array_args={},
         client_args={"cors_all": True},
+        overwrite: bool = False,
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -1675,6 +1725,7 @@ class Map(MapWidget):
             opacity=opacity,
             visible=visible,
             before_id=before_id,
+            overwrite=overwrite,
         )
 
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
@@ -1861,6 +1912,8 @@ class Map(MapWidget):
             if "paint" in layer:
                 layer["paint"][prop_name] = opacity
         super().set_paint_property(name, prop_name, opacity)
+        if self.layer_manager is not None:
+            self.layer_manager.refresh()
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
@@ -1877,6 +1930,8 @@ class Map(MapWidget):
         """
         super().set_visibility(name, visible)
         self.layer_dict[name]["visible"] = visible
+        if self.layer_manager is not None:
+            self.layer_manager.refresh()
 
     def layer_interact(self, name=None):
         """Create a layer widget for changing the visibility and opacity of a layer.

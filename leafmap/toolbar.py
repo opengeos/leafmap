@@ -6925,8 +6925,8 @@ def nasa_opera_gui(
                             if "Footprints" in m.get_layer_names():
                                 if backend == "ipyleaflet":
                                     m.remove(m.find_layer("Footprints"))
-                                else:
-                                    m.remove_layer("Footprints")
+                                # else:
+                                #     m.remove_layer("Footprints")
                             if backend == "ipyleaflet":
                                 if (
                                     hasattr(m, "_NASA_DATA_CTRL")
@@ -6960,11 +6960,14 @@ def nasa_opera_gui(
                                     hover_style=hover_style,
                                 )
                             else:
+                                layer_name = get_unique_name(
+                                    "Footprints", m.get_layer_names()
+                                )
                                 m.add_gdf(
                                     gdf,
-                                    name="Footprints",
+                                    name=layer_name,
                                 )
-                                m.set_opacity("Footprints", 0.05)
+                                m.set_opacity(layer_name, 0.2)
                             if backend == "ipyleaflet":
                                 setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
 

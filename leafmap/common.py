@@ -17026,3 +17026,26 @@ def json_to_geojson(input_path: str, output_path: str) -> None:
     # Save the GeoJSON file
     with open(output_path, "w") as f:
         json.dump(geojson, f, indent=2)
+
+
+def get_unique_name(name: str, names: list, overwrite: bool = False) -> str:
+    """
+    Generates a unique name based on the input name and existing names.
+
+    Args:
+        name (str): The base name to generate a unique name from.
+        names (list): A list of existing names to check against.
+        overwrite (bool, optional): If True, the function will return the original name even if it exists in the list. Defaults to False.
+
+    Returns:
+        str: A unique name based on the input name.
+    """
+    if overwrite or name not in names:
+        return name
+    else:
+        counter = 1
+        while True:
+            unique_name = f"{name}_{counter}"
+            if unique_name not in names:
+                return unique_name
+            counter += 1
