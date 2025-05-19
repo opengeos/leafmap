@@ -6968,6 +6968,7 @@ def nasa_opera_gui(
                                     name=layer_name,
                                 )
                                 m.set_opacity(layer_name, 0.2)
+                                m.layer_manager.refresh()
                             if backend == "ipyleaflet":
                                 setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
 

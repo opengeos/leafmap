@@ -80,6 +80,7 @@ class Map(MapWidget):
         use_message_queue: bool = None,
         add_sidebar: bool = True,
         sidebar_visible: bool = False,
+        sidebar_width: int = 360,
         sidebar_args: Optional[Dict] = None,
         **kwargs: Any,
     ) -> None:
@@ -115,6 +116,7 @@ class Map(MapWidget):
             add_sidebar (bool, optional): Whether to add a sidebar to the map.
                 Defaults to True. If True, the map will be displayed in a sidebar.
             sidebar_visible (bool, optional): Whether the sidebar is visible. Defaults to False.
+            sidebar_width (int, optional): The width of the sidebar in pixels. Defaults to 360.
             sidebar_args (dict, optional): The arguments for the sidebar. It can
                 be a dictionary with the following keys: "sidebar_visible", "min_width",
                 "max_width", and "sidebar_content". Defaults to None. If None, it will
@@ -226,6 +228,8 @@ class Map(MapWidget):
             sidebar_args = {}
         if "sidebar_visible" not in sidebar_args:
             sidebar_args["sidebar_visible"] = sidebar_visible
+        if "sidebar_width" not in sidebar_args:
+            sidebar_args["min_width"] = sidebar_width
         self.sidebar_args = sidebar_args
         self.layer_manager = None
         self.container = None
@@ -389,7 +393,7 @@ class Map(MapWidget):
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         if self.container is None:
-            self.creater_container()
+            self.creater_container(**self.sidebar_args)
         self.container.add_to_sidebar(
             widget,
             add_header=add_header,
@@ -460,7 +464,6 @@ class Map(MapWidget):
                 self.add_to_sidebar(
                     widget, widget_icon="mdi-satellite-variant", label="NASA OPERA"
                 )
-                self.set_sidebar_width(min_width=460)
 
     def add_layer(
         self,
@@ -505,6 +508,9 @@ class Map(MapWidget):
             name = layer.id
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
+        if name in self.get_layer_names():
+            self.remove_layer(name)
+            self.layer_dict.pop(name)
 
         if (
             "paint" in layer.to_dict()
@@ -1311,6 +1317,9 @@ class Map(MapWidget):
             None
         """
 
+        if overwrite and name in self.get_layer_names():
+            self.remove_layer(name)
+
         raster_source = RasterTileSource(
             tiles=[url.strip()],
             attribution=attribution,
@@ -1653,7 +1662,7 @@ class Map(MapWidget):
         opacity=1.0,
         array_args={},
         client_args={"cors_all": True},
-        overwrite: bool = False,
+        overwrite: bool = True,
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -1693,6 +1702,10 @@ class Map(MapWidget):
                 `array_to_memory_file` when reading the raster. Defaults to {}.
             client_args (dict, optional): Additional arguments to pass to
                 localtileserver.TileClient. Defaults to { "cors_all": False }.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to True.
+            **kwargs: Additional keyword arguments to be passed to the underlying
+                `add_tile_layer` method.
         """
         import numpy as np
         import xarray as xr
@@ -1718,6 +1731,9 @@ class Map(MapWidget):
             return_client=True,
             **kwargs,
         )
+
+        if overwrite and name in self.get_layer_names():
+            self.remove_layer(name)
 
         self.add_tile_layer(
             url,
@@ -1912,8 +1928,8 @@ class Map(MapWidget):
             if "paint" in layer:
                 layer["paint"][prop_name] = opacity
         super().set_paint_property(name, prop_name, opacity)
-        if self.layer_manager is not None:
-            self.layer_manager.refresh()
+        # if self.layer_manager is not None:
+        #     self.layer_manager.refresh()
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
@@ -1930,8 +1946,8 @@ class Map(MapWidget):
         """
         super().set_visibility(name, visible)
         self.layer_dict[name]["visible"] = visible
-        if self.layer_manager is not None:
-            self.layer_manager.refresh()
+        # if self.layer_manager is not None:
+        #     self.layer_manager.refresh()
 
     def layer_interact(self, name=None):
         """Create a layer widget for changing the visibility and opacity of a layer.

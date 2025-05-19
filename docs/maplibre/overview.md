@@ -472,6 +472,12 @@ Add a polygon and circle layer from the same GeoJSON source.
 
 [![](https://i.imgur.com/9q7npbO.png)](https://leafmap.org/maplibre/multiple_geometries)
 
+## Search and visualize NASA OPERA data products
+
+Search and visualize NASA OPERA data products interactively
+
+[![image](https://github.com/user-attachments/assets/bca2f4de-84d2-4429-b076-a982279d3eaa)](https://leafmap.org/maplibre/nasa_opera)
+
 ## Display map navigation controls
 
 Add zoom and rotation controls to the map.
