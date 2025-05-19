@@ -82,6 +82,7 @@ class Map(MapWidget):
         sidebar_visible: bool = False,
         sidebar_width: int = 360,
         sidebar_args: Optional[Dict] = None,
+        layer_manager_expanded: bool = True,
         **kwargs: Any,
     ) -> None:
         """
@@ -121,7 +122,7 @@ class Map(MapWidget):
                 be a dictionary with the following keys: "sidebar_visible", "min_width",
                 "max_width", and "sidebar_content". Defaults to None. If None, it will
                 use the default values for the sidebar.
-            kwargs (Any): Additional keyword arguments that are passed to the MapOptions class.
+            layer_manager_expanded (bool, optional): Whether the layer manager is expanded. Defaults to True.
             **kwargs: Additional keyword arguments that are passed to the MapOptions class.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/MapOptions/
                 for more information.
@@ -230,6 +231,8 @@ class Map(MapWidget):
             sidebar_args["sidebar_visible"] = sidebar_visible
         if "sidebar_width" not in sidebar_args:
             sidebar_args["min_width"] = sidebar_width
+        if "expanded" not in sidebar_args:
+            sidebar_args["expanded"] = layer_manager_expanded
         self.sidebar_args = sidebar_args
         self.layer_manager = None
         self.container = None
@@ -7158,6 +7161,8 @@ class LayerManagerWidget(v.ExpansionPanels):
                         c for c in self.layers_box.children if c != row_ref
                     )
                 self.layer_items.pop(layer_name, None)
+                if f"Style {layer_name}" in self.m.sidebar_widgets:
+                    self.m.remove_from_sidebar(name=f"Style {layer_name}")
 
             def on_settings_clicked(btn, layer_name=name):
                 style_widget = LayerStyleWidget(self.m.layer_dict[layer_name], self.m)
