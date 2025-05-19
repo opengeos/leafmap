@@ -400,6 +400,12 @@ Control layer visibility and opacity with a layer manager.
 
 [![image](https://github.com/user-attachments/assets/d6624b02-332c-4df2-805e-ee39772081f1)](https://leafmap.org/maplibre/layer_manager)
 
+## Style a layer interactively
+
+Style a layer interactively with a widget.
+
+[![image](https://github.com/user-attachments/assets/d0f034d9-4896-4d7a-92ac-500f5e26c17d)](https://leafmap.org/maplibre/layer_styling)
+
 ## Create a gradient line using an expression
 
 Use the line-gradient paint property and an expression to visualize distance from the starting point of a line.
