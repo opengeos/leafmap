@@ -6621,6 +6621,7 @@ def nasa_opera_gui(
     position: Optional[str] = "topright",
     opened: Optional[bool] = True,
     default_dataset: Optional[str] = "OPERA_L3_DSWX-HLS_V1",
+    backend: Optional[str] = "ipyleaflet",
     **kwargs,
 ):
     """Search NASA Earth data interactive
@@ -6630,6 +6631,7 @@ def nasa_opera_gui(
         position (str, optional): The position of the widget. Defaults to "topright".
         opened (bool, optional): Whether to open the widget. Defaults to True.
         default_dataset (str, optional): The default dataset. Defaults to "OPERA_L3_DSWX-HLS_V1".
+        backend (str, optional): The backend to use. Defaults to "ipyleaflet".
 
     Returns:
         ipywidgets: The tool GUI widget.
@@ -6921,12 +6923,16 @@ def nasa_opera_gui(
 
                         if len(results) > 0:
                             if "Footprints" in m.get_layer_names():
-                                m.remove(m.find_layer("Footprints"))
-                            if (
-                                hasattr(m, "_NASA_DATA_CTRL")
-                                and m._NASA_DATA_CTRL in m.controls
-                            ):
-                                m.remove(m._NASA_DATA_CTRL)
+                                if backend == "ipyleaflet":
+                                    m.remove(m.find_layer("Footprints"))
+                                # else:
+                                #     m.remove_layer("Footprints")
+                            if backend == "ipyleaflet":
+                                if (
+                                    hasattr(m, "_NASA_DATA_CTRL")
+                                    and m._NASA_DATA_CTRL in m.controls
+                                ):
+                                    m.remove(m._NASA_DATA_CTRL)
 
                             style = {
                                 # "stroke": True,
@@ -6944,15 +6950,27 @@ def nasa_opera_gui(
                                 "color": "yellow",
                             }
 
-                            m.add_gdf(
-                                gdf,
-                                layer_name="Footprints",
-                                info_mode="on_click",
-                                zoom_to_layer=False,
-                                style=style,
-                                hover_style=hover_style,
-                            )
-                            setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
+                            if backend == "ipyleaflet":
+                                m.add_gdf(
+                                    gdf,
+                                    layer_name="Footprints",
+                                    info_mode="on_click",
+                                    zoom_to_layer=False,
+                                    style=style,
+                                    hover_style=hover_style,
+                                )
+                            else:
+                                layer_name = get_unique_name(
+                                    "Footprints", m.get_layer_names()
+                                )
+                                m.add_gdf(
+                                    gdf,
+                                    name=layer_name,
+                                )
+                                m.set_opacity(layer_name, 0.2)
+                                m.layer_manager.refresh()
+                            if backend == "ipyleaflet":
+                                setattr(m, "_NASA_DATA_CTRL", m.controls[-1])
 
                             dataset.options = gdf["native-id"].values.tolist()
                             dataset.value = dataset.options[0]
@@ -7029,6 +7047,7 @@ def nasa_opera_gui(
                             nodata=nodata,
                             layer_name=layer_name,
                         )
+
                         output.clear_output()
                     elif link.endswith(".h5"):
                         os.makedirs("data", exist_ok=True)
@@ -7065,6 +7084,7 @@ def nasa_opera_gui(
                             nodata=nodata,
                             layer_name=layer_name,
                         )
+
                         output.clear_output()
                     else:
                         output.clear_output()
@@ -7096,10 +7116,13 @@ def nasa_opera_gui(
 
         elif change["new"] == "Close":
             if m is not None:
-                m.toolbar_reset()
-                if m.tool_control is not None and m.tool_control in m.controls:
-                    m.remove_control(m.tool_control)
-                    m.tool_control = None
+                if backend == "ipyleaflet":
+                    m.toolbar_reset()
+                    if m.tool_control is not None and m.tool_control in m.controls:
+                        m.remove_control(m.tool_control)
+                        m.tool_control = None
+                else:
+                    m.remove_from_sidebar(name="NASA OPERA")
             toolbar_widget.close()
 
         buttons.value = None
@@ -7107,7 +7130,7 @@ def nasa_opera_gui(
     buttons.observe(button_clicked, "value")
 
     toolbar_button.value = opened
-    if m is not None and hasattr(m, "controls"):
+    if m is not None and hasattr(m, "controls") and backend == "ipyleaflet":
         toolbar_control = ipyleaflet.WidgetControl(
             widget=toolbar_widget, position=position
         )
@@ -7115,6 +7138,8 @@ def nasa_opera_gui(
         if toolbar_control not in m.controls:
             m.add(toolbar_control)
             m.tool_control = toolbar_control
+    elif backend == "maplibre":
+        return toolbar_footer
     else:
         return toolbar_widget
 

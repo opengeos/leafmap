@@ -44,6 +44,8 @@ from .common import (
     get_overture_data,
     geojson_bounds,
     geojson_to_gdf,
+    nasa_data_login,
+    nasa_data_download,
     pandas_to_geojson,
     pmtiles_metadata,
     pmtiles_style,
@@ -72,11 +74,13 @@ class Map(MapWidget):
             "navigation": "top-right",
             "fullscreen": "top-right",
             "scale": "bottom-left",
+            "globe": "top-right",
         },
         projection: str = "mercator",
         use_message_queue: bool = None,
         add_sidebar: bool = True,
         sidebar_visible: bool = False,
+        sidebar_width: int = 360,
         sidebar_args: Optional[Dict] = None,
         **kwargs: Any,
     ) -> None:
@@ -112,6 +116,7 @@ class Map(MapWidget):
             add_sidebar (bool, optional): Whether to add a sidebar to the map.
                 Defaults to True. If True, the map will be displayed in a sidebar.
             sidebar_visible (bool, optional): Whether the sidebar is visible. Defaults to False.
+            sidebar_width (int, optional): The width of the sidebar in pixels. Defaults to 360.
             sidebar_args (dict, optional): The arguments for the sidebar. It can
                 be a dictionary with the following keys: "sidebar_visible", "min_width",
                 "max_width", and "sidebar_content". Defaults to None. If None, it will
@@ -186,8 +191,10 @@ class Map(MapWidget):
             use_message_queue = os.environ.get("USE_MESSAGE_QUEUE", False)
         self.use_message_queue(use_message_queue)
 
+        self.controls = {}
         for control, position in controls.items():
             self.add_control(control, position)
+            self.controls[control] = position
 
         self.layer_dict = {}
         self.layer_dict["background"] = {
@@ -203,7 +210,7 @@ class Map(MapWidget):
             self.style_dict[layer["id"]] = layer
         self.source_dict = {}
 
-        if projection.lower() == "globe":
+        if projection.lower() == "globe" and ("globe" not in self.controls):
             self.add_globe_control()
             self.set_projection(
                 type=[
@@ -221,6 +228,8 @@ class Map(MapWidget):
             sidebar_args = {}
         if "sidebar_visible" not in sidebar_args:
             sidebar_args["sidebar_visible"] = sidebar_visible
+        if "sidebar_width" not in sidebar_args:
+            sidebar_args["min_width"] = sidebar_width
         self.sidebar_args = sidebar_args
         self.layer_manager = None
         self.container = None
@@ -291,6 +300,7 @@ class Map(MapWidget):
             **kwargs,
         )
         self.container = container
+        self.container.sidebar_widgets["Layers"] = self.layer_manager
         return container
 
     def _repr_html_(self, **kwargs: Any) -> None:
@@ -339,6 +349,7 @@ class Map(MapWidget):
                 sidebar_content=[self.layer_manager],
                 **kwargs,
             )
+            container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
 
         display(container)
@@ -381,29 +392,33 @@ class Map(MapWidget):
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
-        if self.container is not None:
-            self.container.add_to_sidebar(
-                widget,
-                add_header=add_header,
-                widget_icon=widget_icon,
-                close_icon=close_icon,
-                label=label,
-                background_color=background_color,
-                height=height,
-                expanded=expanded,
-                host_map=self,
-                **kwargs,
-            )
+        if self.container is None:
+            self.creater_container(**self.sidebar_args)
+        self.container.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            host_map=self,
+            **kwargs,
+        )
 
-    def remove_from_sidebar(self, widget: widgets.Widget) -> None:
+    def remove_from_sidebar(
+        self, widget: widgets.Widget = None, name: str = None
+    ) -> None:
         """
         Removes a widget from the sidebar content.
 
         Args:
             widget (widgets.Widget): The widget to remove from the sidebar.
+            name (str): The name of the widget to remove from the sidebar.
         """
         if self.container is not None:
-            self.container.remove_from_sidebar(widget)
+            self.container.remove_from_sidebar(widget, name)
 
     def set_sidebar_width(self, min_width: int = None, max_width: int = None) -> None:
         """
@@ -413,8 +428,42 @@ class Map(MapWidget):
             min_width (int, optional): New minimum width in pixels. If None, keep current.
             max_width (int, optional): New maximum width in pixels. If None, keep current.
         """
-        if self.container is not None:
-            self.container.set_sidebar_width(min_width, max_width)
+        if self.container is None:
+            self.creater_container()
+        self.container.set_sidebar_width(min_width, max_width)
+
+    @property
+    def sidebar_widgets(self) -> Dict[str, widgets.Widget]:
+        """
+        Returns a dictionary of widgets currently in the sidebar.
+
+        Returns:
+            Dict[str, widgets.Widget]: A dictionary where keys are the labels of the widgets and values are the widgets themselves.
+        """
+        return self.container.sidebar_widgets
+
+    def add(self, obj: Union[str, Any], **kwargs) -> None:
+        """
+        Adds a widget or layer to the map based on the type of obj.
+
+        If obj is a string and equals "NASA_OPERA", it adds a NASA OPERA data GUI widget to the sidebar.
+        Otherwise, it attempts to add obj as a layer to the map.
+
+        Args:
+            obj (Union[str, Any]): The object to add to the map. Can be a string or any other type.
+            **kwargs (Any): Additional keyword arguments to pass to the widget or layer constructor.
+
+        Returns:
+            None
+        """
+        if isinstance(obj, str):
+            if obj.upper() == "NASA_OPERA":
+                from .toolbar import nasa_opera_gui
+
+                widget = nasa_opera_gui(self, backend="maplibre", **kwargs)
+                self.add_to_sidebar(
+                    widget, widget_icon="mdi-satellite-variant", label="NASA OPERA"
+                )
 
     def add_layer(
         self,
@@ -423,6 +472,7 @@ class Map(MapWidget):
         name: Optional[str] = None,
         opacity: float = 1.0,
         visible: bool = True,
+        overwrite: bool = False,
     ) -> None:
         """
         Adds a layer to the map.
@@ -440,6 +490,8 @@ class Map(MapWidget):
                 in the layer dictionary. If None, the layer's ID is used as the key.
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             visible (bool, optional): Whether the layer is visible by default.
+            overwrite (bool, optional): If True, the function will return the
+                original name even if it exists in the list. Defaults to False.
 
         Returns:
             None
@@ -454,6 +506,11 @@ class Map(MapWidget):
 
         if name is None:
             name = layer.id
+
+        name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
+        if name in self.get_layer_names():
+            self.remove_layer(name)
+            self.layer_dict.pop(name)
 
         if (
             "paint" in layer.to_dict()
@@ -626,6 +683,9 @@ class Map(MapWidget):
 
         if isinstance(control, str):
             control = control.lower()
+            if control in self.controls:
+                return
+
             if control == "scale":
                 control = ScaleControl(**kwargs)
             elif control == "fullscreen":
@@ -656,7 +716,7 @@ class Map(MapWidget):
         self,
         options: Optional[Dict[str, Any]] = None,
         controls: Optional[Dict[str, Any]] = None,
-        position: str = "top-left",
+        position: str = "top-right",
         geojson: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> None:
@@ -675,7 +735,7 @@ class Map(MapWidget):
                 'point', 'trash', 'combine_features', 'uncombine_features'.
                 Defaults to None.
             position (str): The position of the control on the map. Defaults
-                to "top-left".
+                to "top-right".
             geojson (Optional[Dict[str, Any]]): Initial GeoJSON data to load
                 into the drawing control. Defaults to None.
             **kwargs (Any): Additional keyword arguments to be passed to the
@@ -727,7 +787,8 @@ class Map(MapWidget):
         Returns:
             None
         """
-        self.add_control(GlobeControl(), position=position, **kwargs)
+        if "globe" not in self.controls:
+            self.add_control(GlobeControl(), position=position, **kwargs)
 
     def save_draw_features(self, filepath: str, indent=4, **kwargs) -> None:
         """
@@ -955,6 +1016,7 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         source_args: Dict = {},
         fit_bounds_options: Dict = None,
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -989,6 +1051,8 @@ class Map(MapWidget):
             fit_bounds_options (dict, optional): Additional options for fitting the bounds.
                 See https://maplibre.org/maplibre-gl-js/docs/API/type-aliases/FitBoundsOptions
                 for more information.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://maplibre.org/maplibre-style-spec/layers/ for more info.
 
@@ -1063,7 +1127,9 @@ class Map(MapWidget):
             source=source,
             **kwargs,
         )
-        self.add_layer(layer, before_id=before_id, name=name, visible=visible)
+        self.add_layer(
+            layer, before_id=before_id, name=name, visible=visible, overwrite=overwrite
+        )
         self.add_popup(name)
         if fit_bounds and bounds is not None:
             self.fit_bounds(bounds, fit_bounds_options)
@@ -1084,6 +1150,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1113,6 +1180,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
 
         Returns:
@@ -1137,6 +1206,7 @@ class Map(MapWidget):
             visible=visible,
             before_id=before_id,
             source_args=source_args,
+            overwrite=overwrite,
             **kwargs,
         )
 
@@ -1151,6 +1221,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1176,6 +1247,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the GeoJSONSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
 
         Returns:
@@ -1197,6 +1270,7 @@ class Map(MapWidget):
             visible=visible,
             before_id=before_id,
             source_args=source_args,
+            overwrite=overwrite,
             **kwargs,
         )
 
@@ -1210,6 +1284,7 @@ class Map(MapWidget):
         tile_size: int = 256,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1233,12 +1308,17 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the RasterTileSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
 
         Returns:
             None
         """
+
+        if overwrite and name in self.get_layer_names():
+            self.remove_layer(name)
 
         raster_source = RasterTileSource(
             tiles=[url.strip()],
@@ -1247,7 +1327,7 @@ class Map(MapWidget):
             **source_args,
         )
         layer = Layer(id=name, source=raster_source, type=LayerType.RASTER, **kwargs)
-        self.add_layer(layer, before_id=before_id, name=name)
+        self.add_layer(layer, before_id=before_id, name=name, overwrite=overwrite)
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
@@ -1263,6 +1343,7 @@ class Map(MapWidget):
         tile_size: int = 256,
         before_id: Optional[str] = None,
         source_args: Dict = {},
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1288,6 +1369,8 @@ class Map(MapWidget):
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
                 passed to the RasterTileSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments that are passed to the Layer class.
                 See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
 
@@ -1306,6 +1389,7 @@ class Map(MapWidget):
             tile_size=tile_size,
             before_id=before_id,
             source_args=source_args,
+            overwrite=overwrite,
             **kwargs,
         )
 
@@ -1320,6 +1404,7 @@ class Map(MapWidget):
         visible: bool = True,
         before_id: Optional[str] = None,
         ee_initialize: bool = False,
+        overwrite: bool = False,
         **kwargs,
     ) -> None:
         """
@@ -1341,6 +1426,9 @@ class Map(MapWidget):
             before_id (str, optional): The ID of an existing layer before which
                 the new layer should be inserted.
             ee_initialize (bool, optional): Whether to initialize the Earth Engine
+                account. Default is False.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Additional keyword arguments to be passed to the underlying
                 `add_tile_layer` method.
 
@@ -1368,6 +1456,7 @@ class Map(MapWidget):
                     opacity=opacity,
                     visible=visible,
                     before_id=before_id,
+                    overwrite=overwrite,
                     **kwargs,
                 )
             else:
@@ -1389,6 +1478,7 @@ class Map(MapWidget):
                     opacity=opacity,
                     visible=visible,
                     before_id=before_id,
+                    overwrite=overwrite,
                     **kwargs,
                 )
             except Exception as e:
@@ -1410,6 +1500,7 @@ class Map(MapWidget):
         titiler_endpoint: str = None,
         fit_bounds: bool = True,
         before_id: Optional[str] = None,
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1435,6 +1526,8 @@ class Map(MapWidget):
                 Defaults to "https://titiler.xyz".
             fit_bounds (bool, optional): Whether to adjust the viewport of
                 the map to fit the bounds of the layer. Defaults to True.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Arbitrary keyword arguments, including bidx, expression,
                 nodata, unscale, resampling, rescale, color_formula, colormap,
                     colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
@@ -1454,7 +1547,13 @@ class Map(MapWidget):
         )
         bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
-            tile_url, name, attribution, opacity, visible, before_id=before_id
+            tile_url,
+            name,
+            attribution,
+            opacity,
+            visible,
+            before_id=before_id,
+            overwrite=overwrite,
         )
         if fit_bounds:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
@@ -1474,6 +1573,7 @@ class Map(MapWidget):
         visible: bool = True,
         fit_bounds: bool = True,
         before_id: Optional[str] = None,
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -1508,6 +1608,8 @@ class Map(MapWidget):
                 be zoomed to the layer extent. Defaults to True.
             before_id (str, optional): The ID of an existing layer before which
                 the new layer should be inserted.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
             **kwargs: Arbitrary keyword arguments, including bidx, expression,
                 nodata, unscale, resampling, rescale, color_formula, colormap,
                 colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
@@ -1534,7 +1636,13 @@ class Map(MapWidget):
         )
         bounds = common.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(
-            tile_url, name, attribution, opacity, visible, before_id=before_id
+            tile_url,
+            name,
+            attribution,
+            opacity,
+            visible,
+            before_id=before_id,
+            overwrite=overwrite,
         )
         if fit_bounds:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
@@ -1547,7 +1655,6 @@ class Map(MapWidget):
         vmin=None,
         vmax=None,
         nodata=None,
-        attribution="Localtileserver",
         name="Raster",
         before_id=None,
         fit_bounds=True,
@@ -1555,6 +1662,7 @@ class Map(MapWidget):
         opacity=1.0,
         array_args={},
         client_args={"cors_all": True},
+        overwrite: bool = True,
         **kwargs,
     ):
         """Add a local raster dataset to the map.
@@ -1594,14 +1702,24 @@ class Map(MapWidget):
                 `array_to_memory_file` when reading the raster. Defaults to {}.
             client_args (dict, optional): Additional arguments to pass to
                 localtileserver.TileClient. Defaults to { "cors_all": False }.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to True.
+            **kwargs: Additional keyword arguments to be passed to the underlying
+                `add_tile_layer` method.
         """
         import numpy as np
         import xarray as xr
 
+        if "zoom_to_layer" in kwargs:
+            fit_bounds = kwargs.pop("zoom_to_layer")
+
+        if "layer_name" in kwargs:
+            name = kwargs.pop("layer_name")
+
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
             source = common.array_to_image(source, **array_args)
 
-        tile_layer, tile_client = common.get_local_tile_layer(
+        url, tile_client = common.get_local_tile_url(
             source,
             indexes=indexes,
             colormap=colormap,
@@ -1609,20 +1727,21 @@ class Map(MapWidget):
             vmax=vmax,
             nodata=nodata,
             opacity=opacity,
-            attribution=attribution,
-            layer_name=name,
             client_args=client_args,
             return_client=True,
             **kwargs,
         )
 
+        if overwrite and name in self.get_layer_names():
+            self.remove_layer(name)
+
         self.add_tile_layer(
-            tile_layer.url,
+            url,
             name=name,
             opacity=opacity,
             visible=visible,
-            attribution=attribution,
             before_id=before_id,
+            overwrite=overwrite,
         )
 
         bounds = tile_client.bounds()  # [ymin, ymax, xmin, xmax]
@@ -1809,6 +1928,8 @@ class Map(MapWidget):
             if "paint" in layer:
                 layer["paint"][prop_name] = opacity
         super().set_paint_property(name, prop_name, opacity)
+        # if self.layer_manager is not None:
+        #     self.layer_manager.refresh()
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
@@ -1825,6 +1946,8 @@ class Map(MapWidget):
         """
         super().set_visibility(name, visible)
         self.layer_dict[name]["visible"] = visible
+        # if self.layer_manager is not None:
+        #     self.layer_manager.refresh()
 
     def layer_interact(self, name=None):
         """Create a layer widget for changing the visibility and opacity of a layer.
@@ -4847,6 +4970,62 @@ class Map(MapWidget):
             layer, before_id=before_id, name=name, opacity=opacity, visible=visible
         )
 
+    @property
+    def user_roi(self) -> Optional[dict]:
+        """Gets the first user-drawn ROI feature.
+
+        Returns:
+            Optional[dict]: The first user-drawn ROI feature or None if no features are drawn.
+        """
+        if len(self.draw_features_created) > 0:
+            return self.draw_features_created[0]
+        else:
+            return None
+
+    @property
+    def user_rois(self) -> list:
+        """Gets all user-drawn ROI features.
+
+        Returns:
+            list: A list of all user-drawn ROI features.
+        """
+        return self.draw_feature_collection_all
+
+    def user_roi_bounds(self, decimals: int = 4) -> Optional[list]:
+        """Gets the bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy).
+
+        Args:
+            decimals (int, optional): The number of decimals to round the coordinates to. Defaults to 4.
+
+        Returns:
+            Optional[list]: The bounds of the user drawn ROI as a tuple of (minx, miny, maxx, maxy), or None if no ROI is drawn.
+        """
+        if self.user_roi is not None:
+            return common.geometry_bounds(self.user_roi, decimals=decimals)
+        else:
+            return None
+
+    @property
+    def bounds(self) -> tuple:
+        """Gets the bounds of the map view state.
+
+        Returns:
+            tuple: A tuple of two tuples, each containing (lat, lng) coordinates for the southwest and northeast corners of the map view.
+        """
+        sw = self.view_state["bounds"]["_sw"]
+        ne = self.view_state["bounds"]["_ne"]
+        coords = ((sw["lat"], sw["lng"]), (ne["lat"], ne["lng"]))
+        return coords
+
+    def get_layer_names(self) -> list:
+        """Gets layer names as a list.
+
+        Returns:
+            list: A list of layer names.
+        """
+        layer_names = list(self.layer_dict.keys())
+        return layer_names
+
 
 class Container(v.Container):
     """
@@ -4894,6 +5073,7 @@ class Container(v.Container):
         self.min_width = min_width
         self.max_width = max_width
         self.host_map = host_map
+        self.sidebar_widgets = {}
 
         # Map display container (left column)
         self.map_container = v.Col(
@@ -5055,6 +5235,9 @@ class Container(v.Container):
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
 
+        if label in self.sidebar_widgets:
+            self.remove_from_sidebar(name=label)
+
         if add_header:
             widget = CustomWidget(
                 widget,
@@ -5069,14 +5252,27 @@ class Container(v.Container):
             )
 
         self.sidebar_content_box.children += (widget,)
+        self.sidebar_widgets[label] = widget
 
-    def remove_from_sidebar(self, widget: widgets.Widget) -> None:
+    def remove_from_sidebar(
+        self, widget: widgets.Widget = None, name: str = None
+    ) -> None:
         """
         Removes a widget from the sidebar content.
 
         Args:
             widget (widgets.Widget): The widget to remove from the sidebar.
+            name (str): The name of the widget to remove from the sidebar.
         """
+        key = None
+        for key, value in self.sidebar_widgets.items():
+            if value == widget or key == name:
+                if widget is None:
+                    widget = self.sidebar_widgets[key]
+                break
+
+        if key is not None and key in self.sidebar_widgets:
+            self.sidebar_widgets.pop(key)
         self.sidebar_content_box.children = tuple(
             child for child in self.sidebar_content_box.children if child != widget
         )
