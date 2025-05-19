@@ -5132,7 +5132,7 @@ class Container(v.Container):
         )
 
         # Sidebar (right column)
-        self.sidebar = v.Col(class_="pa-1")
+        self.sidebar = v.Col(class_="pa-1", style_="overflow-y: hidden;")
         self.update_sidebar_content()
 
         # Main layout row
@@ -7159,6 +7159,14 @@ class LayerManagerWidget(v.ExpansionPanels):
                     )
                 self.layer_items.pop(layer_name, None)
 
+            def on_settings_clicked(btn, layer_name=name):
+                style_widget = LayerStyleWidget(self.m.layer_dict[layer_name], self.m)
+                self.m.add_to_sidebar(
+                    style_widget,
+                    widget_icon="mdi-palette",
+                    label=f"Style {layer_name}",
+                )
+
             checkbox.observe(on_visibility_change, names="value")
             slider.observe(on_opacity_change, names="value")
 
@@ -7170,6 +7178,10 @@ class LayerManagerWidget(v.ExpansionPanels):
                 lambda btn, r=row, n=name: on_remove_clicked(
                     btn, layer_name=n, row_ref=r
                 )
+            )
+
+            settings.on_click(
+                lambda btn, n=name: on_settings_clicked(btn, layer_name=n)
             )
 
             rows.append(row)
@@ -7344,3 +7356,254 @@ class CustomWidget(v.ExpansionPanels):
             widgets_list (List[widgets.Widget]): A list of widgets to set as the content of the content box.
         """
         self.content_box.children = widgets_list
+
+
+class LayerStyleWidget(widgets.VBox):
+    """
+    A widget for styling map layers interactively.
+
+    Args:
+        layer (dict): The layer to style.
+        map_widget (ipyleaflet.Map or folium.Map): The map widget to update.
+        widget_width (str, optional): The width of the widget. Defaults to "270px".
+        label_width (str, optional): The width of the label. Defaults to "130px".
+    """
+
+    def __init__(
+        self,
+        layer: dict,
+        map_widget: Map,
+        widget_width: str = "270px",
+        label_width: str = "130px",
+    ):
+        super().__init__()
+        self.layer = layer
+        self.map = map_widget
+        self.layer_type = self._get_layer_type()
+        self.layer_id = layer["layer"].id
+        self.layer_paint = layer["layer"].paint
+        self.original_style = self._get_current_style()
+        self.widget_width = widget_width
+        self.label_width = label_width
+
+        # Create the styling widgets based on layer type
+        self.style_widgets = self._create_style_widgets()
+
+        # Create buttons
+        self.apply_btn = widgets.Button(
+            description="Apply",
+            button_style="primary",
+            tooltip="Apply style changes",
+            layout=widgets.Layout(width="auto"),
+        )
+
+        self.reset_btn = widgets.Button(
+            description="Reset",
+            button_style="warning",
+            tooltip="Reset to original style",
+            layout=widgets.Layout(width="auto"),
+        )
+
+        self.close_btn = widgets.Button(
+            description="Close",
+            button_style="",
+            tooltip="Close the widget",
+            layout=widgets.Layout(width="auto"),
+        )
+
+        self.output_widget = widgets.Output()
+
+        # Button container
+        self.button_box = widgets.HBox([self.apply_btn, self.reset_btn, self.close_btn])
+
+        # Add button callbacks
+        self.apply_btn.on_click(self._apply_style)
+        self.reset_btn.on_click(self._reset_style)
+        self.close_btn.on_click(self._close_widget)
+
+        # Layout
+        self.layout = widgets.Layout(width="300px", padding="10px")
+
+        # Combine all widgets
+        self.children = [*self.style_widgets, self.button_box, self.output_widget]
+
+    def _get_layer_type(self) -> str:
+        """Determine the layer type."""
+        return self.layer["type"]
+
+    def _get_current_style(self) -> dict:
+        """Get the current layer style."""
+        return self.layer_paint
+
+    def _create_style_widgets(self) -> List[widgets.Widget]:
+        """Create style widgets based on layer type."""
+        widgets_list = []
+
+        if self.layer_type == "circle":
+            widgets_list.extend(
+                [
+                    self._create_color_picker(
+                        "Circle Color", "circle-color", "#3388ff"
+                    ),
+                    self._create_number_slider(
+                        "Circle Radius", "circle-radius", 6, 1, 20
+                    ),
+                    self._create_number_slider(
+                        "Circle Opacity", "circle-opacity", 0.8, 0, 1, 0.05
+                    ),
+                    self._create_number_slider(
+                        "Circle Blur", "circle-blur", 0, 0, 1, 0.05
+                    ),
+                    self._create_color_picker(
+                        "Circle Stroke Color", "circle-stroke-color", "#3388ff"
+                    ),
+                    self._create_number_slider(
+                        "Circle Stroke Width", "circle-stroke-width", 1, 0, 5
+                    ),
+                    self._create_number_slider(
+                        "Circle Stroke Opacity",
+                        "circle-stroke-opacity",
+                        1.0,
+                        0,
+                        1,
+                        0.05,
+                    ),
+                ]
+            )
+
+        elif self.layer_type == "line":
+            widgets_list.extend(
+                [
+                    self._create_color_picker("Line Color", "line-color", "#3388ff"),
+                    self._create_number_slider("Line Width", "line-width", 2, 1, 10),
+                    self._create_number_slider(
+                        "Line Opacity", "line-opacity", 1.0, 0, 1, 0.05
+                    ),
+                    self._create_number_slider("Line Blur", "line-blur", 0, 0, 1, 0.05),
+                    self._create_dropdown(
+                        "Line Style",
+                        "line-dasharray",
+                        [
+                            ("Solid", [1]),
+                            ("Dashed", [2, 4]),
+                            ("Dotted", [1, 4]),
+                            ("Dash-dot", [2, 4, 8, 4]),
+                        ],
+                    ),
+                ]
+            )
+
+        elif self.layer_type == "fill":
+            widgets_list.extend(
+                [
+                    self._create_color_picker("Fill Color", "fill-color", "#3388ff"),
+                    self._create_number_slider(
+                        "Fill Opacity", "fill-opacity", 0.2, 0, 1, 0.05
+                    ),
+                    self._create_color_picker(
+                        "Fill Outline Color", "fill-outline-color", "#3388ff"
+                    ),
+                ]
+            )
+        else:
+            widgets_list.extend(
+                [widgets.HTML(value=f"Layer type {self.layer_type} is not supported.")]
+            )
+
+        return widgets_list
+
+    def _create_color_picker(
+        self, description: str, property_name: str, default_color: str
+    ) -> widgets.ColorPicker:
+        """Create a color picker widget."""
+        return widgets.ColorPicker(
+            description=description,
+            value=self.original_style.get(property_name, default_color),
+            layout=widgets.Layout(
+                width=self.widget_width, description_width=self.label_width
+            ),
+            style={"description_width": "initial"},
+        )
+
+    def _create_number_slider(
+        self,
+        description: str,
+        property_name: str,
+        default_value: float,
+        min_val: float,
+        max_val: float,
+        step: float = 1,
+    ) -> widgets.FloatSlider:
+        """Create a number slider widget."""
+        return widgets.FloatSlider(
+            description=description,
+            value=self.original_style.get(property_name, default_value),
+            min=min_val,
+            max=max_val,
+            step=step,
+            layout=widgets.Layout(
+                width=self.widget_width, description_width=self.label_width
+            ),
+            style={"description_width": "initial"},
+            continuous_update=False,
+        )
+
+    def _create_dropdown(
+        self,
+        description: str,
+        property_name: str,
+        options: List[Tuple[str, List[float]]],
+    ) -> widgets.Dropdown:
+        """Create a dropdown widget."""
+        return widgets.Dropdown(
+            description=description,
+            options=options,
+            value=self.original_style.get(property_name, options[0][1]),
+            layout=widgets.Layout(
+                width=self.widget_width, description_width=self.label_width
+            ),
+            style={"description_width": "initial"},
+        )
+
+    def _apply_style(self, _) -> None:
+        """Apply the style changes to the layer."""
+        new_style = {}
+
+        for widget in self.style_widgets:
+            if isinstance(widget, widgets.ColorPicker):
+                property_name = widget.description.lower().replace(" ", "-")
+                new_style[property_name] = widget.value
+            elif isinstance(widget, widgets.FloatSlider):
+                property_name = widget.description.lower().replace(" ", "-")
+                new_style[property_name] = widget.value
+            elif isinstance(widget, widgets.Dropdown):
+                property_name = widget.description.lower().replace(" ", "-")
+                new_style[property_name] = widget.value
+
+        with self.output_widget:
+            try:
+                for key, value in new_style.items():
+                    if key == "line-style":
+                        key = "line-dasharray"
+                    self.map.set_paint_property(self.layer["layer"].id, key, value)
+            except Exception as e:
+                print(e)
+
+        self.map.layer_manager.refresh()
+
+    def _reset_style(self, _) -> None:
+        """Reset to original style."""
+
+        # Update widgets to reflect original style
+        for widget in self.style_widgets:
+            if isinstance(
+                widget, (widgets.ColorPicker, widgets.FloatSlider, widgets.Dropdown)
+            ):
+                property_name = widget.description.lower().replace(" ", "-")
+                if property_name in self.original_style:
+                    widget.value = self.original_style[property_name]
+
+    def _close_widget(self, _) -> None:
+        """Close the widget."""
+        self.close()
+        self.map.remove_from_sidebar(name=f"Style {self.layer['layer'].id}")
