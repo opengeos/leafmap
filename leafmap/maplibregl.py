@@ -5029,6 +5029,87 @@ class Map(MapWidget):
         layer_names = list(self.layer_dict.keys())
         return layer_names
 
+    def add_annotation_widget(
+        self,
+        properties: Optional[Dict[str, List[Any]]] = None,
+        time_format: str = "%Y%m%dT%H%M%S",
+        out_dir: Optional[str] = None,
+        filename_prefix: str = "",
+        file_ext: str = "geojson",
+        add_mapillary: bool = False,
+        style: str = "photo",
+        radius: float = 0.00005,
+        width: int = 300,
+        height: int = 420,
+        frame_border: int = 0,
+        download: bool = True,
+        name: str = None,
+        paint: Dict[str, Any] = None,
+        add_header: bool = True,
+        widget_icon: str = "mdi-drawing",
+        close_icon: str = "mdi-close",
+        label: str = "Annotation",
+        background_color: str = "#f5f5f5",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds an annotation widget to the map.
+
+        This method creates a vector data widget for annotations and adds it to the map's sidebar.
+
+        Args:
+            properties (Optional[Dict[str, List[Any]]], optional): Properties of the annotation. Defaults to None.
+            time_format (str, optional): Format for the timestamp. Defaults to "%Y%m%dT%H%M%S".
+            out_dir (Optional[str], optional): Output directory for the annotation data. Defaults to None.
+            filename_prefix (str, optional): Prefix for the filename of the annotation data. Defaults to "".
+            file_ext (str, optional): File extension for the annotation data. Defaults to "geojson".
+            add_mapillary (bool, optional): Whether to add Mapillary data. Defaults to False.
+            style (str, optional): Style of the annotation. Defaults to "photo".
+            radius (float, optional): Radius of the annotation. Defaults to 0.00005.
+            width (int, optional): Width of the annotation widget. Defaults to 300.
+            height (int, optional): Height of the annotation widget. Defaults to 420.
+            frame_border (int, optional): Border width of the annotation widget frame. Defaults to 0.
+            download (bool, optional): Whether to allow downloading the annotation data. Defaults to True.
+            name (str, optional): Name of the annotation widget. Defaults to None.
+            paint (Dict[str, Any], optional): Paint properties for the annotation. Defaults to None.
+            add_header (bool, optional): Whether to add a header to the annotation widget. Defaults to True.
+            widget_icon (str, optional): Icon for the annotation widget. Defaults to "mdi-drawing".
+            close_icon (str, optional): Icon for closing the annotation widget. Defaults to "mdi-close".
+            label (str, optional): Label for the annotation widget. Defaults to "Annotation".
+            background_color (str, optional): Background color of the annotation widget. Defaults to "#f5f5f5".
+            expanded (bool, optional): Whether the annotation widget is expanded by default. Defaults to True.
+            **kwargs (Any, optional): Additional keyword arguments for the add_to_sidebar method.
+        """
+        widget = create_vector_data(
+            self,
+            properties=properties,
+            time_format=time_format,
+            out_dir=out_dir,
+            filename_prefix=filename_prefix,
+            file_ext=file_ext,
+            add_mapillary=add_mapillary,
+            style=style,
+            radius=radius,
+            width=width,
+            height=height,
+            frame_border=frame_border,
+            download=download,
+            name=name,
+            paint=paint,
+            return_sidebar=True,
+        )
+        self.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            expanded=expanded,
+            **kwargs,
+        )
+
 
 class Container(v.Container):
     """
@@ -6353,6 +6434,7 @@ def create_vector_data(
     download: bool = True,
     name: str = None,
     paint: Dict[str, Any] = None,
+    return_sidebar: bool = False,
     **kwargs: Any,
 ) -> widgets.VBox:
     """Generates a widget-based interface for creating and managing vector data on a map.
@@ -6395,6 +6477,8 @@ def create_vector_data(
         paint (Dict[str, Any], optional): A dictionary specifying the paint properties for the
             drawn features. This can include properties like "circle-radius", "circle-color",
             "circle-opacity", "circle-stroke-color", and "circle-stroke-width". Defaults to None.
+        return_sidebar (bool, optional): Whether to return the sidebar widget. Defaults to False.
+
         **kwargs (Any): Additional keyword arguments that may be passed to the add_geojson method.
 
     Returns:
@@ -6618,22 +6702,26 @@ def create_vector_data(
         image_widget,
     ]
 
-    left_col_layout = v.Col(
-        cols=column_widths[0],
-        children=[m],
-        class_="pa-1",  # padding for consistent spacing
-    )
-    right_col_layout = v.Col(
-        cols=column_widths[1],
-        children=[sidebar_widget],
-        class_="pa-1",  # padding for consistent spacing
-    )
-    row1 = v.Row(
-        class_="d-flex flex-wrap",
-        children=[left_col_layout, right_col_layout],
-    )
-    main_widget = v.Col(children=[row1])
-    return main_widget
+    if return_sidebar:
+        return sidebar_widget
+    else:
+
+        left_col_layout = v.Col(
+            cols=column_widths[0],
+            children=[m],
+            class_="pa-1",  # padding for consistent spacing
+        )
+        right_col_layout = v.Col(
+            cols=column_widths[1],
+            children=[sidebar_widget],
+            class_="pa-1",  # padding for consistent spacing
+        )
+        row1 = v.Row(
+            class_="d-flex flex-wrap",
+            children=[left_col_layout, right_col_layout],
+        )
+        main_widget = v.Col(children=[row1])
+        return main_widget
 
 
 def edit_vector_data(
