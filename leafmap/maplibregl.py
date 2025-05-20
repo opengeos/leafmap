@@ -2624,21 +2624,22 @@ class Map(MapWidget):
 
     def add_symbol(
         self,
-        source: str,
+        source: Union[str, Dict],
         image: str,
         icon_size: int = 1,
         symbol_placement: str = "line",
         minzoom: Optional[float] = None,
         maxzoom: Optional[float] = None,
         filter: Optional[Any] = None,
-        name: Optional[str] = None,
+        name: Optional[str] = "symbol",
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
         Adds a symbol to the map.
 
         Args:
-            source (str): The source of the symbol.
+            source (Union[str, Dict]): The source of the symbol.
             image (str): The URL or local file path to the image. Default to the arrow image.
                 at https://assets.gishub.org/images/arrow.png.
             icon_size (int, optional): The size of the symbol. Defaults to 1.
@@ -2657,13 +2658,21 @@ class Map(MapWidget):
         id = f"image_{common.random_string(3)}"
         self.add_image(id, image)
 
-        if name is None:
-            name = f"symbol_{common.random_string(3)}"
+        name = common.get_unique_name(name, self.get_layer_names(), overwrite)
+
+        if isinstance(source, str):
+            geojson = gpd.read_file(source).__geo_interface__
+            geojson_source = {"type": "geojson", "data": geojson}
+            self.add_source(name, geojson_source)
+        elif isinstance(source, dict):
+            self.add_source(name, source)
+        else:
+            raise ValueError("The source must be a string or a dictionary.")
 
         layer = {
             "id": name,
             "type": "symbol",
-            "source": source,
+            "source": name,
             "layout": {
                 "icon-image": id,
                 "icon-size": icon_size,
@@ -2689,6 +2698,8 @@ class Map(MapWidget):
         image: Optional[str] = None,
         icon_size: int = 0.1,
         minzoom: Optional[float] = 19,
+        name: Optional[str] = "arrow",
+        overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -2709,7 +2720,15 @@ class Map(MapWidget):
         if image is None:
             image = "https://assets.gishub.org/images/arrow.png"
 
-        self.add_symbol(source, image, icon_size, minzoom=minzoom, **kwargs)
+        self.add_symbol(
+            source,
+            image,
+            icon_size,
+            minzoom=minzoom,
+            name=name,
+            overwrite=overwrite,
+            **kwargs,
+        )
 
     def to_streamlit(
         self,
@@ -7700,3 +7719,210 @@ class LayerStyleWidget(widgets.VBox):
         """Close the widget."""
         self.close()
         self.map.remove_from_sidebar(name=f"Style {self.layer['layer'].id}")
+
+
+class DateFilterWidget(widgets.VBox):
+    """
+    A widget for filtering data based on time range.
+    """
+
+    def __init__(
+        self,
+        sources: List[Dict[str, Any]],
+        names: List[str] = None,
+        styles: Dict[str, Any] = None,
+        start_date_col: str = "startDate",
+        end_date_col: str = "endDate",
+        date_col: str = None,
+        date_format: str = "%Y-%m-%d",
+        min_date: str = None,
+        max_date: str = None,
+        file_index: int = 0,
+        freq: str = "D",
+        unit: str = "ms",
+        map_widget: Map = None,
+    ) -> None:
+        """
+        Initialize the DateFilterWidget.
+
+        Args:
+            sources (List[Dict[str, Any]]): List of data sources.
+            names (List[str], optional): List of names for the data sources. Defaults to None.
+            styles (Dict[str, Any], optional): Dictionary of styles for the data sources. Defaults to None.
+            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDate".
+            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDate".
+            date_col (str, optional): Name of the column containing the date. Defaults to None.
+            date_format (str, optional): Format of the date. Defaults to "%Y-%m-%d".
+            min_date (str, optional): Minimum date. Defaults to None.
+            max_date (str, optional): Maximum date. Defaults to None.
+            file_index (int, optional): Index of the main file. Defaults to 0.
+            freq (str, optional): Frequency of the date range. Defaults to "D".
+            unit (str, optional): Unit of the date. Defaults to "ms".
+            map_widget (Map, optional): Map widget. Defaults to None.
+        """
+        from datetime import datetime
+
+        super().__init__()
+
+        if names is None:
+            names = [f"layer_{i}" for i in range(len(sources))]
+
+        gdfs = []
+        if map_widget is not None:
+            for index, source in enumerate(sources):
+                gdf = gpd.read_file(source)
+                gdfs.append(gdf)
+                style = styles[names[index]]
+                layer_type = style["layer_type"]
+                paint = style["paint"]
+                map_widget.add_gdf(
+                    gdf, name=names[index], layer_type=layer_type, paint=paint
+                )
+            map_widget.add_arrow(sources[file_index])
+
+        gdf = gdfs[file_index]
+        gdf["startDatetime"] = pd.to_datetime(gdf[start_date_col], unit=unit)
+        gdf["endDatetime"] = pd.to_datetime(gdf[end_date_col], unit=unit)
+
+        if min_date is None:
+            min_date = gdf["startDatetime"].min().normalize()
+        elif isinstance(min_date, str):
+            min_date = datetime.strptime(min_date, date_format)
+        elif isinstance(min_date, pd.Timestamp):
+            pass
+        else:
+            raise ValueError("min_date must be a string, pd.Timestamp, or None")
+
+        if max_date is None:
+            max_date = gdf["endDatetime"].max().normalize()
+        elif isinstance(max_date, str):
+            max_date = datetime.strptime(max_date, date_format)
+        elif isinstance(max_date, pd.Timestamp):
+            pass
+        else:
+            raise ValueError("max_date must be a string, pd.Timestamp, or None")
+
+        date_range = pd.date_range(min_date, max_date, freq=freq)
+        if len(date_range) < 2:
+            date_range = pd.date_range(min_date, max_date, freq=freq)
+
+        slider = widgets.SelectionRangeSlider(
+            options=list(date_range),
+            index=(0, len(date_range) - 1),
+            description="Date range:",
+            orientation="horizontal",
+            continuous_update=True,
+            readout=False,
+            style={"description_width": "initial"},
+            layout=widgets.Layout(width="95%"),
+        )
+
+        range_label = widgets.Label()
+
+        date_picker = widgets.DatePicker(
+            value=min_date.date(),
+            layout=widgets.Layout(width="130px"),
+        )
+
+        # Buttons with valid FontAwesome icons
+        start_btn = widgets.Button(
+            icon="fast-backward",
+            tooltip="Go to start date",
+            layout=widgets.Layout(width="38px", height="25px"),
+        )
+        end_btn = widgets.Button(
+            icon="fast-forward",
+            tooltip="Go to end date",
+            layout=widgets.Layout(width="38px", height="25px"),
+        )
+        forward_btn = widgets.Button(
+            icon="forward",
+            tooltip="Forward one day",
+            layout=widgets.Layout(width="38px", height="25px"),
+        )
+        backward_btn = widgets.Button(
+            icon="backward",
+            tooltip="Back one day",
+            layout=widgets.Layout(width="38px", height="25px"),
+        )
+
+        nav_box = widgets.HBox(
+            [backward_btn, start_btn, date_picker, end_btn, forward_btn]
+        )
+        output = widgets.Output()
+
+        def clamp_end(start: pd.Timestamp) -> pd.Timestamp:
+            """Ensure the end is at least one day after the start."""
+            next_day = start + pd.Timedelta(days=1)
+            return next_day if next_day <= max_date else max_date
+
+        def update_date_picker():
+            start, end = slider.value
+            date_picker.value = start.date()
+
+        def on_date_picker_change(change):
+            if change["name"] == "value" and change["type"] == "change":
+                new_start = pd.Timestamp(change["new"])
+                _, end = slider.value
+                # Do not clamp unless end <= new_start
+                if new_start > end:
+                    slider.value = (new_start, new_start + pd.Timedelta(days=1))
+                else:
+                    slider.value = (new_start, end)
+
+        def on_start_btn_click(_):
+            start = min_date
+            end = clamp_end(start)
+            slider.value = (start, end)
+
+        def on_end_btn_click(_):
+            start = max_date - pd.Timedelta(days=1)
+            if start < min_date:
+                start = min_date
+            end = clamp_end(start)
+            slider.value = (start, end)
+
+        def on_forward_btn_click(_):
+            start, _ = slider.value
+            next_start = start + pd.Timedelta(days=1)
+            if next_start <= max_date - pd.Timedelta(days=1):
+                slider.value = (next_start, clamp_end(next_start))
+
+        def on_backward_btn_click(_):
+            start, _ = slider.value
+            prev_start = start - pd.Timedelta(days=1)
+            if prev_start >= min_date:
+                slider.value = (prev_start, clamp_end(prev_start))
+
+        def on_slider_change(change):
+            if slider.value:
+                start, end = slider.value
+                range_label.value = f"Selected range: {start.strftime(date_format)} to {end.strftime(date_format)}"
+                filtered_gdf = gdf[
+                    (gdf["startDatetime"] >= start) & (gdf["endDatetime"] <= end)
+                ]
+                map_widget.set_data(names[file_index], filtered_gdf.__geo_interface__)
+                if "arrow" in map_widget.get_layer_names():
+                    map_widget.set_data("arrow", filtered_gdf.__geo_interface__)
+
+                for index, point_gdf in enumerate(gdfs[file_index + 1 :]):
+                    filtered = point_gdf[
+                        (point_gdf[date_col] >= start) & (point_gdf[date_col] <= end)
+                    ]
+
+                    map_widget.set_data(
+                        names[index + file_index + 1], filtered.__geo_interface__
+                    )
+                update_date_picker()
+
+        slider.observe(on_slider_change, names="value")
+        date_picker.observe(on_date_picker_change)
+        start_btn.on_click(on_start_btn_click)
+        end_btn.on_click(on_end_btn_click)
+        forward_btn.on_click(on_forward_btn_click)
+        backward_btn.on_click(on_backward_btn_click)
+
+        # Initial trigger
+        on_slider_change(None)
+
+        self.children = [slider, range_label, nav_box, output]
