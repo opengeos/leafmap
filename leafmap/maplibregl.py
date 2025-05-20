@@ -833,6 +833,16 @@ class Map(MapWidget):
         super().add_source(id, source)
         self.source_dict[id] = source
 
+    def remove_source(self, id: str) -> None:
+        """
+        Removes a source from the map.
+        """
+        super().add_call("removeSource", id)
+        if id in self.source_dict:
+            self.source_dict.pop(id)
+        if id in self.source_names:
+            self.source_names.remove(id)
+
     def set_center(self, lon: float, lat: float, zoom: Optional[int] = None) -> None:
         """
         Sets the center of the map.
@@ -1002,7 +1012,10 @@ class Map(MapWidget):
                 layer_name = "OpenStreetMap"
             else:
                 layer_name = name
-        layer = Layer(id=layer_name, source=raster_source, type=LayerType.RASTER)
+
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, raster_source)
+        layer = Layer(id=layer_name, source=source_name, type=LayerType.RASTER)
         self.add_layer(layer)
         self.set_opacity(layer_name, opacity)
         self.set_visibility(layer_name, visible)
@@ -1329,7 +1342,9 @@ class Map(MapWidget):
             tile_size=tile_size,
             **source_args,
         )
-        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER, **kwargs)
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, raster_source)
+        layer = Layer(id=name, source=source_name, type=LayerType.RASTER, **kwargs)
         self.add_layer(layer, before_id=before_id, name=name, overwrite=overwrite)
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
@@ -2183,7 +2198,9 @@ class Map(MapWidget):
             attribution=tile["attribution"],
             tile_size=256,
         )
-        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, raster_source)
+        layer = Layer(id=name, source=source_name, type=LayerType.RASTER)
         self.add_layer(layer)
         self.set_opacity(name, 1.0)
         self.set_visibility(name, True)
@@ -2224,7 +2241,9 @@ class Map(MapWidget):
                 attribution=tile["attribution"],
                 tile_size=256,
             )
-            layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+            source_name = common.get_unique_name("source", self.source_names)
+            self.add_source(source_name, raster_source)
+            layer = Layer(id=name, source=source_name, type=LayerType.RASTER)
             self.add_layer(layer)
             self.set_opacity(name, 1.0)
             self.set_visibility(name, True)
