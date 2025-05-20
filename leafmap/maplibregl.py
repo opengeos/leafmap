@@ -511,9 +511,9 @@ class Map(MapWidget):
             name = layer.id
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
+
         if name in self.get_layer_names():
             self.remove_layer(name)
-            self.layer_dict.pop(name)
 
         if (
             "paint" in layer.to_dict()
@@ -833,6 +833,36 @@ class Map(MapWidget):
         super().add_source(id, source)
         self.source_dict[id] = source
 
+    def remove_source(self, id: str) -> None:
+        """
+        Removes a source from the map.
+        """
+        super().add_call("removeSource", id)
+        if id in self.source_dict:
+            self.source_dict.pop(id)
+        if id in self.source_names:
+            self.source_names.remove(id)
+
+    def set_data(self, id: str, data: Union[str, Dict]) -> None:
+        """
+        Sets the data for a source.
+
+        Args:
+            id (str): The ID of the source.
+            data (str or dict): The data to set for the source.
+
+        Returns:
+            None
+        """
+        if id in self.layer_names:
+            id = self.layer_dict[id]["layer"].source
+        elif id in self.source_names:
+            pass
+        else:
+            raise ValueError(f"Source {id} not found.")
+
+        super().set_data(id, data)
+
     def set_center(self, lon: float, lat: float, zoom: Optional[int] = None) -> None:
         """
         Sets the center of the map.
@@ -1002,7 +1032,10 @@ class Map(MapWidget):
                 layer_name = "OpenStreetMap"
             else:
                 layer_name = name
-        layer = Layer(id=layer_name, source=raster_source, type=LayerType.RASTER)
+
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, raster_source)
+        layer = Layer(id=layer_name, source=source_name, type=LayerType.RASTER)
         self.add_layer(layer)
         self.set_opacity(layer_name, opacity)
         self.set_visibility(layer_name, visible)
@@ -1085,12 +1118,12 @@ class Map(MapWidget):
         else:
             raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, source)
+
         if name is None:
-            layer_names = list(self.layer_dict.keys())
-            if "geojson" not in layer_names:
-                name = "geojson"
-            else:
-                name = f"geojson_{common.random_string()}"
+            name = "GeoJSON"
+        name = common.get_unique_name(name, self.layer_names, overwrite)
 
         if filter is not None:
             kwargs["filter"] = filter
@@ -1127,7 +1160,7 @@ class Map(MapWidget):
         layer = Layer(
             id=name,
             type=layer_type,
-            source=source,
+            source=source_name,
             **kwargs,
         )
         self.add_layer(
@@ -1329,7 +1362,9 @@ class Map(MapWidget):
             tile_size=tile_size,
             **source_args,
         )
-        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER, **kwargs)
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, raster_source)
+        layer = Layer(id=name, source=source_name, type=LayerType.RASTER, **kwargs)
         self.add_layer(layer, before_id=before_id, name=name, overwrite=overwrite)
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
@@ -1930,9 +1965,11 @@ class Map(MapWidget):
             prop_name = f"{layer_type}-opacity"
             if "paint" in layer:
                 layer["paint"][prop_name] = opacity
-        super().set_paint_property(name, prop_name, opacity)
-        # if self.layer_manager is not None:
-        #     self.layer_manager.refresh()
+        if layer_type != "symbol":
+            super().set_paint_property(name, prop_name, opacity)
+        else:
+            super().set_paint_property(name, "icon-opacity", opacity)
+            super().set_paint_property(name, "text-opacity", opacity)
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
@@ -2181,7 +2218,9 @@ class Map(MapWidget):
             attribution=tile["attribution"],
             tile_size=256,
         )
-        layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, raster_source)
+        layer = Layer(id=name, source=source_name, type=LayerType.RASTER)
         self.add_layer(layer)
         self.set_opacity(name, 1.0)
         self.set_visibility(name, True)
@@ -2222,7 +2261,9 @@ class Map(MapWidget):
                 attribution=tile["attribution"],
                 tile_size=256,
             )
-            layer = Layer(id=name, source=raster_source, type=LayerType.RASTER)
+            source_name = common.get_unique_name("source", self.source_names)
+            self.add_source(source_name, raster_source)
+            layer = Layer(id=name, source=source_name, type=LayerType.RASTER)
             self.add_layer(layer)
             self.set_opacity(name, 1.0)
             self.set_visibility(name, True)
@@ -2631,7 +2672,7 @@ class Map(MapWidget):
         minzoom: Optional[float] = None,
         maxzoom: Optional[float] = None,
         filter: Optional[Any] = None,
-        name: Optional[str] = "symbol",
+        name: Optional[str] = "Symbols",
         overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -2655,26 +2696,32 @@ class Map(MapWidget):
             None
         """
 
-        id = f"image_{common.random_string(3)}"
-        self.add_image(id, image)
+        image_id = f"image_{common.random_string(3)}"
+        self.add_image(image_id, image)
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite)
 
         if isinstance(source, str):
-            geojson = gpd.read_file(source).__geo_interface__
-            geojson_source = {"type": "geojson", "data": geojson}
-            self.add_source(name, geojson_source)
+            if source in self.get_layer_names():
+                source_name = source
+            else:
+                geojson = gpd.read_file(source).__geo_interface__
+                geojson_source = {"type": "geojson", "data": geojson}
+                source_name = common.get_unique_name(
+                    "geojson", self.get_layer_names(), overwrite
+                )
+                self.add_source(source_name, geojson_source)
         elif isinstance(source, dict):
-            self.add_source(name, source)
+            self.add_source(source_name, source)
         else:
             raise ValueError("The source must be a string or a dictionary.")
 
         layer = {
             "id": name,
             "type": "symbol",
-            "source": name,
+            "source": source_name,
             "layout": {
-                "icon-image": id,
+                "icon-image": image_id,
                 "icon-size": icon_size,
                 "symbol-placement": symbol_placement,
             },
@@ -2698,7 +2745,7 @@ class Map(MapWidget):
         image: Optional[str] = None,
         icon_size: int = 0.1,
         minzoom: Optional[float] = 19,
-        name: Optional[str] = "arrow",
+        name: Optional[str] = "Arrow",
         overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -4944,7 +4991,8 @@ class Map(MapWidget):
         """
 
         if name is None:
-            name = f"label_source_{common.random_string(3)}"
+            name = "Labels"
+        name = common.get_unique_name(name, self.layer_names)
 
         if isinstance(source, str):
             gdf = common.read_vector(source)
@@ -4962,8 +5010,8 @@ class Map(MapWidget):
             "type": "geojson",
             "data": geojson,
         }
-
-        self.add_source(name, source)
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, source)
 
         if layout is None:
             layout = {
@@ -4978,9 +5026,9 @@ class Map(MapWidget):
             }
 
         layer = {
-            "id": f"{name}_labels",
+            "id": name,
             "type": "symbol",
-            "source": name,
+            "source": source_name,
             "layout": layout,
             "paint": paint,
             "min_zoom": min_zoom,
@@ -5047,6 +5095,28 @@ class Map(MapWidget):
         """
         layer_names = list(self.layer_dict.keys())
         return layer_names
+
+    @property
+    def layer_names(self) -> list:
+        """Gets layer names as a list.
+
+        Returns:
+            list: A list of layer names.
+        """
+        return self.get_layer_names()
+
+    @property
+    def source_names(self) -> list:
+        """Gets source as a list.
+
+        Returns:
+            list: A list of sources.
+        """
+        return [
+            layer["layer"].source
+            for layer in self.layer_dict.values()
+            if layer["layer"].source is not None
+        ]
 
     def add_annotation_widget(
         self,
@@ -5125,6 +5195,83 @@ class Map(MapWidget):
             close_icon=close_icon,
             label=label,
             background_color=background_color,
+            expanded=expanded,
+            **kwargs,
+        )
+
+    def add_date_filter_widget(
+        self,
+        sources: List[Dict[str, Any]],
+        names: List[str] = None,
+        styles: Dict[str, Any] = None,
+        start_date_col: str = "startDate",
+        end_date_col: str = "endDate",
+        date_col: str = None,
+        date_format: str = "%Y-%m-%d",
+        min_date: str = None,
+        max_date: str = None,
+        file_index: int = 0,
+        freq: str = "D",
+        unit: str = "ms",
+        add_header: bool = True,
+        widget_icon: str = "mdi-filter",
+        close_icon: str = "mdi-close",
+        label: str = "Date Filter",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Initialize the DateFilterWidget.
+
+        Args:
+            sources (List[Dict[str, Any]]): List of data sources.
+            names (List[str], optional): List of names for the data sources. Defaults to None.
+            styles (Dict[str, Any], optional): Dictionary of styles for the data sources. Defaults to None.
+            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDate".
+            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDate".
+            date_col (str, optional): Name of the column containing the date. Defaults to None.
+            date_format (str, optional): Format of the date. Defaults to "%Y-%m-%d".
+            min_date (str, optional): Minimum date. Defaults to None.
+            max_date (str, optional): Maximum date. Defaults to None.
+            file_index (int, optional): Index of the main file. Defaults to 0.
+            freq (str, optional): Frequency of the date range. Defaults to "D".
+            unit (str, optional): Unit of the date. Defaults to "ms".
+            add_header (bool, optional): Whether to add a header to the widget. Defaults to True.
+            widget_icon (str, optional): Icon of the widget. Defaults to "mdi-filter".
+            close_icon (str, optional): Icon of the close button. Defaults to "mdi-close".
+            label (str, optional): Label of the widget. Defaults to "Date Filter".
+            background_color (str, optional): Background color of the widget. Defaults to "#f5f5f5".
+            height (str, optional): Height of the widget. Defaults to "40px".
+            expanded (bool, optional): Whether the widget is expanded by default. Defaults to True.
+            **kwargs (Any, optional): Additional keyword arguments for the add_to_sidebar method.
+        """
+
+        widget = DateFilterWidget(
+            sources=sources,
+            names=names,
+            styles=styles,
+            start_date_col=start_date_col,
+            end_date_col=end_date_col,
+            date_col=date_col,
+            date_format=date_format,
+            min_date=min_date,
+            max_date=max_date,
+            file_index=file_index,
+            freq=freq,
+            unit=unit,
+            map_widget=self,
+        )
+
+        self.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
             expanded=expanded,
             **kwargs,
         )
@@ -7778,7 +7925,7 @@ class DateFilterWidget(widgets.VBox):
                 map_widget.add_gdf(
                     gdf, name=names[index], layer_type=layer_type, paint=paint
                 )
-            map_widget.add_arrow(sources[file_index])
+            map_widget.add_arrow(sources[file_index], name="arrow")
 
         gdf = gdfs[file_index]
         gdf["startDatetime"] = pd.to_datetime(gdf[start_date_col], unit=unit)
