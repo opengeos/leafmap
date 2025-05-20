@@ -511,9 +511,9 @@ class Map(MapWidget):
             name = layer.id
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
+
         if name in self.get_layer_names():
             self.remove_layer(name)
-            self.layer_dict.pop(name)
 
         if (
             "paint" in layer.to_dict()
@@ -1085,12 +1085,12 @@ class Map(MapWidget):
         else:
             raise ValueError("The data must be a URL or a GeoJSON dictionary.")
 
+        source_name = common.get_unique_name("source", self.source_names)
+        self.add_source(source_name, source)
+
         if name is None:
-            layer_names = list(self.layer_dict.keys())
-            if "geojson" not in layer_names:
-                name = "geojson"
-            else:
-                name = f"geojson_{common.random_string()}"
+            name = "geojson"
+        name = common.get_unique_name(name, self.layer_names, overwrite)
 
         if filter is not None:
             kwargs["filter"] = filter
@@ -1127,7 +1127,7 @@ class Map(MapWidget):
         layer = Layer(
             id=name,
             type=layer_type,
-            source=source,
+            source=source_name,
             **kwargs,
         )
         self.add_layer(
@@ -1930,9 +1930,11 @@ class Map(MapWidget):
             prop_name = f"{layer_type}-opacity"
             if "paint" in layer:
                 layer["paint"][prop_name] = opacity
-        super().set_paint_property(name, prop_name, opacity)
-        # if self.layer_manager is not None:
-        #     self.layer_manager.refresh()
+        if layer_type != "symbol":
+            super().set_paint_property(name, prop_name, opacity)
+        else:
+            super().set_paint_property(name, "icon-opacity", opacity)
+            super().set_paint_property(name, "text-opacity", opacity)
 
     def set_visibility(self, name: str, visible: bool) -> None:
         """
@@ -2631,7 +2633,7 @@ class Map(MapWidget):
         minzoom: Optional[float] = None,
         maxzoom: Optional[float] = None,
         filter: Optional[Any] = None,
-        name: Optional[str] = "symbol",
+        name: Optional[str] = "Symbols",
         overwrite: bool = False,
         **kwargs: Any,
     ) -> None:
@@ -2655,26 +2657,32 @@ class Map(MapWidget):
             None
         """
 
-        id = f"image_{common.random_string(3)}"
-        self.add_image(id, image)
+        image_id = f"image_{common.random_string(3)}"
+        self.add_image(image_id, image)
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite)
 
         if isinstance(source, str):
-            geojson = gpd.read_file(source).__geo_interface__
-            geojson_source = {"type": "geojson", "data": geojson}
-            self.add_source(name, geojson_source)
+            if source in self.get_layer_names():
+                source_name = source
+            else:
+                geojson = gpd.read_file(source).__geo_interface__
+                geojson_source = {"type": "geojson", "data": geojson}
+                source_name = common.get_unique_name(
+                    "geojson", self.get_layer_names(), overwrite
+                )
+                self.add_source(source_name, geojson_source)
         elif isinstance(source, dict):
-            self.add_source(name, source)
+            self.add_source(source_name, source)
         else:
             raise ValueError("The source must be a string or a dictionary.")
 
         layer = {
             "id": name,
             "type": "symbol",
-            "source": name,
+            "source": source_name,
             "layout": {
-                "icon-image": id,
+                "icon-image": image_id,
                 "icon-size": icon_size,
                 "symbol-placement": symbol_placement,
             },
@@ -5047,6 +5055,28 @@ class Map(MapWidget):
         """
         layer_names = list(self.layer_dict.keys())
         return layer_names
+
+    @property
+    def layer_names(self) -> list:
+        """Gets layer names as a list.
+
+        Returns:
+            list: A list of layer names.
+        """
+        return self.get_layer_names()
+
+    @property
+    def source_names(self) -> list:
+        """Gets source as a list.
+
+        Returns:
+            list: A list of sources.
+        """
+        return [
+            layer["layer"].source
+            for layer in self.layer_dict.values()
+            if layer["layer"].source is not None
+        ]
 
     def add_annotation_widget(
         self,
