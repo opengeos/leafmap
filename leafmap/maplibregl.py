@@ -35,7 +35,9 @@ from .basemaps import xyz_to_leaflet
 from . import common
 from .common import (
     download_file,
+    filter_geom_type,
     find_files,
+    sort_files,
     execute_maplibre_notebook_dir,
     generate_index_html,
     geojson_to_pmtiles,
@@ -2682,7 +2684,8 @@ class Map(MapWidget):
         Args:
             source (Union[str, Dict]): The source of the symbol.
             image (str): The URL or local file path to the image. Default to the arrow image.
-                at https://assets.gishub.org/images/arrow.png.
+                at https://assets.gishub.org/images/right-arrow.png.
+                Find more icons from https://www.veryicon.com.
             icon_size (int, optional): The size of the symbol. Defaults to 1.
             symbol_placement (str, optional): The placement of the symbol. Defaults to "line".
             minzoom (Optional[float], optional): The minimum zoom level for the symbol. Defaults to None.
@@ -2759,7 +2762,8 @@ class Map(MapWidget):
         Args:
             source (str): The source layer to which the arrow symbol will be added.
             image (Optional[str], optional): The URL of the arrow image.
-                Defaults to "https://assets.gishub.org/images/arrow.png".
+                Defaults to "https://assets.gishub.org/images/right-arrow.png".
+                Find more icons from https://www.veryicon.com.
             icon_size (int, optional): The size of the icon. Defaults to 0.1.
             minzoom (Optional[float], optional): The minimum zoom level at which
                 the arrow symbol will be visible. Defaults to 19.
@@ -2769,7 +2773,7 @@ class Map(MapWidget):
             None
         """
         if image is None:
-            image = "https://assets.gishub.org/images/arrow.png"
+            image = "https://assets.gishub.org/images/right-arrow.png"
 
         self.add_symbol(
             source,
@@ -4774,6 +4778,8 @@ class Map(MapWidget):
         image_minzoom: int = 17,
         add_popup: bool = True,
         access_token: str = None,
+        opacity: float = 1.0,
+        visible: bool = True,
     ) -> None:
         """
         Adds Mapillary layers to the map.
@@ -4789,6 +4795,8 @@ class Map(MapWidget):
             image_minzoom (int): Minimum zoom level for the image layer. Defaults to 17.
             add_popup (bool): Whether to add popups to the layers. Defaults to True.
             access_token (str, optional): Access token for Mapillary API. Defaults to None.
+            opacity (float): Opacity of the Mapillary layers. Defaults to 1.0.
+            visible (bool): Whether the Mapillary layers are visible. Defaults to True.
 
         Raises:
             ValueError: If no access token is provided.
@@ -4844,8 +4852,20 @@ class Map(MapWidget):
             "minzoom": image_minzoom,
         }
 
-        self.add_layer(sequence_lyr, name=sequence_lyr_name, before_id=before_id)
-        self.add_layer(image_lyr, name=image_lyr_name, before_id=before_id)
+        self.add_layer(
+            sequence_lyr,
+            name=sequence_lyr_name,
+            before_id=before_id,
+            opacity=opacity,
+            visible=visible,
+        )
+        self.add_layer(
+            image_lyr,
+            name=image_lyr_name,
+            before_id=before_id,
+            opacity=opacity,
+            visible=visible,
+        )
         if add_popup:
             self.add_popup(sequence_lyr_name)
             self.add_popup(image_lyr_name)
@@ -5221,8 +5241,9 @@ class Map(MapWidget):
         min_date: str = None,
         max_date: str = None,
         file_index: int = 0,
+        group_col: str = None,
         freq: str = "D",
-        unit: str = "ms",
+        interval: int = 1,
         add_header: bool = True,
         widget_icon: str = "mdi-filter",
         close_icon: str = "mdi-close",
@@ -5246,8 +5267,10 @@ class Map(MapWidget):
             min_date (str, optional): Minimum date. Defaults to None.
             max_date (str, optional): Maximum date. Defaults to None.
             file_index (int, optional): Index of the main file. Defaults to 0.
+            group_col (str, optional): Name of the column containing the group. Defaults to None.
             freq (str, optional): Frequency of the date range. Defaults to "D".
             unit (str, optional): Unit of the date. Defaults to "ms".
+            interval (int, optional): Interval of the date range. Defaults to 1.
             add_header (bool, optional): Whether to add a header to the widget. Defaults to True.
             widget_icon (str, optional): Icon of the widget. Defaults to "mdi-filter".
             close_icon (str, optional): Icon of the close button. Defaults to "mdi-close".
@@ -5269,8 +5292,9 @@ class Map(MapWidget):
             min_date=min_date,
             max_date=max_date,
             file_index=file_index,
+            group_col=group_col,
             freq=freq,
-            unit=unit,
+            interval=interval,
             map_widget=self,
         )
 
@@ -7888,15 +7912,16 @@ class DateFilterWidget(widgets.VBox):
         sources: List[Dict[str, Any]],
         names: List[str] = None,
         styles: Dict[str, Any] = None,
-        start_date_col: str = "startDate",
-        end_date_col: str = "endDate",
+        start_date_col: str = "startDatetime",
+        end_date_col: str = "endDatetime",
         date_col: str = None,
         date_format: str = "%Y-%m-%d",
         min_date: str = None,
         max_date: str = None,
         file_index: int = 0,
+        group_col: str = None,
         freq: str = "D",
-        unit: str = "ms",
+        interval: int = 1,
         map_widget: Map = None,
     ) -> None:
         """
@@ -7906,15 +7931,16 @@ class DateFilterWidget(widgets.VBox):
             sources (List[Dict[str, Any]]): List of data sources.
             names (List[str], optional): List of names for the data sources. Defaults to None.
             styles (Dict[str, Any], optional): Dictionary of styles for the data sources. Defaults to None.
-            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDate".
-            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDate".
+            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDatetime".
+            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDatetime".
             date_col (str, optional): Name of the column containing the date. Defaults to None.
             date_format (str, optional): Format of the date. Defaults to "%Y-%m-%d".
             min_date (str, optional): Minimum date. Defaults to None.
             max_date (str, optional): Maximum date. Defaults to None.
             file_index (int, optional): Index of the main file. Defaults to 0.
+            group_col (str, optional): Name of the column containing the group. Defaults to None.
             freq (str, optional): Frequency of the date range. Defaults to "D".
-            unit (str, optional): Unit of the date. Defaults to "ms".
+            interval (int, optional): Interval of the date range. Defaults to 1.
             map_widget (Map, optional): Map widget. Defaults to None.
         """
         from datetime import datetime
@@ -7927,19 +7953,31 @@ class DateFilterWidget(widgets.VBox):
         gdfs = []
         if map_widget is not None:
             for index, source in enumerate(sources):
+                if index == file_index:
+                    fit_bounds = True
+                else:
+                    fit_bounds = False
                 gdf = gpd.read_file(source)
                 gdfs.append(gdf)
+
                 style = styles[names[index]]
                 layer_type = style["layer_type"]
                 paint = style["paint"]
                 map_widget.add_gdf(
-                    gdf, name=names[index], layer_type=layer_type, paint=paint
+                    gdf,
+                    name=names[index],
+                    layer_type=layer_type,
+                    paint=paint,
+                    fit_bounds=fit_bounds,
+                    fit_bounds_options={"animate": False},
                 )
-            map_widget.add_arrow(names[file_index], name="arrow")
+
+            map_widget.add_arrow(
+                names[file_index],
+                name="arrow",
+            )
 
         gdf = gdfs[file_index]
-        gdf["startDatetime"] = pd.to_datetime(gdf[start_date_col], unit=unit)
-        gdf["endDatetime"] = pd.to_datetime(gdf[end_date_col], unit=unit)
 
         if min_date is None:
             min_date = gdf["startDatetime"].min().normalize()
@@ -7963,6 +8001,27 @@ class DateFilterWidget(widgets.VBox):
         if len(date_range) < 2:
             date_range = pd.date_range(min_date, max_date, freq=freq)
 
+        group_dropdown = widgets.Dropdown(
+            description=group_col,
+            options=sorted(gdf[group_col].unique()),
+            value=None,
+            layout=widgets.Layout(width="250px"),
+            style={"description_width": "initial"},
+        )
+
+        dropdown_reset_btn = widgets.Button(
+            icon="eraser",
+            tooltip="Clear selection",
+            layout=widgets.Layout(width="38px"),
+        )
+
+        def on_dropdown_reset_btn_click(_):
+            group_dropdown.value = None
+
+        dropdown_reset_btn.on_click(on_dropdown_reset_btn_click)
+
+        dropdown_box = widgets.HBox([group_dropdown, dropdown_reset_btn])
+
         slider = widgets.SelectionRangeSlider(
             options=list(date_range),
             index=(0, len(date_range) - 1),
@@ -7985,32 +8044,33 @@ class DateFilterWidget(widgets.VBox):
         start_btn = widgets.Button(
             icon="fast-backward",
             tooltip="Go to start date",
-            layout=widgets.Layout(width="38px", height="25px"),
+            layout=widgets.Layout(width="38px"),
         )
         end_btn = widgets.Button(
             icon="fast-forward",
             tooltip="Go to end date",
-            layout=widgets.Layout(width="38px", height="25px"),
+            layout=widgets.Layout(width="38px"),
         )
         forward_btn = widgets.Button(
             icon="forward",
             tooltip="Forward one day",
-            layout=widgets.Layout(width="38px", height="25px"),
+            layout=widgets.Layout(width="38px"),
         )
         backward_btn = widgets.Button(
             icon="backward",
             tooltip="Back one day",
-            layout=widgets.Layout(width="38px", height="25px"),
+            layout=widgets.Layout(width="38px"),
         )
 
         nav_box = widgets.HBox(
             [backward_btn, start_btn, date_picker, end_btn, forward_btn]
         )
+
         output = widgets.Output()
 
         def clamp_end(start: pd.Timestamp) -> pd.Timestamp:
             """Ensure the end is at least one day after the start."""
-            next_day = start + pd.Timedelta(days=1)
+            next_day = start + pd.Timedelta(days=interval)
             return next_day if next_day <= max_date else max_date
 
         def update_date_picker():
@@ -8058,6 +8118,10 @@ class DateFilterWidget(widgets.VBox):
                 filtered_gdf = gdf[
                     (gdf["startDatetime"] >= start) & (gdf["endDatetime"] <= end)
                 ]
+                if group_dropdown.value is not None:
+                    filtered_gdf = filtered_gdf[
+                        filtered_gdf[group_col] == group_dropdown.value
+                    ]
                 map_widget.set_data(names[file_index], filtered_gdf.__geo_interface__)
                 if "arrow" in map_widget.get_layer_names():
                     map_widget.set_data("arrow", filtered_gdf.__geo_interface__)
@@ -8066,11 +8130,18 @@ class DateFilterWidget(widgets.VBox):
                     filtered = point_gdf[
                         (point_gdf[date_col] >= start) & (point_gdf[date_col] <= end)
                     ]
-
+                    if group_dropdown.value is not None:
+                        filtered = filtered[filtered[group_col] == group_dropdown.value]
                     map_widget.set_data(
                         names[index + file_index + 1], filtered.__geo_interface__
                     )
                 update_date_picker()
+
+        def on_group_dropdown_change(change):
+            if change["name"] == "value" and change["type"] == "change":
+                on_slider_change(None)
+
+        group_dropdown.observe(on_group_dropdown_change, names="value")
 
         slider.observe(on_slider_change, names="value")
         date_picker.observe(on_date_picker_change)
@@ -8082,4 +8153,4 @@ class DateFilterWidget(widgets.VBox):
         # Initial trigger
         on_slider_change(None)
 
-        self.children = [slider, range_label, nav_box, output]
+        self.children = [dropdown_box, slider, range_label, nav_box, output]
