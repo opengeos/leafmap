@@ -3,7 +3,7 @@
 import logging
 import os
 import requests
-from typing import Tuple, Dict, Any, Optional, Union, List
+from typing import Tuple, Dict, Any, Optional, Union, List, Callable
 from IPython.display import display
 
 import xyzservices
@@ -555,7 +555,10 @@ class Map(MapWidget):
 
         super().add_call("removeLayer", name)
         if name in self.layer_dict:
+            source = self.layer_dict[name]["layer"].source
             self.layer_dict.pop(name)
+            if source in self.source_dict:
+                self.remove_source(source)
 
         if self.layer_manager is not None:
             self.layer_manager.refresh()
@@ -1122,7 +1125,6 @@ class Map(MapWidget):
 
         source_name = common.get_unique_name("source", self.source_names)
         self.add_source(source_name, source)
-
         if name is None:
             name = "GeoJSON"
         name = common.get_unique_name(name, self.layer_names, overwrite)
@@ -5310,6 +5312,63 @@ class Map(MapWidget):
             **kwargs,
         )
 
+    def add_select_data_widget(
+        self,
+        default_path: str = ".",
+        widget_width: str = "360px",
+        callback: Optional[Callable[[str], None]] = None,
+        reset_callback: Optional[Callable[[], None]] = None,
+        add_header: bool = True,
+        widget_icon: str = "mdi-folder",
+        close_icon: str = "mdi-close",
+        label: str = "Data Selection",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a select data widget to the map.
+
+        This method creates a widget for selecting and uploading data to be added to a map.
+        It includes a folder chooser, a file uploader, and buttons to apply or reset the selection.
+
+        Args:
+            default_path (str, optional): The default path for the folder chooser. Defaults to ".".
+            widget_width (str, optional): The width of the widget. Defaults to "360px".
+            callback (Optional[Callable[[str], None]], optional): A callback function to be
+                called when data is applied. Defaults to None.
+            reset_callback (Optional[Callable[[], None]], optional): A callback function to
+                be called when the selection is reset. Defaults to None.
+            add_header (bool, optional): Whether to add a header to the widget. Defaults to True.
+            widget_icon (str, optional): The icon for the widget. Defaults to "mdi-folder".
+            close_icon (str, optional): The icon for the close button. Defaults to "mdi-close".
+            label (str, optional): The label for the widget. Defaults to "Data Selection".
+            background_color (str, optional): The background color of the widget. Defaults to "#f5f5f5".
+            height (str, optional): The height of the widget. Defaults to "40px".
+            expanded (bool, optional): Whether the widget is expanded by default. Defaults to True.
+            **kwargs (Any, optional): Additional keyword arguments for the add_to_sidebar method.
+        """
+        widget = SelectDataWidget(
+            default_path=default_path,
+            widget_width=widget_width,
+            callback=callback,
+            reset_callback=reset_callback,
+            map_widget=self,
+        )
+
+        self.add_to_sidebar(
+            widget,
+            add_header=add_header,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+            **kwargs,
+        )
+
 
 class Container(v.Container):
     """
@@ -7413,6 +7472,7 @@ class LayerManagerWidget(v.ExpansionPanels):
             opacity = info.get("opacity", 1.0)
 
             checkbox = widgets.Checkbox(value=visible, description=name, style=style)
+            checkbox.layout.max_width = "150px"
 
             slider = widgets.FloatSlider(
                 value=opacity,
@@ -8154,3 +8214,210 @@ class DateFilterWidget(widgets.VBox):
         on_slider_change(None)
 
         self.children = [dropdown_box, slider, range_label, nav_box, output]
+
+
+class SelectDataWidget(widgets.VBox):
+    """
+    A widget for selecting and uploading data to be added to a map.
+
+    This widget allows users to select a folder or upload files to be added to a map.
+    It includes a folder chooser, a file uploader, and buttons to apply or reset the selection.
+    """
+
+    def __init__(
+        self,
+        default_path: str = ".",
+        widget_width: str = "360px",
+        callback: Optional[Callable[[str], None]] = None,
+        reset_callback: Optional[Callable[[], None]] = None,
+        map_widget: Optional[Map] = None,
+    ):
+        """
+        Initializes the SelectDataWidget.
+
+        Args:
+            default_path (str, optional): The default path for the folder chooser. Defaults to ".".
+            widget_width (str, optional): The width of the widget. Defaults to "360px".
+            callback (Optional[Callable[[str], None]], optional): A callback function
+                to be called when data is applied. Defaults to None.
+            reset_callback (Optional[Callable[[], None]], optional): A callback function
+                to be called when the selection is reset. Defaults to None.
+            map_widget (Optional[Map], optional): The map widget to which the data will be added. Defaults to None.
+        """
+        import ipyfilechooser
+        import tempfile
+
+        super().__init__(layout=widgets.Layout(max_width=widget_width))
+
+        temp_dirs = []
+        layer_names = []
+        source_names = []
+
+        if map_widget is not None:
+            layer_names = map_widget.layer_names
+            source_names = map_widget.source_names
+
+        folder_chooser = ipyfilechooser.FileChooser(
+            default_path=default_path,
+            select_dirs=True,
+            show_only_dirs=True,
+            select_desc="Select Folder",
+        )
+
+        folder_chooser._select.layout.min_width = "100px"
+        folder_chooser._select.layout.width = "100px"
+
+        uploader = widgets.FileUpload(
+            accept=".geojson",
+            multiple=True,
+            description="Upload",
+            layout=widgets.Layout(width="100px"),
+        )
+        output = widgets.Output()
+
+        def on_upload(change):
+            folder_chooser.reset()
+            with output:
+                output.clear_output()
+                print("Uploading ...")
+            temp_dir = tempfile.mkdtemp()
+            temp_dirs.clear()
+            for value in uploader.value:
+                filename = value["name"]
+                content = value["content"]
+                file_path = os.path.join(temp_dir, filename)
+                with open(file_path, "wb") as f:
+                    f.write(content)
+            temp_dirs.append(temp_dir)
+            output.clear_output()
+            with output:
+                print("Click Apply to add files to map")
+
+        uploader.observe(on_upload, names="value")
+
+        def on_folder_chooser_change(change):
+            uploader.value = ()
+            temp_dirs.clear()
+            temp_dirs.append(folder_chooser.selected)
+
+        folder_chooser.register_callback(on_folder_chooser_change)
+
+        apply_btn = widgets.Button(
+            description="Apply",
+            tooltip="Apply selection",
+            layout=widgets.Layout(width="80px"),
+            style={"description_width": "initial"},
+            button_style="primary",
+        )
+
+        def default_callback(temp_dir: str):
+            """
+            The default callback function to add data to the map.
+
+            This function is called when the Apply button is clicked. It finds
+                all .geojson files in the selected directory,
+            adds them to the map, and fits the bounds to the first file.
+
+            Args:
+                temp_dir (str): The temporary directory containing the uploaded files.
+            """
+            files = common.find_files(temp_dir, ext="geojson", recursive=False)
+            if map_widget is not None:
+                with output:
+                    output.clear_output()
+                    print("Adding data to the map ...")
+                    for index, file in enumerate(files):
+                        if index == 0:
+                            fit_bounds = True
+                        else:
+                            fit_bounds = False
+                        basename = os.path.basename(file)
+                        source_name = os.path.splitext(basename)[0]
+                        map_widget.add_geojson(
+                            file,
+                            name=source_name,
+                            fit_bounds=fit_bounds,
+                            fit_bounds_options={"animate": False},
+                            overwrite=True,
+                        )
+                    output.clear_output()
+
+        def on_apply(change):
+            """
+            Handles the Apply button click event.
+
+            This function checks if there are any temporary directories containing
+                uploaded files. If there are, it calls the callback function
+            (either the default or a custom one) to add the data to the map. If not,
+                it prompts the user to select a folder or upload files.
+
+            Args:
+                change (Any): The change event triggered by the Apply button click.
+            """
+            with output:
+                if callback is None:
+                    if len(temp_dirs) > 0:
+                        print("Adding data to the map ...")
+                        default_callback(temp_dirs[-1])
+                        output.clear_output()
+                    else:
+                        output.clear_output()
+                        print("Select a folder or upload files")
+                else:
+                    with output:
+                        if len(temp_dirs) > 0:
+                            print("Adding data to the map ...")
+                            callback(temp_dirs[-1])
+                            output.clear_output()
+                        else:
+                            output.clear_output()
+                            print("Select a folder or upload files")
+
+            folder_chooser.reset()
+            uploader.value = ()
+            temp_dirs.clear()
+
+        apply_btn.on_click(on_apply)
+
+        reset_btn = widgets.Button(
+            description="Reset",
+            tooltip="Clear selection",
+            layout=widgets.Layout(width="80px"),
+            style={"description_width": "initial"},
+            button_style="warning",
+        )
+
+        def on_reset(change):
+            """
+            Handles the Reset button click event.
+
+            This function resets the folder chooser and uploader, clears the temporary
+            directories, and removes any layers or sources not in the original list.
+            If a reset callback function is provided, it calls that function.
+
+            Args:
+                change (Any): The change event triggered by the Reset button click.
+            """
+            folder_chooser.reset()
+            uploader.value = ()
+            temp_dirs.clear()
+
+            if map_widget is not None:
+                for layer_name in map_widget.layer_names:
+                    if layer_name not in layer_names:
+                        map_widget.remove_layer(layer_name)
+                for source_name in map_widget.source_names:
+                    if source_name not in source_names:
+                        map_widget.remove_source(source_name)
+
+            if reset_callback is not None:
+                reset_callback()
+            output.clear_output()
+
+        reset_btn.on_click(on_reset)
+
+        self.children = [
+            folder_chooser,
+            widgets.HBox([uploader, apply_btn, reset_btn]),
+            output,
+        ]
