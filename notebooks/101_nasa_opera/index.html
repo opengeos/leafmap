@@ -6713,7 +6713,7 @@ m</div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Pan and zoom to your area of interest. Select a dataset from the Short Name dropdown list. Click the "Search" button to load the available datasets for the region. The footprints of the datasets will be displayed on the map. Click on a footprint to display the metadata of the dataset.</p>
-<p><img alt="image" src="https://github.com/user-attachments/assets/f3b1b42e-d83d-4f40-b9e6-67082d364367"/></p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/1fdb58b5-9faa-4666-96f3-0fb1869f7551"/></p>
 </div>
 </div>
 </div>
@@ -6762,7 +6762,13 @@ m</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Select a dataset from the Dataset dropdown list. Then, select a layer from the Layer dropdown list. Choose a appropriate colormap, then click on the "Display" button to display the selected layer on the map.</p>
+<p>There are two options to visualize OPERA product granule(s):</p>
+<ul>
+<li><p>Option 1: Select a dataset from the Dataset dropdown menu, and select a corresponding layer from the Layer dropdown menu. Choose a colormap (if colormap is blank, the default OPERA colormap from the metadata will be used). Click on the "Display (Single)" button to display the selected granule layer on the map.</p>
+</li>
+<li><p>Option 2: Select a layer from the Layer dropdown menu. Choose a colormap (if colormap is blank, the default OPERA colormap from the metadata will be used). Click on the "Display (Mosaic)" button to display a mosaic of the granules shown on the map (Currently only supported for geotiff products; RTC/DSWx/DIST).</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -6773,10 +6779,10 @@ m</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The water classification layer:</p>
-<p><img alt="image" src="https://github.com/user-attachments/assets/f9800913-c683-4a9f-a3b5-164c911a4486"/></p>
-<p>The DEM layer:</p>
-<p><img alt="image" src="https://github.com/user-attachments/assets/15690881-d259-474f-9c77-eb6c40027ccc"/></p>
+<p>The OPERA Dynamic Surface Water Extent from Sentinel-1 (DSWx-S1) water classification (WTR) layer over Lake Mead in southern Nevada, USA:</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/0ff253f3-e6b0-4bdd-8592-750b05414db8"/></p>
+<p>The OPERA Surface Disturbance from Harmonized Landsat and Sentinel-2 (DIST-HLS) vegetation disturbance status (VEG-DIST-STATUS) layer over a wildfire-impacted region of northern Quebec, Canada:</p>
+<p><img alt="image" src="https://github.com/user-attachments/assets/fbb02210-8654-425b-84d3-620d12708e6a"/></p>
 </div>
 </div>
 </div>
@@ -6848,9 +6854,9 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">_NASA_DATA_DS</span><span class="p">[</span><span class="s2">"band_data"</span><span class="p">]</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">to_raster</span><span class="p">(</span><span class="s2">"DSWx.tif"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">_NASA_DATA_DS</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">to_raster</span><span class="p">(</span><span class="s2">"DSWx.tif"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">m._NASA_DATA_DS["band_data"].rio.to_raster("DSWx.tif")</div>
+<div class="clipboard-copy-txt" id="cell-7">m._NASA_DATA_DS.rio.to_raster("DSWx.tif")</div>
 </div>
 </div>
 </div>
@@ -6928,7 +6934,7 @@ m</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 17, 2025 13:49:17"><span class="timeago" datetime="2025-05-17T13:49:17+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 17, 2025 13:49:17">2025-05-17</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 21, 2025 17:52:53"><span class="timeago" datetime="2025-05-21T17:52:53+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 21, 2025 17:52:53">2025-05-21</span>
   </span>
 
     
