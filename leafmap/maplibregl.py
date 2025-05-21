@@ -211,7 +211,7 @@ class Map(MapWidget):
             self.style_dict[layer["id"]] = layer
         self.source_dict = {}
 
-        if projection.lower() == "globe" and ("globe" not in self.controls):
+        if projection.lower() == "globe":
             self.add_globe_control()
             self.set_projection(
                 type=[
@@ -2699,20 +2699,24 @@ class Map(MapWidget):
         image_id = f"image_{common.random_string(3)}"
         self.add_image(image_id, image)
 
-        name = common.get_unique_name(name, self.get_layer_names(), overwrite)
+        name = common.get_unique_name(name, self.layer_names, overwrite)
 
         if isinstance(source, str):
-            if source in self.get_layer_names():
+            if source in self.layer_names:
+                source_name = self.layer_dict[source]["layer"].source
+            elif source in self.source_names:
                 source_name = source
             else:
                 geojson = gpd.read_file(source).__geo_interface__
                 geojson_source = {"type": "geojson", "data": geojson}
                 source_name = common.get_unique_name(
-                    "geojson", self.get_layer_names(), overwrite
+                    "source", self.source_names, overwrite=False
                 )
                 self.add_source(source_name, geojson_source)
         elif isinstance(source, dict):
-            self.add_source(source_name, source)
+            source_name = common.get_unique_name("source", self.source_names)
+            geojson_source = {"type": "geojson", "data": source}
+            self.add_source(source_name, geojson_source)
         else:
             raise ValueError("The source must be a string or a dictionary.")
 
@@ -5112,11 +5116,17 @@ class Map(MapWidget):
         Returns:
             list: A list of sources.
         """
-        return [
-            layer["layer"].source
-            for layer in self.layer_dict.values()
-            if layer["layer"].source is not None
-        ]
+        sources = list(
+            set(
+                [
+                    layer["layer"].source
+                    for layer in self.layer_dict.values()
+                    if layer["layer"].source is not None
+                ]
+            )
+        )
+        sources.sort()
+        return sources
 
     def add_annotation_widget(
         self,
@@ -7925,7 +7935,7 @@ class DateFilterWidget(widgets.VBox):
                 map_widget.add_gdf(
                     gdf, name=names[index], layer_type=layer_type, paint=paint
                 )
-            map_widget.add_arrow(sources[file_index], name="arrow")
+            map_widget.add_arrow(names[file_index], name="arrow")
 
         gdf = gdfs[file_index]
         gdf["startDatetime"] = pd.to_datetime(gdf[start_date_col], unit=unit)
