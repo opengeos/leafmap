@@ -6048,6 +6048,7 @@ def mosaic(
     if verbose:
         print(f"Saved mosaic to {output}")
 
+
 def mosaic_opera(DS, merge_args={}):
     """Mosaics a list of OPERA product granules into a single image (in memory).
 
@@ -6061,20 +6062,21 @@ def mosaic_opera(DS, merge_args={}):
         nodata: The nodata value for the mosaic corresponding to the original OPERA product granule metadata.
     """
     from rioxarray.merge import merge_arrays
-    
+
     DA = []
     for ds in DS:
         nodata = ds.rio.nodata
         da = ds.fillna(nodata)
         DA.append(da)
 
-    merged_arr =  merge_arrays(DA)
+    merged_arr = merge_arrays(DA)
 
     try:
         colormap = get_image_colormap(DS[0])
     except Exception as e:
         colormap = None
     return merged_arr, colormap, nodata
+
 
 def geometry_bounds(geometry, decimals=4):
     """Returns the bounds of a geometry.

@@ -6810,7 +6810,13 @@ def nasa_opera_gui(
     buttons = widgets.ToggleButtons(
         value=None,
         options=["Search", "Display (Single)", "Display (Mosaic)", "Reset", "Close"],
-        tooltips=["Get Items", "Display the Selected Granule", "Display Granule Mosaic", "Reset", "Close"],
+        tooltips=[
+            "Get Items",
+            "Display the Selected Granule",
+            "Display Granule Mosaic",
+            "Reset",
+            "Close",
+        ],
         button_style="primary",
     )
     buttons.style.button_width = "120px"
@@ -6919,7 +6925,7 @@ def nasa_opera_gui(
                             short_name=short_name.value,
                             bbox=bounds,
                             temporal=date_range,
-                            return_gdf=True
+                            return_gdf=True,
                         )
 
                         if len(results) > 0:
@@ -6940,7 +6946,7 @@ def nasa_opera_gui(
                                 "color": "#3388ff",
                                 "weight": 2,
                                 "opacity": 1,
-                                "fill": False
+                                "fill": False,
                             }
 
                             hover_style = {
@@ -6979,7 +6985,9 @@ def nasa_opera_gui(
 
                             if len(m._NASA_DATA_RESULTS) > 0:
                                 all_links = m._NASA_DATA_RESULTS[0].data_links()
-                                layer.options = [link.split("_")[-1] for link in all_links]
+                                layer.options = [
+                                    link.split("_")[-1] for link in all_links
+                                ]
                                 layer.value = layer.options[0]
                             else:
                                 layer.options = []
@@ -6987,9 +6995,13 @@ def nasa_opera_gui(
 
                             output.clear_output()
 
-                            print('Option 1: Select granule from the Dataset menu and click "Display (Single)"')
-                            print('Option 2: Click "Display (Mosaic)" to display a mosaic of all granules')
-                    
+                            print(
+                                'Option 1: Select granule from the Dataset menu and click "Display (Single)"'
+                            )
+                            print(
+                                'Option 2: Click "Display (Mosaic)" to display a mosaic of all granules'
+                            )
+
                     except Exception as e:
                         print(e)
 
@@ -7014,7 +7026,7 @@ def nasa_opera_gui(
                             f = open_file(
                                 link,
                                 earthdata_username=username,
-                                earthdata_password=password
+                                earthdata_password=password,
                             )
                             ds = rioxarray.open_rasterio(f, masked=False)
                         setattr(m, "_NASA_DATA_DS", ds)
@@ -7084,7 +7096,9 @@ def nasa_opera_gui(
             output.clear_output()
             with output:
                 print("Loading granule mosaic...")
-                layer_links = [result.data_links()[layer.index] for result in m._NASA_DATA_RESULTS]
+                layer_links = [
+                    result.data_links()[layer.index] for result in m._NASA_DATA_RESULTS
+                ]
                 tif_links = [link for link in layer_links if link.endswith(".tif")]
                 if tif_links:
                     links = tif_links
@@ -7100,7 +7114,7 @@ def nasa_opera_gui(
                                 f = open_file(
                                     link,
                                     earthdata_username=username,
-                                    earthdata_password=password
+                                    earthdata_password=password,
                                 )
                                 DS.append(rioxarray.open_rasterio(f, masked=False))
                         da_mosaic, colormap, nodata = mosaic_opera(DS, merge_args={})
@@ -7124,7 +7138,7 @@ def nasa_opera_gui(
                         print("Currently only geotiff mosaicking is supported.")
                 except Exception as e:
                     output.clear_output()
-                    print(e)            
+                    print(e)
 
         elif change["new"] == "Reset":
             short_name.options = m._NASA_DATA_NAMES
