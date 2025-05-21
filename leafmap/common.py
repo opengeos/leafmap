@@ -6365,6 +6365,34 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
     return files
 
 
+def sort_files(files: List[str], names: Optional[List[str]] = None) -> List[str]:
+    """
+    Sorts a list of files based on a list of names.
+
+    If names is None, the function sorts the list of files in-place and returns the sorted list.
+    If names is provided, the function filters the list of files to include only those that
+        contain any of the names in the list, and returns the filtered list.
+
+    Args:
+        files (List[str]): The list of files to sort or filter.
+        names (Optional[List[str]], optional): The list of names to filter by. Defaults to None.
+
+    Returns:
+        List[str]: The sorted or filtered list of files.
+    """
+    if names is None:
+
+        return sorted(files)
+    else:
+        filenames = []
+        for name in names:
+            for file in files:
+                if name in file:
+                    filenames.append(file)
+                    break
+        return filenames
+
+
 def zoom_level_resolution(zoom, latitude=0):
     """Returns the approximate pixel scale based on zoom level and latutude.
         See https://blogs.bing.com/maps/2006/02/25/map-control-zoom-levels-gt-resolution
@@ -17049,3 +17077,45 @@ def get_unique_name(name: str, names: list, overwrite: bool = False) -> str:
             if unique_name not in names:
                 return unique_name
             counter += 1
+
+
+def filter_geom_type(
+    data: Union[str, dict, "gpd.GeoDataFrame"],
+    geom_type: str,
+    output: Optional[str] = None,
+    **kwargs: Any,
+) -> "gpd.GeoDataFrame":
+    """
+    Filters a GeoDataFrame based on the geometry type.
+
+    Args:
+        data (Union[str, dict, gpd.GeoDataFrame]): The GeoDataFrame to filter.
+        geom_type (str): The geometry type to filter by.
+        output (Optional[str], optional): The file path to save the filtered GeoDataFrame. Defaults to None.
+        **kwargs: Additional keyword arguments to pass to the GeoDataFrame.read_file method.
+
+    Returns:
+        gpd.GeoDataFrame: The filtered GeoDataFrame.
+    """
+
+    if isinstance(data, str):
+        data = read_vector(data)
+    elif isinstance(data, dict):
+        data = gpd.GeoDataFrame.from_features(data)
+    elif isinstance(data, gpd.GeoDataFrame):
+        pass
+    else:
+        raise ValueError(
+            "Invalid data type. Must be a string, dictionary, or GeoDataFrame."
+        )
+
+    filtered = data[data.geom_type == geom_type]
+
+    if output is not None:
+        if os.path.exists(output):
+            if len(filtered) < len(data):
+                filtered.to_file(output, **kwargs)
+        else:
+            filtered.to_file(output, **kwargs)
+
+    return filtered
