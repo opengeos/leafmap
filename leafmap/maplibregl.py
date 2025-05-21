@@ -1,5 +1,6 @@
 """The maplibregl module provides the Map class for creating interactive maps using the maplibre.ipywidget module."""
 
+import json
 import logging
 import os
 import requests
@@ -154,6 +155,8 @@ class Map(MapWidget):
                         "The provided style URL is invalid. Falling back to 'dark-matter'."
                     )
                     style = "dark-matter"
+                else:
+                    style = json.loads(response.text)
             elif style.startswith("3d-"):
                 style = maptiler_3d_style(
                     style=style.replace("3d-", "").lower(),
