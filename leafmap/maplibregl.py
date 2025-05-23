@@ -782,6 +782,8 @@ class Map(MapWidget):
             options=options, position=position, geojson=geojson, **kwargs
         )
 
+        self.controls["draw"] = position
+
     def add_globe_control(self, position: str = "top-right", **kwargs: Any) -> None:
         """
         Adds a globe control to the map.
@@ -5156,6 +5158,7 @@ class Map(MapWidget):
     def add_annotation_widget(
         self,
         properties: Optional[Dict[str, List[Any]]] = None,
+        geojson: Optional[Union[str, dict]] = None,
         time_format: str = "%Y%m%dT%H%M%S",
         out_dir: Optional[str] = None,
         filename_prefix: str = "",
@@ -5169,6 +5172,9 @@ class Map(MapWidget):
         download: bool = True,
         name: str = None,
         paint: Dict[str, Any] = None,
+        options: Optional[Dict[str, Any]] = None,
+        controls: Optional[Dict[str, Any]] = None,
+        position: str = "top-right",
         add_header: bool = True,
         widget_icon: str = "mdi-drawing",
         close_icon: str = "mdi-close",
@@ -5208,6 +5214,7 @@ class Map(MapWidget):
         widget = create_vector_data(
             self,
             properties=properties,
+            geojson=geojson,
             time_format=time_format,
             out_dir=out_dir,
             filename_prefix=filename_prefix,
@@ -5221,6 +5228,9 @@ class Map(MapWidget):
             download=download,
             name=name,
             paint=paint,
+            options=options,
+            controls=controls,
+            position=position,
             return_sidebar=True,
         )
         self.add_to_sidebar(
@@ -6681,6 +6691,7 @@ def open_gps_traces(
 def create_vector_data(
     m: Optional[Map] = None,
     properties: Optional[Dict[str, List[Any]]] = None,
+    geojson: Optional[Union[str, dict]] = None,
     time_format: str = "%Y%m%dT%H%M%S",
     column_widths: Optional[List[int]] = (9, 3),
     map_height: str = "600px",
@@ -6696,6 +6707,9 @@ def create_vector_data(
     download: bool = True,
     name: str = None,
     paint: Dict[str, Any] = None,
+    options: Optional[Dict[str, Any]] = None,
+    controls: Optional[Dict[str, Any]] = None,
+    position: str = "top-right",
     return_sidebar: bool = False,
     **kwargs: Any,
 ) -> widgets.VBox:
@@ -6771,6 +6785,12 @@ def create_vector_data(
             "circle-stroke-width": 1,
         }
 
+    if geojson is not None and isinstance(geojson, str):
+        geojson = gpd.read_file(geojson).__geo_interface__
+        setattr(m, "geojson", geojson)
+
+    setattr(m, "draw_feature_collection_initial", geojson)
+
     def create_default_map():
         m = Map(style="liberty", height=map_height)
         m.add_basemap("Satellite")
@@ -6784,6 +6804,10 @@ def create_vector_data(
 
     if m is None:
         m = create_default_map()
+
+    m.add_draw_control(
+        options=options, controls=controls, position=position, geojson=geojson
+    )
 
     setattr(m, "draw_features", {})
 
@@ -6820,6 +6844,15 @@ def create_vector_data(
                     description=key,
                 )
                 prop_widgets.children += (prop_widget,)
+
+    if geojson is not None:
+        for feature in geojson["features"]:
+            feature_id = feature["id"]
+            if feature_id not in m.draw_features:
+                m.draw_features[feature_id] = {}
+                for prop_widget in prop_widgets.children:
+                    key = prop_widget.description
+                    m.draw_features[feature_id][key] = feature["properties"][key]
 
     def draw_change(lng_lat):
         if lng_lat.new:
@@ -8190,11 +8223,19 @@ class DateFilterWidget(widgets.VBox):
                     map_widget.set_data("arrow", filtered_gdf.__geo_interface__)
 
                 for index, point_gdf in enumerate(gdfs[file_index + 1 :]):
-                    filtered = point_gdf[
-                        (point_gdf[date_col] >= start) & (point_gdf[date_col] <= end)
-                    ]
-                    if group_dropdown.value is not None:
+                    if date_col in point_gdf.columns:
+                        filtered = point_gdf[
+                            (point_gdf[date_col] >= start)
+                            & (point_gdf[date_col] <= end)
+                        ]
+                    else:
+                        filtered = point_gdf
+                    if (
+                        group_dropdown.value is not None
+                        and group_col in point_gdf.columns
+                    ):
                         filtered = filtered[filtered[group_col] == group_dropdown.value]
+
                     map_widget.set_data(
                         names[index + file_index + 1], filtered.__geo_interface__
                     )
