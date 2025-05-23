@@ -5175,6 +5175,7 @@ class Map(MapWidget):
         options: Optional[Dict[str, Any]] = None,
         controls: Optional[Dict[str, Any]] = None,
         position: str = "top-right",
+        callback: Callable = None,
         add_header: bool = True,
         widget_icon: str = "mdi-drawing",
         close_icon: str = "mdi-close",
@@ -5209,6 +5210,8 @@ class Map(MapWidget):
             label (str, optional): Label for the annotation widget. Defaults to "Annotation".
             background_color (str, optional): Background color of the annotation widget. Defaults to "#f5f5f5".
             expanded (bool, optional): Whether the annotation widget is expanded by default. Defaults to True.
+            callback (Callable, optional): A callback function to be called when the export button is clicked.
+                Defaults to None.
             **kwargs (Any, optional): Additional keyword arguments for the add_to_sidebar method.
         """
         widget = create_vector_data(
@@ -5232,6 +5235,7 @@ class Map(MapWidget):
             controls=controls,
             position=position,
             return_sidebar=True,
+            callback=callback,
         )
         self.add_to_sidebar(
             widget,
@@ -6710,6 +6714,7 @@ def create_vector_data(
     options: Optional[Dict[str, Any]] = None,
     controls: Optional[Dict[str, Any]] = None,
     position: str = "top-right",
+    callback: Callable = None,
     return_sidebar: bool = False,
     **kwargs: Any,
 ) -> widgets.VBox:
@@ -6753,6 +6758,8 @@ def create_vector_data(
         paint (Dict[str, Any], optional): A dictionary specifying the paint properties for the
             drawn features. This can include properties like "circle-radius", "circle-color",
             "circle-opacity", "circle-stroke-color", and "circle-stroke-width". Defaults to None.
+        callback (Callable, optional): A callback function to be called when the export button is clicked.
+            Defaults to None.
         return_sidebar (bool, optional): Whether to return the sidebar widget. Defaults to False.
 
         **kwargs (Any): Additional keyword arguments that may be passed to the add_geojson method.
@@ -6961,14 +6968,17 @@ def create_vector_data(
                 m.draw_feature_collection_all["features"][index]["properties"] = (
                     m.draw_features[feature_id]
                 )
-
-        gdf = gpd.GeoDataFrame.from_features(
-            m.draw_feature_collection_all, crs="EPSG:4326"
-        )
+        if callback is not None:
+            with output:
+                gdf = callback(m)
+        else:
+            gdf = gpd.GeoDataFrame.from_features(
+                m.draw_feature_collection_all, crs="EPSG:4326"
+            )
         gdf.to_file(filename)
         with output:
             if download:
-                download_link = common.create_download_link(filename, title="Download")
+                download_link = common.create_download_link(filename, title="⬇️")
                 display(download_link)
             else:
                 print(f"Exported: {os.path.basename(filename)}")
