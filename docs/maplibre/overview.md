@@ -532,6 +532,12 @@ Display a satellite raster baselayer.
 
 [![](https://i.imgur.com/S17IRDh.png)](https://leafmap.org/maplibre/satellite_map)
 
+## Add a search control
+
+Use MapTiler Geocoding API to add a search control to the map.
+
+[![](https://github.com/user-attachments/assets/219b101a-8757-48a2-98c1-2467f78b4d04)](https://leafmap.org/maplibre/search_control)
+
 ## Set pitch and bearing
 
 Initialize a map with pitch and bearing camera options.
