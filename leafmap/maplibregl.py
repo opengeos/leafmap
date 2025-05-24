@@ -1963,6 +1963,17 @@ class Map(MapWidget):
         Returns:
             None
         """
+        if name == "background":
+            for layer in self.get_style_layers():
+                layer_type = layer.get("type")
+                if layer_type != "symbol":
+                    super().set_paint_property(
+                        layer["id"], f"{layer_type}-opacity", opacity
+                    )
+                else:
+                    super().set_paint_property(layer["id"], "icon-opacity", opacity)
+                    super().set_paint_property(layer["id"], "text-opacity", opacity)
+            return
 
         if name in self.layer_dict:
             layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
@@ -1993,10 +2004,14 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().set_visibility(name, visible)
-        self.layer_dict[name]["visible"] = visible
-        # if self.layer_manager is not None:
-        #     self.layer_manager.refresh()
+
+        if name == "background":
+            for layer in self.get_style_layers():
+                super().set_visibility(layer["id"], visible)
+        else:
+            super().set_visibility(name, visible)
+        if name in self.layer_dict:
+            self.layer_dict[name]["visible"] = visible
 
     def layer_interact(self, name=None):
         """Create a layer widget for changing the visibility and opacity of a layer.
@@ -7511,8 +7526,8 @@ class LayerManagerWidget(v.ExpansionPanels):
         padding = "0px 5px 0px 5px"
 
         for name, info in list(self.m.layer_dict.items()):
-            if name == "background":
-                continue
+            # if name == "background":
+            #     continue
 
             visible = info.get("visible", True)
             opacity = info.get("opacity", 1.0)
@@ -7549,7 +7564,11 @@ class LayerManagerWidget(v.ExpansionPanels):
                 self.set_layer_opacity(layer_name, change["new"])
 
             def on_remove_clicked(btn, layer_name=name, row_ref=None):
-                self.m.remove_layer(layer_name)
+                if layer_name == "background":
+                    for layer in self.m.get_style_layers():
+                        self.m.add_call("removeLayer", layer["id"])
+                else:
+                    self.m.remove_layer(layer_name)
                 if row_ref in self.layers_box.children:
                     self.layers_box.children = tuple(
                         c for c in self.layers_box.children if c != row_ref
