@@ -803,6 +803,39 @@ class Map(MapWidget):
         if "globe" not in self.controls:
             self.add_control(GlobeControl(), position=position, **kwargs)
 
+    def add_search_control(
+        self,
+        position: str = "top-right",
+        api_key: str = None,
+        collapsed: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a search control to the map.
+
+        Args:
+            position (str): The position of the control on the map. Defaults to "top-right".
+            api_key (str): The API key for the search control. Defaults to None.
+                If not provided, it will be retrieved from the environment variable MAPTILER_KEY.
+            collapsed (bool): Whether the control is collapsed. Defaults to True.
+            **kwargs: Additional keyword arguments to be passed to the search control.
+                See https://eoda-dev.github.io/py-maplibregl/api/controls/#maplibre.controls.MapTilerGeocodingControl
+        """
+        from maplibre.controls import MapTilerGeocodingControl
+
+        if api_key is None:
+            api_key = common.get_api_key("MAPTILER_KEY")
+            if api_key is None:
+                print(
+                    "An MapTiler API key is required. Please set the MAPTILER_KEY environment variable."
+                )
+                return
+
+        control = MapTilerGeocodingControl(
+            api_key=api_key, collapsed=collapsed, **kwargs
+        )
+        self.add_control(control, position=position)
+
     def save_draw_features(self, filepath: str, indent=4, **kwargs) -> None:
         """
         Saves the drawn features to a file.
