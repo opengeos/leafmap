@@ -5755,7 +5755,6 @@ def construct_amazon_style(
             return None
 
     url = f"https://maps.geo.{region}.amazonaws.com/v2/styles/{map_style.title()}/descriptor?key={api_key}"
-    print(url)
     return url
 
 
