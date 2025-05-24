@@ -164,6 +164,13 @@ class Map(MapWidget):
                     tile_size=kwargs.pop("tile_size", 512),
                     hillshade=kwargs.pop("hillshade", True),
                 )
+            elif style.startswith("amazon-"):
+                style = construct_amazon_style(
+                    map_style=style.replace("amazon-", "").lower(),
+                    region=kwargs.pop("region", "us-east-1"),
+                    api_key=kwargs.pop("api_key", None),
+                    token=kwargs.pop("token", "AWS_MAPS_API_KEY"),
+                )
 
             elif style.lower() in carto_basemaps:
                 style = construct_carto_basemap_url(style.lower())
@@ -1044,7 +1051,12 @@ class Map(MapWidget):
                 max_zoom = basemap["max_zoom"]
             if "min_zoom" in basemap.keys():
                 min_zoom = basemap["min_zoom"]
-
+        elif basemap == "amazon-satellite":
+            region = kwargs.pop("region", "us-east-1")
+            token = kwargs.pop("token", "AWS_MAPS_API_KEY")
+            url = f"https://maps.geo.{region}.amazonaws.com/v2/tiles/raster.satellite/{{z}}/{{x}}/{{y}}?key={os.getenv(token)}"
+            attribution = "© Amazon"
+            print(url)
         elif basemap in basemaps:
             url = basemaps[basemap]["url"]
             if attribution is None:
@@ -1066,7 +1078,7 @@ class Map(MapWidget):
             attribution=attribution,
             max_zoom=max_zoom,
             min_zoom=min_zoom,
-            tile_size=256,
+            # tile_size=256,
             **kwargs,
         )
 
@@ -5707,6 +5719,44 @@ class Container(v.Container):
     def on_width_change(self, change: dict) -> None:
         new_width = change["new"]
         self.set_sidebar_width(min_width=new_width, max_width=new_width)
+
+
+def construct_amazon_style(
+    map_style: str = "standard",
+    region: str = "us-east-1",
+    api_key: str = None,
+    token: str = "AWS_MAPS_API_KEY",
+) -> str:
+    """
+    Constructs a URL for an Amazon Map style.
+
+    Args:
+        map_style (str): The name of the MapTiler style to be accessed. It can be one of the following:
+            standard, monochrome, satellite, hybrid.
+        region (str): The region of the Amazon Map. It can be one of the following:
+            us-east-1, us-west-2, eu-central-1, eu-west-1, ap-northeast-1, ap-northeast-2, ap-southeast-1, etc.
+        api_key (str): The API key for the Amazon Map. If None, the function attempts to retrieve the API key using a predefined method.
+        token (str): The token for the Amazon Map. If None, the function attempts to retrieve the API key using a predefined method.
+
+    Returns:
+        str: The URL for the requested Amazon Map style.
+    """
+
+    if map_style.lower() not in ["standard", "monochrome", "satellite", "hybrid"]:
+        print(
+            "Invalid map style. Please choose from amazon-standard, amazon-monochrome, amazon-satellite, or amazon-hybrid."
+        )
+        return None
+
+    if api_key is None:
+        api_key = common.get_api_key(token)
+        if api_key is None:
+            print("An API key is required to use the Amazon Map style.")
+            return None
+
+    url = f"https://maps.geo.{region}.amazonaws.com/v2/styles/{map_style.title()}/descriptor?key={api_key}"
+    print(url)
+    return url
 
 
 def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
