@@ -678,9 +678,6 @@ def stac_tile(
                 if colormap is not None:
                     kwargs["colormap"] = colormap
 
-            if isinstance(kwargs["assets"], list):
-                kwargs["assets"] = ",".join(kwargs["assets"])
-
         if (
             (assets is not None)
             and ("asset_expression" not in kwargs)
