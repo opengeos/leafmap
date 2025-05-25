@@ -281,7 +281,7 @@ class Map(MapWidget):
             **kwargs,
         )
 
-    def creater_container(
+    def create_container(
         self,
         sidebar_visible: bool = False,
         min_width: int = 360,
@@ -408,7 +408,7 @@ class Map(MapWidget):
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         if self.container is None:
-            self.creater_container(**self.sidebar_args)
+            self.create_container(**self.sidebar_args)
         self.container.add_to_sidebar(
             widget,
             add_header=add_header,
@@ -444,7 +444,7 @@ class Map(MapWidget):
             max_width (int, optional): New maximum width in pixels. If None, keep current.
         """
         if self.container is None:
-            self.creater_container()
+            self.create_container()
         self.container.set_sidebar_width(min_width, max_width)
 
     @property
@@ -7591,7 +7591,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         """Calls the on_close callback if provided."""
 
         self.m.remove_from_sidebar(self)
-        self.on_close()
+        self.close()
 
     def build_layer_controls(self) -> None:
         """
@@ -7826,7 +7826,7 @@ class CustomWidget(v.ExpansionPanels):
 
         if self.host_map is not None:
             self.host_map.remove_from_sidebar(self)
-        self.on_close()
+        self.close()
 
     def add_widget(self, widget: widgets.Widget) -> None:
         """
