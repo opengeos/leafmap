@@ -181,6 +181,11 @@ def cog_tile(
     elif isinstance(kwargs["bidx"], int):
         kwargs["bidx"] = [kwargs["bidx"]]
 
+    if len(kwargs["bidx"]) == 1 and ("colormap" not in kwargs):
+        colormap = _get_image_colormap(url)
+        if colormap is not None:
+            kwargs["colormap"] = colormap
+
     if "rescale" not in kwargs and ("colormap" not in kwargs):
         stats = cog_stats(url, titiler_endpoint)
 
@@ -555,6 +560,7 @@ def stac_tile(
     Returns:
         str: Returns the STAC Tile layer URL.
     """
+    import json
 
     if url is None and collection is None:
         raise ValueError("Either url or collection must be specified.")
@@ -661,21 +667,30 @@ def stac_tile(
                     assets = None
 
         else:
-            kwargs["asset_bidx"] = bands
+            if bands is not None:
+                kwargs["asset_bidx"] = bands
         if assets is not None:
             kwargs["assets"] = assets
+
+            if len(kwargs["assets"]) == 1 and ("colormap" not in kwargs):
+                cog_url = get_cog_link_from_stac_item(url)
+                colormap = _get_image_colormap(cog_url)
+                if colormap is not None:
+                    kwargs["colormap"] = colormap
 
         if (
             (assets is not None)
             and ("asset_expression" not in kwargs)
             and ("expression" not in kwargs)
             and ("rescale" not in kwargs)
+            and ("colormap" not in kwargs)
         ):
             stats = stac_stats(
                 url=url,
                 assets=assets,
                 titiler_endpoint=titiler_endpoint,
             )
+
             if "detail" not in stats:
                 try:
                     percentile_2 = min([stats[s]["percentile_2"] for s in stats])
@@ -701,6 +716,9 @@ def stac_tile(
     if "TileMatrixSetId" in kwargs.keys():
         TileMatrixSetId = kwargs["TileMatrixSetId"]
         kwargs.pop("TileMatrixSetId")
+
+    if "colormap" in kwargs and isinstance(kwargs["colormap"], dict):
+        kwargs["colormap"] = json.dumps(kwargs["colormap"])
 
     if mosaic_json:
         r = requests.get(
@@ -1205,25 +1223,47 @@ def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) ->
     """
     collection_id = None
     try:
-        obj = pystac.STACObject.from_file(url, **kwargs)
+        response = requests.get(url, **kwargs)
+        response.raise_for_status()
+        data = response.json()
+
+        # Handle FeatureCollection from /items endpoint
+        if data.get("type") == "FeatureCollection":
+            features = data.get("features", [])
+            if not features:
+                raise ValueError("FeatureCollection contains no features.")
+            item = pystac.Item.from_dict(features[0])
+            collection_id = item.collection_id
+            root = item.get_root_link()
+            return (
+                (root.get_href() if root else item.get_self_href(), collection_id)
+                if return_col_id
+                else item.get_self_href()
+            )
+
+        # Handle STAC API Collection with root link
+        links = data.get("links", [])
+        root_href = None
+        for link in links:
+            if link.get("rel") == "root":
+                root_href = link.get("href")
+            if return_col_id and data.get("type") == "Collection":
+                collection_id = data.get("id")
+
+        if root_href:
+            return (root_href, collection_id) if return_col_id else root_href
+
+        # Otherwise, parse as regular STAC object
+        obj = pystac.STACObject.from_dict(data)
         if isinstance(obj, pystac.Collection):
             collection_id = obj.id
-        href = obj.get_root_link().get_href()
-
-        if not url.startswith(href):
-            href = obj.get_self_href()
-
-        if return_col_id:
-            return href, collection_id
-        else:
-            return href
+        root = obj.get_root_link()
+        href = root.get_href() if root else obj.get_self_href()
+        return (href, collection_id) if return_col_id else href
 
     except Exception as e:
-        print(e)
-        if return_col_id:
-            return None, None
-        else:
-            return None
+        print(f"Failed to resolve STAC root from {url}: {e}")
+        return (None, None) if return_col_id else None
 
 
 def stac_client(
@@ -2227,4 +2267,88 @@ def oam_search(
             return None
 
     except Exception as e:
+        return None
+
+
+def _get_image_colormap(image, index=1):
+    """
+    Retrieve the colormap from an image.
+
+    Args:
+        image (str, rasterio.io.DatasetReader, rioxarray.DataArray):
+            The input image. It can be:
+            - A file path to a raster image (string).
+            - A rasterio dataset.
+            - A rioxarray DataArray.
+        index (int): The band index to retrieve the colormap from (default is 1).
+
+    Returns:
+        dict: A dictionary representing the colormap (value: (R, G, B, A)), or None if no colormap is found.
+
+    Raises:
+        ValueError: If the input image type is unsupported.
+    """
+    import rasterio
+    import rioxarray
+    import xarray as xr
+
+    def remove_black_fills(d: dict) -> dict:
+        """Remove keys with value (0, 0, 0, 255)."""
+        return {str(k): v for k, v in d.items() if v != (0, 0, 0, 255)}
+
+    dataset = None
+
+    if isinstance(image, str):  # File path
+        with rasterio.open(image) as ds:
+            try:
+                return remove_black_fills(ds.colormap(index)) if ds.count > 0 else None
+            except:
+                return None
+    elif isinstance(image, rasterio.io.DatasetReader):  # rasterio dataset
+        dataset = image
+    elif isinstance(image, xr.DataArray) or isinstance(image, xr.Dataset):
+        source = image.encoding.get("source")
+        if source:
+            with rasterio.open(source) as ds:
+                return remove_black_fills(ds.colormap(index)) if ds.count > 0 else None
+        else:
+            raise ValueError(
+                "Cannot extract colormap: DataArray does not have a source."
+            )
+    else:
+        raise ValueError(
+            "Unsupported input type. Provide a file path, rasterio dataset, or rioxarray DataArray."
+        )
+
+    if dataset:
+        return (
+            remove_black_fills(dataset.colormap(index)) if dataset.count > 0 else None
+        )
+
+
+def get_cog_link_from_stac_item(item_url: str) -> str:
+    """
+    Retrieve the URL of the GeoTIFF asset from a STAC Item.
+
+    Args:
+        item_url (str): The URL to a STAC Item JSON.
+
+    Returns:
+        str: URL of the first .tif asset, or None if not found.
+    """
+    try:
+        response = requests.get(item_url)
+        response.raise_for_status()
+        item = response.json()
+
+        # Look for any asset ending in .tif
+        for asset_key, asset in item.get("assets", {}).items():
+            href = asset.get("href", "")
+            if href.endswith(".tif") or ".tif?" in href:
+                return href
+
+        print("No .tif asset found in item.")
+        return None
+    except Exception as e:
+        print(f"Failed to retrieve STAC item: {e}")
         return None
