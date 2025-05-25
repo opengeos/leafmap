@@ -283,10 +283,10 @@ class Map(MapWidget):
 
     def create_container(
         self,
-        sidebar_visible: bool = False,
-        min_width: int = 360,
-        max_width: int = 360,
-        expanded: bool = True,
+        sidebar_visible: bool = None,
+        min_width: int = None,
+        max_width: int = None,
+        expanded: bool = None,
         **kwargs: Any,
     ):
         """
@@ -305,7 +305,17 @@ class Map(MapWidget):
         Returns:
             Container: The created container widget with the map and sidebar.
         """
+
+        if sidebar_visible is None:
+            sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+        if min_width is None:
+            min_width = self.sidebar_args.get("min_width", 360)
+        if max_width is None:
+            max_width = self.sidebar_args.get("max_width", 360)
+        if expanded is None:
+            expanded = self.sidebar_args.get("expanded", True)
         self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+
         container = Container(
             host_map=self,
             sidebar_visible=sidebar_visible,
@@ -5445,6 +5455,29 @@ class Map(MapWidget):
             expanded=expanded,
             **kwargs,
         )
+
+    def to_solara(self, map_only: bool = False, **kwargs):
+        """
+        Converts the widget to a Solara widget.
+
+        Args:
+            map_only (bool, optional): Whether to only return the map widget. Defaults to False.
+        """
+
+        try:
+            import reacton.ipyvuetify as rv
+        except ImportError:
+            print(
+                "solara is not installed. Please install it with `pip install solara`."
+            )
+            return None
+
+        if map_only:
+            return rv.Row(children=[self], **kwargs)
+        else:
+            if self.container is None:
+                self.create_container()
+            return rv.Row(children=[self.container], **kwargs)
 
 
 class Container(v.Container):
