@@ -2300,7 +2300,10 @@ def _get_image_colormap(image, index=1):
 
     if isinstance(image, str):  # File path
         with rasterio.open(image) as ds:
-            return remove_black_fills(ds.colormap(index)) if ds.count > 0 else None
+            try:
+                return remove_black_fills(ds.colormap(index)) if ds.count > 0 else None
+            except:
+                return None
     elif isinstance(image, rasterio.io.DatasetReader):  # rasterio dataset
         dataset = image
     elif isinstance(image, xr.DataArray) or isinstance(image, xr.Dataset):
