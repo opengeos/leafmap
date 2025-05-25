@@ -1624,18 +1624,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.maplibregl.Map.create_mapillary_widget" class="md-nav__link">
+  <a href="#leafmap.maplibregl.Map.create_container" class="md-nav__link">
     <span class="md-ellipsis">
-      create_mapillary_widget
+      create_container
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.maplibregl.Map.creater_container" class="md-nav__link">
+  <a href="#leafmap.maplibregl.Map.create_mapillary_widget" class="md-nav__link">
     <span class="md-ellipsis">
-      creater_container
+      create_mapillary_widget
     </span>
   </a>
   
@@ -8109,18 +8109,18 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.maplibregl.Map.create_mapillary_widget" class="md-nav__link">
+  <a href="#leafmap.maplibregl.Map.create_container" class="md-nav__link">
     <span class="md-ellipsis">
-      create_mapillary_widget
+      create_container
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#leafmap.maplibregl.Map.creater_container" class="md-nav__link">
+  <a href="#leafmap.maplibregl.Map.create_mapillary_widget" class="md-nav__link">
     <span class="md-ellipsis">
-      creater_container
+      create_mapillary_widget
     </span>
   </a>
   
@@ -10692,7 +10692,7 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">host_map</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">host_map</span><span class="o">.</span><span class="n">remove_from_sidebar</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">add_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">:</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Widget</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -13074,7 +13074,7 @@ to their corresponding control widgets (checkbox and slider).</p>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calls the on_close callback if provided.&quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">remove_from_sidebar</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">build_layer_controls</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -20328,7 +20328,7 @@ and buttons for removing layers.</p>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">creater_container</span><span class="p">(</span>
+    <span class="k">def</span> <span class="nf">create_container</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sidebar_visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">min_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
@@ -20455,7 +20455,7 @@ and buttons for removing layers.</p>
 <span class="sd">            **kwargs (Any): Additional keyword arguments for the parent class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">creater_container</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sidebar_args</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_container</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sidebar_args</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">add_to_sidebar</span><span class="p">(</span>
             <span class="n">widget</span><span class="p">,</span>
             <span class="n">add_header</span><span class="o">=</span><span class="n">add_header</span><span class="p">,</span>
@@ -20491,7 +20491,7 @@ and buttons for removing layers.</p>
 <span class="sd">            max_width (int, optional): New maximum width in pixels. If None, keep current.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">creater_container</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">create_container</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">set_sidebar_width</span><span class="p">(</span><span class="n">min_width</span><span class="p">,</span> <span class="n">max_width</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -43287,7 +43287,7 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 <span class="sd">        **kwargs (Any): Additional keyword arguments for the parent class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">creater_container</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sidebar_args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_container</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">sidebar_args</span><span class="p">)</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">add_to_sidebar</span><span class="p">(</span>
         <span class="n">widget</span><span class="p">,</span>
         <span class="n">add_header</span><span class="o">=</span><span class="n">add_header</span><span class="p">,</span>
@@ -44583,6 +44583,218 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
 <div class="doc doc-object doc-function">
 
 
+<h3 id="leafmap.maplibregl.Map.create_container" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">create_container</span><span class="p">(</span><span class="n">sidebar_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_width</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">expanded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#leafmap.maplibregl.Map.create_container" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Creates a container widget for the map with an optional sidebar.</p>
+<p>This method initializes a <code>LayerManagerWidget</code> and a <code>Container</code> widget to display the map
+alongside a sidebar. The sidebar can be customized with visibility, width, and additional content.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>sidebar_visible</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the sidebar is visible. Defaults to False.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>min_width</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Minimum width of the sidebar in pixels. Defaults to 360.</p>
+              </div>
+            </td>
+            <td>
+                  <code>360</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_width</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum width of the sidebar in pixels. Defaults to 360.</p>
+              </div>
+            </td>
+            <td>
+                  <code>360</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>expanded</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the <code>LayerManagerWidget</code> is expanded by default. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional keyword arguments passed to the <code>Container</code> widget.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>Container</code></td>            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The created container widget with the map and sidebar.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">create_container</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">sidebar_visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">min_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
+    <span class="n">max_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
+    <span class="n">expanded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates a container widget for the map with an optional sidebar.</span>
+
+<span class="sd">    This method initializes a `LayerManagerWidget` and a `Container` widget to display the map</span>
+<span class="sd">    alongside a sidebar. The sidebar can be customized with visibility, width, and additional content.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sidebar_visible (bool): Whether the sidebar is visible. Defaults to False.</span>
+<span class="sd">        min_width (int): Minimum width of the sidebar in pixels. Defaults to 360.</span>
+<span class="sd">        max_width (int): Maximum width of the sidebar in pixels. Defaults to 360.</span>
+<span class="sd">        expanded (bool): Whether the `LayerManagerWidget` is expanded by default. Defaults to True.</span>
+<span class="sd">        **kwargs (Any): Additional keyword arguments passed to the `Container` widget.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Container: The created container widget with the map and sidebar.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">layer_manager</span> <span class="o">=</span> <span class="n">LayerManagerWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expanded</span><span class="o">=</span><span class="n">expanded</span><span class="p">)</span>
+    <span class="n">container</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span>
+        <span class="n">host_map</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">sidebar_visible</span><span class="o">=</span><span class="n">sidebar_visible</span><span class="p">,</span>
+        <span class="n">min_width</span><span class="o">=</span><span class="n">min_width</span><span class="p">,</span>
+        <span class="n">max_width</span><span class="o">=</span><span class="n">max_width</span><span class="p">,</span>
+        <span class="n">sidebar_content</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_manager</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">sidebar_widgets</span><span class="p">[</span><span class="s2">&quot;Layers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_manager</span>
+    <span class="k">return</span> <span class="n">container</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="leafmap.maplibregl.Map.create_mapillary_widget" class="doc doc-heading">
             <code class="highlight language-python"><span class="n">create_mapillary_widget</span><span class="p">(</span><span class="n">lon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">5e-05</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;classic&#39;</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">560</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">frame_border</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">link</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">container</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">column_widths</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
@@ -45023,218 +45235,6 @@ See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.</p
     <span class="k">else</span><span class="p">:</span>
 
         <span class="k">return</span> <span class="n">widget</span>
-</code></pre></div></td></tr></table></div>
-            </details>
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h3 id="leafmap.maplibregl.Map.creater_container" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">creater_container</span><span class="p">(</span><span class="n">sidebar_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">min_width</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">max_width</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span> <span class="n">expanded</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
-
-<a href="#leafmap.maplibregl.Map.creater_container" class="headerlink" title="Permanent link">&para;</a></h3>
-
-
-    <div class="doc doc-contents ">
-
-        <p>Creates a container widget for the map with an optional sidebar.</p>
-<p>This method initializes a <code>LayerManagerWidget</code> and a <code>Container</code> widget to display the map
-alongside a sidebar. The sidebar can be customized with visibility, width, and additional content.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>sidebar_visible</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether the sidebar is visible. Defaults to False.</p>
-              </div>
-            </td>
-            <td>
-                  <code>False</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>min_width</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Minimum width of the sidebar in pixels. Defaults to 360.</p>
-              </div>
-            </td>
-            <td>
-                  <code>360</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>max_width</code>
-            </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Maximum width of the sidebar in pixels. Defaults to 360.</p>
-              </div>
-            </td>
-            <td>
-                  <code>360</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>expanded</code>
-            </td>
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Whether the <code>LayerManagerWidget</code> is expanded by default. Defaults to True.</p>
-              </div>
-            </td>
-            <td>
-                  <code>True</code>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                <code>**kwargs</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Additional keyword arguments passed to the <code>Container</code> widget.</p>
-              </div>
-            </td>
-            <td>
-                  <code>{}</code>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-<th>Name</th>          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-<td><code>Container</code></td>            <td>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The created container widget with the map and sidebar.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-            <details class="quote">
-              <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">284</span>
-<span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span>
-<span class="normal">288</span>
-<span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span>
-<span class="normal">292</span>
-<span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
-<span class="normal">298</span>
-<span class="normal">299</span>
-<span class="normal">300</span>
-<span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span>
-<span class="normal">304</span>
-<span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span>
-<span class="normal">309</span>
-<span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
-<span class="normal">317</span>
-<span class="normal">318</span>
-<span class="normal">319</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">creater_container</span><span class="p">(</span>
-    <span class="bp">self</span><span class="p">,</span>
-    <span class="n">sidebar_visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">min_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
-    <span class="n">max_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">360</span><span class="p">,</span>
-    <span class="n">expanded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Creates a container widget for the map with an optional sidebar.</span>
-
-<span class="sd">    This method initializes a `LayerManagerWidget` and a `Container` widget to display the map</span>
-<span class="sd">    alongside a sidebar. The sidebar can be customized with visibility, width, and additional content.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        sidebar_visible (bool): Whether the sidebar is visible. Defaults to False.</span>
-<span class="sd">        min_width (int): Minimum width of the sidebar in pixels. Defaults to 360.</span>
-<span class="sd">        max_width (int): Maximum width of the sidebar in pixels. Defaults to 360.</span>
-<span class="sd">        expanded (bool): Whether the `LayerManagerWidget` is expanded by default. Defaults to True.</span>
-<span class="sd">        **kwargs (Any): Additional keyword arguments passed to the `Container` widget.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        Container: The created container widget with the map and sidebar.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">layer_manager</span> <span class="o">=</span> <span class="n">LayerManagerWidget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expanded</span><span class="o">=</span><span class="n">expanded</span><span class="p">)</span>
-    <span class="n">container</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span>
-        <span class="n">host_map</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
-        <span class="n">sidebar_visible</span><span class="o">=</span><span class="n">sidebar_visible</span><span class="p">,</span>
-        <span class="n">min_width</span><span class="o">=</span><span class="n">min_width</span><span class="p">,</span>
-        <span class="n">max_width</span><span class="o">=</span><span class="n">max_width</span><span class="p">,</span>
-        <span class="n">sidebar_content</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">layer_manager</span><span class="p">],</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
-    <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">sidebar_widgets</span><span class="p">[</span><span class="s2">&quot;Layers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">layer_manager</span>
-    <span class="k">return</span> <span class="n">container</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -48406,7 +48406,7 @@ the pitch. For more information, see https://maplibre.org/maplibre-gl-js/docs/AP
 <span class="sd">        max_width (int, optional): New maximum width in pixels. If None, keep current.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">creater_container</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_container</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">set_sidebar_width</span><span class="p">(</span><span class="n">min_width</span><span class="p">,</span> <span class="n">max_width</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
