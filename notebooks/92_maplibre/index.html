@@ -12,13 +12,13 @@
         <meta name="author" content="Qiusheng Wu">
       
       
-        <link rel="canonical" href="https://leafmap.org/notebooks/15_openstreetmap/">
+        <link rel="canonical" href="https://leafmap.org/notebooks/92_maplibre/">
       
       
-        <link rel="prev" href="../14_postgis/">
+        <link rel="prev" href="../91_raster_viz_gui/">
       
       
-        <link rel="next" href="../16_heremap/">
+        <link rel="next" href="../93_maplibre_pmtiles/">
       
       
       <link rel="icon" href="../../assets/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>15 openstreetmap - leafmap</title>
+        <title>92 maplibre - leafmap</title>
       
     
     
@@ -91,6 +91,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#installation" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -122,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              15 openstreetmap
+              92 maplibre
             
           </span>
         </div>
@@ -3997,17 +4002,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../15_openstreetmap/" class="md-nav__link">
         
   
   
@@ -4018,7 +4016,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -5776,10 +5773,30 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../92_maplibre/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    92 maplibre
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -5790,6 +5807,186 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import libraries
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create maps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add controls
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-basemaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add basemaps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xyz-tile-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      XYZ tile layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wms-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      WMS layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cog-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      COG layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stac-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      STAC layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local raster
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vancouver-property-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vancouver Property Value
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#earthquake-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Earthquake Clusters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#airport-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Airport Markers
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3d-indoor-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      3D Indoor Mapping
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-basemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Basemap
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#h3-grid-uk-road-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      H3 Grid UK Road Safety
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deckgl-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deck.GL Layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-deckgl-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple Deck.GL Layers
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -6119,6 +6316,176 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import libraries
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create maps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add controls
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-basemaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Add basemaps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#xyz-tile-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      XYZ tile layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wms-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      WMS layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cog-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      COG layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stac-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      STAC layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-raster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local raster
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vancouver-property-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vancouver Property Value
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#earthquake-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Earthquake Clusters
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#airport-markers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Airport Markers
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3d-indoor-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      3D Indoor Mapping
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-basemap" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Basemap
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#h3-grid-uk-road-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      H3 Grid UK Road Safety
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deckgl-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deck.GL Layer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multiple-deckgl-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Multiple Deck.GL Layers
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -6130,7 +6497,7 @@
               <article class="md-content__inner md-typeset">
                 
 
-    <a href="/notebooks/15_openstreetmap/15_openstreetmap.ipynb" title="Download Notebook" class="md-content__button md-icon">
+    <a href="/notebooks/92_maplibre/92_maplibre.ipynb" title="Download Notebook" class="md-content__button md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7z"/></svg>
     </a>
 
@@ -6143,7 +6510,7 @@
   
 
 
-  <h1>15 openstreetmap</h1>
+  <h1>92 maplibre</h1>
 
 <script>
 (function (global, factory) {
@@ -6586,11 +6953,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="https://demo.leafmap.org/lab/index.html?path=notebooks/15_openstreetmap.ipynb"><img alt="image" src="https://jupyterlite.rtfd.io/en/latest/_static/badge.svg"/></a>
-<a href="https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/notebooks/15_openstreetmap.ipynb"><img alt="image" src="https://colab.research.google.com/assets/colab-badge.svg"/></a>
+<p><a href="https://demo.leafmap.org/lab/index.html?path=notebooks/92_maplibre.ipynb"><img alt="image" src="https://jupyterlite.rtfd.io/en/latest/_static/badge.svg"/></a>
+<a href="https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/notebooks/92_maplibre.ipynb"><img alt="image" src="https://colab.research.google.com/assets/colab-badge.svg"/></a>
 <a href="https://mybinder.org/v2/gh/opengeos/leafmap/HEAD"><img alt="image" src="https://mybinder.org/badge_logo.svg"/></a></p>
-<p><strong>Downloading OpenStreetMap data with a single line of code</strong></p>
-<p>Uncomment the following line to install <a href="https://leafmap.org">leafmap</a> if needed.</p>
+<p><strong>Creating 3D maps with MapLibre</strong></p>
+<p>The notebook demonstrates how to create 3D maps using the <a href="https://github.com/eodaGmbH/py-maplibregl">MapLibre</a> Python package. The examples shown in this notebook are based on the <a href="https://eodagmbh.github.io/py-maplibregl/examples/vancouver_blocks/">MapLibre documentation</a>. Credits to the original authors at <a href="https://www.eoda.de/en/">eoda GmbH</a>.</p>
+<h2 id="installation">Installation<a class="anchor-link" href="#installation">¶</a></h2><p>Uncomment the following line to install <a href="https://leafmap.org">leafmap</a> if needed.</p>
 </div>
 </div>
 </div>
@@ -6613,16 +6981,27 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># !pip install leafmap</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %pip install "leafmap[maplibre]"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># !pip install leafmap</div>
+<div class="clipboard-copy-txt" id="cell-1"># %pip install "leafmap[maplibre]"</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="import-libraries">Import libraries<a class="anchor-link" href="#import-libraries">¶</a></h2>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6640,16 +7019,27 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># !pip install geopandas osmnx</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">leafmap.maplibregl</span> <span class="k">as</span> <span class="nn">leafmap</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2"># !pip install geopandas osmnx</div>
+<div class="clipboard-copy-txt" id="cell-2">import leafmap.maplibregl as leafmap</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="create-maps">Create maps<a class="anchor-link" href="#create-maps">¶</a></h2><p>Create an interactive map by specifying map center [lon, lat], zoom level, pitch, and bearing.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6667,27 +7057,40 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">leafmap</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">import leafmap</div>
+<div class="clipboard-copy-txt" id="cell-3">m = leafmap.Map(center=[-100, 40], zoom=3, pitch=0, bearing=0)
+m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Add OSM data of place(s) by name or ID to the map. Note that the leafmap custom layer control does not support GeoJSON, we need to use the ipyleaflet built-in layer control.</p>
+<p><img alt="" src="https://i.imgur.com/8ITaEZa.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>To customize the basemap, you can specify the <code>style</code> parameter. It can be an URL or a string, such as <code>dark-matter</code>, <code>positron</code>, <code>voyager</code>, <code>demotiles</code>.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6705,20 +7108,40 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_geocode</span><span class="p">(</span><span class="s2">"New York City"</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s2">"NYC"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"positron"</span><span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">m = leafmap.Map(toolbar_control=False, layers_control=True)
-m.add_osm_from_geocode("New York City", layer_name="NYC")
+<div class="clipboard-copy-txt" id="cell-4">m = leafmap.Map(style="positron")
 m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/9fImW21.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>To create a map with a background color, use <code>style="background-&lt;COLOR&gt;"</code>, such as <code>background-lightgray</code> and <code>background-green</code>.</p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6736,12 +7159,10 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_geocode</span><span class="p">(</span><span class="s2">"Chicago, Illinois"</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s2">"Chicago, IL"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"background-lightgray"</span><span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">m = leafmap.Map(toolbar_control=False, layers_control=True)
-m.add_osm_from_geocode("Chicago, Illinois", layer_name="Chicago, IL")
+<div class="clipboard-copy-txt" id="cell-5">m = leafmap.Map(style="background-lightgray")
 m</div>
 </div>
 </div>
@@ -6749,19 +7170,29 @@ m</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Show OSM feature tags.</p>
-<p><a href="https://wiki.openstreetmap.org/wiki/Map_features">https://wiki.openstreetmap.org/wiki/Map_features</a></p>
+<p><img alt="" src="https://i.imgur.com/xFeDTkE.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Alternatively, you can provide a URL to a vector style.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6779,27 +7210,42 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># leafmap.osm_tags_list()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">style</span> <span class="o">=</span> <span class="s2">"https://demotiles.maplibre.org/style.json"</span>
+<span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">)</span>
+<span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6"># leafmap.osm_tags_list()</div>
+<div class="clipboard-copy-txt" id="cell-6">style = "https://demotiles.maplibre.org/style.json"
+m = leafmap.Map(style=style)
+m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Add OSM entities within some distance N, S, E, W of address to the map.</p>
+<p><img alt="" src="https://i.imgur.com/yaZYrr1.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=16">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="add-controls">Add controls<a class="anchor-link" href="#add-controls">¶</a></h2><p>The control to add to the map. Can be one of the following: <code>scale</code>, <code>fullscreen</code>, <code>geolocate</code>, <code>navigation</code>.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=17">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6817,24 +7263,42 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_address</span><span class="p">(</span>
-    <span class="n">address</span><span class="o">=</span><span class="s2">"New York City"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">"amenity"</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">},</span> <span class="n">dist</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s2">"NYC bars"</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_control</span><span class="p">(</span><span class="s2">"geolocate"</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="s2">"top-left"</span><span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">m = leafmap.Map(toolbar_control=False, layers_control=True)
-m.add_osm_from_address(
-    address="New York City", tags={"amenity": "bar"}, dist=1500, layer_name="NYC bars"
-)
+<div class="clipboard-copy-txt" id="cell-7">m = leafmap.Map()
+m.add_control("geolocate", position="top-left")
 m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/7LS5WAk.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="add-basemaps">Add basemaps<a class="anchor-link" href="#add-basemaps">¶</a></h2>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=11">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=20">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6852,41 +7316,18 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_address</span><span class="p">(</span>
-    <span class="n">address</span><span class="o">=</span><span class="s2">"New York City"</span><span class="p">,</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">"landuse"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"retail"</span><span class="p">,</span> <span class="s2">"commercial"</span><span class="p">],</span> <span class="s2">"building"</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-    <span class="n">dist</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">layer_name</span><span class="o">=</span><span class="s2">"NYC buildings"</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">m = leafmap.Map(toolbar_control=False, layers_control=True)
-m.add_osm_from_address(
-    address="New York City",
-    tags={"landuse": ["retail", "commercial"], "building": True},
-    dist=1000,
-    layer_name="NYC buildings",
-)
+<div class="clipboard-copy-txt" id="cell-8">m = leafmap.Map()
 m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=12">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Add OSM entities within a N, S, E, W bounding box to the map.</p>
-</div>
-</div>
-</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=13">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6904,37 +7345,16 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">west</span> <span class="o">=</span> <span class="mf">40.7551</span><span class="p">,</span> <span class="mf">40.7454</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.9738</span><span class="p">,</span> <span class="o">-</span><span class="mf">73.9965</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_bbox</span><span class="p">(</span>
-    <span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">west</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">"amenity"</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">},</span> <span class="n">layer_name</span><span class="o">=</span><span class="s2">"NYC bars"</span>
-<span class="p">)</span>
-<span class="n">m</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">()</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-9">m = leafmap.Map(toolbar_control=False, layers_control=True)
-north, south, east, west = 40.7551, 40.7454, -73.9738, -73.9965
-m.add_osm_from_bbox(
-    north, south, east, west, tags={"amenity": "bar"}, layer_name="NYC bars"
-)
-m</div>
+<div class="clipboard-copy-txt" id="cell-9">m.add_basemap()</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=14">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Add OSM entities within some distance N, S, E, W of a point to the map.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=15">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=22">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6952,34 +7372,31 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
-    <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">46.7808</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.0156</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_point</span><span class="p">(</span>
-    <span class="n">center_point</span><span class="o">=</span><span class="p">(</span><span class="mf">46.7808</span><span class="p">,</span> <span class="o">-</span><span class="mf">96.0156</span><span class="p">),</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">"natural"</span><span class="p">:</span> <span class="s2">"water"</span><span class="p">},</span>
-    <span class="n">dist</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span>
-    <span class="n">layer_name</span><span class="o">=</span><span class="s2">"Lakes"</span><span class="p">,</span>
-<span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"OpenTopoMap"</span><span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-10">m = leafmap.Map(
-    center=[46.7808, -96.0156], zoom=12, toolbar_control=False, layers_control=True
-)
-m.add_osm_from_point(
-    center_point=(46.7808, -96.0156),
-    tags={"natural": "water"},
-    dist=10000,
-    layer_name="Lakes",
-)
+<div class="clipboard-copy-txt" id="cell-10">m = leafmap.Map()
+m.add_basemap("OpenTopoMap")
 m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=23">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/MRRw1MW.png"/></p>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=16">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=24">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -6997,45 +7414,27 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
-    <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">39.9170</span><span class="p">,</span> <span class="mf">116.3908</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_osm_from_point</span><span class="p">(</span>
-    <span class="n">center_point</span><span class="o">=</span><span class="p">(</span><span class="mf">39.9170</span><span class="p">,</span> <span class="mf">116.3908</span><span class="p">),</span>
-    <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">"building"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"natural"</span><span class="p">:</span> <span class="s2">"water"</span><span class="p">},</span>
-    <span class="n">dist</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
-    <span class="n">layer_name</span><span class="o">=</span><span class="s2">"Beijing"</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">m</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"Esri.WorldImagery"</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-11">m = leafmap.Map(
-    center=[39.9170, 116.3908], zoom=15, toolbar_control=False, layers_control=True
-)
-m.add_osm_from_point(
-    center_point=(39.9170, 116.3908),
-    tags={"building": True, "natural": "water"},
-    dist=1000,
-    layer_name="Beijing",
-)
-m</div>
+<div class="clipboard-copy-txt" id="cell-11">m.add_basemap("Esri.WorldImagery")</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=25">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Add OSM entities within the current map view to the map.</p>
+<h2 id="xyz-tile-layer">XYZ tile layer<a class="anchor-link" href="#xyz-tile-layer">¶</a></h2>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=18">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=26">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7053,12 +7452,18 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">toolbar_control</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">layers_control</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">set_center</span><span class="p">(</span><span class="o">-</span><span class="mf">73.9854</span><span class="p">,</span> <span class="mf">40.7500</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://tile.openstreetmap.org/</span><span class="si">{z}</span><span class="s2">/</span><span class="si">{x}</span><span class="s2">/</span><span class="si">{y}</span><span class="s2">.png"</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_tile_layer</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"OpenStreetMap"</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s2">"OpenStreetMap"</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-12">m = leafmap.Map(toolbar_control=False, layers_control=True)
-m.set_center(-73.9854, 40.7500, 16)
+<div class="clipboard-copy-txt" id="cell-12">m = leafmap.Map()
+url = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+m.add_tile_layer(
+    url, name="OpenStreetMap", attribution="OpenStreetMap", opacity=1.0, visible=True
+)
 m</div>
 </div>
 </div>
@@ -7066,18 +7471,29 @@ m</div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=27">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The <code>add_osm_from_view()</code> is only available for the ipyleaflet plotting backend.</p>
+<p><img alt="" src="https://i.imgur.com/V9wmsjl.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=28">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="wms-layer">WMS layer<a class="anchor-link" href="#wms-layer">¶</a></h2>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=20">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=29">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7095,27 +7511,48 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># m.add_osm_from_view(tags={"amenity": "bar", "building": True}, layer_name="New York")</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"Esri.WorldImagery"</span><span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://www.mrlc.gov/geoserver/mrlc_display/NLCD_2021_Land_Cover_L48/wms"</span>
+<span class="n">layers</span> <span class="o">=</span> <span class="s2">"NLCD_2021_Land_Cover_L48"</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_wms_layer</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">layers</span><span class="o">=</span><span class="n">layers</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NLCD"</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-13"># m.add_osm_from_view(tags={"amenity": "bar", "building": True}, layer_name="New York")</div>
+<div class="clipboard-copy-txt" id="cell-13">m = leafmap.Map(center=[-100, 40], zoom=3)
+m.add_basemap("Esri.WorldImagery")
+url = "https://www.mrlc.gov/geoserver/mrlc_display/NLCD_2021_Land_Cover_L48/wms"
+layers = "NLCD_2021_Land_Cover_L48"
+m.add_wms_layer(url, layers=layers, name="NLCD", opacity=0.8)
+m</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=21">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=30">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Create a GeoPandas GeoDataFrame from place.</p>
+<p><img alt="" src="https://i.imgur.com/xcZ4VKv.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=31">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="cog-layer">COG layer<a class="anchor-link" href="#cog-layer">¶</a></h2>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=22">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=32">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7133,13 +7570,1310 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gdf</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">osm_gdf_from_place</span><span class="p">(</span><span class="s2">"New York City"</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">"amenity"</span><span class="p">:</span> <span class="s2">"bar"</span><span class="p">})</span>
-<span class="n">gdf</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+<span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"https://github.com/opengeos/datasets/releases/download/raster/Libya-2023-07-01.tif"</span>
+<span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_cog_layer</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"COG"</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s2">"Maxar"</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-14">gdf = leafmap.osm_gdf_from_place("New York City", tags={"amenity": "bar"})
-gdf</div>
+<div class="clipboard-copy-txt" id="cell-14">m = leafmap.Map()
+url = (
+    "https://github.com/opengeos/datasets/releases/download/raster/Libya-2023-07-01.tif"
+)
+m.add_cog_layer(url, name="COG", attribution="Maxar", fit_bounds=True)
+m</div>
 </div>
 </div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=33">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/ApGhjDp.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=34">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="stac-layer">STAC layer<a class="anchor-link" href="#stac-layer">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=35">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-15">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_stac_layer</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"SPOT"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-15">m = leafmap.Map()
+url = "https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"
+m.add_stac_layer(url, bands=["B4", "B3", "B2"], name="SPOT", vmin=0, vmax=150)
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=36">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/RJAhsV5.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=37">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="local-raster">Local raster<a class="anchor-link" href="#local-raster">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=38">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-16">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s2">"https://github.com/opengeos/datasets/releases/download/raster/srtm90.tif"</span>
+<span class="n">filepath</span> <span class="o">=</span> <span class="s2">"srtm90.tif"</span>
+<span class="n">leafmap</span><span class="o">.</span><span class="n">download_file</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-16">url = "https://github.com/opengeos/datasets/releases/download/raster/srtm90.tif"
+filepath = "srtm90.tif"
+leafmap.download_file(url, filepath)</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=39">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-17">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_raster</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s2">"terrain"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"DEM"</span><span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-17">m = leafmap.Map()
+m.add_raster(filepath, colormap="terrain", name="DEM")
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=40">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/pMcuQAp.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=41">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="vancouver-property-value">Vancouver Property Value<a class="anchor-link" href="#vancouver-property-value">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=42">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-18">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mf">123.13</span><span class="p">,</span> <span class="mf">49.254</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"dark-matter"</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/geojson/vancouver-blocks.json"</span>
+<span class="n">paint_line</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"line-color"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span>
+    <span class="s2">"line-width"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">paint_fill</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"fill-extrusion-color"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"property"</span><span class="p">:</span> <span class="s2">"valuePerSqm"</span><span class="p">,</span>
+        <span class="s2">"stops"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s2">"grey"</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1000</span><span class="p">,</span> <span class="s2">"yellow"</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">5000</span><span class="p">,</span> <span class="s2">"orange"</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">10000</span><span class="p">,</span> <span class="s2">"darkred"</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">50000</span><span class="p">,</span> <span class="s2">"lightblue"</span><span class="p">],</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="s2">"fill-extrusion-height"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"*"</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">[</span><span class="s2">"sqrt"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"valuePerSqm"</span><span class="p">]]],</span>
+    <span class="s2">"fill-extrusion-opacity"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">layer_type</span><span class="o">=</span><span class="s2">"line"</span><span class="p">,</span> <span class="n">paint</span><span class="o">=</span><span class="n">paint_line</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"blocks-line"</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">layer_type</span><span class="o">=</span><span class="s2">"fill-extrusion"</span><span class="p">,</span> <span class="n">paint</span><span class="o">=</span><span class="n">paint_fill</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"blocks-fill"</span><span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-18">m = leafmap.Map(
+    center=[-123.13, 49.254], zoom=11, style="dark-matter", pitch=45, bearing=0
+)
+url = "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/geojson/vancouver-blocks.json"
+paint_line = {
+    "line-color": "white",
+    "line-width": 2,
+}
+paint_fill = {
+    "fill-extrusion-color": {
+        "property": "valuePerSqm",
+        "stops": [
+            [0, "grey"],
+            [1000, "yellow"],
+            [5000, "orange"],
+            [10000, "darkred"],
+            [50000, "lightblue"],
+        ],
+    },
+    "fill-extrusion-height": ["*", 10, ["sqrt", ["get", "valuePerSqm"]]],
+    "fill-extrusion-opacity": 0.9,
+}
+m.add_geojson(url, layer_type="line", paint=paint_line, name="blocks-line")
+m.add_geojson(url, layer_type="fill-extrusion", paint=paint_fill, name="blocks-fill")
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=43">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-19">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span><span class="o">.</span><span class="n">layer_interact</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-19">m.layer_interact()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=44">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/IZXfgSz.gif"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=45">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="earthquake-clusters">Earthquake Clusters<a class="anchor-link" href="#earthquake-clusters">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=46">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-20">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"positron"</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="s2">"https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"</span>
+<span class="n">source_args</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"cluster"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"cluster_radius"</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+    <span class="s2">"cluster_min_points"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"cluster_max_zoom"</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="s2">"cluster_properties"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"maxMag"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"max"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"mag"</span><span class="p">]],</span>
+        <span class="s2">"minMag"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"min"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"mag"</span><span class="p">]],</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"earthquake-circles"</span><span class="p">,</span>
+    <span class="nb">filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"!"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"has"</span><span class="p">,</span> <span class="s2">"point_count"</span><span class="p">]],</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span><span class="s2">"circle-color"</span><span class="p">:</span> <span class="s2">"darkblue"</span><span class="p">},</span>
+    <span class="n">source_args</span><span class="o">=</span><span class="n">source_args</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"earthquake-clusters"</span><span class="p">,</span>
+    <span class="nb">filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"has"</span><span class="p">,</span> <span class="s2">"point_count"</span><span class="p">],</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"circle-color"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"step"</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"point_count"</span><span class="p">],</span>
+            <span class="s2">"#51bbd6"</span><span class="p">,</span>
+            <span class="mi">100</span><span class="p">,</span>
+            <span class="s2">"#f1f075"</span><span class="p">,</span>
+            <span class="mi">750</span><span class="p">,</span>
+            <span class="s2">"#f28cb1"</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">"circle-radius"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"step"</span><span class="p">,</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"point_count"</span><span class="p">],</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">750</span><span class="p">,</span> <span class="mi">40</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">source_args</span><span class="o">=</span><span class="n">source_args</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="o">=</span><span class="s2">"symbol"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"earthquake-labels"</span><span class="p">,</span>
+    <span class="nb">filter</span><span class="o">=</span><span class="p">[</span><span class="s2">"has"</span><span class="p">,</span> <span class="s2">"point_count"</span><span class="p">],</span>
+    <span class="n">layout</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"text-field"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"point_count_abbreviated"</span><span class="p">],</span>
+        <span class="s2">"text-size"</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">source_args</span><span class="o">=</span><span class="n">source_args</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-20">m = leafmap.Map(style="positron")
+
+data = "https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"
+source_args = {
+    "cluster": True,
+    "cluster_radius": 50,
+    "cluster_min_points": 2,
+    "cluster_max_zoom": 14,
+    "cluster_properties": {
+        "maxMag": ["max", ["get", "mag"]],
+        "minMag": ["min", ["get", "mag"]],
+    },
+}
+
+m.add_geojson(
+    data,
+    layer_type="circle",
+    name="earthquake-circles",
+    filter=["!", ["has", "point_count"]],
+    paint={"circle-color": "darkblue"},
+    source_args=source_args,
+)
+
+m.add_geojson(
+    data,
+    layer_type="circle",
+    name="earthquake-clusters",
+    filter=["has", "point_count"],
+    paint={
+        "circle-color": [
+            "step",
+            ["get", "point_count"],
+            "#51bbd6",
+            100,
+            "#f1f075",
+            750,
+            "#f28cb1",
+        ],
+        "circle-radius": ["step", ["get", "point_count"], 20, 100, 30, 750, 40],
+    },
+    source_args=source_args,
+)
+
+m.add_geojson(
+    data,
+    layer_type="symbol",
+    name="earthquake-labels",
+    filter=["has", "point_count"],
+    layout={
+        "text-field": ["get", "point_count_abbreviated"],
+        "text-size": 12,
+    },
+    source_args=source_args,
+)
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=47">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/vge4jF4.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=48">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="airport-markers">Airport Markers<a class="anchor-link" href="#airport-markers">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=49">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-21">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">maplibre.controls</span> <span class="kn">import</span> <span class="n">Marker</span><span class="p">,</span> <span class="n">MarkerOptions</span><span class="p">,</span> <span class="n">Popup</span><span class="p">,</span> <span class="n">PopupOptions</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-21">from maplibre.controls import Marker, MarkerOptions, Popup, PopupOptions
+import pandas as pd</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=50">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-22">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"positron"</span><span class="p">)</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">"https://github.com/visgl/deck.gl-data/raw/master/examples/line/airports.json"</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">pandas_to_geojson</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">,</span> <span class="s2">"coordinates"</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s2">"type"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">,</span> <span class="s2">"abbrev"</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"Airports"</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"circle-color"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"match"</span><span class="p">,</span>
+            <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"type"</span><span class="p">],</span>
+            <span class="s2">"mid"</span><span class="p">,</span>
+            <span class="s2">"darkred"</span><span class="p">,</span>
+            <span class="s2">"major"</span><span class="p">,</span>
+            <span class="s2">"darkgreen"</span><span class="p">,</span>
+            <span class="s2">"darkblue"</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">"circle_radius"</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">"circle-opacity"</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_color</span><span class="p">(</span><span class="n">airport_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="s2">"darkblue"</span>
+    <span class="k">if</span> <span class="n">airport_type</span> <span class="o">==</span> <span class="s2">"mid"</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">"darkred"</span>
+    <span class="k">elif</span> <span class="n">airport_type</span> <span class="o">==</span> <span class="s2">"major"</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s2">"darkgreen"</span>
+
+    <span class="k">return</span> <span class="n">color</span>
+
+
+<span class="n">airports_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">popup_options</span> <span class="o">=</span> <span class="n">PopupOptions</span><span class="p">(</span><span class="n">close_button</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">airports_data</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add_marker</span><span class="p">(</span>
+        <span class="n">lng_lat</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"coordinates"</span><span class="p">],</span>
+        <span class="n">options</span><span class="o">=</span><span class="n">MarkerOptions</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">get_color</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s2">"type"</span><span class="p">])),</span>
+        <span class="n">popup</span><span class="o">=</span><span class="n">Popup</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">popup_options</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-22">m = leafmap.Map(style="positron")
+
+url = "https://github.com/visgl/deck.gl-data/raw/master/examples/line/airports.json"
+data = leafmap.pandas_to_geojson(
+    url, "coordinates", properties=["type", "name", "abbrev"]
+)
+
+m.add_geojson(
+    data,
+    name="Airports",
+    layer_type="circle",
+    paint={
+        "circle-color": [
+            "match",
+            ["get", "type"],
+            "mid",
+            "darkred",
+            "major",
+            "darkgreen",
+            "darkblue",
+        ],
+        "circle_radius": 10,
+        "circle-opacity": 0.3,
+    },
+)
+
+
+def get_color(airport_type: str) -&gt; str:
+    color = "darkblue"
+    if airport_type == "mid":
+        color = "darkred"
+    elif airport_type == "major":
+        color = "darkgreen"
+
+    return color
+
+
+airports_data = pd.read_json(url)
+popup_options = PopupOptions(close_button=False)
+
+for _, r in airports_data.iterrows():
+    m.add_marker(
+        lng_lat=r["coordinates"],
+        options=MarkerOptions(color=get_color(r["type"])),
+        popup=Popup(
+            text=r["name"],
+            options=popup_options,
+        ),
+    )
+
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=51">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/q7nN1PW.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=52">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="3d-indoor-mapping">3D Indoor Mapping<a class="anchor-link" href="#3d-indoor-mapping">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=53">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-23">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">87.61694</span><span class="p">,</span> <span class="mf">41.86625</span><span class="p">),</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span> <span class="n">pitch</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"positron"</span>
+<span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"OpenStreetMap.Mapnik"</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="s2">"https://maplibre.org/maplibre-gl-js/docs/assets/indoor-3d-map.geojson"</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="o">=</span><span class="s2">"fill-extrusion"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"floorplan"</span><span class="p">,</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"fill-extrusion-color"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">],</span>
+        <span class="s2">"fill-extrusion-height"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"height"</span><span class="p">],</span>
+        <span class="s2">"fill-extrusion-base"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"base_height"</span><span class="p">],</span>
+        <span class="s2">"fill-extrusion-opacity"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-23">m = leafmap.Map(
+    center=(-87.61694, 41.86625), zoom=17, pitch=40, bearing=20, style="positron"
+)
+m.add_basemap("OpenStreetMap.Mapnik")
+data = "https://maplibre.org/maplibre-gl-js/docs/assets/indoor-3d-map.geojson"
+m.add_geojson(
+    data,
+    layer_type="fill-extrusion",
+    name="floorplan",
+    paint={
+        "fill-extrusion-color": ["get", "color"],
+        "fill-extrusion-height": ["get", "height"],
+        "fill-extrusion-base": ["get", "base_height"],
+        "fill-extrusion-opacity": 0.5,
+    },
+)
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=54">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/dteQlQC.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=55">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="custom-basemap">Custom Basemap<a class="anchor-link" href="#custom-basemap">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=56">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-24">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">leafmap.maplibregl</span> <span class="k">as</span> <span class="nn">leafmap</span>
+<span class="kn">from</span> <span class="nn">maplibre.basemaps</span> <span class="kn">import</span> <span class="n">construct_basemap_style</span>
+<span class="kn">from</span> <span class="nn">maplibre</span> <span class="kn">import</span> <span class="n">Layer</span><span class="p">,</span> <span class="n">LayerType</span><span class="p">,</span> <span class="n">Map</span><span class="p">,</span> <span class="n">MapOptions</span>
+<span class="kn">from</span> <span class="nn">maplibre.sources</span> <span class="kn">import</span> <span class="n">GeoJSONSource</span>
+
+
+<span class="n">bg_layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">BACKGROUND</span><span class="p">,</span>
+    <span class="nb">id</span><span class="o">=</span><span class="s2">"background"</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span><span class="s2">"background-color"</span><span class="p">:</span> <span class="s2">"darkblue"</span><span class="p">,</span> <span class="s2">"background-opacity"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">countries_source</span> <span class="o">=</span> <span class="n">GeoJSONSource</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="s2">"https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson"</span>
+<span class="p">)</span>
+
+<span class="n">lines_layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">LINE</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="s2">"countries"</span><span class="p">,</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span><span class="s2">"line-color"</span><span class="p">:</span> <span class="s2">"white"</span><span class="p">,</span> <span class="s2">"line-width"</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">polygons_layer</span> <span class="o">=</span> <span class="n">Layer</span><span class="p">(</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">LayerType</span><span class="o">.</span><span class="n">FILL</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="s2">"countries"</span><span class="p">,</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span><span class="s2">"fill-color"</span><span class="p">:</span> <span class="s2">"darkred"</span><span class="p">,</span> <span class="s2">"fill-opacity"</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">custom_basemap</span> <span class="o">=</span> <span class="n">construct_basemap_style</span><span class="p">(</span>
+    <span class="n">layers</span><span class="o">=</span><span class="p">[</span><span class="n">bg_layer</span><span class="p">,</span> <span class="n">polygons_layer</span><span class="p">,</span> <span class="n">lines_layer</span><span class="p">],</span>
+    <span class="n">sources</span><span class="o">=</span><span class="p">{</span><span class="s2">"countries"</span><span class="p">:</span> <span class="n">countries_source</span><span class="p">},</span>
+<span class="p">)</span>
+
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">custom_basemap</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="s2">"https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">layer_type</span><span class="o">=</span><span class="s2">"circle"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"earthquakes"</span><span class="p">,</span>
+    <span class="n">paint</span><span class="o">=</span><span class="p">{</span><span class="s2">"circle-color"</span><span class="p">:</span> <span class="s2">"yellow"</span><span class="p">,</span> <span class="s2">"circle-radius"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_popup</span><span class="p">(</span><span class="s2">"earthquakes"</span><span class="p">,</span> <span class="s2">"mag"</span><span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-24">import leafmap.maplibregl as leafmap
+from maplibre.basemaps import construct_basemap_style
+from maplibre import Layer, LayerType, Map, MapOptions
+from maplibre.sources import GeoJSONSource
+
+
+bg_layer = Layer(
+    type=LayerType.BACKGROUND,
+    id="background",
+    source=None,
+    paint={"background-color": "darkblue", "background-opacity": 0.8},
+)
+
+countries_source = GeoJSONSource(
+    data="https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_110m_admin_0_countries.geojson"
+)
+
+lines_layer = Layer(
+    type=LayerType.LINE,
+    source="countries",
+    paint={"line-color": "white", "line-width": 1.5},
+)
+
+polygons_layer = Layer(
+    type=LayerType.FILL,
+    source="countries",
+    paint={"fill-color": "darkred", "fill-opacity": 0.8},
+)
+
+custom_basemap = construct_basemap_style(
+    layers=[bg_layer, polygons_layer, lines_layer],
+    sources={"countries": countries_source},
+)
+
+
+m = leafmap.Map(style=custom_basemap)
+data = "https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"
+m.add_geojson(
+    data,
+    layer_type="circle",
+    name="earthquakes",
+    paint={"circle-color": "yellow", "circle-radius": 5},
+)
+m.add_popup("earthquakes", "mag")
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=57">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/Bn9Kwje.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=58">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="h3-grid-uk-road-safety">H3 Grid UK Road Safety<a class="anchor-link" href="#h3-grid-uk-road-safety">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=59">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-25">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">h3</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-25">import pandas as pd
+import h3</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=60">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-26">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">RESOLUTION</span> <span class="o">=</span> <span class="mi">7</span>
+<span class="n">COLORS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">"lightblue"</span><span class="p">,</span>
+    <span class="s2">"turquoise"</span><span class="p">,</span>
+    <span class="s2">"lightgreen"</span><span class="p">,</span>
+    <span class="s2">"yellow"</span><span class="p">,</span>
+    <span class="s2">"orange"</span><span class="p">,</span>
+    <span class="s2">"darkred"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">road_safety</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="s2">"https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv"</span>
+<span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">create_h3_grid</span><span class="p">(</span><span class="n">res</span><span class="o">=</span><span class="n">RESOLUTION</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">road_safety</span><span class="p">[</span><span class="s2">"h3"</span><span class="p">]</span> <span class="o">=</span> <span class="n">road_safety</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">h3</span><span class="o">.</span><span class="n">geo_to_h3</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">"lat"</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s2">"lng"</span><span class="p">],</span> <span class="n">resolution</span><span class="o">=</span><span class="n">res</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">road_safety</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"h3"</span><span class="p">)</span><span class="o">.</span><span class="n">h3</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="s2">"count"</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s2">"count"</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"hexagon"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">[</span><span class="n">h3</span><span class="o">.</span><span class="n">h3_to_geo_boundary</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">"h3"</span><span class="p">],</span> <span class="n">geo_json</span><span class="o">=</span><span class="kc">True</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+    <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">"color"</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">cut</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">"count"</span><span class="p">],</span>
+        <span class="n">bins</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">COLORS</span><span class="p">),</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">COLORS</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">pandas_to_geojson</span><span class="p">(</span>
+        <span class="n">df</span><span class="p">,</span> <span class="s2">"hexagon"</span><span class="p">,</span> <span class="n">geometry_type</span><span class="o">=</span><span class="s2">"Polygon"</span><span class="p">,</span> <span class="n">properties</span><span class="o">=</span><span class="p">[</span><span class="s2">"count"</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">]</span>
+    <span class="p">)</span>
+
+
+<span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">1.415727</span><span class="p">,</span> <span class="mf">52.232395</span><span class="p">),</span>
+    <span class="n">zoom</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+    <span class="n">pitch</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+    <span class="n">bearing</span><span class="o">=-</span><span class="mi">27</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">create_h3_grid</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">layer_type</span><span class="o">=</span><span class="s2">"fill-extrusion"</span><span class="p">,</span>
+        <span class="n">paint</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">"fill-extrusion-color"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"color"</span><span class="p">],</span>
+            <span class="s2">"fill-extrusion-opacity"</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+            <span class="s2">"fill-extrusion-height"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"*"</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="p">[</span><span class="s2">"get"</span><span class="p">,</span> <span class="s2">"count"</span><span class="p">]],</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">pass</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-26">RESOLUTION = 7
+COLORS = (
+    "lightblue",
+    "turquoise",
+    "lightgreen",
+    "yellow",
+    "orange",
+    "darkred",
+)
+
+road_safety = pd.read_csv(
+    "https://raw.githubusercontent.com/visgl/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv"
+).dropna()
+
+
+def create_h3_grid(res=RESOLUTION) -&gt; dict:
+    road_safety["h3"] = road_safety.apply(
+        lambda x: h3.geo_to_h3(x["lat"], x["lng"], resolution=res), axis=1
+    )
+    df = road_safety.groupby("h3").h3.agg("count").to_frame("count").reset_index()
+    df["hexagon"] = df.apply(
+        lambda x: [h3.h3_to_geo_boundary(x["h3"], geo_json=True)], axis=1
+    )
+    df["color"] = pd.cut(
+        df["count"],
+        bins=len(COLORS),
+        labels=COLORS,
+    )
+    return leafmap.pandas_to_geojson(
+        df, "hexagon", geometry_type="Polygon", properties=["count", "color"]
+    )
+
+
+m = leafmap.Map(
+    center=(-1.415727, 52.232395),
+    zoom=7,
+    pitch=40,
+    bearing=-27,
+)
+try:
+    data = create_h3_grid()
+    m.add_geojson(
+        data,
+        layer_type="fill-extrusion",
+        paint={
+            "fill-extrusion-color": ["get", "color"],
+            "fill-extrusion-opacity": 0.7,
+            "fill-extrusion-height": ["*", 100, ["get", "count"]],
+        },
+    )
+except:
+    pass
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=61">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/DYWmj5y.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=62">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="deckgl-layer">Deck.GL Layer<a class="anchor-link" href="#deckgl-layer">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=63">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-27">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="s2">"positron"</span><span class="p">,</span>
+    <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">122.4</span><span class="p">,</span> <span class="mf">37.74</span><span class="p">),</span>
+    <span class="n">zoom</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
+    <span class="n">pitch</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">deck_grid_layer</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"@@type"</span><span class="p">:</span> <span class="s2">"GridLayer"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"GridLayer"</span><span class="p">,</span>
+    <span class="s2">"data"</span><span class="p">:</span> <span class="s2">"https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/sf-bike-parking.json"</span><span class="p">,</span>
+    <span class="s2">"extruded"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"getPosition"</span><span class="p">:</span> <span class="s2">"@@=COORDINATES"</span><span class="p">,</span>
+    <span class="s2">"getColorWeight"</span><span class="p">:</span> <span class="s2">"@@=SPACES"</span><span class="p">,</span>
+    <span class="s2">"getElevationWeight"</span><span class="p">:</span> <span class="s2">"@@=SPACES"</span><span class="p">,</span>
+    <span class="s2">"elevationScale"</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s2">"cellSize"</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="s2">"pickable"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">add_deck_layers</span><span class="p">([</span><span class="n">deck_grid_layer</span><span class="p">],</span> <span class="n">tooltip</span><span class="o">=</span><span class="s2">"Number of points: {{ count }}"</span><span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-27">m = leafmap.Map(
+    style="positron",
+    center=(-122.4, 37.74),
+    zoom=12,
+    pitch=40,
+)
+deck_grid_layer = {
+    "@@type": "GridLayer",
+    "id": "GridLayer",
+    "data": "https://raw.githubusercontent.com/visgl/deck.gl-data/master/website/sf-bike-parking.json",
+    "extruded": True,
+    "getPosition": "@@=COORDINATES",
+    "getColorWeight": "@@=SPACES",
+    "getElevationWeight": "@@=SPACES",
+    "elevationScale": 4,
+    "cellSize": 200,
+    "pickable": True,
+}
+
+m.add_deck_layers([deck_grid_layer], tooltip="Number of points: {{ count }}")
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=64">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/xBVdT2u.png"/></p>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="multiple-deckgl-layers">Multiple Deck.GL Layers<a class="anchor-link" href="#multiple-deckgl-layers">¶</a></h2>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=66">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-28">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-28">import requests</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=67">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-29">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">"https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_airports.geojson"</span>
+<span class="p">)</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-29">data = requests.get(
+    "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_airports.geojson"
+).json()</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=68">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-30">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
+    <span class="n">style</span><span class="o">=</span><span class="s2">"positron"</span><span class="p">,</span>
+    <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mf">0.45</span><span class="p">,</span> <span class="mf">51.47</span><span class="p">),</span>
+    <span class="n">zoom</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">pitch</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">deck_geojson_layer</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"@@type"</span><span class="p">:</span> <span class="s2">"GeoJsonLayer"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"airports"</span><span class="p">,</span>
+    <span class="s2">"data"</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+    <span class="s2">"filled"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"pointRadiusMinPixels"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"pointRadiusScale"</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+    <span class="s2">"getPointRadius"</span><span class="p">:</span> <span class="s2">"@@=11 - properties.scalerank"</span><span class="p">,</span>
+    <span class="s2">"getFillColor"</span><span class="p">:</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">180</span><span class="p">],</span>
+    <span class="s2">"autoHighlight"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"pickable"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">deck_arc_layer</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"@@type"</span><span class="p">:</span> <span class="s2">"ArcLayer"</span><span class="p">,</span>
+    <span class="s2">"id"</span><span class="p">:</span> <span class="s2">"arcs"</span><span class="p">,</span>
+    <span class="s2">"data"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="n">feature</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">"features"</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">feature</span><span class="p">[</span><span class="s2">"properties"</span><span class="p">][</span><span class="s2">"scalerank"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">4</span>
+    <span class="p">],</span>
+    <span class="s2">"getSourcePosition"</span><span class="p">:</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.4531566</span><span class="p">,</span> <span class="mf">51.4709959</span><span class="p">],</span>  <span class="c1"># London</span>
+    <span class="s2">"getTargetPosition"</span><span class="p">:</span> <span class="s2">"@@=geometry.coordinates"</span><span class="p">,</span>
+    <span class="s2">"getSourceColor"</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span>
+    <span class="s2">"getTargetColor"</span><span class="p">:</span> <span class="p">[</span><span class="mi">200</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">],</span>
+    <span class="s2">"getWidth"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"pickable"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">m</span><span class="o">.</span><span class="n">add_deck_layers</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">deck_geojson_layer</span><span class="p">,</span> <span class="n">deck_arc_layer</span><span class="p">],</span>
+    <span class="n">tooltip</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">"airports"</span><span class="p">:</span> <span class="s2">"{{ &amp;properties.name }}"</span><span class="p">,</span>
+        <span class="s2">"arcs"</span><span class="p">:</span> <span class="s2">"gps_code: {{ properties.gps_code }}"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-30">m = leafmap.Map(
+    style="positron",
+    center=(0.45, 51.47),
+    zoom=4,
+    pitch=30,
+)
+deck_geojson_layer = {
+    "@@type": "GeoJsonLayer",
+    "id": "airports",
+    "data": data,
+    "filled": True,
+    "pointRadiusMinPixels": 2,
+    "pointRadiusScale": 2000,
+    "getPointRadius": "@@=11 - properties.scalerank",
+    "getFillColor": [200, 0, 80, 180],
+    "autoHighlight": True,
+    "pickable": True,
+}
+
+deck_arc_layer = {
+    "@@type": "ArcLayer",
+    "id": "arcs",
+    "data": [
+        feature
+        for feature in data["features"]
+        if feature["properties"]["scalerank"] &lt; 4
+    ],
+    "getSourcePosition": [-0.4531566, 51.4709959],  # London
+    "getTargetPosition": "@@=geometry.coordinates",
+    "getSourceColor": [0, 128, 200],
+    "getTargetColor": [200, 0, 80],
+    "getWidth": 2,
+    "pickable": True,
+}
+
+m.add_deck_layers(
+    [deck_geojson_layer, deck_arc_layer],
+    tooltip={
+        "airports": "{{ &amp;properties.name }}",
+        "arcs": "gps_code: {{ properties.gps_code }}",
+    },
+)
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=69">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://i.imgur.com/eFc4IbZ.png"/></p>
 </div>
 </div>
 </div>
@@ -7173,7 +8907,7 @@ gdf</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="September 1, 2024 13:26:35 UTC"><span class="timeago" datetime="2024-09-01T13:26:35+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="September 1, 2024 13:26:35 UTC">2024-09-01</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="October 14, 2024 02:32:39 UTC"><span class="timeago" datetime="2024-10-14T02:32:39+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="October 14, 2024 02:32:39 UTC">2024-10-14</span>
   </span>
 
     
@@ -7183,7 +8917,7 @@ gdf</div>
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="May 26, 2021 03:56:51 UTC"><span class="timeago" datetime="2021-05-26T03:56:51+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="May 26, 2021 03:56:51 UTC">2021-05-26</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="June 17, 2024 18:41:13 UTC"><span class="timeago" datetime="2024-06-17T18:41:13+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="June 17, 2024 18:41:13 UTC">2024-06-17</span>
   </span>
 
     
