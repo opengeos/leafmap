@@ -1164,6 +1164,9 @@ class Map(ipyleaflet.Map):
         if isinstance(assets, str) and "," in assets:
             assets = assets.split(",")
 
+        if not isinstance(assets, list) and assets is not None:
+            assets = [assets]
+
         if "rescale" in kwargs:
             rescale = kwargs["rescale"]
             vmin, vmax = [float(v) for v in rescale.split(",")]
@@ -1178,6 +1181,7 @@ class Map(ipyleaflet.Map):
             nodata = None
 
         band_names = common.stac_bands(url, collection, item, titiler_endpoint)
+
         if assets is not None:
             indexes = [band_names.index(band) + 1 for band in assets]
         else:

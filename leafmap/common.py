@@ -16543,18 +16543,25 @@ def get_image_colormap(image, index=1):
     import rioxarray
     import xarray as xr
 
+    def remove_black_fills(d: dict) -> dict:
+        """Remove keys with value (0, 0, 0, 255)."""
+        return {str(k): v for k, v in d.items() if v != (0, 0, 0, 255)}
+
     dataset = None
 
     if isinstance(image, str):  # File path
         with rasterio.open(image) as ds:
-            return ds.colormap(index) if ds.count > 0 else None
+            try:
+                return remove_black_fills(ds.colormap(index)) if ds.count > 0 else None
+            except:
+                return None
     elif isinstance(image, rasterio.io.DatasetReader):  # rasterio dataset
         dataset = image
     elif isinstance(image, xr.DataArray) or isinstance(image, xr.Dataset):
         source = image.encoding.get("source")
         if source:
             with rasterio.open(source) as ds:
-                return ds.colormap(index) if ds.count > 0 else None
+                return remove_black_fills(ds.colormap(index)) if ds.count > 0 else None
         else:
             raise ValueError(
                 "Cannot extract colormap: DataArray does not have a source."
@@ -16565,7 +16572,9 @@ def get_image_colormap(image, index=1):
         )
 
     if dataset:
-        return dataset.colormap(index) if dataset.count > 0 else None
+        return (
+            remove_black_fills(dataset.colormap(index)) if dataset.count > 0 else None
+        )
 
 
 def write_image_colormap(image, colormap, output_path=None):
