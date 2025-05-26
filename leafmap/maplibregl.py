@@ -7653,7 +7653,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         """Calls the on_close callback if provided."""
 
         self.m.remove_from_sidebar(self)
-        self.close()
+        # self.close()
 
     def build_layer_controls(self) -> None:
         """
@@ -7888,7 +7888,7 @@ class CustomWidget(v.ExpansionPanels):
 
         if self.host_map is not None:
             self.host_map.remove_from_sidebar(self)
-        self.close()
+        # self.close()
 
     def add_widget(self, widget: widgets.Widget) -> None:
         """
@@ -8167,7 +8167,7 @@ class LayerStyleWidget(widgets.VBox):
 
     def _close_widget(self, _) -> None:
         """Close the widget."""
-        self.close()
+        # self.close()
         self.map.remove_from_sidebar(name=f"Style {self.layer['layer'].id}")
 
 
