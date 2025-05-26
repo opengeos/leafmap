@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import requests
+import sys
 from typing import Tuple, Dict, Any, Optional, Union, List, Callable
 from IPython.display import display
 
@@ -380,7 +381,12 @@ class Map(MapWidget):
             container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
 
-        display(container)
+        if "google.colab" in sys.modules:
+            import ipyvue as vue
+
+            display(vue.Html(children=[]), container)
+        else:
+            display(container)
 
     def set_sidebar_content(
         self, content: Union[widgets.VBox, List[widgets.Widget]]
