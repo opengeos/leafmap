@@ -5578,7 +5578,7 @@ class Container(v.Container):
         self.toggle_btn.on_event("click", self.toggle_sidebar)
 
         # Settings icon
-        self.settings_icon = v.Icon(children=["mdi-cog"])
+        self.settings_icon = v.Icon(children=["mdi-wrench"])
         self.settings_btn = v.Btn(
             icon=True,
             children=[self.settings_icon],
