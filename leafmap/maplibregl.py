@@ -5482,6 +5482,22 @@ class Map(MapWidget):
                 self.create_container()
             return rv.Row(children=[self.container], **kwargs)
 
+    def add_stac_gui(
+        self,
+        label="STAC Search",
+        widget_icon="mdi-search-web",
+        sidebar_width="515px",
+        **kwargs,
+    ):
+        """
+        Adds a STAC GUI to the map.
+        """
+        from .toolbar import stac_gui
+
+        widget = stac_gui(m=self, backend="maplibre")
+        self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
+        self.set_sidebar_width(min_width=sidebar_width)
+
 
 class Container(v.Container):
     """

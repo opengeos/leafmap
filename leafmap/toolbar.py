@@ -5005,41 +5005,42 @@ def stac_gui(
                         query = {}
 
                 print("Retrieving items...")
-                try:
-                    if connection.value in [
-                        "Google Earth Engine",
-                        "NASA Common Metadata Repository",
-                    ]:
-                        output.clear_output()
-                        print(f"{connection.value} is not supported yet.")
+                # try:
+                if connection.value in [
+                    "Google Earth Engine",
+                    "NASA Common Metadata Repository",
+                ]:
+                    output.clear_output()
+                    print(f"{connection.value} is not supported yet.")
+                else:
+                    if connection.value == "Custom STAC API Endpoint":
+                        search = stac_search(
+                            url=http_url.value,
+                            max_items=int(max_items.value),
+                            intersects=intersects,
+                            datetime=datetime,
+                            collections=custom_dataset.value,
+                            **query,
+                        )
+
                     else:
-                        if connection.value == "Custom STAC API Endpoint":
-                            search = stac_search(
-                                url=http_url.value,
-                                max_items=int(max_items.value),
-                                intersects=intersects,
-                                datetime=datetime,
-                                collections=custom_dataset.value,
-                                **query,
-                            )
+                        search = stac_search(
+                            url=http_url.value,
+                            max_items=int(max_items.value),
+                            intersects=intersects,
+                            datetime=datetime,
+                            **query,
+                        )
+                    search_dict = stac_search_to_dict(search)
+                    item.options = list(search_dict.keys())
+                    item.value = item.options[0]
+                    setattr(m, "stac_search", search)
+                    setattr(m, "stac_dict", search_dict)
+                    setattr(m, "stac_items", stac_search_to_list(search))
 
-                        else:
-                            search = stac_search(
-                                url=http_url.value,
-                                max_items=int(max_items.value),
-                                intersects=intersects,
-                                datetime=datetime,
-                                **query,
-                            )
-                        search_dict = stac_search_to_dict(search)
-                        item.options = list(search_dict.keys())
-                        item.value = item.options[0]
-                        setattr(m, "stac_search", search)
-                        setattr(m, "stac_dict", search_dict)
-                        setattr(m, "stac_items", stac_search_to_list(search))
-
-                        if add_footprints.value and m is not None:
-                            gdf = stac_search_to_gdf(search)
+                    if add_footprints.value and m is not None:
+                        gdf = stac_search_to_gdf(search)
+                        if backend == "ipyleaflet":
                             style = {
                                 "stroke": True,
                                 "color": "#000000",
@@ -5061,17 +5062,25 @@ def stac_gui(
                                 layer_name="Footprints",
                                 zoom_to_layer=True,
                             )
-                            setattr(m, "stac_gdf", gdf)
+                        else:
+                            name = get_unique_name("Footprints", m.get_layer_names())
+                            m.add_gdf(
+                                gdf,
+                                name=name,
+                            )
+                            m.set_opacity(name, 0.2)
+                            m.layer_manager.refresh()
+                        setattr(m, "stac_gdf", gdf)
 
-                        stac_data.clear()
-                        stac_data.append(search_dict)
-                        update_bands()
-                        output.clear_output()
-                except NotImplementedError as e:
-                    print(e)
+                    stac_data.clear()
+                    stac_data.append(search_dict)
+                    update_bands()
+                    output.clear_output()
+                # except NotImplementedError as e:
+                #     print(e)
 
-                except Exception as e:
-                    print(e)
+                # except Exception as e:
+                #     print(e)
 
         elif change["new"] == "Display":
             with output:
@@ -5113,48 +5122,48 @@ def stac_gui(
                     else:
                         assets = f"{red.value},{green.value},{blue.value}"
 
-                    try:
-                        if connection.value == "Microsoft Planetary Computer":
-                            m.add_stac_layer(
-                                collection=http_url.value.split("/")[-1],
-                                item=item.value,
-                                assets=assets,
-                                name=layer_name.value,
-                                fit_bounds=True,
-                                **vis_params,
-                            )
-                            setattr(
-                                m,
-                                "stac_item",
-                                m.stac_dict[item.value],
-                            )
-                            m.stac_item["collection"] = http_url.value.split("/")[-1]
-                        elif "digitalearth.africa" in http_url.value:
-                            setattr(m, "stac_item", m.stac_dict[item.value])
-                            red.value = red.options[0]
-                            green.value = green.options[0]
-                            blue.value = blue.options[0]
-                            url = s3_to_https(m.stac_item["assets"][red.value].href)
-                            m.add_cog_layer(
-                                url,
-                                name=layer_name.value,
-                                fit_bounds=True,
-                                **vis_params,
-                            )
+                    # try:
+                    if connection.value == "Microsoft Planetary Computer":
+                        m.add_stac_layer(
+                            collection=http_url.value.split("/")[-1],
+                            item=item.value,
+                            assets=assets,
+                            name=layer_name.value,
+                            fit_bounds=True,
+                            **vis_params,
+                        )
+                        setattr(
+                            m,
+                            "stac_item",
+                            m.stac_dict[item.value],
+                        )
+                        m.stac_item["collection"] = http_url.value.split("/")[-1]
+                    elif "digitalearth.africa" in http_url.value:
+                        setattr(m, "stac_item", m.stac_dict[item.value])
+                        red.value = red.options[0]
+                        green.value = green.options[0]
+                        blue.value = blue.options[0]
+                        url = s3_to_https(m.stac_item["assets"][red.value].href)
+                        m.add_cog_layer(
+                            url,
+                            name=layer_name.value,
+                            fit_bounds=True,
+                            **vis_params,
+                        )
 
-                        else:
-                            setattr(m, "stac_item", m.stac_dict[item.value])
-                            m.add_stac_layer(
-                                url=stac_data[0][item.value]["href"],
-                                item=item.value,
-                                assets=assets,
-                                name=layer_name.value,
-                                fit_bounds=True,
-                                **vis_params,
-                            )
-                        output.clear_output()
-                    except Exception as e:
-                        print(e)
+                    else:
+                        setattr(m, "stac_item", m.stac_dict[item.value])
+                        m.add_stac_layer(
+                            url=stac_data[0][item.value]["href"],
+                            item=item.value,
+                            assets=assets,
+                            name=layer_name.value,
+                            fit_bounds=True,
+                            **vis_params,
+                        )
+                    output.clear_output()
+                    # except Exception as e:
+                    #     print(e)
 
                 else:
                     print("Please click on the search button first.")
@@ -5165,12 +5174,14 @@ def stac_gui(
 
         elif change["new"] == "Close":
             if m is not None:
-                m.toolbar_reset()
-                if m.tool_control is not None and m.tool_control in m.controls:
-                    m.remove_control(m.tool_control)
-                    m.tool_control = None
-            toolbar_widget.close()
-
+                if backend == "ipyleaflet":
+                    m.toolbar_reset()
+                    if m.tool_control is not None and m.tool_control in m.controls:
+                        m.remove_control(m.tool_control)
+                        m.tool_control = None
+                    toolbar_widget.close()
+                else:
+                    m.remove_from_sidebar(name="STAC Search")
         buttons.value = None
 
     buttons.observe(button_clicked, "value")
