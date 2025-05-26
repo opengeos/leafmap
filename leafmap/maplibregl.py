@@ -242,7 +242,10 @@ class Map(MapWidget):
         if "sidebar_visible" not in sidebar_args:
             sidebar_args["sidebar_visible"] = sidebar_visible
         if "sidebar_width" not in sidebar_args:
+            if isinstance(sidebar_width, str):
+                sidebar_width = int(sidebar_width.replace("px", ""))
             sidebar_args["min_width"] = sidebar_width
+            sidebar_args["max_width"] = sidebar_width
         if "expanded" not in sidebar_args:
             sidebar_args["expanded"] = layer_manager_expanded
         self.sidebar_args = sidebar_args
@@ -5739,8 +5742,12 @@ class Container(v.Container):
             max_width (int, optional): New maximum width in pixels. If None, keep current.
         """
         if min_width is not None:
+            if isinstance(min_width, str):
+                min_width = int(min_width.replace("px", ""))
             self.min_width = min_width
         if max_width is not None:
+            if isinstance(max_width, str):
+                max_width = int(max_width.replace("px", ""))
             self.max_width = max_width
         self.update_sidebar_content()
 
