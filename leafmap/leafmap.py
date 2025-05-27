@@ -181,10 +181,11 @@ class Map(ipyleaflet.Map):
 
                     with self.edit_output:
                         self.edit_output.outputs = ()
+                        self.edit_output.clear_output()
                         self.edit_sheet = ipysheet.from_dataframe(
                             self.get_draw_props(n=self.num_attributes, return_df=True)
                         )
-                        display(self.edit_sheet)
+                        self.edit_output.append_display_data(self.edit_sheet)
 
                 self.user_rois = {
                     "type": "FeatureCollection",
@@ -2088,8 +2089,9 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
         with output:
+            output.clear_output()
             output.outputs = ()
-            display(colormap)
+            output.append_display_data(colormap)
 
         self.colorbar = colormap_ctrl
         self.add(colormap_ctrl)
@@ -2140,21 +2142,24 @@ class Map(ipyleaflet.Map):
             transparent_bg=transparent_bg,
         )
         with output:
+            output.clear_output()
             output.outputs = ()
-            plot_colormap(
-                cmap,
-                colors,
-                discrete,
-                label,
-                width,
-                height,
-                orientation,
-                vmin,
-                vmax,
-                axis_off,
-                show_name,
-                font_size,
-                **kwargs,
+            output.append_display_data(
+                plot_colormap(
+                    cmap,
+                    colors,
+                    discrete,
+                    label,
+                    width,
+                    height,
+                    orientation,
+                    vmin,
+                    vmax,
+                    axis_off,
+                    show_name,
+                    font_size,
+                    **kwargs,
+                )
             )
 
         self.colorbar = colormap_ctrl
