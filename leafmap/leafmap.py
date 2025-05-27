@@ -2013,7 +2013,7 @@ class Map(ipyleaflet.Map):
             )
             legend_widget = widgets.HTML(value=legend_text)
             with legend_output_widget:
-                display(legend_widget)
+                legend_output_widget.append_display_data(legend_widget)
 
             self.legend_widget = legend_output_widget
             self.legend_control = legend_control
@@ -4404,7 +4404,7 @@ class Map(ipyleaflet.Map):
                 else:
                     widget = widgets.Output(**kwargs)
                     with widget:
-                        display(content)
+                        widget.append_display_data(content)
                 control = ipyleaflet.WidgetControl(widget=widget, position=position)
                 self.add(control)
 

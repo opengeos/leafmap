@@ -3092,8 +3092,10 @@ def plotly_toolbar(
             map_widget.layout.width = map_min_width
             if map_refresh:
                 with map_widget:
+                    map_widget.clear_output()
                     map_widget.outputs = ()
-                    display(m)
+
+                    map_widget.append_display_data(m)
             layers_button.value = False
             toolbar_widget.children = [toolbar_header, toolbar_footer]
         else:
@@ -3103,8 +3105,9 @@ def plotly_toolbar(
                 toolbar_widget.children = [toolbar_button]
             if map_refresh:
                 with map_widget:
+                    map_widget.clear_output()
                     map_widget.outputs = ()
-                    display(m)
+                    map_widget.append_display_data(m)
 
     toolbar_button.observe(toolbar_btn_click, "value")
 
@@ -4006,7 +4009,7 @@ def show_table_gui(m, df):
         if sheet.layout.height > output.layout.max_height:
             sheet.layout.height = output.layout.max_height
         with output:
-            display(sheet)
+            output.append_display_data(sheet)
 
     checkbox.observe(checkbox_clicked, "value")
 
@@ -4201,7 +4204,7 @@ def show_table_gui(m, df):
     close_button.observe(close_btn_click, "value")
 
     with output:
-        display(sheet)
+        output.append_display_data(sheet)
 
     toolbar_button.value = True
     if m is not None:

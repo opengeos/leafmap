@@ -347,15 +347,19 @@ def show_image(
         out = widgets.Output()
         # layout={'border': '1px solid black'})
         # layout={'border': '1px solid black', 'width': str(width + 20) + 'px', 'height': str(height + 10) + 'px'},)
+        out.clear_output()
         out.outputs = ()
+
         display(out)
         with out:
             file = open(img_path, "rb")
             image = file.read()
             if (width is None) and (height is None):
-                display(widgets.Image(value=image))
+                out.append_display_data(widgets.Image(value=image))
             elif (width is not None) and (height is not None):
-                display(widgets.Image(value=image, width=width, height=height))
+                out.append_display_data(
+                    widgets.Image(value=image, width=width, height=height)
+                )
             else:
                 print("You need set both width and height.")
                 return
@@ -11499,9 +11503,10 @@ def widget_template(
             close_button.value = False
             toolbar_widget.children = [toolbar_header, toolbar_footer]
             if display_widget is not None:
+                widget.clear_output()
                 widget.outputs = ()
                 with widget:
-                    display(display_widget)
+                    widget.append_display_date(display_widget)
         else:
             toolbar_widget.children = [toolbar_button]
 

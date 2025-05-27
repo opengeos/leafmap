@@ -46,7 +46,7 @@ class Canvas:
 
         map_widget = widgets.Output(layout=widgets.Layout(width=map_max_width))
         with map_widget:
-            display(map)
+            map_widget.append_display_data(map)
 
         self.map = map
         self.map_min_width = map_min_width
