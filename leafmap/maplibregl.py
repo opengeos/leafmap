@@ -1078,7 +1078,6 @@ class Map(MapWidget):
             token = kwargs.pop("token", "AWS_MAPS_API_KEY")
             url = f"https://maps.geo.{region}.amazonaws.com/v2/tiles/raster.satellite/{{z}}/{{x}}/{{y}}?key={os.getenv(token)}"
             attribution = "© Amazon"
-            print(url)
         elif basemap == "USGS.Imagery":
             url = "https://basemap.nationalmap.gov/arcgis/services/USGSImageryOnly/MapServer/WMSServer?service=WMS&request=GetMap&layers=0&styles=&format=image%2Fpng&transparent=true&version=1.1.1&height=256&width=256&srs=EPSG%3A3857&bbox={bbox-epsg-3857}"
             attribution = "© USGS"
@@ -1643,7 +1642,7 @@ class Map(MapWidget):
                 Defaults to None.
             nodata (float, optional): The nodata value to use for the layer.
             titiler_endpoint (str, optional): The endpoint of the titiler service.
-                Defaults to "https://titiler.xyz".
+                Defaults to "https://giswqs-titiler-endpoint.hf.space".
             fit_bounds (bool, optional): Whether to adjust the viewport of
                 the map to fit the bounds of the layer. Defaults to True.
             overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
@@ -1716,7 +1715,7 @@ class Map(MapWidget):
             bands (list, optional): A list of band names, e.g.,
                 ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.
             no_data (int | float, optional): The nodata value to use for the layer.
-            titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz",
+            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space",
                 "https://planetarycomputer.microsoft.com/api/data/v1",
                 "planetary-computer", "pc". Defaults to None.
             name (str, optional): The layer name to use for the layer. Defaults to 'STAC Layer'.
@@ -8534,7 +8533,7 @@ class SelectDataWidget(widgets.VBox):
             accept=".geojson",
             multiple=True,
             description="Upload",
-            layout=widgets.Layout(width="100px"),
+            layout=widgets.Layout(width="120px"),
         )
         output = widgets.Output()
 
