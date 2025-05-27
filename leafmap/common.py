@@ -347,15 +347,19 @@ def show_image(
         out = widgets.Output()
         # layout={'border': '1px solid black'})
         # layout={'border': '1px solid black', 'width': str(width + 20) + 'px', 'height': str(height + 10) + 'px'},)
+        out.clear_output()
         out.outputs = ()
+
         display(out)
         with out:
             file = open(img_path, "rb")
             image = file.read()
             if (width is None) and (height is None):
-                display(widgets.Image(value=image))
+                out.append_display_data(widgets.Image(value=image))
             elif (width is not None) and (height is not None):
-                display(widgets.Image(value=image, width=width, height=height))
+                out.append_display_data(
+                    widgets.Image(value=image, width=width, height=height)
+                )
             else:
                 print("You need set both width and height.")
                 return
@@ -11499,9 +11503,10 @@ def widget_template(
             close_button.value = False
             toolbar_widget.children = [toolbar_header, toolbar_footer]
             if display_widget is not None:
+                widget.clear_output()
                 widget.outputs = ()
                 with widget:
-                    display(display_widget)
+                    widget.append_display_date(display_widget)
         else:
             toolbar_widget.children = [toolbar_button]
 
@@ -17226,3 +17231,33 @@ def create_lines_from_points(
         return gdf
     else:
         return gdf.__geo_interface__
+
+
+def s3_to_https(s3_url: str, region: str = "af-south-1") -> str:
+    """
+    Convert an S3 URI to an HTTPS URL for public access.
+
+    Parameters:
+        s3_url (str): The S3 URI, e.g., "s3://bucket-name/path/to/file.tif"
+        region (str): The AWS region where the bucket is located.
+
+    Returns:
+        str: The corresponding HTTPS URL.
+
+    Examples:
+        >>> s3_url = "s3://deafrica-services/crop_mask/northern/x187/y109/2019--P1Y/crop_mask_x187y109_2019--P1Y_mask.tif"
+        >>> https_url = s3_to_https(s3_url, region="af-south-1")
+        >>> print(https_url)
+        # https://deafrica-services.s3.af-south-1.amazonaws.com/crop_mask/northern/x187/y109/2019--P1Y/crop_mask_x187y109_2019--P1Y_mask.tif
+    """
+    if not s3_url.startswith("s3://"):
+        raise ValueError("Input must be an S3 URI starting with 's3://'")
+
+    s3_path = s3_url.replace("s3://", "")
+    parts = s3_path.split("/", 1)
+    if len(parts) != 2:
+        raise ValueError("Invalid S3 URI format")
+
+    bucket, key = parts
+    https_url = f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
+    return https_url

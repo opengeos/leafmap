@@ -1215,11 +1215,16 @@ def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) ->
 
     Args:
         url (str): The STAC object URL.
-        return_col_id (bool, optional): Return the collection ID if the STAC object is a collection. Defaults to False.
-        **kwargs: Keyword arguments for pystac.STACObject.from_file(). Defaults to None.
+        return_col_id (bool, optional): Return the collection ID if the STAC object
+            is a collection. Defaults to False.
+        **kwargs: Keyword arguments for pystac.STACObject.from_file().
 
     Returns:
-        str: The root link of the STAC object.
+        str: The root link of the STAC object. Returns None if no root link found.
+        tuple: If return_col_id is True, returns (root_link, collection_id).
+
+    Raises:
+        ValueError: If FeatureCollection contains no features.
     """
     collection_id = None
     try:
@@ -1238,25 +1243,41 @@ def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) ->
             return (
                 (root.get_href() if root else item.get_self_href(), collection_id)
                 if return_col_id
-                else item.get_self_href()
+                else root.get_href() if root else item.get_self_href()
             )
 
-        # Handle STAC API Collection with root link
+        # Handle STAC API objects (Collection, Catalog, etc.)
         links = data.get("links", [])
         root_href = None
+        self_href = None
+
         for link in links:
             if link.get("rel") == "root":
                 root_href = link.get("href")
-            if return_col_id and data.get("type") == "Collection":
+            elif link.get("rel") == "self":
+                self_href = link.get("href")
+
+        # Get collection/catalog ID if requested
+        if return_col_id:
+            if data.get("type") in ["Collection", "Catalog"]:
                 collection_id = data.get("id")
 
+        # Determine the root href:
+        # 1. If there's an explicit root link, use it
+        # 2. If there's no root link but there's a self link, the self link is the root
+        #    (this is common for root catalogs in STAC APIs)
+        # 3. Otherwise, fall back to parsing as a regular STAC object
         if root_href:
             return (root_href, collection_id) if return_col_id else root_href
+        elif self_href and not root_href:
+            # When there's no root link, self link often indicates this IS the root
+            return (self_href, collection_id) if return_col_id else self_href
 
-        # Otherwise, parse as regular STAC object
+        # Fallback: parse as regular STAC object using pystac
         obj = pystac.STACObject.from_dict(data)
-        if isinstance(obj, pystac.Collection):
+        if isinstance(obj, (pystac.Collection, pystac.Catalog)):
             collection_id = obj.id
+
         root = obj.get_root_link()
         href = root.get_href() if root else obj.get_self_href()
         return (href, collection_id) if return_col_id else href
@@ -1319,6 +1340,12 @@ def stac_client(
     try:
         if get_root:
             root = stac_root_link(url, return_col_id=return_col_id)
+            # Handle case where root is None
+            if root is None:
+                if return_col_id:
+                    root = (url, None)
+                else:
+                    root = url
         else:
             root = url
 
