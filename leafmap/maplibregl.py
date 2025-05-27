@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import requests
+import sys
 from typing import Tuple, Dict, Any, Optional, Union, List, Callable
 from IPython.display import display
 
@@ -242,7 +243,10 @@ class Map(MapWidget):
         if "sidebar_visible" not in sidebar_args:
             sidebar_args["sidebar_visible"] = sidebar_visible
         if "sidebar_width" not in sidebar_args:
+            if isinstance(sidebar_width, str):
+                sidebar_width = int(sidebar_width.replace("px", ""))
             sidebar_args["min_width"] = sidebar_width
+            sidebar_args["max_width"] = sidebar_width
         if "expanded" not in sidebar_args:
             sidebar_args["expanded"] = layer_manager_expanded
         self.sidebar_args = sidebar_args
@@ -377,7 +381,12 @@ class Map(MapWidget):
             container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
 
-        display(container)
+        if "google.colab" in sys.modules:
+            import ipyvue as vue
+
+            display(vue.Html(children=[]), container)
+        else:
+            display(container)
 
     def set_sidebar_content(
         self, content: Union[widgets.VBox, List[widgets.Widget]]
@@ -5479,6 +5488,22 @@ class Map(MapWidget):
                 self.create_container()
             return rv.Row(children=[self.container], **kwargs)
 
+    def add_stac_gui(
+        self,
+        label="STAC Search",
+        widget_icon="mdi-search-web",
+        sidebar_width="515px",
+        **kwargs,
+    ):
+        """
+        Adds a STAC GUI to the map.
+        """
+        from .toolbar import stac_gui
+
+        widget = stac_gui(m=self, backend="maplibre")
+        self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
+        self.set_sidebar_width(min_width=sidebar_width)
+
 
 class Container(v.Container):
     """
@@ -5553,7 +5578,7 @@ class Container(v.Container):
         self.toggle_btn.on_event("click", self.toggle_sidebar)
 
         # Settings icon
-        self.settings_icon = v.Icon(children=["mdi-cog"])
+        self.settings_icon = v.Icon(children=["mdi-wrench"])
         self.settings_btn = v.Btn(
             icon=True,
             children=[self.settings_icon],
@@ -5739,8 +5764,12 @@ class Container(v.Container):
             max_width (int, optional): New maximum width in pixels. If None, keep current.
         """
         if min_width is not None:
+            if isinstance(min_width, str):
+                min_width = int(min_width.replace("px", ""))
             self.min_width = min_width
         if max_width is not None:
+            if isinstance(max_width, str):
+                max_width = int(max_width.replace("px", ""))
             self.max_width = max_width
         self.update_sidebar_content()
 
@@ -6231,6 +6260,7 @@ def edit_gps_trace(
     def draw_change(lng_lat):
         if lng_lat.new:
             output.clear_output()
+            output.outputs = ()
             features = {
                 "type": "FeatureCollection",
                 "features": m.draw_features_selected,
@@ -6397,7 +6427,9 @@ def edit_gps_trace(
 
     def on_save_click(b):
         output.clear_output()
+        output.outputs = ()
         download_widget.clear_output()
+        download_widget.outputs = ()
 
         m.gdf.loc[m.gdf[ann_column_edited] == "selected", ann_column] = dropdown.value
         m.gdf.loc[m.gdf[ann_column_edited] == "selected", ann_column_edited] = (
@@ -6434,9 +6466,11 @@ def edit_gps_trace(
 
     def on_export_click(b):
         output.clear_output()
+        output.outputs = ()
         download_widget.clear_output()
+        download_widget.outputs = ()
         with output:
-            print("Exporting annotated GPS trace...")
+            output.append_stdout("Exporting annotated GPS trace...")
         changed_inx = m.gdf[m.gdf[ann_column] != m.gps_trace[ann_column]].index
         m.gps_trace.loc[changed_inx, "changed_timestamp"] = datetime.now().strftime(
             time_format
@@ -6468,15 +6502,20 @@ def edit_gps_trace(
 
             with output:
                 output.clear_output()
-                display(csv_link)
+                output.outputs = ()
+                output.append_display_data(csv_link)
             with download_widget:
                 download_widget.clear_output()
-                display(geojson_link)
+                download_widget.outputs = ()
+                download_widget.append_display_data(geojson_link)
         else:
             with output:
                 output.clear_output()
-                print(f"Saved CSV: {os.path.basename(output_csv)}")
-                print(f"Saved GeoJSON: {os.path.basename(output_geojson)}")
+                output.outputs = ()
+                output.append_stdout(f"Saved CSV: {os.path.basename(output_csv)}")
+                output.append_stdout(
+                    f"Saved GeoJSON: {os.path.basename(output_geojson)}"
+                )
 
         # Remove the temporary file if it exists
         tmp_file = os.path.splitext(filename)[0] + "_tmp.csv"
@@ -6489,7 +6528,9 @@ def edit_gps_trace(
         multi_select.value = []
         features_widget.children = []
         output.clear_output()
+        output.outputs = ()
         download_widget.clear_output()
+        download_widget.outputs = ()
 
     reset.on_click(on_reset_click)
 
@@ -6613,6 +6654,7 @@ def open_gps_trace(
                 f.write(content)
             with output:
                 output.clear_output()
+                output.outputs = ()
 
                 if "m" in kwargs:
                     m = kwargs.pop("m")
@@ -6657,7 +6699,8 @@ def open_gps_trace(
                         **kwargs,
                     )
                 except Exception as e:
-                    print(f"Error: {e}")
+                    output.outputs = ()
+                    output.append_stdout(f"Error: {e}")
                     edit_widget = widgets.VBox()
                 main_widget.children = [
                     widgets.HBox([uploader, reset]),
@@ -6809,7 +6852,8 @@ def open_gps_traces(
                         **kwargs,
                     )
                 except Exception as e:
-                    print(f"Error: {e}")
+                    output.outputs = ()
+                    output.append_stdout(f"Error: {e}")
                     edit_widget = widgets.VBox()
 
             main_widget.children = [filepath_widget, edit_widget, output]
@@ -7068,6 +7112,7 @@ def create_vector_data(
     def on_save_click(b):
 
         output.clear_output()
+        output.outputs = ()
         if len(m.draw_features_selected) > 0:
             feature_id = m.draw_features_selected[0]["id"]
             for prop_widget in prop_widgets.children:
@@ -7076,12 +7121,14 @@ def create_vector_data(
         else:
             with output:
                 output.clear_output()
-                print("Please select a feature to save.")
+                output.outputs = ()
+                output.append_stdout("Please select a feature to save.")
 
     save.on_click(on_save_click)
 
     def on_export_click(b):
         output.clear_output()
+        output.outputs = ()
         current_time = datetime.now().strftime(time_format)
         if filename_widget.value:
             filename = filename_widget.value
@@ -7109,14 +7156,17 @@ def create_vector_data(
         with output:
             if download:
                 download_link = common.create_download_link(filename, title="⬇️")
-                display(download_link)
+                output.outputs = ()
+                output.append_display_data(download_link)
             else:
-                print(f"Exported: {os.path.basename(filename)}")
+                output.outputs = ()
+                output.append_stdout(f"Exported: {os.path.basename(filename)}")
 
     export.on_click(on_export_click)
 
     def on_reset_click(b):
         output.clear_output()
+        output.outputs = ()
         for prop_widget in prop_widgets.children:
             description = prop_widget.description
             if description in properties:
@@ -7343,6 +7393,7 @@ def edit_vector_data(
         if lng_lat.new:
             if len(m.draw_features_selected) > 0:
                 output.clear_output()
+                output.outputs = ()
                 feature_id = m.draw_features_selected[0]["id"]
                 if feature_id not in m.draw_features:
                     m.draw_features[feature_id] = {}
@@ -7409,11 +7460,13 @@ def edit_vector_data(
                 m.draw_features[feature_id][key] = prop_widget.value
             with output:
                 output.clear_output()
-                print("Faeature saved.")
+                output.outputs = ()
+                output.append_stdout("Faeature saved.")
         else:
             with output:
                 output.clear_output()
-                print("Please select a feature to save.")
+                output.outputs = ()
+                output.append_stdout("Please select a feature to save.")
 
     save.on_click(on_save_click)
 
@@ -7434,12 +7487,14 @@ def edit_vector_data(
         gdf.to_file(filename)
         with output:
             output.clear_output()
-            print(f"Exported: {filename}")
+            output.outputs = ()
+            output.append_stdout(f"Exported: {filename}")
 
     export.on_click(on_export_click)
 
     def on_reset_click(b):
         output.clear_output()
+        output.outputs = ()
         for prop_widget in prop_widgets.children:
             description = prop_widget.description
             if description in properties:
@@ -7624,7 +7679,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         """Calls the on_close callback if provided."""
 
         self.m.remove_from_sidebar(self)
-        self.close()
+        # self.close()
 
     def build_layer_controls(self) -> None:
         """
@@ -7859,7 +7914,7 @@ class CustomWidget(v.ExpansionPanels):
 
         if self.host_map is not None:
             self.host_map.remove_from_sidebar(self)
-        self.close()
+        # self.close()
 
     def add_widget(self, widget: widgets.Widget) -> None:
         """
@@ -8138,7 +8193,7 @@ class LayerStyleWidget(widgets.VBox):
 
     def _close_widget(self, _) -> None:
         """Close the widget."""
-        self.close()
+        # self.close()
         self.map.remove_from_sidebar(name=f"Style {self.layer['layer'].id}")
 
 
@@ -8467,7 +8522,8 @@ class SelectDataWidget(widgets.VBox):
             folder_chooser.reset()
             with output:
                 output.clear_output()
-                print("Uploading ...")
+                output.outputs = ()
+                output.append_stdout("Uploading ...")
             temp_dir = tempfile.mkdtemp()
             temp_dirs.clear()
             for value in uploader.value:
@@ -8479,7 +8535,8 @@ class SelectDataWidget(widgets.VBox):
             temp_dirs.append(temp_dir)
             output.clear_output()
             with output:
-                print("Click Apply to add files to map")
+                output.outputs = ()
+                output.append_stdout("Click Apply to add files to map")
 
         uploader.observe(on_upload, names="value")
 
@@ -8513,7 +8570,8 @@ class SelectDataWidget(widgets.VBox):
             if map_widget is not None:
                 with output:
                     output.clear_output()
-                    print("Adding data to the map ...")
+                    output.outputs = ()
+                    output.append_stdout("Adding data to the map ...")
                     for index, file in enumerate(files):
                         if index == 0:
                             fit_bounds = True
@@ -8529,6 +8587,7 @@ class SelectDataWidget(widgets.VBox):
                             overwrite=True,
                         )
                     output.clear_output()
+                    output.outputs = ()
 
         def on_apply(change):
             """
@@ -8548,18 +8607,23 @@ class SelectDataWidget(widgets.VBox):
                         print("Adding data to the map ...")
                         default_callback(temp_dirs[-1])
                         output.clear_output()
+                        output.outputs = ()
                     else:
                         output.clear_output()
-                        print("Select a folder or upload files")
+                        output.outputs = ()
+                        output.append_stdout("Select a folder or upload files")
                 else:
                     with output:
                         if len(temp_dirs) > 0:
-                            print("Adding data to the map ...")
+                            output.outputs = ()
+                            output.append_stdout("Adding data to the map ...")
                             callback(temp_dirs[-1])
                             output.clear_output()
+                            output.outputs = ()
                         else:
                             output.clear_output()
-                            print("Select a folder or upload files")
+                            output.outputs = ()
+                            output.append_stdout("Select a folder or upload files")
 
             folder_chooser.reset()
             uploader.value = ()
@@ -8601,6 +8665,7 @@ class SelectDataWidget(widgets.VBox):
             if reset_callback is not None:
                 reset_callback()
             output.clear_output()
+            output.outputs = ()
 
         reset_btn.on_click(on_reset)
 

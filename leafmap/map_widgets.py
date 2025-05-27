@@ -305,8 +305,9 @@ class Legend(ipywidgets.VBox):
         super().__init__(children=[legend_output_widget])
 
         legend_output.clear_output()
+        legend_output.outputs = ()
         with legend_output:
-            display(legend_widget)
+            legend_output.append_display_data(legend_widget)
 
     def __check_if_allowed(value, value_name, allowed_list):  # pylint: disable=E0213
         if value not in allowed_list:
