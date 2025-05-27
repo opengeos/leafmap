@@ -1009,6 +1009,7 @@ class Map(MapWidget):
         opacity: float = 1.0,
         visible: bool = True,
         attribution: Optional[str] = None,
+        before_id: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         """
@@ -1029,6 +1030,8 @@ class Map(MapWidget):
             attribution (str, optional): The attribution text to display for the
                 basemap. If None, the attribution text is taken from the basemap
                 or the TileProvider. Defaults to None.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
             **kwargs: Additional keyword arguments that are passed to the
                 RasterTileSource class. See https://bit.ly/4erD2MQ for more information.
 
@@ -1076,6 +1079,12 @@ class Map(MapWidget):
             url = f"https://maps.geo.{region}.amazonaws.com/v2/tiles/raster.satellite/{{z}}/{{x}}/{{y}}?key={os.getenv(token)}"
             attribution = "© Amazon"
             print(url)
+        elif basemap == "USGS.Imagery":
+            url = "https://basemap.nationalmap.gov/arcgis/services/USGSImageryOnly/MapServer/WMSServer?service=WMS&request=GetMap&layers=0&styles=&format=image%2Fpng&transparent=true&version=1.1.1&height=256&width=256&srs=EPSG%3A3857&bbox={bbox-epsg-3857}"
+            attribution = "© USGS"
+            name = "USGS.Imagery"
+            if before_id is None:
+                before_id = self.first_symbol_layer_id
         elif basemap in basemaps:
             url = basemaps[basemap]["url"]
             if attribution is None:
@@ -1110,7 +1119,7 @@ class Map(MapWidget):
         source_name = common.get_unique_name("source", self.source_names)
         self.add_source(source_name, raster_source)
         layer = Layer(id=layer_name, source=source_name, type=LayerType.RASTER)
-        self.add_layer(layer)
+        self.add_layer(layer, before_id=before_id)
         self.set_opacity(layer_name, opacity)
         self.set_visibility(layer_name, visible)
 
@@ -3190,6 +3199,17 @@ class Map(MapWidget):
             if layer["type"] == "symbol":
                 return layer
         return None
+
+    @property
+    def first_symbol_layer_id(self) -> Optional[str]:
+        """
+        Get the ID of the first symbol layer in the map's current style.
+        """
+        layer = self.find_first_symbol_layer()
+        if layer is not None:
+            return layer["id"]
+        else:
+            return None
 
     def add_text(
         self,
