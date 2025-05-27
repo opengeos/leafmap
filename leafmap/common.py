@@ -996,7 +996,7 @@ def local_tile_pixel_value(
         lat (float): Latitude of the pixel.
         url (str): HTTP URL to a COG, e.g., 'https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif'
         bidx (str, optional): Dataset band indexes (e.g bidx=1, bidx=1&bidx=2&bidx=3). Defaults to None.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
         verbose (bool, optional): Print status messages. Defaults to True.
 
     Returns:
@@ -4361,7 +4361,7 @@ def mosaic_tile(url, titiler_endpoint=None, **kwargs):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
 
     Returns:
         str: The tile URL.
@@ -4390,7 +4390,7 @@ def mosaic_bounds(url, titiler_endpoint=None, **kwargs):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
 
     Returns:
         list: A list of values representing [left, bottom, right, top]
@@ -4419,7 +4419,7 @@ def mosaic_info(url, titiler_endpoint=None, **kwargs):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
 
     Returns:
         dict: A dictionary containing bounds, center, minzoom, maxzoom, and name as keys.
@@ -4448,7 +4448,7 @@ def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
 
     Returns:
         dict: A dictionary representing a dict of GeoJSON.
@@ -15105,7 +15105,9 @@ def d2s_tile(url: str, titiler_endpoint: str = None, **kwargs: Any) -> str:
     """
 
     if titiler_endpoint is None:
-        titiler_endpoint = os.environ.get("TITILER_ENDPOINT", "https://titiler.xyz")
+        titiler_endpoint = os.environ.get(
+            "TITILER_ENDPOINT", "https://giswqs-titiler-endpoint.hf.space"
+        )
 
     stats = cog_stats(url, titiler_endpoint=titiler_endpoint, **kwargs)
     if "detail" in stats:

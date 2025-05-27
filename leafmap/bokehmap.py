@@ -186,7 +186,7 @@ class Map:
             url (str): The URL of the COG tile layer.
             attribution (str, optional): The attribution to use. Defaults to ''.
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
-            titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
+            titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
             cog_args: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
@@ -288,7 +288,7 @@ class Map:
             item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
             assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
             bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
-            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.xyz", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
+            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
             attribution (str, optional): The attribution to use. Defaults to ''.
             fit_bounds (bool, optional): Whether to fit the map bounds to the raster bounds. Defaults to True.
             open_args: Arbitrary keyword arguments for get_local_tile_layer(). Defaults to {}.
