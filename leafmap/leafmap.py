@@ -1010,7 +1010,7 @@ class Map(ipyleaflet.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
-            titiler_endpoint (str, optional): Titiler endpoint. Defaults to "https://titiler.xyz".
+            titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
             zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
             layer_index (int, optional): The index at which to add the layer. Defaults to None.
             overwrite (bool, optional): Whether to overwrite the layer if it already exists. Defaults to False.
@@ -1136,7 +1136,7 @@ class Map(ipyleaflet.Map):
             item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
             assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
             bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
-            titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
+            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
             name (str, optional): The layer name to use for the layer. Defaults to 'STAC Layer'.
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
@@ -1223,7 +1223,7 @@ class Map(ipyleaflet.Map):
 
         Args:
             url (str): HTTP URL to a MosaicJSON.
-            titiler_endpoint (str, optional): Titiler endpoint, e.g., "https://titiler.xyz". Defaults to None.
+            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
             name (str, optional): The layer name to use for the layer. Defaults to 'Mosaic Layer'.
             attribution (str, optional): The attribution to use. Defaults to ''.
             opacity (float, optional): The opacity of the layer. Defaults to 1.
