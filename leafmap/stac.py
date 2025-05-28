@@ -152,7 +152,11 @@ def cog_tile(
 
     kwargs["url"] = url
 
-    band_names = cog_bands(url, titiler_endpoint)
+    try:
+        band_names = cog_bands(url, titiler_endpoint)
+    except Exception as e:
+        titiler_endpoint = "https://titiler.xyz"
+        band_names = cog_bands(url, titiler_endpoint)
 
     if isinstance(bands, str):
         bands = [bands]
@@ -187,7 +191,11 @@ def cog_tile(
             kwargs["colormap"] = colormap
 
     if "rescale" not in kwargs and ("colormap" not in kwargs):
-        stats = cog_stats(url, titiler_endpoint)
+        try:
+            stats = cog_stats(url, titiler_endpoint)
+        except Exception as e:
+            titiler_endpoint = "https://titiler.xyz"
+            stats = cog_stats(url, titiler_endpoint)
 
         if "message" not in stats:
             try:
@@ -214,9 +222,19 @@ def cog_tile(
     if "default_vis" in kwargs.keys() and kwargs["default_vis"]:
         kwargs = {"url": url}
 
-    r = requests.get(
-        f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json", params=kwargs
-    ).json()
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json",
+            params=kwargs,
+            timeout=10,
+        ).json()
+    except Exception as e:
+        titiler_endpoint = "https://titiler.xyz"
+        r = requests.get(
+            f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json",
+            params=kwargs,
+            timeout=10,
+        ).json()
     return r["tiles"][0]
 
 
@@ -616,12 +634,22 @@ def stac_tile(
             and ("expression" not in kwargs)
             and ("rescale" not in kwargs)
         ):
-            stats = stac_stats(
-                collection=collection,
-                item=item,
-                assets=assets,
-                titiler_endpoint=titiler_endpoint,
-            )
+            try:
+                stats = stac_stats(
+                    collection=collection,
+                    item=item,
+                    assets=assets,
+                    titiler_endpoint=titiler_endpoint,
+                )
+            except Exception as e:
+                titiler_endpoint = "https://titiler.xyz"
+                stats = stac_stats(
+                    collection=collection,
+                    item=item,
+                    assets=assets,
+                    titiler_endpoint=titiler_endpoint,
+                )
+
             if "detail" not in stats:
                 try:
                     percentile_2 = min([stats[s]["percentile_2"] for s in stats])
@@ -685,11 +713,19 @@ def stac_tile(
             and ("rescale" not in kwargs)
             and ("colormap" not in kwargs)
         ):
-            stats = stac_stats(
-                url=url,
-                assets=assets,
-                titiler_endpoint=titiler_endpoint,
-            )
+            try:
+                stats = stac_stats(
+                    url=url,
+                    assets=assets,
+                    titiler_endpoint=titiler_endpoint,
+                )
+            except Exception as e:
+                titiler_endpoint = "https://titiler.xyz"
+                stats = stac_stats(
+                    url=url,
+                    assets=assets,
+                    titiler_endpoint=titiler_endpoint,
+                )
 
             if "detail" not in stats:
                 try:
@@ -721,18 +757,38 @@ def stac_tile(
         kwargs["colormap"] = json.dumps(kwargs["colormap"])
 
     if mosaic_json:
-        r = requests.get(
-            f"{titiler_endpoint}/mosaicjson/{TileMatrixSetId}/tilejson.json",
-            params=kwargs,
-        ).json()
+        try:
+            r = requests.get(
+                f"{titiler_endpoint}/mosaicjson/{TileMatrixSetId}/tilejson.json",
+                params=kwargs,
+                timeout=10,
+            ).json()
+        except Exception as e:
+            titiler_endpoint = "https://titiler.xyz"
+            r = requests.get(
+                f"{titiler_endpoint}/mosaicjson/{TileMatrixSetId}/tilejson.json",
+                params=kwargs,
+                timeout=10,
+            ).json()
     else:
         if isinstance(titiler_endpoint, str):
-            r = requests.get(
-                f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
-                params=kwargs,
-            ).json()
+            try:
+                r = requests.get(
+                    f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
+                    params=kwargs,
+                    timeout=10,
+                ).json()
+            except Exception as e:
+                titiler_endpoint = "https://titiler.xyz"
+                r = requests.get(
+                    f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
+                    params=kwargs,
+                    timeout=10,
+                ).json()
         else:
-            r = requests.get(titiler_endpoint.url_for_stac_item(), params=kwargs).json()
+            r = requests.get(
+                titiler_endpoint.url_for_stac_item(), params=kwargs, timeout=10
+            ).json()
 
     return r["tiles"][0]
 
