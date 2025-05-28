@@ -11644,7 +11644,18 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 <span class="normal">8475</span>
 <span class="normal">8476</span>
 <span class="normal">8477</span>
-<span class="normal">8478</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DateFilterWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="normal">8478</span>
+<span class="normal">8479</span>
+<span class="normal">8480</span>
+<span class="normal">8481</span>
+<span class="normal">8482</span>
+<span class="normal">8483</span>
+<span class="normal">8484</span>
+<span class="normal">8485</span>
+<span class="normal">8486</span>
+<span class="normal">8487</span>
+<span class="normal">8488</span>
+<span class="normal">8489</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DateFilterWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A widget for filtering data based on time range.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -11662,6 +11673,7 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
         <span class="n">max_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">file_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">group_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">match</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span>
         <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
         <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">map_widget</span><span class="p">:</span> <span class="n">Map</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11681,6 +11693,7 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 <span class="sd">            max_date (str, optional): Maximum date. Defaults to None.</span>
 <span class="sd">            file_index (int, optional): Index of the main file. Defaults to 0.</span>
 <span class="sd">            group_col (str, optional): Name of the column containing the group. Defaults to None.</span>
+<span class="sd">            match (str, optional): Match type. Can be &quot;partial&quot; or &quot;exact&quot;. Defaults to &quot;partial&quot;.</span>
 <span class="sd">            freq (str, optional): Frequency of the date range. Defaults to &quot;D&quot;.</span>
 <span class="sd">            interval (int, optional): Interval of the date range. Defaults to 1.</span>
 <span class="sd">            map_widget (Map, optional): Map widget. Defaults to None.</span>
@@ -11880,7 +11893,16 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
                         <span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                         <span class="ow">and</span> <span class="n">group_col</span> <span class="ow">in</span> <span class="n">point_gdf</span><span class="o">.</span><span class="n">columns</span>
                     <span class="p">):</span>
-                        <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span><span class="n">filtered</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">match</span> <span class="o">==</span> <span class="s2">&quot;exact&quot;</span><span class="p">:</span>
+                            <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span>
+                                <span class="n">filtered</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span>
+                            <span class="p">]</span>
+                        <span class="k">elif</span> <span class="n">match</span> <span class="o">==</span> <span class="s2">&quot;partial&quot;</span><span class="p">:</span>
+                            <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span>
+                                <span class="n">filtered</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                            <span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid match type: </span><span class="si">{</span><span class="n">match</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                     <span class="n">map_widget</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span>
                         <span class="n">names</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="n">file_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">filtered</span><span class="o">.</span><span class="n">__geo_interface__</span>
@@ -11923,7 +11945,7 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 
 
 <h3 id="leafmap.maplibregl.DateFilterWidget.__init__" class="doc doc-heading">
-            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">styles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_date_col</span><span class="o">=</span><span class="s1">&#39;startDatetime&#39;</span><span class="p">,</span> <span class="n">end_date_col</span><span class="o">=</span><span class="s1">&#39;endDatetime&#39;</span><span class="p">,</span> <span class="n">date_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">min_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">map_widget</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">sources</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">styles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">start_date_col</span><span class="o">=</span><span class="s1">&#39;startDatetime&#39;</span><span class="p">,</span> <span class="n">end_date_col</span><span class="o">=</span><span class="s1">&#39;endDatetime&#39;</span><span class="p">,</span> <span class="n">date_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">date_format</span><span class="o">=</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">min_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">group_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="s1">&#39;partial&#39;</span><span class="p">,</span> <span class="n">freq</span><span class="o">=</span><span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">map_widget</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#leafmap.maplibregl.DateFilterWidget.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -12118,6 +12140,22 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
             </td>
             <td>
                   <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>match</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Match type. Can be "partial" or "exact". Defaults to "partial".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;partial&#39;</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -12428,7 +12466,18 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 <span class="normal">8475</span>
 <span class="normal">8476</span>
 <span class="normal">8477</span>
-<span class="normal">8478</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">8478</span>
+<span class="normal">8479</span>
+<span class="normal">8480</span>
+<span class="normal">8481</span>
+<span class="normal">8482</span>
+<span class="normal">8483</span>
+<span class="normal">8484</span>
+<span class="normal">8485</span>
+<span class="normal">8486</span>
+<span class="normal">8487</span>
+<span class="normal">8488</span>
+<span class="normal">8489</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12441,6 +12490,7 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
     <span class="n">max_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">file_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="n">group_col</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">match</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;partial&quot;</span><span class="p">,</span>
     <span class="n">freq</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;D&quot;</span><span class="p">,</span>
     <span class="n">interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">map_widget</span><span class="p">:</span> <span class="n">Map</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12460,6 +12510,7 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 <span class="sd">        max_date (str, optional): Maximum date. Defaults to None.</span>
 <span class="sd">        file_index (int, optional): Index of the main file. Defaults to 0.</span>
 <span class="sd">        group_col (str, optional): Name of the column containing the group. Defaults to None.</span>
+<span class="sd">        match (str, optional): Match type. Can be &quot;partial&quot; or &quot;exact&quot;. Defaults to &quot;partial&quot;.</span>
 <span class="sd">        freq (str, optional): Frequency of the date range. Defaults to &quot;D&quot;.</span>
 <span class="sd">        interval (int, optional): Interval of the date range. Defaults to 1.</span>
 <span class="sd">        map_widget (Map, optional): Map widget. Defaults to None.</span>
@@ -12659,7 +12710,16 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
                     <span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                     <span class="ow">and</span> <span class="n">group_col</span> <span class="ow">in</span> <span class="n">point_gdf</span><span class="o">.</span><span class="n">columns</span>
                 <span class="p">):</span>
-                    <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span><span class="n">filtered</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">match</span> <span class="o">==</span> <span class="s2">&quot;exact&quot;</span><span class="p">:</span>
+                        <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span>
+                            <span class="n">filtered</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span>
+                        <span class="p">]</span>
+                    <span class="k">elif</span> <span class="n">match</span> <span class="o">==</span> <span class="s2">&quot;partial&quot;</span><span class="p">:</span>
+                        <span class="n">filtered</span> <span class="o">=</span> <span class="n">filtered</span><span class="p">[</span>
+                            <span class="n">filtered</span><span class="p">[</span><span class="n">group_col</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">group_dropdown</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid match type: </span><span class="si">{</span><span class="n">match</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
                 <span class="n">map_widget</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span>
                     <span class="n">names</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="n">file_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="n">filtered</span><span class="o">.</span><span class="n">__geo_interface__</span>
@@ -50521,18 +50581,7 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
 
               <details class="quote">
                 <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8481</span>
-<span class="normal">8482</span>
-<span class="normal">8483</span>
-<span class="normal">8484</span>
-<span class="normal">8485</span>
-<span class="normal">8486</span>
-<span class="normal">8487</span>
-<span class="normal">8488</span>
-<span class="normal">8489</span>
-<span class="normal">8490</span>
-<span class="normal">8491</span>
-<span class="normal">8492</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8492</span>
 <span class="normal">8493</span>
 <span class="normal">8494</span>
 <span class="normal">8495</span>
@@ -50735,7 +50784,18 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
 <span class="normal">8692</span>
 <span class="normal">8693</span>
 <span class="normal">8694</span>
-<span class="normal">8695</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SelectDataWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="normal">8695</span>
+<span class="normal">8696</span>
+<span class="normal">8697</span>
+<span class="normal">8698</span>
+<span class="normal">8699</span>
+<span class="normal">8700</span>
+<span class="normal">8701</span>
+<span class="normal">8702</span>
+<span class="normal">8703</span>
+<span class="normal">8704</span>
+<span class="normal">8705</span>
+<span class="normal">8706</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SelectDataWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A widget for selecting and uploading data to be added to a map.</span>
 
@@ -51078,18 +51138,7 @@ to be called when the selection is reset. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8489</span>
-<span class="normal">8490</span>
-<span class="normal">8491</span>
-<span class="normal">8492</span>
-<span class="normal">8493</span>
-<span class="normal">8494</span>
-<span class="normal">8495</span>
-<span class="normal">8496</span>
-<span class="normal">8497</span>
-<span class="normal">8498</span>
-<span class="normal">8499</span>
-<span class="normal">8500</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8500</span>
 <span class="normal">8501</span>
 <span class="normal">8502</span>
 <span class="normal">8503</span>
@@ -51284,7 +51333,18 @@ to be called when the selection is reset. Defaults to None.</p>
 <span class="normal">8692</span>
 <span class="normal">8693</span>
 <span class="normal">8694</span>
-<span class="normal">8695</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">8695</span>
+<span class="normal">8696</span>
+<span class="normal">8697</span>
+<span class="normal">8698</span>
+<span class="normal">8699</span>
+<span class="normal">8700</span>
+<span class="normal">8701</span>
+<span class="normal">8702</span>
+<span class="normal">8703</span>
+<span class="normal">8704</span>
+<span class="normal">8705</span>
+<span class="normal">8706</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">default_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="n">widget_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;360px&quot;</span><span class="p">,</span>
