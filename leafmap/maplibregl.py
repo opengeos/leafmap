@@ -8234,6 +8234,7 @@ class DateFilterWidget(widgets.VBox):
         max_date: str = None,
         file_index: int = 0,
         group_col: str = None,
+        match: str = "partial",
         freq: str = "D",
         interval: int = 1,
         map_widget: Map = None,
@@ -8253,6 +8254,7 @@ class DateFilterWidget(widgets.VBox):
             max_date (str, optional): Maximum date. Defaults to None.
             file_index (int, optional): Index of the main file. Defaults to 0.
             group_col (str, optional): Name of the column containing the group. Defaults to None.
+            match (str, optional): Match type. Can be "partial" or "exact". Defaults to "partial".
             freq (str, optional): Frequency of the date range. Defaults to "D".
             interval (int, optional): Interval of the date range. Defaults to 1.
             map_widget (Map, optional): Map widget. Defaults to None.
@@ -8452,7 +8454,16 @@ class DateFilterWidget(widgets.VBox):
                         group_dropdown.value is not None
                         and group_col in point_gdf.columns
                     ):
-                        filtered = filtered[filtered[group_col] == group_dropdown.value]
+                        if match == "exact":
+                            filtered = filtered[
+                                filtered[group_col] == group_dropdown.value
+                            ]
+                        elif match == "partial":
+                            filtered = filtered[
+                                filtered[group_col].str.contains(group_dropdown.value)
+                            ]
+                        else:
+                            raise ValueError(f"Invalid match type: {match}")
 
                     map_widget.set_data(
                         names[index + file_index + 1], filtered.__geo_interface__
