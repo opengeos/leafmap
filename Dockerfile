@@ -66,5 +66,5 @@ WORKDIR /home/jovyan
 
 # ------------------------------
 # Usage:
-# docker run -it -p 8888:8888 -v $(pwd):/home/jovyan/work ghcr.io/giswqs/leafmap:latest
+# docker run -it -p 8888:8888 -v $(pwd):/home/jovyan/work ghcr.io/opengeos/leafmap:latest
 # ------------------------------
