@@ -37,7 +37,10 @@ jobs:
 
                   if [[ "${{ github.event_name }}" == "release" ]]; then
                     VERSION_TAG=${{ github.event.release.tag_name }}
-                    echo "tags=${REPO}:${VERSION_TAG},${REPO}:latest" >> $GITHUB_OUTPUT
+                    echo "tags<<EOF" >> $GITHUB_OUTPUT
+                    echo "${REPO}:${VERSION_TAG}" >> $GITHUB_OUTPUT
+                    echo "${REPO}:latest" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
 
                   elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
                     PR_NUMBER=${{ github.event.pull_request.number }}
@@ -54,5 +57,6 @@ jobs:
                   platforms: linux/amd64,linux/arm64
                   push: true
                   tags: ${{ steps.meta.outputs.tags }}
+                  provenance: false
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
