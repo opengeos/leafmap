@@ -446,7 +446,9 @@ class Map(ipyleaflet.Map):
 
     def add_ee_layer(
         self,
-        asset_id: str,
+        ee_object=None,
+        vis_params={},
+        asset_id: str = None,
         name: str = None,
         attribution: str = "Google Earth Engine",
         shown: bool = True,
@@ -458,6 +460,8 @@ class Map(ipyleaflet.Map):
             https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
 
         Args:
+            ee_object (object): The Earth Engine object to display.
+            vis_params (dict): Visualization parameters. For example, {'min': 0, 'max': 100}.
             asset_id (str): The ID of the Earth Engine asset.
             name (str, optional): The name of the tile layer. If not provided, the asset ID will be used. Default is None.
             attribution (str, optional): The attribution text to be displayed. Default is "Google Earth Engine".
@@ -470,17 +474,37 @@ class Map(ipyleaflet.Map):
         """
         import pandas as pd
 
-        df = pd.read_csv(
-            "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
-            sep="\t",
-        )
+        if isinstance(asset_id, str):
 
-        asset_id = asset_id.strip()
-        if name is None:
-            name = asset_id
+            df = pd.read_csv(
+                "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
+                sep="\t",
+            )
 
-        if asset_id in df["id"].values:
-            url = df.loc[df["id"] == asset_id, "url"].values[0]
+            asset_id = asset_id.strip()
+            if name is None:
+                name = asset_id
+
+            if asset_id in df["id"].values:
+                url = df.loc[df["id"] == asset_id, "url"].values[0]
+                self.add_tile_layer(
+                    url,
+                    name,
+                    attribution=attribution,
+                    shown=shown,
+                    opacity=opacity,
+                    **kwargs,
+                )
+            else:
+                print(f"The provided EE tile layer {asset_id} does not exist.")
+                return
+        elif ee_object is not None:
+            url = get_ee_tile_url(ee_object, vis_params)
+            if url is None:
+                print(f"The provided EE tile layer {ee_object} does not exist.")
+                return
+            if name is None:
+                name = "EE Layer"
             self.add_tile_layer(
                 url,
                 name,
@@ -489,8 +513,6 @@ class Map(ipyleaflet.Map):
                 opacity=opacity,
                 **kwargs,
             )
-        else:
-            print(f"The provided EE tile layer {asset_id} does not exist.")
 
     def add_layer_control(self, position="topright") -> None:
         """Adds a layer control to the map.
