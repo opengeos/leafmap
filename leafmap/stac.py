@@ -469,12 +469,23 @@ def cog_stats(
     """
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    r = requests.get(
-        f"{titiler_endpoint}/cog/statistics",
-        params={
-            "url": url,
-        },
-    ).json()
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/cog/statistics",
+            params={
+                "url": url,
+            },
+            timeout=10,
+        ).json()
+    except Exception as e:
+        titiler_endpoint = "https://titiler.xyz"
+        r = requests.get(
+            f"{titiler_endpoint}/cog/statistics",
+            params={
+                "url": url,
+            },
+            timeout=10,
+        ).json()
 
     return r
 
@@ -499,12 +510,23 @@ def cog_info(
     if return_geojson:
         info = "info.geojson"
 
-    r = requests.get(
-        f"{titiler_endpoint}/cog/{info}",
-        params={
-            "url": url,
-        },
-    ).json()
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/cog/{info}",
+            params={
+                "url": url,
+            },
+            timeout=10,
+        ).json()
+    except Exception as e:
+        titiler_endpoint = "https://titiler.xyz"
+        r = requests.get(
+            f"{titiler_endpoint}/cog/{info}",
+            params={
+                "url": url,
+            },
+            timeout=10,
+        ).json()
 
     return r
 

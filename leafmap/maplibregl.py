@@ -45,6 +45,7 @@ from .common import (
     geojson_to_pmtiles,
     get_api_key,
     get_bounds,
+    get_ee_tile_url,
     get_overture_data,
     geojson_bounds,
     geojson_to_gdf,
@@ -1581,31 +1582,22 @@ class Map(MapWidget):
             else:
                 print(f"The provided EE tile layer {asset_id} does not exist.")
         elif ee_object is not None:
-            try:
-                import geemap
-                from geemap.ee_tile_layers import _get_tile_url_format
-
-                if ee_initialize:
-                    geemap.ee_initialize()
-                url = _get_tile_url_format(ee_object, vis_params)
-                if name is None:
-                    name = "EE Layer"
-                self.add_tile_layer(
-                    url,
-                    name,
-                    attribution=attribution,
-                    opacity=opacity,
-                    visible=visible,
-                    before_id=before_id,
-                    overwrite=overwrite,
-                    **kwargs,
-                )
-            except Exception as e:
-                print(e)
-                print(
-                    "Please install the `geemap` package to use the `add_ee_layer` function."
-                )
+            url = get_ee_tile_url(ee_object, vis_params)
+            if url is None:
+                print(f"The provided EE tile layer {ee_object} does not exist.")
                 return
+            if name is None:
+                name = "EE Layer"
+            self.add_tile_layer(
+                url,
+                name,
+                attribution=attribution,
+                opacity=opacity,
+                visible=visible,
+                before_id=before_id,
+                overwrite=overwrite,
+                **kwargs,
+            )
 
     def add_cog_layer(
         self,

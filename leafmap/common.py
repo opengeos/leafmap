@@ -17263,3 +17263,47 @@ def s3_to_https(s3_url: str, region: str = "af-south-1") -> str:
     bucket, key = parts
     https_url = f"https://{bucket}.s3.{region}.amazonaws.com/{key}"
     return https_url
+
+
+def get_ee_tile_url(
+    asset_id: str,
+    vis_params: dict = None,
+    endpoint: str = "https://giswqs-ee-tile-request.hf.space/tile",
+) -> str:
+    """Retrieve an Earth Engine tile URL from a remote API.
+
+    Sends a POST request to the Hugging Face-hosted FastAPI endpoint to generate
+    a tile URL for an Earth Engine asset. Supports `ee.Image`, `ee.ImageCollection`,
+    and `ee.FeatureCollection` types.
+
+    Args:
+        asset_id (str): The Earth Engine asset ID (e.g., a string like
+            'USGS/SRTMGL1_003', or an `ee.` expression string).
+        vis_params (dict, optional): Visualization parameters in Earth Engine
+            format. Defaults to an empty dictionary if not provided.
+        endpoint (str, optional): The URL of the tile endpoint. Defaults to
+            'https://giswqs-ee-tile-request.hf.space/tile'.
+
+    Returns:
+        str: A tile URL string if successful, or an error message string if the
+        request fails or the response is invalid.
+
+    Example:
+        >>> get_ee_tile_url(
+        ...     "USGS/SRTMGL1_003",
+        ...     {"min": 0, "max": 3000,  "palette": "terrain"}
+        ... )
+        'https://earthengine.googleapis.com/map/abc123/{z}/{x}/{y}'
+    """
+    asset_id = asset_id.strip()
+    if vis_params is None:
+        vis_params = {}
+
+    payload = {"asset_id": asset_id, "vis_params": vis_params}
+    try:
+        response = requests.post(endpoint, json=payload)
+        response.raise_for_status()
+        return response.json()["tile_url"]
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        return None
