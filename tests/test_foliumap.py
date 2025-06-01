@@ -22,10 +22,9 @@ class TestFoliumap(unittest.TestCase):
     def test_add_basemap(self):
         """Check basemaps"""
         m = leafmap.Map()
-        leafmap.set_api_key("API-KEY")
-        m.add_basemap("TERRAIN")
+        m.add_basemap("Satellite")
         out_str = m.to_html()
-        assert "Google Terrain" in out_str
+        assert "Esri.WorldImagery" in out_str
 
     # def test_add_cog_layer(self):
     #     """Check COG layer"""
