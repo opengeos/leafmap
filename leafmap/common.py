@@ -517,45 +517,50 @@ def hex_to_rgb(value: Optional[str] = "FFFFFF") -> Tuple[int, int, int]:
     return tuple(int(value[i : i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
-def check_color(in_color: Union[str, Tuple]) -> str:
+def check_color(in_color: Union[str, Tuple, List]) -> str:
     """Checks the input color and returns the corresponding hex color code.
 
     Args:
-            in_color (str or tuple or list): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple (e.g., (255, 127, 0)).
+        in_color (str or tuple or list): It can be a string (e.g., 'red', '#ffff00', 'ffff00', 'ff0') or RGB tuple/list (e.g., (255, 127, 0)).
 
     Returns:
         str: A hex color code.
     """
-    import colour
+    from matplotlib import colors
 
     out_color = "#000000"  # default black color
-    if (isinstance(in_color, tuple) or isinstance(in_color, list)) and len(
-        in_color
-    ) == 3:
+    # Handle RGB tuple or list
+    if isinstance(in_color, (tuple, list)) and len(in_color) == 3:
         # rescale color if necessary
         if all(isinstance(item, int) for item in in_color):
+            # Ensure values are floats between 0 and 1 for to_hex
             in_color = [c / 255.0 for c in in_color]
-
-        return colour.Color(rgb=tuple(in_color)).hex_l
-
-    else:
-        # try to guess the color system
         try:
-            return colour.Color(in_color).hex_l
-
-        except Exception as e:
-            pass
-
-        # try again by adding an extra # (GEE handle hex codes without #)
-        try:
-            return colour.Color(f"#{in_color}").hex_l
-
-        except Exception as e:
+            return colors.to_hex(in_color)
+        except ValueError:
             print(
-                f"The provided color ({in_color}) is invalid. Using the default black color."
+                f"The provided RGB color ({in_color}) is invalid. Using the default black color."
             )
-            print(e)
+            return out_color
 
+    # Handle string color input
+    elif isinstance(in_color, str):
+        try:
+            # Try converting directly (handles color names and hex with #)
+            return colors.to_hex(in_color)
+        except ValueError:
+            try:
+                # Try again by adding an extra # (handles hex without #)
+                return colors.to_hex(f"#{in_color}")
+            except ValueError:
+                print(
+                    f"The provided color string ({in_color}) is invalid. Using the default black color."
+                )
+                return out_color
+    else:
+        print(
+            f"The provided color type ({type(in_color)}) is invalid. Using the default black color."
+        )
         return out_color
 
 
@@ -5710,7 +5715,7 @@ class The_national_map_USGS:
 
         Args:
             region (str | list): an URL|filepath to a vector dataset to a polygon
-            geopandas_reader_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
+            geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
                 Used for reading a region URL|filepath.
         """
         import geopandas as gpd
@@ -8865,7 +8870,7 @@ def zonal_stats(
             use either by name or number. Defaults to 0
         band_num (int | str, optional): If raster is a GDAL source, the band number to use (counting from 1). defaults to 1.
         nodata (float, optional): If raster is a GDAL source, this value overrides any NODATA value
-            specified in the file’s metadata. If None, the file’s metadata’s NODATA value (if any)
+            specified in the file's metadata. If None, the file's metadata's NODATA value (if any)
             will be used. defaults to None.
         affine (Affine, optional): required only for ndarrays, otherwise it is read from src. Defaults to None.
         stats (str | list, optional): Which statistics to calculate for each zone.

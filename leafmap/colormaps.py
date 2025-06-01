@@ -198,8 +198,8 @@ def plot_colormap(
     colors: Optional[List] = None,
     discrete: Optional[bool] = False,
     label: Optional[str] = None,
-    width: Optional[float] = 8.0,
-    height: Optional[float] = 0.4,
+    width: Optional[float] = 3.0,
+    height: Optional[float] = 0.25,
     orientation: Optional[str] = "horizontal",
     vmin: Optional[float] = 0,
     vmax: Optional[float] = 1.0,
@@ -215,8 +215,8 @@ def plot_colormap(
         colors (list, optional): A list of custom colors to create a colormap. Defaults to None.
         discrete (bool, optional): Whether to create a discrete colorbar. Defaults to False.
         label (str, optional): Label for the colorbar. Defaults to None.
-        width (float, optional): The width of the colormap. Defaults to 8.0.
-        height (float, optional): The height of the colormap. Defaults to 0.4.
+        width (float, optional): The width of the colormap. Defaults to 3.0.
+        height (float, optional): The height of the colormap. Defaults to 0.25.
         orientation (str, optional): The orientation of the colormap. Defaults to "horizontal".
         vmin (float, optional): The minimum value range. Defaults to 0.
         vmax (float, optional): The maximum value range. Defaults to 1.0.

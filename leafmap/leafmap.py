@@ -2165,8 +2165,7 @@ class Map(ipyleaflet.Map):
         )
         with output:
             output.clear_output()
-            output.outputs = ()
-            output.append_display_data(
+            with output:
                 plot_colormap(
                     cmap,
                     colors,
@@ -2182,7 +2181,6 @@ class Map(ipyleaflet.Map):
                     font_size,
                     **kwargs,
                 )
-            )
 
         self.colorbar = colormap_ctrl
         self.add(colormap_ctrl)
