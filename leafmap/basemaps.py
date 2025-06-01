@@ -25,9 +25,9 @@ import requests
 import folium
 import ipyleaflet
 import xyzservices
-from .common import check_package, planet_tiles
+from .common import check_package, planet_tiles, GoogleMapsTileProvider
 
-GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", "YOUR-API-KEY")
+GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", None)
 
 XYZ_TILES = {
     "OpenStreetMap": {
@@ -38,29 +38,13 @@ XYZ_TILES = {
 }
 
 # Add Google basemaps if API key is detected in the environment variables.
-if GOOGLE_MAPS_API_KEY != "":
+if GOOGLE_MAPS_API_KEY is not None:
     XYZ_TILES.update(
         {
-            "ROADMAP": {
-                "url": f"https://mt1.google.com/vt/lyrs=m&x={{x}}&y={{y}}&z={{z}}&key={GOOGLE_MAPS_API_KEY}",
-                "attribution": "Google",
-                "name": "Google Maps",
-            },
-            "SATELLITE": {
-                "url": f"https://mt1.google.com/vt/lyrs=s&x={{x}}&y={{y}}&z={{z}}&key={GOOGLE_MAPS_API_KEY}",
-                "attribution": "Google",
-                "name": "Google Satellite",
-            },
-            "TERRAIN": {
-                "url": f"https://mt1.google.com/vt/lyrs=p&x={{x}}&y={{y}}&z={{z}}&key={GOOGLE_MAPS_API_KEY}",
-                "attribution": "Google",
-                "name": "Google Terrain",
-            },
-            "HYBRID": {
-                "url": f"https://mt1.google.com/vt/lyrs=y&x={{x}}&y={{y}}&z={{z}}&key={GOOGLE_MAPS_API_KEY}",
-                "attribution": "Google",
-                "name": "Google Hybrid",
-            },
+            "ROADMAP": GoogleMapsTileProvider(map_type="roadmap"),
+            "SATELLITE": GoogleMapsTileProvider(map_type="satellite"),
+            "TERRAIN": GoogleMapsTileProvider(map_type="terrain"),
+            "HYBRID": GoogleMapsTileProvider(map_type="hybrid"),
         }
     )
 else:  # If Google Maps API key is not detected, defaulting to Esri basemaps.

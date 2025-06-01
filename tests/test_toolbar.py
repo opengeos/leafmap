@@ -21,7 +21,6 @@ class TestToolbar(unittest.TestCase):
         m = leafmap.Map()
         change_basemap(m)
         out_str = m.to_html()
-        assert "Google Terrain" in out_str
         assert "OpenStreetMap" in out_str
         assert "FWS NWI Wetlands" in out_str
         assert "NLCD 2016 CONUS Land Cover" in out_str
