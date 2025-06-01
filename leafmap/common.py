@@ -10574,10 +10574,6 @@ def get_google_map(
             },
         }
 
-        print(
-            "Google Maps API key is required to use Google Maps. You can generate one from https://bit.ly/3sw0THG and use geemap.set_api_key(), defaulting to Esri basemaps."
-        )
-
     else:
         MAP_TILES = {
             "ROADMAP": GoogleMapsTileProvider(map_type="roadmap"),
