@@ -5497,7 +5497,7 @@ class Map(ipyleaflet.Map):
         widget_control = ipyleaflet.WidgetControl(
             widget=attribute_editor, position="topright"
         )
-        self.add_control(widget_control)
+        self.add(widget_control)
 
         def close_widget_control(_):
             self.remove(widget_control)
@@ -5738,7 +5738,7 @@ class Map(ipyleaflet.Map):
         widget_control = ipyleaflet.WidgetControl(
             widget=attribute_editor, position="topright"
         )
-        self.add_control(widget_control)
+        self.add(widget_control)
 
         def close_widget_control(_):
             self.remove(widget_control)

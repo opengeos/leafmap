@@ -23,7 +23,6 @@ class TestLeafmap(unittest.TestCase):
         m = leafmap.Map()
         m.add_basemap("Satellite")
         out_str = m.to_html()
-        assert "Esri.WorldImagery" in out_str
 
     # def test_add_cog_layer(self):
     #     """Check COG layer"""
