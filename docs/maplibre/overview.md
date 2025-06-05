@@ -394,6 +394,12 @@ Control layer visibility with a layer control.
 
 [![](https://i.imgur.com/NffngdY.png)](https://leafmap.org/maplibre/layer_control)
 
+## Create layer group toggle buttons
+
+Create layer group toggle buttons for the layer manager.
+
+[![image](https://github.com/user-attachments/assets/313f60da-1ee7-4bc1-b125-7a3c0a0c3850)](https://leafmap.org/maplibre/layer_groups)
+
 ## Add a layer manager
 
 Control layer visibility and opacity with a layer manager.
