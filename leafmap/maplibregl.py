@@ -319,7 +319,8 @@ class Map(MapWidget):
             max_width = self.sidebar_args.get("max_width", 360)
         if expanded is None:
             expanded = self.sidebar_args.get("expanded", True)
-        self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+        if self.layer_manager is None:
+            self.layer_manager = LayerManagerWidget(self, expanded=expanded)
 
         container = Container(
             host_map=self,
@@ -370,7 +371,8 @@ class Map(MapWidget):
             min_width = self.sidebar_args.get("min_width", 360)
             max_width = self.sidebar_args.get("max_width", 360)
             expanded = self.sidebar_args.get("expanded", True)
-            self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+            if self.layer_manager is None:
+                self.layer_manager = LayerManagerWidget(self, expanded=expanded)
             container = Container(
                 host_map=self,
                 sidebar_visible=sidebar_visible,
@@ -388,6 +390,30 @@ class Map(MapWidget):
             display(vue.Html(children=[]), container)
         else:
             display(container)
+
+    def add_layer_manager(
+        self,
+        expanded: bool = True,
+        height: str = "40px",
+        layer_icon: str = "mdi-layers",
+        close_icon: str = "mdi-close",
+        label="Layers",
+        background_color: str = "#f5f5f5",
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        if self.layer_manager is None:
+            self.layer_manager = LayerManagerWidget(
+                self,
+                expanded=expanded,
+                height=height,
+                layer_icon=layer_icon,
+                close_icon=close_icon,
+                label=label,
+                background_color=background_color,
+                *args,
+                **kwargs,
+            )
 
     def set_sidebar_content(
         self, content: Union[widgets.VBox, List[widgets.Widget]]
@@ -2051,6 +2077,8 @@ class Map(MapWidget):
                 layer["paint"][prop_name] = opacity
         if layer_type != "symbol":
             super().set_paint_property(name, prop_name, opacity)
+            if layer_type == "circle":
+                super().set_paint_property(name, "circle-stroke-opacity", opacity)
         else:
             super().set_paint_property(name, "icon-opacity", opacity)
             super().set_paint_property(name, "text-opacity", opacity)
@@ -7610,6 +7638,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         close_icon: str = "mdi-close",
         label="Layers",
         background_color: str = "#f5f5f5",
+        groups: dict = None,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -7624,11 +7653,15 @@ class LayerManagerWidget(v.ExpansionPanels):
             close_icon (str): The icon for the close button. Defaults to "mdi-close".
             label (str): The label for the layer manager. Defaults to "Layers".
             background_color (str): The background color of the header. Defaults to "#f5f5f5".
+            groups (dict): A dictionary of layer groups, such as {"Group 1": ["layer1", "layer2"],
+                "Group 2": ["layer3", "layer4"]}. A group layer toggle will be created for each group.
+                Defaults to None.
             *args (Any): Additional positional arguments for the parent class.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         self.m = m
         self.layer_items = {}
+        self.groups = groups
         self._building = False
 
         # Master toggle
@@ -7637,6 +7670,17 @@ class LayerManagerWidget(v.ExpansionPanels):
             value=True, description="All layers on/off", style=style
         )
         self.master_toggle.observe(self.toggle_all_layers, names="value")
+
+        self.group_toggles = widgets.VBox()
+        if isinstance(groups, dict):
+            for group_name, group_layers in groups.items():
+                group_toggle = widgets.Checkbox(
+                    value=True,
+                    description=f"{group_name} group layers on/off",
+                    style=style,
+                )
+                group_toggle.observe(self.toggle_group_layers, names="value")
+                self.group_toggles.children += (group_toggle,)
 
         # Build individual layer rows
         self.layers_box = widgets.VBox()
@@ -7674,7 +7718,11 @@ class LayerManagerWidget(v.ExpansionPanels):
             children=[
                 header,
                 v.ExpansionPanelContent(
-                    children=[widgets.VBox([self.master_toggle, self.layers_box])]
+                    children=[
+                        widgets.VBox(
+                            [self.master_toggle, self.group_toggles, self.layers_box]
+                        )
+                    ]
                 ),
             ]
         )
@@ -7800,6 +7848,21 @@ class LayerManagerWidget(v.ExpansionPanels):
             return
         for name, controls in self.layer_items.items():
             controls["checkbox"].value = change["new"]
+
+        for widget in self.group_toggles.children:
+            widget.value = change["new"]
+
+    def toggle_group_layers(self, change: Dict[str, Any]) -> None:
+        """
+        Toggles the visibility of a group of layers.
+        """
+        if self._building:
+            return
+        group_name = change["owner"].description.split(" ")[0]
+        group_layers = self.groups[group_name]
+        for layer_name in group_layers:
+            self.set_layer_visibility(layer_name, change["new"])
+        self.refresh()
 
     def set_layer_visibility(self, name: str, visible: bool) -> None:
         """
