@@ -24,15 +24,28 @@ RUN mamba install -n base -c conda-forge -y \
     pyproj \
     fiona \
     geopandas \
-    rioxarray \
     maplibre \
     pmtiles \
     flask \
     flask-cors \
     localtileserver \
     jupyter-server-proxy \
+    h5netcdf \
+    h5py \
+    opera-utils \
+    rioxarray \
+    rio-cogeo \
     && mamba clean --all --yes \
     && fix-permissions $CONDA_DIR
+
+RUN mamba install -c conda-forge gdal==3.11.0 -y
+
+# ------------------------------
+# 2b. Create missing sqlite symlinks (after files exist)
+# ------------------------------
+RUN ln -s $CONDA_PREFIX/lib/libsqlite3.so.3.50.0 $CONDA_PREFIX/lib/libsqlite3.so \
+    && ln -s $CONDA_PREFIX/lib/libsqlite3.so.3.50.0 $CONDA_PREFIX/lib/libsqlite3.so.0
+    
 
 # ------------------------------
 # 3. Set geospatial environment variables

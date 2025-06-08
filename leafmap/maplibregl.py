@@ -5888,9 +5888,9 @@ def construct_maptiler_style(style: str, api_key: Optional[str] = None) -> str:
 
     response = requests.get(url)
     if response.status_code != 200:
-        print(
-            "Failed to retrieve the MapTiler style. Defaulting to OpenFreeMap 'liberty' style."
-        )
+        # print(
+        #     "Failed to retrieve the MapTiler style. Defaulting to OpenFreeMap 'liberty' style."
+        # )
         url = "https://tiles.openfreemap.org/styles/liberty"
 
     return url
