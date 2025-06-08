@@ -45,7 +45,7 @@ RUN mamba install -c conda-forge gdal==3.11.0 -y
 # ------------------------------
 RUN ln -s $CONDA_PREFIX/lib/libsqlite3.so.3.50.0 $CONDA_PREFIX/lib/libsqlite3.so \
     && ln -s $CONDA_PREFIX/lib/libsqlite3.so.3.50.0 $CONDA_PREFIX/lib/libsqlite3.so.0
-    
+
 
 # ------------------------------
 # 3. Set geospatial environment variables
