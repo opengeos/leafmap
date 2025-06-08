@@ -777,7 +777,11 @@ def csv_to_shp(
         latitude (str, optional): The column name of the latitude column. Defaults to 'latitude'.
         longitude (str, optional): The column name of the longitude column. Defaults to 'longitude'.
     """
-    import shapefile as shp
+    try:
+        import shapefile as shp
+    except ImportError:
+        install_package("pyshp")
+        import shapefile as shp
 
     if in_csv.startswith("http") and in_csv.endswith(".csv"):
         in_csv = github_raw_url(in_csv)
@@ -6773,7 +6777,11 @@ def is_on_aws():
         bool: True if the notebook is running on AWS.
     """
 
-    import psutil
+    try:
+        import psutil
+    except ImportError:
+        install_package("psutil")
+        import psutil
 
     on_aws = False
     try:
@@ -6794,7 +6802,11 @@ def is_studio_lab():
         bool: True if the notebook is running on Studio Lab.
     """
 
-    import psutil
+    try:
+        import psutil
+    except ImportError:
+        install_package("psutil")
+        import psutil
 
     on_studio_lab = False
 
