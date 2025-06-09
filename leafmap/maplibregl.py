@@ -2106,8 +2106,8 @@ class Map(MapWidget):
                 layer["paint"][prop_name] = opacity
         if layer_type != "symbol":
             super().set_paint_property(name, prop_name, opacity)
-            if layer_type == "circle":
-                super().set_paint_property(name, "circle-stroke-opacity", opacity)
+            # if layer_type == "circle":
+            #     super().set_paint_property(name, "circle-stroke-opacity", opacity)
         else:
             super().set_paint_property(name, "icon-opacity", opacity)
             super().set_paint_property(name, "text-opacity", opacity)
