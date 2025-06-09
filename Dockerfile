@@ -10,7 +10,7 @@ USER root
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        git \
+    git \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ------------------------------
@@ -20,6 +20,7 @@ RUN mamba install -n base -c conda-forge -y \
     gdal \
     proj \
     geos \
+    fiona \
     rasterio \
     pyproj \
     fiona \
@@ -38,7 +39,7 @@ RUN mamba install -n base -c conda-forge -y \
     && mamba clean --all --yes \
     && fix-permissions $CONDA_DIR
 
-RUN mamba install -c conda-forge gdal==3.11.0 -y
+# RUN mamba install -c conda-forge gdal==3.11.0 -y
 
 # ------------------------------
 # 2b. Create missing sqlite symlinks (after files exist)
@@ -79,6 +80,6 @@ WORKDIR /home/jovyan
 
 # ------------------------------
 # Usage:
-# docker pull ghcr.io/opengeos/leafmap:latest
-# docker run -it -p 8888:8888 -v $(pwd):/home/jovyan/work ghcr.io/opengeos/leafmap:latest
+# docker pull giswqs/leafmap:latest
+# docker run -it -p 8888:8888 -v $(pwd):/home/jovyan/work giswqs/leafmap:latest
 # ------------------------------
