@@ -4646,10 +4646,15 @@ def stac_gui(
 
     df = pd.read_csv(stac_info[connection.value]["filename"], sep="\t")
     datasets = df[stac_info[connection.value]["name"]].tolist()
+    default_dataset = (
+        "Sentinel-2 Cloud-Optimized GeoTIFFs - Level 2A scenes and metadata"
+    )
+    if default_dataset not in datasets:
+        default_dataset = datasets[0]
 
     dataset = widgets.Dropdown(
         options=datasets,
-        value="Sentinel-2 Cloud-Optimized GeoTIFFs",
+        value=default_dataset,
         description="Dataset:",
         style=style,
         layout=widgets.Layout(width="454px", padding=padding),
@@ -4823,7 +4828,7 @@ def stac_gui(
         """Reset the options to their default values."""
         connection.value = "AWS Open Data"
         dataset.options = datasets
-        dataset.value = "Sentinel-2 Cloud-Optimized GeoTIFFs"
+        dataset.value = default_dataset
         http_url.value = (
             "https://earth-search.aws.element84.com/v1/collections/sentinel-2-l2a"
         )
@@ -4979,7 +4984,7 @@ def stac_gui(
         if change["new"]:
             layer_name.value = item.value
 
-            if dataset.value == "Sentinel-2 Cloud-Optimized GeoTIFFs":
+            if dataset.value == default_dataset:
                 vmin.value = "0"
                 vmax.value = "3000"
             else:
