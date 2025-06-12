@@ -2811,7 +2811,7 @@ def inspector_gui(
                         output.outputs = ()
                         output.append_stdout(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
-                            output.append_stdout(f"{key}: {result[key]}")
+                            output.append_stdout(f"{key}: {result[key]}\n")
 
                         result["latitude"] = lat
                         result["longitude"] = lon
@@ -2845,7 +2845,7 @@ def inspector_gui(
                         output.outputs = ()
                         output.append_stdout(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
-                            output.append_stdout(f"{key}: {result[key]}")
+                            output.append_stdout(f"{key}: {result[key]}\n")
 
                         result["latitude"] = lat
                         result["longitude"] = lon
@@ -2890,7 +2890,7 @@ def inspector_gui(
                         output.outputs = ()
                         output.append_stdout(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
                         for key in result:
-                            output.append_stdout(f"{key}: {result[key]}")
+                            output.append_stdout(f"{key}: {result[key]}\n")
 
                         result["latitude"] = lat
                         result["longitude"] = lon

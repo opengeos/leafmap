@@ -17033,6 +17033,8 @@ def read_vector(source, layer=None, **kwargs):
     # If it's a local file, check if it exists
     if not is_url and not os.path.exists(source):
         raise ValueError(f"File does not exist: {source}")
+    elif is_url and source.endswith(".parquet"):
+        source = download_file(source, quiet=True, overwrite=True)
 
     # Get file extension
     _, ext = os.path.splitext(source)
