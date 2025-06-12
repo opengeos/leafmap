@@ -261,6 +261,14 @@ WMS_TILES = {
         "format": "image/png",
         "transparent": True,
     },
+    "USGS.Imagery": {
+        "url": "https://basemap.nationalmap.gov/arcgis/services/USGSImageryOnly/MapServer/WMSServer?",
+        "layers": "0",
+        "name": "USGS.Imagery",
+        "attribution": "USGS",
+        "format": "image/png",
+        "transparent": True,
+    },
 }
 
 custom_tiles = {"xyz": XYZ_TILES, "wms": WMS_TILES}
