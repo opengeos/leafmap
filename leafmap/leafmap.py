@@ -17,8 +17,8 @@ from . import examples
 from . import map_widgets
 from . import osm
 from . import pc
-from . import plot
 from .common import *
+from .plot import *
 
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
