@@ -16648,10 +16648,24 @@ def write_image_colormap(image, colormap, output_path=None):
     if not output_path:
         output_path = "output_with_colormap.tif"
 
+    # Check and sanitize colormap
+    fixed_colormap = {}
+    for k, v in colormap.items():
+        if not isinstance(k, int):
+            k = int(k)
+        if len(v) == 3:  # RGB
+            fixed_colormap[k] = tuple(int(c) for c in v)
+        elif len(v) == 4:  # RGBA
+            fixed_colormap[k] = tuple(
+                int(c) for c in v[:3]
+            )  # Drop alpha for compatibility
+        else:
+            raise ValueError(f"Invalid colormap value: {v}")
+
     # Write the updated dataset with the colormap
     with rasterio.open(output_path, "w", **src_profile) as dst:
         dst.write(src_data, 1)
-        dst.write_colormap(1, colormap)
+        dst.write_colormap(1, fixed_colormap)
 
     return output_path
 
