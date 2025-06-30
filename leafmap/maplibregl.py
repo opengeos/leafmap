@@ -8357,6 +8357,9 @@ class DateFilterWidget(widgets.VBox):
                     fit_bounds = True
                 else:
                     fit_bounds = False
+                if source is None:
+                    gdfs.append(None)
+                    continue
                 gdf = gpd.read_file(source)
                 gdfs.append(gdf)
 
@@ -8527,6 +8530,8 @@ class DateFilterWidget(widgets.VBox):
                     map_widget.set_data("arrow", filtered_gdf.__geo_interface__)
 
                 for index, point_gdf in enumerate(gdfs[file_index + 1 :]):
+                    if point_gdf is None:
+                        continue
                     if date_col in point_gdf.columns:
                         filtered = point_gdf[
                             (point_gdf[date_col] >= start)

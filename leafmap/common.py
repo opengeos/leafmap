@@ -6409,7 +6409,9 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
     return files
 
 
-def sort_files(files: List[str], names: Optional[List[str]] = None) -> List[str]:
+def sort_files(
+    files: List[str], names: Optional[List[str]] = None, fill_na=True
+) -> List[str]:
     """
     Sorts a list of files based on a list of names.
 
@@ -6429,11 +6431,14 @@ def sort_files(files: List[str], names: Optional[List[str]] = None) -> List[str]
         return sorted(files)
     else:
         filenames = []
-        for name in names:
+        for index, name in enumerate(names):
             for file in files:
                 if name in file:
                     filenames.append(file)
                     break
+            if fill_na and index >= len(filenames):
+                filenames.append(None)
+
         return filenames
 
 
