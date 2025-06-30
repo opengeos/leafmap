@@ -11719,7 +11719,12 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 <span class="normal">8570</span>
 <span class="normal">8571</span>
 <span class="normal">8572</span>
-<span class="normal">8573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DateFilterWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="normal">8573</span>
+<span class="normal">8574</span>
+<span class="normal">8575</span>
+<span class="normal">8576</span>
+<span class="normal">8577</span>
+<span class="normal">8578</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">DateFilterWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A widget for filtering data based on time range.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -11776,6 +11781,9 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
                     <span class="n">fit_bounds</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">fit_bounds</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">gdfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                    <span class="k">continue</span>
                 <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
                 <span class="n">gdfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 
@@ -11946,6 +11954,8 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
                     <span class="n">map_widget</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="s2">&quot;arrow&quot;</span><span class="p">,</span> <span class="n">filtered_gdf</span><span class="o">.</span><span class="n">__geo_interface__</span><span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">point_gdf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gdfs</span><span class="p">[</span><span class="n">file_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]):</span>
+                    <span class="k">if</span> <span class="n">point_gdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
                     <span class="k">if</span> <span class="n">date_col</span> <span class="ow">in</span> <span class="n">point_gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                         <span class="n">filtered</span> <span class="o">=</span> <span class="n">point_gdf</span><span class="p">[</span>
                             <span class="p">(</span><span class="n">point_gdf</span><span class="p">[</span><span class="n">date_col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)</span>
@@ -12541,7 +12551,12 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
 <span class="normal">8570</span>
 <span class="normal">8571</span>
 <span class="normal">8572</span>
-<span class="normal">8573</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">8573</span>
+<span class="normal">8574</span>
+<span class="normal">8575</span>
+<span class="normal">8576</span>
+<span class="normal">8577</span>
+<span class="normal">8578</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">sources</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
     <span class="n">names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -12593,6 +12608,9 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
                 <span class="n">fit_bounds</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">fit_bounds</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">gdfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
             <span class="n">gdfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 
@@ -12763,6 +12781,8 @@ and dynamic content. Widgets can be added, removed, or replaced in the content b
                 <span class="n">map_widget</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="s2">&quot;arrow&quot;</span><span class="p">,</span> <span class="n">filtered_gdf</span><span class="o">.</span><span class="n">__geo_interface__</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">point_gdf</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gdfs</span><span class="p">[</span><span class="n">file_index</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]):</span>
+                <span class="k">if</span> <span class="n">point_gdf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">date_col</span> <span class="ow">in</span> <span class="n">point_gdf</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
                     <span class="n">filtered</span> <span class="o">=</span> <span class="n">point_gdf</span><span class="p">[</span>
                         <span class="p">(</span><span class="n">point_gdf</span><span class="p">[</span><span class="n">date_col</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start</span><span class="p">)</span>
@@ -50964,12 +50984,7 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
 
               <details class="quote">
                 <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8576</span>
-<span class="normal">8577</span>
-<span class="normal">8578</span>
-<span class="normal">8579</span>
-<span class="normal">8580</span>
-<span class="normal">8581</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8581</span>
 <span class="normal">8582</span>
 <span class="normal">8583</span>
 <span class="normal">8584</span>
@@ -51178,7 +51193,12 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
 <span class="normal">8787</span>
 <span class="normal">8788</span>
 <span class="normal">8789</span>
-<span class="normal">8790</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SelectDataWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="normal">8790</span>
+<span class="normal">8791</span>
+<span class="normal">8792</span>
+<span class="normal">8793</span>
+<span class="normal">8794</span>
+<span class="normal">8795</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SelectDataWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A widget for selecting and uploading data to be added to a map.</span>
 
@@ -51521,12 +51541,7 @@ to be called when the selection is reset. Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>leafmap/maplibregl.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8584</span>
-<span class="normal">8585</span>
-<span class="normal">8586</span>
-<span class="normal">8587</span>
-<span class="normal">8588</span>
-<span class="normal">8589</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">8589</span>
 <span class="normal">8590</span>
 <span class="normal">8591</span>
 <span class="normal">8592</span>
@@ -51727,7 +51742,12 @@ to be called when the selection is reset. Defaults to None.</p>
 <span class="normal">8787</span>
 <span class="normal">8788</span>
 <span class="normal">8789</span>
-<span class="normal">8790</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">8790</span>
+<span class="normal">8791</span>
+<span class="normal">8792</span>
+<span class="normal">8793</span>
+<span class="normal">8794</span>
+<span class="normal">8795</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">default_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="n">widget_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;360px&quot;</span><span class="p">,</span>
