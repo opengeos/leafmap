@@ -17573,3 +17573,58 @@ def get_nwi_year(
     else:
         print("Failed to download data:", r.status_code)
         return None
+
+
+def clip_vector(input_gdf, clip_geom=None, bbox=None, output=None):
+    """
+    Clip a vector dataset using either a bounding box or another vector dataset.
+
+    Args:
+        input_gdf (str | Path | gpd.GeoDataFrame): The input vector data, either as a file path or a GeoDataFrame.
+        clip_geom (str | Path | gpd.GeoDataFrame, optional): A vector dataset used for clipping, either as a file path or GeoDataFrame.
+        bbox (tuple, optional): Bounding box defined as (minx, miny, maxx, maxy).
+        output (str | Path, optional): File path to save the clipped result. If None, the result is not saved.
+
+    Returns:
+        gpd.GeoDataFrame: The clipped GeoDataFrame.
+
+    Raises:
+        ValueError: If both `clip_geom` and `bbox` are provided or neither is provided.
+        ValueError: If `bbox` is not a 4-element tuple or list.
+    """
+    import geopandas as gpd
+    from shapely.geometry import box
+    from pathlib import Path
+
+    # Load input_gdf if it's a file path
+    if isinstance(input_gdf, (str, Path)):
+        input_gdf = gpd.read_file(input_gdf)
+
+    # Load clip_geom if it's a file path
+    if isinstance(clip_geom, (str, Path)):
+        clip_geom = gpd.read_file(clip_geom)
+
+    if clip_geom is not None and bbox is not None:
+        raise ValueError("Specify either 'clip_geom' or 'bbox', not both.")
+
+    if clip_geom is not None:
+        if input_gdf.crs != clip_geom.crs:
+            clip_geom = clip_geom.to_crs(input_gdf.crs)
+        clipped = gpd.clip(input_gdf, clip_geom)
+
+    elif bbox is not None:
+        if not isinstance(bbox, (tuple, list)) or len(bbox) != 4:
+            raise ValueError("bbox must be a tuple or list of (minx, miny, maxx, maxy)")
+        minx, miny, maxx, maxy = bbox
+        bbox_geom = gpd.GeoDataFrame(
+            geometry=[box(minx, miny, maxx, maxy)], crs=input_gdf.crs
+        )
+        clipped = gpd.clip(input_gdf, bbox_geom)
+
+    else:
+        raise ValueError("You must provide either 'clip_geom' or 'bbox'.")
+
+    if output:
+        clipped.to_file(output)
+
+    return clipped
