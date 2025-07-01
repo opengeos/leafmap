@@ -17515,3 +17515,61 @@ def get_env_var(key: str) -> Optional[str]:
             pass
 
     return os.environ.get(key)
+
+
+def get_nwi_year(
+    xy: Optional[tuple] = None,
+    bbox: Optional[list] = None,
+    output: Optional[str] = None,
+    fields: str = "*",
+    epsg: int = 4326,
+    return_geometry: bool = True,
+):
+    """
+    Get the NWI year from the NWI map service.
+
+    Args:
+        xy: A tuple of (x, y) coordinates.
+        bbox: A list of [xmin, ymin, xmax, ymax] coordinates.
+        output: The file path to save the output GeoDataFrame.
+        fields: The fields to return.
+        epsg: The EPSG code of the coordinate system.
+        return_geometry: Whether to return the geometry.
+    """
+    import geopandas as gpd
+
+    if xy is not None:
+        bbox = [xy[0], xy[1], xy[0], xy[1]]
+    if bbox is not None:
+        if len(bbox) == 2:
+            bbox = [bbox[0], bbox[1], bbox[0], bbox[1]]
+        if len(bbox) != 4:
+            raise ValueError("bbox must be a list of 4 numbers")
+        if not all(isinstance(x, (int, float)) for x in bbox):
+            raise ValueError("bbox must be a list of 4 numbers")
+
+    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Data_Source/MapServer/3/query"
+    params = {
+        "f": "geojson",
+        "where": "1=1",
+        "geometry": f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}",
+        "geometryType": "esriGeometryEnvelope",
+        "inSR": epsg,
+        "spatialRel": "esriSpatialRelIntersects",
+        "outFields": fields,
+        "returnGeometry": return_geometry,
+    }
+    r = requests.get(url, params=params)
+    if r.status_code == 200:
+        gdf = gpd.GeoDataFrame.from_features(r.json())
+        gdf.crs = f"EPSG:{epsg}"
+        if output is not None:
+            gdf.to_file(output)
+
+        if return_geometry:
+            return gdf
+        else:
+            return gdf["IMAGE_YR"].unique().tolist()
+    else:
+        print("Failed to download data:", r.status_code)
+        return None
