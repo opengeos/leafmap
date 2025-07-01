@@ -15529,11 +15529,13 @@ def _convert_geodataframe_to_esri_format(gdf: "gpd.GeoDataFrame"):
 
 def get_nwi(
     geometry: Dict[str, Any],
-    inSR: str = "4326",
-    outSR: str = "3857",
-    spatialRel: str = "esriSpatialRelIntersects",
+    in_sr: str = "4326",
+    out_sr: str = "3857",
+    spatial_rel: str = "esriSpatialRelIntersects",
     return_geometry: bool = True,
-    outFields: str = "*",
+    out_fields: str = None,
+    clip: bool = False,
+    add_class: bool = False,
     output: Optional[str] = None,
     **kwargs: Any,
 ) -> Union["gpd.GeoDataFrame", "pd.DataFrame", Dict[str, str]]:
@@ -15543,11 +15545,14 @@ def get_nwi(
 
     Args:
         geometry (dict): The geometry data (e.g., point, polygon, polyline, multipoint, etc.).
-        inSR (str): The input spatial reference (default is EPSG:4326).
-        outSR (str): The output spatial reference (default is EPSG:3857).
-        spatialRel (str): The spatial relationship (default is "esriSpatialRelIntersects").
+        in_sr (str): The input spatial reference (default is EPSG:4326).
+        out_sr (str): The output spatial reference (default is EPSG:3857).
+        spatial_rel (str): The spatial relationship (default is "esriSpatialRelIntersects").
         return_geometry (bool): Whether to return the geometry (default is True).
-        outFields (str): The fields to be returned (default is "*").
+        out_fields (str): The fields to be returned (default is None). Can be "*" or a
+            comma-separated list of fields. The field names start with "Wetlands." or "NWI_Wetland_Codes."
+        clip (bool): Whether to clip the geometry to the input geometry (default is False).
+        add_class (bool): Whether to add a unique integer class column to the output GeoDataFrame (default is False).
         output (str): The output file path to save the GeoDataFrame (default is None).
         **kwargs: Additional keyword arguments to pass to the API.
 
@@ -15558,6 +15563,9 @@ def get_nwi(
     import geopandas as gpd
     import pandas as pd
     from shapely.geometry import Polygon
+
+    if out_fields is None:
+        out_fields = "Wetlands.OBJECTID, Wetlands.ATTRIBUTE, Wetlands.WETLAND_TYPE, Wetlands.ACRES, Wetlands.Shape_Length, Wetlands.Shape_Area"
 
     def detect_geometry_type(geometry):
         """
@@ -15591,6 +15599,14 @@ def get_nwi(
         geometry_dict = geometry
     elif isinstance(geometry, str):
         geometry_dict = geometry
+    elif isinstance(geometry, list) and len(geometry) == 4:
+        geometry_dict = {
+            "xmin": geometry[0],
+            "ymin": geometry[1],
+            "xmax": geometry[2],
+            "ymax": geometry[3],
+        }
+        geometry_type = "esriGeometryEnvelope"
     else:
         raise ValueError(
             "Invalid geometry input. Must be a GeoDataFrame or a dictionary."
@@ -15608,9 +15624,9 @@ def get_nwi(
     params = {
         "geometry": geometry_json,  # The geometry as a JSON string
         "geometryType": geometry_type,  # Geometry type (automatically detected)
-        "inSR": inSR,  # Spatial reference system (default is WGS84)
-        "spatialRel": spatialRel,  # Spatial relationship (default is intersects)
-        "outFields": outFields,  # Which fields to return (default is all fields)
+        "inSR": in_sr,  # Spatial reference system (default is WGS84)
+        "spatialRel": spatial_rel,  # Spatial relationship (default is intersects)
+        "outFields": out_fields,  # Which fields to return (default is all fields)
         "returnGeometry": str(
             return_geometry
         ).lower(),  # Whether to return the geometry
@@ -15637,14 +15653,14 @@ def get_nwi(
 
     # Create a DataFrame for attributes
     df = pd.DataFrame(attributes)
-    df.rename(
-        columns={
-            "Shape__Length": "Shape_Length",
-            "Shape__Area": "Shape_Area",
-            "WETLAND_TYPE": "WETLAND_TY",
-        },
-        inplace=True,
-    )
+    if "NWI_Wetland_Codes.OBJECTID" in df.columns:
+        df.drop(
+            columns=["NWI_Wetland_Codes.OBJECTID", "NWI_Wetland_Codes.ATTRIBUTE"],
+            inplace=True,
+        )
+
+    df.columns = [column.split(".")[-1] for column in df.columns]
+    df.rename(columns={"WETLAND_TYPE": "WETLAND_TY"}, inplace=True)
 
     if return_geometry:
         geometries = [Polygon(feature["geometry"]["rings"][0]) for feature in features]
@@ -15654,8 +15670,14 @@ def get_nwi(
             geometry=geometries,
             crs=f"EPSG:{data['spatialReference']['latestWkid']}",
         )
-        if outSR != "3857":
-            gdf = gdf.to_crs(outSR)
+        if out_sr != "3857":
+            gdf = gdf.to_crs(out_sr)
+
+        if clip:
+            gdf = clip_vector(gdf, bbox=geometry)
+
+        if add_class:
+            gdf = add_unique_class(gdf, "WETLAND_TY")
 
         if output is not None:
             gdf.to_file(output)
@@ -17515,3 +17537,152 @@ def get_env_var(key: str) -> Optional[str]:
             pass
 
     return os.environ.get(key)
+
+
+def get_nwi_year(
+    xy: Optional[tuple] = None,
+    bbox: Optional[list] = None,
+    output: Optional[str] = None,
+    fields: str = "*",
+    epsg: int = 4326,
+    return_geometry: bool = True,
+):
+    """
+    Get the NWI year from the NWI map service.
+
+    Args:
+        xy: A tuple of (x, y) coordinates.
+        bbox: A list of [xmin, ymin, xmax, ymax] coordinates.
+        output: The file path to save the output GeoDataFrame.
+        fields: The fields to return.
+        epsg: The EPSG code of the coordinate system.
+        return_geometry: Whether to return the geometry.
+    """
+    import geopandas as gpd
+
+    if xy is not None:
+        bbox = [xy[0], xy[1], xy[0], xy[1]]
+    if bbox is not None:
+        if len(bbox) == 2:
+            bbox = [bbox[0], bbox[1], bbox[0], bbox[1]]
+        if len(bbox) != 4:
+            raise ValueError("bbox must be a list of 4 numbers")
+        if not all(isinstance(x, (int, float)) for x in bbox):
+            raise ValueError("bbox must be a list of 4 numbers")
+
+    url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Data_Source/MapServer/3/query"
+    params = {
+        "f": "geojson",
+        "where": "1=1",
+        "geometry": f"{bbox[0]},{bbox[1]},{bbox[2]},{bbox[3]}",
+        "geometryType": "esriGeometryEnvelope",
+        "inSR": epsg,
+        "spatialRel": "esriSpatialRelIntersects",
+        "outFields": fields,
+        "returnGeometry": return_geometry,
+    }
+    r = requests.get(url, params=params)
+    if r.status_code == 200:
+        gdf = gpd.GeoDataFrame.from_features(r.json())
+        gdf.crs = f"EPSG:{epsg}"
+        if output is not None:
+            gdf.to_file(output)
+
+        if return_geometry:
+            return gdf
+        else:
+            return gdf["IMAGE_YR"].unique().tolist()
+    else:
+        print("Failed to download data:", r.status_code)
+        return None
+
+
+def clip_vector(input_gdf, clip_geom=None, bbox=None, output=None):
+    """
+    Clip a vector dataset using either a bounding box or another vector dataset.
+
+    Args:
+        input_gdf (str | Path | gpd.GeoDataFrame): The input vector data, either as a file path or a GeoDataFrame.
+        clip_geom (str | Path | gpd.GeoDataFrame, optional): A vector dataset used for clipping, either as a file path or GeoDataFrame.
+        bbox (tuple, optional): Bounding box defined as (minx, miny, maxx, maxy).
+        output (str | Path, optional): File path to save the clipped result. If None, the result is not saved.
+
+    Returns:
+        gpd.GeoDataFrame: The clipped GeoDataFrame.
+
+    Raises:
+        ValueError: If both `clip_geom` and `bbox` are provided or neither is provided.
+        ValueError: If `bbox` is not a 4-element tuple or list.
+    """
+    import geopandas as gpd
+    from shapely.geometry import box
+    from pathlib import Path
+
+    # Load input_gdf if it's a file path
+    if isinstance(input_gdf, (str, Path)):
+        input_gdf = gpd.read_file(input_gdf)
+
+    # Load clip_geom if it's a file path
+    if isinstance(clip_geom, (str, Path)):
+        clip_geom = gpd.read_file(clip_geom)
+
+    if clip_geom is not None and bbox is not None:
+        raise ValueError("Specify either 'clip_geom' or 'bbox', not both.")
+
+    if clip_geom is not None:
+        if input_gdf.crs != clip_geom.crs:
+            clip_geom = clip_geom.to_crs(input_gdf.crs)
+        clipped = gpd.clip(input_gdf, clip_geom)
+
+    elif bbox is not None:
+        if not isinstance(bbox, (tuple, list)) or len(bbox) != 4:
+            raise ValueError("bbox must be a tuple or list of (minx, miny, maxx, maxy)")
+        minx, miny, maxx, maxy = bbox
+        bbox_geom = gpd.GeoDataFrame(
+            geometry=[box(minx, miny, maxx, maxy)], crs="EPSG:4326"
+        )
+        bbox_geom = bbox_geom.to_crs(input_gdf.crs)
+        clipped = gpd.clip(input_gdf, bbox_geom)
+
+    else:
+        raise ValueError("You must provide either 'clip_geom' or 'bbox'.")
+
+    if output:
+        clipped.to_file(output)
+
+    return clipped
+
+
+def add_unique_class(
+    data: Union[str, "gpd.GeoDataFrame"],
+    column: str,
+    class_column: str = "class",
+    mapping: Optional[Dict[str, int]] = None,
+) -> "gpd.GeoDataFrame":
+    """
+    Add a unique integer class column to a vector dataset based on an existing column.
+
+    Args:
+        data (str or GeoDataFrame): Input vector data as file path or GeoDataFrame.
+        column (str): The column name used for generating unique classes.
+        class_column (str): The name of the new column to store integer classes. Default is "class".
+        mapping (dict, optional): A dictionary mapping original values to integer classes.
+            If not provided, a mapping will be generated automatically starting from 1.
+
+    Returns:
+        GeoDataFrame: The updated GeoDataFrame with the new class column.
+    """
+    import geopandas as gpd
+
+    gdf = gpd.read_file(data) if isinstance(data, str) else data.copy()
+
+    if column not in gdf.columns:
+        raise ValueError(f"Column '{column}' not found in the input data.")
+
+    if mapping is None:
+        unique_values = sorted(gdf[column].dropna().unique())
+        mapping = {val: idx + 1 for idx, val in enumerate(unique_values)}
+
+    gdf[class_column] = gdf[column].map(mapping)
+
+    return gdf
