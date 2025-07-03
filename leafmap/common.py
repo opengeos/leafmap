@@ -17693,7 +17693,7 @@ def convert_to_cog(
     output_dir: str,
     prefix: str = "",
     suffix: str = "_cog",
-    extra_options: Optional[List[str]] = None
+    extra_options: Optional[List[str]] = None,
 ):
     """
     Convert all .tif files in a directory to Cloud Optimized GeoTIFFs (COGs).
@@ -17707,6 +17707,7 @@ def convert_to_cog(
             Example: ["-co", "TILED=YES", "-co", "BLOCKSIZE=512"]
     """
     import glob
+
     os.makedirs(output_dir, exist_ok=True)
 
     if isinstance(images, str):
