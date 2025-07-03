@@ -167,7 +167,7 @@ WMS_TILES = {
     },
     "USGS NAIP Imagery": {
         "url": "https://imagery.nationalmap.gov/arcgis/services/USGSNAIPImagery/ImageServer/WMSServer?",
-        "layers": "USGSNAIPImagery:NaturalColor",
+        "layers": "USGSNAIPImagery",
         "name": "USGS NAIP Imagery",
         "attribution": "USGS",
         "format": "image/png",
