@@ -17689,7 +17689,7 @@ def add_unique_class(
 
 
 def convert_to_cog(
-    images: str | list,
+    images: str,
     output_dir: str,
     prefix: str = "",
     suffix: str = "_cog",
