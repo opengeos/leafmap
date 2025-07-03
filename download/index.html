@@ -930,6 +930,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#leafmap.download.view_pc_items" class="md-nav__link">
+    <span class="md-ellipsis">
+      view_pc_items
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6536,6 +6545,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#leafmap.download.view_pc_items" class="md-nav__link">
+    <span class="md-ellipsis">
+      view_pc_items
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -10782,6 +10800,525 @@ by converting it to an RGB array and displaying it with matplotlib.</p>
         <span class="k">return</span> <span class="n">asset_url</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">signed_item</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="leafmap.download.view_pc_items" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">view_pc_items</span><span class="p">(</span><span class="n">urls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">assets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attribution</span><span class="o">=</span><span class="s1">&#39;Planetary Computer&#39;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">shown</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">layer_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;folium&#39;</span><span class="p">,</span> <span class="n">basemap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+
+<a href="#leafmap.download.view_pc_items" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Visualize multiple STAC items from the Planetary Computer on an interactive map.</p>
+<p>This function allows users to display multiple STAC items on a map using either
+the <code>folium</code> or <code>ipyleaflet</code> backend. It supports adding basemaps, configuring
+map options, and customizing the visualization of the STAC items.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>urls</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of URLs of the STAC items to visualize. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>collection</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The collection ID of the STAC items. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>items</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span> or <span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of STAC items or their IDs. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>assets</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of asset keys to visualize. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>bands</code>
+            </td>
+            <td>
+                  <code><span title="list">list</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>List of specific bands to visualize. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>titiler_endpoint</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>URL of the Titiler endpoint for rendering. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>attribution</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Attribution text for the layers. Defaults to "Planetary Computer".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;Planetary Computer&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>opacity</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Opacity of the layers (0.0 to 1.0). Defaults to 1.0.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>shown</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the layers are visible by default. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>fit_bounds</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether to fit the map bounds to the layers. Defaults to True.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>layer_index</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Index of the layers in the map's layer stack. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>backend</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Map backend to use ('folium' or 'ipyleaflet'). Defaults to "folium".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;folium&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>basemap</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Name of the basemap to add to the map. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>map_args</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional arguments for configuring the map. Defaults to None.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**kwargs</code>
+            </td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Additional keyword arguments passed to the <code>add_stac_layer</code> method.</p>
+              </div>
+            </td>
+            <td>
+                  <code>{}</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>leafmap.Map: An interactive map with the STAC items visualized.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If an unsupported backend is specified.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>leafmap/download.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1141</span>
+<span class="normal">1142</span>
+<span class="normal">1143</span>
+<span class="normal">1144</span>
+<span class="normal">1145</span>
+<span class="normal">1146</span>
+<span class="normal">1147</span>
+<span class="normal">1148</span>
+<span class="normal">1149</span>
+<span class="normal">1150</span>
+<span class="normal">1151</span>
+<span class="normal">1152</span>
+<span class="normal">1153</span>
+<span class="normal">1154</span>
+<span class="normal">1155</span>
+<span class="normal">1156</span>
+<span class="normal">1157</span>
+<span class="normal">1158</span>
+<span class="normal">1159</span>
+<span class="normal">1160</span>
+<span class="normal">1161</span>
+<span class="normal">1162</span>
+<span class="normal">1163</span>
+<span class="normal">1164</span>
+<span class="normal">1165</span>
+<span class="normal">1166</span>
+<span class="normal">1167</span>
+<span class="normal">1168</span>
+<span class="normal">1169</span>
+<span class="normal">1170</span>
+<span class="normal">1171</span>
+<span class="normal">1172</span>
+<span class="normal">1173</span>
+<span class="normal">1174</span>
+<span class="normal">1175</span>
+<span class="normal">1176</span>
+<span class="normal">1177</span>
+<span class="normal">1178</span>
+<span class="normal">1179</span>
+<span class="normal">1180</span>
+<span class="normal">1181</span>
+<span class="normal">1182</span>
+<span class="normal">1183</span>
+<span class="normal">1184</span>
+<span class="normal">1185</span>
+<span class="normal">1186</span>
+<span class="normal">1187</span>
+<span class="normal">1188</span>
+<span class="normal">1189</span>
+<span class="normal">1190</span>
+<span class="normal">1191</span>
+<span class="normal">1192</span>
+<span class="normal">1193</span>
+<span class="normal">1194</span>
+<span class="normal">1195</span>
+<span class="normal">1196</span>
+<span class="normal">1197</span>
+<span class="normal">1198</span>
+<span class="normal">1199</span>
+<span class="normal">1200</span>
+<span class="normal">1201</span>
+<span class="normal">1202</span>
+<span class="normal">1203</span>
+<span class="normal">1204</span>
+<span class="normal">1205</span>
+<span class="normal">1206</span>
+<span class="normal">1207</span>
+<span class="normal">1208</span>
+<span class="normal">1209</span>
+<span class="normal">1210</span>
+<span class="normal">1211</span>
+<span class="normal">1212</span>
+<span class="normal">1213</span>
+<span class="normal">1214</span>
+<span class="normal">1215</span>
+<span class="normal">1216</span>
+<span class="normal">1217</span>
+<span class="normal">1218</span>
+<span class="normal">1219</span>
+<span class="normal">1220</span>
+<span class="normal">1221</span>
+<span class="normal">1222</span>
+<span class="normal">1223</span>
+<span class="normal">1224</span>
+<span class="normal">1225</span>
+<span class="normal">1226</span>
+<span class="normal">1227</span>
+<span class="normal">1228</span>
+<span class="normal">1229</span>
+<span class="normal">1230</span>
+<span class="normal">1231</span>
+<span class="normal">1232</span>
+<span class="normal">1233</span>
+<span class="normal">1234</span>
+<span class="normal">1235</span>
+<span class="normal">1236</span>
+<span class="normal">1237</span>
+<span class="normal">1238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">view_pc_items</span><span class="p">(</span>
+    <span class="n">urls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">collection</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">assets</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">bands</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">titiler_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">attribution</span><span class="o">=</span><span class="s2">&quot;Planetary Computer&quot;</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">shown</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">layer_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;folium&quot;</span><span class="p">,</span>
+    <span class="n">basemap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">map_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Visualize multiple STAC items from the Planetary Computer on an interactive map.</span>
+
+<span class="sd">    This function allows users to display multiple STAC items on a map using either</span>
+<span class="sd">    the `folium` or `ipyleaflet` backend. It supports adding basemaps, configuring</span>
+<span class="sd">    map options, and customizing the visualization of the STAC items.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        urls (list, optional): List of URLs of the STAC items to visualize. Defaults to None.</span>
+<span class="sd">        collection (str, optional): The collection ID of the STAC items. Defaults to None.</span>
+<span class="sd">        items (list or str, optional): List of STAC items or their IDs. Defaults to None.</span>
+<span class="sd">        assets (list, optional): List of asset keys to visualize. Defaults to None.</span>
+<span class="sd">        bands (list, optional): List of specific bands to visualize. Defaults to None.</span>
+<span class="sd">        titiler_endpoint (str, optional): URL of the Titiler endpoint for rendering. Defaults to None.</span>
+<span class="sd">        attribution (str, optional): Attribution text for the layers. Defaults to &quot;Planetary Computer&quot;.</span>
+<span class="sd">        opacity (float, optional): Opacity of the layers (0.0 to 1.0). Defaults to 1.0.</span>
+<span class="sd">        shown (bool, optional): Whether the layers are visible by default. Defaults to True.</span>
+<span class="sd">        fit_bounds (bool, optional): Whether to fit the map bounds to the layers. Defaults to True.</span>
+<span class="sd">        layer_index (int, optional): Index of the layers in the map&#39;s layer stack. Defaults to None.</span>
+<span class="sd">        backend (str, optional): Map backend to use (&#39;folium&#39; or &#39;ipyleaflet&#39;). Defaults to &quot;folium&quot;.</span>
+<span class="sd">        basemap (str, optional): Name of the basemap to add to the map. Defaults to None.</span>
+<span class="sd">        map_args (dict, optional): Additional arguments for configuring the map. Defaults to None.</span>
+<span class="sd">        **kwargs: Additional keyword arguments passed to the `add_stac_layer` method.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        leafmap.Map: An interactive map with the STAC items visualized.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If an unsupported backend is specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;folium&quot;</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">leafmap.foliumap</span> <span class="k">as</span> <span class="nn">leafmap</span>
+
+    <span class="k">elif</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;ipyleaflet&quot;</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">leafmap.leafmap</span> <span class="k">as</span> <span class="nn">leafmap</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Unsupported backend: </span><span class="si">{</span><span class="n">backend</span><span class="si">}</span><span class="s2">. Supported backends are &#39;folium&#39; and &#39;ipyleaflet&#39;.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">map_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">map_args</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="s2">&quot;draw_control&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">map_args</span><span class="p">:</span>
+        <span class="n">map_args</span><span class="p">[</span><span class="s2">&quot;draw_control&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">urls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">pystac</span><span class="o">.</span><span class="n">Item</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">url</span><span class="p">)</span> <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">pystac</span><span class="o">.</span><span class="n">Item</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">items</span><span class="p">)]</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="o">**</span><span class="n">map_args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basemap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">basemap</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">pystac</span><span class="o">.</span><span class="n">Item</span><span class="p">):</span>
+                <span class="n">collection</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">collection_id</span>
+                <span class="k">if</span> <span class="n">assets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">assets</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">assets</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">id</span>
+
+                <span class="n">m</span><span class="o">.</span><span class="n">add_stac_layer</span><span class="p">(</span>
+                    <span class="n">collection</span><span class="o">=</span><span class="n">collection</span><span class="p">,</span>
+                    <span class="n">item</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
+                    <span class="n">assets</span><span class="o">=</span><span class="n">assets</span><span class="p">,</span>
+                    <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span>
+                    <span class="n">titiler_endpoint</span><span class="o">=</span><span class="n">titiler_endpoint</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">item</span><span class="p">,</span>
+                    <span class="n">attribution</span><span class="o">=</span><span class="n">attribution</span><span class="p">,</span>
+                    <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+                    <span class="n">shown</span><span class="o">=</span><span class="n">shown</span><span class="p">,</span>
+                    <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span><span class="p">,</span>
+                    <span class="n">layer_index</span><span class="o">=</span><span class="n">layer_index</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="n">m</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
