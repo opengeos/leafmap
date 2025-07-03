@@ -17686,3 +17686,46 @@ def add_unique_class(
     gdf[class_column] = gdf[column].map(mapping)
 
     return gdf
+
+
+def convert_to_cog(
+    images: str,
+    output_dir: str,
+    prefix: str = "",
+    suffix: str = "_cog",
+    extra_options: Optional[List[str]] = None,
+):
+    """
+    Convert all .tif files in a directory to Cloud Optimized GeoTIFFs (COGs).
+
+    Args:
+        input_dir (str): Path to the input directory containing .tif files.
+        output_dir (str): Path to the output directory where COGs will be saved.
+        prefix (str): Prefix to add to the output filenames.
+        suffix (str): Suffix to add to the output filenames before the .tif extension.
+        extra_options (List[str], optional): Additional gdal_translate options.
+            Example: ["-co", "TILED=YES", "-co", "BLOCKSIZE=512"]
+    """
+    import glob
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    if isinstance(images, str):
+        tif_files = glob.glob(os.path.join(images, "*.tif"))
+    elif isinstance(images, list):
+        tif_files = [tif for tif in images if tif.endswith(".tif")]
+    else:
+        raise ValueError("images must be a string or list of strings")
+
+    if extra_options is None:
+        extra_options = []
+
+    for tif in tif_files:
+        base = os.path.splitext(os.path.basename(tif))[0]
+        out_file = os.path.join(output_dir, f"{prefix}{base}{suffix}.tif")
+
+        cmd = ["gdal_translate", tif, out_file, "-of", "COG", "-co", "COMPRESS=DEFLATE"]
+        cmd.extend(extra_options)
+
+        print(f"Converting: {tif} -> {out_file}")
+        subprocess.run(cmd, check=True)
