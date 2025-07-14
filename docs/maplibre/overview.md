@@ -550,6 +550,12 @@ Initialize a map with pitch and bearing camera options.
 
 [![](https://i.imgur.com/onKRYXz.png)](https://leafmap.org/maplibre/set_pitch_bearing)
 
+## Set terrain
+
+Set terrain on the map.
+
+[![](https://github.com/user-attachments/assets/5527dfa5-8a06-47b8-b123-c353005b72c0)](https://leafmap.org/maplibre/set_terrain)
+
 ## Add a sidebar widget
 
 Create a sidebar widget to display the layer manager and custom widgets.

@@ -1029,6 +1029,40 @@ class Map(MapWidget):
         options["animate"] = options.get("animate", True)
         self.add_call("fitBounds", bounds, options)
 
+    def set_terrain(
+        self,
+        source: str = "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png",
+        exaggeration: float = 1.0,
+        tile_size: int = 256,
+        encoding: str = "terrarium",
+        source_id: str = "terrain-dem",
+    ) -> None:
+        """Add terrain visualization to the map.
+
+        Args:
+            source: URL template for terrain tiles. Defaults to AWS elevation tiles.
+            exaggeration: Terrain exaggeration factor. Defaults to 1.0.
+            tile_size: Tile size in pixels. Defaults to 256.
+            encoding: Encoding for the terrain tiles. Defaults to "terrarium".
+            source_id: Unique identifier for the terrain source. Defaults to "terrain-dem".
+        """
+        # Add terrain source
+        self.add_source(
+            source_id,
+            {
+                "type": "raster-dem",
+                "tiles": [source],
+                "tileSize": tile_size,
+                "encoding": encoding,
+            },
+        )
+
+        # Set terrain on the map
+        terrain_config = {"source": source_id, "exaggeration": exaggeration}
+
+        # Store terrain configuration in persistent state
+        super().add_call("setTerrain", terrain_config)
+
     def add_basemap(
         self,
         basemap: Union[str, xyzservices.TileProvider] = None,
