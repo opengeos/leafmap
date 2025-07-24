@@ -23,7 +23,6 @@ RUN mamba install -n base -c conda-forge -y \
     fiona \
     rasterio \
     pyproj \
-    fiona \
     geopandas \
     maplibre \
     pmtiles \
@@ -39,14 +38,11 @@ RUN mamba install -n base -c conda-forge -y \
     && mamba clean --all --yes \
     && fix-permissions $CONDA_DIR
 
-# RUN mamba install -c conda-forge gdal==3.11.0 -y
-
 # ------------------------------
-# 2b. Create missing sqlite symlinks (after files exist)
+# 2b. Create missing sqlite symlinks
 # ------------------------------
 RUN ln -s $CONDA_PREFIX/lib/libsqlite3.so.3.50.0 $CONDA_PREFIX/lib/libsqlite3.so \
     && ln -s $CONDA_PREFIX/lib/libsqlite3.so.3.50.0 $CONDA_PREFIX/lib/libsqlite3.so.0
-
 
 # ------------------------------
 # 3. Set geospatial environment variables
@@ -56,15 +52,20 @@ ENV PROJ_LIB=$CONDA_DIR/share/proj \
     LOCALTILESERVER_CLIENT_PREFIX='proxy/{port}'
 
 # ------------------------------
-# 4. Copy source code after env setup
+# 4. Add jupyter_server_config.py to increase websocket limit
+# ------------------------------
+RUN mkdir -p /home/jovyan/.jupyter && \
+    echo "c = get_config()  # noqa" > /home/jovyan/.jupyter/jupyter_server_config.py && \
+    echo "c.ServerApp.tornado_settings = {\"websocket_max_message_size\": 100 * 1024 * 1024}" >> /home/jovyan/.jupyter/jupyter_server_config.py && \
+    fix-permissions /home/jovyan/.jupyter
+
+
+# ------------------------------
+# 5. Copy source code and install leafmap
 # ------------------------------
 COPY . /home/jovyan/leafmap
 WORKDIR /home/jovyan/leafmap
 
-# ------------------------------
-# 5. Install leafmap from source
-# ------------------------------
-# Prevent version resolution errors in CI
 ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_LEAFMAP=0.0.0
 
 RUN pip install . && \
