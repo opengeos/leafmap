@@ -6370,6 +6370,36 @@ def image_resolution(image, **kwargs):
     return client.metadata()["GeoTransform"][1]
 
 
+def image_bbox(raster_path, output_file=None, to_crs=None, **kwargs):
+    """Get the bounding box of an image.
+
+    Args:
+        raster_path (str): The input image filepath or URL.
+        output_file (str, optional): The output file path. Defaults to None.
+        to_crs (str, optional): The CRS to convert the bounding box to. Defaults to None.
+    """
+
+    import rasterio
+    from shapely.geometry import box
+    import geopandas as gpd
+
+    with rasterio.open(raster_path) as src:
+        bounds = src.bounds
+        bbox = box(bounds.left, bounds.bottom, bounds.right, bounds.top)
+        crs = src.crs
+
+    # Convert to GeoDataFrame
+    gdf = gpd.GeoDataFrame({"geometry": [bbox]}, crs=crs)
+    if to_crs is not None:
+        gdf = gdf.to_crs(to_crs)
+
+    # Save to file (e.g., GeoJSON)
+    if output_file is not None:
+        gdf.to_file(output_file, driver="GeoJSON")
+    else:
+        return gdf
+
+
 def find_files(input_dir, ext=None, fullpath=True, recursive=True):
     """Find files in a directory.
 
@@ -15674,7 +15704,7 @@ def get_nwi(
             gdf = gdf.to_crs(out_sr)
 
         if clip:
-            gdf = clip_vector(gdf, bbox=geometry)
+            gdf = clip_vector(gdf, clip_geom=geometry)
 
         if add_class:
             gdf = add_unique_class(gdf, "WETLAND_TY")
