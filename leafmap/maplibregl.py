@@ -7824,6 +7824,9 @@ class LayerManagerWidget(v.ExpansionPanels):
             visible = info.get("visible", True)
             opacity = info.get("opacity", 1.0)
 
+            if isinstance(opacity, list) and "match" in opacity and len(opacity) >= 5:
+                opacity = opacity[3]
+
             checkbox = widgets.Checkbox(value=visible, description=name, style=style)
             checkbox.layout.max_width = "150px"
 
@@ -8241,9 +8244,12 @@ class LayerStyleWidget(widgets.VBox):
         self, description: str, property_name: str, default_color: str
     ) -> widgets.ColorPicker:
         """Create a color picker widget."""
+        value = self.original_style.get(property_name, default_color)
+        if isinstance(value, list) and "match" in value and len(value) >= 5:
+            value = value[3]
         return widgets.ColorPicker(
             description=description,
-            value=self.original_style.get(property_name, default_color),
+            value=value,
             layout=widgets.Layout(
                 width=self.widget_width, description_width=self.label_width
             ),
@@ -8260,9 +8266,12 @@ class LayerStyleWidget(widgets.VBox):
         step: float = 1,
     ) -> widgets.FloatSlider:
         """Create a number slider widget."""
+        value = self.original_style.get(property_name, default_value)
+        if isinstance(value, list) and "match" in value and len(value) >= 5:
+            value = value[3]
         return widgets.FloatSlider(
             description=description,
-            value=self.original_style.get(property_name, default_value),
+            value=value,
             min=min_val,
             max=max_val,
             step=step,
