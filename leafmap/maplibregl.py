@@ -8673,7 +8673,7 @@ class SelectDataWidget(widgets.VBox):
         folder_chooser._select.layout.width = "100px"
 
         uploader = widgets.FileUpload(
-            accept=".geojson",
+            accept=".geojson,.json,.parquet,.csv,.shp,dbf,shx,prj,.gpkg",
             multiple=True,
             description="Upload",
             layout=widgets.Layout(width="120px"),
