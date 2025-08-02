@@ -8830,6 +8830,9 @@ class SelectDataWidget(widgets.VBox):
             output.outputs = ()
 
         reset_btn.on_click(on_reset)
+        folder_chooser.layout.width = (
+            str(abs(int(widget_width.replace("px", "")) - 60)) + "px"
+        )
 
         self.children = [
             folder_chooser,
