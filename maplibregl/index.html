@@ -51513,7 +51513,10 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
 <span class="normal">8835</span>
 <span class="normal">8836</span>
 <span class="normal">8837</span>
-<span class="normal">8838</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SelectDataWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="normal">8838</span>
+<span class="normal">8839</span>
+<span class="normal">8840</span>
+<span class="normal">8841</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SelectDataWidget</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A widget for selecting and uploading data to be added to a map.</span>
 
@@ -51565,7 +51568,7 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
         <span class="n">folder_chooser</span><span class="o">.</span><span class="n">_select</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;100px&quot;</span>
 
         <span class="n">uploader</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span>
-            <span class="n">accept</span><span class="o">=</span><span class="s2">&quot;.geojson&quot;</span><span class="p">,</span>
+            <span class="n">accept</span><span class="o">=</span><span class="s2">&quot;.geojson,.json,.parquet,.csv,.shp,dbf,shx,prj,.gpkg&quot;</span><span class="p">,</span>
             <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Upload&quot;</span><span class="p">,</span>
             <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;120px&quot;</span><span class="p">),</span>
@@ -51722,6 +51725,9 @@ It includes a folder chooser, a file uploader, and buttons to apply or reset the
             <span class="n">output</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="p">()</span>
 
         <span class="n">reset_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">on_reset</span><span class="p">)</span>
+        <span class="n">folder_chooser</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">widget_width</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;px&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">-</span> <span class="mi">60</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;px&quot;</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">folder_chooser</span><span class="p">,</span>
@@ -52062,7 +52068,10 @@ to be called when the selection is reset. Defaults to None.</p>
 <span class="normal">8835</span>
 <span class="normal">8836</span>
 <span class="normal">8837</span>
-<span class="normal">8838</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">8838</span>
+<span class="normal">8839</span>
+<span class="normal">8840</span>
+<span class="normal">8841</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">default_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="n">widget_width</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;360px&quot;</span><span class="p">,</span>
@@ -52106,7 +52115,7 @@ to be called when the selection is reset. Defaults to None.</p>
     <span class="n">folder_chooser</span><span class="o">.</span><span class="n">_select</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="s2">&quot;100px&quot;</span>
 
     <span class="n">uploader</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span>
-        <span class="n">accept</span><span class="o">=</span><span class="s2">&quot;.geojson&quot;</span><span class="p">,</span>
+        <span class="n">accept</span><span class="o">=</span><span class="s2">&quot;.geojson,.json,.parquet,.csv,.shp,dbf,shx,prj,.gpkg&quot;</span><span class="p">,</span>
         <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Upload&quot;</span><span class="p">,</span>
         <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;120px&quot;</span><span class="p">),</span>
@@ -52263,6 +52272,9 @@ to be called when the selection is reset. Defaults to None.</p>
         <span class="n">output</span><span class="o">.</span><span class="n">outputs</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="n">reset_btn</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">on_reset</span><span class="p">)</span>
+    <span class="n">folder_chooser</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">widget_width</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;px&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="o">-</span> <span class="mi">60</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;px&quot;</span>
+    <span class="p">)</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">folder_chooser</span><span class="p">,</span>
