@@ -23,18 +23,14 @@ RUN mamba install -n base -c conda-forge -y \
     fiona \
     rasterio \
     pyproj \
-    geopandas \
-    maplibre \
-    pmtiles \
     flask \
     flask-cors \
-    localtileserver \
+    leafmap \
     jupyter-server-proxy \
-    h5netcdf \
-    h5py \
-    opera-utils \
+    # h5netcdf \
+    # h5py \
     rioxarray \
-    rio-cogeo \
+    # rio-cogeo \
     polars \
     && mamba clean --all --yes \
     && fix-permissions $CONDA_DIR
@@ -64,16 +60,20 @@ RUN mkdir -p /home/jovyan/.jupyter && \
 # ------------------------------
 # 5. Copy source code and install leafmap
 # ------------------------------
-COPY . /home/jovyan/leafmap
-WORKDIR /home/jovyan/leafmap
+# Set working directory
+WORKDIR /home/jovyan
 
-ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_LEAFMAP=0.0.0
+# Copy only the leafmap Python package (no pip install)
+COPY leafmap /opt/conda/lib/python3.12/site-packages/leafmap
 
-RUN pip install . && \
-    pip install quak && \
+RUN pip install --no-cache-dir quak && \
     rm -rf ./build ./dist *.egg-info && \
+    rm -rf leafmap && \
     mkdir -p /home/jovyan/work && \
     fix-permissions /home/jovyan
+
+COPY ./docs/maplibre /home/jovyan/leafmap/maplibre
+COPY ./docs/notebooks /home/jovyan/leafmap/notebooks
 
 # ------------------------------
 # 6. Switch back to default user
@@ -83,6 +83,8 @@ WORKDIR /home/jovyan
 
 # ------------------------------
 # Usage:
+# docker build -t giswqs/leafmap:latest .
+# docker buildx build --platform linux/amd64,linux/arm64 -t giswqs/leafmap:latest --push .
 # docker pull giswqs/leafmap:latest
 # docker run -it -p 8888:8888 -v $(pwd):/home/jovyan/work giswqs/leafmap:latest
 # ------------------------------
