@@ -35,6 +35,7 @@ RUN mamba install -n base -c conda-forge -y \
     opera-utils \
     rioxarray \
     rio-cogeo \
+    polars \
     && mamba clean --all --yes \
     && fix-permissions $CONDA_DIR
 
@@ -69,6 +70,7 @@ WORKDIR /home/jovyan/leafmap
 ENV SETUPTOOLS_SCM_PRETEND_VERSION_FOR_LEAFMAP=0.0.0
 
 RUN pip install . && \
+    pip install quak && \
     rm -rf ./build ./dist *.egg-info && \
     mkdir -p /home/jovyan/work && \
     fix-permissions /home/jovyan
