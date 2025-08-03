@@ -2018,26 +2018,13 @@ class Map(ipyleaflet.Map):
             legend_text = legend_text.replace("height: 16px", "height: 3px")
 
         try:
-            legend_output_widget = widgets.Output(
-                layout={
-                    # "border": "1px solid black",
-                    "max_width": max_width,
-                    "min_width": min_width,
-                    "max_height": max_height,
-                    "min_height": min_height,
-                    "height": height,
-                    "width": width,
-                    "overflow": "scroll",
-                }
-            )
-            legend_control = ipyleaflet.WidgetControl(
-                widget=legend_output_widget, position=position
-            )
-            legend_widget = widgets.HTML(value=legend_text)
-            with legend_output_widget:
-                legend_output_widget.append_display_data(legend_widget)
 
-            self.legend_widget = legend_output_widget
+            legend_widget = widgets.HTML(value=legend_text)
+            legend_control = ipyleaflet.WidgetControl(
+                widget=legend_widget, position=position
+            )
+
+            self.legend_widget = legend_widget
             self.legend_control = legend_control
             self.add(legend_control)
 
