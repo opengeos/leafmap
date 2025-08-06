@@ -5606,6 +5606,176 @@ class Map(MapWidget):
         self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
         self.set_sidebar_width(min_width=sidebar_width)
 
+    def add_alphaearth_gui(
+        self,
+        start_year: int = 2017,
+        end_year: int = 2024,
+        label: str = "AlphaEarth",
+        widget_icon: str = "mdi-earth",
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a AlphaEarth GUI to the map.
+        Earth Engine Dataset: https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL
+
+        Args:
+            start_year (int, optional): The start year. Defaults to 2017.
+            end_year (int, optional): The end year. Defaults to 2024.
+            label (str, optional): The label of the widget. Defaults to "AlphaEarth".
+            widget_icon (str, optional): The icon of the widget. Defaults to "mdi-earth".
+            **kwargs (Any, optional): Additional keyword arguments for the add_to_sidebar method.
+        """
+        import ee
+
+        band_names = (
+            ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL")
+            .first()
+            .bandNames()
+            .getInfo()
+        )
+
+        style = {"description_width": "initial"}
+        year_slider = widgets.IntSlider(
+            value=2020,
+            min=start_year,
+            max=end_year,
+            step=1,
+            description="Year:",
+            continuous_update=True,
+            style=style,
+        )
+
+        red_band = widgets.Dropdown(
+            options=band_names, value="A01", description="Red:", style=style
+        )
+
+        green_band = widgets.Dropdown(
+            options=band_names, value="A02", description="Green:", style=style
+        )
+
+        blue_band = widgets.Dropdown(
+            options=band_names, value="A03", description="Blue:", style=style
+        )
+
+        min_max_slider = widgets.FloatRangeSlider(
+            value=[-0.3, 0.3],
+            min=-1.0,
+            max=1.0,
+            step=0.01,
+            description="Min-Max:",
+            style=style,
+        )
+
+        layer_name_widget = widgets.Text(
+            value=f"Embeddings {year_slider.value}",
+            description="Layer Name:",
+            style=style,
+        )
+
+        add_label_widget = widgets.Checkbox(
+            value=True, description="Add labels on top", style=style
+        )
+
+        terrain_exaggeration_slider = widgets.FloatSlider(
+            value=2,
+            min=1,
+            max=10,
+            step=0.1,
+            description="Terrain exaggeration:",
+            style=style,
+        )
+
+        apply_button = widgets.Button(
+            description="Apply",
+            button_style="primary",
+            tooltip="Apply changes",
+        )
+
+        reset_button = widgets.Button(
+            description="Reset",
+            button_style="primary",
+            tooltip="Reset to default",
+        )
+
+        close_button = widgets.Button(
+            description="Close",
+            button_style="primary",
+            tooltip="Close the app",
+        )
+
+        def update_year(change):
+            if change["new"]:
+                year = change.new
+                layer_name_widget.value = f"Embeddings {year}"
+
+        year_slider.observe(update_year, names="value")
+
+        def terrain_exaggeration_changed(change):
+            if change["new"]:
+                self.set_terrain(exaggeration=terrain_exaggeration_slider.value)
+
+        terrain_exaggeration_slider.observe(terrain_exaggeration_changed, names="value")
+
+        def apply_button_clicked(change):
+            layer_name = layer_name_widget.value
+            if layer_name in self.get_layer_names():
+                self.remove_layer(layer_name)
+
+            if add_label_widget.value:
+                before_id = self.first_symbol_layer_id
+            else:
+                before_id = None
+
+            dataset = (
+                ee.ImageCollection("GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL")
+                .filterDate(f"{year_slider.value}-01-01", f"{year_slider.value}-12-31")
+                .mosaic()
+            )
+            vis_params = {
+                "min": min_max_slider.value[0],
+                "max": min_max_slider.value[1],
+                "bands": [red_band.value, green_band.value, blue_band.value],
+            }
+            self.add_ee_layer(
+                dataset, vis_params, name=layer_name, opacity=1.0, before_id=before_id
+            )
+            self.set_terrain(exaggeration=terrain_exaggeration_slider.value)
+
+        apply_button.on_click(apply_button_clicked)
+
+        def reset_button_clicked(change):
+            year_slider.value = 2020
+            terrain_exaggeration_slider.value = 2
+            min_max_slider.value = [-0.3, 0.3]
+            red_band.value = "A01"
+            green_band.value = "A02"
+            blue_band.value = "A03"
+            add_label_widget.value = True
+            layer_name_widget.value = f"Embeddings {year_slider.value}"
+            if layer_name_widget.value in self.get_layer_names():
+                self.remove_layer(layer_name_widget.value)
+
+        reset_button.on_click(reset_button_clicked)
+
+        def close_button_clicked(change):
+            self.remove_from_sidebar(name=label)
+
+        close_button.on_click(close_button_clicked)
+
+        widget = widgets.VBox(
+            [
+                year_slider,
+                widgets.HBox([red_band, green_band, blue_band]),
+                min_max_slider,
+                terrain_exaggeration_slider,
+                add_label_widget,
+                layer_name_widget,
+                widgets.HBox([apply_button, reset_button, close_button]),
+            ]
+        )
+
+        self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
+
 
 class Container(v.Container):
     """
