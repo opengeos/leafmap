@@ -27,11 +27,11 @@ RUN mamba install -n base -c conda-forge -y \
     flask-cors \
     leafmap \
     jupyter-server-proxy \
-    # h5netcdf \
-    # h5py \
+    quak \
     rioxarray \
-    # rio-cogeo \
     polars \
+    voila \
+    voila_topbar \
     && mamba clean --all --yes \
     && fix-permissions $CONDA_DIR
 
@@ -66,10 +66,7 @@ WORKDIR /home/jovyan
 # Copy only the leafmap Python package (no pip install)
 COPY leafmap /opt/conda/lib/python3.12/site-packages/leafmap
 
-RUN pip install --no-cache-dir quak && \
-    rm -rf ./build ./dist *.egg-info && \
-    rm -rf leafmap && \
-    mkdir -p /home/jovyan/work && \
+RUN mkdir -p /home/jovyan/work && \
     fix-permissions /home/jovyan
 
 COPY ./docs/maplibre /home/jovyan/leafmap/maplibre
