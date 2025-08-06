@@ -128,6 +128,12 @@ Add text to the map.
 
 [![](https://i.imgur.com/UAtlh3r.png)](https://leafmap.org/maplibre/add_text)
 
+## Visualize AlphaEarth satellite embeddings in 3D
+
+Visualize AlphaEarth satellite embeddings in 3D.
+
+[![](https://github.com/user-attachments/assets/fdcf844e-6385-4e62-a49f-363c00fa0998)](https://leafmap.org/maplibre/AlphaEarth)
+
 ## Animate a line
 
 Animate a line by updating a GeoJSON source on each frame.
