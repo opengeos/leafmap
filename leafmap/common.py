@@ -11054,13 +11054,17 @@ def array_to_image(
 
 
 def images_to_tiles(
-    images: Union[str, List[str]], names: List[str] = None, **kwargs
+    images: Union[str, List[str]],
+    names: List[str] = None,
+    ipyleaflet: bool = True,
+    **kwargs,
 ) -> Dict[str, ipyleaflet.TileLayer]:
     """Convert a list of images to a dictionary of ipyleaflet.TileLayer objects.
 
     Args:
         images (str | list): The path to a directory of images or a list of image paths.
         names (list, optional): A list of names for the layers. Defaults to None.
+        ipyleaflet (bool, optional): Whether to return ipyleaflet.TileLayer objects. Defaults to True.
         **kwargs: Additional arguments to pass to get_local_tile_layer().
 
     Returns:
@@ -11087,12 +11091,21 @@ def images_to_tiles(
         try:
             if image.startswith("http") and image.endswith(".tif"):
                 url = cog_tile(image, **kwargs)
-                tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+                if ipyleaflet:
+                    tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+                else:
+                    tile = url
             elif image.startswith("http"):
                 url = stac_tile(image, **kwargs)
-                tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+                if ipyleaflet:
+                    tile = ipyleaflet.TileLayer(url=url, name=name, **kwargs)
+                else:
+                    tile = url
             else:
-                tile = get_local_tile_layer(image, layer_name=name, **kwargs)
+                if ipyleaflet:
+                    tile = get_local_tile_layer(image, layer_name=name, **kwargs)
+                else:
+                    tile = get_local_tile_url(image, **kwargs)
             tiles[name] = tile
         except Exception as e:
             print(image, e)
