@@ -1047,6 +1047,9 @@ class Map(MapWidget):
             source_id: Unique identifier for the terrain source. Defaults to "terrain-dem".
         """
         # Add terrain source
+        if source is None:
+            super().add_call("setTerrain", None)
+            return
         self.add_source(
             source_id,
             {
@@ -1062,6 +1065,10 @@ class Map(MapWidget):
 
         # Store terrain configuration in persistent state
         super().add_call("setTerrain", terrain_config)
+
+    def remove_terrain(self) -> None:
+        """Remove terrain visualization from the map."""
+        super().add_call("setTerrain", None)
 
     def add_basemap(
         self,
