@@ -574,6 +574,12 @@ Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.
 
 [![](https://i.imgur.com/zWsNXSF.png)](https://leafmap.org/maplibre/stac)
 
+## Add a time slider for visualizing time series data
+
+Add a time slider for visualizing time series data.
+
+[![](https://github.com/user-attachments/assets/2bfd5ad9-cf2e-43ce-96c0-278ea57fa020)](https://leafmap.org/maplibre/time_slider)
+
 ## Export 3D maps as HTML files for website hosting
 
 Export 3D maps as HTML files for website hosting.
