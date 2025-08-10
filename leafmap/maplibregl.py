@@ -1742,10 +1742,14 @@ class Map(MapWidget):
         if name is None:
             name = "COG_" + common.random_string()
 
+        if "vmin" in kwargs and "vmax" in kwargs:
+            vmin = kwargs.pop("vmin")
+            vmax = kwargs.pop("vmax")
+            kwargs["rescale"] = f"{vmin},{vmax}"
+
         tile_url = common.cog_tile(
             url, bands, titiler_endpoint, nodata=nodata, **kwargs
         )
-        bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
             tile_url,
             name,
@@ -1756,6 +1760,7 @@ class Map(MapWidget):
             overwrite=overwrite,
         )
         if fit_bounds:
+            bounds = common.cog_bounds(url, titiler_endpoint)
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
 
     def add_stac_layer(
@@ -1918,6 +1923,9 @@ class Map(MapWidget):
 
         if isinstance(source, np.ndarray) or isinstance(source, xr.DataArray):
             source = common.array_to_image(source, **array_args)
+
+        if "colormap_name" in kwargs:
+            colormap = kwargs.pop("colormap_name")
 
         url, tile_client = common.get_local_tile_url(
             source,
@@ -5776,6 +5784,67 @@ class Map(MapWidget):
 
         self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
 
+    def add_time_slider(
+        self,
+        images: Optional[Union[Dict, List, str]] = None,
+        labels: Optional[List] = None,
+        time_interval: Optional[int] = 1,
+        label_width: Optional[str] = "150px",
+        slider_width: Optional[str] = "150px",
+        button_width: Optional[str] = "45px",
+        layer_name: Optional[str] = "Image",
+        zoom_to_layer: Optional[bool] = True,
+        widget_icon: str = "mdi-image",
+        close_icon: str = "mdi-close",
+        label: str = "Time Slider",
+        background_color: str = "#f5f5f5",
+        height: str = "40px",
+        expanded: bool = True,
+        **kwargs,
+    ):
+        """
+        Adds a time slider to the map.
+
+        Args:
+            images (dict, optional): The dictionary containing a set of images.
+            labels (list, optional): The list of labels to be used for the time series. Defaults to None.
+            time_interval (int, optional): Time interval in seconds. Defaults to 1.
+            layer_name (str, optional): The name of the layer. Defaults to "Image".
+            zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
+            label_width (str, optional): Width of the label. Defaults to "150px".
+            slider_width (str, optional): Width of the slider. Defaults to "150px".
+            button_width (str, optional): Width of the buttons. Defaults to "45px".
+            widget_icon (str, optional): The icon for the widget. Defaults to "mdi-image".
+            close_icon (str, optional): The icon for the close button. Defaults to "mdi-close".
+            label (str, optional): The label for the widget. Defaults to "Time Slider".
+            background_color (str, optional): The background color of the widget. Defaults to "#f5f5f5".
+            height (str, optional): The height of the widget. Defaults to "40px".
+            expanded (bool, optional): Whether the widget is expanded by default. Defaults to True.
+            **kwargs: Additional keyword arguments to be passed to the add_raster or add_cog_layer function.
+        """
+        widget = TimeSliderWidget(
+            self,
+            images,
+            labels,
+            time_interval,
+            layer_name,
+            zoom_to_layer,
+            label_width,
+            slider_width,
+            button_width,
+            **kwargs,
+        )
+
+        self.add_to_sidebar(
+            widget,
+            widget_icon=widget_icon,
+            close_icon=close_icon,
+            label=label,
+            background_color=background_color,
+            height=height,
+            expanded=expanded,
+        )
+
 
 class Container(v.Container):
     """
@@ -9009,3 +9078,136 @@ class SelectDataWidget(widgets.VBox):
             widgets.HBox([uploader, apply_btn, reset_btn]),
             output,
         ]
+
+
+def TimeSliderWidget(
+    m,
+    images: Optional[Union[Dict, List, str]] = None,
+    labels: Optional[List] = None,
+    time_interval: Optional[int] = 1,
+    layer_name: Optional[str] = "Image",
+    zoom_to_layer: Optional[bool] = True,
+    label_width: Optional[str] = "150px",
+    slider_width: Optional[str] = "150px",
+    button_width: Optional[str] = "45px",
+    **kwargs,
+):
+    """Adds a time slider to the map.
+
+    Args:
+        images (dict, optional): The dictionary containing a set of images.
+        labels (list, optional): The list of labels to be used for the time series. Defaults to None.
+        time_interval (int, optional): Time interval in seconds. Defaults to 1.
+        layer_name (str, optional): The name of the layer. Defaults to "Image".
+        zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
+        label_width (str, optional): Width of the label. Defaults to "150px".
+        slider_width (str, optional): Width of the slider. Defaults to "150px".
+        button_width (str, optional): Width of the buttons. Defaults to "45px".
+        **kwargs: Additional keyword arguments to be passed to the add_raster or add_cog_layer function.
+    """
+    import time
+    import threading
+
+    if isinstance(images, str):
+        images = find_files(images, ext="*.tif", recursive=False)
+
+    if labels is None:
+        labels = list(range(1, len(images) + 1))
+        labels = [str(label) for label in labels]
+
+    if len(labels) != len(images):
+        raise ValueError("The length of labels is not equal to that of layers.")
+
+    slider = widgets.IntSlider(
+        min=1,
+        max=len(labels),
+        readout=False,
+        continuous_update=False,
+        layout=widgets.Layout(width=slider_width),
+    )
+    label = widgets.Label(
+        value=labels[0],
+        layout=widgets.Layout(padding="0px 5px 0px 5px", width=label_width),
+    )
+
+    play_btn = widgets.Button(
+        icon="play",
+        tooltip="Play the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width=button_width),
+    )
+
+    pause_btn = widgets.Button(
+        icon="pause",
+        tooltip="Pause the time slider",
+        button_style="primary",
+        layout=widgets.Layout(width=button_width),
+    )
+
+    play_chk = widgets.Checkbox(value=False)
+
+    slider_widget = widgets.HBox([label, slider, play_btn, pause_btn])
+
+    def play_click(b):
+        play_chk.value = True
+
+        def work(slider):
+            while play_chk.value:
+                if slider.value < len(labels):
+                    slider.value += 1
+                else:
+                    slider.value = 1
+                time.sleep(time_interval)
+
+        thread = threading.Thread(target=work, args=(slider,))
+        thread.start()
+
+    def pause_click(b):
+        play_chk.value = False
+
+    play_btn.on_click(play_click)
+    pause_btn.on_click(pause_click)
+
+    first_image = images[0]
+    if first_image.startswith("http"):
+        m.add_cog_layer(
+            first_image,
+            name=layer_name,
+            overwrite=True,
+            fit_bounds=zoom_to_layer,
+            **kwargs,
+        )
+    else:
+        m.add_raster(
+            first_image,
+            name=layer_name,
+            overwrite=True,
+            fit_bounds=zoom_to_layer,
+            **kwargs,
+        )
+
+    def slider_changed(change):
+        if change["new"]:
+            index = slider.value - 1
+            label.value = labels[index]
+
+            if images[index].startswith("http"):
+                m.add_cog_layer(
+                    images[index],
+                    name=layer_name,
+                    overwrite=True,
+                    fit_bounds=False,
+                    **kwargs,
+                )
+            else:
+                m.add_raster(
+                    images[index],
+                    name=layer_name,
+                    overwrite=True,
+                    fit_bounds=False,
+                    **kwargs,
+                )
+
+    slider.observe(slider_changed, "value")
+
+    return slider_widget
