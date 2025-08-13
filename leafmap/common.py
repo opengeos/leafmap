@@ -28,6 +28,7 @@ except ImportError:
     pass
 
 if TYPE_CHECKING:
+    from obstore.auth.boto3 import Boto3CredentialProvider
     import geopandas as gpd
 
 
@@ -9275,6 +9276,334 @@ def s3_get_objects(
         s3_get_object(
             bucket, key, output, chunk_size, request_payer, quiet, client_args, **kwargs
         )
+
+
+def s3_credential_provider(**kwargs) -> "Boto3CredentialProvider":
+    """Create a Boto3 credential provider for S3 authentication.
+
+    This function creates a Boto3 credential provider that can be used with obstore
+    for S3 authentication. It uses the default AWS credential chain (environment
+    variables, AWS config files, IAM roles, etc.).
+
+    Args:
+        **kwargs: Additional keyword arguments to pass to the Boto3CredentialProvider.
+                 Common options include:
+                 - profile_name (str): AWS profile name to use
+                 - region_name (str): AWS region name
+
+    Returns:
+        Boto3CredentialProvider: A credential provider instance that can be used
+                                with obstore S3Store for authentication.
+
+    Example:
+        >>> provider = s3_credential_provider(profile_name='my-profile')
+        >>> store = S3Store('my-bucket', credential_provider=provider)
+    """
+    from boto3 import Session
+    from obstore.auth.boto3 import Boto3CredentialProvider
+
+    session = Session()
+    credential_provider = Boto3CredentialProvider(session, **kwargs)
+    return credential_provider
+
+
+def s3_list_directories(
+    bucket: Optional[str] = None,
+    prefix: Optional[str] = None,
+    path: Optional[str] = None,
+    region: Optional[str] = None,
+    config: Optional[dict] = None,
+    client_options: Optional[dict] = None,
+    retry_config: Optional[dict] = None,
+    credential_provider: Optional["Boto3CredentialProvider"] = None,
+    skip_signature: bool = True,
+    return_full_path: bool = False,
+) -> List[str]:
+    """List directories (common prefixes) in an S3 bucket.
+
+    This function lists directories (common prefixes) in an S3 bucket using the
+    obstore library. It can work with either bucket/prefix parameters or a full
+    S3 path.
+
+    Args:
+        bucket (str, optional): The S3 bucket name. Required if path is not provided.
+        prefix (str, optional): The prefix to filter directories. Required if path is not provided.
+        path (str, optional): Full S3 path in format 's3://bucket/prefix'.
+                             If provided, bucket and prefix are extracted from this.
+        region (str, optional): AWS region where the bucket is located.
+                               If not provided, uses default region.
+        config (dict, optional): Additional S3 configuration options.
+        client_options (dict, optional): Additional S3 client options.
+        retry_config (dict, optional): Retry configuration for S3 operations.
+        credential_provider (Boto3CredentialProvider, optional): Custom credential provider.
+                                                                If not provided, creates a default one.
+        skip_signature (bool, optional): Whether to skip request signing for public buckets.
+                                        Defaults to True.
+        return_full_path (bool, optional): Whether to return full S3 paths or just directory names.
+                                          Defaults to False.
+
+    Returns:
+        List[str]: List of directory names or full S3 paths, depending on return_full_path parameter.
+
+    Raises:
+        ValueError: If neither path nor both bucket and prefix are provided.
+
+    Example:
+        >>> # Using bucket and prefix
+        >>> dirs = s3_list_directories(
+        ...     bucket='my-bucket',
+        ...     prefix='data/',
+        ...     region='us-west-2'
+        ... )
+
+        >>> # Using full S3 path
+        >>> dirs = s3_list_directories(
+        ...     path='s3://my-bucket/data/',
+        ...     region='us-west-2',
+        ...     return_full_path=True
+        ... )
+    """
+    from obstore.store import S3Store
+    import obstore as obs
+
+    if path is not None:
+        bare_path = path.replace(f"s3://", "")
+        bucket = bare_path.split("/")[0]
+        prefix = bare_path.replace(bucket, "")[1:]
+    elif bucket is not None and prefix is not None:
+        pass
+    else:
+        raise ValueError("Either path or bucket and prefix must be provided")
+
+    if credential_provider is None:
+        credential_provider = s3_credential_provider()
+
+    store = S3Store(
+        bucket,
+        region=region,
+        config=config,
+        client_options=client_options,
+        retry_config=retry_config,
+        credential_provider=credential_provider,
+        skip_signature=skip_signature,
+    )
+    result = obs.list_with_delimiter(store, prefix=prefix)
+    common_prefixes = result.get("common_prefixes", [])
+
+    paths = []
+    # Extract directory names from common prefixes
+    for common_prefix in common_prefixes:
+        if return_full_path:
+            paths.append(f"s3://{bucket}/{common_prefix}")
+        else:
+            # Extract just the directory name (last part before trailing slash)
+            dir_parts = common_prefix.rstrip("/").split("/")
+            if dir_parts:
+                paths.append(dir_parts[-1])
+    return paths
+
+
+def s3_list_files(
+    bucket: Optional[str] = None,
+    prefix: Optional[str] = None,
+    path: Optional[str] = None,
+    file_ext: Optional[str] = None,
+    region: Optional[str] = None,
+    config: Optional[dict] = None,
+    client_options: Optional[dict] = None,
+    retry_config: Optional[dict] = None,
+    credential_provider: Optional["Boto3CredentialProvider"] = None,
+    skip_signature: bool = True,
+    return_full_path: bool = False,
+) -> List[str]:
+    """List files in an S3 bucket with optional filtering.
+
+    This function lists files in an S3 bucket using the obstore library. It supports
+    filtering by file extension and can return either relative paths or full S3 URLs.
+
+    Args:
+        bucket (str, optional): The S3 bucket name. Required if path is not provided.
+        prefix (str, optional): The prefix to filter files. Required if path is not provided.
+        path (str, optional): Full S3 path in format 's3://bucket/prefix'.
+                             If provided, bucket and prefix are extracted from this.
+        file_ext (str, optional): File extension to filter by (e.g., '.parquet', '.json').
+                                 If provided, only files with this extension are returned.
+        region (str, optional): AWS region where the bucket is located.
+                               If not provided, uses default region.
+        config (dict, optional): Additional S3 configuration options.
+        client_options (dict, optional): Additional S3 client options.
+        retry_config (dict, optional): Retry configuration for S3 operations.
+        credential_provider (Boto3CredentialProvider, optional): Custom credential provider.
+                                                                If not provided, creates a default one.
+        skip_signature (bool, optional): Whether to skip request signing for public buckets.
+                                        Defaults to True.
+        return_full_path (bool, optional): Whether to return full S3 URLs or relative paths.
+                                          Defaults to False.
+
+    Returns:
+        List[str]: List of file paths. Format depends on return_full_path parameter:
+                  - If True: Full S3 URLs like 's3://bucket/path/file.ext'
+                  - If False: Relative paths like 'path/file.ext'
+
+    Raises:
+        ValueError: If neither path nor both bucket and prefix are provided.
+
+    Example:
+        >>> # List all files in a directory
+        >>> files = s3_list_files(
+        ...     bucket='my-bucket',
+        ...     prefix='data/2024/',
+        ...     region='us-west-2'
+        ... )
+
+        >>> # List only parquet files with full paths
+        >>> parquet_files = s3_list_files(
+        ...     path='s3://my-bucket/data/2024/',
+        ...     file_ext='.parquet',
+        ...     return_full_path=True
+        ... )
+    """
+    from obstore.store import S3Store
+    import obstore as obs
+
+    if path is not None:
+        bare_path = path.replace(f"s3://", "")
+        bucket = bare_path.split("/")[0]
+        prefix = bare_path.replace(bucket, "")[1:]
+    elif bucket is not None and prefix is not None:
+        pass
+    else:
+        raise ValueError("Either path or bucket and prefix must be provided")
+
+    if credential_provider is None:
+        credential_provider = s3_credential_provider()
+
+    store = S3Store(
+        bucket,
+        region=region,
+        config=config,
+        client_options=client_options,
+        retry_config=retry_config,
+        credential_provider=credential_provider,
+        skip_signature=skip_signature,
+    )
+    list_stream = obs.list(store, prefix=prefix)
+    paths = []
+    for batch in list_stream:
+        for meta in batch:
+            if return_full_path:
+                paths.append(f"s3://{bucket}/{meta['path']}")
+            else:
+                paths.append(meta["path"])
+
+    # Filter by file extension if provided
+    if file_ext is not None:
+        if not file_ext.startswith("."):
+            file_ext = f".{file_ext}"
+        paths = [path for path in paths if path.lower().endswith(file_ext.lower())]
+
+    return paths
+
+
+def s3_get_file(
+    path: str,
+    region: Optional[str] = None,
+    config: Optional[dict] = None,
+    client_options: Optional[dict] = None,
+    retry_config: Optional[dict] = None,
+    credential_provider: Optional["Boto3CredentialProvider"] = None,
+    skip_signature: bool = True,
+    output_file: Optional[str] = None,
+    overwrite: bool = False,
+) -> str:
+    """Download a file from S3 to local filesystem.
+
+    This function downloads a single file from an S3 bucket using the obstore library.
+    It supports both full S3 URLs and relative paths, and can save the file to a
+    specified location or the system's temporary directory.
+
+    Args:
+        path (str): The S3 path to the file. Can be either:
+                   - Full S3 URL: 's3://bucket/path/to/file.ext'
+                   - Relative path: 'bucket/path/to/file.ext' (s3:// will be added)
+        region (str, optional): AWS region where the bucket is located.
+                               If not provided, uses default region.
+        config (dict, optional): Additional S3 configuration options.
+        client_options (dict, optional): Additional S3 client options.
+        retry_config (dict, optional): Retry configuration for S3 operations.
+        credential_provider (Boto3CredentialProvider, optional): Custom credential provider.
+                                                                If not provided, creates a default one.
+        skip_signature (bool, optional): Whether to skip request signing for public buckets.
+                                        Defaults to True.
+        output_file (str, optional): Local path where the file should be saved.
+                                    If not provided, saves to system temp directory
+                                    with the original filename.
+        overwrite (bool, optional): Whether to overwrite the file if it already exists.
+                                    Defaults to False.
+
+
+    Returns:
+        str: The local path where the file was saved.
+
+    Raises:
+        FileNotFoundError: If the file does not exist in the S3 bucket.
+        PermissionError: If there are insufficient permissions to write to the output location.
+        ValueError: If the path format is invalid.
+
+    Example:
+        >>> # Download to temp directory
+        >>> local_path = s3_get_file(
+        ...     's3://my-bucket/data/file.parquet',
+        ...     region='us-west-2'
+        ... )
+
+        >>> # Download to specific location
+        >>> local_path = s3_get_file(
+        ...     's3://my-bucket/data/file.parquet',
+        ...     region='us-west-2',
+        ...     output_file='/home/user/downloads/file.parquet'
+        ... )
+
+        >>> print(f"File downloaded to: {local_path}")
+    """
+    import obstore as obs
+    import tempfile
+    from obstore.store import S3Store
+
+    if path.startswith("s3://"):
+        pass
+    else:
+        path = f"s3://{path}"
+
+    bucket = path.split("/")[2]
+    filename = path.split("/")[-1]
+    full_path = path.replace(f"s3://{bucket}/", "")
+
+    if output_file is None:
+        output_file = os.path.join(tempfile.gettempdir(), filename)
+
+    if not overwrite and os.path.exists(output_file):
+        print(f"File {output_file} already exists. Set overwrite=True to overwrite.")
+        return output_file
+
+    credential_provider = s3_credential_provider()
+    store = S3Store(
+        bucket,
+        region=region,
+        config=config,
+        client_options=client_options,
+        retry_config=retry_config,
+        credential_provider=credential_provider,
+        skip_signature=skip_signature,
+    )
+
+    resp = obs.get(store, full_path)
+
+    with open(output_file, "wb") as f:
+        for chunk in resp:
+            f.write(chunk)
+
+    return output_file
 
 
 def read_raster(
