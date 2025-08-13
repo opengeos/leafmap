@@ -17,6 +17,7 @@ RUN apt-get update && \
 # 2. Install conda packages into base env
 # ------------------------------
 RUN mamba install -n base -c conda-forge -y \
+    boto3 \
     gdal \
     proj \
     geos \
@@ -30,6 +31,7 @@ RUN mamba install -n base -c conda-forge -y \
     quak \
     rioxarray \
     polars \
+    obstore \
     voila \
     voila_topbar \
     && mamba clean --all --yes \
