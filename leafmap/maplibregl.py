@@ -9114,6 +9114,7 @@ def TimeSliderWidget(
     """
     import time
     import threading
+    import xarray as xr
 
     if isinstance(images, str):
         images = find_files(images, ext="*.tif", recursive=False)
@@ -9176,7 +9177,7 @@ def TimeSliderWidget(
     pause_btn.on_click(pause_click)
 
     first_image = images[0]
-    if first_image.startswith("http"):
+    if isinstance(first_image, str) and first_image.startswith("http"):
         m.add_cog_layer(
             first_image,
             name=layer_name,
@@ -9198,7 +9199,7 @@ def TimeSliderWidget(
             index = slider.value - 1
             label.value = labels[index]
 
-            if images[index].startswith("http"):
+            if isinstance(images[index], str) and images[index].startswith("http"):
                 m.add_cog_layer(
                     images[index],
                     name=layer_name,
