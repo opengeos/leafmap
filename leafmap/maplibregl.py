@@ -5,7 +5,7 @@ import logging
 import os
 import requests
 import sys
-from typing import Tuple, Dict, Any, Optional, Union, List, Callable
+from typing import Tuple, Dict, Any, Optional, Union, List, Callable, Iterable
 from IPython.display import display
 
 import xyzservices
@@ -492,6 +492,30 @@ class Map(MapWidget):
         if self.container is None:
             self.create_container()
         self.container.set_sidebar_width(min_width, max_width)
+
+    def add_to_map_container(
+        self, *items: Union[widgets.Widget, Iterable[widgets.Widget], None]
+    ) -> None:
+        """
+        Append one or more widgets beneath the map (in insertion order).
+
+        This method adds widgets to the map container while ensuring the sidebar
+        remains visible and properly positioned.
+
+        Args:
+            *items: One or more widgets to add beneath the map. Can be individual
+                   widgets or iterables of widgets. None values are ignored.
+
+        Example:
+            >>> import ipywidgets as widgets
+            >>> m = leafmap.Map()
+            >>> button = widgets.Button(description="Click me")
+            >>> slider = widgets.IntSlider(value=5, min=0, max=10)
+            >>> m.add_to_map_container(button, slider)
+        """
+        if self.container is None:
+            self.create_container()
+        self.container.add_to_map_container(*items)
 
     @property
     def sidebar_widgets(self) -> Dict[str, widgets.Widget]:
@@ -5901,23 +5925,35 @@ class Container(v.Container):
         self.host_map = host_map
         self.sidebar_widgets = {}
 
-        # Map display container (left column)
+        # Map column (left)
         self.map_container = v.Col(
             class_="pa-1",
             style_="flex-grow: 1; flex-shrink: 1; flex-basis: 0;",
         )
-        self.map_container.children = [host_map or self.create_map()]
 
-        # Sidebar content container (mutable VBox)
+        # --- NEW: a vertical stack inside the map column ---
+        # Everything under the map (including the map itself) goes here.
+        self.map_stack = v.Col(
+            class_="ma-0 pa-0 d-flex flex-column",
+            style_="overflow-x: auto; max-width: 100%;",
+        )
+        self.map_container.children = [self.map_stack]
+
+        # Ensure the map exists and is visible
+        m = host_map or self.create_map()
+
+        # Put the map as the first child of the stack
+        self.map_stack.children = [m]
+
+        # Sidebar content container
         self.sidebar_content_box = widgets.VBox()
         if sidebar_content:
             self.set_sidebar_content(sidebar_content)
 
         # Toggle button
-        if sidebar_visible:
-            self.toggle_icon = v.Icon(children=["mdi-chevron-right"])
-        else:
-            self.toggle_icon = v.Icon(children=["mdi-chevron-left"])  # default icon
+        self.toggle_icon = v.Icon(
+            children=["mdi-chevron-right"] if sidebar_visible else ["mdi-chevron-left"]
+        )
         self.toggle_btn = v.Btn(
             icon=True,
             children=[self.toggle_icon],
@@ -5934,12 +5970,12 @@ class Container(v.Container):
         )
         self.settings_btn.on_event("click", self.toggle_width_slider)
 
-        # Sidebar controls row (toggle + settings)
+        # Sidebar controls row
         self.sidebar_controls = v.Row(
             class_="ma-0 pa-0", children=[self.toggle_btn, self.settings_btn]
         )
 
-        # Sidebar width slider (initially hidden)
+        # Sidebar width slider
         self.width_slider = widgets.IntSlider(
             value=self.max_width,
             min=200,
@@ -5963,11 +5999,53 @@ class Container(v.Container):
 
         # Main layout row
         self.row = v.Row(
-            class_="d-flex flex-nowrap",
-            children=[self.map_container, self.sidebar],
+            class_="d-flex flex-nowrap", children=[self.map_container, self.sidebar]
         )
 
         super().__init__(fluid=True, children=[self.row], *args, **kwargs)
+
+    # --- NEW: method to add widgets beneath the map dynamically ---
+    def add_to_map_container(
+        self, *items: Union[widgets.Widget, Iterable[widgets.Widget], None]
+    ) -> None:
+        """Append one or more widgets beneath the map (in insertion order)."""
+        new_items: List[widgets.Widget] = []
+        for it in items:
+            if it is None:
+                continue
+            if isinstance(it, (list, tuple)):
+                new_items.extend([w for w in it if w is not None])
+            else:
+                new_items.append(it)
+        if not new_items:
+            return
+
+        # Apply width constraints to prevent widgets from exceeding container width
+        for item in new_items:
+            if hasattr(item, "layout"):
+                # Ensure widgets don't exceed the available width
+                if (
+                    not hasattr(item.layout, "max_width")
+                    or item.layout.max_width is None
+                ):
+                    item.layout.max_width = "100%"
+                if not hasattr(item.layout, "width") or item.layout.width is None:
+                    item.layout.width = "auto"
+                # Enable overflow handling for wide content
+                item.layout.overflow = "auto"
+
+        # IMPORTANT: reassign, don't mutate in place
+        self.map_stack.children = [*self.map_stack.children, *new_items]
+
+        # Ensure sidebar remains visible after adding items to map container
+        # Force a refresh of the sidebar content to prevent it from disappearing
+        if hasattr(self, "sidebar") and hasattr(self, "sidebar_visible"):
+            # Trigger a refresh of the sidebar content
+            self.update_sidebar_content()
+            # Ensure the main row layout is properly maintained
+            if hasattr(self, "row") and hasattr(self, "map_container"):
+                # Reassign children to force layout refresh
+                self.row.children = [self.map_container, self.sidebar]
 
     def create_map(self) -> Any:
         """
