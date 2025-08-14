@@ -12,13 +12,11 @@
         <meta name="author" content="Qiusheng Wu">
       
       
-        <link rel="canonical" href="https://leafmap.org/notebooks/68_openaerialmap/">
+        <link rel="canonical" href="https://leafmap.org/notebooks/106_aws_s3/">
       
       
-        <link rel="prev" href="../67_maxar_open_data/">
+        <link rel="prev" href="../105_vector_time_slider/">
       
-      
-        <link rel="next" href="../69_turkey_earthquake/">
       
       
       <link rel="icon" href="../../assets/favicon.png">
@@ -26,7 +24,7 @@
     
     
       
-        <title>68 openaerialmap - leafmap</title>
+        <title>106 aws s3 - leafmap</title>
       
     
     
@@ -122,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              68 openaerialmap
+              106 aws s3
             
           </span>
         </div>
@@ -5331,17 +5329,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../68_openaerialmap/" class="md-nav__link">
         
   
   
@@ -5352,7 +5343,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -6213,10 +6203,17 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../106_aws_s3/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -6227,6 +6224,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -6268,7 +6266,7 @@
               <article class="md-content__inner md-typeset">
                 
 
-    <a href="/notebooks/68_openaerialmap/68_openaerialmap.ipynb" title="Download Notebook" class="md-content__button md-icon">
+    <a href="/notebooks/106_aws_s3/106_aws_s3.ipynb" title="Download Notebook" class="md-content__button md-icon">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 20h14v-2H5m14-9h-4V3H9v6H5l7 7z"/></svg>
     </a>
 
@@ -6281,7 +6279,7 @@
   
 
 
-  <h1>68 openaerialmap</h1>
+  <h1>106 aws s3</h1>
 
 <script>
 (function (global, factory) {
@@ -6724,11 +6722,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><a href="https://demo.leafmap.org/lab/index.html?path=notebooks/68_openaerialmap.ipynb"><img alt="image" src="https://jupyterlite.rtfd.io/en/latest/_static/badge.svg"/></a>
-<a href="https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/notebooks/68_openaerialmap.ipynb"><img alt="image" src="https://colab.research.google.com/assets/colab-badge.svg"/></a>
+<p><a href="https://demo.leafmap.org/lab/index.html?path=notebooks/106_aws_s3.ipynb"><img alt="image" src="https://jupyterlite.rtfd.io/en/latest/_static/badge.svg"/></a>
+<a href="https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/notebooks/106_aws_s3.ipynb"><img alt="image" src="https://colab.research.google.com/assets/colab-badge.svg"/></a>
 <a href="https://mybinder.org/v2/gh/opengeos/leafmap/HEAD"><img alt="image" src="https://mybinder.org/badge_logo.svg"/></a></p>
-<p><strong>Searching and visualizing OpenAerialMap imagery interactively</strong></p>
-<p><a href="https://openaerialmap.org/">OpenAerialMap</a> (OAM) provides openly licensed satellite and unmanned aerial vehicle (UAV) imagery. Currently, it has over 12,400+ images around the globe. This notebook demonstrates how to search and visualize OAM imagery interactively. You can download images automatically with one line of code.</p>
+<p><strong>Accessing files from AWS S3</strong></p>
 <p>Uncomment the following line to install <a href="https://leafmap.org">leafmap</a> if needed.</p>
 </div>
 </div>
@@ -6739,7 +6736,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-1">
@@ -6752,32 +6749,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">leafmap</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %pip install -U leafmap</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1">import leafmap</div>
+<div class="clipboard-copy-txt" id="cell-1"># %pip install -U leafmap</div>
 </div>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Search OAM images by a bounding box and a date range. The results can be returned as a GeoDataFrame or a list of image metadata.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-2">
@@ -6790,33 +6776,21 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bbox</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">79.6344</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9063</span><span class="p">,</span> <span class="o">-</span><span class="mf">77.3383</span><span class="p">,</span> <span class="mf">1.0436</span><span class="p">]</span>
-<span class="n">start_date</span> <span class="o">=</span> <span class="s2">"2016-04-01"</span>
-<span class="n">end_date</span> <span class="o">=</span> <span class="s2">"2016-04-30"</span>
-<span class="n">gdf</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">oam_search</span><span class="p">(</span>
-    <span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="n">start_date</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">end_date</span><span class="p">,</span> <span class="n">return_gdf</span><span class="o">=</span><span class="kc">True</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span><span class="si">}</span><span class="s2"> images"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">leafmap.common</span> <span class="kn">import</span> <span class="n">s3_list_directories</span><span class="p">,</span> <span class="n">s3_list_files</span><span class="p">,</span> <span class="n">s3_get_file</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-2">bbox = [-79.6344, -0.9063, -77.3383, 1.0436]
-start_date = "2016-04-01"
-end_date = "2016-04-30"
-gdf = leafmap.oam_search(
-    bbox=bbox, start_date=start_date, end_date=end_date, return_gdf=True
-)
-print(f"Found {len(gdf)} images")</div>
+<div class="clipboard-copy-txt" id="cell-2">from leafmap.common import s3_list_directories, s3_list_files, s3_get_file</div>
 </div>
 </div>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=4">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-3">
@@ -6829,32 +6803,25 @@ print(f"Found {len(gdf)} images")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">gdf</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">bucket</span> <span class="o">=</span> <span class="s2">"overturemaps-us-west-2"</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="s2">"release"</span>
+<span class="n">region</span> <span class="o">=</span> <span class="s2">"us-west-2"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-3">gdf.head()</div>
+<div class="clipboard-copy-txt" id="cell-3">bucket = "overturemaps-us-west-2"
+prefix = "release"
+region = "us-west-2"</div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The tile URLs are stored in the <code>tms</code> column of the GeoDataFrame.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=4">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-4">
@@ -6867,34 +6834,60 @@ print(f"Found {len(gdf)} images")</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">tiles</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="s2">"tms"</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-<span class="n">tiles</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">directories</span> <span class="o">=</span> <span class="n">s3_list_directories</span><span class="p">(</span><span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">return_full_path</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">directories</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-4">tiles = gdf["tms"].tolist()
-tiles[:5]</div>
+<div class="clipboard-copy-txt" id="cell-4">directories = s3_list_directories(bucket, prefix, region=region, return_full_path=False)
+directories</div>
 </div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>['2023-04-02-alpha',
+ '2023-07-26-alpha.0',
+ '2023-10-19-alpha.0',
+ '2023-11-14-alpha.0',
+ '2023-12-14-alpha.0',
+ '2024-01-17-alpha.0',
+ '2024-02-15-alpha.0',
+ '2024-03-12-alpha.0',
+ '2024-04-16-beta.0',
+ '2024-05-16-beta.0',
+ '2024-06-13-beta.0',
+ '2024-06-13-beta.1',
+ '2024-07-22.0',
+ '2024-08-20.0',
+ '2024-09-18.0',
+ '2024-10-23.0',
+ '2024-11-13.0',
+ '2024-12-18.0',
+ '2025-01-22.0',
+ '2025-02-19.0',
+ '2025-03-19.0',
+ '2025-03-19.1',
+ '2025-04-23.0',
+ '2025-05-21.0',
+ '2025-06-25.0',
+ '2025-07-23.0']</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>The image sources (downloadable URLs) are stored in the <code>uuid</code> column of the GeoDataFrame.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
@@ -6907,34 +6900,21 @@ tiles[:5]</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="n">gdf</span><span class="p">[</span><span class="s2">"uuid"</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-<span class="n">images</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">prefix</span> <span class="o">=</span> <span class="s2">"release/2025-07-23.0/theme=buildings/type=building"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-5">images = gdf["uuid"].tolist()
-images[:5]</div>
+<div class="clipboard-copy-txt" id="cell-5">prefix = "release/2025-07-23.0/theme=buildings/type=building"</div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Download all images using the <code>download_files()</code> function.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-6">
@@ -6947,32 +6927,43 @@ images[:5]</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">leafmap</span><span class="o">.</span><span class="n">download_files</span><span class="p">(</span><span class="n">images</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">files</span> <span class="o">=</span> <span class="n">s3_list_files</span><span class="p">(</span>
+    <span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">skip_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_full_path</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">files</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-6">leafmap.download_files(images[:2])</div>
+<div class="clipboard-copy-txt" id="cell-6">files = s3_list_files(
+    bucket, prefix, region=region, skip_signature=True, return_full_path=True
+)
+files[:5]</div>
 </div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[6]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>['s3://overturemaps-us-west-2/release/2025-07-23.0/theme=buildings/type=building/part-00000-afde5bd5-ea80-4567-968a-54b9be7eeafd-c000.zstd.parquet',
+ 's3://overturemaps-us-west-2/release/2025-07-23.0/theme=buildings/type=building/part-00001-afde5bd5-ea80-4567-968a-54b9be7eeafd-c000.zstd.parquet',
+ 's3://overturemaps-us-west-2/release/2025-07-23.0/theme=buildings/type=building/part-00002-afde5bd5-ea80-4567-968a-54b9be7eeafd-c000.zstd.parquet',
+ 's3://overturemaps-us-west-2/release/2025-07-23.0/theme=buildings/type=building/part-00003-afde5bd5-ea80-4567-968a-54b9be7eeafd-c000.zstd.parquet',
+ 's3://overturemaps-us-west-2/release/2025-07-23.0/theme=buildings/type=building/part-00004-afde5bd5-ea80-4567-968a-54b9be7eeafd-c000.zstd.parquet']</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=11">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Add the image footprints to the map.</p>
 </div>
 </div>
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=12">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-7">
@@ -6985,36 +6976,23 @@ images[:5]</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_gdf</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">layer_name</span><span class="o">=</span><span class="s2">"Footprints"</span><span class="p">)</span>
-<span class="n">m</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">path</span> <span class="o">=</span> <span class="s2">"s3://us-west-2.opendata.source.coop/giswqs/nwi/state_boundary/AK.parquet"</span>
+<span class="n">output_file</span> <span class="o">=</span> <span class="s2">"AK.parquet"</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-7">m = leafmap.Map()
-m.add_gdf(gdf, layer_name="Footprints")
-m</div>
+<div class="clipboard-copy-txt" id="cell-7">path = "s3://us-west-2.opendata.source.coop/giswqs/nwi/state_boundary/AK.parquet"
+output_file = "AK.parquet"</div>
 </div>
 </div>
 </div>
 </div>
 </div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=13">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Search OAM imagery within the current map extent or user drawn ROI.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=14">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="CodeMirror cm-s-jupyter">
 <div class="zeroclipboard-container">
 <clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-8">
@@ -7027,74 +7005,23 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">4.7955</span><span class="p">,</span> <span class="o">-</span><span class="mf">75.6899</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"SATELLITE"</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="n">bbox</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">75.7138</span><span class="p">,</span> <span class="mf">4.7826</span><span class="p">,</span> <span class="o">-</span><span class="mf">75.6659</span><span class="p">,</span> <span class="mf">4.808332</span><span class="p">]</span>
-<span class="n">m</span><span class="o">.</span><span class="n">oam_search</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">)</span>
-
-<span class="n">m</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">s3_get_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">region</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">skip_signature</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output_file</span><span class="o">=</span><span class="n">output_file</span><span class="p">)</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-8">m = leafmap.Map(center=[4.7955, -75.6899], zoom=15)
-m.add_basemap("SATELLITE", show=False)
-
-bbox = [-75.7138, 4.7826, -75.6659, 4.808332]
-m.oam_search(bbox=bbox)
-
-m</div>
+<div class="clipboard-copy-txt" id="cell-8">s3_get_file(path, region=region, skip_signature=True, output_file=output_file)</div>
 </div>
 </div>
 </div>
 </div>
+<div class="jp-Cell-outputWrapper">
+<div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
+</div>
+<div class="jp-OutputArea jp-Cell-outputArea">
+<div class="jp-OutputArea-child jp-OutputArea-executeResult">
+<div class="jp-OutputPrompt jp-OutputArea-prompt">Out[8]:</div>
+<div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
+<pre>'AK.parquet'</pre>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=15">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p>Search OAM imagery interactively using the interactive GUI.</p>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
-<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=16">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="CodeMirror cm-s-jupyter">
-<div class="zeroclipboard-container">
-<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-9">
-<div>
-<span class="notice" hidden="">Copied!</span>
-<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
-<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
-</svg>
-</div>
-</clipboard-copy>
-</div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">4.7955</span><span class="p">,</span> <span class="o">-</span><span class="mf">75.6899</span><span class="p">],</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-<span class="n">m</span>
-</pre></div>
-<div class="clipboard-copy-txt" id="cell-9">m = leafmap.Map(center=[4.7955, -75.6899], zoom=15)
-m</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=17">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="" src="https://i.imgur.com/YLnNOVF.gif"/></p>
 </div>
 </div>
 </div>
@@ -7128,7 +7055,7 @@ m</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="September 1, 2024 13:26:35 UTC"><span class="timeago" datetime="2024-09-01T13:26:35+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="September 1, 2024 13:26:35 UTC">2024-09-01</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="August 13, 2025 23:44:48 UTC"><span class="timeago" datetime="2025-08-13T23:44:48+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="August 13, 2025 23:44:48 UTC">2025-08-13</span>
   </span>
 
     
