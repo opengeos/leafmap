@@ -5935,7 +5935,7 @@ class Container(v.Container):
         # Everything under the map (including the map itself) goes here.
         self.map_stack = v.Col(
             class_="ma-0 pa-0 d-flex flex-column",
-            style_="overflow-x: auto; max-width: 100%;"
+            style_="overflow-x: auto; max-width: 100%;",
         )
         self.map_container.children = [self.map_stack]
 
@@ -6019,18 +6019,21 @@ class Container(v.Container):
                 new_items.append(it)
         if not new_items:
             return
-        
+
         # Apply width constraints to prevent widgets from exceeding container width
         for item in new_items:
-            if hasattr(item, 'layout'):
+            if hasattr(item, "layout"):
                 # Ensure widgets don't exceed the available width
-                if not hasattr(item.layout, 'max_width') or item.layout.max_width is None:
-                    item.layout.max_width = '100%'
-                if not hasattr(item.layout, 'width') or item.layout.width is None:
-                    item.layout.width = 'auto'
+                if (
+                    not hasattr(item.layout, "max_width")
+                    or item.layout.max_width is None
+                ):
+                    item.layout.max_width = "100%"
+                if not hasattr(item.layout, "width") or item.layout.width is None:
+                    item.layout.width = "auto"
                 # Enable overflow handling for wide content
-                item.layout.overflow = 'auto'
-        
+                item.layout.overflow = "auto"
+
         # IMPORTANT: reassign, don't mutate in place
         self.map_stack.children = [*self.map_stack.children, *new_items]
 
