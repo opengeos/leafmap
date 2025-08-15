@@ -18101,3 +18101,192 @@ def convert_to_cog(
 
         print(f"Converting: {tif} -> {out_file}")
         subprocess.run(cmd, check=True)
+
+
+def start_martin(
+    db_url: str | None = None,
+    *,
+    mbtiles: list[str | Path] | None = None,
+    pmtiles: list[str | Path] | None = None,
+    port: int = 3000,
+    cache_dir: str | Path = None,
+    extra_args: list[str] | None = None,
+    pidfile: str | Path = None,
+    martin_version: str = "v0.18.1",
+) -> subprocess.Popen:
+    """
+    Start Martin v0.18.1 serving from any combo of:
+      - PostgreSQL (db_url)
+      - MBTiles (mbtiles=[...])
+      - PMTiles (pmtiles=[...])
+
+    Args:
+        db_url: The URL of the PostgreSQL database.
+        mbtiles: A list of MBTiles files.
+        pmtiles: A list of PMTiles files.
+        port: The port to listen on.
+        cache_dir: The directory to cache the Martin binary.
+        extra_args: Extra arguments to pass to the Martin binary.
+        pidfile: The file to write the PID to.
+        martin_version: The version of Martin to use.
+
+    Returns:
+        subprocess.Popen: A subprocess.Popen object representing the Martin process.
+        Also writes a PID file for stop_martin().
+    """
+
+    import platform
+    import stat
+
+    from pathlib import Path
+
+    BASE = f"https://github.com/maplibre/martin/releases/download/{martin_version}"
+
+    # Default cache + pidfile
+    if cache_dir is None:
+        cache_dir = Path("~/.cache/martin").expanduser()
+    if pidfile is None:
+        pidfile = cache_dir / f"martin-{martin_version}.pid"
+
+    def _detect_asset_v0181() -> str:
+        """Return the exact tar.gz asset name for v0.18.1 matching the current OS/arch."""
+        sysname = platform.system().lower()
+        machine = platform.machine().lower()
+
+        if sysname.startswith("linux"):
+            if machine in ("x86_64", "amd64"):
+                # Prefer glibc build; fall back to musl if you need static
+                return "martin-x86_64-unknown-linux-gnu.tar.gz"
+            elif machine in ("aarch64", "arm64"):
+                return "martin-aarch64-unknown-linux-musl.tar.gz"
+            else:
+                raise RuntimeError(f"Unsupported Linux arch: {machine}")
+
+        if sysname.startswith("darwin"):
+            if machine in ("x86_64", "amd64"):
+                return "martin-x86_64-apple-darwin.tar.gz"
+            elif machine in ("arm64", "aarch64"):
+                return "martin-aarch64-apple-darwin.tar.gz"
+            else:
+                raise RuntimeError(f"Unsupported macOS arch: {machine}")
+
+        raise RuntimeError("This helper supports Linux and macOS only.")
+
+    def _ensure_exec(p: Path):
+        p.chmod(p.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+
+    if not any([db_url, mbtiles, pmtiles]):
+        raise ValueError("Provide at least one source: db_url, mbtiles, or pmtiles.")
+    cache_dir = Path(cache_dir).expanduser()
+    pidfile = Path(pidfile)
+
+    asset = _detect_asset_v0181()
+    url = f"{BASE}/{asset}"
+    tar_path = cache_dir / martin_version / asset
+    bin_dir = cache_dir / martin_version
+
+    # 2) Extract (only once)
+    martin_bin = bin_dir / "martin"
+    if not martin_bin.exists():
+        download_file(url, str(tar_path), quiet=True)
+
+    _ensure_exec(martin_bin)
+
+    # Build command (note: port set via --listen-addresses)
+    args = [str(martin_bin), "--listen-addresses", f"0.0.0.0:{port}"]
+
+    if extra_args:
+        args.extend(extra_args)
+    if db_url:
+        args.append(db_url)
+    if mbtiles:
+        args.extend(str(p) for p in mbtiles)
+    if pmtiles:
+        args.extend(str(p) for p in pmtiles)
+
+    # Launch
+    proc = subprocess.Popen(args, env=os.environ.copy())
+    pidfile.parent.mkdir(parents=True, exist_ok=True)
+    pidfile.write_text(str(proc.pid), encoding="utf-8")
+    print(f"Martin {martin_version} started (pid={proc.pid}) on port {port}")
+    return proc
+
+
+def stop_martin(
+    proc: subprocess.Popen | None = None,
+    pidfile: str | Path = None,
+    timeout: float = 10.0,
+    cache_dir: str | Path = None,
+    martin_version: str = "v0.18.1",
+):
+    """
+    Stop Martin started via start_martin(). Use the Popen handle if you have it,
+    otherwise it falls back to the PID file.
+
+    Args:
+        proc: The subprocess.Popen object representing the Martin process.
+        pidfile: The file to read the PID from.
+        timeout: The timeout in seconds to wait for the Martin process to terminate.
+        cache_dir: The directory to cache the Martin binary.
+        martin_version: The version of Martin to use.
+
+    Returns:
+        None
+
+    Raises:
+        subprocess.TimeoutExpired: If the Martin process does not terminate within the timeout.
+
+    """
+    import signal
+
+    # Default cache + pidfile
+    if cache_dir is None:
+        cache_dir = Path("~/.cache/martin").expanduser()
+
+    if pidfile is None:
+        pidfile = cache_dir / f"martin-{martin_version}.pid"
+
+    if proc is not None and proc.poll() is None:
+        proc.terminate()
+        try:
+            proc.wait(timeout=timeout)
+            print("Martin terminated via process handle.")
+            return
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            print("Martin killed after timeout via process handle.")
+            return
+
+    pidfile = Path(pidfile)
+    if not pidfile.exists():
+        print("No PID file found; nothing to stop.")
+        return
+
+    try:
+        pid = int(pidfile.read_text().strip())
+    except Exception:
+        print(f"PID file unreadable: {pidfile}")
+        return
+
+    try:
+        os.kill(pid, signal.SIGTERM)
+    except ProcessLookupError:
+        print(f"No process with pid {pid}; removing stale PID file.")
+        pidfile.unlink(missing_ok=True)
+        return
+
+    # wait briefly, then SIGKILL if needed
+    import time
+
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            pidfile.unlink(missing_ok=True)
+            print("Martin terminated.")
+            return
+        time.sleep(0.2)
+    os.kill(pid, signal.SIGKILL)
+    pidfile.unlink(missing_ok=True)
+    print("Martin killed after timeout.")
