@@ -18104,14 +18104,14 @@ def convert_to_cog(
 
 
 def start_martin(
-    db_url: str | None = None,
+    db_url: Optional[str] = None,
     *,
-    mbtiles: list[str | Path] | None = None,
-    pmtiles: list[str | Path] | None = None,
+    mbtiles: Optional[list[Union[str, Path]]] = None,
+    pmtiles: Optional[list[Union[str, Path]]] = None,
     port: int = 3000,
-    cache_dir: str | Path = None,
-    extra_args: list[str] | None = None,
-    pidfile: str | Path = None,
+    cache_dir: Optional[Union[str, Path]] = None,
+    extra_args: Optional[list[str]] = None,
+    pidfile: Optional[Union[str, Path]] = None,
     martin_version: str = "v0.18.1",
 ) -> subprocess.Popen:
     """
@@ -18213,10 +18213,10 @@ def start_martin(
 
 
 def stop_martin(
-    proc: subprocess.Popen | None = None,
-    pidfile: str | Path = None,
+    proc: Optional[subprocess.Popen] = None,
+    pidfile: Optional[Union[str, Path]] = None,
     timeout: float = 10.0,
-    cache_dir: str | Path = None,
+    cache_dir: Optional[Union[str, Path]] = None,
     martin_version: str = "v0.18.1",
 ):
     """
