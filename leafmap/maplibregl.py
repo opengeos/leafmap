@@ -1542,6 +1542,159 @@ class Map(MapWidget):
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
+    def add_vector_tile(
+        self,
+        url: str,
+        layer_id: str,
+        layer_type: str = "fill",
+        source_layer: Optional[str] = None,
+        name: Optional[str] = None,
+        paint: Optional[Dict] = None,
+        layout: Optional[Dict] = None,
+        filter: Optional[Dict] = None,
+        minzoom: Optional[int] = None,
+        maxzoom: Optional[int] = None,
+        visible: bool = True,
+        opacity: float = 1.0,
+        add_popup: bool = True,
+        before_id: Optional[str] = None,
+        source_args: Dict = {},
+        overwrite: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a vector tile layer to the map.
+
+        This method adds a vector tile layer to the map using a vector tile source.
+        Vector tiles are a data format for efficiently storing and transmitting
+        vector map data.
+
+        Args:
+            url (str): The URL template for the vector tiles. Should contain {z}, {x},
+                and {y} placeholders for tile coordinates.
+            layer_id (str): The ID of the layer within the vector tile source.
+            layer_type (str, optional): The type of layer to create. Can be 'fill',
+                'line', 'symbol', 'circle', etc. Defaults to 'fill'.
+            source_layer (str, optional): The name of the source layer within the
+                vector tiles. If None, uses layer_id.
+            name (str, optional): The name to use for the layer. If None, uses layer_id.
+            paint (dict, optional): Paint properties for the layer. If None, uses
+                default styling based on layer_type.
+            layout (dict, optional): Layout properties for the layer.
+            filter (dict, optional): Filter expression for the layer.
+            minzoom (int, optional): Minimum zoom level for the layer.
+            maxzoom (int, optional): Maximum zoom level for the layer.
+            visible (bool, optional): Whether the layer should be visible by default.
+                Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
+            add_popup (bool, optional): Whether to add a popup to the layer. Defaults to True.
+            before_id (str, optional): The ID of an existing layer before which the
+                new layer should be inserted.
+            source_args (dict, optional): Additional keyword arguments passed to the
+                vector tile source.
+            overwrite (bool, optional): Whether to overwrite an existing layer with
+                the same name. Defaults to False.
+            **kwargs: Additional keyword arguments passed to the Layer class.
+
+        Returns:
+            None
+
+        Example:
+            >>> m = Map()
+            >>> m.add_vector_tile(
+            ...     url="https://api.maptiler.com/tiles/contours/tiles.json?key={api_key}",
+            ...     layer_id="contour-lines",
+            ...     layer_type="line",
+            ...     source_layer="contour",
+            ...     paint={"line-color": "#ff69b4", "line-width": 1}
+            ... )
+        """
+
+        if name is None:
+            name = layer_id
+
+        if source_layer is None:
+            source_layer = layer_id
+
+        if overwrite and name in self.get_layer_names():
+            self.remove_layer(name)
+
+        # Create vector tile source
+        vector_source = {
+            "type": "vector",
+            "url": url,
+            **source_args,
+        }
+
+        # If URL doesn't contain tiles.json, assume it's a direct tile URL template
+        if not url.endswith("tiles.json") and "{z}" in url:
+            vector_source = {
+                "type": "vector",
+                "tiles": [url],
+                **source_args,
+            }
+
+        source_name = common.get_unique_name("source", self.source_names)
+
+        self.add_source(source_name, vector_source)
+
+        # Set default paint properties based on layer type
+        if paint is None:
+            if layer_type == "fill":
+                paint = {
+                    "fill-color": "#3388ff",
+                    "fill-opacity": 0.8,
+                    "fill-outline-color": "#ffffff",
+                }
+            elif layer_type == "line":
+                paint = {"line-color": "#3388ff", "line-width": 2}
+            elif layer_type == "circle":
+                paint = {
+                    "circle-radius": 5,
+                    "circle-color": "#3388ff",
+                    "circle-stroke-color": "#ffffff",
+                    "circle-stroke-width": 1,
+                }
+            elif layer_type == "symbol":
+                paint = {
+                    "text-color": "#000000",
+                    "text-halo-color": "#ffffff",
+                    "text-halo-width": 1,
+                }
+
+        # Build layer configuration
+        layer_config = {
+            "id": name,
+            "type": layer_type,
+            "source": vector_source,
+            "source-layer": source_layer,
+        }
+
+        if paint is not None:
+            layer_config["paint"] = paint
+        if layout is not None:
+            layer_config["layout"] = layout
+        if filter is not None:
+            layer_config["filter"] = filter
+        if minzoom is not None:
+            layer_config["minzoom"] = minzoom
+        if maxzoom is not None:
+            layer_config["maxzoom"] = maxzoom
+
+        # Add any additional kwargs
+        layer_config.update(kwargs)
+        self.add_layer(
+            layer_config,
+            before_id=before_id,
+            name=name,
+            opacity=opacity,
+            visible=visible,
+            overwrite=overwrite,
+        )
+
+        if add_popup:
+            self.add_popup(name)
+
     def add_wms_layer(
         self,
         url: str,
