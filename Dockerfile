@@ -66,7 +66,7 @@ RUN mkdir -p /home/jovyan/.jupyter && \
 WORKDIR /home/jovyan
 
 # Copy only the leafmap Python package (no pip install)
-COPY leafmap /opt/conda/lib/python3.12/site-packages/leafmap
+COPY leafmap /opt/conda/lib/python3.13/site-packages/leafmap
 
 RUN mkdir -p /home/jovyan/work && \
     fix-permissions /home/jovyan
