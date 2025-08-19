@@ -6401,7 +6401,9 @@ def image_bbox(raster_path, output_file=None, to_crs=None, **kwargs):
         return gdf
 
 
-def find_files(input_dir, ext=None, fullpath=True, recursive=True):
+def find_files(
+    input_dir, ext=None, fullpath=True, recursive=True, include_hidden=False
+):
     """Find files in a directory.
 
     Args:
@@ -6409,7 +6411,7 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
         ext (str, optional): The file extension to match. Defaults to None.
         fullpath (bool, optional): Whether to return the full path. Defaults to True.
         recursive (bool, optional): Whether to search recursively. Defaults to True.
-
+        include_hidden (bool, optional): Whether to include hidden files. Defaults to False.
     Returns:
         list: A list of matching files.
     """
@@ -6437,6 +6439,8 @@ def find_files(input_dir, ext=None, fullpath=True, recursive=True):
             files = [path.name for path in Path(input_dir).glob(ext)]
 
     files.sort()
+    if not include_hidden:
+        files = [file for file in files if not os.path.basename(file).startswith(".")]
     return files
 
 
@@ -6464,7 +6468,7 @@ def sort_files(
         filenames = []
         for index, name in enumerate(names):
             for file in files:
-                if name in file:
+                if name in os.path.basename(file):
                     filenames.append(file)
                     break
             if fill_na and index >= len(filenames):
