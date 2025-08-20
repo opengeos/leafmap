@@ -635,10 +635,12 @@ class Map(MapWidget):
 
         super().add_call("removeLayer", name)
         if name in self.layer_dict:
-            source = self.layer_dict[name]["layer"].source
-            self.layer_dict.pop(name)
-            if source in self.source_dict:
-                self.remove_source(source)
+            if isinstance(self.layer_dict[name]["layer"], Layer):
+                if hasattr(self.layer_dict[name]["layer"], "source"):
+                    source = self.layer_dict[name]["layer"].source
+                    self.layer_dict.pop(name)
+                    if source in self.source_dict:
+                        self.remove_source(source)
 
         if self.layer_manager is not None:
             self.layer_manager.refresh()
@@ -2321,7 +2323,12 @@ class Map(MapWidget):
             return
 
         if name in self.layer_dict:
-            layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
+            if isinstance(self.layer_dict[name]["layer"], Layer):
+                layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
+            elif isinstance(self.layer_dict[name]["layer"], dict):
+                layer_type = self.layer_dict[name]["type"]
+            else:
+                layer_type = self.layer_dict[name]["type"]
             prop_name = f"{layer_type}-opacity"
             self.layer_dict[name]["opacity"] = opacity
         elif name in self.style_dict:
@@ -5521,7 +5528,8 @@ class Map(MapWidget):
                 [
                     layer["layer"].source
                     for layer in self.layer_dict.values()
-                    if layer["layer"].source is not None
+                    if hasattr(layer["layer"], "source")
+                    and (layer["layer"].source is not None)
                 ]
             )
         )
@@ -8350,6 +8358,8 @@ class LayerManagerWidget(v.ExpansionPanels):
                     self.m.remove_from_sidebar(name=f"Style {layer_name}")
 
             def on_settings_clicked(btn, layer_name=name):
+                # if isinstance(self.m.layer_dict[layer_name]["layer"], dict):
+                #     return
                 style_widget = LayerStyleWidget(self.m.layer_dict[layer_name], self.m)
                 self.m.add_to_sidebar(
                     style_widget,
@@ -8585,8 +8595,15 @@ class LayerStyleWidget(widgets.VBox):
         self.layer = layer
         self.map = map_widget
         self.layer_type = self._get_layer_type()
-        self.layer_id = layer["layer"].id
-        self.layer_paint = layer["layer"].paint
+        if isinstance(layer["layer"], dict):
+            self.layer_id = layer["layer"]["id"]
+            if "paint" in layer["layer"]:
+                self.layer_paint = layer["layer"]["paint"]
+            else:
+                self.layer_paint = {}
+        else:
+            self.layer_id = layer["layer"].id
+            self.layer_paint = layer["layer"].paint
         self.original_style = self._get_current_style()
         self.widget_width = widget_width
         self.label_width = label_width
@@ -8817,7 +8834,7 @@ class LayerStyleWidget(widgets.VBox):
     def _close_widget(self, _) -> None:
         """Close the widget."""
         # self.close()
-        self.map.remove_from_sidebar(name=f"Style {self.layer['layer'].id}")
+        self.map.remove_from_sidebar(name=f"Style {self.layer_id}")
 
 
 class DateFilterWidget(widgets.VBox):
