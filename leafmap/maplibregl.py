@@ -641,12 +641,17 @@ class Map(MapWidget):
                     self.layer_dict.pop(name)
                     if source in self.source_dict:
                         self.remove_source(source)
+            else:
+                self.layer_dict.pop(name)
 
         if self.layer_manager is not None:
             self.layer_manager.refresh()
 
     def add_deck_layers(
-        self, layers: list[dict], tooltip: Union[str, dict] = None
+        self,
+        layers: list[dict],
+        tooltip: Union[str, dict] = None,
+        columns: list[str] = None,
     ) -> None:
         """Add Deck.GL layers to the layer stack
 
@@ -654,7 +659,11 @@ class Map(MapWidget):
             layers (list[dict]): A list of dictionaries containing the Deck.GL layers to be added.
             tooltip (str | dict): Either a single mustache template string applied to all layers
                 or a dictionary where keys are layer ids and values are mustache template strings.
+            columns (list[str]): A list of column names to be used for the tooltip.
         """
+        if isinstance(columns, list) and (tooltip is None):
+            tooltip = "<br>".join([f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns])
+
         super().add_deck_layers(layers, tooltip)
 
         for layer in layers:
@@ -666,6 +675,9 @@ class Map(MapWidget):
                 "type": layer.get("@@type", "deck"),
                 "color": layer.get("getFillColor", "#ffffff"),
             }
+
+        if self.layer_manager is not None:
+            self.layer_manager.refresh()
 
     def add_arc_layer(
         self,
@@ -721,7 +733,9 @@ class Map(MapWidget):
             columns = df.columns
         elif isinstance(tooltip, list):
             columns = tooltip
-        tooltip_content = "<br>".join([f"{col}: {{{{ {col} }}}}" for col in columns])
+        tooltip_content = "<br>".join(
+            [f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns]
+        )
 
         deck_arc_layer = {
             "@@type": "ArcLayer",
@@ -9467,3 +9481,74 @@ def TimeSliderWidget(
     slider.observe(slider_changed, "value")
 
     return slider_widget
+
+
+def create_arc_layer(
+    data: Union[str, pd.DataFrame],
+    src_lon: str,
+    src_lat: str,
+    dst_lon: str,
+    dst_lat: str,
+    src_color: List[int] = [255, 0, 0],
+    dst_color: List[int] = [255, 255, 0],
+    line_width: int = 2,
+    layer_id: str = "arc_layer",
+    pickable: bool = True,
+    tooltip: Optional[Union[str, List[str]]] = None,
+    **kwargs: Any,
+) -> dict:
+    """
+    Create a DeckGL ArcLayer.
+
+    Args:
+        data (Union[str, pd.DataFrame]): The file path or DataFrame containing the data.
+        src_lon (str): The source longitude column name.
+        src_lat (str): The source latitude column name.
+        dst_lon (str): The destination longitude column name.
+        dst_lat (str): The destination latitude column name.
+        src_color (List[int]): The source color as an RGB list.
+        dst_color (List[int]): The destination color as an RGB list.
+        line_width (int): The width of the lines.
+        layer_id (str): The ID of the layer.
+        pickable (bool): Whether the layer is pickable.
+        tooltip (Optional[Union[str, List[str]]], optional): The tooltip content or list of columns. Defaults to None.
+        **kwargs (Any): Additional arguments for the layer.
+
+    Returns:
+        None
+    """
+
+    df = common.read_file(data)
+    if "geometry" in df.columns:
+        df = df.drop(columns=["geometry"])
+
+    arc_data = [
+        {
+            "source_position": [row[src_lon], row[src_lat]],
+            "target_position": [row[dst_lon], row[dst_lat]],
+            **row.to_dict(),  # Include other columns
+        }
+        for _, row in df.iterrows()
+    ]
+
+    # Generate tooltip template dynamically based on the columns
+    if tooltip is None:
+        columns = df.columns
+    elif isinstance(tooltip, list):
+        columns = tooltip
+
+    deck_arc_layer = {
+        "@@type": "ArcLayer",
+        "id": layer_id,
+        "data": arc_data,
+        "getSourcePosition": "@@=source_position",
+        "getTargetPosition": "@@=target_position",
+        "getSourceColor": src_color,
+        "getTargetColor": dst_color,
+        "getWidth": line_width,
+        "pickable": pickable,
+    }
+
+    deck_arc_layer.update(kwargs)
+
+    return deck_arc_layer
