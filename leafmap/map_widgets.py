@@ -1,9 +1,11 @@
-import ipywidgets
+from typing import Callable, Iterable, List, Optional
+import ipywidgets as widgets
+import ipyvuetify as v
 
 from . import common
 
 
-class Colorbar(ipywidgets.Output):
+class Colorbar(widgets.Output):
     """A matplotlib colorbar widget that can be added to the map."""
 
     def __init__(
@@ -133,7 +135,7 @@ class Colorbar(ipywidgets.Output):
         if transparent_bg:
             fig.patch.set_alpha(0.0)
 
-        super().__init__(layout=ipywidgets.Layout(width=max_width))
+        super().__init__(layout=widgets.Layout(width=max_width))
         with self:
             self.outputs = ()
             matplotlib.pyplot.show()
@@ -151,7 +153,7 @@ class Colorbar(ipywidgets.Output):
         return width, height
 
 
-class Legend(ipywidgets.VBox):
+class Legend(widgets.VBox):
     """A legend widget that can be added to the map."""
 
     ALLOWED_POSITIONS = ["topleft", "topright", "bottomleft", "bottomright"]
@@ -284,8 +286,8 @@ class Legend(ipywidgets.VBox):
             )
         elif shape_type == "line":
             legend_text = legend_text.replace("height: 16px", "height: 3px")
-        legend_output = ipywidgets.Output(layout=Legend.__create_layout(**kwargs))
-        legend_widget = ipywidgets.HTML(value=legend_text)
+        legend_output = widgets.Output(layout=Legend.__create_layout(**kwargs))
+        legend_widget = widgets.HTML(value=legend_text)
 
         if add_header:
             if "show_close_button" not in widget_args:
@@ -372,7 +374,7 @@ class Legend(ipywidgets.VBox):
         return default_value if name not in kwargs else kwargs[name]
 
 
-class LayerEditor(ipywidgets.VBox):
+class LayerEditor(widgets.VBox):
     """Widget for displaying and editing layer visualization properties."""
 
     def __init__(self, host_map, layer_dict):
@@ -392,38 +394,36 @@ class LayerEditor(ipywidgets.VBox):
                 f"Must pass a valid map when creating a {self.__class__.__name__} widget."
             )
 
-        self._toggle_button = ipywidgets.ToggleButton(
+        self._toggle_button = widgets.ToggleButton(
             value=True,
             tooltip="Layer editor",
             icon="gear",
-            layout=ipywidgets.Layout(
-                width="28px", height="28px", padding="0px 0 0 3px"
-            ),
+            layout=widgets.Layout(width="28px", height="28px", padding="0px 0 0 3px"),
         )
         self._toggle_button.observe(self._on_toggle_click, "value")
 
-        self._close_button = ipywidgets.Button(
+        self._close_button = widgets.Button(
             tooltip="Close the vis params dialog",
             icon="times",
             button_style="primary",
-            layout=ipywidgets.Layout(width="28px", height="28px", padding="0"),
+            layout=widgets.Layout(width="28px", height="28px", padding="0"),
         )
         self._close_button.on_click(self._on_close_click)
 
-        layout = ipywidgets.Layout(width="95px")
-        self._import_button = ipywidgets.Button(
+        layout = widgets.Layout(width="95px")
+        self._import_button = widgets.Button(
             description="Import",
             # button_style="primary",
             tooltip="Import vis params to notebook",
             layout=layout,
         )
-        self._apply_button = ipywidgets.Button(
+        self._apply_button = widgets.Button(
             description="Apply", tooltip="Apply vis params to the layer", layout=layout
         )
 
-        self._layer_spinner = ipywidgets.Button(
+        self._layer_spinner = widgets.Button(
             icon="check",
-            layout=ipywidgets.Layout(width="28px", height="28px", padding="0px"),
+            layout=widgets.Layout(width="28px", height="28px", padding="0px"),
             tooltip="Loaded",
         )
 
@@ -438,11 +438,11 @@ class LayerEditor(ipywidgets.VBox):
         self._import_button.on_click(self._on_import_click)
         self._apply_button.on_click(self._on_apply_click)
 
-        self._label = ipywidgets.Label(
+        self._label = widgets.Label(
             value=layer_dict["layer_name"],
-            layout=ipywidgets.Layout(max_width="200px", padding="1px 4px 0 4px"),
+            layout=widgets.Layout(max_width="200px", padding="1px 4px 0 4px"),
         )
-        self._embedded_widget = ipywidgets.Label(value="Vis params are uneditable")
+        self._embedded_widget = widgets.Label(value="Vis params are uneditable")
         if layer_dict is not None:
             if layer_dict["type"] in ["LOCAL", "COG", "STAC", "XARRAY"]:
                 self._embedded_widget = RasterLayerEditor(
@@ -457,15 +457,15 @@ class LayerEditor(ipywidgets.VBox):
     def _on_toggle_click(self, change):
         if change["new"]:
             self.children = [
-                ipywidgets.HBox([self._close_button, self._toggle_button, self._label]),
+                widgets.HBox([self._close_button, self._toggle_button, self._label]),
                 self._embedded_widget,
-                ipywidgets.HBox(
+                widgets.HBox(
                     [self._import_button, self._apply_button, self._layer_spinner]
                 ),
             ]
         else:
             self.children = [
-                ipywidgets.HBox([self._close_button, self._toggle_button, self._label]),
+                widgets.HBox([self._close_button, self._toggle_button, self._label]),
             ]
 
     def _on_import_click(self, _):
@@ -494,7 +494,7 @@ class LayerEditor(ipywidgets.VBox):
         self.on_close()
 
 
-class RasterLayerEditor(ipywidgets.VBox):
+class RasterLayerEditor(widgets.VBox):
     """Widget for displaying and editing layer visualization properties for raster layers."""
 
     def __init__(self, host_map, layer_dict):
@@ -540,81 +540,81 @@ class RasterLayerEditor(ipywidgets.VBox):
         band_names = self._layer_dict["band_names"]
         self._band_count = len(band_names)
 
-        self._greyscale_radio_button = ipywidgets.RadioButtons(
+        self._greyscale_radio_button = widgets.RadioButtons(
             options=["1 band (Grayscale)"],
             layout={"width": "max-content", "margin": "0 15px 0 0"},
         )
-        self._rgb_radio_button = ipywidgets.RadioButtons(
+        self._rgb_radio_button = widgets.RadioButtons(
             options=["3 bands (RGB)"], layout={"width": "max-content"}
         )
         self._greyscale_radio_button.index = None
         self._rgb_radio_button.index = None
 
-        band_dropdown_layout = ipywidgets.Layout(width="98px")
-        self._band_1_dropdown = ipywidgets.Dropdown(
+        band_dropdown_layout = widgets.Layout(width="98px")
+        self._band_1_dropdown = widgets.Dropdown(
             options=band_names, value=band_names[0], layout=band_dropdown_layout
         )
-        self._band_2_dropdown = ipywidgets.Dropdown(
+        self._band_2_dropdown = widgets.Dropdown(
             options=band_names, value=band_names[0], layout=band_dropdown_layout
         )
-        self._band_3_dropdown = ipywidgets.Dropdown(
+        self._band_3_dropdown = widgets.Dropdown(
             options=band_names, value=band_names[0], layout=band_dropdown_layout
         )
-        self._bands_hbox = ipywidgets.HBox(layout=ipywidgets.Layout(margin="0 0 6px 0"))
+        self._bands_hbox = widgets.HBox(layout=widgets.Layout(margin="0 0 6px 0"))
 
-        self._color_picker = ipywidgets.ColorPicker(
+        self._color_picker = widgets.ColorPicker(
             concise=False,
             value="#000000",
-            layout=ipywidgets.Layout(width="116px"),
+            layout=widgets.Layout(width="116px"),
             style={"description_width": "initial"},
         )
 
-        self._add_color_button = ipywidgets.Button(
+        self._add_color_button = widgets.Button(
             icon="plus",
             tooltip="Add a hex color string to the palette",
-            layout=ipywidgets.Layout(width="32px"),
+            layout=widgets.Layout(width="32px"),
         )
-        self._del_color_button = ipywidgets.Button(
+        self._del_color_button = widgets.Button(
             icon="minus",
             tooltip="Remove a hex color string from the palette",
-            layout=ipywidgets.Layout(width="32px"),
+            layout=widgets.Layout(width="32px"),
         )
-        self._reset_color_button = ipywidgets.Button(
+        self._reset_color_button = widgets.Button(
             icon="eraser",
             tooltip="Remove all color strings from the palette",
-            layout=ipywidgets.Layout(width="34px"),
+            layout=widgets.Layout(width="34px"),
         )
         self._add_color_button.on_click(self._add_color_clicked)
         self._del_color_button.on_click(self._del_color_clicked)
         self._reset_color_button.on_click(self._reset_color_clicked)
 
-        self._classes_dropdown = ipywidgets.Dropdown(
+        self._classes_dropdown = widgets.Dropdown(
             options=["Any"] + [str(i) for i in range(3, 13)],
             description="Classes:",
-            layout=ipywidgets.Layout(width="115px"),
+            layout=widgets.Layout(width="115px"),
             style={"description_width": "initial"},
         )
         self._classes_dropdown.observe(self._classes_changed, "value")
 
-        self._colormap_dropdown = ipywidgets.Dropdown(
+        self._colormap_dropdown = widgets.Dropdown(
             options=self._get_colormaps(),
             value=None,
             description="Colormap:",
-            layout=ipywidgets.Layout(width="300px"),
+            layout=widgets.Layout(width="300px"),
             style={"description_width": "initial"},
         )
         self._colormap_dropdown.observe(self._colormap_changed, "value")
 
-        self._palette_label = ipywidgets.Text(
+        self._palette_label = widgets.Text(
             value=", ".join(self._layer_palette),
             placeholder="List of hex color code (RRGGBB)",
             description="Palette:",
             tooltip="Enter a list of hex color code (RRGGBB)",
-            layout=ipywidgets.Layout(width="300px"),
+            layout=widgets.Layout(width="300px"),
             style={"description_width": "initial"},
         )
 
-        self._value_range_slider = ipywidgets.FloatRangeSlider(
+        self._value_range_slider = widgets.FloatRangeSlider(
             value=[self._min_value, self._max_value],
             min=self._left_value,
             max=self._right_value,
@@ -624,11 +624,11 @@ class RasterLayerEditor(ipywidgets.VBox):
             continuous_update=False,
             readout=True,
             readout_format=".2f",
-            layout=ipywidgets.Layout(width="300px"),
+            layout=widgets.Layout(width="300px"),
             style={"description_width": "45px"},
         )
 
-        self._opacity_slider = ipywidgets.FloatSlider(
+        self._opacity_slider = widgets.FloatSlider(
             value=self._layer_opacity,
             min=0,
             max=1,
@@ -637,12 +637,12 @@ class RasterLayerEditor(ipywidgets.VBox):
             continuous_update=False,
             readout=True,
             readout_format=".2f",
-            layout=ipywidgets.Layout(width="310px"),
+            layout=widgets.Layout(width="310px"),
             style={"description_width": "50px"},
         )
 
-        self._colorbar_output = ipywidgets.Output(
-            layout=ipywidgets.Layout(height="60px", max_width="300px")
+        self._colorbar_output = widgets.Output(
+            layout=widgets.Layout(height="60px", max_width="300px")
         )
 
         children = []
@@ -676,7 +676,7 @@ class RasterLayerEditor(ipywidgets.VBox):
         self._rgb_radio_button.observe(self._radio2_observer, names=["value"])
 
         super().__init__(
-            layout=ipywidgets.Layout(
+            layout=widgets.Layout(
                 padding="5px 0px 5px 8px",  # top, right, bottom, left
                 # width="330px",
                 max_height="305px",
@@ -688,7 +688,7 @@ class RasterLayerEditor(ipywidgets.VBox):
 
     def _get_tool_layout(self, grayscale):
         return [
-            ipywidgets.HBox([self._greyscale_radio_button, self._rgb_radio_button]),
+            widgets.HBox([self._greyscale_radio_button, self._rgb_radio_button]),
             self._bands_hbox,
             self._value_range_slider,
             self._opacity_slider,
@@ -697,7 +697,7 @@ class RasterLayerEditor(ipywidgets.VBox):
                 self._colormap_dropdown,
                 # self._palette_label,
                 self._colorbar_output,
-                # ipywidgets.HBox(
+                # widgets.HBox(
                 #     [
                 #         self._color_picker,
                 #         self._add_color_button,
@@ -997,3 +997,548 @@ class RasterLayerEditor(ipywidgets.VBox):
         self._reset_color_button.disabled = True
         self.children = self._get_tool_layout(grayscale=False)
         self._colorbar_output.clear_output()
+
+
+class TabWidget:
+    """
+    Reusable ipyvuetify tab widget.
+
+    - Optional tab header bar
+    - Optional per-panel titles (bold text inside each card)
+    - Toolbar with title and working Refresh/Help buttons
+    - Built‑in **Help dialog**; provide your own content via `set_help_content()`
+    - Add/remove/rename tabs, set content, observe selection
+    """
+
+    def __init__(
+        self,
+        title: str = "Dashboard",
+        tabs: Iterable[str] = ("Overview", "Data", "Settings"),
+        icons: Iterable[str] = ("mdi-view-dashboard", "mdi-table", "mdi-cog"),
+        contents: Optional[Iterable[widgets.Widget]] = None,
+        dark_topbar: bool = True,
+        show_tab_header: bool = True,
+        show_panel_titles: bool = True,
+        wrap_in_card: bool = True,
+        elevation: int = 2,
+        on_refresh: Optional[Callable[[], None]] = None,
+        on_help: Optional[Callable[[], None]] = None,
+    ) -> None:
+        """
+        Initialize the TabWidget.
+
+        Args:
+            title: The title of the dashboard.
+            tabs: The tabs to display.
+            icons: The icons to display.
+            contents: The contents of the tabs.
+            dark_topbar: Whether to use a dark topbar.
+            show_tab_header: Whether to show the tab header.
+            show_panel_titles: Whether to show the panel titles.
+            wrap_in_card: Whether to wrap the contents in a card.
+            elevation: The elevation of the tabs.
+            on_refresh: The function to call when the refresh button is clicked.
+            on_help: The function to call when the help button is clicked.
+        """
+        self._labels: List[str] = list(tabs)
+        self._icons: List[str] = list(icons)
+        self._wrap_in_card = wrap_in_card
+        self._elevation = elevation
+        self._show_titles = show_panel_titles
+        self._header_visible = show_tab_header
+
+        # Toolbar
+        self._title = v.ToolbarTitle(children=[title])
+        self._refresh_btn = v.Btn(
+            icon=True, children=[v.Icon(children=["mdi-refresh"])], tooltip="Refresh"
+        )
+        self._help_btn = v.Btn(
+            icon=True,
+            children=[v.Icon(children=["mdi-help-circle-outline"])],
+            tooltip="Help",
+        )
+        self._toolbar = v.Toolbar(
+            dense=True,
+            flat=True,
+            color="primary" if dark_topbar else "white",
+            dark=dark_topbar,
+            children=[self._title, v.Spacer(), self._refresh_btn, self._help_btn],
+        )
+
+        # Tabs header & items (linked by jslink)
+        self._tabs_header = v.Tabs(
+            v_model=0,
+            background_color="transparent",
+            slider_color="primary",
+            class_="px-4" if show_tab_header else "px-4 d-none",
+            children=[],
+        )
+        self._tabs_items = v.TabsItems(v_model=0, children=[])
+        widgets.jslink((self._tabs_header, "v_model"), (self._tabs_items, "v_model"))
+
+        # Snackbar for quick feedback
+        self._snackbar = v.Snackbar(
+            v_model=False, timeout=1400, color="primary", bottom=True, children=[""]
+        )
+
+        # Help dialog (default content)
+        default_help = widgets.HTML(
+            """
+            <div style="line-height:1.5">
+              <h3 style="margin:0 0 .5rem 0">Help</h3>
+              <p>Add your own help content via <code>set_help_content(widget)</code>.</p>
+            </div>
+            """
+        )
+        self._help_title = v.CardTitle(class_="text-h6", children=["Help"])
+        self._help_cardtext = v.CardText(class_="py-4", children=[default_help])
+        self._help_close_btn = v.Btn(text=True, color="primary", children=["Close"])
+        self._help_card = v.Card(
+            class_="rounded-xl",
+            children=[
+                self._help_title,
+                v.Divider(),
+                self._help_cardtext,
+                v.CardActions(children=[v.Spacer(), self._help_close_btn]),
+            ],
+        )
+        self._help_dialog = v.Dialog(
+            v_model=False, max_width=720, scrollable=True, children=[self._help_card]
+        )
+        self._help_close_btn.on_event("click", lambda *_: self.close_help_dialog())
+
+        # Global style
+        self._style = v.Html(
+            tag="style",
+            children=[
+                """
+                .rounded-xl { border-radius: 16px; }
+                .v-tab { border-radius: 8px; margin-right: 6px; }
+                .v-tab--active { background: rgba(33,150,243,.08); }
+                .v-data-table { background: white; }
+                .mdi-spin { -webkit-animation: mdi-spin 2s infinite linear; animation: mdi-spin 2s infinite linear; }
+                @-webkit-keyframes mdi-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
+                @keyframes mdi-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+                """
+            ],
+        )
+
+        # Build initial tabs
+        contents_list = list(contents) if contents is not None else []
+        for i, label in enumerate(self._labels):
+            icon = self._icons[i] if i < len(self._icons) else "mdi-tab"
+            body = (
+                contents_list[i]
+                if i < len(contents_list)
+                else widgets.HTML(f"<em>{label}</em> content")
+            )
+            self._append_tab(label, icon, body)
+
+        # Root
+        self._surface = v.Sheet(
+            class_="pa-2",
+            color="#fafafa",
+            children=[
+                self._toolbar,
+                self._tabs_header,
+                self._tabs_items,
+                self._snackbar,
+                self._help_dialog,
+            ],
+        )
+        self._root = v.Container(
+            fluid=True, class_="pa-0", children=[self._style, self._surface]
+        )
+
+        # Event plumbing
+        self._change_handlers: List[Callable[[int], None]] = []
+        self._refresh_handlers: List[Callable[[], None]] = []
+        self._help_handlers: List[Callable[[], None]] = []
+        if on_refresh:
+            self._refresh_handlers.append(on_refresh)
+        if on_help:
+            self._help_handlers.append(on_help)
+
+        self._tabs_header.observe(self._forward_tab_change, "v_model")
+        self._refresh_btn.on_event("click", lambda *_: self._emit_refresh())
+        self._help_btn.on_event("click", lambda *_: self._emit_help())
+
+    # Public API
+    @property
+    def widget(self) -> widgets.Widget:
+        return self._root
+
+    @property
+    def selected_index(self) -> int:
+        return int(self._tabs_header.v_model)
+
+    @selected_index.setter
+    def selected_index(self, idx: int) -> None:
+        self.select(idx)
+
+    def select(self, index: int) -> None:
+        n = len(self._tabs_header.children)
+        if not (0 <= index < n):
+            raise IndexError(f"index {index} out of range (0..{n-1})")
+        self._tabs_header.v_model = int(index)
+
+    def on_tab_change(self, handler: Callable[[int], None]) -> None:
+        self._change_handlers.append(handler)
+
+    def on_refresh(self, handler: Callable[[], None]) -> None:
+        self._refresh_handlers.append(handler)
+
+    def on_help(self, handler: Callable[[], None]) -> None:
+        self._help_handlers.append(handler)
+
+    def set_title(self, title: str) -> None:
+        self._title.children = [title]
+
+    def add_tab(
+        self,
+        label: str,
+        icon: str = "mdi-tab",
+        content: Optional[widgets.Widget] = None,
+        index: Optional[int] = None,
+    ) -> None:
+        """
+        Add a tab to the dashboard.
+
+        Args:
+            label: The label of the tab.
+            icon: The icon of the tab.
+            content: The content of the tab.
+            index: The index of the tab.
+        """
+        if content is None:
+            content = widgets.HTML(f"<em>{label}</em> content")
+        self._insert_tab(label, icon, content, index)
+
+    def remove_tab(self, index: int) -> None:
+        """
+        Remove a tab from the dashboard.
+
+        Args:
+            index: The index of the tab.
+        """
+        hdr = list(self._tabs_header.children)
+        items = list(self._tabs_items.children)
+        n = len(hdr)
+        if not (0 <= index < n):
+            raise IndexError(f"index {index} out of range (0..{n-1})")
+        del hdr[index]
+        del items[index]
+        self._tabs_header.children = tuple(hdr)
+        self._tabs_items.children = tuple(items)
+        del self._labels[index]
+        if index < len(self._icons):
+            del self._icons[index]
+        if hdr:
+            if self.selected_index >= len(hdr):
+                self.select(len(hdr) - 1)
+        else:
+            self._tabs_header.v_model = 0
+
+    def set_tab_label(self, index: int, label: str) -> None:
+        """
+        Set the label of a tab.
+
+        Args:
+            index: The index of the tab.
+            label: The label of the tab.
+        """
+        tab = self._tabs_header.children[index]
+        if len(tab.children) == 2 and isinstance(tab.children[0], v.Icon):
+            tab.children = [tab.children[0], label]
+        else:
+            tab.children = [label]
+        self._labels[index] = label
+        try:
+            item = self._tabs_items.children[index]
+            if self._wrap_in_card and isinstance(item.children[0], v.Card):
+                card = item.children[0]
+                kids = list(card.children)
+                if kids and isinstance(kids[0], v.CardTitle):
+                    kids[0].children = [label]
+                    card.children = kids
+        except Exception:
+            pass
+
+    def set_tab_icon(self, index: int, icon: Optional[str]) -> None:
+        """
+        Set the icon of a tab.
+
+        Args:
+            index: The index of the tab.
+            icon: The icon of the tab.
+        """
+        tab = self._tabs_header.children[index]
+        label = self._labels[index]
+        if icon:
+            tab.children = [v.Icon(left=True, small=True, children=[icon]), label]
+        else:
+            tab.children = [label]
+        if index < len(self._icons):
+            self._icons[index] = icon or ""
+        else:
+            self._icons.append(icon or "")
+
+    def set_tab_content(self, index: int, content: widgets.Widget) -> None:
+        """
+        Set the content of a tab.
+
+        Args:
+            index: The index of the tab.
+            content: The content of the tab.
+        """
+        item = self._tabs_items.children[index]
+        if self._wrap_in_card and isinstance(item.children[0], v.Card):
+            card = item.children[0]
+            kids = list(card.children)
+            replaced = False
+            for i, k in enumerate(kids):
+                if isinstance(k, v.CardText):
+                    kids[i] = v.CardText(class_="py-4", children=[content])
+                    card.children = kids
+                    replaced = True
+                    break
+            if not replaced:
+                if self._show_titles:
+                    card.children = [
+                        v.CardTitle(class_="text-h6", children=[self._labels[index]]),
+                        v.Divider(),
+                        v.CardText(class_="py-4", children=[content]),
+                    ]
+                else:
+                    card.children = [v.CardText(class_="py-4", children=[content])]
+        else:
+            item.children = [content]
+
+    # Help dialog controls
+    def set_help_title(self, title: str) -> None:
+        """
+        Set the title of the help dialog.
+
+        Args:
+            title: The title of the help dialog.
+        """
+        self._help_title.children = [title]
+
+    def set_help_content(self, content: widgets.Widget) -> None:
+        """
+        Set the content of the help dialog.
+
+        Args:
+            content: The content of the help dialog.
+        """
+        self._help_cardtext.children = [content]
+
+    def open_help_dialog(self) -> None:
+        """
+        Open the help dialog.
+        """
+        self._help_dialog.v_model = True
+
+    def close_help_dialog(self) -> None:
+        """
+        Close the help dialog.
+        """
+        self._help_dialog.v_model = False
+
+    @property
+    def tab_header_visible(self) -> bool:
+        """
+        Get the visibility of the tab header.
+        """
+        return bool(self._header_visible)
+
+    @tab_header_visible.setter
+    def tab_header_visible(self, visible: bool) -> None:
+        self.set_tab_header_visible(visible)
+
+    def set_tab_header_visible(self, visible: bool) -> None:
+        """
+        Set the visibility of the tab header.
+
+        Args:
+            visible: Whether to show the tab header.
+        """
+        self._header_visible = bool(visible)
+        self._tabs_header.class_ = "px-4" if self._header_visible else "px-4 d-none"
+
+    @property
+    def panel_titles_visible(self) -> bool:
+        """
+        Get the visibility of the panel titles.
+        """
+        return bool(self._show_titles)
+
+    @panel_titles_visible.setter
+    def panel_titles_visible(self, visible: bool) -> None:
+        self.set_panel_titles_visible(visible)
+
+    def set_panel_titles_visible(self, visible: bool) -> None:
+        """
+        Set the visibility of the panel titles.
+
+        Args:
+            visible: Whether to show the panel titles.
+        """
+        self._show_titles = bool(visible)
+        for i, item in enumerate(self._tabs_items.children):
+            if not self._wrap_in_card or not isinstance(item.children[0], v.Card):
+                continue
+            card = item.children[0]
+            kids = list(card.children)
+            if self._show_titles:
+                if not kids or not isinstance(kids[0], v.CardTitle):
+                    card.children = [
+                        v.CardTitle(class_="text-h6", children=[self._labels[i]]),
+                        v.Divider(),
+                    ] + kids
+                else:
+                    card.children = kids
+            else:
+                if kids and isinstance(kids[0], v.CardTitle):
+                    if len(kids) > 1 and isinstance(kids[1], v.Divider):
+                        card.children = kids[2:]
+                    else:
+                        card.children = kids[1:]
+
+    # Private helpers
+    def _toast(self, message: str, color: str = "primary") -> None:
+        """
+        Show a snackbar message.
+
+        Args:
+            message: The message to show.
+            color: The color of the snackbar.
+        """
+        self._snackbar.color = color
+        self._snackbar.children = [message]
+        self._snackbar.v_model = False
+        self._snackbar.v_model = True
+
+    def _card(self, title_text: str, body: widgets.Widget) -> v.Card:
+        """
+        Create a card with a title and body.
+
+        Args:
+            title_text: The text of the title.
+            body: The body of the card.
+        """
+        if self._show_titles:
+            kids = [
+                v.CardTitle(class_="text-h6", children=[title_text]),
+                v.Divider(),
+                v.CardText(class_="py-4", children=[body]),
+            ]
+        else:
+            kids = [v.CardText(class_="py-4", children=[body])]
+        return v.Card(
+            class_="ma-4 elevation-{} rounded-xl".format(self._elevation),
+            children=kids,
+        )
+
+    def _append_tab(self, label: str, icon: str, body: widgets.Widget) -> None:
+        """
+        Append a tab to the dashboard.
+
+        Args:
+            label: The label of the tab.
+            icon: The icon of the tab.
+            body: The body of the tab.
+        """
+        hdr_children = list(self._tabs_header.children)
+        items_children = list(self._tabs_items.children)
+        tab_hdr = (
+            v.Tab(children=[v.Icon(left=True, small=True, children=[icon]), label])
+            if icon
+            else v.Tab(children=[label])
+        )
+        hdr_children.append(tab_hdr)
+        content = self._card(label, body) if self._wrap_in_card else body
+        items_children.append(v.TabItem(children=[content]))
+        self._tabs_header.children = tuple(hdr_children)
+        self._tabs_items.children = tuple(items_children)
+
+    def _insert_tab(
+        self, label: str, icon: str, body: widgets.Widget, index: Optional[int]
+    ) -> None:
+        """
+        Insert a tab into the dashboard.
+
+        Args:
+            label: The label of the tab.
+            icon: The icon of the tab.
+            body: The body of the tab.
+            index: The index of the tab.
+        """
+        hdr_children = list(self._tabs_header.children)
+        items_children = list(self._tabs_items.children)
+        n = len(hdr_children)
+        if index is None:
+            index = n
+        if not (0 <= index <= n):
+            raise IndexError(f"index {index} out of range (0..{n})")
+        tab_hdr = (
+            v.Tab(children=[v.Icon(left=True, small=True, children=[icon]), label])
+            if icon
+            else v.Tab(children=[label])
+        )
+        hdr_children.insert(index, tab_hdr)
+        content = self._card(label, body) if self._wrap_in_card else body
+        items_children.insert(index, v.TabItem(children=[content]))
+        self._tabs_header.children = tuple(hdr_children)
+        self._tabs_items.children = tuple(items_children)
+        self._labels.insert(index, label)
+        self._icons.insert(index, icon)
+
+    def _forward_tab_change(self, change):
+        """
+        Forward the tab change event.
+
+        Args:
+            change: The change event.
+        """
+        if change.get("name") == "v_model":
+            idx = int(change.get("new", 0) or 0)
+            for h in list(self._change_handlers):
+                try:
+                    h(idx)
+                except Exception:
+                    pass
+
+    def _emit_refresh(self):
+        """
+        Emit the refresh event.
+        """
+        original = self._refresh_btn.children
+        try:
+            self._refresh_btn.children = [
+                v.Icon(children=["mdi-loading"], class_="mdi-spin")
+            ]
+            if self._refresh_handlers:
+                for h in list(self._refresh_handlers):
+                    try:
+                        h()
+                    except Exception as e:
+                        self._toast(f"Refresh error: {e}", color="error")
+                self._toast("Refreshed")
+            else:
+                self._toast("Refreshed")
+        finally:
+            self._refresh_btn.children = original
+
+    def _emit_help(self):
+        """
+        Emit the help event.
+        """
+        # Run custom handlers (if any), then open the dialog
+        if self._help_handlers:
+            for h in list(self._help_handlers):
+                try:
+                    h()
+                except Exception as e:
+                    self._toast(f"Help error: {e}", color="error")
+        self.open_help_dialog()
