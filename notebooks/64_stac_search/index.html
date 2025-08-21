@@ -2228,6 +2228,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../maplibre/dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dashboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../maplibre/data_driven_lines/" class="md-nav__link">
         
   
@@ -6444,6 +6467,34 @@
         }, 1000)
       })
 </script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        
+        var widgetRendererSrc = 'https://unpkg.com/@jupyter-js-widgets@*/dist/embed.js';
+        
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -6869,7 +6920,7 @@ search</div>
 <div class="jp-OutputArea-child jp-OutputArea-executeResult">
 <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[4]:</div>
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain" tabindex="0">
-<pre>&lt;pystac_client.item_search.ItemSearch at 0x7f1a9fd6bda0&gt;</pre>
+<pre>&lt;pystac_client.item_search.ItemSearch at 0x7f1293f24650&gt;</pre>
 </div>
 </div>
 </div>
@@ -7400,7 +7451,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_73cc7760c288d3cf95f1e507535abb48 {
+                #map_d3d630bfb59e7591dcbdf8cba5c7bd3f {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -7420,14 +7471,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_73cc7760c288d3cf95f1e507535abb48&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_d3d630bfb59e7591dcbdf8cba5c7bd3f&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_73cc7760c288d3cf95f1e507535abb48 = L.map(
-                &quot;map_73cc7760c288d3cf95f1e507535abb48&quot;,
+            var map_d3d630bfb59e7591dcbdf8cba5c7bd3f = L.map(
+                &quot;map_d3d630bfb59e7591dcbdf8cba5c7bd3f&quot;,
                 {
                     center: [37.7517, -122.4433],
                     crs: L.CRS.EPSG3857,
@@ -7438,24 +7489,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_73cc7760c288d3cf95f1e507535abb48);
+            L.control.scale().addTo(map_d3d630bfb59e7591dcbdf8cba5c7bd3f);
 
             
 
         
     
-            var tile_layer_f54b1d76fbbe9fe09699b4f2ed1743c3 = L.tileLayer(
+            var tile_layer_0d66a73df8a9c62995755c19b0b2622f = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_f54b1d76fbbe9fe09699b4f2ed1743c3.addTo(map_73cc7760c288d3cf95f1e507535abb48);
+            tile_layer_0d66a73df8a9c62995755c19b0b2622f.addTo(map_d3d630bfb59e7591dcbdf8cba5c7bd3f);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_73cc7760c288d3cf95f1e507535abb48);
+            ).addTo(map_d3d630bfb59e7591dcbdf8cba5c7bd3f);
         
     
             var options = {
@@ -7464,14 +7515,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_9830aeeef2a1fdc57c5281d355b40004 = new L.featureGroup().addTo(
-                map_73cc7760c288d3cf95f1e507535abb48
+            var drawnItems_draw_control_026cfd7a8a20e6a0ab504eeb0a222810 = new L.featureGroup().addTo(
+                map_d3d630bfb59e7591dcbdf8cba5c7bd3f
             );
-            options.edit.featureGroup = drawnItems_draw_control_9830aeeef2a1fdc57c5281d355b40004;
-            var draw_control_9830aeeef2a1fdc57c5281d355b40004 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_026cfd7a8a20e6a0ab504eeb0a222810;
+            var draw_control_026cfd7a8a20e6a0ab504eeb0a222810 = new L.Control.Draw(
                 options
-            ).addTo( map_73cc7760c288d3cf95f1e507535abb48 );
-            map_73cc7760c288d3cf95f1e507535abb48.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_d3d630bfb59e7591dcbdf8cba5c7bd3f );
+            map_d3d630bfb59e7591dcbdf8cba5c7bd3f.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7479,52 +7530,52 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_9830aeeef2a1fdc57c5281d355b40004.addLayer(layer);
+                drawnItems_draw_control_026cfd7a8a20e6a0ab504eeb0a222810.addLayer(layer);
              });
-            map_73cc7760c288d3cf95f1e507535abb48.on('draw:created', function(e) {
-                drawnItems_draw_control_9830aeeef2a1fdc57c5281d355b40004.addLayer(e.layer);
+            map_d3d630bfb59e7591dcbdf8cba5c7bd3f.on('draw:created', function(e) {
+                drawnItems_draw_control_026cfd7a8a20e6a0ab504eeb0a222810.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_54f1565b8855f3b4c70f92d9e288e643 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_27df2844d88ab61b1decf20b2854730b = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_54f1565b8855f3b4c70f92d9e288e643 = geocoderOpts_geocoder_54f1565b8855f3b4c70f92d9e288e643[&quot;provider&quot;];
+            var geocoderName_geocoder_27df2844d88ab61b1decf20b2854730b = geocoderOpts_geocoder_27df2844d88ab61b1decf20b2854730b[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_54f1565b8855f3b4c70f92d9e288e643 = L.Control.Geocoder[ geocoderName_geocoder_54f1565b8855f3b4c70f92d9e288e643 ](
-                geocoderOpts_geocoder_54f1565b8855f3b4c70f92d9e288e643['providerOptions']
+            var customGeocoder_geocoder_27df2844d88ab61b1decf20b2854730b = L.Control.Geocoder[ geocoderName_geocoder_27df2844d88ab61b1decf20b2854730b ](
+                geocoderOpts_geocoder_27df2844d88ab61b1decf20b2854730b['providerOptions']
             );
-            geocoderOpts_geocoder_54f1565b8855f3b4c70f92d9e288e643[&quot;geocoder&quot;] = customGeocoder_geocoder_54f1565b8855f3b4c70f92d9e288e643;
+            geocoderOpts_geocoder_27df2844d88ab61b1decf20b2854730b[&quot;geocoder&quot;] = customGeocoder_geocoder_27df2844d88ab61b1decf20b2854730b;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_54f1565b8855f3b4c70f92d9e288e643
+                geocoderOpts_geocoder_27df2844d88ab61b1decf20b2854730b
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_54f1565b8855f3b4c70f92d9e288e643['zoom'] || map_73cc7760c288d3cf95f1e507535abb48.getZoom();
-                map_73cc7760c288d3cf95f1e507535abb48.setView(e.geocode.center, zoom);
-            }).addTo(map_73cc7760c288d3cf95f1e507535abb48);
+                var zoom = geocoderOpts_geocoder_27df2844d88ab61b1decf20b2854730b['zoom'] || map_d3d630bfb59e7591dcbdf8cba5c7bd3f.getZoom();
+                map_d3d630bfb59e7591dcbdf8cba5c7bd3f.setView(e.geocode.center, zoom);
+            }).addTo(map_d3d630bfb59e7591dcbdf8cba5c7bd3f);
 
         
     
-            map_73cc7760c288d3cf95f1e507535abb48.fitBounds(
+            map_d3d630bfb59e7591dcbdf8cba5c7bd3f.fitBounds(
                 [[37.7517, -122.4433], [37.7517, -122.4433]],
                 {&quot;maxZoom&quot;: 8}
             );
         
     
-            var layer_control_81f532fe09fa0c099dec35bf4169ebd4_layers = {
+            var layer_control_9f857042b1242710cfce4c2c4552556c_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_f54b1d76fbbe9fe09699b4f2ed1743c3,
+                    &quot;openstreetmap&quot; : tile_layer_0d66a73df8a9c62995755c19b0b2622f,
                 },
                 overlays :  {
                 },
             };
-            let layer_control_81f532fe09fa0c099dec35bf4169ebd4 = L.control.layers(
-                layer_control_81f532fe09fa0c099dec35bf4169ebd4_layers.base_layers,
-                layer_control_81f532fe09fa0c099dec35bf4169ebd4_layers.overlays,
+            let layer_control_9f857042b1242710cfce4c2c4552556c = L.control.layers(
+                layer_control_9f857042b1242710cfce4c2c4552556c_layers.base_layers,
+                layer_control_9f857042b1242710cfce4c2c4552556c_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_73cc7760c288d3cf95f1e507535abb48);
+            ).addTo(map_d3d630bfb59e7591dcbdf8cba5c7bd3f);
 
         
 &lt;/script&gt;
@@ -7629,6 +7680,9 @@ m</div>
 </div>
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"8ee8c0b04ff2484ea5511b469f6951fa": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "3990b2c99d6f41f199b900a167cbdfeb": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_8ee8c0b04ff2484ea5511b469f6951fa"}}, "b4461073062f40d485ddd153af476d87": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "e3aa76c0587b44fd83dfea317992b676": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "f4f3b1f440d64f19aad74126a4790b27": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
+</script>
 
         <style>
         ['pre { line-height: 125%; }\ntd.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\nspan.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\ntd.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\nspan.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\n.highlight-ipynb .hll { background-color: var(--jp-cell-editor-active-background) }\n.highlight-ipynb { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }\n.highlight-ipynb .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */\n.highlight-ipynb .err { color: var(--jp-mirror-editor-error-color) } /* Error */\n.highlight-ipynb .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */\n.highlight-ipynb .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */\n.highlight-ipynb .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */\n.highlight-ipynb .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */\n.highlight-ipynb .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */\n.highlight-ipynb .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */\n.highlight-ipynb .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */\n.highlight-ipynb .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */\n.highlight-ipynb .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */\n.highlight-ipynb .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */\n.highlight-ipynb .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */\n.highlight-ipynb .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */\n.highlight-ipynb .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */\n.highlight-ipynb .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */\n.highlight-ipynb .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */\n.highlight-ipynb .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */\n.highlight-ipynb .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */\n.highlight-ipynb .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */\n.highlight-ipynb .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */\n.highlight-ipynb .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */\n.highlight-ipynb .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */\n.highlight-ipynb .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */\n.highlight-ipynb .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */\n.highlight-ipynb .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */\n.highlight-ipynb .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */\n.highlight-ipynb .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */\n.highlight-ipynb .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */\n.highlight-ipynb .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */\n.highlight-ipynb .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */\n.highlight-ipynb .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */\n.highlight-ipynb .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */\n.highlight-ipynb .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */\n.highlight-ipynb .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */\n.highlight-ipynb .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */\n.highlight-ipynb .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */\n.highlight-ipynb .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */\n.highlight-ipynb .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */\n.highlight-ipynb .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */\n.highlight-ipynb .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */']
