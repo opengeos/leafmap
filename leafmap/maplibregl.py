@@ -34,6 +34,7 @@ from maplibre.controls import (
 )
 
 from .basemaps import xyz_to_leaflet
+from .map_widgets import TabWidget
 from . import common
 from .common import (
     download_file,
