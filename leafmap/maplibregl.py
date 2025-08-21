@@ -493,6 +493,8 @@ class Map(MapWidget):
         if self.container is None:
             self.create_container()
         self.container.set_sidebar_width(min_width, max_width)
+        self.sidebar_args["min_width"] = min_width
+        self.sidebar_args["max_width"] = max_width
 
     def add_to_map_container(
         self, *items: Union[widgets.Widget, Iterable[widgets.Widget], None]
@@ -5182,6 +5184,15 @@ class Map(MapWidget):
         access_token: str = None,
         opacity: float = 1.0,
         visible: bool = True,
+        add_to_sidebar: bool = False,
+        style: str = "photo",
+        radius: float = 0.00005,
+        height: int = 420,
+        frame_border: int = 0,
+        default_message: str = "No Mapillary image found",
+        widget_icon: str = "mdi-image",
+        widget_label: str = "Mapillary StreetView",
+        **kwargs: Any,
     ) -> None:
         """
         Adds Mapillary layers to the map.
@@ -5271,6 +5282,53 @@ class Map(MapWidget):
         if add_popup:
             self.add_popup(sequence_lyr_name)
             self.add_popup(image_lyr_name)
+
+        if add_to_sidebar:
+            self._mapillary_widget = widgets.HTML()
+
+            self.add_to_sidebar(
+                self._mapillary_widget,
+                label=widget_label,
+                widget_icon=widget_icon,
+                expanded=False,
+                **kwargs,
+            )
+
+            def log_lng_lat(lng_lat):
+                width = int(self.sidebar_args["min_width"] - 60)
+                lon = lng_lat.new["lng"]
+                lat = lng_lat.new["lat"]
+                image_id = common.search_mapillary_images(
+                    lon, lat, radius=radius, limit=1
+                )
+                if len(image_id) > 0:
+                    content = f"""
+                    <iframe
+                        src="https://www.mapillary.com/embed?image_key={image_id[0]}&style={style}"
+                        height="{height}"
+                        width="{width}"
+                        frameborder="{frame_border}">
+                    </iframe>
+                    """
+                    self._mapillary_widget.value = content
+                else:
+                    self._mapillary_widget.value = default_message
+
+            self._mapillary_function = log_lng_lat
+
+            def _on_panel_toggle(change):
+                if 0 in change["new"]:
+                    self._mapillary_widget.value = (
+                        "Click on the map to view Mapillary StreetView"
+                    )
+                    self.observe(log_lng_lat, names="clicked")
+                else:
+                    self._mapillary_widget.value = ""
+                    self.unobserve_mapillary()
+
+            self.sidebar_widgets[widget_label].observe(
+                _on_panel_toggle, names="v_model"
+            )
 
     def create_mapillary_widget(
         self,
@@ -5820,6 +5878,8 @@ class Map(MapWidget):
         widget = stac_gui(m=self, backend="maplibre")
         self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
         self.set_sidebar_width(min_width=sidebar_width)
+        self.sidebar_args["min_width"] = sidebar_width
+        self.sidebar_args["max_width"] = sidebar_width
 
     def add_alphaearth_gui(
         self,
@@ -6051,6 +6111,58 @@ class Map(MapWidget):
             height=height,
             expanded=expanded,
         )
+
+    def observe_mapillary(
+        self,
+        html_widget: widgets.HTML,
+        style: str = "photo",
+        radius: float = 0.00005,
+        height: int = 420,
+        frame_border: int = 0,
+        default_message: str = "No Mapillary image found",
+    ):
+        """
+        Observes the mapillary data and updates the html widget.
+
+        Args:
+            html_widget (widgets.HTML): The html widget to display the mapillary data.
+            style (str, optional): The style of the Mapillary image widget. Can be "classic", "photo",
+                or "split". Defaults to "photo".
+            radius (float, optional): The radius (in degrees) used to search for the nearest Mapillary
+                image. Defaults to 0.00005 degrees.
+            height (int, optional): The height of the Mapillary image widget. Defaults to 420.
+            frame_border (int, optional): The width of the frame border for the Mapillary image widget.
+                Defaults to 0.
+            default_message (str, optional): The message to display when no Mapillary image is found.
+        """
+
+        def log_lng_lat(lng_lat):
+            width = int(self.sidebar_args["min_width"] - 60)
+            lon = lng_lat.new["lng"]
+            lat = lng_lat.new["lat"]
+            image_id = common.search_mapillary_images(lon, lat, radius=radius, limit=1)
+            if len(image_id) > 0:
+                content = f"""
+                <iframe
+                    src="https://www.mapillary.com/embed?image_key={image_id[0]}&style={style}"
+                    height="{height}"
+                    width="{width}"
+                    frameborder="{frame_border}">
+                </iframe>
+                """
+                html_widget.value = content
+            else:
+                html_widget.value = default_message
+
+        self._mapillary_function = log_lng_lat
+
+        self.observe(log_lng_lat, names="clicked")
+
+    def unobserve_mapillary(self):
+        """
+        Unobserves the mapillary street view.
+        """
+        self.unobserve(self._mapillary_function, names="clicked")
 
 
 class Container(v.Container):
@@ -6383,6 +6495,8 @@ class Container(v.Container):
     def on_width_change(self, change: dict) -> None:
         new_width = change["new"]
         self.set_sidebar_width(min_width=new_width, max_width=new_width)
+        self.host_map.sidebar_args["min_width"] = new_width
+        self.host_map.sidebar_args["max_width"] = new_width
 
 
 def construct_amazon_style(
@@ -8586,6 +8700,16 @@ class CustomWidget(v.ExpansionPanels):
             widgets_list (List[widgets.Widget]): A list of widgets to set as the content of the content box.
         """
         self.content_box.children = widgets_list
+
+    @property
+    def expanded(self) -> bool:
+        """
+        Returns whether the panel is expanded.
+        """
+        if len(self.v_model) > 0:
+            return True
+        else:
+            return False
 
 
 class LayerStyleWidget(widgets.VBox):
