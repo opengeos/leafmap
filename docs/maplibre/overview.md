@@ -237,6 +237,12 @@ Use the icon-image property to change the icon image of a marker.
 
 [![](https://i.imgur.com/yEVKJlA.png)](https://leafmap.org/maplibre/custom_marker)
 
+## Create a dashboard
+
+Create a dashboard with maps, widgets, and buttons.
+
+[![](https://github.com/user-attachments/assets/f98d9261-650f-4e53-b8d0-f35a3a7e875a)](https://leafmap.org/maplibre/dashboard)
+
 ## Style lines with a data-driven property
 
 Create a visualization with a data expression for line-color.
