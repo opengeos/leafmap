@@ -2228,6 +2228,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../maplibre/dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dashboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../maplibre/data_driven_lines/" class="md-nav__link">
         
   
@@ -6444,6 +6467,34 @@
         }, 1000)
       })
 </script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        
+        var widgetRendererSrc = 'https://unpkg.com/@jupyter-js-widgets@*/dist/embed.js';
+        
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -6900,7 +6951,19 @@ To: /home/runner/work/leafmap/leafmap/docs/notebooks/dem.tif
 <div class="jp-OutputArea-child">
 <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
-<pre>100%|██████████| 16.6M/16.6M [00:00&lt;00:00, 326MB/s]</pre>
+<pre>  6%|▋         | 1.05M/16.6M [00:00&lt;00:01, 10.2MB/s]</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre> 98%|█████████▊| 16.3M/16.6M [00:00&lt;00:00, 92.5MB/s]</pre>
+</div>
+</div>
+<div class="jp-OutputArea-child">
+<div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="application/vnd.jupyter.stderr" tabindex="0">
+<pre>100%|██████████| 16.6M/16.6M [00:00&lt;00:00, 80.9MB/s]</pre>
 </div>
 </div>
 <div class="jp-OutputArea-child">
@@ -6994,7 +7057,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_0346bdf631e8c14b7a57cd741d3411e8 {
+                #map_db1ee912c8089c338def344522e692f4 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -7014,14 +7077,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_0346bdf631e8c14b7a57cd741d3411e8&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_db1ee912c8089c338def344522e692f4&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_0346bdf631e8c14b7a57cd741d3411e8 = L.map(
-                &quot;map_0346bdf631e8c14b7a57cd741d3411e8&quot;,
+            var map_db1ee912c8089c338def344522e692f4 = L.map(
+                &quot;map_db1ee912c8089c338def344522e692f4&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -7032,24 +7095,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_0346bdf631e8c14b7a57cd741d3411e8);
+            L.control.scale().addTo(map_db1ee912c8089c338def344522e692f4);
 
             
 
         
     
-            var tile_layer_dcd4a64268f01874052ab78a29d34dd1 = L.tileLayer(
+            var tile_layer_8376087bc4c6315c27f7f05635892f93 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_dcd4a64268f01874052ab78a29d34dd1.addTo(map_0346bdf631e8c14b7a57cd741d3411e8);
+            tile_layer_8376087bc4c6315c27f7f05635892f93.addTo(map_db1ee912c8089c338def344522e692f4);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_0346bdf631e8c14b7a57cd741d3411e8);
+            ).addTo(map_db1ee912c8089c338def344522e692f4);
         
     
             var options = {
@@ -7058,14 +7121,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_f2f7fd0e9a55e4b6c0ecf1592d046d5c = new L.featureGroup().addTo(
-                map_0346bdf631e8c14b7a57cd741d3411e8
+            var drawnItems_draw_control_012ddc715aa6782f1b673c9bc3ecfc7a = new L.featureGroup().addTo(
+                map_db1ee912c8089c338def344522e692f4
             );
-            options.edit.featureGroup = drawnItems_draw_control_f2f7fd0e9a55e4b6c0ecf1592d046d5c;
-            var draw_control_f2f7fd0e9a55e4b6c0ecf1592d046d5c = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_012ddc715aa6782f1b673c9bc3ecfc7a;
+            var draw_control_012ddc715aa6782f1b673c9bc3ecfc7a = new L.Control.Draw(
                 options
-            ).addTo( map_0346bdf631e8c14b7a57cd741d3411e8 );
-            map_0346bdf631e8c14b7a57cd741d3411e8.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_db1ee912c8089c338def344522e692f4 );
+            map_db1ee912c8089c338def344522e692f4.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7073,68 +7136,68 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_f2f7fd0e9a55e4b6c0ecf1592d046d5c.addLayer(layer);
+                drawnItems_draw_control_012ddc715aa6782f1b673c9bc3ecfc7a.addLayer(layer);
              });
-            map_0346bdf631e8c14b7a57cd741d3411e8.on('draw:created', function(e) {
-                drawnItems_draw_control_f2f7fd0e9a55e4b6c0ecf1592d046d5c.addLayer(e.layer);
+            map_db1ee912c8089c338def344522e692f4.on('draw:created', function(e) {
+                drawnItems_draw_control_012ddc715aa6782f1b673c9bc3ecfc7a.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_e47d0783ac00c2659caead0864c049cb = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_acf483d12e3b215eecc410c88740c3c2 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_e47d0783ac00c2659caead0864c049cb = geocoderOpts_geocoder_e47d0783ac00c2659caead0864c049cb[&quot;provider&quot;];
+            var geocoderName_geocoder_acf483d12e3b215eecc410c88740c3c2 = geocoderOpts_geocoder_acf483d12e3b215eecc410c88740c3c2[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_e47d0783ac00c2659caead0864c049cb = L.Control.Geocoder[ geocoderName_geocoder_e47d0783ac00c2659caead0864c049cb ](
-                geocoderOpts_geocoder_e47d0783ac00c2659caead0864c049cb['providerOptions']
+            var customGeocoder_geocoder_acf483d12e3b215eecc410c88740c3c2 = L.Control.Geocoder[ geocoderName_geocoder_acf483d12e3b215eecc410c88740c3c2 ](
+                geocoderOpts_geocoder_acf483d12e3b215eecc410c88740c3c2['providerOptions']
             );
-            geocoderOpts_geocoder_e47d0783ac00c2659caead0864c049cb[&quot;geocoder&quot;] = customGeocoder_geocoder_e47d0783ac00c2659caead0864c049cb;
+            geocoderOpts_geocoder_acf483d12e3b215eecc410c88740c3c2[&quot;geocoder&quot;] = customGeocoder_geocoder_acf483d12e3b215eecc410c88740c3c2;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_e47d0783ac00c2659caead0864c049cb
+                geocoderOpts_geocoder_acf483d12e3b215eecc410c88740c3c2
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_e47d0783ac00c2659caead0864c049cb['zoom'] || map_0346bdf631e8c14b7a57cd741d3411e8.getZoom();
-                map_0346bdf631e8c14b7a57cd741d3411e8.setView(e.geocode.center, zoom);
-            }).addTo(map_0346bdf631e8c14b7a57cd741d3411e8);
+                var zoom = geocoderOpts_geocoder_acf483d12e3b215eecc410c88740c3c2['zoom'] || map_db1ee912c8089c338def344522e692f4.getZoom();
+                map_db1ee912c8089c338def344522e692f4.setView(e.geocode.center, zoom);
+            }).addTo(map_db1ee912c8089c338def344522e692f4);
 
         
     
-            map_0346bdf631e8c14b7a57cd741d3411e8.fitBounds(
+            map_db1ee912c8089c338def344522e692f4.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_9472d8461950920d6145c9ba30806073 = L.tileLayer(
-                &quot;http://127.0.0.1:41871/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Fdem.tif\u0026colormap=terrain&quot;,
+            var tile_layer_d6c9bf89fb393464cbf3680faca1a364 = L.tileLayer(
+                &quot;http://127.0.0.1:41757/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fhome%2Frunner%2Fwork%2Fleafmap%2Fleafmap%2Fdocs%2Fnotebooks%2Fdem.tif\u0026colormap=terrain&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.634011, -120.755927], [38.626923, -117.30451]], &quot;corsAll&quot;: false, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_9472d8461950920d6145c9ba30806073.addTo(map_0346bdf631e8c14b7a57cd741d3411e8);
+            tile_layer_d6c9bf89fb393464cbf3680faca1a364.addTo(map_db1ee912c8089c338def344522e692f4);
         
     
-            map_0346bdf631e8c14b7a57cd741d3411e8.fitBounds(
+            map_db1ee912c8089c338def344522e692f4.fitBounds(
                 [[36.634011, -120.755927], [38.626923, -117.30451]],
                 {}
             );
         
     
-            var layer_control_00fa77a8d8c253423036f56b4c91f14d_layers = {
+            var layer_control_c3aae81907a49a154b8947f9eafc9517_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_dcd4a64268f01874052ab78a29d34dd1,
+                    &quot;openstreetmap&quot; : tile_layer_8376087bc4c6315c27f7f05635892f93,
                 },
                 overlays :  {
-                    &quot;DEM&quot; : tile_layer_9472d8461950920d6145c9ba30806073,
+                    &quot;DEM&quot; : tile_layer_d6c9bf89fb393464cbf3680faca1a364,
                 },
             };
-            let layer_control_00fa77a8d8c253423036f56b4c91f14d = L.control.layers(
-                layer_control_00fa77a8d8c253423036f56b4c91f14d_layers.base_layers,
-                layer_control_00fa77a8d8c253423036f56b4c91f14d_layers.overlays,
+            let layer_control_c3aae81907a49a154b8947f9eafc9517 = L.control.layers(
+                layer_control_c3aae81907a49a154b8947f9eafc9517_layers.base_layers,
+                layer_control_c3aae81907a49a154b8947f9eafc9517_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_0346bdf631e8c14b7a57cd741d3411e8);
+            ).addTo(map_db1ee912c8089c338def344522e692f4);
 
         
 &lt;/script&gt;
@@ -7426,6 +7489,9 @@ except Exception as e:
 </div>
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"cfd8dc72142e4620a76920416206ad16": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "f2beaa0fb6c546619a030bec05821991": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_cfd8dc72142e4620a76920416206ad16"}}, "fdecc0781c1f4c32ab30015d269a43ab": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "41cf957ea9df481c866dbd4109516b28": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "e6cd376b72694b658a431e972a97b720": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
+</script>
 
         <style>
         ['pre { line-height: 125%; }\ntd.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\nspan.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\ntd.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\nspan.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\n.highlight-ipynb .hll { background-color: var(--jp-cell-editor-active-background) }\n.highlight-ipynb { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }\n.highlight-ipynb .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */\n.highlight-ipynb .err { color: var(--jp-mirror-editor-error-color) } /* Error */\n.highlight-ipynb .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */\n.highlight-ipynb .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */\n.highlight-ipynb .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */\n.highlight-ipynb .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */\n.highlight-ipynb .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */\n.highlight-ipynb .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */\n.highlight-ipynb .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */\n.highlight-ipynb .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */\n.highlight-ipynb .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */\n.highlight-ipynb .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */\n.highlight-ipynb .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */\n.highlight-ipynb .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */\n.highlight-ipynb .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */\n.highlight-ipynb .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */\n.highlight-ipynb .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */\n.highlight-ipynb .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */\n.highlight-ipynb .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */\n.highlight-ipynb .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */\n.highlight-ipynb .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */\n.highlight-ipynb .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */\n.highlight-ipynb .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */\n.highlight-ipynb .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */\n.highlight-ipynb .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */\n.highlight-ipynb .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */\n.highlight-ipynb .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */\n.highlight-ipynb .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */\n.highlight-ipynb .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */\n.highlight-ipynb .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */\n.highlight-ipynb .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */\n.highlight-ipynb .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */\n.highlight-ipynb .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */\n.highlight-ipynb .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */\n.highlight-ipynb .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */\n.highlight-ipynb .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */\n.highlight-ipynb .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */\n.highlight-ipynb .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */\n.highlight-ipynb .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */\n.highlight-ipynb .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */\n.highlight-ipynb .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */']

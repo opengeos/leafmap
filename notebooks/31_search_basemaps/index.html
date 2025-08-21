@@ -2228,6 +2228,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../maplibre/dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Dashboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../maplibre/data_driven_lines/" class="md-nav__link">
         
   
@@ -6444,6 +6467,34 @@
         }, 1000)
       })
 </script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        
+        var widgetRendererSrc = 'https://unpkg.com/@jupyter-js-widgets@*/dist/embed.js';
+        
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
 <style type="text/css">
     pre { line-height: 125%; }
 td.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }
@@ -6923,7 +6974,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_e1538d438362d17155fec8783bd2c1b0 {
+                #map_ba33baa8cf6da36e201f06e7432dfe96 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -6943,14 +6994,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_e1538d438362d17155fec8783bd2c1b0&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_ba33baa8cf6da36e201f06e7432dfe96&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_e1538d438362d17155fec8783bd2c1b0 = L.map(
-                &quot;map_e1538d438362d17155fec8783bd2c1b0&quot;,
+            var map_ba33baa8cf6da36e201f06e7432dfe96 = L.map(
+                &quot;map_ba33baa8cf6da36e201f06e7432dfe96&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -6961,24 +7012,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_e1538d438362d17155fec8783bd2c1b0);
+            L.control.scale().addTo(map_ba33baa8cf6da36e201f06e7432dfe96);
 
             
 
         
     
-            var tile_layer_63faff38a0895b15d760e54af5da71e3 = L.tileLayer(
+            var tile_layer_0095831a7e1a02692ff530545c4873bf = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_63faff38a0895b15d760e54af5da71e3.addTo(map_e1538d438362d17155fec8783bd2c1b0);
+            tile_layer_0095831a7e1a02692ff530545c4873bf.addTo(map_ba33baa8cf6da36e201f06e7432dfe96);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_e1538d438362d17155fec8783bd2c1b0);
+            ).addTo(map_ba33baa8cf6da36e201f06e7432dfe96);
         
     
             var options = {
@@ -6987,14 +7038,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_d1708c3f8260601d88a079226a5f74d6 = new L.featureGroup().addTo(
-                map_e1538d438362d17155fec8783bd2c1b0
+            var drawnItems_draw_control_642d2fc208523d034a429cb87dba0c7b = new L.featureGroup().addTo(
+                map_ba33baa8cf6da36e201f06e7432dfe96
             );
-            options.edit.featureGroup = drawnItems_draw_control_d1708c3f8260601d88a079226a5f74d6;
-            var draw_control_d1708c3f8260601d88a079226a5f74d6 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_642d2fc208523d034a429cb87dba0c7b;
+            var draw_control_642d2fc208523d034a429cb87dba0c7b = new L.Control.Draw(
                 options
-            ).addTo( map_e1538d438362d17155fec8783bd2c1b0 );
-            map_e1538d438362d17155fec8783bd2c1b0.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_ba33baa8cf6da36e201f06e7432dfe96 );
+            map_ba33baa8cf6da36e201f06e7432dfe96.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7002,62 +7053,62 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_d1708c3f8260601d88a079226a5f74d6.addLayer(layer);
+                drawnItems_draw_control_642d2fc208523d034a429cb87dba0c7b.addLayer(layer);
              });
-            map_e1538d438362d17155fec8783bd2c1b0.on('draw:created', function(e) {
-                drawnItems_draw_control_d1708c3f8260601d88a079226a5f74d6.addLayer(e.layer);
+            map_ba33baa8cf6da36e201f06e7432dfe96.on('draw:created', function(e) {
+                drawnItems_draw_control_642d2fc208523d034a429cb87dba0c7b.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_4604f93549ae747a4fc854b8352a111c = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877 = geocoderOpts_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877[&quot;provider&quot;];
+            var geocoderName_geocoder_4604f93549ae747a4fc854b8352a111c = geocoderOpts_geocoder_4604f93549ae747a4fc854b8352a111c[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877 = L.Control.Geocoder[ geocoderName_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877 ](
-                geocoderOpts_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877['providerOptions']
+            var customGeocoder_geocoder_4604f93549ae747a4fc854b8352a111c = L.Control.Geocoder[ geocoderName_geocoder_4604f93549ae747a4fc854b8352a111c ](
+                geocoderOpts_geocoder_4604f93549ae747a4fc854b8352a111c['providerOptions']
             );
-            geocoderOpts_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877[&quot;geocoder&quot;] = customGeocoder_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877;
+            geocoderOpts_geocoder_4604f93549ae747a4fc854b8352a111c[&quot;geocoder&quot;] = customGeocoder_geocoder_4604f93549ae747a4fc854b8352a111c;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877
+                geocoderOpts_geocoder_4604f93549ae747a4fc854b8352a111c
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_62f7d3d45ce435b9f0494cd7f4d3a877['zoom'] || map_e1538d438362d17155fec8783bd2c1b0.getZoom();
-                map_e1538d438362d17155fec8783bd2c1b0.setView(e.geocode.center, zoom);
-            }).addTo(map_e1538d438362d17155fec8783bd2c1b0);
+                var zoom = geocoderOpts_geocoder_4604f93549ae747a4fc854b8352a111c['zoom'] || map_ba33baa8cf6da36e201f06e7432dfe96.getZoom();
+                map_ba33baa8cf6da36e201f06e7432dfe96.setView(e.geocode.center, zoom);
+            }).addTo(map_ba33baa8cf6da36e201f06e7432dfe96);
 
         
     
-            map_e1538d438362d17155fec8783bd2c1b0.fitBounds(
+            map_ba33baa8cf6da36e201f06e7432dfe96.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_3def6b7834fc361b33c2945ef1a6b850 = L.tileLayer(
+            var tile_layer_d9d19eb05fc21fcd9c6c6879792d51e8 = L.tileLayer(
                 &quot;https://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}&quot;,
                 {&quot;attribution&quot;: &quot;Tiles (C) Esri -- National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_3def6b7834fc361b33c2945ef1a6b850.addTo(map_e1538d438362d17155fec8783bd2c1b0);
+            tile_layer_d9d19eb05fc21fcd9c6c6879792d51e8.addTo(map_ba33baa8cf6da36e201f06e7432dfe96);
         
     
-            var layer_control_1a41f05cf5abc88d7d71d9e6a321b5da_layers = {
+            var layer_control_558bf76c09ab53596d9e588ea7da152b_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_63faff38a0895b15d760e54af5da71e3,
+                    &quot;openstreetmap&quot; : tile_layer_0095831a7e1a02692ff530545c4873bf,
                 },
                 overlays :  {
-                    &quot;Esri.NatGeoWorldMap&quot; : tile_layer_3def6b7834fc361b33c2945ef1a6b850,
+                    &quot;Esri.NatGeoWorldMap&quot; : tile_layer_d9d19eb05fc21fcd9c6c6879792d51e8,
                 },
             };
-            let layer_control_1a41f05cf5abc88d7d71d9e6a321b5da = L.control.layers(
-                layer_control_1a41f05cf5abc88d7d71d9e6a321b5da_layers.base_layers,
-                layer_control_1a41f05cf5abc88d7d71d9e6a321b5da_layers.overlays,
+            let layer_control_558bf76c09ab53596d9e588ea7da152b = L.control.layers(
+                layer_control_558bf76c09ab53596d9e588ea7da152b_layers.base_layers,
+                layer_control_558bf76c09ab53596d9e588ea7da152b_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_e1538d438362d17155fec8783bd2c1b0);
+            ).addTo(map_ba33baa8cf6da36e201f06e7432dfe96);
 
         
 &lt;/script&gt;
@@ -7201,7 +7252,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_d55a66395450fc1b331fae3c2b9e1334 {
+                #map_b728eee07ff8d3631e0d1dde75933c75 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -7221,14 +7272,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_d55a66395450fc1b331fae3c2b9e1334&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_b728eee07ff8d3631e0d1dde75933c75&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_d55a66395450fc1b331fae3c2b9e1334 = L.map(
-                &quot;map_d55a66395450fc1b331fae3c2b9e1334&quot;,
+            var map_b728eee07ff8d3631e0d1dde75933c75 = L.map(
+                &quot;map_b728eee07ff8d3631e0d1dde75933c75&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -7239,24 +7290,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_d55a66395450fc1b331fae3c2b9e1334);
+            L.control.scale().addTo(map_b728eee07ff8d3631e0d1dde75933c75);
 
             
 
         
     
-            var tile_layer_63741966cf2cd770ae51c839bfddce14 = L.tileLayer(
+            var tile_layer_a72fb091c53c92b09097c4b4418f49cb = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_63741966cf2cd770ae51c839bfddce14.addTo(map_d55a66395450fc1b331fae3c2b9e1334);
+            tile_layer_a72fb091c53c92b09097c4b4418f49cb.addTo(map_b728eee07ff8d3631e0d1dde75933c75);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_d55a66395450fc1b331fae3c2b9e1334);
+            ).addTo(map_b728eee07ff8d3631e0d1dde75933c75);
         
     
             var options = {
@@ -7265,14 +7316,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_b9718bba44785c25b14d9916719f55d3 = new L.featureGroup().addTo(
-                map_d55a66395450fc1b331fae3c2b9e1334
+            var drawnItems_draw_control_2a4fbc961caff37f5b194f9aa2890010 = new L.featureGroup().addTo(
+                map_b728eee07ff8d3631e0d1dde75933c75
             );
-            options.edit.featureGroup = drawnItems_draw_control_b9718bba44785c25b14d9916719f55d3;
-            var draw_control_b9718bba44785c25b14d9916719f55d3 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_2a4fbc961caff37f5b194f9aa2890010;
+            var draw_control_2a4fbc961caff37f5b194f9aa2890010 = new L.Control.Draw(
                 options
-            ).addTo( map_d55a66395450fc1b331fae3c2b9e1334 );
-            map_d55a66395450fc1b331fae3c2b9e1334.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_b728eee07ff8d3631e0d1dde75933c75 );
+            map_b728eee07ff8d3631e0d1dde75933c75.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7280,62 +7331,62 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_b9718bba44785c25b14d9916719f55d3.addLayer(layer);
+                drawnItems_draw_control_2a4fbc961caff37f5b194f9aa2890010.addLayer(layer);
              });
-            map_d55a66395450fc1b331fae3c2b9e1334.on('draw:created', function(e) {
-                drawnItems_draw_control_b9718bba44785c25b14d9916719f55d3.addLayer(e.layer);
+            map_b728eee07ff8d3631e0d1dde75933c75.on('draw:created', function(e) {
+                drawnItems_draw_control_2a4fbc961caff37f5b194f9aa2890010.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_edaa17fa62dd246594b578916c542118 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_11bc4e15e50acb9af9215d9ec9a4d295 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_edaa17fa62dd246594b578916c542118 = geocoderOpts_geocoder_edaa17fa62dd246594b578916c542118[&quot;provider&quot;];
+            var geocoderName_geocoder_11bc4e15e50acb9af9215d9ec9a4d295 = geocoderOpts_geocoder_11bc4e15e50acb9af9215d9ec9a4d295[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_edaa17fa62dd246594b578916c542118 = L.Control.Geocoder[ geocoderName_geocoder_edaa17fa62dd246594b578916c542118 ](
-                geocoderOpts_geocoder_edaa17fa62dd246594b578916c542118['providerOptions']
+            var customGeocoder_geocoder_11bc4e15e50acb9af9215d9ec9a4d295 = L.Control.Geocoder[ geocoderName_geocoder_11bc4e15e50acb9af9215d9ec9a4d295 ](
+                geocoderOpts_geocoder_11bc4e15e50acb9af9215d9ec9a4d295['providerOptions']
             );
-            geocoderOpts_geocoder_edaa17fa62dd246594b578916c542118[&quot;geocoder&quot;] = customGeocoder_geocoder_edaa17fa62dd246594b578916c542118;
+            geocoderOpts_geocoder_11bc4e15e50acb9af9215d9ec9a4d295[&quot;geocoder&quot;] = customGeocoder_geocoder_11bc4e15e50acb9af9215d9ec9a4d295;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_edaa17fa62dd246594b578916c542118
+                geocoderOpts_geocoder_11bc4e15e50acb9af9215d9ec9a4d295
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_edaa17fa62dd246594b578916c542118['zoom'] || map_d55a66395450fc1b331fae3c2b9e1334.getZoom();
-                map_d55a66395450fc1b331fae3c2b9e1334.setView(e.geocode.center, zoom);
-            }).addTo(map_d55a66395450fc1b331fae3c2b9e1334);
+                var zoom = geocoderOpts_geocoder_11bc4e15e50acb9af9215d9ec9a4d295['zoom'] || map_b728eee07ff8d3631e0d1dde75933c75.getZoom();
+                map_b728eee07ff8d3631e0d1dde75933c75.setView(e.geocode.center, zoom);
+            }).addTo(map_b728eee07ff8d3631e0d1dde75933c75);
 
         
     
-            map_d55a66395450fc1b331fae3c2b9e1334.fitBounds(
+            map_b728eee07ff8d3631e0d1dde75933c75.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_6244d034e01e76a2129c063713c94a0a = L.tileLayer(
+            var tile_layer_73f7719f7dee03dc0543c3aca43259dc = L.tileLayer(
                 &quot;https://mt1.google.com/vt/lyrs=y\u0026x={x}\u0026y={y}\u0026z={z}&quot;,
                 {&quot;attribution&quot;: &quot; &quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_6244d034e01e76a2129c063713c94a0a.addTo(map_d55a66395450fc1b331fae3c2b9e1334);
+            tile_layer_73f7719f7dee03dc0543c3aca43259dc.addTo(map_b728eee07ff8d3631e0d1dde75933c75);
         
     
-            var layer_control_974cc74ae2775d7eb271758444eaebb0_layers = {
+            var layer_control_16c6f973ec7261fd4253cdcfc68f33c9_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_63741966cf2cd770ae51c839bfddce14,
+                    &quot;openstreetmap&quot; : tile_layer_a72fb091c53c92b09097c4b4418f49cb,
                 },
                 overlays :  {
-                    &quot;Google Satellite Hybrid&quot; : tile_layer_6244d034e01e76a2129c063713c94a0a,
+                    &quot;Google Satellite Hybrid&quot; : tile_layer_73f7719f7dee03dc0543c3aca43259dc,
                 },
             };
-            let layer_control_974cc74ae2775d7eb271758444eaebb0 = L.control.layers(
-                layer_control_974cc74ae2775d7eb271758444eaebb0_layers.base_layers,
-                layer_control_974cc74ae2775d7eb271758444eaebb0_layers.overlays,
+            let layer_control_16c6f973ec7261fd4253cdcfc68f33c9 = L.control.layers(
+                layer_control_16c6f973ec7261fd4253cdcfc68f33c9_layers.base_layers,
+                layer_control_16c6f973ec7261fd4253cdcfc68f33c9_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_d55a66395450fc1b331fae3c2b9e1334);
+            ).addTo(map_b728eee07ff8d3631e0d1dde75933c75);
 
         
 &lt;/script&gt;
@@ -7370,6 +7421,9 @@ m</div>
 </div>
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"214f2074e669479e81ed15f8d1573beb": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "47123286e0844112b4a363ed713d2ba2": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_214f2074e669479e81ed15f8d1573beb"}}, "af8a4c38848f4c0c9834ea5ce34ecb0c": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "2ea464506dd545019778cd953cbe5e2a": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "f9f785ccc985400f8a51c003f06f64dd": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
+</script>
 
         <style>
         ['pre { line-height: 125%; }\ntd.linenos .normal { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\nspan.linenos { color: inherit; background-color: transparent; padding-left: 5px; padding-right: 5px; }\ntd.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\nspan.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }\n.highlight-ipynb .hll { background-color: var(--jp-cell-editor-active-background) }\n.highlight-ipynb { background: var(--jp-cell-editor-background); color: var(--jp-mirror-editor-variable-color) }\n.highlight-ipynb .c { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment */\n.highlight-ipynb .err { color: var(--jp-mirror-editor-error-color) } /* Error */\n.highlight-ipynb .k { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword */\n.highlight-ipynb .o { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator */\n.highlight-ipynb .p { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation */\n.highlight-ipynb .ch { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Hashbang */\n.highlight-ipynb .cm { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Multiline */\n.highlight-ipynb .cp { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Preproc */\n.highlight-ipynb .cpf { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.PreprocFile */\n.highlight-ipynb .c1 { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Single */\n.highlight-ipynb .cs { color: var(--jp-mirror-editor-comment-color); font-style: italic } /* Comment.Special */\n.highlight-ipynb .kc { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Constant */\n.highlight-ipynb .kd { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Declaration */\n.highlight-ipynb .kn { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Namespace */\n.highlight-ipynb .kp { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Pseudo */\n.highlight-ipynb .kr { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Reserved */\n.highlight-ipynb .kt { color: var(--jp-mirror-editor-keyword-color); font-weight: bold } /* Keyword.Type */\n.highlight-ipynb .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */\n.highlight-ipynb .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */\n.highlight-ipynb .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */\n.highlight-ipynb .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */\n.highlight-ipynb .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */\n.highlight-ipynb .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */\n.highlight-ipynb .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */\n.highlight-ipynb .mh { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Hex */\n.highlight-ipynb .mi { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer */\n.highlight-ipynb .mo { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Oct */\n.highlight-ipynb .sa { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Affix */\n.highlight-ipynb .sb { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Backtick */\n.highlight-ipynb .sc { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Char */\n.highlight-ipynb .dl { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Delimiter */\n.highlight-ipynb .sd { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Doc */\n.highlight-ipynb .s2 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Double */\n.highlight-ipynb .se { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Escape */\n.highlight-ipynb .sh { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Heredoc */\n.highlight-ipynb .si { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Interpol */\n.highlight-ipynb .sx { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Other */\n.highlight-ipynb .sr { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Regex */\n.highlight-ipynb .s1 { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Single */\n.highlight-ipynb .ss { color: var(--jp-mirror-editor-string-color) } /* Literal.String.Symbol */\n.highlight-ipynb .il { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Integer.Long */']
