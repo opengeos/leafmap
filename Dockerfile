@@ -28,7 +28,7 @@ RUN mamba install -n base -c conda-forge -y \
     flask-cors \
     leafmap \
     jupyter-server-proxy \
-    quak \
+    qgridnext \
     rioxarray \
     polars \
     obstore \
