@@ -17685,50 +17685,6 @@ def s3_to_https(s3_url: str, region: str = "af-south-1") -> str:
     return https_url
 
 
-def get_ee_tile_url(
-    asset_id: str,
-    vis_params: dict = None,
-    endpoint: str = "https://giswqs-ee-tile-request.hf.space/tile",
-) -> str:
-    """Retrieve an Earth Engine tile URL from a remote API.
-
-    Sends a POST request to the Hugging Face-hosted FastAPI endpoint to generate
-    a tile URL for an Earth Engine asset. Supports `ee.Image`, `ee.ImageCollection`,
-    and `ee.FeatureCollection` types.
-
-    Args:
-        asset_id (str): The Earth Engine asset ID (e.g., a string like
-            'USGS/SRTMGL1_003', or an `ee.` expression string).
-        vis_params (dict, optional): Visualization parameters in Earth Engine
-            format. Defaults to an empty dictionary if not provided.
-        endpoint (str, optional): The URL of the tile endpoint. Defaults to
-            'https://giswqs-ee-tile-request.hf.space/tile'.
-
-    Returns:
-        str: A tile URL string if successful, or an error message string if the
-        request fails or the response is invalid.
-
-    Example:
-        >>> get_ee_tile_url(
-        ...     "USGS/SRTMGL1_003",
-        ...     {"min": 0, "max": 3000,  "palette": "terrain"}
-        ... )
-        'https://earthengine.googleapis.com/map/abc123/{z}/{x}/{y}'
-    """
-    asset_id = asset_id.strip()
-    if vis_params is None:
-        vis_params = {}
-
-    payload = {"asset_id": asset_id, "vis_params": vis_params}
-    try:
-        response = requests.post(endpoint, json=payload)
-        response.raise_for_status()
-        return response.json()["tile_url"]
-    except requests.RequestException as e:
-        print(f"Request failed: {e}")
-        return None
-
-
 class GoogleMapsTileProvider(xyzservices.TileProvider):
     """Google Maps TileProvider."""
 
@@ -18294,3 +18250,82 @@ def stop_martin(
     os.kill(pid, signal.SIGKILL)
     pidfile.unlink(missing_ok=True)
     print("Martin killed after timeout.")
+
+
+def get_ee_tile_url(
+    asset_id: str,
+    vis_params: Optional[Union[str, dict]] = None,
+    endpoint: Optional[str] = None,
+) -> str:
+    """
+    Get the tile URL for an Earth Engine asset.
+
+    Args:
+        asset_id: The Earth Engine asset ID.
+        vis_params: The visualization parameters.
+        endpoint: The endpoint to use for the tile request. Set to "default" to use the default endpoint.
+
+    Returns:
+        The tile URL.
+
+    Raises:
+        ValueError: If the asset ID is not a valid Earth Engine asset ID.
+        ValueError: If the visualization parameters are not a valid JSON string.
+        ValueError: If the endpoint is not a valid URL.
+        ValueError: If the data type is not supported.
+    """
+
+    if isinstance(endpoint, str):
+
+        if endpoint == "default":
+            endpoint = "https://giswqs-ee-tile-request.hf.space/tile"
+
+        payload = {"asset_id": asset_id, "vis_params": vis_params or {}}
+
+        response = requests.post(endpoint, json=payload)
+        response.raise_for_status()
+        return response.json()["tile_url"]
+
+    try:
+
+        import ee
+        from geemap.ee_tile_layers import _get_tile_url_format, _validate_palette
+
+        if isinstance(asset_id, str):
+            if asset_id.startswith("ee."):
+                ee_object = eval(asset_id)
+            else:
+                data_dict = ee.data.getAsset(asset_id)
+                data_type = data_dict["type"]
+                if data_type == "IMAGE":
+                    ee_object = ee.Image(asset_id)
+                elif data_type == "IMAGE_COLLECTION":
+                    ee_object = ee.ImageCollection(asset_id)
+                elif data_type in ["TABLE", "TABLE_COLLECTION"]:
+                    ee_object = ee.FeatureCollection(asset_id)
+                else:
+                    raise ValueError(f"Unsupported data type: {data_type}")
+        else:
+            ee_object = asset_id
+
+        if vis_params is None:
+            vis_params = {}
+        if isinstance(vis_params, str):
+            if len(vis_params) == 0:
+                vis_params = "{}"
+            if vis_params.startswith("{") and vis_params.endswith("}"):
+                vis_params = json.loads(vis_params)
+            else:
+                raise ValueError(f"Unsupported vis_params type: {type(vis_params)}")
+        elif isinstance(vis_params, dict):
+            pass
+        else:
+            raise ValueError(f"Unsupported vis_params type: {type(vis_params)}")
+
+        if "palette" in vis_params:
+            vis_params["palette"] = _validate_palette(vis_params["palette"])
+
+        url = _get_tile_url_format(ee_object, vis_params)
+        return url
+    except Exception as e:
+        return f"Error: {str(e)}"
