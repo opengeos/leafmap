@@ -1542,3 +1542,197 @@ class TabWidget:
                 except Exception as e:
                     self._toast(f"Help error: {e}", color="error")
         self.open_help_dialog()
+
+
+class SimilaritySearch(widgets.VBox):
+    """A widget for similarity search."""
+
+    def __init__(
+        self,
+        m: "leafmap.Map",
+        before_id: str = None,
+        default_year: int = 2024,
+        default_color: str = "#0000ff",
+        default_threshold: float = 0.8,
+    ):
+        """
+        A widget for similarity search.
+
+        Args:
+            m: The map to add the widget to.
+            before_id: The ID of the layer to add the widget to.
+            default_year: The default year to use for the widget. Defaults to 2024.
+            default_color: The default color to use for the widget. Defaults to "#0000ff".
+            default_threshold: The default threshold to use for the widget. Defaults to 0.8.
+
+        Returns:
+            None
+        """
+        import ee
+
+        super().__init__()
+
+        style = {"description_width": "initial"}
+        year_widget = widgets.IntSlider(
+            description="Year",
+            value=default_year,
+            min=2017,
+            max=2024,
+            step=1,
+            style=style,
+        )
+        threshold_widget = widgets.FloatSlider(
+            description="Threshold",
+            value=default_threshold,
+            min=0,
+            max=1,
+            step=0.01,
+            style=style,
+        )
+        color_widget = widgets.ColorPicker(
+            description="Color", value=default_color, concise=False, style=style
+        )
+        layer_name_widget = widgets.Text(
+            value=f"Similarity {default_year}",
+            description="Layer Name",
+            style={"description_width": "initial"},
+        )
+        apply_button = widgets.Button(
+            description="Apply",
+            button_style="primary",
+            style={"description_width": "initial"},
+        )
+        reset_button = widgets.Button(
+            description="Reset",
+            button_style="primary",
+            style={"description_width": "initial"},
+        )
+        output = widgets.Output()
+        self.children = [
+            year_widget,
+            threshold_widget,
+            color_widget,
+            layer_name_widget,
+            widgets.HBox([apply_button, reset_button]),
+            output,
+        ]
+        # m.add_to_sidebar(self, label="Similarity Search", widget_icon="mdi-map-search")
+
+        def year_change(change):
+            year = year_widget.value
+            layer_name_widget.value = f"Similarity {year}"
+
+        year_widget.observe(year_change, names="value")
+
+        def apply_button_click(change):
+
+            with output:
+                if len(m.draw_features_selected) == 0:
+                    print("Please create a point on the map")
+                    return
+                else:
+                    try:
+                        lon, lat = m.draw_features_selected[0]["geometry"][
+                            "coordinates"
+                        ]
+                        point = ee.Geometry.Point([lon, lat])
+
+                        embeddings = ee.ImageCollection(
+                            "GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL"
+                        )
+                        s2 = ee.ImageCollection("COPERNICUS/S2_HARMONIZED")
+                        csPlus = ee.ImageCollection(
+                            "GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED"
+                        )
+
+                        year = year_widget.value
+
+                        palette = [
+                            "000004",
+                            "2C105C",
+                            "711F81",
+                            "B63679",
+                            "EE605E",
+                            "FDAE78",
+                            "FCFDBF",
+                            "FFFFFF",
+                        ]
+
+                        date_filter = ee.Filter.date(
+                            str(year) + "-01-01", str(year + 1) + "-01-01"
+                        )
+
+                        mosaic = embeddings.filter(date_filter).mosaic()
+                        band_names = mosaic.bandNames()
+
+                        similarity = ee.ImageCollection(
+                            mosaic.sample(**{"region": point, "scale": 10}).map(
+                                lambda f: ee.Image(f.toArray(band_names))
+                                .arrayFlatten(ee.List([band_names]))
+                                .multiply(mosaic)
+                                .reduce("sum")
+                            )
+                        )
+
+                        binary = (
+                            similarity.mosaic().gt(threshold_widget.value).selfMask()
+                        )
+
+                        def magic(i, lo, hi, sat):
+                            i = i.add(1).log().divide(10).subtract(lo).divide(hi - lo)
+                            grey_axis = (
+                                ee.Image(0.57735026919)
+                                .addBands(ee.Image(0.57735026919))
+                                .addBands(ee.Image(0.57735026919))
+                            )
+                            grey_level = grey_axis.multiply(
+                                i.multiply(grey_axis).reduce("sum")
+                            )
+                            return i.subtract(grey_level).multiply(sat).add(grey_level)
+
+                        composite = (
+                            s2.filter(date_filter)
+                            .filterBounds(point)
+                            .linkCollection(csPlus, ["cs_cdf"])
+                            .map(
+                                lambda img: img.updateMask(
+                                    img.select("cs_cdf").gte(0.5)
+                                )
+                            )
+                            .median()
+                        )
+
+                        composite = magic(
+                            composite.select(["B4", "B3", "B2"]), 0.58, 0.9, 1.8
+                        )
+
+                        if layer_name_widget.value in m.layer_names:
+                            m.remove_layer(layer_name_widget.value)
+                        if f"Sentinel-2 {year}" in m.layer_names:
+                            m.remove_layer(f"Sentinel-2 {year}")
+                        if f"Segmentation {year}" in m.layer_names:
+                            m.remove_layer(f"Segmentation {year}")
+
+                        m.add_ee_layer(
+                            composite,
+                            {"min": 0, "max": 1, "bands": ["B4", "B3", "B2"]},
+                            name=f"Sentinel-2 {year}",
+                            before_id=before_id,
+                        )
+                        m.add_ee_layer(
+                            similarity,
+                            {"min": 0, "max": 1, "palette": palette},
+                            name=layer_name_widget.value,
+                            before_id=before_id,
+                        )
+                        m.add_ee_layer(
+                            binary,
+                            {"min": 0, "max": 1, "palette": [color_widget.value]},
+                            name=f"Segmentation {year}",
+                            before_id=before_id,
+                        )
+                    except Exception as e:
+                        print(e)
+                        print("Error: Please try again")
+
+        apply_button.on_click(apply_button_click)
