@@ -1035,6 +1035,30 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.SimilaritySearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      SimilaritySearch
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SimilaritySearch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.SimilaritySearch.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#leafmap.map_widgets.TabWidget" class="md-nav__link">
     <span class="md-ellipsis">
       TabWidget
@@ -3794,6 +3818,29 @@
   
   <span class="md-ellipsis">
     Sidebar
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maplibre/similarity_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Similarity search
     
   </span>
   
@@ -6666,6 +6713,30 @@
         
           <li class="md-nav__item">
   <a href="#leafmap.map_widgets.RasterLayerEditor.__init__" class="md-nav__link">
+    <span class="md-ellipsis">
+      __init__
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.SimilaritySearch" class="md-nav__link">
+    <span class="md-ellipsis">
+      SimilaritySearch
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SimilaritySearch">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leafmap.map_widgets.SimilaritySearch.__init__" class="md-nav__link">
     <span class="md-ellipsis">
       __init__
     </span>
@@ -10653,6 +10724,956 @@ Defaults to None.</p>
         <span class="p">),</span>
         <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span>
     <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="leafmap.map_widgets.SimilaritySearch" class="doc doc-heading">
+            <code>SimilaritySearch</code>
+
+
+<a href="#leafmap.map_widgets.SimilaritySearch" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="ipywidgets.VBox">VBox</span></code></p>
+
+
+        <p>A widget for similarity search.</p>
+
+
+
+
+
+
+
+
+              <details class="quote">
+                <summary>Source code in <code>leafmap/map_widgets.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1547</span>
+<span class="normal">1548</span>
+<span class="normal">1549</span>
+<span class="normal">1550</span>
+<span class="normal">1551</span>
+<span class="normal">1552</span>
+<span class="normal">1553</span>
+<span class="normal">1554</span>
+<span class="normal">1555</span>
+<span class="normal">1556</span>
+<span class="normal">1557</span>
+<span class="normal">1558</span>
+<span class="normal">1559</span>
+<span class="normal">1560</span>
+<span class="normal">1561</span>
+<span class="normal">1562</span>
+<span class="normal">1563</span>
+<span class="normal">1564</span>
+<span class="normal">1565</span>
+<span class="normal">1566</span>
+<span class="normal">1567</span>
+<span class="normal">1568</span>
+<span class="normal">1569</span>
+<span class="normal">1570</span>
+<span class="normal">1571</span>
+<span class="normal">1572</span>
+<span class="normal">1573</span>
+<span class="normal">1574</span>
+<span class="normal">1575</span>
+<span class="normal">1576</span>
+<span class="normal">1577</span>
+<span class="normal">1578</span>
+<span class="normal">1579</span>
+<span class="normal">1580</span>
+<span class="normal">1581</span>
+<span class="normal">1582</span>
+<span class="normal">1583</span>
+<span class="normal">1584</span>
+<span class="normal">1585</span>
+<span class="normal">1586</span>
+<span class="normal">1587</span>
+<span class="normal">1588</span>
+<span class="normal">1589</span>
+<span class="normal">1590</span>
+<span class="normal">1591</span>
+<span class="normal">1592</span>
+<span class="normal">1593</span>
+<span class="normal">1594</span>
+<span class="normal">1595</span>
+<span class="normal">1596</span>
+<span class="normal">1597</span>
+<span class="normal">1598</span>
+<span class="normal">1599</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span>
+<span class="normal">1602</span>
+<span class="normal">1603</span>
+<span class="normal">1604</span>
+<span class="normal">1605</span>
+<span class="normal">1606</span>
+<span class="normal">1607</span>
+<span class="normal">1608</span>
+<span class="normal">1609</span>
+<span class="normal">1610</span>
+<span class="normal">1611</span>
+<span class="normal">1612</span>
+<span class="normal">1613</span>
+<span class="normal">1614</span>
+<span class="normal">1615</span>
+<span class="normal">1616</span>
+<span class="normal">1617</span>
+<span class="normal">1618</span>
+<span class="normal">1619</span>
+<span class="normal">1620</span>
+<span class="normal">1621</span>
+<span class="normal">1622</span>
+<span class="normal">1623</span>
+<span class="normal">1624</span>
+<span class="normal">1625</span>
+<span class="normal">1626</span>
+<span class="normal">1627</span>
+<span class="normal">1628</span>
+<span class="normal">1629</span>
+<span class="normal">1630</span>
+<span class="normal">1631</span>
+<span class="normal">1632</span>
+<span class="normal">1633</span>
+<span class="normal">1634</span>
+<span class="normal">1635</span>
+<span class="normal">1636</span>
+<span class="normal">1637</span>
+<span class="normal">1638</span>
+<span class="normal">1639</span>
+<span class="normal">1640</span>
+<span class="normal">1641</span>
+<span class="normal">1642</span>
+<span class="normal">1643</span>
+<span class="normal">1644</span>
+<span class="normal">1645</span>
+<span class="normal">1646</span>
+<span class="normal">1647</span>
+<span class="normal">1648</span>
+<span class="normal">1649</span>
+<span class="normal">1650</span>
+<span class="normal">1651</span>
+<span class="normal">1652</span>
+<span class="normal">1653</span>
+<span class="normal">1654</span>
+<span class="normal">1655</span>
+<span class="normal">1656</span>
+<span class="normal">1657</span>
+<span class="normal">1658</span>
+<span class="normal">1659</span>
+<span class="normal">1660</span>
+<span class="normal">1661</span>
+<span class="normal">1662</span>
+<span class="normal">1663</span>
+<span class="normal">1664</span>
+<span class="normal">1665</span>
+<span class="normal">1666</span>
+<span class="normal">1667</span>
+<span class="normal">1668</span>
+<span class="normal">1669</span>
+<span class="normal">1670</span>
+<span class="normal">1671</span>
+<span class="normal">1672</span>
+<span class="normal">1673</span>
+<span class="normal">1674</span>
+<span class="normal">1675</span>
+<span class="normal">1676</span>
+<span class="normal">1677</span>
+<span class="normal">1678</span>
+<span class="normal">1679</span>
+<span class="normal">1680</span>
+<span class="normal">1681</span>
+<span class="normal">1682</span>
+<span class="normal">1683</span>
+<span class="normal">1684</span>
+<span class="normal">1685</span>
+<span class="normal">1686</span>
+<span class="normal">1687</span>
+<span class="normal">1688</span>
+<span class="normal">1689</span>
+<span class="normal">1690</span>
+<span class="normal">1691</span>
+<span class="normal">1692</span>
+<span class="normal">1693</span>
+<span class="normal">1694</span>
+<span class="normal">1695</span>
+<span class="normal">1696</span>
+<span class="normal">1697</span>
+<span class="normal">1698</span>
+<span class="normal">1699</span>
+<span class="normal">1700</span>
+<span class="normal">1701</span>
+<span class="normal">1702</span>
+<span class="normal">1703</span>
+<span class="normal">1704</span>
+<span class="normal">1705</span>
+<span class="normal">1706</span>
+<span class="normal">1707</span>
+<span class="normal">1708</span>
+<span class="normal">1709</span>
+<span class="normal">1710</span>
+<span class="normal">1711</span>
+<span class="normal">1712</span>
+<span class="normal">1713</span>
+<span class="normal">1714</span>
+<span class="normal">1715</span>
+<span class="normal">1716</span>
+<span class="normal">1717</span>
+<span class="normal">1718</span>
+<span class="normal">1719</span>
+<span class="normal">1720</span>
+<span class="normal">1721</span>
+<span class="normal">1722</span>
+<span class="normal">1723</span>
+<span class="normal">1724</span>
+<span class="normal">1725</span>
+<span class="normal">1726</span>
+<span class="normal">1727</span>
+<span class="normal">1728</span>
+<span class="normal">1729</span>
+<span class="normal">1730</span>
+<span class="normal">1731</span>
+<span class="normal">1732</span>
+<span class="normal">1733</span>
+<span class="normal">1734</span>
+<span class="normal">1735</span>
+<span class="normal">1736</span>
+<span class="normal">1737</span>
+<span class="normal">1738</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">SimilaritySearch</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">VBox</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A widget for similarity search.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">m</span><span class="p">:</span> <span class="s2">&quot;leafmap.Map&quot;</span><span class="p">,</span>
+        <span class="n">before_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2024</span><span class="p">,</span>
+        <span class="n">default_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#0000ff&quot;</span><span class="p">,</span>
+        <span class="n">default_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A widget for similarity search.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            m: The map to add the widget to.</span>
+<span class="sd">            before_id: The ID of the layer to add the widget to.</span>
+<span class="sd">            default_year: The default year to use for the widget. Defaults to 2024.</span>
+<span class="sd">            default_color: The default color to use for the widget. Defaults to &quot;#0000ff&quot;.</span>
+<span class="sd">            default_threshold: The default threshold to use for the widget. Defaults to 0.8.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">ee</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">}</span>
+        <span class="n">year_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Year&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">default_year</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">2017</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">2024</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">threshold_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Threshold&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">default_threshold</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">color_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Color&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">default_color</span><span class="p">,</span> <span class="n">concise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span>
+        <span class="p">)</span>
+        <span class="n">layer_name_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Similarity </span><span class="si">{</span><span class="n">default_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Layer Name&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">apply_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply&quot;</span><span class="p">,</span>
+            <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">reset_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reset&quot;</span><span class="p">,</span>
+            <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">year_widget</span><span class="p">,</span>
+            <span class="n">threshold_widget</span><span class="p">,</span>
+            <span class="n">color_widget</span><span class="p">,</span>
+            <span class="n">layer_name_widget</span><span class="p">,</span>
+            <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">apply_button</span><span class="p">,</span> <span class="n">reset_button</span><span class="p">]),</span>
+            <span class="n">output</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="c1"># m.add_to_sidebar(self, label=&quot;Similarity Search&quot;, widget_icon=&quot;mdi-map-search&quot;)</span>
+
+        <span class="k">def</span> <span class="nf">year_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+            <span class="n">year</span> <span class="o">=</span> <span class="n">year_widget</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Similarity </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">year_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">year_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">apply_button_click</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+
+            <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please create a point on the map&quot;</span><span class="p">)</span>
+                    <span class="k">return</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span>
+                            <span class="s2">&quot;coordinates&quot;</span>
+                        <span class="p">]</span>
+                        <span class="n">point</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">([</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">])</span>
+
+                        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+                            <span class="s2">&quot;GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL&quot;</span>
+                        <span class="p">)</span>
+                        <span class="n">s2</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S2_HARMONIZED&quot;</span><span class="p">)</span>
+                        <span class="n">csPlus</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+                            <span class="s2">&quot;GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED&quot;</span>
+                        <span class="p">)</span>
+
+                        <span class="n">year</span> <span class="o">=</span> <span class="n">year_widget</span><span class="o">.</span><span class="n">value</span>
+
+                        <span class="n">palette</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="s2">&quot;000004&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;2C105C&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;711F81&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;B63679&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;EE605E&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;FDAE78&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;FCFDBF&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;FFFFFF&quot;</span><span class="p">,</span>
+                        <span class="p">]</span>
+
+                        <span class="n">date_filter</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">date</span><span class="p">(</span>
+                            <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-01-01&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-01-01&quot;</span>
+                        <span class="p">)</span>
+
+                        <span class="n">mosaic</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">date_filter</span><span class="p">)</span><span class="o">.</span><span class="n">mosaic</span><span class="p">()</span>
+                        <span class="n">band_names</span> <span class="o">=</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">bandNames</span><span class="p">()</span>
+
+                        <span class="n">similarity</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+                            <span class="n">mosaic</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="n">point</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                                <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">toArray</span><span class="p">(</span><span class="n">band_names</span><span class="p">))</span>
+                                <span class="o">.</span><span class="n">arrayFlatten</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">List</span><span class="p">([</span><span class="n">band_names</span><span class="p">]))</span>
+                                <span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">mosaic</span><span class="p">)</span>
+                                <span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                        <span class="n">binary</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">similarity</span><span class="o">.</span><span class="n">mosaic</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">threshold_widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">selfMask</span><span class="p">()</span>
+                        <span class="p">)</span>
+
+                        <span class="k">def</span> <span class="nf">magic</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">sat</span><span class="p">):</span>
+                            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span><span class="p">)</span>
+                            <span class="n">grey_axis</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="mf">0.57735026919</span><span class="p">)</span>
+                                <span class="o">.</span><span class="n">addBands</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="mf">0.57735026919</span><span class="p">))</span>
+                                <span class="o">.</span><span class="n">addBands</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="mf">0.57735026919</span><span class="p">))</span>
+                            <span class="p">)</span>
+                            <span class="n">grey_level</span> <span class="o">=</span> <span class="n">grey_axis</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+                                <span class="n">i</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">grey_axis</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="k">return</span> <span class="n">i</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">grey_level</span><span class="p">)</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">sat</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grey_level</span><span class="p">)</span>
+
+                        <span class="n">composite</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">s2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">date_filter</span><span class="p">)</span>
+                            <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+                            <span class="o">.</span><span class="n">linkCollection</span><span class="p">(</span><span class="n">csPlus</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;cs_cdf&quot;</span><span class="p">])</span>
+                            <span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                                <span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">updateMask</span><span class="p">(</span>
+                                    <span class="n">img</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;cs_cdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">gte</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                        <span class="p">)</span>
+
+                        <span class="n">composite</span> <span class="o">=</span> <span class="n">magic</span><span class="p">(</span>
+                            <span class="n">composite</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">]),</span> <span class="mf">0.58</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.8</span>
+                        <span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">layer_names</span><span class="p">:</span>
+                            <span class="n">m</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;Sentinel-2 </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">layer_names</span><span class="p">:</span>
+                            <span class="n">m</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sentinel-2 </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;Segmentation </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">layer_names</span><span class="p">:</span>
+                            <span class="n">m</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Segmentation </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                        <span class="n">m</span><span class="o">.</span><span class="n">add_ee_layer</span><span class="p">(</span>
+                            <span class="n">composite</span><span class="p">,</span>
+                            <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;bands&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">]},</span>
+                            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Sentinel-2 </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">add_ee_layer</span><span class="p">(</span>
+                            <span class="n">similarity</span><span class="p">,</span>
+                            <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;palette&quot;</span><span class="p">:</span> <span class="n">palette</span><span class="p">},</span>
+                            <span class="n">name</span><span class="o">=</span><span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                            <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">add_ee_layer</span><span class="p">(</span>
+                            <span class="n">binary</span><span class="p">,</span>
+                            <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;palette&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">color_widget</span><span class="o">.</span><span class="n">value</span><span class="p">]},</span>
+                            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Segmentation </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Please try again&quot;</span><span class="p">)</span>
+
+        <span class="n">apply_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">apply_button_click</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="leafmap.map_widgets.SimilaritySearch.__init__" class="doc doc-heading">
+            <code class="highlight language-python"><span class="fm">__init__</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">default_year</span><span class="o">=</span><span class="mi">2024</span><span class="p">,</span> <span class="n">default_color</span><span class="o">=</span><span class="s1">&#39;#0000ff&#39;</span><span class="p">,</span> <span class="n">default_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span></code>
+
+<a href="#leafmap.map_widgets.SimilaritySearch.__init__" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>A widget for similarity search.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>m</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Map (leafmap.leafmap.Map)" href="../leafmap/#leafmap.leafmap.Map">Map</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The map to add the widget to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>before_id</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The ID of the layer to add the widget to.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>default_year</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The default year to use for the widget. Defaults to 2024.</p>
+              </div>
+            </td>
+            <td>
+                  <code>2024</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>default_color</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The default color to use for the widget. Defaults to "#0000ff".</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;#0000ff&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>default_threshold</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The default threshold to use for the widget. Defaults to 0.8.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.8</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>None</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="quote">
+              <summary>Source code in <code>leafmap/map_widgets.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1550</span>
+<span class="normal">1551</span>
+<span class="normal">1552</span>
+<span class="normal">1553</span>
+<span class="normal">1554</span>
+<span class="normal">1555</span>
+<span class="normal">1556</span>
+<span class="normal">1557</span>
+<span class="normal">1558</span>
+<span class="normal">1559</span>
+<span class="normal">1560</span>
+<span class="normal">1561</span>
+<span class="normal">1562</span>
+<span class="normal">1563</span>
+<span class="normal">1564</span>
+<span class="normal">1565</span>
+<span class="normal">1566</span>
+<span class="normal">1567</span>
+<span class="normal">1568</span>
+<span class="normal">1569</span>
+<span class="normal">1570</span>
+<span class="normal">1571</span>
+<span class="normal">1572</span>
+<span class="normal">1573</span>
+<span class="normal">1574</span>
+<span class="normal">1575</span>
+<span class="normal">1576</span>
+<span class="normal">1577</span>
+<span class="normal">1578</span>
+<span class="normal">1579</span>
+<span class="normal">1580</span>
+<span class="normal">1581</span>
+<span class="normal">1582</span>
+<span class="normal">1583</span>
+<span class="normal">1584</span>
+<span class="normal">1585</span>
+<span class="normal">1586</span>
+<span class="normal">1587</span>
+<span class="normal">1588</span>
+<span class="normal">1589</span>
+<span class="normal">1590</span>
+<span class="normal">1591</span>
+<span class="normal">1592</span>
+<span class="normal">1593</span>
+<span class="normal">1594</span>
+<span class="normal">1595</span>
+<span class="normal">1596</span>
+<span class="normal">1597</span>
+<span class="normal">1598</span>
+<span class="normal">1599</span>
+<span class="normal">1600</span>
+<span class="normal">1601</span>
+<span class="normal">1602</span>
+<span class="normal">1603</span>
+<span class="normal">1604</span>
+<span class="normal">1605</span>
+<span class="normal">1606</span>
+<span class="normal">1607</span>
+<span class="normal">1608</span>
+<span class="normal">1609</span>
+<span class="normal">1610</span>
+<span class="normal">1611</span>
+<span class="normal">1612</span>
+<span class="normal">1613</span>
+<span class="normal">1614</span>
+<span class="normal">1615</span>
+<span class="normal">1616</span>
+<span class="normal">1617</span>
+<span class="normal">1618</span>
+<span class="normal">1619</span>
+<span class="normal">1620</span>
+<span class="normal">1621</span>
+<span class="normal">1622</span>
+<span class="normal">1623</span>
+<span class="normal">1624</span>
+<span class="normal">1625</span>
+<span class="normal">1626</span>
+<span class="normal">1627</span>
+<span class="normal">1628</span>
+<span class="normal">1629</span>
+<span class="normal">1630</span>
+<span class="normal">1631</span>
+<span class="normal">1632</span>
+<span class="normal">1633</span>
+<span class="normal">1634</span>
+<span class="normal">1635</span>
+<span class="normal">1636</span>
+<span class="normal">1637</span>
+<span class="normal">1638</span>
+<span class="normal">1639</span>
+<span class="normal">1640</span>
+<span class="normal">1641</span>
+<span class="normal">1642</span>
+<span class="normal">1643</span>
+<span class="normal">1644</span>
+<span class="normal">1645</span>
+<span class="normal">1646</span>
+<span class="normal">1647</span>
+<span class="normal">1648</span>
+<span class="normal">1649</span>
+<span class="normal">1650</span>
+<span class="normal">1651</span>
+<span class="normal">1652</span>
+<span class="normal">1653</span>
+<span class="normal">1654</span>
+<span class="normal">1655</span>
+<span class="normal">1656</span>
+<span class="normal">1657</span>
+<span class="normal">1658</span>
+<span class="normal">1659</span>
+<span class="normal">1660</span>
+<span class="normal">1661</span>
+<span class="normal">1662</span>
+<span class="normal">1663</span>
+<span class="normal">1664</span>
+<span class="normal">1665</span>
+<span class="normal">1666</span>
+<span class="normal">1667</span>
+<span class="normal">1668</span>
+<span class="normal">1669</span>
+<span class="normal">1670</span>
+<span class="normal">1671</span>
+<span class="normal">1672</span>
+<span class="normal">1673</span>
+<span class="normal">1674</span>
+<span class="normal">1675</span>
+<span class="normal">1676</span>
+<span class="normal">1677</span>
+<span class="normal">1678</span>
+<span class="normal">1679</span>
+<span class="normal">1680</span>
+<span class="normal">1681</span>
+<span class="normal">1682</span>
+<span class="normal">1683</span>
+<span class="normal">1684</span>
+<span class="normal">1685</span>
+<span class="normal">1686</span>
+<span class="normal">1687</span>
+<span class="normal">1688</span>
+<span class="normal">1689</span>
+<span class="normal">1690</span>
+<span class="normal">1691</span>
+<span class="normal">1692</span>
+<span class="normal">1693</span>
+<span class="normal">1694</span>
+<span class="normal">1695</span>
+<span class="normal">1696</span>
+<span class="normal">1697</span>
+<span class="normal">1698</span>
+<span class="normal">1699</span>
+<span class="normal">1700</span>
+<span class="normal">1701</span>
+<span class="normal">1702</span>
+<span class="normal">1703</span>
+<span class="normal">1704</span>
+<span class="normal">1705</span>
+<span class="normal">1706</span>
+<span class="normal">1707</span>
+<span class="normal">1708</span>
+<span class="normal">1709</span>
+<span class="normal">1710</span>
+<span class="normal">1711</span>
+<span class="normal">1712</span>
+<span class="normal">1713</span>
+<span class="normal">1714</span>
+<span class="normal">1715</span>
+<span class="normal">1716</span>
+<span class="normal">1717</span>
+<span class="normal">1718</span>
+<span class="normal">1719</span>
+<span class="normal">1720</span>
+<span class="normal">1721</span>
+<span class="normal">1722</span>
+<span class="normal">1723</span>
+<span class="normal">1724</span>
+<span class="normal">1725</span>
+<span class="normal">1726</span>
+<span class="normal">1727</span>
+<span class="normal">1728</span>
+<span class="normal">1729</span>
+<span class="normal">1730</span>
+<span class="normal">1731</span>
+<span class="normal">1732</span>
+<span class="normal">1733</span>
+<span class="normal">1734</span>
+<span class="normal">1735</span>
+<span class="normal">1736</span>
+<span class="normal">1737</span>
+<span class="normal">1738</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">m</span><span class="p">:</span> <span class="s2">&quot;leafmap.Map&quot;</span><span class="p">,</span>
+    <span class="n">before_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">default_year</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2024</span><span class="p">,</span>
+    <span class="n">default_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;#0000ff&quot;</span><span class="p">,</span>
+    <span class="n">default_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A widget for similarity search.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        m: The map to add the widget to.</span>
+<span class="sd">        before_id: The ID of the layer to add the widget to.</span>
+<span class="sd">        default_year: The default year to use for the widget. Defaults to 2024.</span>
+<span class="sd">        default_color: The default color to use for the widget. Defaults to &quot;#0000ff&quot;.</span>
+<span class="sd">        default_threshold: The default threshold to use for the widget. Defaults to 0.8.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">ee</span>
+
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">}</span>
+    <span class="n">year_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Year&quot;</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_year</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">2017</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mi">2024</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">threshold_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Threshold&quot;</span><span class="p">,</span>
+        <span class="n">value</span><span class="o">=</span><span class="n">default_threshold</span><span class="p">,</span>
+        <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">color_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">ColorPicker</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Color&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">default_color</span><span class="p">,</span> <span class="n">concise</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">style</span>
+    <span class="p">)</span>
+    <span class="n">layer_name_widget</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span>
+        <span class="n">value</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Similarity </span><span class="si">{</span><span class="n">default_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Layer Name&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">apply_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply&quot;</span><span class="p">,</span>
+        <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">reset_button</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Reset&quot;</span><span class="p">,</span>
+        <span class="n">button_style</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description_width&quot;</span><span class="p">:</span> <span class="s2">&quot;initial&quot;</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">year_widget</span><span class="p">,</span>
+        <span class="n">threshold_widget</span><span class="p">,</span>
+        <span class="n">color_widget</span><span class="p">,</span>
+        <span class="n">layer_name_widget</span><span class="p">,</span>
+        <span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">([</span><span class="n">apply_button</span><span class="p">,</span> <span class="n">reset_button</span><span class="p">]),</span>
+        <span class="n">output</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="c1"># m.add_to_sidebar(self, label=&quot;Similarity Search&quot;, widget_icon=&quot;mdi-map-search&quot;)</span>
+
+    <span class="k">def</span> <span class="nf">year_change</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">year_widget</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Similarity </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">year_widget</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="n">year_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">apply_button_click</span><span class="p">(</span><span class="n">change</span><span class="p">):</span>
+
+        <span class="k">with</span> <span class="n">output</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Please create a point on the map&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">draw_features_selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">][</span>
+                        <span class="s2">&quot;coordinates&quot;</span>
+                    <span class="p">]</span>
+                    <span class="n">point</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Geometry</span><span class="o">.</span><span class="n">Point</span><span class="p">([</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">])</span>
+
+                    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+                        <span class="s2">&quot;GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">s2</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span><span class="s2">&quot;COPERNICUS/S2_HARMONIZED&quot;</span><span class="p">)</span>
+                    <span class="n">csPlus</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+                        <span class="s2">&quot;GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="n">year</span> <span class="o">=</span> <span class="n">year_widget</span><span class="o">.</span><span class="n">value</span>
+
+                    <span class="n">palette</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="s2">&quot;000004&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;2C105C&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;711F81&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;B63679&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;EE605E&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;FDAE78&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;FCFDBF&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;FFFFFF&quot;</span><span class="p">,</span>
+                    <span class="p">]</span>
+
+                    <span class="n">date_filter</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">Filter</span><span class="o">.</span><span class="n">date</span><span class="p">(</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-01-01&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;-01-01&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="n">mosaic</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">date_filter</span><span class="p">)</span><span class="o">.</span><span class="n">mosaic</span><span class="p">()</span>
+                    <span class="n">band_names</span> <span class="o">=</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">bandNames</span><span class="p">()</span>
+
+                    <span class="n">similarity</span> <span class="o">=</span> <span class="n">ee</span><span class="o">.</span><span class="n">ImageCollection</span><span class="p">(</span>
+                        <span class="n">mosaic</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="n">point</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">toArray</span><span class="p">(</span><span class="n">band_names</span><span class="p">))</span>
+                            <span class="o">.</span><span class="n">arrayFlatten</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">List</span><span class="p">([</span><span class="n">band_names</span><span class="p">]))</span>
+                            <span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">mosaic</span><span class="p">)</span>
+                            <span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                    <span class="n">binary</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">similarity</span><span class="o">.</span><span class="n">mosaic</span><span class="p">()</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="n">threshold_widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">selfMask</span><span class="p">()</span>
+                    <span class="p">)</span>
+
+                    <span class="k">def</span> <span class="nf">magic</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">sat</span><span class="p">):</span>
+                        <span class="n">i</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">()</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">lo</span><span class="p">)</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span><span class="p">)</span>
+                        <span class="n">grey_axis</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="mf">0.57735026919</span><span class="p">)</span>
+                            <span class="o">.</span><span class="n">addBands</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="mf">0.57735026919</span><span class="p">))</span>
+                            <span class="o">.</span><span class="n">addBands</span><span class="p">(</span><span class="n">ee</span><span class="o">.</span><span class="n">Image</span><span class="p">(</span><span class="mf">0.57735026919</span><span class="p">))</span>
+                        <span class="p">)</span>
+                        <span class="n">grey_level</span> <span class="o">=</span> <span class="n">grey_axis</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span>
+                            <span class="n">i</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">grey_axis</span><span class="p">)</span><span class="o">.</span><span class="n">reduce</span><span class="p">(</span><span class="s2">&quot;sum&quot;</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">return</span> <span class="n">i</span><span class="o">.</span><span class="n">subtract</span><span class="p">(</span><span class="n">grey_level</span><span class="p">)</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">sat</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grey_level</span><span class="p">)</span>
+
+                    <span class="n">composite</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">s2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">date_filter</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">filterBounds</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">linkCollection</span><span class="p">(</span><span class="n">csPlus</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;cs_cdf&quot;</span><span class="p">])</span>
+                        <span class="o">.</span><span class="n">map</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">img</span><span class="p">:</span> <span class="n">img</span><span class="o">.</span><span class="n">updateMask</span><span class="p">(</span>
+                                <span class="n">img</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;cs_cdf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">gte</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                    <span class="p">)</span>
+
+                    <span class="n">composite</span> <span class="o">=</span> <span class="n">magic</span><span class="p">(</span>
+                        <span class="n">composite</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">]),</span> <span class="mf">0.58</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.8</span>
+                    <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">layer_names</span><span class="p">:</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;Sentinel-2 </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">layer_names</span><span class="p">:</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sentinel-2 </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;Segmentation </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">layer_names</span><span class="p">:</span>
+                        <span class="n">m</span><span class="o">.</span><span class="n">remove_layer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Segmentation </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                    <span class="n">m</span><span class="o">.</span><span class="n">add_ee_layer</span><span class="p">(</span>
+                        <span class="n">composite</span><span class="p">,</span>
+                        <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;bands&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;B4&quot;</span><span class="p">,</span> <span class="s2">&quot;B3&quot;</span><span class="p">,</span> <span class="s2">&quot;B2&quot;</span><span class="p">]},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Sentinel-2 </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">add_ee_layer</span><span class="p">(</span>
+                        <span class="n">similarity</span><span class="p">,</span>
+                        <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;palette&quot;</span><span class="p">:</span> <span class="n">palette</span><span class="p">},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">layer_name_widget</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">add_ee_layer</span><span class="p">(</span>
+                        <span class="n">binary</span><span class="p">,</span>
+                        <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;palette&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">color_widget</span><span class="o">.</span><span class="n">value</span><span class="p">]},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Segmentation </span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">before_id</span><span class="o">=</span><span class="n">before_id</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: Please try again&quot;</span><span class="p">)</span>
+
+    <span class="n">apply_button</span><span class="o">.</span><span class="n">on_click</span><span class="p">(</span><span class="n">apply_button_click</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

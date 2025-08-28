@@ -3516,6 +3516,29 @@
   
   
     <li class="md-nav__item">
+      <a href="../../maplibre/similarity_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Similarity search
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../maplibre/stac/" class="md-nav__link">
         
   
@@ -7209,7 +7232,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_828aae789e1532608e814d6ff06182b4 {
+                #map_13e06a69edab5e76e8b626dd74ce120f {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -7229,7 +7252,7 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_828aae789e1532608e814d6ff06182b4&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_13e06a69edab5e76e8b626dd74ce120f&quot; &gt;&lt;/div&gt;
         
     
 &lt;!doctype html&gt;
@@ -7326,8 +7349,8 @@ m</div>
 &lt;script&gt;
     
     
-            var map_828aae789e1532608e814d6ff06182b4 = L.map(
-                &quot;map_828aae789e1532608e814d6ff06182b4&quot;,
+            var map_13e06a69edab5e76e8b626dd74ce120f = L.map(
+                &quot;map_13e06a69edab5e76e8b626dd74ce120f&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -7338,24 +7361,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_828aae789e1532608e814d6ff06182b4);
+            L.control.scale().addTo(map_13e06a69edab5e76e8b626dd74ce120f);
 
             
 
         
     
-            var tile_layer_b4cf8e751de8abfd597aa2a6ee72f70c = L.tileLayer(
+            var tile_layer_672a5a3df568194b1d237f1fdc5c6865 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_b4cf8e751de8abfd597aa2a6ee72f70c.addTo(map_828aae789e1532608e814d6ff06182b4);
+            tile_layer_672a5a3df568194b1d237f1fdc5c6865.addTo(map_13e06a69edab5e76e8b626dd74ce120f);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_828aae789e1532608e814d6ff06182b4);
+            ).addTo(map_13e06a69edab5e76e8b626dd74ce120f);
         
     
             var options = {
@@ -7364,14 +7387,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_e87b581e2d404192ebc91ca4b5db9e4f = new L.featureGroup().addTo(
-                map_828aae789e1532608e814d6ff06182b4
+            var drawnItems_draw_control_b219df2a7ed91eec95d1e0b81eb15df1 = new L.featureGroup().addTo(
+                map_13e06a69edab5e76e8b626dd74ce120f
             );
-            options.edit.featureGroup = drawnItems_draw_control_e87b581e2d404192ebc91ca4b5db9e4f;
-            var draw_control_e87b581e2d404192ebc91ca4b5db9e4f = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_b219df2a7ed91eec95d1e0b81eb15df1;
+            var draw_control_b219df2a7ed91eec95d1e0b81eb15df1 = new L.Control.Draw(
                 options
-            ).addTo( map_828aae789e1532608e814d6ff06182b4 );
-            map_828aae789e1532608e814d6ff06182b4.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_13e06a69edab5e76e8b626dd74ce120f );
+            map_13e06a69edab5e76e8b626dd74ce120f.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7379,78 +7402,78 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_e87b581e2d404192ebc91ca4b5db9e4f.addLayer(layer);
+                drawnItems_draw_control_b219df2a7ed91eec95d1e0b81eb15df1.addLayer(layer);
              });
-            map_828aae789e1532608e814d6ff06182b4.on('draw:created', function(e) {
-                drawnItems_draw_control_e87b581e2d404192ebc91ca4b5db9e4f.addLayer(e.layer);
+            map_13e06a69edab5e76e8b626dd74ce120f.on('draw:created', function(e) {
+                drawnItems_draw_control_b219df2a7ed91eec95d1e0b81eb15df1.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_e423f47c81aec092c88b5085c4c2eac1 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_e423f47c81aec092c88b5085c4c2eac1 = geocoderOpts_geocoder_e423f47c81aec092c88b5085c4c2eac1[&quot;provider&quot;];
+            var geocoderName_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e = geocoderOpts_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_e423f47c81aec092c88b5085c4c2eac1 = L.Control.Geocoder[ geocoderName_geocoder_e423f47c81aec092c88b5085c4c2eac1 ](
-                geocoderOpts_geocoder_e423f47c81aec092c88b5085c4c2eac1['providerOptions']
+            var customGeocoder_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e = L.Control.Geocoder[ geocoderName_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e ](
+                geocoderOpts_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e['providerOptions']
             );
-            geocoderOpts_geocoder_e423f47c81aec092c88b5085c4c2eac1[&quot;geocoder&quot;] = customGeocoder_geocoder_e423f47c81aec092c88b5085c4c2eac1;
+            geocoderOpts_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e[&quot;geocoder&quot;] = customGeocoder_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_e423f47c81aec092c88b5085c4c2eac1
+                geocoderOpts_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_e423f47c81aec092c88b5085c4c2eac1['zoom'] || map_828aae789e1532608e814d6ff06182b4.getZoom();
-                map_828aae789e1532608e814d6ff06182b4.setView(e.geocode.center, zoom);
-            }).addTo(map_828aae789e1532608e814d6ff06182b4);
+                var zoom = geocoderOpts_geocoder_8e19c1e26bc2266f0029d1b76cb9ff3e['zoom'] || map_13e06a69edab5e76e8b626dd74ce120f.getZoom();
+                map_13e06a69edab5e76e8b626dd74ce120f.setView(e.geocode.center, zoom);
+            }).addTo(map_13e06a69edab5e76e8b626dd74ce120f);
 
         
     
-            map_828aae789e1532608e814d6ff06182b4.fitBounds(
+            map_13e06a69edab5e76e8b626dd74ce120f.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_085b959839882683f6359f648586ddd6 = L.tileLayer(
+            var tile_layer_a57e9769aac23337a1f8070fce7585ee = L.tileLayer(
                 &quot;https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}&quot;,
                 {&quot;attribution&quot;: &quot;Esri&quot;, &quot;detectRetina&quot;: false, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_085b959839882683f6359f648586ddd6.addTo(map_828aae789e1532608e814d6ff06182b4);
+            tile_layer_a57e9769aac23337a1f8070fce7585ee.addTo(map_13e06a69edab5e76e8b626dd74ce120f);
         
     
-            var tile_layer_c3e68d34c368ea1e777c6492224424a5 = L.tileLayer(
-                &quot;http://127.0.0.1:32861/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2F0c9bc4c3-f195-4334-a111-eca97008e0f0%2F0c9bc4c3-f195-4334-a111-eca97008e0f0.tif\u0026nodata=255&quot;,
+            var tile_layer_67a1ee47da366a2506a0d85de2615b30 = L.tileLayer(
+                &quot;http://127.0.0.1:39561/api/tiles/{z}/{x}/{y}.png?\u0026filename=%2Fvsimem%2Fbf6e0ba7-d225-491a-bcd8-dcd0ead03a47%2Fbf6e0ba7-d225-491a-bcd8-dcd0ead03a47.tif\u0026nodata=255&quot;,
                 {&quot;attribution&quot;: &quot;Raster file served by \u003ca href=\u0027https://github.com/banesullivan/localtileserver\u0027 target=\u0027_blank\u0027\u003elocaltileserver\u003c/a\u003e.&quot;, &quot;bounds&quot;: [[36.007451, -114.780526], [37.025284, -113.519414]], &quot;corsAll&quot;: false, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_c3e68d34c368ea1e777c6492224424a5.addTo(map_828aae789e1532608e814d6ff06182b4);
+            tile_layer_67a1ee47da366a2506a0d85de2615b30.addTo(map_13e06a69edab5e76e8b626dd74ce120f);
         
     
-            map_828aae789e1532608e814d6ff06182b4.fitBounds(
+            map_13e06a69edab5e76e8b626dd74ce120f.fitBounds(
                 [[36.007451, -114.780526], [37.025284, -113.519414]],
                 {}
             );
         
     
-            var layer_control_30e433aae77d5f4b9b35951248de607b_layers = {
+            var layer_control_8c6519c8ad7ca63ed8567ba075c584b7_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_b4cf8e751de8abfd597aa2a6ee72f70c,
+                    &quot;openstreetmap&quot; : tile_layer_672a5a3df568194b1d237f1fdc5c6865,
                 },
                 overlays :  {
-                    &quot;Esri.WorldImagery&quot; : tile_layer_085b959839882683f6359f648586ddd6,
-                    &quot;Water&quot; : tile_layer_c3e68d34c368ea1e777c6492224424a5,
+                    &quot;Esri.WorldImagery&quot; : tile_layer_a57e9769aac23337a1f8070fce7585ee,
+                    &quot;Water&quot; : tile_layer_67a1ee47da366a2506a0d85de2615b30,
                 },
             };
-            let layer_control_30e433aae77d5f4b9b35951248de607b = L.control.layers(
-                layer_control_30e433aae77d5f4b9b35951248de607b_layers.base_layers,
-                layer_control_30e433aae77d5f4b9b35951248de607b_layers.overlays,
+            let layer_control_8c6519c8ad7ca63ed8567ba075c584b7 = L.control.layers(
+                layer_control_8c6519c8ad7ca63ed8567ba075c584b7_layers.base_layers,
+                layer_control_8c6519c8ad7ca63ed8567ba075c584b7_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_828aae789e1532608e814d6ff06182b4);
+            ).addTo(map_13e06a69edab5e76e8b626dd74ce120f);
 
         
 &lt;/script&gt;
@@ -7475,7 +7498,7 @@ m</div>
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
 <script type="application/vnd.jupyter.widget-state+json">
-{"state": {"a6f49e4cc6594fa2852106a1ce36565d": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "0ef0cc36fc004f1ba263fabe899f8d63": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_a6f49e4cc6594fa2852106a1ce36565d"}}, "e9e0191ac66d48439c0e788bdb880925": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "ed1fdbca788e4109a3591c82878ea004": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "cabbe227febb422799935e796ff64cf6": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
+{"state": {"5ecb4d9ed38442b28e3114ba812cca31": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "dfa159e6661f4b018643843b50cce93f": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_5ecb4d9ed38442b28e3114ba812cca31"}}, "7c547cf3a68a4449a4d1a4d897c191a9": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "2f19eb049d0347bd96cfbed38f8d403b": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "5870dbb2e06c489eaf9eb63f1e489829": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
 </script>
 
         <style>
