@@ -574,6 +574,12 @@ Create a sidebar widget to display the layer manager and custom widgets.
 
 [![image](https://github.com/user-attachments/assets/50250de3-fb3c-49d9-921c-b80c8f32ccb5)](https://leafmap.org/maplibre/sidebar)
 
+## Similarity Search with AlphaEarth Satellite Embeddings
+
+Use the similarity search widget to search for similar satellite images.
+
+[![](https://github.com/user-attachments/assets/51a5a1c0-5784-48da-9790-a84704ed2187)](https://leafmap.org/maplibre/similarity_search)
+
 ## Visualize SpatioTemporal Asset Catalog (STAC)
 
 Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.

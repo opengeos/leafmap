@@ -1776,12 +1776,68 @@ class Map(MapWidget):
             **kwargs,
         )
 
+    def add_nwi_basemap(
+        self,
+        name: str = "NWI Wetlands",
+        format: str = "image/png",
+        attribution: str = "USFWS",
+        opacity: float = 1.0,
+        visible: bool = True,
+        tile_size: int = 256,
+        before_id: Optional[str] = None,
+        overwrite: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a NWI Wetlands basemap to the map.
+
+        This method adds a NWI Wetlands basemap to the map. The NWI Wetlands basemap is created from
+            the specified URL, and it is added to the map with the specified
+            name, attribution, visibility, and tile size.
+
+        Args:
+            name (str, optional): The name to use for the layer. Defaults to
+                'NWI Wetlands'.
+            format (str, optional): The format of the tiles in the layer.
+            attribution (str, optional): The attribution to use for the layer.
+                Defaults to ''.
+            visible (bool, optional): Whether the layer should be visible by
+                default. Defaults to True.
+            tile_size (int, optional): The size of the tiles in the layer.
+                Defaults to 256.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+                See https://eodagmbh.github.io/py-maplibregl/api/layer/ for more information.
+
+        Returns:
+            None
+        """
+
+        url = "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/services/Wetlands/MapServer/WMSServer"
+        layers = "1"
+        self.add_wms_layer(
+            url,
+            layers=layers,
+            format=format,
+            attribution=attribution,
+            name=name,
+            opacity=opacity,
+            visible=visible,
+            tile_size=tile_size,
+            before_id=before_id,
+            overwrite=overwrite,
+            **kwargs,
+        )
+
     def add_ee_layer(
         self,
         ee_object=None,
         vis_params={},
-        asset_id: str = None,
         name: str = None,
+        asset_id: str = None,
         opacity: float = 1.0,
         attribution: str = "Google Earth Engine",
         visible: bool = True,
@@ -1797,9 +1853,9 @@ class Map(MapWidget):
         Args:
             ee_object (object): The Earth Engine object to display.
             vis_params (dict): Visualization parameters. For example, {'min': 0, 'max': 100}.
-            asset_id (str): The ID of the Earth Engine asset.
             name (str, optional): The name of the tile layer. If not provided,
                 the asset ID will be used. Default is None.
+            asset_id (str): The ID of the Earth Engine asset.
             opacity (float, optional): The opacity of the tile layer (0 to 1).
                 Default is 1.
             attribution (str, optional): The attribution text to be displayed.
@@ -6050,6 +6106,41 @@ class Map(MapWidget):
         )
 
         self.add_to_sidebar(widget, label=label, widget_icon=widget_icon, **kwargs)
+
+    def add_similarity_search(
+        self,
+        before_id: str = None,
+        default_year: int = 2024,
+        default_color: str = "#0000ff",
+        default_threshold: float = 0.8,
+        widget_icon="mdi-map-search",
+        widget_label="Similarity Search",
+        **kwargs,
+    ):
+        """
+        Adds a similarity search widget to the map.
+
+        Args:
+            before_id: The ID of the layer to add the widget to.
+            default_year: The default year to use for the widget. Defaults to 2024.
+            default_color: The default color to use for the widget. Defaults to "#0000ff".
+            default_threshold: The default threshold to use for the widget. Defaults to 0.8.
+            widget_icon: The icon for the widget. Defaults to "mdi-map-search".
+            widget_label: The label for the widget. Defaults to "Similarity Search".
+            **kwargs: Additional keyword arguments to be passed to the add_to_sidebar method.
+        """
+        from .map_widgets import SimilaritySearch
+
+        widget = SimilaritySearch(
+            self,
+            before_id=before_id,
+            default_year=default_year,
+            default_color=default_color,
+            default_threshold=default_threshold,
+        )
+        self.add_to_sidebar(
+            widget, widget_icon=widget_icon, label=widget_label, **kwargs
+        )
 
     def add_time_slider(
         self,
