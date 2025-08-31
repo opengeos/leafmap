@@ -358,6 +358,12 @@ Use globe projection to visualize a 3D globe.
 
 [![](https://github.com/user-attachments/assets/d8d1ba3b-1e69-45ca-93c2-0d696c269b01)](https://leafmap.org/maplibre/globe_projection)
 
+## Create raster tiles for rendering in Google Earth
+
+Create raster tiles for rendering in Google Earth at https://earth.google.com.
+
+[![](https://github.com/user-attachments/assets/e2c8039a-d445-46ed-94e6-12bb83e472b3)](https://leafmap.org/maplibre/google_earth)
+
 ## Google Earth Engine
 
 Add Google Earth Engine data layers to a map.
