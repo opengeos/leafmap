@@ -164,6 +164,12 @@ Animate a point along the distance of a line.
 
 [![](https://i.imgur.com/kdP1oT1.png)](https://leafmap.org/maplibre/animate_point_along_route)
 
+## Add Arc Layer
+
+Add an ArcLayer to the map.
+
+[![](https://github.com/user-attachments/assets/467c0b25-4459-43cf-abb3-7e99815bf160)](https://leafmap.org/maplibre/arc_layer)
+
 ## Change the default position for attribution
 
 Place attribution in the top-left position when initializing a map.
