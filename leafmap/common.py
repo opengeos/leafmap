@@ -11182,6 +11182,10 @@ def array_to_memory_file(
 
     # Check and sanitize colormap
     fixed_colormap = {}
+
+    if colormap is None:
+        colormap = {}
+
     for k, v in colormap.items():
         if not isinstance(k, int):
             k = int(k)
