@@ -11180,15 +11180,33 @@ def array_to_memory_file(
     memory_file = rasterio.MemoryFile()
     dst = memory_file.open(**metadata)
 
+    # Check and sanitize colormap
+    fixed_colormap = {}
+
+    if colormap is None:
+        colormap = {}
+
+    for k, v in colormap.items():
+        if not isinstance(k, int):
+            k = int(k)
+        if len(v) == 3:  # RGB
+            fixed_colormap[k] = tuple(int(c) for c in v)
+        elif len(v) == 4:  # RGBA
+            fixed_colormap[k] = tuple(
+                int(c) for c in v[:3]
+            )  # Drop alpha for compatibility
+        else:
+            raise ValueError(f"Invalid colormap value: {v}")
+
     if array.ndim == 2:
         dst.write(array, 1)
         if colormap:
-            dst.write_colormap(1, colormap)
+            dst.write_colormap(1, fixed_colormap)
     elif array.ndim == 3:
         for i in range(array.shape[2]):
             dst.write(array[:, :, i], i + 1)
             if colormap:
-                dst.write_colormap(i + 1, colormap)
+                dst.write_colormap(i + 1, fixed_colormap)
 
     dst.close()
     # Read the dataset from memory
