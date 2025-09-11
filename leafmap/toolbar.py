@@ -6785,7 +6785,7 @@ def nasa_opera_gui(
     from opera_utils.disp._remote import open_file
     import netrc
 
-    widget_width = "600px"
+    widget_width = "400px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
     style = {"description_width": "initial"}
 
@@ -6940,7 +6940,7 @@ def nasa_opera_gui(
         value=None,
         description="Colormap:",
         style=style,
-        layout=widgets.Layout(width="200px", padding=padding),
+        layout=widgets.Layout(width="195px", padding=padding),
     )
 
     buttons = widgets.ToggleButtons(
@@ -6954,8 +6954,9 @@ def nasa_opera_gui(
             "Close",
         ],
         button_style="primary",
+        layout=widgets.Layout(width=widget_width, padding=padding),
     )
-    buttons.style.button_width = "120px"
+    buttons.style.button_width = "127px"
 
     def change_dataset(change):
         title.value = m._NASA_DATA[m._NASA_DATA["ShortName"] == short_name.value][
@@ -7172,6 +7173,7 @@ def nasa_opera_gui(
                             colormap = get_image_colormap(ds)
                         except Exception as e:
                             colormap = None
+
                         image = array_to_image(da, colormap=colormap)
                         setattr(m, "_NASA_DATA_IMAGE", image)
                         name_prefix = layer.value.split(".")[0]
