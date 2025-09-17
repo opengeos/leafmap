@@ -155,7 +155,7 @@ def cog_tile(
     try:
         band_names = cog_bands(url, titiler_endpoint)
     except Exception as e:
-        titiler_endpoint = "https://titiler.xyz"
+        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
         band_names = cog_bands(url, titiler_endpoint)
 
     if isinstance(bands, str):
@@ -194,7 +194,7 @@ def cog_tile(
         try:
             stats = cog_stats(url, titiler_endpoint)
         except Exception as e:
-            titiler_endpoint = "https://titiler.xyz"
+            titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
             stats = cog_stats(url, titiler_endpoint)
 
         if "message" not in stats:
@@ -229,7 +229,7 @@ def cog_tile(
             timeout=10,
         ).json()
     except Exception as e:
-        titiler_endpoint = "https://titiler.xyz"
+        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
         r = requests.get(
             f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json",
             params=kwargs,
@@ -478,7 +478,7 @@ def cog_stats(
             timeout=10,
         ).json()
     except Exception as e:
-        titiler_endpoint = "https://titiler.xyz"
+        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
         r = requests.get(
             f"{titiler_endpoint}/cog/statistics",
             params={
@@ -519,7 +519,7 @@ def cog_info(
             timeout=10,
         ).json()
     except Exception as e:
-        titiler_endpoint = "https://titiler.xyz"
+        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
         r = requests.get(
             f"{titiler_endpoint}/cog/{info}",
             params={
@@ -664,7 +664,7 @@ def stac_tile(
                     titiler_endpoint=titiler_endpoint,
                 )
             except Exception as e:
-                titiler_endpoint = "https://titiler.xyz"
+                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
                 stats = stac_stats(
                     collection=collection,
                     item=item,
@@ -742,7 +742,7 @@ def stac_tile(
                     titiler_endpoint=titiler_endpoint,
                 )
             except Exception as e:
-                titiler_endpoint = "https://titiler.xyz"
+                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
                 stats = stac_stats(
                     url=url,
                     assets=assets,
@@ -786,7 +786,7 @@ def stac_tile(
                 timeout=10,
             ).json()
         except Exception as e:
-            titiler_endpoint = "https://titiler.xyz"
+            titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
             r = requests.get(
                 f"{titiler_endpoint}/mosaicjson/{TileMatrixSetId}/tilejson.json",
                 params=kwargs,
@@ -801,7 +801,7 @@ def stac_tile(
                     timeout=10,
                 ).json()
             except Exception as e:
-                titiler_endpoint = "https://titiler.xyz"
+                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
                 r = requests.get(
                     f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
                     params=kwargs,

@@ -2310,13 +2310,14 @@ class Map(MapWidget):
 
     def set_paint_property(self, name: str, prop: str, value: Any) -> None:
         """
-        Set the opacity of a layer.
+        Set the paint property of a layer.
 
         This method sets the opacity of the specified layer to the specified value.
 
         Args:
             name (str): The name of the layer.
-            opacity (float): The opacity value to set.
+            prop (str): The paint property to set.
+            value (Any): The value to set.
 
         Returns:
             None
@@ -3300,7 +3301,7 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().add_call("rotateTo", bearing, options, **kwargs)
+        super().add_call("rotateTo", bearing, options)
 
     def open_geojson(self, **kwargs: Any) -> widgets.FileUpload:
         """
@@ -3352,7 +3353,7 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().add_call("panTo", lnglat, options, **kwargs)
+        super().add_call("panTo", lnglat, options)
 
     def set_pitch(self, pitch: float, **kwargs: Any) -> None:
         """
@@ -3370,7 +3371,7 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().add_call("setPitch", pitch, **kwargs)
+        super().add_call("setPitch", pitch)
 
     def jump_to(self, options: Dict[str, Any] = {}, **kwargs: Any) -> None:
         """
@@ -3387,7 +3388,7 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().add_call("jumpTo", options, **kwargs)
+        super().add_call("jumpTo", options)
 
     def _get_3d_terrain_style(
         self,
@@ -3539,7 +3540,7 @@ class Map(MapWidget):
         Returns:
             None
         """
-        super().add_call("zoomTo", zoom, options, **kwargs)
+        super().add_call("zoomTo", zoom, options)
 
     def find_first_symbol_layer(self) -> Optional[Dict]:
         """
