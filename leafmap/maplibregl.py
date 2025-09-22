@@ -225,6 +225,9 @@ class Map(MapWidget):
         for layer in self.get_style_layers():
             self.style_dict[layer["id"]] = layer
         self.source_dict = {}
+        self._deck_layers = []
+        self._deck_layer_ids = []
+        self._deck_layer_tooltips = {}
 
         if projection.lower() == "globe":
             self.add_globe_control()
@@ -623,7 +626,7 @@ class Map(MapWidget):
         if self.layer_manager is not None:
             self.layer_manager.refresh()
 
-    def remove_layer(self, name: str) -> None:
+    def remove_layer(self, name: str, **kwargs: Any) -> None:
         """
         Removes a layer from the map.
 
@@ -635,6 +638,11 @@ class Map(MapWidget):
         Returns:
             None
         """
+        if name in self.layer_dict:
+            layer = self.layer_dict[name]
+            if "type" in layer and layer["type"].startswith("Deck"):
+                self.remove_deck_layers(layer_ids=[name], **kwargs)
+                return
 
         super().add_call("removeLayer", name)
         if name in self.layer_dict:
@@ -668,6 +676,9 @@ class Map(MapWidget):
             tooltip = "<br>".join([f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns])
 
         super().add_deck_layers(layers, tooltip)
+        self._deck_layers = layers
+        self._deck_layer_ids = [layer["id"] for layer in layers]
+        self._deck_layer_tooltips = tooltip
 
         for layer in layers:
 
@@ -675,12 +686,51 @@ class Map(MapWidget):
                 "layer": layer,
                 "opacity": layer.get("opacity", 1.0),
                 "visible": layer.get("visible", True),
-                "type": layer.get("@@type", "deck"),
+                "type": "Deck-" + layer.get("@@type"),
                 "color": layer.get("getFillColor", "#ffffff"),
+                # "tooltip": tooltip.get(layer["id"], None),
             }
 
         if self.layer_manager is not None:
             self.layer_manager.refresh()
+
+    def remove_deck_layers(
+        self, layer_ids: List[str] = None, tooltip: bool = None
+    ) -> None:
+        """Remove a list of Deck.GL layers from the map.
+
+        Args:
+            layer_ids (List[str]): A list of layer IDs to remove.
+            tooltip (bool): Tooltip for the remaining layers.
+        """
+        if tooltip is None:
+            tooltip = {}
+        deck_layers = []
+        deck_layer_ids = []
+        for layer_id in self.layer_dict:
+            layer = self.layer_dict[layer_id]["layer"]
+            layer_type = self.layer_dict[layer_id]["type"]
+            if layer_type.startswith("Deck"):
+                deck_layers.append(layer)
+                deck_layer_ids.append(layer["id"])
+
+        if layer_ids is None:
+            super().set_deck_layers([])
+            for layer_id in deck_layer_ids:
+                self.layer_dict.pop(layer_id)
+        else:
+            remaining_layers = []
+            remaining_layer_ids = []
+            for layer_id in deck_layer_ids:
+                if layer_id not in layer_ids:
+                    remaining_layers.append(self.layer_dict[layer_id]["layer"])
+                    remaining_layer_ids.append(layer_id)
+                else:
+                    self.layer_dict.pop(layer_id)
+            super().set_deck_layers(remaining_layers, tooltip=tooltip)
+            self._deck_layers = remaining_layers
+            self._deck_layer_ids = remaining_layer_ids
+            self._deck_layer_tooltips = tooltip
 
     def add_arc_layer(
         self,
@@ -760,6 +810,62 @@ class Map(MapWidget):
                 layer_id: tooltip_content,
             },
         )
+
+    def get_deck_layer(self, layer_id: str) -> dict:
+        """Get a Deck.GL layer from the map.
+
+        Args:
+            layer_id (str): The ID of the layer to get.
+        """
+        deck_layers = self._deck_layers
+        for layer in deck_layers:
+            if layer["id"] == layer_id:
+                return layer
+        return None
+
+    def set_deck_layer_opacity(self, layer_id: str, opacity: float) -> None:
+        """Set the opacity of a Deck.GL layer.
+
+        Args:
+            layer_id (str): The ID of the layer to set the opacity of.
+            opacity (float): The opacity of the layer.
+        """
+        deck_layer = self.get_deck_layer(layer_id)
+        deck_layer_index = self._deck_layers.index(deck_layer)
+        deck_layer["opacity"] = opacity
+        self._deck_layers[deck_layer_index] = deck_layer
+        self.layer_dict[layer_id]["opacity"] = opacity
+
+        self.set_deck_layers(self._deck_layers, tooltip=self._deck_layer_tooltips)
+
+    def set_deck_layer_property(self, layer_id: str, property: str, value: Any) -> None:
+        """Set the property of a Deck.GL layer.
+
+        Args:
+            layer_id (str): The ID of the layer to set the property of.
+            property (str): The property to set.
+            value (Any): The value of the property.
+        """
+        deck_layer = self.get_deck_layer(layer_id)
+        deck_layer_index = self._deck_layers.index(deck_layer)
+        deck_layer[property] = value
+        self._deck_layers[deck_layer_index] = deck_layer
+        self.layer_dict[layer_id][property] = value
+        self.set_deck_layers(self._deck_layers, tooltip=self._deck_layer_tooltips)
+
+    def set_deck_layer_properties(self, layer_id: str, properties: dict) -> None:
+        """Set the properties of a Deck.GL layer.
+
+        Args:
+            layer_id (str): The ID of the layer to set the properties of.
+            properties (dict): The properties to set.
+        """
+        deck_layer = self.get_deck_layer(layer_id)
+        deck_layer_index = self._deck_layers.index(deck_layer)
+        deck_layer.update(properties)
+        self._deck_layers[deck_layer_index] = deck_layer
+        self.layer_dict[layer_id].update(properties)
+        self.set_deck_layers(self._deck_layers, tooltip=self._deck_layer_tooltips)
 
     def add_control(
         self, control: Union[str, Any], position: str = "top-right", **kwargs: Any
@@ -2397,6 +2503,9 @@ class Map(MapWidget):
             return
 
         if name in self.layer_dict:
+            if name in self._deck_layer_ids:
+                self.set_deck_layer_opacity(name, opacity)
+                return
             if isinstance(self.layer_dict[name]["layer"], Layer):
                 layer_type = self.layer_dict[name]["layer"].to_dict()["type"]
             elif isinstance(self.layer_dict[name]["layer"], dict):
