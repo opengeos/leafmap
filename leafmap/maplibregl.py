@@ -642,6 +642,8 @@ class Map(MapWidget):
             layer = self.layer_dict[name]
             if "type" in layer and layer["type"].startswith("Deck"):
                 self.remove_deck_layers(layer_ids=[name], **kwargs)
+                if self.layer_manager is not None:
+                    self.layer_manager.refresh()
                 return
 
         super().add_call("removeLayer", name)
@@ -674,8 +676,11 @@ class Map(MapWidget):
         """
         if isinstance(columns, list) and (tooltip is None):
             tooltip = "<br>".join([f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns])
-
-        super().add_deck_layers(layers, tooltip)
+        if not hasattr(self, "_deck_initialized"):
+            setattr(self, "_deck_initialized", True)
+            super().add_deck_layers(layers, tooltip)
+        else:
+            super().set_deck_layers(layers, tooltip)
         self._deck_layers = layers
         self._deck_layer_ids = [layer["id"] for layer in layers]
         self._deck_layer_tooltips = tooltip
