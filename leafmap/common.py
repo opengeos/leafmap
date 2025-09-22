@@ -2940,8 +2940,11 @@ def get_local_tile_layer(
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
         kwargs.pop("prefix")
 
-    from localtileserver import (TileClient, get_folium_tile_layer,
-                                 get_leaflet_tile_layer)
+    from localtileserver import (
+        TileClient,
+        get_folium_tile_layer,
+        get_leaflet_tile_layer,
+    )
 
     # if "show_loading" not in kwargs:
     #     kwargs["show_loading"] = False
@@ -6141,8 +6144,7 @@ def reproject(
 
     """
     import rasterio as rio
-    from rasterio.warp import (Resampling, calculate_default_transform,
-                               reproject)
+    from rasterio.warp import Resampling, calculate_default_transform, reproject
 
     if isinstance(resampling, str):
         resampling = getattr(Resampling, resampling)
@@ -11984,8 +11986,7 @@ def start_server(
 
     def run_flask():
         try:
-            from flask import (Flask, render_template_string,
-                               send_from_directory)
+            from flask import Flask, render_template_string, send_from_directory
             from flask_cors import CORS
 
             app = Flask(__name__, static_folder=directory)
@@ -14204,8 +14205,13 @@ def gedi_subset(
 
     import geopandas as gpd
     import requests as re
-    from harmony import (BBox, Client, Collection,  # pylint: disable=E0401
-                         Environment, Request)
+    from harmony import (
+        BBox,
+        Client,
+        Collection,  # pylint: disable=E0401
+        Environment,
+        Request,
+    )
 
     if out_dir is None:
         out_dir = os.getcwd()
@@ -18329,8 +18335,7 @@ def get_ee_tile_url(
     try:
 
         import ee
-        from geemap.ee_tile_layers import (_get_tile_url_format,
-                                           _validate_palette)
+        from geemap.ee_tile_layers import _get_tile_url_format, _validate_palette
 
         if isinstance(asset_id, str):
             if asset_id.startswith("ee."):

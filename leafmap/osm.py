@@ -14,7 +14,9 @@ from .common import check_package
 warnings.filterwarnings("ignore")
 
 
-def osm_gdf_from_address(address: str, tags: Dict, dist: Optional[int] = 1000) -> gpd.GeoDataFrame:
+def osm_gdf_from_address(
+    address: str, tags: Dict, dist: Optional[int] = 1000
+) -> gpd.GeoDataFrame:
     """Create GeoDataFrame of OSM entities within some distance N, S, E, W of address.
 
     Args:
@@ -275,7 +277,9 @@ def osm_geojson_from_polygon(
         return gdf.__geo_interface__
 
 
-def osm_gdf_from_bbox(north: float, south: float, east: float, west: float, tags: Dict) -> gpd.GeoDataFrame:
+def osm_gdf_from_bbox(
+    north: float, south: float, east: float, west: float, tags: Dict
+) -> gpd.GeoDataFrame:
     """Create a GeoDataFrame of OSM entities within a N, S, E, W bounding box.
 
     Args:
@@ -347,7 +351,9 @@ def osm_geojson_from_bbox(
         return gdf.__geo_interface__
 
 
-def osm_gdf_from_xml(filepath: str, polygon=None, tags: Dict = None) -> gpd.GeoDataFrame:
+def osm_gdf_from_xml(
+    filepath: str, polygon=None, tags: Dict = None
+) -> gpd.GeoDataFrame:
     """Create a GeoDataFrame of OSM entities in an OSM-formatted XML file.
 
     Args:

@@ -32,7 +32,9 @@ def get_pc_collections(verbose: Optional[bool] = False) -> dict[str, str]:
     return result
 
 
-def get_first_item(collection: str, return_id: Optional[bool] = False) -> Union[str, pystac.Item]:
+def get_first_item(
+    collection: str, return_id: Optional[bool] = False
+) -> Union[str, pystac.Item]:
     """Get the first item in a collection.
 
     Args:

@@ -4,21 +4,61 @@ from box import Box
 
 from . import common, map_widgets, plot
 from .basemaps import xyz_to_leaflet
-from .common import (add_crs, basemap_xyz_tiles, cog_bands, cog_bounds,
-                     cog_center, cog_tile, convert_lidar, create_legend,
-                     csv_to_df, csv_to_geojson, csv_to_shp, download_file,
-                     download_from_url, download_ned, gdf_to_geojson,
-                     geojson_to_pmtiles, get_api_key, get_census_dict,
-                     image_comparison, image_to_numpy, map_tiles_to_geotiff,
-                     netcdf_to_tif, numpy_to_cog, planet_monthly_tiles,
-                     planet_quarterly_tiles, planet_tiles, plot_raster,
-                     plot_raster_3d, pmtiles_metadata, pmtiles_style,
-                     read_lidar, read_netcdf, read_raster, read_rasters,
-                     save_colorbar, search_qms, search_xyz_services,
-                     set_api_key, show_html, show_youtube_video, stac_assets,
-                     stac_bands, stac_bounds, stac_center, stac_info,
-                     stac_search, stac_stats, stac_tile, start_server,
-                     vector_to_gif, view_lidar, write_lidar, zonal_stats)
+from .common import (
+    add_crs,
+    basemap_xyz_tiles,
+    cog_bands,
+    cog_bounds,
+    cog_center,
+    cog_tile,
+    convert_lidar,
+    create_legend,
+    csv_to_df,
+    csv_to_geojson,
+    csv_to_shp,
+    download_file,
+    download_from_url,
+    download_ned,
+    gdf_to_geojson,
+    geojson_to_pmtiles,
+    get_api_key,
+    get_census_dict,
+    image_comparison,
+    image_to_numpy,
+    map_tiles_to_geotiff,
+    netcdf_to_tif,
+    numpy_to_cog,
+    planet_monthly_tiles,
+    planet_quarterly_tiles,
+    planet_tiles,
+    plot_raster,
+    plot_raster_3d,
+    pmtiles_metadata,
+    pmtiles_style,
+    read_lidar,
+    read_netcdf,
+    read_raster,
+    read_rasters,
+    save_colorbar,
+    search_qms,
+    search_xyz_services,
+    set_api_key,
+    show_html,
+    show_youtube_video,
+    stac_assets,
+    stac_bands,
+    stac_bounds,
+    stac_center,
+    stac_info,
+    stac_search,
+    stac_stats,
+    stac_tile,
+    start_server,
+    vector_to_gif,
+    view_lidar,
+    write_lidar,
+    zonal_stats,
+)
 
 try:
     import geopandas as gpd
@@ -263,9 +303,16 @@ class Map(lonboard.Map):
             None
         """
 
-        from lonboard import (BitmapLayer, BitmapTileLayer, HeatmapLayer,
-                              PathLayer, PointCloudLayer, PolygonLayer,
-                              ScatterplotLayer, SolidPolygonLayer)
+        from lonboard import (
+            BitmapLayer,
+            BitmapTileLayer,
+            HeatmapLayer,
+            PathLayer,
+            PointCloudLayer,
+            PolygonLayer,
+            ScatterplotLayer,
+            SolidPolygonLayer,
+        )
 
         if type(layer) in [
             BitmapLayer,

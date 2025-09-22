@@ -18,8 +18,7 @@ from geopandas import GeoDataFrame, GeoSeries
 
 from . import examples
 from .basemaps import xyz_to_heremap
-from .common import (gdf_to_geojson, random_string, shp_to_geojson,
-                     vector_to_geojson)
+from .common import gdf_to_geojson, random_string, shp_to_geojson, vector_to_geojson
 
 try:
     import here_map_widget
@@ -30,9 +29,17 @@ except ImportError:
 
 
 warnings.filterwarnings("ignore")
-from here_map_widget import (FullscreenControl, GeoJSON, ImageTileProvider,
-                             LayersControl, MeasurementControl, ScaleBar,
-                             TileLayer, WidgetControl, ZoomControl)
+from here_map_widget import (
+    FullscreenControl,
+    GeoJSON,
+    ImageTileProvider,
+    LayersControl,
+    MeasurementControl,
+    ScaleBar,
+    TileLayer,
+    WidgetControl,
+    ZoomControl,
+)
 
 basemaps = Box(xyz_to_heremap(), frozen_box=True)
 
