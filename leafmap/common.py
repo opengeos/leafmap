@@ -1489,7 +1489,9 @@ def shp_to_gdf(in_shp):
         raise Exception(e)
 
 
-def shp_to_geojson(in_shp, output=None, encoding="utf-8", crs="EPSG:4326", **kwargs: Any):
+def shp_to_geojson(
+    in_shp, output=None, encoding="utf-8", crs="EPSG:4326", **kwargs: Any
+):
     """Converts a shapefile to GeoJSON.
 
     Args:
@@ -7024,7 +7026,9 @@ def is_jupyterlite():
         return False
 
 
-async def download_file_lite(url, output=None, binary=False, overwrite=False, **kwargs: Any):
+async def download_file_lite(
+    url, output=None, binary=False, overwrite=False, **kwargs: Any
+):
     """Download a file using Pyodide. This function is only available on JupyterLite. Call the function with await, such as await download_file_lite(url).
 
     Args:
@@ -13005,7 +13009,9 @@ def vector_to_parquet(
     gdf.to_parquet(output, **kwargs)
 
 
-def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs: Any):
+def vector_to_parquet_batch(
+    input_dir, output_dir=None, file_ext=".geojson", **kwargs: Any
+):
     """
     Converts all vector files in a directory to Parquet format in batch.
 
@@ -13071,7 +13077,9 @@ def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **k
     print("All conversions complete!")
 
 
-def vector_to_gpkg_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs: Any):
+def vector_to_gpkg_batch(
+    input_dir, output_dir=None, file_ext=".geojson", **kwargs: Any
+):
     """
     Converts all vector files in a directory to GeoPackage format in batch.
 
@@ -13682,7 +13690,9 @@ def parquet_to_gdf(
     return gdf
 
 
-def df_to_gdf(df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs: Any):
+def df_to_gdf(
+    df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs: Any
+):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
 
