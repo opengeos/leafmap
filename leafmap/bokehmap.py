@@ -66,7 +66,7 @@ class Map:
         basemap: Optional[str] = "OpenStreetMap",
         grid_visible: bool = False,
         output_notebook: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ):
         if "x_axis_type" not in kwargs:
             kwargs["x_axis_type"] = "mercator"
@@ -105,7 +105,7 @@ class Map:
         self.output_notebook = output_notebook
         self.output_notebook_done = False
 
-    def _repr_mimebundle_(self, **kwargs) -> None:
+    def _repr_mimebundle_(self, **kwargs: Any) -> None:
         """Display the bokeh map. Reference: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_"""
         if self.output_notebook and (os.environ["OUTPUT_NOTEBOOK"] == "False"):
             output_notebook()
@@ -157,12 +157,12 @@ class Map:
         elif basemap is None:
             raise ValueError("Please specify a valid basemap")
 
-    def add_tile(self, tile: str, **kwargs) -> None:
+    def add_tile(self, tile: str, **kwargs: Any) -> None:
         """Adds a tile to the map.
 
         Args:
             tile (bokeh.models.tiles.WMTSTileSource): A bokeh tile.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
         """
         try:
             self.figure.add_tile(tile, **kwargs)
@@ -188,11 +188,11 @@ class Map:
             attribution (str, optional): The attribution to use. Defaults to ''.
             bands (list, optional): A list of bands to use for the layer. Defaults to None.
             titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
-            cog_args: Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
+            cog_args (dict): Arbitrary keyword arguments, including bidx, expression, nodata, unscale, resampling, rescale,
                 color_formula, colormap, colormap_name, return_mask. See https://developmentseed.org/titiler/endpoints/cog/
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
         """
         tile_url = common.cog_tile(url, bands, titiler_endpoint, **cog_args)
         tile_options = {
@@ -215,9 +215,9 @@ class Map:
         nodata: Optional[float] = None,
         attribution: Optional[str] = "",
         fit_bounds: bool = True,
-        layer_name="Local COG",
-        open_args={},
-        **kwargs,
+        layer_name: str = "Local COG",
+        open_args: Dict = {},
+        **kwargs: Any,
     ) -> None:
         """Add a local raster dataset to the map.
             If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer) and
@@ -236,8 +236,8 @@ class Map:
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Local COG'.
             fit_bounds (bool, optional): Whether to fit the map bounds to the raster bounds. Defaults to True.
-            open_args: Arbitrary keyword arguments for get_local_tile_layer(). Defaults to {}.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
+            open_args (dict): Arbitrary keyword arguments for get_local_tile_layer(). Defaults to {}.
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.
         """
 
         if source.startswith("http"):
@@ -278,8 +278,8 @@ class Map:
         titiler_endpoint: Optional[str] = None,
         attribution: Optional[str] = "",
         fit_bounds: Optional[bool] = True,
-        open_args={},
-        **kwargs,
+        open_args: Dict = {},
+        **kwargs: Any,
     ) -> None:
         """Adds a STAC TileLayer to the map.
 
@@ -311,11 +311,11 @@ class Map:
 
     def add_gdf(
         self,
-        gdf,
+        gdf: Any,
         to_crs: Optional[str] = "epsg:3857",
-        tooltips: Optional[list] = None,
+        tooltips: Optional[List] = None,
         fit_bounds: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a GeoDataFrame to the map.
 
@@ -323,7 +323,7 @@ class Map:
             gdf (GeoDataFrame): The GeoDataFrame to add to the map.
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
         import geopandas as gpd
@@ -367,7 +367,7 @@ class Map:
         to_crs: Optional[str] = "epsg:3857",
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a GeoJSON file to the map.
 
@@ -378,7 +378,7 @@ class Map:
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the GeoJSON. Defaults to True.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
         import geopandas as gpd
@@ -399,7 +399,7 @@ class Map:
         to_crs: Optional[str] = "epsg:3857",
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a shapefile to the map.
 
@@ -410,7 +410,7 @@ class Map:
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the shapefile. Defaults to True.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
         import glob
@@ -452,7 +452,7 @@ class Map:
         to_crs: Optional[str] = "epsg:3857",
         tooltips: Optional[List] = None,
         fit_bounds: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a vector dataset to the map.
 
@@ -463,7 +463,7 @@ class Map:
             to_crs (str, optional): The CRS to use for the GeoDataFrame. Defaults to "epsg:3857".
             tooltips (list, optional): A list of column names to use for tooltips in the form of [(name, @column_name), ...]. Defaults to None, which uses all columns.
             fit_bounds (bool, optional): A flag indicating whether to fit the map bounds to the vector dataset. Defaults to True.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
         import geopandas as gpd
@@ -481,14 +481,14 @@ class Map:
         )
 
     def to_html(
-        self, filename: Optional[str] = None, title: Optional[str] = None, **kwargs
+        self, filename: Optional[str] = None, title: Optional[str] = None, **kwargs: Any
     ) -> None:
         """Converts the map to HTML.
 
         Args:
             filename (str, optional): The filename to save the HTML to. Defaults to None.
             title (str, optional): The title to use for the HTML. Defaults to None.
-            **kwargs: Arbitrary keyword arguments for bokeh.figure.save().
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.save().
         """
         save(self.figure, filename=filename, title=title, **kwargs)
 
@@ -511,7 +511,7 @@ class Map:
         width: Optional[int] = 800,
         height: Optional[int] = 600,
         use_container_width: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Displays the map in a Streamlit app.
 
@@ -519,7 +519,7 @@ class Map:
             width (int, optional): The width of the map. Defaults to 800.
             height (int, optional): The height of the map. Defaults to 600.
             use_container_width (bool, optional): A flag indicating whether to use the full width of the container. Defaults to True.
-            **kwargs: Arbitrary keyword arguments for bokeh.plotting.show().
+            **kwargs (Any): Arbitrary keyword arguments for bokeh.plotting.show().
         """
         import streamlit as st  # pylint: disable=E0401
 

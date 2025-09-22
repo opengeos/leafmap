@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 import pystac
@@ -1637,7 +1637,7 @@ def stac_search(
             return search
 
 
-def stac_search_to_gdf(search, **kwargs):
+def stac_search_to_gdf(search, **kwargs: Any):
     """Convert STAC search result to a GeoDataFrame.
 
     Args:
@@ -1806,7 +1806,7 @@ def maxar_collections(return_ids: Optional[bool] = True, **kwargs) -> List:
 
     Args:
         return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         list : A list of Maxar collections.
@@ -1856,7 +1856,7 @@ def maxar_child_collections(
         collection_id (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23
             Use maxar_collections() to retrieve all available collection IDs.
         return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         list: A list of Maxar child collections.
@@ -1908,7 +1908,7 @@ def maxar_items(
         return_gdf (bool, optional): If True, return a GeoDataFrame. Defaults to True.
         assets (list, optional): A list of asset names to include in the GeoDataFrame.
             It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
@@ -2016,7 +2016,7 @@ def maxar_all_items(
         assets (list, optional): A list of asset names to include in the GeoDataFrame.
             It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
         verbose (bool, optional): If True, print progress. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.

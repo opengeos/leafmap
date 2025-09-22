@@ -37,7 +37,7 @@ if TYPE_CHECKING:
 class WhiteboxTools(whitebox.WhiteboxTools):
     """This class inherits the whitebox WhiteboxTools class."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: Any):
         super().__init__(**kwargs)
 
 
@@ -898,7 +898,7 @@ def csv_to_gdf(
     geometry=None,
     crs="EPSG:4326",
     encoding="utf-8",
-    **kwargs,
+    **kwargs: Any,
 ):
     """Creates points for a CSV file and converts them to a GeoDataFrame.
 
@@ -943,7 +943,7 @@ def csv_to_vector(
     geometry=None,
     crs="EPSG:4326",
     encoding="utf-8",
-    **kwargs,
+    **kwargs: Any,
 ):
     """Creates points for a CSV file and converts them to a vector dataset.
 
@@ -1002,20 +1002,17 @@ def local_tile_pixel_value(
     lat,
     tile_client,
     verbose=True,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Get pixel value from COG.
 
     Args:
         lon (float): Longitude of the pixel.
         lat (float): Latitude of the pixel.
-        url (str): HTTP URL to a COG, e.g., 'https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif'
-        bidx (str, optional): Dataset band indexes (e.g bidx=1, bidx=1&bidx=2&bidx=3). Defaults to None.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
         verbose (bool, optional): Print status messages. Defaults to True.
 
     Returns:
-        PointData: rio-tiler point data.
+        rio-tiler point data.
     """
     return tile_client.point(lon, lat, coord_crs="EPSG:4326", **kwargs)
 
@@ -1023,7 +1020,7 @@ def local_tile_pixel_value(
 def local_tile_vmin_vmax(
     source,
     bands=None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Get vmin and vmax from COG.
 
@@ -1035,7 +1032,7 @@ def local_tile_vmin_vmax(
         ValueError: If source is not a TileClient object or a local COG file path.
 
     Returns:
-        tuple: A tuple of vmin and vmax.
+        A tuple of vmin and vmax.
     """
     check_package("localtileserver", "https://github.com/banesullivan/localtileserver")
     from localtileserver import TileClient
@@ -1446,7 +1443,7 @@ def kml_to_geojson(in_kml, out_geojson=None):
         return gdf.__geo_interface__
 
 
-def csv_to_df(in_csv, **kwargs):
+def csv_to_df(in_csv, **kwargs: Any):
     """Converts a CSV file to pandas dataframe.
 
     Args:
@@ -1492,7 +1489,7 @@ def shp_to_gdf(in_shp):
         raise Exception(e)
 
 
-def shp_to_geojson(in_shp, output=None, encoding="utf-8", crs="EPSG:4326", **kwargs):
+def shp_to_geojson(in_shp, output=None, encoding="utf-8", crs="EPSG:4326", **kwargs: Any):
     """Converts a shapefile to GeoJSON.
 
     Args:
@@ -1545,7 +1542,7 @@ def vector_to_geojson(
     rows=None,
     epsg="4326",
     encoding="utf-8",
-    **kwargs,
+    **kwargs: Any,
 ):
     """Converts any geopandas-supported vector dataset to GeoJSON.
 
@@ -1740,7 +1737,7 @@ def connect_postgis(
     return engine
 
 
-def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
+def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs: Any):
     """Reads data from a PostGIS database and returns a GeoDataFrame.
 
     Args:
@@ -1760,7 +1757,7 @@ def read_postgis(sql, con, geom_col="geom", crs=None, **kwargs):
     return gdf
 
 
-def vector_col_names(filename, **kwargs):
+def vector_col_names(filename, **kwargs: Any):
     """Retrieves the column names of a vector attribute table.
 
     Args:
@@ -2693,7 +2690,7 @@ def st_download_button(
     on_click=None,
     args=None,
     csv_sep=",",
-    **kwargs,
+    **kwargs: Any,
 ):
     """Streamlit function to create a download button.
 
@@ -2852,7 +2849,7 @@ def get_local_tile_layer(
     client_args={"cors_all": False},
     return_client=False,
     quiet=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
         If you are using this function in JupyterHub on a remote server and the raster does not render properly, try
@@ -3063,7 +3060,7 @@ def get_local_tile_url(
     nodata=None,
     client_args={"cors_all": False},
     return_client=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Generate an ipyleaflet/folium TileLayer from a local raster dataset or remote Cloud Optimized GeoTIFF (COG).
         If you are using this function in JupyterHub on a remote server and the raster does not render properly, try
@@ -3340,7 +3337,7 @@ def get_palettable(types=None):
     return palettes
 
 
-def points_from_xy(data, x=None, y=None, z=None, crs=None, **kwargs):
+def points_from_xy(data, x=None, y=None, z=None, crs=None, **kwargs: Any):
     """Create a GeoPandas GeoDataFrame from a csv or Pandas DataFrame containing x, y, z values.
 
     Args:
@@ -3405,7 +3402,7 @@ def html_to_streamlit(
     scrolling=False,
     token_name=None,
     token_value=None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Renders an HTML file in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
 
@@ -3472,7 +3469,7 @@ def cesium_to_streamlit(
     scrolling=False,
     token_name=None,
     token_value=None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Renders an cesium HTML file in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
 
@@ -3536,7 +3533,7 @@ def geom_type(in_geojson, encoding="utf-8"):
         raise Exception(e)
 
 
-def geojson_to_gdf(in_geojson, encoding="utf-8", **kwargs):
+def geojson_to_gdf(in_geojson, encoding="utf-8", **kwargs: Any):
     """Converts a GeoJSON object to a geopandas GeoDataFrame.
 
     Args:
@@ -3601,7 +3598,7 @@ def geojson_to_df(in_geojson, encoding="utf-8", drop_geometry=True):
     return df
 
 
-def geojson_to_shp(in_geojson, out_shp, **kwargs):
+def geojson_to_shp(in_geojson, out_shp, **kwargs: Any):
     """Converts a GeoJSON object to GeoPandas GeoDataFrame.
 
     Args:
@@ -3627,7 +3624,7 @@ def geojson_to_shp(in_geojson, out_shp, **kwargs):
     gdf.to_file(out_shp)
 
 
-def geojson_to_gpkg(in_geojson, out_gpkg, **kwargs):
+def geojson_to_gpkg(in_geojson, out_gpkg, **kwargs: Any):
     """Converts a GeoJSON object to GeoPackage.
 
     Args:
@@ -3732,7 +3729,7 @@ def gdf_geom_type(gdf, first_only=True):
         return gdf.geometry.type
 
 
-def vector_geom_type(data, first_only=True, **kwargs):
+def vector_geom_type(data, first_only=True, **kwargs: Any):
     """Returns the geometry type of a vector dataset.
 
     Args:
@@ -3886,7 +3883,7 @@ def image_to_geotiff(image, dst_path, dtype=None, to_cog=True, **kwargs) -> None
         image_to_cog(dst_path, dst_path)
 
 
-def image_to_cog(source, dst_path=None, profile="deflate", BIGTIFF=None, **kwargs):
+def image_to_cog(source, dst_path=None, profile="deflate", BIGTIFF=None, **kwargs: Any):
     """Converts an image to a COG file.
 
     Args:
@@ -3997,7 +3994,7 @@ def numpy_to_image(
     bands: Union[int, list] = None,
     size: Tuple = None,
     resize_args: dict = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """Converts a numpy array to an image in the specified format, such as JPG, PNG, TIFF, etc.
 
@@ -4185,7 +4182,7 @@ def numpy_to_cog(
             )
 
 
-def get_stac_collections(url, **kwargs):
+def get_stac_collections(url, **kwargs: Any):
     """Retrieve a list of STAC collections from a URL.
     This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L31.
     Credits to Mykola Kozyr.
@@ -4228,7 +4225,7 @@ def get_stac_items(
     intersects=None,
     ids=None,
     open_args=None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Retrieve a list of STAC items from a URL and a collection.
     This function is adapted from https://github.com/mykolakozyr/stacdiscovery/blob/a5d1029aec9c428a7ce7ae615621ea8915162824/app.py#L49.
@@ -4372,7 +4369,7 @@ def get_palette_colors(cmap_name=None, n_class=None, hashtag=False):
     return colors
 
 
-def mosaic_tile(url, titiler_endpoint=None, **kwargs):
+def mosaic_tile(url, titiler_endpoint=None, **kwargs: Any):
     """Get the tile URL from a MosaicJSON.
 
     Args:
@@ -4401,7 +4398,7 @@ def mosaic_tile(url, titiler_endpoint=None, **kwargs):
     return r["tiles"][0]
 
 
-def mosaic_bounds(url, titiler_endpoint=None, **kwargs):
+def mosaic_bounds(url, titiler_endpoint=None, **kwargs: Any):
     """Get the bounding box of a MosaicJSON.
 
     Args:
@@ -4430,7 +4427,7 @@ def mosaic_bounds(url, titiler_endpoint=None, **kwargs):
     return r["bounds"]
 
 
-def mosaic_info(url, titiler_endpoint=None, **kwargs):
+def mosaic_info(url, titiler_endpoint=None, **kwargs: Any):
     """Get the info of a MosaicJSON.
 
     Args:
@@ -4459,7 +4456,7 @@ def mosaic_info(url, titiler_endpoint=None, **kwargs):
     return r
 
 
-def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs):
+def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs: Any):
     """Get the info of a MosaicJSON.
 
     Args:
@@ -4494,7 +4491,7 @@ def view_lidar(
     backend="pyvista",
     background=None,
     eye_dome_lighting=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """View LiDAR data in 3D.
 
@@ -4584,7 +4581,7 @@ def view_lidar(
         raise ValueError(f"{backend} is not a valid backend.")
 
 
-def read_lidar(filename, **kwargs):
+def read_lidar(filename, **kwargs: Any):
     """Read a LAS file.
 
     Args:
@@ -4997,7 +4994,7 @@ def netcdf_to_tif(
     time=0,
     crs="epsg:4326",
     return_vars=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Convert a netcdf file to a GeoTIFF file.
 
@@ -5077,7 +5074,7 @@ def netcdf_to_tif(
         return output
 
 
-def read_netcdf(filename, **kwargs):
+def read_netcdf(filename, **kwargs: Any):
     """Read a netcdf file.
 
     Args:
@@ -5121,7 +5118,7 @@ def netcdf_tile_layer(
     shift_lon=True,
     lat="lat",
     lon="lon",
-    **kwargs,
+    **kwargs: Any,
 ):
     """Generate an ipyleaflet/folium TileLayer from a netCDF file.
         If you are using this function in JupyterHub on a remote server (e.g., Binder, Microsoft Planetary Computer),
@@ -5139,7 +5136,6 @@ def netcdf_tile_layer(
         vmax (float, optional): The maximum value to use when colormapping the colormap when plotting a single band. Defaults to None.
         nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
         debug (bool, optional): If True, the server will be started in debug mode. Defaults to False.
-        projection (str, optional): The projection of the GeoTIFF. Defaults to "EPSG:3857".
         attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
         tile_format (str, optional): The tile layer format. Can be either ipyleaflet or folium. Defaults to "ipyleaflet".
         layer_name (str, optional): The layer name to use. Defaults to "NetCDF layer".
@@ -5466,7 +5462,7 @@ def plot_raster(
     proj="EPSG:3857",
     figsize=None,
     open_kwargs={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """Plot a raster image.
 
@@ -5523,7 +5519,7 @@ def plot_raster_3d(
     component=None,
     open_kwargs={},
     mesh_kwargs={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """Plot a raster image in 3D.
 
@@ -5806,7 +5802,6 @@ class The_national_map_USGS:
         Args:
             region (str | list, optional): An URL|filepath to a vector dataset Or a list of bounds in the form of [minx, miny, maxx, maxy].
                 Alternatively you could use API parameters such as polygon or bbox.
-            out_dir (str, optional): The directory to download the files to. Defaults to None, which uses the current working directory.
             return_type (str): list | dict. Defaults to list. Changes the return output type and content.
             geopandas_args (dict, optional): A dictionary of arguments to pass to the geopandas.read_file() function.
                 Used for reading a region URL|filepath.
@@ -5814,8 +5809,7 @@ class The_national_map_USGS:
                 Exposes most of the documented API parameters. Defaults to {}.
 
         Returns:
-            list: A list of download_urls.
-            dict: A dictionary with urls and related metadata
+            A list of download URLs if return_type is 'list', otherwise a dictionary with URLs and related metadata.
         """
         assert region or API, "Provide a region or use the API"
 
@@ -6007,7 +6001,7 @@ def mosaic(
     merge_args={},
     to_cog=True,
     verbose=True,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Mosaics a list of images into a single image. Inspired by https://bit.ly/3A6roDK.
 
@@ -6200,7 +6194,7 @@ def image_check(image):
         raise ValueError("image must be a URL or filepath.")
 
 
-def image_client(image, **kwargs):
+def image_client(image, **kwargs: Any):
     """Get a LocalTileserver TileClient from an image.
 
     Args:
@@ -6215,7 +6209,7 @@ def image_client(image, **kwargs):
     return client
 
 
-def image_center(image, **kwargs):
+def image_center(image, **kwargs: Any):
     """Get the center of an image.
 
     Args:
@@ -6233,7 +6227,7 @@ def image_center(image, **kwargs):
     return client.center()
 
 
-def image_bounds(image, **kwargs):
+def image_bounds(image, **kwargs: Any):
     """Get the bounds of an image.
 
     Args:
@@ -6252,7 +6246,7 @@ def image_bounds(image, **kwargs):
     return [(bounds[0], bounds[2]), (bounds[1], bounds[3])]
 
 
-def image_metadata(image, **kwargs):
+def image_metadata(image, **kwargs: Any):
     """Get the metadata of an image.
 
     Args:
@@ -6270,7 +6264,7 @@ def image_metadata(image, **kwargs):
     return client.metadata
 
 
-def image_bandcount(image, **kwargs):
+def image_bandcount(image, **kwargs: Any):
     """Get the number of bands in an image.
 
     Args:
@@ -6289,7 +6283,7 @@ def image_bandcount(image, **kwargs):
     return len(client.metadata()["bands"])
 
 
-def image_size(image, **kwargs):
+def image_size(image, **kwargs: Any):
     """Get the size (width, height) of an image.
 
     Args:
@@ -6309,7 +6303,7 @@ def image_size(image, **kwargs):
     return metadata["sourceSizeX"], metadata["sourceSizeY"]
 
 
-def image_projection(image, **kwargs):
+def image_projection(image, **kwargs: Any):
     """Get the projection of an image.
 
     Args:
@@ -6342,7 +6336,7 @@ def image_set_crs(image, epsg):
         rds.crs = CRS.from_epsg(epsg)
 
 
-def image_geotransform(image, **kwargs):
+def image_geotransform(image, **kwargs: Any):
     """Get the geotransform of an image.
 
     Args:
@@ -6360,7 +6354,7 @@ def image_geotransform(image, **kwargs):
     return client.metadata()["GeoTransform"]
 
 
-def image_resolution(image, **kwargs):
+def image_resolution(image, **kwargs: Any):
     """Get the resolution of an image.
 
     Args:
@@ -6378,7 +6372,7 @@ def image_resolution(image, **kwargs):
     return client.metadata()["GeoTransform"][1]
 
 
-def image_bbox(raster_path, output_file=None, to_crs=None, **kwargs):
+def image_bbox(raster_path, output_file=None, to_crs=None, **kwargs: Any):
     """Get the bounding box of an image.
 
     Args:
@@ -7030,7 +7024,7 @@ def is_jupyterlite():
         return False
 
 
-async def download_file_lite(url, output=None, binary=False, overwrite=False, **kwargs):
+async def download_file_lite(url, output=None, binary=False, overwrite=False, **kwargs: Any):
     """Download a file using Pyodide. This function is only available on JupyterLite. Call the function with await, such as await download_file_lite(url).
 
     Args:
@@ -7875,7 +7869,7 @@ def create_timelapse(
     quiet: bool = True,
     reduce_size: bool = False,
     clean_up: bool = True,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Creates a timelapse gif from a list of images.
 
@@ -8391,7 +8385,7 @@ def save_colorbar(
     dpi="figure",
     transparent=False,
     show_colorbar=True,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Create a standalone colorbar and save it as an image.
 
@@ -8688,7 +8682,7 @@ def vector_to_raster(
     image_set_crs(output, to_epsg)
 
 
-def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwargs):
+def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwargs: Any):
     """
     Displays a Youtube video in a Jupyter notebook.
 
@@ -8723,7 +8717,7 @@ def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwarg
     )
 
 
-def html_to_gradio(html, width="100%", height="500px", **kwargs):
+def html_to_gradio(html, width="100%", height="500px", **kwargs: Any):
     """Converts the map to an HTML string that can be used in Gradio. Removes unsupported elements, such as
         attribution and any code blocks containing functions. See https://github.com/gradio-app/gradio/issues/3190
 
@@ -8776,7 +8770,7 @@ def html_to_gradio(html, width="100%", height="500px", **kwargs):
     allowpaymentrequest="" frameborder="0" srcdoc='{"".join(output)}'></iframe>"""
 
 
-def filter_bounds(data, bbox, within=False, align=True, **kwargs):
+def filter_bounds(data, bbox, within=False, align=True, **kwargs: Any):
     """Filters a GeoDataFrame or GeoSeries by a bounding box.
 
     Args:
@@ -8867,7 +8861,7 @@ def skip_mkdocs_build():
         return False
 
 
-def disjoint(input_features, selecting_features, output=None, **kwargs):
+def disjoint(input_features, selecting_features, output=None, **kwargs: Any):
     """Find the features in the input_features that do not intersect the selecting_features.
 
     Args:
@@ -8924,7 +8918,7 @@ def zonal_stats(
     dst_crs=None,
     open_vector_args={},
     open_raster_args={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """This function wraps rasterstats.zonal_stats and performs reprojection if necessary.
         See https://pythonhosted.org/rasterstats/rasterstats.html.
@@ -9052,7 +9046,7 @@ def s3_list_objects(
     fullpath=True,
     request_payer="bucket-owner",
     client_args={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """List objects in a S3 bucket
 
@@ -9102,7 +9096,7 @@ def s3_list_objects(
         return [r["Key"] for r in files]
 
 
-def s3_download_file(filename=None, bucket=None, key=None, outfile=None, **kwargs):
+def s3_download_file(filename=None, bucket=None, key=None, outfile=None, **kwargs: Any):
     """Download a file from S3.
 
     Args:
@@ -9186,7 +9180,7 @@ def s3_get_object(
     request_payer="bucket-owner",
     quiet=False,
     client_args={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """Download a file from S3.
 
@@ -9254,7 +9248,7 @@ def s3_get_objects(
     request_payer="bucket-owner",
     quiet=True,
     client_args={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """Download multiple files from S3.
 
@@ -9633,7 +9627,7 @@ def read_raster(
     request_payer="bucket-owner",
     env_args={},
     open_args={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """Read a raster from S3.
 
@@ -9683,7 +9677,7 @@ def read_rasters(
     request_payer="bucket-owner",
     env_args={},
     open_args={},
-    **kwargs,
+    **kwargs: Any,
 ):
     """Read a raster from S3.
 
@@ -9723,7 +9717,7 @@ def read_rasters(
     return result
 
 
-def transform_coords(x, y, src_crs, dst_crs, **kwargs):
+def transform_coords(x, y, src_crs, dst_crs, **kwargs: Any):
     """Transform coordinates from one CRS to another.
 
     Args:
@@ -9743,7 +9737,7 @@ def transform_coords(x, y, src_crs, dst_crs, **kwargs):
     return transformer.transform(x, y)
 
 
-def transform_bbox_coords(bbox, src_crs, dst_crs, **kwargs):
+def transform_bbox_coords(bbox, src_crs, dst_crs, **kwargs: Any):
     """Transforms the coordinates of a bounding box [x1, y1, x2, y2] from one CRS to another.
 
     Args:
@@ -9773,7 +9767,7 @@ def coords_to_xy(
     request_payer="bucket-owner",
     env_args={},
     open_args={},
-    **kwargs,
+    **kwargs: Any,
 ) -> list:
     """Converts a list of coordinates to pixel coordinates, i.e., (col, row) coordinates.
 
@@ -9855,7 +9849,7 @@ def map_tiles_to_geotiff(
     crs="EPSG:3857",
     to_cog=False,
     quiet=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Download map tiles and convert them to a GeoTIFF. The source is adapted from https://github.com/gumblex/tms2geotiff.
         Credits to the GitHub user @gumblex.
@@ -10465,7 +10459,7 @@ def get_nhd_basins(
     fsource="nwissite",
     split_catchment=False,
     simplified=True,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Get NHD basins for a list of station IDs.
 
@@ -10514,7 +10508,7 @@ def get_3dep_dem(
     dst_crs="EPSG:5070",
     to_cog=False,
     overwrite=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Get DEM data at any resolution from 3DEP.
 
@@ -10570,7 +10564,7 @@ def get_3dep_dem(
     return dem
 
 
-def vector_set_crs(source, output=None, crs="EPSG:4326", **kwargs):
+def vector_set_crs(source, output=None, crs="EPSG:4326", **kwargs: Any):
     """Set CRS of a vector file.
 
     Args:
@@ -10599,7 +10593,7 @@ def vector_set_crs(source, output=None, crs="EPSG:4326", **kwargs):
         return gdf
 
 
-def select_largest(source, column, count=1, output=None, **kwargs):
+def select_largest(source, column, count=1, output=None, **kwargs: Any):
     """Select the largest features in a GeoDataFrame based on a column.
 
     Args:
@@ -10631,7 +10625,7 @@ def select_largest(source, column, count=1, output=None, **kwargs):
         return gdf
 
 
-def coords_to_vector(coords, output=None, crs="EPSG:4326", **kwargs):
+def coords_to_vector(coords, output=None, crs="EPSG:4326", **kwargs: Any):
     """Convert a list of coordinates to a GeoDataFrame or a vector file.
 
     Args:
@@ -10813,7 +10807,7 @@ def merge_rasters(
     output_format: str = "GTiff",
     output_nodata: float = None,
     output_options: list = None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Merge a directory of rasters or a list of file paths into a single raster.
@@ -10825,7 +10819,7 @@ def merge_rasters(
         output_format (str, optional): The output raster format. Defaults to "GTiff".
         output_nodata (float, optional): The nodata value for the output raster. Defaults to None.
         output_options (list, optional): A list of creation options for the output raster. Defaults to ["COMPRESS=DEFLATE"].
-        **kwargs: Additional arguments to pass to gdal.WarpOptions.
+        **kwargs (Any): Additional arguments to pass to gdal.WarpOptions.
 
     Raises:
         ImportError: If GDAL is not installed.
@@ -11072,7 +11066,7 @@ def array_to_memory_file(
     transform: tuple = None,
     driver="COG",
     colormap: dict = None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """Convert a NumPy array to a memory file.
 
@@ -11088,7 +11082,7 @@ def array_to_memory_file(
             Can be rio.transform() or a tuple like (0.5, 0.0, -180.25, 0.0, -0.5, 83.780361). Defaults to None.
         driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
         colormap (dict, optional): A dictionary defining the colormap (value: (R, G, B, A)).
-        **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
+        **kwargs (Any): Additional keyword arguments to be passed to the rasterio.open() function.
 
     Returns:
         rasterio.DatasetReader: The rasterio dataset reader object for the converted array.
@@ -11243,7 +11237,7 @@ def array_to_image(
     transform: tuple = None,
     driver: str = "COG",
     colormap: dict = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> str:
     """Save a NumPy array as a GeoTIFF using the projection information from an existing GeoTIFF file.
 
@@ -11260,7 +11254,7 @@ def array_to_image(
             Defaults to None.
         driver (str, optional): The driver to use for creating the output file, such as 'GTiff'. Defaults to "COG".
         colormap (dict, optional): A dictionary defining the colormap (value: (R, G, B, A)).
-        **kwargs: Additional keyword arguments to be passed to the rasterio.open() function.
+        **kwargs (Any): Additional keyword arguments to be passed to the rasterio.open() function.
     """
 
     import numpy as np
@@ -11424,7 +11418,7 @@ def images_to_tiles(
     images: Union[str, List[str]],
     names: List[str] = None,
     ipyleaflet: bool = True,
-    **kwargs,
+    **kwargs: Any,
 ) -> Dict[str, ipyleaflet.TileLayer]:
     """Convert a list of images to a dictionary of ipyleaflet.TileLayer objects.
 
@@ -11583,7 +11577,7 @@ def merge_vector(
     recursive: bool = False,
     quiet: bool = False,
     return_gdf: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> Optional["gpd.GeoDataFrame"]:
     """
     Merge vector files into a single GeoDataFrame.
@@ -11596,7 +11590,7 @@ def merge_vector(
         recursive: Optional. If True, search for files recursively in subdirectories. Default is False.
         quiet: Optional. If True, suppresses progress messages. Default is False.
         return_gdf: Optional. If True, returns the merged GeoDataFrame. Default is False.
-        **kwargs: Additional keyword arguments to be passed to the `gpd.read_file` function.
+        **kwargs (Any): Additional keyword arguments to be passed to the `gpd.read_file` function.
 
     Returns:
         If `return_gdf` is True, returns the merged GeoDataFrame. Otherwise, returns None.
@@ -11646,7 +11640,7 @@ def download_ms_buildings(
     merge_output: Optional[str] = None,
     head=None,
     quiet: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> List[str]:
     """
     Download Microsoft Buildings dataset for a specific location. Check the dataset links from
@@ -11719,7 +11713,7 @@ def download_google_buildings(
     keep_geojson: bool = False,
     overwrite: bool = False,
     quiet: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> List[str]:
     """
     Download Google Open Building dataset for a specific location. Check the dataset links from
@@ -12462,7 +12456,7 @@ def pmtiles_style(
     circle_radius: int = 5,
     line_width: int = 1,
     attribution: str = "PMTiles",
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Generates a Mapbox style JSON for rendering PMTiles data.
@@ -12699,7 +12693,7 @@ def blend_images(
     show=True,
     figsize=(12, 10),
     axis="off",
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Blends two images together using the addWeighted function from the OpenCV library.
@@ -12712,7 +12706,7 @@ def blend_images(
         show (bool, optional): Whether to display the blended image. Defaults to True.
         figsize (tuple, optional): The size of the figure. Defaults to (12, 10).
         axis (str, optional): The axis of the figure. Defaults to "off".
-        **kwargs: Additional keyword arguments to pass to the cv2.addWeighted() function.
+        **kwargs (Any): Additional keyword arguments to pass to the cv2.addWeighted() function.
 
     Returns:
         numpy.ndarray: The blended image as a NumPy array.
@@ -12771,7 +12765,7 @@ def blend_images(
         return blend_img
 
 
-def regularize(source, output=None, crs="EPSG:4326", **kwargs):
+def regularize(source, output=None, crs="EPSG:4326", **kwargs: Any):
     """Regularize a polygon GeoDataFrame.
 
     Args:
@@ -12861,7 +12855,7 @@ def gdb_to_vector(
     file_extension: Optional[str] = None,
     overwrite: bool = False,
     quiet=False,
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """Converts layers from a File Geodatabase (GDB) to a vector format.
 
@@ -13011,7 +13005,7 @@ def vector_to_parquet(
     gdf.to_parquet(output, **kwargs)
 
 
-def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs):
+def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs: Any):
     """
     Converts all vector files in a directory to Parquet format in batch.
 
@@ -13077,7 +13071,7 @@ def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **k
     print("All conversions complete!")
 
 
-def vector_to_gpkg_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs):
+def vector_to_gpkg_batch(input_dir, output_dir=None, file_ext=".geojson", **kwargs: Any):
     """
     Converts all vector files in a directory to GeoPackage format in batch.
 
@@ -13143,7 +13137,7 @@ def vector_to_gpkg_batch(input_dir, output_dir=None, file_ext=".geojson", **kwar
     print("All conversions complete!")
 
 
-def vector_to_geojson_batch(input_dir, output_dir=None, file_ext=".shp", **kwargs):
+def vector_to_geojson_batch(input_dir, output_dir=None, file_ext=".shp", **kwargs: Any):
     """
     Converts all vector files in a directory to GeoJSON format in batch.
 
@@ -13215,7 +13209,7 @@ def geojsonl_to_parquet_batch(
     batch_size=50,
     file_ext=".json",
     filename_predix="batch_",
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Convert JSON Lines files to multiple GeoParquet files, with each GeoParquet file
@@ -13655,7 +13649,7 @@ def parquet_to_gdf(
     dst_crs="EPSG:4326",
     columns=None,
     limit=None,
-    **kwargs,
+    **kwargs: Any,
 ):
 
     import duckdb
@@ -13688,7 +13682,7 @@ def parquet_to_gdf(
     return gdf
 
 
-def df_to_gdf(df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs):
+def df_to_gdf(df, geometry="geometry", src_crs="EPSG:4326", dst_crs=None, **kwargs: Any):
     """
     Converts a pandas DataFrame to a GeoPandas GeoDataFrame.
 
@@ -13746,7 +13740,7 @@ def read_parquet(
     src_crs: Optional[str] = None,
     dst_crs: Optional[str] = None,
     return_type: str = "gdf",
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Read Parquet data from a source and return a GeoDataFrame or DataFrame.
@@ -13936,7 +13930,7 @@ def gedi_search(
     return_type: str = "gdf",
     output: Optional[str] = None,
     sort_filesize: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> Union[pd.DataFrame, None]:
     """
     Searches for GEDI data using the Common Metadata Repository (CMR) API.
@@ -14158,7 +14152,7 @@ def gedi_subset(
     username=None,
     password=None,
     overwrite=False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Subsets GEDI data using the Harmony API.
@@ -14512,7 +14506,7 @@ def h5_to_gdf(
     columns: Optional[List[str]] = None,
     crs: str = "EPSG:4326",
     nodata=None,
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Read data from one or multiple HDF5 files and return as a GeoDataFrame.
@@ -14697,7 +14691,7 @@ def nasa_data_search(
     output: Optional[str] = None,
     crs: str = "EPSG:4326",
     return_gdf: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ) -> Union[List[dict], tuple]:
     """Searches for NASA Earthdata granules.
 
@@ -15471,7 +15465,7 @@ def ee_tile_url(
     asset_id: str = None,
     ee_initialize: bool = False,
     project_id=None,
-    **kwargs,
+    **kwargs: Any,
 ) -> None:
     """
     Adds a Google Earth Engine tile layer to the map based on the tile layer URL from
@@ -15851,7 +15845,7 @@ def get_nhd(
     dataset: str = "wbd08",
     predicate: str = "intersects",
     sort_attr: Optional[str] = None,
-    **kwargs,
+    **kwargs: Any,
 ) -> Optional["gpd.GeoDataFrame"]:
     """
     Fetches National Hydrography Dataset (NHD) data based on the provided geometry.
@@ -16282,7 +16276,7 @@ def get_nwi_by_huc8(
     out_dir: Optional[str] = None,
     quiet: bool = True,
     layer: str = "Wetlands",
-    **kwargs,
+    **kwargs: Any,
 ) -> "gpd.GeoDataFrame":
     """
     Fetches National Wetlands Inventory (NWI) data by HUC8 code.
@@ -16368,7 +16362,7 @@ def get_max_pixel_coords(
     dst_crs="EPSG:4326",
     output=None,
     return_gdf=True,
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Find the geographic coordinates of the maximum pixel value in a GeoTIFF.
@@ -16458,7 +16452,7 @@ def get_max_pixel_coords(
             return {"max_value": max_value, "coordinates": (x[0], y[0]), "crs": dst_crs}
 
 
-def point_to_gdf(x, y, point_crs="EPSG:4326", to_crs="EPSG:4326", **kwargs):
+def point_to_gdf(x, y, point_crs="EPSG:4326", to_crs="EPSG:4326", **kwargs: Any):
     """
     Convert a point to a GeoDataFrame.
 
@@ -16693,7 +16687,7 @@ def plot_actual_vs_predicted(
     template: str = "plotly_white",
     square_aspect: bool = True,
     return_figure: bool = False,
-    **kwargs,
+    **kwargs: Any,
 ):
     """
     Plots a customizable scatter plot with a reference line for actual vs. predicted values.
@@ -17454,7 +17448,7 @@ def set_proj_lib_path(verbose=False):
         return
 
 
-def read_vector(source, layer=None, **kwargs):
+def read_vector(source, layer=None, **kwargs: Any):
     """Reads vector data from various formats including GeoParquet.
 
     This function dynamically determines the file type based on extension
