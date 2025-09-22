@@ -638,10 +638,11 @@ class Map(MapWidget):
         Returns:
             None
         """
-        layer_type = self.layer_dict[name]["type"]
-        if layer_type.startswith("Deck"):
-            self.remove_deck_layers(layer_ids=[name], **kwargs)
-            return
+        if name in self.layer_dict:
+            layer = self.layer_dict[name]
+            if "type" in layer and layer["type"].startswith("Deck"):
+                self.remove_deck_layers(layer_ids=[name], **kwargs)
+                return
 
         super().add_call("removeLayer", name)
         if name in self.layer_dict:
