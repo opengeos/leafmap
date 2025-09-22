@@ -5,6 +5,7 @@ __email__ = "giswqs@gmail.com"
 __version__ = "0.52.2"
 
 import os
+
 from .report import Report
 
 

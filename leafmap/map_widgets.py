@@ -1,6 +1,7 @@
 from typing import Callable, Iterable, List, Optional
-import ipywidgets as widgets
+
 import ipyvuetify as v
+import ipywidgets as widgets
 
 from . import common
 
@@ -206,10 +207,14 @@ class Legend(widgets.VBox):
             ValueError: If the position is not allowed.
 
         """
-        import os  # pylint: disable=import-outside-toplevel
-        from IPython.display import display  # pylint: disable=import-outside-toplevel
         import importlib.resources  # pylint: disable=import-outside-toplevel
-        from .legends import builtin_legends  # pylint: disable=import-outside-toplevel
+        import os  # pylint: disable=import-outside-toplevel
+
+        from IPython.display import \
+            display  # pylint: disable=import-outside-toplevel
+
+        from .legends import \
+            builtin_legends  # pylint: disable=import-outside-toplevel
 
         pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
         legend_template = os.path.join(pkg_dir, "data/template/legend.html")
@@ -711,7 +716,8 @@ class RasterLayerEditor(widgets.VBox):
         )
 
     def _get_colormaps(self):
-        from matplotlib import pyplot  # pylint: disable=import-outside-toplevel
+        from matplotlib import \
+            pyplot  # pylint: disable=import-outside-toplevel
 
         colormap_options = pyplot.colormaps()
         colormap_options = [
@@ -724,7 +730,8 @@ class RasterLayerEditor(widgets.VBox):
 
     def _render_colorbar(self, colors):
         import matplotlib  # pylint: disable=import-outside-toplevel
-        from matplotlib import pyplot  # pylint: disable=import-outside-toplevel
+        from matplotlib import \
+            pyplot  # pylint: disable=import-outside-toplevel
 
         colors = common.to_hex_colors(colors)
 
@@ -748,7 +755,8 @@ class RasterLayerEditor(widgets.VBox):
 
     def _classes_changed(self, change):
         import matplotlib  # pylint: disable=import-outside-toplevel
-        from matplotlib import pyplot  # pylint: disable=import-outside-toplevel
+        from matplotlib import \
+            pyplot  # pylint: disable=import-outside-toplevel
 
         if not change["new"]:
             return
@@ -790,7 +798,8 @@ class RasterLayerEditor(widgets.VBox):
 
     def _colormap_changed(self, change):
         import matplotlib  # pylint: disable=import-outside-toplevel
-        from matplotlib import pyplot  # pylint: disable=import-outside-toplevel
+        from matplotlib import \
+            pyplot  # pylint: disable=import-outside-toplevel
 
         if change["new"]:
             n_class = None

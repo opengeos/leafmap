@@ -1,8 +1,9 @@
 import os
+from typing import Callable, Dict, List, Optional, Tuple, Union
+
+import pandas as pd
 import pystac
 import requests
-from typing import Optional, Dict, List, Callable, Tuple, Union
-import pandas as pd
 
 
 class TitilerEndpoint:
@@ -1724,8 +1725,9 @@ def download_data_catalogs(
         str: The path to the downloaded data catalog.
     """
     import tempfile
-    import gdown
     import zipfile
+
+    import gdown
 
     if out_dir is None:
         out_dir = tempfile.gettempdir()
@@ -1811,8 +1813,9 @@ def maxar_collections(return_ids: Optional[bool] = True, **kwargs) -> List:
     """
 
     import tempfile
-    from pystac import Catalog
+
     import pandas as pd
+    from pystac import Catalog
 
     if return_ids:
         url = "https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets.csv"
@@ -1860,6 +1863,7 @@ def maxar_child_collections(
     """
 
     import tempfile
+
     from pystac import Catalog
 
     file_path = os.path.join(tempfile.gettempdir(), f"maxar-{collection_id}.txt")
@@ -1912,6 +1916,7 @@ def maxar_items(
 
     import pickle
     import tempfile
+
     from pystac import Catalog, ItemCollection
 
     file_path = os.path.join(
@@ -2071,8 +2076,9 @@ def maxar_search(
         GeoDataFrame: A GeoDataFrame containing the search results.
     """
     import datetime
-    import pandas as pd
+
     import geopandas as gpd
+    import pandas as pd
     from shapely.geometry import Polygon
 
     collections = maxar_collections()
@@ -2250,8 +2256,8 @@ def create_mosaicjson(images, output):
 
     """
     try:
-        from cogeo_mosaic.mosaic import MosaicJSON
         from cogeo_mosaic.backends import MosaicBackend
+        from cogeo_mosaic.mosaic import MosaicJSON
     except ImportError:
         raise ImportError(
             "cogeo-mosaic is required to use this function. "
@@ -2320,8 +2326,8 @@ def oam_search(
         GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
     """
 
-    from shapely.geometry import Polygon
     import geopandas as gpd
+    from shapely.geometry import Polygon
 
     url = "https://api.openaerialmap.org/meta"
     if bbox is not None:

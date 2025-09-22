@@ -1,55 +1,27 @@
 import os
-from box import Box
-import xyzservices.providers as xyz
-from bokeh.models import WheelZoomTool, WMTSTileSource, GeoJSONDataSource, HoverTool
-from bokeh.plotting import figure, show, save
-from bokeh.io import output_notebook
-from .basemaps import xyz_to_bokeh
-from . import common
-from typing import Optional, List, Dict
+from typing import Any, Dict, List, Optional
 
-from .common import (
-    add_crs,
-    basemap_xyz_tiles,
-    cog_bands,
-    cog_bounds,
-    cog_center,
-    cog_tile,
-    convert_lidar,
-    csv_to_df,
-    csv_to_geojson,
-    csv_to_shp,
-    download_file,
-    download_from_url,
-    download_ned,
-    gdf_to_geojson,
-    get_api_key,
-    get_census_dict,
-    image_to_numpy,
-    netcdf_to_tif,
-    numpy_to_cog,
-    planet_monthly_tiles,
-    planet_quarterly_tiles,
-    planet_tiles,
-    plot_raster,
-    plot_raster_3d,
-    pmtiles_metadata,
-    pmtiles_style,
-    read_lidar,
-    read_netcdf,
-    search_qms,
-    search_xyz_services,
-    set_api_key,
-    stac_assets,
-    stac_bands,
-    stac_bounds,
-    stac_center,
-    stac_info,
-    stac_stats,
-    stac_tile,
-    view_lidar,
-    write_lidar,
-)
+import xyzservices.providers as xyz
+from bokeh.io import output_notebook
+from bokeh.models import (GeoJSONDataSource, HoverTool, WheelZoomTool,
+                          WMTSTileSource)
+from bokeh.plotting import figure, save, show
+from box import Box
+
+from . import common
+from .basemaps import xyz_to_bokeh
+from .common import (add_crs, basemap_xyz_tiles, cog_bands, cog_bounds,
+                     cog_center, cog_tile, convert_lidar, csv_to_df,
+                     csv_to_geojson, csv_to_shp, download_file,
+                     download_from_url, download_ned, gdf_to_geojson,
+                     get_api_key, get_census_dict, image_to_numpy,
+                     netcdf_to_tif, numpy_to_cog, planet_monthly_tiles,
+                     planet_quarterly_tiles, planet_tiles, plot_raster,
+                     plot_raster_3d, pmtiles_metadata, pmtiles_style,
+                     read_lidar, read_netcdf, search_qms, search_xyz_services,
+                     set_api_key, stac_assets, stac_bands, stac_bounds,
+                     stac_center, stac_info, stac_stats, stac_tile, view_lidar,
+                     write_lidar)
 
 os.environ["OUTPUT_NOTEBOOK"] = "False"
 basemaps = Box(xyz_to_bokeh(), frozen_box=True)
@@ -115,7 +87,7 @@ class Map:
         self,
         basemap: Optional[str] = "OpenStreetMap",
         retina: Optional[bool] = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a basemap to the map.
 
@@ -178,7 +150,7 @@ class Map:
         titiler_endpoint: Optional[str] = None,
         cog_args: Dict = {},
         fit_bounds: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a COG TileLayer to the map.
 
@@ -412,9 +384,9 @@ class Map:
             **kwargs: Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see
                 https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure
         """
-        import geopandas as gpd
-
         import glob
+
+        import geopandas as gpd
 
         if filename.startswith("http"):
             filename = common.github_raw_url(filename)

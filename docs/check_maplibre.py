@@ -1,4 +1,5 @@
 import os
+
 import leafmap.maplibregl as leafmap
 
 in_dir = "docs/maplibre/"

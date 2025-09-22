@@ -3,64 +3,40 @@
 import json
 import logging
 import os
-import requests
 import sys
-from typing import Tuple, Dict, Any, Optional, Union, List, Callable, Iterable
-from IPython.display import display
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-import xyzservices
 import geopandas as gpd
 import ipyvuetify as v
-import pandas as pd
 import ipywidgets as widgets
+import pandas as pd
+import requests
+import xyzservices
 from box import Box
+from IPython.display import display
 
 logging.getLogger("maplibre").setLevel(logging.ERROR)
 
-from maplibre.basemaps import background
-from maplibre.basemaps import construct_carto_basemap_url
-from maplibre.ipywidget import MapWidget
 from maplibre import Layer, LayerType, MapOptions
+from maplibre.basemaps import background, construct_carto_basemap_url
+from maplibre.controls import (AttributionControl, FullscreenControl,
+                               GeolocateControl, GlobeControl, Marker,
+                               NavigationControl, ScaleControl)
+from maplibre.ipywidget import MapWidget
 from maplibre.sources import GeoJSONSource, RasterTileSource
 from maplibre.utils import get_bounds
-from maplibre.controls import (
-    ScaleControl,
-    FullscreenControl,
-    GeolocateControl,
-    NavigationControl,
-    AttributionControl,
-    GlobeControl,
-    Marker,
-)
 
-from .basemaps import xyz_to_leaflet
-from .map_widgets import TabWidget
 from . import common
-from .common import (
-    download_file,
-    filter_geom_type,
-    find_files,
-    sort_files,
-    execute_maplibre_notebook_dir,
-    generate_index_html,
-    geojson_to_pmtiles,
-    get_api_key,
-    get_bounds,
-    get_ee_tile_url,
-    get_overture_data,
-    geojson_bounds,
-    geojson_to_gdf,
-    nasa_data_login,
-    nasa_data_download,
-    pandas_to_geojson,
-    pmtiles_metadata,
-    pmtiles_style,
-    random_string,
-    read_geojson,
-    read_vector,
-    stac_assets,
-    start_server,
-)
+from .basemaps import xyz_to_leaflet
+from .common import (download_file, execute_maplibre_notebook_dir,
+                     filter_geom_type, find_files, generate_index_html,
+                     geojson_bounds, geojson_to_gdf, geojson_to_pmtiles,
+                     get_api_key, get_bounds, get_ee_tile_url,
+                     get_overture_data, nasa_data_download, nasa_data_login,
+                     pandas_to_geojson, pmtiles_metadata, pmtiles_style,
+                     random_string, read_geojson, read_vector, sort_files,
+                     stac_assets, start_server)
+from .map_widgets import TabWidget
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -90,7 +66,7 @@ class Map(MapWidget):
         sidebar_args: Optional[Dict] = None,
         layer_manager_expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Create a Map object.
 
@@ -267,7 +243,7 @@ class Map(MapWidget):
         max_width: int = 360,
         sidebar_content: Optional[Any] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Displays the map with an optional sidebar.
 
@@ -297,7 +273,7 @@ class Map(MapWidget):
         max_width: int = None,
         expanded: bool = None,
         **kwargs: Any,
-    ):
+    ) -> v.Container:
         """
         Creates a container widget for the map with an optional sidebar.
 
@@ -312,7 +288,7 @@ class Map(MapWidget):
             **kwargs (Any): Additional keyword arguments passed to the `Container` widget.
 
         Returns:
-            Container: The created container widget with the map and sidebar.
+            v.Container: The created container widget with the map and sidebar.
         """
 
         if sidebar_visible is None:
@@ -357,7 +333,7 @@ class Map(MapWidget):
     def _patched_display(
         self,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Displays the map in an IPython environment with a patched display method.
 
@@ -383,7 +359,7 @@ class Map(MapWidget):
                 min_width=min_width,
                 max_width=max_width,
                 sidebar_content=[self.layer_manager],
-                **kwargs,
+                **kwargs: Any,
             )
             container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
@@ -405,7 +381,7 @@ class Map(MapWidget):
         background_color: str = "#f5f5f5",
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ):
         if self.layer_manager is None:
             self.layer_manager = LayerManagerWidget(
                 self,
@@ -416,7 +392,7 @@ class Map(MapWidget):
                 label=label,
                 background_color=background_color,
                 *args,
-                **kwargs,
+                **kwargs: Any,
             )
 
     def set_sidebar_content(
@@ -443,7 +419,7 @@ class Map(MapWidget):
         height: str = "40px",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Appends a widget to the sidebar content.
 
@@ -751,7 +727,7 @@ class Map(MapWidget):
         pickable: bool = True,
         tooltip: Optional[Union[str, List[str]]] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Add a DeckGL ArcLayer to the map.
 
@@ -937,7 +913,7 @@ class Map(MapWidget):
         position: str = "top-right",
         geojson: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a drawing control to the map.
 
@@ -1016,7 +992,7 @@ class Map(MapWidget):
         api_key: str = None,
         collapsed: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a search control to the map.
 
@@ -1233,7 +1209,7 @@ class Map(MapWidget):
         attribution: Optional[str] = None,
         before_id: Optional[str] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a basemap to the map.
 
@@ -1358,7 +1334,7 @@ class Map(MapWidget):
         fit_bounds_options: Dict = None,
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a GeoJSON layer to the map.
 
@@ -1491,7 +1467,7 @@ class Map(MapWidget):
         source_args: Dict = {},
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a vector layer to the map.
 
@@ -1562,7 +1538,7 @@ class Map(MapWidget):
         source_args: Dict = {},
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a vector layer to the map.
 
@@ -1625,7 +1601,7 @@ class Map(MapWidget):
         source_args: Dict = {},
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a TileLayer to the map.
 
@@ -1691,7 +1667,7 @@ class Map(MapWidget):
         source_args: Dict = {},
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a vector tile layer to the map.
 
@@ -1839,7 +1815,7 @@ class Map(MapWidget):
         source_args: Dict = {},
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a WMS layer to the map.
 
@@ -1898,7 +1874,7 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a NWI Wetlands basemap to the map.
 
@@ -1955,8 +1931,8 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         ee_initialize: bool = False,
         overwrite: bool = False,
-        **kwargs,
-    ) -> None:
+        **kwargs: Any,
+    ):
         """
         Adds a Google Earth Engine tile layer to the map based on the tile layer URL from
             https://github.com/opengeos/ee-tile-layers/blob/main/datasets.tsv.
@@ -2007,7 +1983,7 @@ class Map(MapWidget):
                     visible=visible,
                     before_id=before_id,
                     overwrite=overwrite,
-                    **kwargs,
+                    **kwargs: Any,
                 )
             else:
                 print(f"The provided EE tile layer {asset_id} does not exist.")
@@ -2028,7 +2004,7 @@ class Map(MapWidget):
                     visible=visible,
                     before_id=before_id,
                     overwrite=overwrite,
-                    **kwargs,
+                    **kwargs: Any,
                 )
             else:
 
@@ -2049,7 +2025,7 @@ class Map(MapWidget):
                         visible=visible,
                         before_id=before_id,
                         overwrite=overwrite,
-                        **kwargs,
+                        **kwargs: Any,
                     )
                 except Exception as e:
                     print(e)
@@ -2072,7 +2048,7 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a Cloud Optimized Geotiff (COG) TileLayer to the map.
 
@@ -2150,7 +2126,7 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a STAC TileLayer to the map.
 
@@ -2170,7 +2146,7 @@ class Map(MapWidget):
                 e.g., ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.
             bands (list, optional): A list of band names, e.g.,
                 ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.
-            no_data (int | float, optional): The nodata value to use for the layer.
+            nodata (int | float, optional): The nodata value to use for the layer.
             titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space",
                 "https://planetarycomputer.microsoft.com/api/data/v1",
                 "planetary-computer", "pc". Defaults to None.
@@ -2238,7 +2214,7 @@ class Map(MapWidget):
         array_args={},
         client_args={"cors_all": True},
         overwrite: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ):
         """Add a local raster dataset to the map.
             If you are using this function in JupyterHub on a remote server
@@ -2265,11 +2241,9 @@ class Map(MapWidget):
                 the palette when plotting a single band. Defaults to None.
             nodata (float, optional): The value from the band to use to interpret
                 as not valid data. Defaults to None.
-            attribution (str, optional): Attribution for the source raster. This
-                defaults to a message about it being a local file.. Defaults to None.
-            layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
-            layer_index (int, optional): The index of the layer. Defaults to None.
-            zoom_to_layer (bool, optional): Whether to zoom to the extent of the
+            name (str, optional): The layer name to use. Defaults to 'Raster'.
+            before_id (str, optional): The layer id to insert the layer before. Defaults to None.
+            fit_bounds (bool, optional): Whether to zoom to the extent of the
                 layer. Defaults to True.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
@@ -2338,8 +2312,8 @@ class Map(MapWidget):
         remove_port: bool = True,
         preview: bool = False,
         overwrite: bool = False,
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> str:
         """Render the map to an HTML page.
 
         Args:
@@ -2555,7 +2529,7 @@ class Map(MapWidget):
         if name in self.layer_dict:
             self.layer_dict[name]["visible"] = visible
 
-    def layer_interact(self, name=None):
+    def layer_interact(self, name=None) -> widgets.Widget:
         """Create a layer widget for changing the visibility and opacity of a layer.
 
         Args:
@@ -2639,7 +2613,7 @@ class Map(MapWidget):
 
         return hbox
 
-    def style_layer_interact(self, id=None):
+    def style_layer_interact(self, id=None) -> widgets.Widget:
         """Create a layer widget for changing the visibility and opacity of a style layer.
 
         Args:
@@ -2861,7 +2835,7 @@ class Map(MapWidget):
         attribution: str = "PMTiles",
         fit_bounds: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a PMTiles layer to the map.
 
@@ -2973,7 +2947,7 @@ class Map(MapWidget):
         speed: Optional[float] = None,
         essential: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Makes the map fly to a specified location.
 
@@ -3021,8 +2995,9 @@ class Map(MapWidget):
         """
 
         import os
-        from PIL import Image
+
         import numpy as np
+        from PIL import Image
 
         if isinstance(image, str):
             try:
@@ -3082,7 +3057,7 @@ class Map(MapWidget):
         position: str = None,
         icon_size: float = 1.0,
         **kwargs: Any,
-    ) -> None:
+    ):
         """Add an image to the map.
 
         Args:
@@ -3181,7 +3156,7 @@ class Map(MapWidget):
         header_height: str = "40px",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """Add an image to the map.
 
         Args:
@@ -3241,7 +3216,7 @@ class Map(MapWidget):
         name: Optional[str] = "Symbols",
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a symbol to the map.
 
@@ -3319,7 +3294,7 @@ class Map(MapWidget):
         name: Optional[str] = "Arrow",
         overwrite: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds an arrow symbol to the map.
 
@@ -3380,8 +3355,9 @@ class Map(MapWidget):
             Exception: If there is an error in creating the Streamlit component.
         """
         try:
-            import streamlit.components.v1 as components  # pylint: disable=E0401
             import base64
+
+            import streamlit.components.v1 as components  # pylint: disable=E0401
 
             raw_html = self.to_html().encode("utf-8")
             raw_html = base64.b64encode(raw_html).decode()
@@ -3390,7 +3366,7 @@ class Map(MapWidget):
                 width=width,
                 height=height,
                 scrolling=scrolling,
-                **kwargs,
+                **kwargs: Any,
             )
 
         except Exception as e:
@@ -3451,7 +3427,7 @@ class Map(MapWidget):
         lnglat: List[float],
         options: Dict[str, Any] = {},
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Pans the map to a specified location.
 
@@ -3582,7 +3558,7 @@ class Map(MapWidget):
 
         return style
 
-    def get_style(self):
+    def get_style(self) -> Dict:
         """
         Get the style of the map.
 
@@ -3691,7 +3667,7 @@ class Map(MapWidget):
         border_radius: str = "5px",
         position: str = "bottom-right",
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds text to the map with customizable styling.
 
@@ -3742,7 +3718,7 @@ class Map(MapWidget):
         expanded: bool = True,
         widget_args: Optional[Dict] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds text to the sidebar.
 
@@ -3813,7 +3789,7 @@ class Map(MapWidget):
         height: str = "40px",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Add HTML content to the map.
 
@@ -3887,6 +3863,7 @@ class Map(MapWidget):
             None
         """
         import importlib.resources
+
         from .legends import builtin_legends
 
         pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
@@ -4030,7 +4007,7 @@ class Map(MapWidget):
         height: str = "40px",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a legend to the map.
 
@@ -4100,7 +4077,7 @@ class Map(MapWidget):
         dpi: Optional[Union[str, float]] = "figure",
         transparent: Optional[bool] = False,
         position: str = "bottom-right",
-        **kwargs,
+        **kwargs: Any,
     ) -> str:
         """
         Add a colorbar to the map.
@@ -4322,7 +4299,7 @@ class Map(MapWidget):
         values: List[int] = [0, 200, 400],
         colors: List[str] = ["lightgray", "royalblue", "lightblue"],
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a 3D buildings layer to the map.
 
@@ -4404,7 +4381,7 @@ class Map(MapWidget):
         template: str = "simple",
         fit_bounds: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """Add 3D buildings from Overture Maps to the map.
 
         Args:
@@ -4521,7 +4498,7 @@ class Map(MapWidget):
         tooltip: bool = True,
         fit_bounds: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """Add Overture Maps data to the map.
 
         Args:
@@ -4765,7 +4742,7 @@ class Map(MapWidget):
         tooltip: bool = True,
         fit_bounds: bool = False,
         **kwargs: Any,
-    ) -> None:
+    ):
         """Add Overture Maps data to the map.
 
         Args:
@@ -4993,7 +4970,7 @@ class Map(MapWidget):
         add_legend: bool = True,
         legend_args: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a GPS trace to the map.
 
@@ -5174,7 +5151,7 @@ class Map(MapWidget):
         before_id: Optional[str] = None,
         source_args: Dict = {},
         **kwargs: Any,
-    ) -> None:
+    ):
         """Add vector data to the map with a variety of classification schemes.
 
         Args:
@@ -5364,7 +5341,7 @@ class Map(MapWidget):
         widget_icon: str = "mdi-image",
         widget_label: str = "Mapillary StreetView",
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds Mapillary layers to the map.
 
@@ -5462,7 +5439,7 @@ class Map(MapWidget):
                 label=widget_label,
                 widget_icon=widget_icon,
                 expanded=False,
-                **kwargs,
+                **kwargs: Any,
             )
 
             def log_lng_lat(lng_lat):
@@ -5617,7 +5594,7 @@ class Map(MapWidget):
         opacity: float = 1.0,
         visible: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a label layer to the map.
 
@@ -5688,7 +5665,7 @@ class Map(MapWidget):
             "paint": paint,
             "min_zoom": min_zoom,
             "max_zoom": max_zoom,
-            **kwargs,
+            **kwargs: Any,
         }
 
         self.add_layer(
@@ -5808,7 +5785,7 @@ class Map(MapWidget):
         background_color: str = "#f5f5f5",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds an annotation widget to the map.
 
@@ -5896,7 +5873,7 @@ class Map(MapWidget):
         height: str = "40px",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Initialize the DateFilterWidget.
 
@@ -5968,7 +5945,7 @@ class Map(MapWidget):
         height: str = "40px",
         expanded: bool = True,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a select data widget to the map.
 
@@ -6039,7 +6016,7 @@ class Map(MapWidget):
         label="STAC Search",
         widget_icon="mdi-search-web",
         sidebar_width="515px",
-        **kwargs,
+        **kwargs: Any,
     ):
         """
         Adds a STAC GUI to the map.
@@ -6059,7 +6036,7 @@ class Map(MapWidget):
         label: str = "AlphaEarth",
         widget_icon: str = "mdi-earth",
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Adds a AlphaEarth GUI to the map.
         Earth Engine Dataset: https://developers.google.com/earth-engine/datasets/catalog/GOOGLE_SATELLITE_EMBEDDING_V1_ANNUAL
@@ -6228,9 +6205,9 @@ class Map(MapWidget):
         default_year: int = 2024,
         default_color: str = "#0000ff",
         default_threshold: float = 0.8,
-        widget_icon="mdi-map-search",
-        widget_label="Similarity Search",
-        **kwargs,
+        widget_icon: str = "mdi-map-search",
+        widget_label: str = "Similarity Search",
+        **kwargs: Any,
     ):
         """
         Adds a similarity search widget to the map.
@@ -6273,7 +6250,7 @@ class Map(MapWidget):
         background_color: str = "#f5f5f5",
         height: str = "40px",
         expanded: bool = True,
-        **kwargs,
+        **kwargs: Any,
     ):
         """
         Adds a time slider to the map.
@@ -6399,7 +6376,7 @@ class Container(v.Container):
         sidebar_content: Optional[Union[widgets.VBox, List[widgets.Widget]]] = None,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Initializes the Container widget.
 
@@ -6617,7 +6594,7 @@ class Container(v.Container):
         expanded: bool = True,
         host_map: Optional[Any] = None,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Appends a widget to the sidebar content.
 
@@ -6646,7 +6623,7 @@ class Container(v.Container):
                 height=height,
                 expanded=expanded,
                 host_map=host_map,
-                **kwargs,
+                **kwargs: Any,
             )
 
         self.sidebar_content_box.children += (widget,)
@@ -6973,10 +6950,11 @@ def edit_gps_trace(
         Any: The main widget containing the map and the editing interface.
     """
 
-    from pathlib import Path
     from datetime import datetime
-    from bqplot import LinearScale, Figure, PanZoom
+    from pathlib import Path
+
     import bqplot as bq
+    from bqplot import Figure, LinearScale, PanZoom
 
     if webGL:
         try:
@@ -7618,7 +7596,7 @@ def open_gps_trace(
                         download,
                         sync_plots,
                         column_widths,
-                        **kwargs,
+                        **kwargs: Any,
                     )
                 except Exception as e:
                     output.outputs = ()
@@ -7771,7 +7749,7 @@ def open_gps_traces(
                         download,
                         sync_plots,
                         column_widths,
-                        **kwargs,
+                        **kwargs: Any,
                     )
                 except Exception as e:
                     output.outputs = ()
@@ -7988,7 +7966,7 @@ def create_vector_data(
                     name=name,
                     paint=paint,
                     fit_bounds=False,
-                    **kwargs,
+                    **kwargs: Any,
                 )
 
             else:
@@ -8524,7 +8502,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         groups: dict = None,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Initializes the LayerManagerWidget.
 
@@ -8804,7 +8782,7 @@ class CustomWidget(v.ExpansionPanels):
         host_map: Optional[Any] = None,
         *args: Any,
         **kwargs: Any,
-    ) -> None:
+    ):
         """
         Initializes the CustomWidget.
 
@@ -9488,8 +9466,9 @@ class SelectDataWidget(widgets.VBox):
                 to be called when the selection is reset. Defaults to None.
             map_widget (Optional[Map], optional): The map widget to which the data will be added. Defaults to None.
         """
-        import ipyfilechooser
         import tempfile
+
+        import ipyfilechooser
 
         super().__init__(layout=widgets.Layout(max_width=widget_width))
 
@@ -9705,8 +9684,9 @@ def TimeSliderWidget(
         button_width (str, optional): Width of the buttons. Defaults to "45px".
         **kwargs: Additional keyword arguments to be passed to the add_raster or add_cog_layer function.
     """
-    import time
     import threading
+    import time
+
     import xarray as xr
 
     if isinstance(images, str):
@@ -9798,7 +9778,7 @@ def TimeSliderWidget(
                     name=layer_name,
                     overwrite=True,
                     fit_bounds=False,
-                    **kwargs,
+                    **kwargs: Any,
                 )
             else:
                 m.add_raster(
@@ -9806,7 +9786,7 @@ def TimeSliderWidget(
                     name=layer_name,
                     overwrite=True,
                     fit_bounds=False,
-                    **kwargs,
+                    **kwargs: Any,
                 )
 
     slider.observe(slider_changed, "value")

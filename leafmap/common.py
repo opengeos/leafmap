@@ -3,23 +3,25 @@
 import csv
 import json
 import os
-import sys
-import requests
 import shutil
+import subprocess
+import sys
 import tarfile
 import urllib.request
 import warnings
 import zipfile
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+
 import folium
 import ipyleaflet
 import ipywidgets as widgets
 import numpy as np
 import pandas as pd
+import requests
 import whitebox
 import xyzservices
-import subprocess
-from pathlib import Path
-from typing import Union, List, Dict, Optional, Tuple, TYPE_CHECKING, Any
+
 from .stac import *
 
 try:
@@ -28,8 +30,8 @@ except ImportError:
     pass
 
 if TYPE_CHECKING:
-    from obstore.auth.boto3 import Boto3CredentialProvider
     import geopandas as gpd
+    from obstore.auth.boto3 import Boto3CredentialProvider
 
 
 class WhiteboxTools(whitebox.WhiteboxTools):
@@ -319,9 +321,9 @@ def open_image_from_url(url: str):
     Returns:
         object: Image object.
     """
-    from PIL import Image
-
     from io import BytesIO
+
+    from PIL import Image
 
     # from urllib.parse import urlparse
 
@@ -689,6 +691,7 @@ def create_download_link(filename, title="Click here to download: ", basename=No
         str: HTML download URL.
     """
     import base64
+
     from IPython.display import HTML
 
     data = open(filename, "rb").read()
@@ -826,6 +829,7 @@ def df_to_geojson(
     """
 
     import json
+
     from geojson import Feature, FeatureCollection, Point
 
     if out_geojson is not None:
@@ -973,7 +977,6 @@ def create_code_cell(code="", where="below"):
     # except ImportError:
     #     install_package("pyperclip")
     #     import pyperclip
-
     from IPython.display import Javascript, display
 
     # try:
@@ -1390,8 +1393,8 @@ def kml_to_shp(in_kml, out_shp):
 
     check_package(name="geopandas", URL="https://geopandas.org")
 
-    import geopandas as gpd
     import fiona
+    import geopandas as gpd
 
     # print(fiona.supported_drivers)
     fiona.drvsupport.supported_drivers["KML"] = "rw"
@@ -1429,8 +1432,8 @@ def kml_to_geojson(in_kml, out_geojson=None):
 
     check_package(name="geopandas", URL="https://geopandas.org")
 
-    import geopandas as gpd
     import fiona
+    import geopandas as gpd
 
     # import fiona
     # print(fiona.supported_drivers)
@@ -1565,8 +1568,8 @@ def vector_to_geojson(
 
     warnings.filterwarnings("ignore")
     check_package(name="geopandas", URL="https://geopandas.org")
-    import geopandas as gpd
     import fiona
+    import geopandas as gpd
 
     if not filename.startswith("http"):
         filename = os.path.abspath(filename)
@@ -1769,8 +1772,8 @@ def vector_col_names(filename, **kwargs):
 
     warnings.filterwarnings("ignore")
     check_package(name="geopandas", URL="https://geopandas.org")
-    import geopandas as gpd
     import fiona
+    import geopandas as gpd
 
     if not filename.startswith("http"):
         filename = os.path.abspath(filename)
@@ -2487,8 +2490,8 @@ def get_census_dict(reset=False):
     Returns:
         dict: A dictionary of Census data.
     """
-    import json
     import importlib.resources
+    import json
 
     pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
     census_data = os.path.join(pkg_dir, "data/census_data.json")
@@ -2707,8 +2710,8 @@ def st_download_button(
 
     """
     try:
-        import streamlit as st
         import pandas as pd
+        import streamlit as st
 
         if key is None:
             key = random_string(6)
@@ -2937,11 +2940,8 @@ def get_local_tile_layer(
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
         kwargs.pop("prefix")
 
-    from localtileserver import (
-        get_leaflet_tile_layer,
-        get_folium_tile_layer,
-        TileClient,
-    )
+    from localtileserver import (TileClient, get_folium_tile_layer,
+                                 get_leaflet_tile_layer)
 
     # if "show_loading" not in kwargs:
     #     kwargs["show_loading"] = False
@@ -3572,8 +3572,9 @@ def geojson_to_df(in_geojson, encoding="utf-8", drop_geometry=True):
     """
 
     import json
-    import pandas as pd
     from urllib.request import urlopen
+
+    import pandas as pd
 
     if isinstance(in_geojson, str):
         if in_geojson.startswith("http"):
@@ -3604,8 +3605,9 @@ def geojson_to_shp(in_geojson, out_shp, **kwargs):
         in_geojson (str | dict): The input GeoJSON file or dict.
         out_shp (str): The output shapefile path.
     """
-    import geopandas as gpd
     import json
+
+    import geopandas as gpd
 
     ext = os.path.splitext(out_shp)[1]
     if ext != ".shp":
@@ -3629,8 +3631,9 @@ def geojson_to_gpkg(in_geojson, out_gpkg, **kwargs):
         in_geojson (str | dict): The input GeoJSON file or dict.
         out_gpkg (str): The output GeoPackage path.
     """
-    import geopandas as gpd
     import json
+
+    import geopandas as gpd
 
     ext = os.path.splitext(out_gpkg)[1]
     if ext.lower() != ".gpkg":
@@ -3940,7 +3943,7 @@ def cog_validate(source, verbose=False):
         tuple: A tuple containing the validation results (True is src_path is a valid COG, List of validation errors, and a list of validation warnings).
     """
     try:
-        from rio_cogeo.cogeo import cog_validate, cog_info
+        from rio_cogeo.cogeo import cog_info, cog_validate
     except ImportError:
         raise ImportError(
             "The rio-cogeo package is not installed. Please install it with `pip install rio-cogeo` or `conda install rio-cogeo -c conda-forge`."
@@ -3971,7 +3974,6 @@ def image_to_numpy(image):
         np.array: A numpy array.
     """
     import rasterio
-
     from osgeo import gdal
 
     # ... and suppress errors
@@ -4089,7 +4091,6 @@ def numpy_to_cog(
     import rasterio
     from rasterio.io import MemoryFile
     from rasterio.transform import from_bounds
-
     from rio_cogeo.cogeo import cog_translate
     from rio_cogeo.profiles import cog_profiles
 
@@ -4197,7 +4198,6 @@ def get_stac_collections(url, **kwargs):
     from pystac_client import Client
 
     # Expensive function. Added cache for it.
-
     # Empty list that would be used for a dataframe to collect and visualize info about collections
     root_catalog = Client.open(url, **kwargs)
     collections_list = []
@@ -4248,9 +4248,10 @@ def get_stac_items(
     """
 
     import itertools
+
     import geopandas as gpd
-    from shapely.geometry import shape
     from pystac_client import Client
+    from shapely.geometry import shape
 
     # Empty list that would be used for a dataframe to collect and visualize info about collections
     items_list = []
@@ -4555,8 +4556,8 @@ def view_lidar(
     elif backend == "open3d":
         try:
             import laspy
-            import open3d as o3d
             import numpy as np
+            import open3d as o3d
         except ImportError:
             print(
                 "The laspy and open3d packages are required for this function. Use pip install laspy open3d to install them."
@@ -4917,6 +4918,7 @@ def clip_image(image, mask, output, to_cog=True):
     """
     try:
         import json
+
         import fiona
         import rasterio
         import rasterio.mask
@@ -5256,11 +5258,11 @@ def classify(
         pd.DataFrame, dict: A pandas dataframe with the classification applied and a legend dictionary.
     """
 
-    import numpy as np
-    import pandas as pd
     import geopandas as gpd
     import matplotlib as mpl
     import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
 
     try:
         import mapclassify
@@ -5438,6 +5440,7 @@ def check_cmap(cmap):
     """
 
     from box import Box
+
     from .colormaps import get_palette
 
     if isinstance(cmap, str):
@@ -6015,9 +6018,10 @@ def mosaic(
         verbose (bool, optional): Whether to print progress. Defaults to True.
 
     """
-    from rasterio.merge import merge
-    import rasterio as rio
     from pathlib import Path
+
+    import rasterio as rio
+    from rasterio.merge import merge
 
     output = os.path.abspath(output)
 
@@ -6137,7 +6141,8 @@ def reproject(
 
     """
     import rasterio as rio
-    from rasterio.warp import calculate_default_transform, reproject, Resampling
+    from rasterio.warp import (Resampling, calculate_default_transform,
+                               reproject)
 
     if isinstance(resampling, str):
         resampling = getattr(Resampling, resampling)
@@ -6328,8 +6333,8 @@ def image_set_crs(image, epsg):
         epsg (int): The EPSG code of the CRS to set.
     """
 
-    from rasterio.crs import CRS
     import rasterio
+    from rasterio.crs import CRS
 
     with rasterio.open(image, "r+") as rds:
         rds.crs = CRS.from_epsg(epsg)
@@ -6380,9 +6385,9 @@ def image_bbox(raster_path, output_file=None, to_crs=None, **kwargs):
         to_crs (str, optional): The CRS to convert the bounding box to. Defaults to None.
     """
 
+    import geopandas as gpd
     import rasterio
     from shapely.geometry import box
-    import geopandas as gpd
 
     with rasterio.open(raster_path) as src:
         bounds = src.bounds
@@ -6739,8 +6744,9 @@ def get_overlap(img1, img2, overlap, out_img1=None, out_img2=None, to_cog=True):
         str: Path to the overlap area in GeoJSON format.
     """
     import json
-    from osgeo import gdal, ogr, osr
+
     import geopandas as gpd
+    from osgeo import gdal, ogr, osr
 
     extent = gdal.Info(img1, format="json")["wgs84Extent"]
     poly1 = ogr.CreateGeometryFromJson(json.dumps(extent))
@@ -6954,8 +6960,8 @@ def image_filesize(
     Returns:
         float: The size of the image in a given unit.
     """
-    import numpy as np
     import geopandas as gpd
+    import numpy as np
 
     if bbox:
         if isinstance(region, gpd.GeoDataFrame):
@@ -7032,6 +7038,7 @@ async def download_file_lite(url, output=None, binary=False, overwrite=False, **
         overwrite (bool, optional): Whether to overwrite the file if it exists. Defaults to False.
     """
     import sys
+
     import pyodide  # pylint: disable=E0401
 
     if "pyodide" not in sys.modules:
@@ -7110,6 +7117,7 @@ def create_legend(
     """
 
     import importlib.resources
+
     from .legends import builtin_legends
 
     pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
@@ -7396,9 +7404,9 @@ def add_text_to_gif(
         loop (int, optional): controls how many times the animation repeats. The default, 1, means that the animation will play once and then stop (displaying the last frame). A value of 0 means that the animation will repeat forever. Defaults to 0.
 
     """
+    import importlib.resources
     import io
 
-    import importlib.resources
     from PIL import Image, ImageDraw, ImageFont, ImageSequence
 
     warnings.simplefilter("ignore")
@@ -7802,6 +7810,7 @@ def make_gif(images, out_gif, ext="jpg", fps=10, loop=0, mp4=False, clean_up=Fal
 
     """
     import glob
+
     from PIL import Image
 
     ext = ext.replace(".", "")
@@ -8411,7 +8420,8 @@ def save_colorbar(
     import matplotlib as mpl
     import matplotlib.pyplot as plt
     import numpy as np
-    from .colormaps import palettes, get_palette
+
+    from .colormaps import get_palette, palettes
 
     if out_fig is None:
         out_fig = temp_file_path("png")
@@ -8691,6 +8701,7 @@ def show_youtube_video(url, width=800, height=450, allow_autoplay=False, **kwarg
         YouTubeVideo: a video that is displayed in your notebook.
     """
     import re
+
     from IPython.display import YouTubeVideo
 
     if not isinstance(url, str):
@@ -8814,8 +8825,9 @@ def filter_date(
     """
 
     import datetime
-    import pandas as pd
+
     import geopandas as gpd
+    import pandas as pd
 
     if isinstance(data, str):
         data = gpd.read_file(data, **kwargs)
@@ -9367,8 +9379,8 @@ def s3_list_directories(
         ...     return_full_path=True
         ... )
     """
-    from obstore.store import S3Store
     import obstore as obs
+    from obstore.store import S3Store
 
     if path is not None:
         bare_path = path.replace(f"s3://", "")
@@ -9467,8 +9479,8 @@ def s3_list_files(
         ...     return_full_path=True
         ... )
     """
-    from obstore.store import S3Store
     import obstore as obs
+    from obstore.store import S3Store
 
     if path is not None:
         bare_path = path.replace(f"s3://", "")
@@ -9570,8 +9582,9 @@ def s3_get_file(
 
         >>> print(f"File downloaded to: {local_path}")
     """
-    import obstore as obs
     import tempfile
+
+    import obstore as obs
     from obstore.store import S3Store
 
     if path.startswith("s3://"):
@@ -9858,11 +9871,11 @@ def map_tiles_to_geotiff(
         **kwargs: Additional arguments to pass to gdal.GetDriverByName("GTiff").Create().
 
     """
-    import re
-    import io
-    import math
-    import itertools
     import concurrent.futures
+    import io
+    import itertools
+    import math
+    import re
 
     import numpy
     from PIL import Image
@@ -10219,16 +10232,17 @@ def image_comparison(
 
     """
 
-    from PIL import Image
     import base64
     import io
     import os
+    import tempfile
     import uuid
     from typing import Union
-    import requests
-    import tempfile
+
     import numpy as np
+    import requests
     from IPython.display import HTML, display
+    from PIL import Image
 
     TEMP_DIR = os.path.join(tempfile.gettempdir(), random_string(6))
     os.makedirs(TEMP_DIR, exist_ok=True)
@@ -10655,8 +10669,8 @@ def check_html_string(html_string):
     Returns:
         str: The HTML string with local images converted to base64.
     """
-    import re
     import base64
+    import re
 
     # Search for img tags with src attribute
     img_regex = r'<img[^>]+src\s*=\s*["\']([^"\':]+)["\'][^>]*>'
@@ -11077,8 +11091,8 @@ def array_to_memory_file(
     Returns:
         rasterio.DatasetReader: The rasterio dataset reader object for the converted array.
     """
-    import rasterio
     import numpy as np
+    import rasterio
     import xarray as xr
     from rasterio.transform import Affine
 
@@ -11249,8 +11263,8 @@ def array_to_image(
 
     import numpy as np
     import rasterio
-    import xarray as xr
     import rioxarray
+    import xarray as xr
     from rasterio.transform import Affine
 
     if output is None:
@@ -11590,8 +11604,8 @@ def merge_vector(
 
     """
 
-    import pandas as pd
     import geopandas as gpd
+    import pandas as pd
 
     if isinstance(files, str):
         files = find_files(files, ext=ext, recursive=recursive)
@@ -11649,8 +11663,8 @@ def download_ms_buildings(
 
     """
 
-    import pandas as pd
     import geopandas as gpd
+    import pandas as pd
     from shapely.geometry import shape
 
     if out_dir is None:
@@ -11724,8 +11738,8 @@ def download_google_buildings(
 
     """
 
-    import pandas as pd
     import geopandas as gpd
+    import pandas as pd
     from shapely import wkt
 
     building_url = "https://sites.research.google/open-buildings/tiles.geojson"
@@ -11808,8 +11822,8 @@ def google_buildings_csv_to_vector(
     Returns:
         None
     """
-    import pandas as pd
     import geopandas as gpd
+    import pandas as pd
     from shapely import wkt
 
     df = pd.read_csv(filename)
@@ -11970,7 +11984,8 @@ def start_server(
 
     def run_flask():
         try:
-            from flask import Flask, send_from_directory, render_template_string
+            from flask import (Flask, render_template_string,
+                               send_from_directory)
             from flask_cors import CORS
 
             app = Flask(__name__, static_folder=directory)
@@ -12099,8 +12114,8 @@ def geojson_to_mbtiles(
         subprocess.CalledProcessError: If there's an error executing the tippecanoe command.
     """
 
-    import subprocess
     import shutil
+    import subprocess
 
     # Check if tippecanoe exists
     if shutil.which("tippecanoe") is None:
@@ -12237,8 +12252,8 @@ def geojson_to_pmtiles(
         subprocess.CalledProcessError: If there's an error executing the tippecanoe command.
     """
 
-    import subprocess
     import shutil
+    import subprocess
 
     # Check if tippecanoe exists
     if shutil.which("tippecanoe") is None:
@@ -12321,11 +12336,12 @@ def pmtiles_header(input_file: str):
         of the file to retrieve the header.
     """
 
-    import requests
     from urllib.parse import urlparse
 
+    import requests
+
     try:
-        from pmtiles.reader import Reader, MmapSource
+        from pmtiles.reader import MmapSource, Reader
         from pmtiles.tile import deserialize_header
     except ImportError:
         print(
@@ -12389,11 +12405,12 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
     """
 
     import json
-    import requests
     from urllib.parse import urlparse
 
+    import requests
+
     try:
-        from pmtiles.reader import Reader, MmapSource, MemorySource
+        from pmtiles.reader import MemorySource, MmapSource, Reader
     except ImportError:
         print(
             "pmtiles is not installed. Please install it using `pip install pmtiles`."
@@ -12572,9 +12589,9 @@ def raster_to_vector(
         simplify_tolerance (float, optional): The maximum allowed geometry displacement.
             The higher this value, the smaller the number of vertices in the resulting geometry.
     """
+    import geopandas as gpd
     import rasterio
     import shapely
-    import geopandas as gpd
     from rasterio import features
 
     with rasterio.open(source, **open_args) as src:
@@ -12623,6 +12640,7 @@ def overlay_images(
 
     """
     import sys
+
     import matplotlib
     import matplotlib.pyplot as plt
     import matplotlib.widgets as mpwidgets
@@ -12698,8 +12716,8 @@ def blend_images(
     Returns:
         numpy.ndarray: The blended image as a NumPy array.
     """
-    import numpy as np
     import matplotlib.pyplot as plt
+    import numpy as np
 
     try:
         import cv2
@@ -13010,6 +13028,7 @@ def vector_to_parquet_batch(input_dir, output_dir=None, file_ext=".geojson", **k
         >>> vector_to_parquet_batch("input_directory", "output_directory", ".geojson")
     """
     import glob
+
     import duckdb
 
     # Set output directory
@@ -13075,6 +13094,7 @@ def vector_to_gpkg_batch(input_dir, output_dir=None, file_ext=".geojson", **kwar
         >>> vector_to_gpkg_batch("input_directory", "output_directory", ".geojson")
     """
     import glob
+
     import duckdb
 
     # Set output directory
@@ -13140,6 +13160,7 @@ def vector_to_geojson_batch(input_dir, output_dir=None, file_ext=".shp", **kwarg
         >>> vector_to_geojson_batch("input_directory", "output_directory", ".shp")
     """
     import glob
+
     import duckdb
 
     # Set output directory
@@ -13209,10 +13230,11 @@ def geojsonl_to_parquet_batch(
         **kwargs: Additional keyword arguments to pass to the `to_parquet` function of GeoDataFrame.
 
     """
-    import geopandas as gpd
-    from shapely.geometry import shape
     import glob
     import math
+
+    import geopandas as gpd
+    from shapely.geometry import shape
 
     if not os.path.exists(input_dir):
         raise FileNotFoundError(f"Input directory not found: {input_dir}")
@@ -13946,10 +13968,11 @@ def gedi_search(
 
     """
 
-    import requests
     import datetime as dt
-    import pandas as pd
+
     import geopandas as gpd
+    import pandas as pd
+    import requests
     from shapely.geometry import MultiPolygon, Polygon, box
     from shapely.ops import orient
 
@@ -14177,16 +14200,12 @@ def gedi_subset(
     except ImportError:
         install_package("harmony-py")
 
-    import requests as re
-    import geopandas as gpd
     from datetime import datetime
-    from harmony import (
-        BBox,
-        Client,
-        Collection,
-        Environment,
-        Request,
-    )  # pylint: disable=E0401
+
+    import geopandas as gpd
+    import requests as re
+    from harmony import (BBox, Client, Collection,  # pylint: disable=E0401
+                         Environment, Request)
 
     if out_dir is None:
         out_dir = os.getcwd()
@@ -14287,9 +14306,10 @@ def gedi_download_file(
     Returns:
         None
     """
+    from urllib.parse import urlparse
+
     import requests
     from tqdm import tqdm
-    from urllib.parse import urlparse
 
     if username is None:
         username = os.environ.get("EARTHDATA_USERNAME", None)
@@ -14352,10 +14372,11 @@ def gedi_download_files(
         None
     """
 
+    from urllib.parse import urlparse
+
+    import geopandas as gpd
     import requests
     from tqdm import tqdm
-    from urllib.parse import urlparse
-    import geopandas as gpd
 
     if isinstance(urls, gpd.GeoDataFrame):
         urls = urls["granule_url"].tolist()
@@ -14522,8 +14543,9 @@ def h5_to_gdf(
         import h5py
 
     import glob
-    import pandas as pd
+
     import geopandas as gpd
+    import pandas as pd
 
     if isinstance(filenames, str):
         if os.path.exists(filenames):
@@ -14609,9 +14631,9 @@ def nasa_data_granules_to_gdf(
     Returns:
         gpd.GeoDataFrame: The resulting GeoDataFrame.
     """
-    import pandas as pd
     import geopandas as gpd
-    from shapely.geometry import box, Polygon
+    import pandas as pd
+    from shapely.geometry import Polygon, box
 
     df = pd.json_normalize([dict(i.items()) for i in granules])
     df.columns = [col.split(".")[-1] for col in df.columns]
@@ -15884,7 +15906,7 @@ def _convert_geometry_to_esri_format(geometry):
     Returns:
         dict: The geometry in ESRI format.
     """
-    from shapely.geometry import Point, Polygon, LineString, MultiPoint
+    from shapely.geometry import LineString, MultiPoint, Point, Polygon
 
     if isinstance(geometry, Point):
         # Convert point to ESRI format
@@ -16279,6 +16301,7 @@ def get_nwi_by_huc8(
         ValueError: If the HUC8 code is invalid or the layer is not allowed.
     """
     import tempfile
+
     import geopandas as gpd
 
     if geometry is not None:
@@ -16355,10 +16378,9 @@ def get_max_pixel_coords(
     Returns:
         dict: Maximum pixel value and its geographic coordinates in the specified CRS.
     """
-    import rasterio
-    import numpy as np
     import geopandas as gpd
-    from rasterio.warp import transform
+    import numpy as np
+    import rasterio
     from rasterio.mask import mask
     from rasterio.warp import transform, transform_geom
 
@@ -16519,8 +16541,8 @@ def connect_points_as_line(
         >>> line_gdf = connect_points_as_line(gdf, 'timestamp', crs="EPSG:3857", single_line=True)
         >>> line_gdf = connect_points_as_line(gdf, single_line=False)  # Uses index and defaults to EPSG:4326
     """
-    from shapely.geometry import LineString
     import geopandas as gpd
+    from shapely.geometry import LineString
 
     # Sort the GeoDataFrame by the specified column or by index if None
     gdf_sorted = gdf.sort_values(by=sort_column) if sort_column else gdf.sort_index()
@@ -16551,8 +16573,8 @@ def line_to_points(data: str) -> "GeoDataFrame":
         GeoDataFrame: A new GeoDataFrame where each vertex of the LineString is a Point geometry.
     """
     import geopandas as gpd
-    from shapely.geometry import Point, LineString
     from geopandas import GeoDataFrame
+    from shapely.geometry import LineString, Point
 
     if isinstance(data, str):
         line_gdf = gpd.read_file(data)
@@ -17964,9 +17986,10 @@ def clip_vector(input_gdf, clip_geom=None, bbox=None, output=None):
         ValueError: If both `clip_geom` and `bbox` are provided or neither is provided.
         ValueError: If `bbox` is not a 4-element tuple or list.
     """
+    from pathlib import Path
+
     import geopandas as gpd
     from shapely.geometry import box
-    from pathlib import Path
 
     # Load input_gdf if it's a file path
     if isinstance(input_gdf, (str, Path)):
@@ -18115,7 +18138,6 @@ def start_martin(
 
     import platform
     import stat
-
     from pathlib import Path
 
     BASE = f"https://github.com/maplibre/martin/releases/download/{martin_version}"
@@ -18307,7 +18329,8 @@ def get_ee_tile_url(
     try:
 
         import ee
-        from geemap.ee_tile_layers import _get_tile_url_format, _validate_palette
+        from geemap.ee_tile_layers import (_get_tile_url_format,
+                                           _validate_palette)
 
         if isinstance(asset_id, str):
             if asset_id.startswith("ee."):

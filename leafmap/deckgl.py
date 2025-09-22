@@ -1,71 +1,28 @@
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 from box import Box
 
-from typing import Union, List, Dict, Optional, Tuple, Any
+from . import common, map_widgets, plot
 from .basemaps import xyz_to_leaflet
-from . import common
-from . import map_widgets
-from . import plot
-
-from .common import (
-    add_crs,
-    basemap_xyz_tiles,
-    cog_bands,
-    cog_bounds,
-    cog_center,
-    cog_tile,
-    convert_lidar,
-    create_legend,
-    csv_to_df,
-    csv_to_geojson,
-    csv_to_shp,
-    download_file,
-    download_from_url,
-    download_ned,
-    gdf_to_geojson,
-    geojson_to_pmtiles,
-    get_api_key,
-    get_census_dict,
-    image_comparison,
-    image_to_numpy,
-    map_tiles_to_geotiff,
-    netcdf_to_tif,
-    numpy_to_cog,
-    planet_monthly_tiles,
-    planet_quarterly_tiles,
-    planet_tiles,
-    plot_raster,
-    plot_raster_3d,
-    pmtiles_metadata,
-    pmtiles_style,
-    read_lidar,
-    read_netcdf,
-    read_raster,
-    read_rasters,
-    save_colorbar,
-    search_qms,
-    search_xyz_services,
-    set_api_key,
-    show_html,
-    show_youtube_video,
-    stac_assets,
-    stac_bands,
-    stac_bounds,
-    stac_center,
-    stac_info,
-    stac_search,
-    stac_stats,
-    stac_tile,
-    start_server,
-    vector_to_gif,
-    view_lidar,
-    write_lidar,
-    zonal_stats,
-)
-
+from .common import (add_crs, basemap_xyz_tiles, cog_bands, cog_bounds,
+                     cog_center, cog_tile, convert_lidar, create_legend,
+                     csv_to_df, csv_to_geojson, csv_to_shp, download_file,
+                     download_from_url, download_ned, gdf_to_geojson,
+                     geojson_to_pmtiles, get_api_key, get_census_dict,
+                     image_comparison, image_to_numpy, map_tiles_to_geotiff,
+                     netcdf_to_tif, numpy_to_cog, planet_monthly_tiles,
+                     planet_quarterly_tiles, planet_tiles, plot_raster,
+                     plot_raster_3d, pmtiles_metadata, pmtiles_style,
+                     read_lidar, read_netcdf, read_raster, read_rasters,
+                     save_colorbar, search_qms, search_xyz_services,
+                     set_api_key, show_html, show_youtube_video, stac_assets,
+                     stac_bands, stac_bounds, stac_center, stac_info,
+                     stac_search, stac_stats, stac_tile, start_server,
+                     vector_to_gif, view_lidar, write_lidar, zonal_stats)
 
 try:
-    import lonboard
     import geopandas as gpd
+    import lonboard
 
 except ImportError:
     raise Exception(
@@ -160,8 +117,8 @@ class Map(lonboard.Map):
             None
         """
 
-        from lonboard import ScatterplotLayer, PathLayer, SolidPolygonLayer
         import matplotlib.pyplot as plt
+        from lonboard import PathLayer, ScatterplotLayer, SolidPolygonLayer
 
         geom_type = gdf.geometry.iloc[0].geom_type
         kwargs["pickable"] = pickable
@@ -306,16 +263,9 @@ class Map(lonboard.Map):
             None
         """
 
-        from lonboard import (
-            BitmapLayer,
-            BitmapTileLayer,
-            HeatmapLayer,
-            PathLayer,
-            PointCloudLayer,
-            PolygonLayer,
-            ScatterplotLayer,
-            SolidPolygonLayer,
-        )
+        from lonboard import (BitmapLayer, BitmapTileLayer, HeatmapLayer,
+                              PathLayer, PointCloudLayer, PolygonLayer,
+                              ScatterplotLayer, SolidPolygonLayer)
 
         if type(layer) in [
             BitmapLayer,
@@ -597,8 +547,8 @@ def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
     Returns:
         array: The colors mapped to the input values.
     """
-    import numpy as np
     import matplotlib.pyplot as plt
+    import numpy as np
 
     if rescale:
         values = np.array(values)

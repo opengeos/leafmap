@@ -1,16 +1,15 @@
 import json
 import os
 import sys
-import requests
-import ipywidgets as widgets
+from typing import Dict, Optional, Union
 
+import ipywidgets as widgets
 import pandas as pd
-from IPython.display import display, HTML
-from . import common
-from . import osm
-from . import examples
-from typing import Optional, Union, Dict
+import requests
+from IPython.display import HTML, display
 from pandas import DataFrame
+
+from . import common, examples, osm
 
 try:
     import keplergl
