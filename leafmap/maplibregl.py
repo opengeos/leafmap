@@ -19,23 +19,46 @@ logging.getLogger("maplibre").setLevel(logging.ERROR)
 
 from maplibre import Layer, LayerType, MapOptions
 from maplibre.basemaps import background, construct_carto_basemap_url
-from maplibre.controls import (AttributionControl, FullscreenControl,
-                               GeolocateControl, GlobeControl, Marker,
-                               NavigationControl, ScaleControl)
+from maplibre.controls import (
+    AttributionControl,
+    FullscreenControl,
+    GeolocateControl,
+    GlobeControl,
+    Marker,
+    NavigationControl,
+    ScaleControl,
+)
 from maplibre.ipywidget import MapWidget
 from maplibre.sources import GeoJSONSource, RasterTileSource
 from maplibre.utils import get_bounds
 
 from . import common
 from .basemaps import xyz_to_leaflet
-from .common import (download_file, execute_maplibre_notebook_dir,
-                     filter_geom_type, find_files, generate_index_html,
-                     geojson_bounds, geojson_to_gdf, geojson_to_pmtiles,
-                     get_api_key, get_bounds, get_ee_tile_url,
-                     get_overture_data, nasa_data_download, nasa_data_login,
-                     pandas_to_geojson, pmtiles_metadata, pmtiles_style,
-                     random_string, read_geojson, read_vector, sort_files,
-                     stac_assets, start_server)
+from .common import (
+    download_file,
+    execute_maplibre_notebook_dir,
+    filter_geom_type,
+    find_files,
+    generate_index_html,
+    geojson_bounds,
+    geojson_to_gdf,
+    geojson_to_pmtiles,
+    get_api_key,
+    get_bounds,
+    get_ee_tile_url,
+    get_overture_data,
+    nasa_data_download,
+    nasa_data_login,
+    pandas_to_geojson,
+    pmtiles_metadata,
+    pmtiles_style,
+    random_string,
+    read_geojson,
+    read_vector,
+    sort_files,
+    stac_assets,
+    start_server,
+)
 from .map_widgets import TabWidget
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
@@ -359,7 +382,7 @@ class Map(MapWidget):
                 min_width=min_width,
                 max_width=max_width,
                 sidebar_content=[self.layer_manager],
-                **kwargs: Any,
+                **kwargs,
             )
             container.sidebar_widgets["Layers"] = self.layer_manager
             self.container = container
@@ -392,7 +415,7 @@ class Map(MapWidget):
                 label=label,
                 background_color=background_color,
                 *args,
-                **kwargs: Any,
+                **kwargs,
             )
 
     def set_sidebar_content(
@@ -1983,7 +2006,7 @@ class Map(MapWidget):
                     visible=visible,
                     before_id=before_id,
                     overwrite=overwrite,
-                    **kwargs: Any,
+                    **kwargs,
                 )
             else:
                 print(f"The provided EE tile layer {asset_id} does not exist.")
@@ -2004,7 +2027,7 @@ class Map(MapWidget):
                     visible=visible,
                     before_id=before_id,
                     overwrite=overwrite,
-                    **kwargs: Any,
+                    **kwargs,
                 )
             else:
 
@@ -2025,7 +2048,7 @@ class Map(MapWidget):
                         visible=visible,
                         before_id=before_id,
                         overwrite=overwrite,
-                        **kwargs: Any,
+                        **kwargs,
                     )
                 except Exception as e:
                     print(e)
@@ -3366,7 +3389,7 @@ class Map(MapWidget):
                 width=width,
                 height=height,
                 scrolling=scrolling,
-                **kwargs: Any,
+                **kwargs,
             )
 
         except Exception as e:
@@ -5439,7 +5462,7 @@ class Map(MapWidget):
                 label=widget_label,
                 widget_icon=widget_icon,
                 expanded=False,
-                **kwargs: Any,
+                **kwargs,
             )
 
             def log_lng_lat(lng_lat):
@@ -5665,7 +5688,7 @@ class Map(MapWidget):
             "paint": paint,
             "min_zoom": min_zoom,
             "max_zoom": max_zoom,
-            **kwargs: Any,
+            **kwargs,
         }
 
         self.add_layer(
@@ -6623,7 +6646,7 @@ class Container(v.Container):
                 height=height,
                 expanded=expanded,
                 host_map=host_map,
-                **kwargs: Any,
+                **kwargs,
             )
 
         self.sidebar_content_box.children += (widget,)
@@ -7596,7 +7619,7 @@ def open_gps_trace(
                         download,
                         sync_plots,
                         column_widths,
-                        **kwargs: Any,
+                        **kwargs,
                     )
                 except Exception as e:
                     output.outputs = ()
@@ -7749,7 +7772,7 @@ def open_gps_traces(
                         download,
                         sync_plots,
                         column_widths,
-                        **kwargs: Any,
+                        **kwargs,
                     )
                 except Exception as e:
                     output.outputs = ()
@@ -7966,7 +7989,7 @@ def create_vector_data(
                     name=name,
                     paint=paint,
                     fit_bounds=False,
-                    **kwargs: Any,
+                    **kwargs,
                 )
 
             else:
@@ -9778,7 +9801,7 @@ def TimeSliderWidget(
                     name=layer_name,
                     overwrite=True,
                     fit_bounds=False,
-                    **kwargs: Any,
+                    **kwargs,
                 )
             else:
                 m.add_raster(
@@ -9786,7 +9809,7 @@ def TimeSliderWidget(
                     name=layer_name,
                     overwrite=True,
                     fit_bounds=False,
-                    **kwargs: Any,
+                    **kwargs,
                 )
 
     slider.observe(slider_changed, "value")
