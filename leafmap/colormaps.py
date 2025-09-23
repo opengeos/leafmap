@@ -1,11 +1,13 @@
 """Module for commonly used colormaps and palettes for visualizing geospatial data."""
 
+from typing import List, Optional
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from box import Box
+
 from .common import to_hex_colors
-from typing import Optional, List
 
 _palette_dict = {
     "ndvi": [

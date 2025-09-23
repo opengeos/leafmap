@@ -1,6 +1,7 @@
 from typing import Callable, Iterable, List, Optional
-import ipywidgets as widgets
+
 import ipyvuetify as v
+import ipywidgets as widgets
 
 from . import common
 
@@ -206,9 +207,11 @@ class Legend(widgets.VBox):
             ValueError: If the position is not allowed.
 
         """
-        import os  # pylint: disable=import-outside-toplevel
-        from IPython.display import display  # pylint: disable=import-outside-toplevel
         import importlib.resources  # pylint: disable=import-outside-toplevel
+        import os  # pylint: disable=import-outside-toplevel
+
+        from IPython.display import display  # pylint: disable=import-outside-toplevel
+
         from .legends import builtin_legends  # pylint: disable=import-outside-toplevel
 
         pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")

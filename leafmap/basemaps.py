@@ -20,12 +20,14 @@ More WMS basemaps can be found at the following websites:
 
 import collections
 import os
-from typing import Dict, Any
-import requests
+from typing import Any, Dict
+
 import folium
 import ipyleaflet
+import requests
 import xyzservices
-from .common import check_package, planet_tiles, GoogleMapsTileProvider
+
+from .common import GoogleMapsTileProvider, check_package, planet_tiles
 
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", None)
 
@@ -274,7 +276,7 @@ WMS_TILES = {
 custom_tiles = {"xyz": XYZ_TILES, "wms": WMS_TILES}
 
 
-def get_xyz_dict(free_only=True, france=False):
+def get_xyz_dict(free_only: bool = True, france: bool = False) -> dict:
     """Returns a dictionary of xyz services.
 
     Args:
@@ -307,7 +309,7 @@ def get_xyz_dict(free_only=True, france=False):
     return xyz_dict
 
 
-def xyz_to_leaflet():
+def xyz_to_leaflet() -> dict:
     """Convert xyz tile services to ipyleaflet tile layers.
 
     Returns:
@@ -333,7 +335,7 @@ def xyz_to_leaflet():
     return leaflet_dict
 
 
-def xyz_to_folium():
+def xyz_to_folium() -> dict:
     """Convert xyz tile services to folium tile layers.
 
     Returns:
@@ -384,7 +386,7 @@ def xyz_to_folium():
     return folium_dict
 
 
-def xyz_to_pydeck():
+def xyz_to_pydeck() -> dict:
     """Convert xyz tile services to pydeck custom tile layers.
 
     Returns:
@@ -426,7 +428,7 @@ def xyz_to_pydeck():
     return pydeck_dict
 
 
-def xyz_to_plotly():
+def xyz_to_plotly() -> dict:
     """Convert xyz tile services to plotly tile layers.
 
     Returns:
@@ -459,7 +461,7 @@ def xyz_to_plotly():
     return plotly_dict
 
 
-def xyz_to_bokeh():
+def xyz_to_bokeh() -> dict:
     """Convert xyz tile services to bokeh tile layers.
 
     Returns:
@@ -517,7 +519,7 @@ def get_qms(service_id, timeout=60):
     return service_details.json()
 
 
-def qms_to_geemap(service_id):
+def qms_to_geemap(service_id: str) -> ipyleaflet.TileLayer:
     """Convert a qms service to an ipyleaflet tile layer.
 
     Args:

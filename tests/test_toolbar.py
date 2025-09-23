@@ -3,6 +3,7 @@
 """Tests for `toolbar` module."""
 
 import unittest
+
 from leafmap import leafmap
 from leafmap.toolbar import *
 

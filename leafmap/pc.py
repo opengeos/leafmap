@@ -2,9 +2,12 @@
 
 import json
 import os
+from typing import List, Optional, Union
+
+import pystac
 from pystac_client import Client
+
 from .common import stac_assets, stac_bands
-from typing import Optional, List, Optional, Union
 
 PC_ENDPOINT = "https://planetarycomputer.microsoft.com/api/stac/v1"
 
@@ -29,7 +32,9 @@ def get_pc_collections(verbose: Optional[bool] = False) -> dict[str, str]:
     return result
 
 
-def get_first_item(collection: str, return_id: Optional[bool] = False):
+def get_first_item(
+    collection: str, return_id: Optional[bool] = False
+) -> Union[str, pystac.Item]:
     """Get the first item in a collection.
 
     Args:

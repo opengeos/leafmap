@@ -1,25 +1,19 @@
 """Main module."""
 
 import os
-from typing import Any, Dict, List, Optional, Tuple, Type, Union, Callable, Sequence
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 import ipyleaflet
 import ipywidgets as widgets
 import pandas as pd
-
 from box import Box
 from IPython.display import display
 
+from . import common, examples, map_widgets, osm, pc
 from .basemaps import xyz_to_leaflet
-from .legends import builtin_legends
-from . import common
-from . import examples
-from . import map_widgets
-from . import osm
-from . import pc
 from .common import *
+from .legends import builtin_legends
 from .plot import *
-
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
@@ -1350,8 +1344,8 @@ class Map(ipyleaflet.Map):
             layer_name (str, optional): The layer name to use for the marker cluster. Defaults to "Circle Markers".
 
         """
-        import pandas as pd
         import geopandas as gpd
+        import pandas as pd
 
         if isinstance(data, pd.DataFrame) or isinstance(data, gpd.GeoDataFrame):
             df = data
@@ -1872,6 +1866,7 @@ class Map(ipyleaflet.Map):
 
         """
         import importlib.resources
+
         from IPython.display import display
 
         pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
@@ -2181,8 +2176,9 @@ class Map(ipyleaflet.Map):
             name (str): name of the layer to show on the layer control.
         """
         from base64 import b64encode
-        from PIL import Image, ImageSequence
         from io import BytesIO
+
+        from PIL import Image, ImageSequence
 
         try:
             if not url.startswith("http"):
@@ -2723,9 +2719,10 @@ class Map(ipyleaflet.Map):
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
-        import shutil
         import json
         import random
+        import shutil
+
         import geopandas as gpd
 
         gdf = None
@@ -3303,8 +3300,8 @@ class Map(ipyleaflet.Map):
 
         warnings.filterwarnings("ignore")
         common.check_package(name="geopandas", URL="https://geopandas.org")
-        import geopandas as gpd
         import fiona
+        import geopandas as gpd
 
         self.default_style = {"cursor": "wait"}
 
@@ -3696,6 +3693,7 @@ class Map(ipyleaflet.Map):
 
         """
         import warnings
+
         import pandas as pd
 
         warnings.filterwarnings("ignore")
@@ -5039,11 +5037,12 @@ class Map(ipyleaflet.Map):
         Raises:
             ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
         """
+        import copy
+        import json
+
+        import geopandas as gpd
         from ipyleaflet import GeoJSON, Popup
         from shapely.geometry import shape
-        import copy
-        import geopandas as gpd
-        import json
 
         bounds = None
 
@@ -5268,8 +5267,9 @@ class Map(ipyleaflet.Map):
             ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
             ValueError: If the GeoJSON data does not contain only Point geometries.
         """
-        import geopandas as gpd
         import json
+
+        import geopandas as gpd
 
         bounds = None
 
@@ -5528,10 +5528,11 @@ class Map(ipyleaflet.Map):
         Raises:
             ValueError: If the data is not a GeoDataFrame or a GeoJSON dictionary.
         """
-        from ipyleaflet import GeoJSON
         import copy
-        import geopandas as gpd
         import json
+
+        import geopandas as gpd
+        from ipyleaflet import GeoJSON
 
         bounds = None
         if isinstance(data, str):
@@ -6016,8 +6017,9 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
 
     def __init__(self, **kwargs):
         from base64 import b64encode
-        from PIL import Image, ImageSequence
         from io import BytesIO
+
+        from PIL import Image, ImageSequence
 
         try:
             url = kwargs.get("url")
@@ -6493,9 +6495,10 @@ def geojson_layer(
     Raises:
         FileNotFoundError: The provided GeoJSON file could not be found.
     """
-    import shutil
     import json
     import random
+    import shutil
+
     import geopandas as gpd
 
     gdf = None

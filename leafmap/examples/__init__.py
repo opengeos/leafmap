@@ -1,6 +1,7 @@
-import box
-import os
 import importlib.resources
+import os
+
+import box
 
 _pkg_dir = os.path.dirname(importlib.resources.files("leafmap") / "leafmap.py")
 _datasets_path = os.path.join(_pkg_dir, "examples/datasets.txt")

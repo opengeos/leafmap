@@ -4,20 +4,21 @@ For more details about Here Map Widget for Jupyter
 please check: https://github.com/heremaps/here-map-widget-for-jupyter
 """
 
-import os
 import json
+import os
 import random
-import requests
 import warnings
-import ipywidgets as widgets
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
-from box import Box
-from .basemaps import xyz_to_heremap
-from .common import shp_to_geojson, gdf_to_geojson, vector_to_geojson, random_string
-from . import examples
-from typing import Optional, Union, List, Dict, Callable, Any, Tuple
-from geopandas import GeoDataFrame, GeoSeries
+import ipywidgets as widgets
+import requests
 import shapely.geometry.base.BaseGeometry
+from box import Box
+from geopandas import GeoDataFrame, GeoSeries
+
+from . import examples
+from .basemaps import xyz_to_heremap
+from .common import gdf_to_geojson, random_string, shp_to_geojson, vector_to_geojson
 
 try:
     import here_map_widget
@@ -30,16 +31,15 @@ except ImportError:
 warnings.filterwarnings("ignore")
 from here_map_widget import (
     FullscreenControl,
+    GeoJSON,
+    ImageTileProvider,
+    LayersControl,
     MeasurementControl,
     ScaleBar,
-    ZoomControl,
-    ImageTileProvider,
     TileLayer,
-    GeoJSON,
     WidgetControl,
-    LayersControl,
+    ZoomControl,
 )
-
 
 basemaps = Box(xyz_to_heremap(), frozen_box=True)
 

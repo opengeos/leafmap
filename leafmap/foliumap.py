@@ -1,15 +1,15 @@
 import os
+
 import folium
 import folium.plugins as plugins
 from box import Box
+from branca.element import Figure, JavascriptLink, MacroElement
+from folium.elements import JSCSSMixin
+from folium.map import Layer
+from jinja2 import Template
 
-from .legends import builtin_legends
+from . import common, examples, map_widgets, osm, plot
 from .basemaps import xyz_to_folium
-from . import common
-from . import osm
-from . import examples
-from . import map_widgets
-from . import plot
 from .common import (
     add_crs,
     array_to_image,
@@ -32,13 +32,13 @@ from .common import (
     gdf_to_geojson,
     gedi_download_files,
     gedi_search,
+    geojson_to_gdf,
+    geojson_to_pmtiles,
     get_api_key,
     get_census_dict,
     get_ee_tile_url,
     get_overture_data,
     get_wbd,
-    geojson_to_gdf,
-    geojson_to_pmtiles,
     image_comparison,
     image_to_numpy,
     map_tiles_to_geotiff,
@@ -62,6 +62,7 @@ from .common import (
     set_api_key,
     show_html,
     show_youtube_video,
+    st_download_button,
     stac_assets,
     stac_bands,
     stac_bounds,
@@ -71,21 +72,17 @@ from .common import (
     stac_stats,
     stac_tile,
     start_server,
-    st_download_button,
     vector_to_gif,
     view_lidar,
     write_lidar,
     zonal_stats,
 )
-
-from branca.element import Figure, JavascriptLink, MacroElement
-from folium.elements import JSCSSMixin
-from folium.map import Layer
-from jinja2 import Template
+from .legends import builtin_legends
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
 import pandas as pd
-from typing import Optional, Union, Any, Callable, Dict, Tuple, List
 
 
 class Map(folium.Map):
@@ -528,7 +525,7 @@ class Map(folium.Map):
         Args:
             url (str): URL of the WMS legend image. Should have this format if using wms legend: {geoserver}/wms?REQUEST=GetLegendGraphic&FORMAT=image/png&LAYER={layer}
         """
-        from branca.element import Figure, MacroElement, Element
+        from branca.element import Element, Figure, MacroElement
 
         # Check if the map is a Folium Map instance
         if not isinstance(self, Map):
@@ -634,6 +631,7 @@ class Map(folium.Map):
             array_args (dict, optional): Additional arguments to pass to `array_to_image`. Defaults to {}.
         """
         import sys
+
         import numpy as np
         import xarray as xr
 
@@ -1372,7 +1370,7 @@ class Map(folium.Map):
             shape_type=shape_type,
         )
         if draggable:
-            from branca.element import Template, MacroElement
+            from branca.element import MacroElement, Template
 
             content = (
                 '"""\n{% macro html(this, kwargs) %}\n'
@@ -1488,9 +1486,10 @@ class Map(folium.Map):
         Raises:
             FileNotFoundError: The provided GeoJSON file could not be found.
         """
-        import shutil
         import json
         import random
+        import shutil
+
         import geopandas as gpd
 
         gdf = None
@@ -2505,6 +2504,7 @@ class Map(folium.Map):
 
         """
         import warnings
+
         import pandas as pd
         from folium.features import DivIcon
 
@@ -2973,9 +2973,10 @@ class Map(folium.Map):
             position (str, optional): The position of the widget. Defaults to "bottomright".
         """
 
-        from matplotlib import figure
         import base64
         from io import BytesIO
+
+        from matplotlib import figure
 
         allowed_positions = ["topleft", "topright", "bottomleft", "bottomright"]
 
@@ -3806,8 +3807,9 @@ def geojson_layer(
         FileNotFoundError: The provided GeoJSON file could not be found.
     """
     import json
-    import requests
     import random
+
+    import requests
 
     try:
         if isinstance(in_geojson, str):

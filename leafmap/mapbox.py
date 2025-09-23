@@ -1,7 +1,9 @@
 import os
 import pathlib
+
 import anywidget
 import traitlets
+
 from . import common
 
 
