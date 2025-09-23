@@ -87,13 +87,9 @@ class Layer(pdk.Layer):
 
 
 class Map(pdk.Deck):
-    """The Map class inherits pydeck.Deck.
+    """The Map class inherits pydeck.Deck."""
 
-    Returns:
-        object: pydeck.Deck object.
-    """
-
-    def __init__(self, center=(20, 0), zoom=1.2, **kwargs):
+    def __init__(self, center=(20, 0), zoom=1.2, **kwargs) -> None:
         """Initialize a Map object.
 
         Args:
@@ -110,7 +106,7 @@ class Map(pdk.Deck):
 
         super().__init__(**kwargs)
 
-    def add_layer(self, layer, layer_name: Optional[str] = None, **kwargs):
+    def add_layer(self, layer, layer_name: Optional[str] = None, **kwargs) -> None:
         """Add a layer to the map.
 
         Args:
