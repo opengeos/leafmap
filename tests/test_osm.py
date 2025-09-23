@@ -4,7 +4,9 @@
 
 import os
 import unittest
+
 import geopandas
+
 from leafmap.osm import *
 
 

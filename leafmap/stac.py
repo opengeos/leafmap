@@ -1,8 +1,13 @@
 import os
+from typing import TYPE_CHECKING
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+
+if TYPE_CHECKING:
+    import geopandas as gpd
+
+import pandas as pd
 import pystac
 import requests
-from typing import Optional, Dict, List, Callable, Tuple, Union
-import pandas as pd
 
 
 class TitilerEndpoint:
@@ -107,11 +112,11 @@ class PlanetaryComputerEndpoint(TitilerEndpoint):
         return f"{self.endpoint}/mosaic/{searchid}/{lon},{lat}/assets"
 
 
-def check_titiler_endpoint(titiler_endpoint: Optional[str] = None):
+def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
     """Returns the default titiler endpoint.
 
     Returns:
-        object: A titiler endpoint.
+        The titiler endpoint.
     """
     if titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
@@ -140,11 +145,11 @@ def cog_tile(
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
         bands (list, optional): List of bands to use. Defaults to None.
         titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
-        **kwargs: Additional arguments to pass to the titiler endpoint. For more information about the available arguments, see https://developmentseed.org/titiler/endpoints/cog/#tiles.
+        **kwargs (Any): Additional arguments to pass to the titiler endpoint. For more information about the available arguments, see https://developmentseed.org/titiler/endpoints/cog/#tiles.
             For example, to apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
 
     Returns:
-        tuple: Returns the COG Tile layer URL and bounds.
+        The COG tile layer URL and bounds.
     """
     import json
 
@@ -298,7 +303,7 @@ def cog_mosaic(
         Exception: If the COG mosaic fails to create.
 
     Returns:
-        str: The tile URL for the COG mosaic.
+        The tile URL for the COG mosaic.
     """
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
@@ -362,7 +367,7 @@ def cog_mosaic_from_file(
         verbose (bool, optional): Whether to print out descriptive information. Defaults to True.
 
     Returns:
-        str: The tile URL for the COG mosaic.
+        The tile URL for the COG mosaic.
     """
     import urllib
 
@@ -420,7 +425,7 @@ def cog_center(
         titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
 
     Returns:
-        tuple: A tuple representing (longitude, latitude)
+        A tuple representing (longitude, latitude).
     """
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     bounds = cog_bounds(url, titiler_endpoint)
@@ -439,7 +444,7 @@ def cog_bands(
         titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
 
     Returns:
-        list: A list of band names
+        A list of band names.
     """
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
@@ -598,7 +603,7 @@ def stac_tile(
         titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
 
     Returns:
-        str: Returns the STAC Tile layer URL.
+        The STAC tile layer URL.
     """
     import json
 
@@ -1194,8 +1199,8 @@ def stac_pixel_value(
     assets: Union[str, List] = None,
     titiler_endpoint: Optional[str] = None,
     verbose: Optional[bool] = True,
-    **kwargs,
-):
+    **kwargs: Any,
+) -> Dict[str, Any]:
     """Get pixel value from STAC assets.
 
     Args:
@@ -1209,7 +1214,7 @@ def stac_pixel_value(
         verbose (bool, optional): Print out the error message. Defaults to True.
 
     Returns:
-        list: A dictionary of pixel values for each asset.
+        A dictionary of pixel values for each asset.
     """
 
     if url is None and collection is None:
@@ -1268,10 +1273,10 @@ def stac_object_type(url: str, **kwargs) -> str:
 
     Args:
         url (str): The STAC object URL.
-        **kwargs: Keyword arguments for pystac.STACObject.from_file(). Defaults to None.
+        **kwargs (Any): Keyword arguments for pystac.STACObject.from_file(). Defaults to None.
 
     Returns:
-        str: The STAC object type, can be catalog, collection, or item.
+        The STAC object type, can be catalog, collection, or item.
     """
     try:
         obj = pystac.STACObject.from_file(url, **kwargs)
@@ -1295,11 +1300,11 @@ def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) ->
         url (str): The STAC object URL.
         return_col_id (bool, optional): Return the collection ID if the STAC object
             is a collection. Defaults to False.
-        **kwargs: Keyword arguments for pystac.STACObject.from_file().
+        **kwargs (Any): Keyword arguments for pystac.STACObject.from_file().
 
     Returns:
-        str: The root link of the STAC object. Returns None if no root link found.
-        tuple: If return_col_id is True, returns (root_link, collection_id).
+        The root link of the STAC object. Returns None if no root link found.
+        If return_col_id is True, returns (root_link, collection_id).
 
     Raises:
         ValueError: If FeatureCollection contains no features.
@@ -1375,8 +1380,8 @@ def stac_client(
     stac_io=None,
     return_col_id: Optional[bool] = False,
     get_root: Optional[bool] = True,
-    **kwargs,
-):
+    **kwargs: Any,
+) -> Any:
     """Get the STAC client. It wraps the pystac.Client.open() method. See
         https://pystac-client.readthedocs.io/en/stable/api.html#pystac_client.Client.open
 
@@ -1403,10 +1408,10 @@ def stac_client(
             instance can be provided here.
         return_col_id (bool, optional): Return the collection ID. Defaults to False.
         get_root (bool, optional): Get the root link of the STAC object. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac.Client.open() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac.Client.open() method.
 
     Returns:
-        pystac.Client: The STAC client.
+        The STAC client.
     """
     from pystac_client import Client
 
@@ -1467,10 +1472,10 @@ def stac_collections(
         url (str): The STAC catalog URL.
         return_ids (bool, optional): Return collection IDs. Defaults to False.
         get_root (bool, optional): Get the root link of the STAC object. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the stac_client() method.
+        **kwargs (Any): Additional keyword arguments to pass to the stac_client() method.
 
     Returns:
-        list: A list of collection IDs.
+        A list of collection IDs.
     """
     try:
         client, _ = stac_client(url, get_root=get_root, **kwargs)
@@ -1566,10 +1571,10 @@ def stac_search(
         get_gdf (bool, optional): True to return a GeoDataFrame. Defaults to False.
         get_info (bool, optional): True to return a dictionary of STAC items. Defaults to False.
         get_root (bool, optional): Get the root link of the STAC object. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the stac_client() function.
+        **kwargs (Any): Additional keyword arguments to pass to the stac_client() function.
 
     Returns:
-        list | pystac.ItemCollection : The search results as a list of links or a pystac.ItemCollection.
+        The search results as a list of links or a pystac.ItemCollection.
     """
 
     client, collection_id = stac_client(
@@ -1636,15 +1641,15 @@ def stac_search(
             return search
 
 
-def stac_search_to_gdf(search, **kwargs):
+def stac_search_to_gdf(search, **kwargs: Any) -> "gpd.GeoDataFrame":
     """Convert STAC search result to a GeoDataFrame.
 
     Args:
         search (pystac_client.item_search): The search result returned by leafmap.stac_search().
-        **kwargs: Additional keyword arguments to pass to the GeoDataFrame.from_features() function.
+        **kwargs (Any): Additional keyword arguments to pass to the GeoDataFrame.from_features() function.
 
     Returns:
-        GeoDataFrame: A GeoPandas GeoDataFrame object.
+        A GeoPandas GeoDataFrame object.
     """
     import geopandas as gpd
 
@@ -1659,10 +1664,10 @@ def stac_search_to_df(search, **kwargs) -> pd.DataFrame:
 
     Args:
         search (pystac_client.item_search): The search result returned by leafmap.stac_search().
-        **kwargs: Additional keyword arguments to pass to the DataFrame.drop() function.
+        **kwargs (Any): Additional keyword arguments to pass to the DataFrame.drop() function.
 
     Returns:
-        DataFrame: A Pandas DataFrame object.
+        A Pandas DataFrame object.
     """
     gdf = stac_search_to_gdf(search)
     return gdf.drop(columns=["geometry"], **kwargs)
@@ -1724,8 +1729,9 @@ def download_data_catalogs(
         str: The path to the downloaded data catalog.
     """
     import tempfile
-    import gdown
     import zipfile
+
+    import gdown
 
     if out_dir is None:
         out_dir = tempfile.gettempdir()
@@ -1804,15 +1810,16 @@ def maxar_collections(return_ids: Optional[bool] = True, **kwargs) -> List:
 
     Args:
         return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         list : A list of Maxar collections.
     """
 
     import tempfile
-    from pystac import Catalog
+
     import pandas as pd
+    from pystac import Catalog
 
     if return_ids:
         url = "https://raw.githubusercontent.com/giswqs/maxar-open-data/master/datasets.csv"
@@ -1853,13 +1860,14 @@ def maxar_child_collections(
         collection_id (str): The collection ID, e.g., Kahramanmaras-turkey-earthquake-23
             Use maxar_collections() to retrieve all available collection IDs.
         return_ids (bool, optional): Whether to return the collection ids. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
         list: A list of Maxar child collections.
     """
 
     import tempfile
+
     from pystac import Catalog
 
     file_path = os.path.join(tempfile.gettempdir(), f"maxar-{collection_id}.txt")
@@ -1892,8 +1900,8 @@ def maxar_items(
     child_id: str,
     return_gdf: Optional[bool] = True,
     assets: Optional[List] = ["visual"],
-    **kwargs,
-):
+    **kwargs: Any,
+) -> Union["gpd.GeoDataFrame", List[Dict[str, Any]]]:
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -1904,14 +1912,15 @@ def maxar_items(
         return_gdf (bool, optional): If True, return a GeoDataFrame. Defaults to True.
         assets (list, optional): A list of asset names to include in the GeoDataFrame.
             It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
-        GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
+        If return_gdf is True, return a GeoDataFrame.
     """
 
     import pickle
     import tempfile
+
     from pystac import Catalog, ItemCollection
 
     file_path = os.path.join(
@@ -2000,8 +2009,8 @@ def maxar_all_items(
     return_gdf: Optional[bool] = True,
     assets: Optional[List] = ["visual"],
     verbose: Optional[bool] = True,
-    **kwargs,
-):
+    **kwargs: Any,
+) -> Union["gpd.GeoDataFrame", List[Dict[str, Any]]]:
     """Retrieve STAC items from Maxar's public STAC API.
 
     Args:
@@ -2011,10 +2020,10 @@ def maxar_all_items(
         assets (list, optional): A list of asset names to include in the GeoDataFrame.
             It can be "visual", "ms_analytic", "pan_analytic", "data-mask". Defaults to ['visual'].
         verbose (bool, optional): If True, print progress. Defaults to True.
-        **kwargs: Additional keyword arguments to pass to the pystac Catalog.from_file() method.
+        **kwargs (Any): Additional keyword arguments to pass to the pystac Catalog.from_file() method.
 
     Returns:
-        GeoDataFrame | pystac.ItemCollection: If return_gdf is True, return a GeoDataFrame.
+        If return_gdf is True, return a GeoDataFrame.
     """
 
     child_ids = maxar_child_collections(collection_id, **kwargs)
@@ -2055,7 +2064,7 @@ def maxar_refresh():
 
 def maxar_search(
     collection, start_date=None, end_date=None, bbox=None, within=False, align=True
-):
+) -> "gpd.GeoDataFrame":
     """Search Maxar Open Data by collection ID, date range, and/or bounding box.
 
     Args:
@@ -2068,11 +2077,12 @@ def maxar_search(
         align (bool, optional): If True, automatically aligns GeoSeries based on their indices. If False, the order of elements is preserved.
 
     Returns:
-        GeoDataFrame: A GeoDataFrame containing the search results.
+        A GeoDataFrame containing the search results.
     """
     import datetime
-    import pandas as pd
+
     import geopandas as gpd
+    import pandas as pd
     from shapely.geometry import Polygon
 
     collections = maxar_collections()
@@ -2109,7 +2119,7 @@ def maxar_search(
     return result.drop(columns=[new_field], axis=1)
 
 
-def maxar_collection_url(collection, dtype="geojson", raw=True):
+def maxar_collection_url(collection, dtype="geojson", raw=True) -> str:
     """Retrieve the URL to a Maxar Open Data collection.
 
     Args:
@@ -2119,7 +2129,7 @@ def maxar_collection_url(collection, dtype="geojson", raw=True):
         raw (bool, optional): If True, return the raw URL. Defaults to True.
 
     Returns:
-        str: The URL to the collection.
+        The URL to the collection.
     """
     collections = maxar_collections()
     if collection not in collections:
@@ -2137,7 +2147,7 @@ def maxar_collection_url(collection, dtype="geojson", raw=True):
     return url
 
 
-def maxar_tile_url(collection, tile, dtype="geojson", raw=True):
+def maxar_tile_url(collection, tile, dtype="geojson", raw=True) -> str:
     """Retrieve the URL to a Maxar Open Data tile.
 
     Args:
@@ -2149,7 +2159,7 @@ def maxar_tile_url(collection, tile, dtype="geojson", raw=True):
         raw (bool, optional): If True, return the raw URL. Defaults to True.
 
     Returns:
-        str: The URL to the tile.
+        The URL to the tile.
     """
 
     collections = maxar_collections()
@@ -2250,8 +2260,8 @@ def create_mosaicjson(images, output):
 
     """
     try:
-        from cogeo_mosaic.mosaic import MosaicJSON
         from cogeo_mosaic.backends import MosaicBackend
+        from cogeo_mosaic.mosaic import MosaicJSON
     except ImportError:
         raise ImportError(
             "cogeo-mosaic is required to use this function. "
@@ -2276,7 +2286,9 @@ def create_mosaicjson(images, output):
         f.write(overwrite=True)
 
 
-def flatten_dict(my_dict, parent_key=False, sep="."):
+def flatten_dict(
+    my_dict: Dict[str, Any], parent_key: bool = False, sep: str = "."
+) -> Dict[str, Any]:
     """Flattens a nested dictionary.
 
     Args:
@@ -2285,7 +2297,7 @@ def flatten_dict(my_dict, parent_key=False, sep="."):
         sep (str, optional): The separator to use. Defaults to '.'.
 
     Returns:
-        dict: The flattened dictionary.
+        The flattened dictionary.
     """
 
     flat_dict = {}
@@ -2304,8 +2316,13 @@ def flatten_dict(my_dict, parent_key=False, sep="."):
 
 
 def oam_search(
-    bbox=None, start_date=None, end_date=None, limit=100, return_gdf=True, **kwargs
-):
+    bbox=None,
+    start_date=None,
+    end_date=None,
+    limit: int = 100,
+    return_gdf: bool = True,
+    **kwargs: Any,
+) -> Union["gpd.GeoDataFrame", List[Dict[str, Any]]]:
     """Search OpenAerialMap (https://openaerialmap.org) and return a GeoDataFrame or list of image metadata.
 
     Args:
@@ -2317,11 +2334,11 @@ def oam_search(
         **kwargs: Additional keyword arguments to pass to the API. See https://hotosm.github.io/oam-api/
 
     Returns:
-        GeoDataFrame | list: If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
+        If return_gdf is True, return a GeoDataFrame. Otherwise, return a list.
     """
 
-    from shapely.geometry import Polygon
     import geopandas as gpd
+    from shapely.geometry import Polygon
 
     url = "https://api.openaerialmap.org/meta"
     if bbox is not None:
@@ -2388,7 +2405,7 @@ def _get_image_colormap(image, index=1):
         index (int): The band index to retrieve the colormap from (default is 1).
 
     Returns:
-        dict: A dictionary representing the colormap (value: (R, G, B, A)), or None if no colormap is found.
+        A dictionary representing the colormap (value: (R, G, B, A)), or None if no colormap is found.
 
     Raises:
         ValueError: If the input image type is unsupported.
@@ -2439,7 +2456,7 @@ def get_cog_link_from_stac_item(item_url: str) -> str:
         item_url (str): The URL to a STAC Item JSON.
 
     Returns:
-        str: URL of the first .tif asset, or None if not found.
+        URL of the first .tif asset, or None if not found.
     """
     try:
         response = requests.get(item_url)

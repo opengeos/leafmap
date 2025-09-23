@@ -4,10 +4,12 @@
 
 import os
 import unittest
-import leafmap.foliumap as leafmap
+from unittest.mock import patch
+
 import geopandas as gpd
 import pandas as pd
-from unittest.mock import patch
+
+import leafmap.foliumap as leafmap
 
 
 class TestFoliumap(unittest.TestCase):

@@ -4,9 +4,11 @@
 
 import os
 import unittest
-from leafmap import leafmap
-import geopandas as gpd
 from unittest.mock import patch
+
+import geopandas as gpd
+
+from leafmap import leafmap
 
 
 class TestLeafmap(unittest.TestCase):

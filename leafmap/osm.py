@@ -5,13 +5,18 @@ https://wiki.openstreetmap.org/wiki/Map_features
 """
 
 import warnings
+from typing import Dict, List, Optional, Tuple, Union
+
+import geopandas as gpd
+
 from .common import check_package
-from typing import Optional, Union, Tuple, Dict, List
 
 warnings.filterwarnings("ignore")
 
 
-def osm_gdf_from_address(address: str, tags: Dict, dist: Optional[int] = 1000):
+def osm_gdf_from_address(
+    address: str, tags: Dict, dist: Optional[int] = 1000
+) -> gpd.GeoDataFrame:
     """Create GeoDataFrame of OSM entities within some distance N, S, E, W of address.
 
     Args:
@@ -77,7 +82,7 @@ def osm_gdf_from_place(
     tags: Dict,
     which_result: Optional[int] = None,
     buffer_dist: Optional[float] = None,
-):
+) -> gpd.GeoDataFrame:
     """Create GeoDataFrame of OSM entities within boundaries of geocodable place(s).
 
     Args:
@@ -153,7 +158,7 @@ def osm_geojson_from_place(
 
 def osm_gdf_from_point(
     center_point: Tuple[float, float], tags: Dict, dist: Optional[int] = 1000
-):
+) -> gpd.GeoDataFrame:
     """Create GeoDataFrame of OSM entities within some distance N, S, E, W of a point.
 
     Args:
@@ -218,7 +223,7 @@ def osm_geojson_from_point(
         return gdf.__geo_interface__
 
 
-def osm_gdf_from_polygon(polygon, tags: Dict):
+def osm_gdf_from_polygon(polygon, tags: Dict) -> gpd.GeoDataFrame:
     """Create GeoDataFrame of OSM entities within boundaries of a (multi)polygon.
 
     Args:
@@ -272,7 +277,9 @@ def osm_geojson_from_polygon(
         return gdf.__geo_interface__
 
 
-def osm_gdf_from_bbox(north: float, south: float, east: float, west: float, tags: Dict):
+def osm_gdf_from_bbox(
+    north: float, south: float, east: float, west: float, tags: Dict
+) -> gpd.GeoDataFrame:
     """Create a GeoDataFrame of OSM entities within a N, S, E, W bounding box.
 
     Args:
@@ -344,7 +351,9 @@ def osm_geojson_from_bbox(
         return gdf.__geo_interface__
 
 
-def osm_gdf_from_xml(filepath: str, polygon=None, tags: Dict = None):
+def osm_gdf_from_xml(
+    filepath: str, polygon=None, tags: Dict = None
+) -> gpd.GeoDataFrame:
     """Create a GeoDataFrame of OSM entities in an OSM-formatted XML file.
 
     Args:
@@ -372,7 +381,7 @@ def osm_gdf_from_geocode(
     which_result: Optional[int] = None,
     by_osmid: Optional[bool] = False,
     buffer_dist: Optional[float] = None,
-):
+) -> gpd.GeoDataFrame:
     """Retrieves place(s) by name or ID from the Nominatim API as a GeoDataFrame.
 
     Args:
@@ -439,7 +448,7 @@ def osm_geojson_from_geocode(
         return gdf.__geo_interface__
 
 
-def osm_tags_list():
+def osm_tags_list() -> dict:
     """Open a browser to see all tags of OSM features."""
     import webbrowser
 

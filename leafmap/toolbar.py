@@ -2,16 +2,18 @@
 
 import math
 import os
+from typing import Any, Dict, List, Optional, Union
+
 import ipyevents
 import ipyleaflet
 import ipywidgets as widgets
 from ipyfilechooser import FileChooser
-from .common import *
+
 from . import pc
-from typing import Optional, Union, Dict, List
+from .common import *
 
 
-def tool_template(m, opened: Optional[bool] = True):
+def tool_template(m, opened: Optional[bool] = True) -> widgets.Widget:
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
@@ -310,7 +312,7 @@ def tool_header_template(m, opened: Optional[bool] = True):
         return toolbar_widget
 
 
-def main_toolbar(m):
+def main_toolbar(m) -> widgets.Widget:
     """Creates the main toolbar and adds it to the map.
 
     Args:
@@ -591,6 +593,7 @@ def open_data_widget(m):
         m (object): leafmap.Map
     """
     import warnings
+
     from .colormaps import list_colormaps
 
     warnings.filterwarnings("ignore")
@@ -1866,8 +1869,8 @@ def time_slider(
         zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
 
     """
-    import time
     import threading
+    import time
 
     bounds = None
 
@@ -1989,7 +1992,7 @@ def time_slider(
     m.slider_ctrl = slider_ctrl
 
 
-def census_widget(m):
+def census_widget(m) -> widgets.Widget:
     """Widget for adding US Census data.
 
     Args:
@@ -6439,8 +6442,9 @@ def nasa_data_gui(
     Returns:
         ipywidgets: The tool GUI widget.
     """
-    import pandas as pd
     from datetime import datetime
+
+    import pandas as pd
 
     widget_width = "400px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
@@ -6772,18 +6776,19 @@ def nasa_opera_gui(
     Returns:
         ipywidgets: The tool GUI widget.
     """
-    import earthaccess
-    import pandas as pd
-    from datetime import datetime
-    import boto3
-    import rasterio as rio
-    from rasterio.session import AWSSession
-    import xarray as xr
-    import rioxarray
-    import matplotlib.pyplot as plt
-    from pathlib import Path
-    from opera_utils.disp._remote import open_file
     import netrc
+    from datetime import datetime
+    from pathlib import Path
+
+    import boto3
+    import earthaccess
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    import rasterio as rio
+    import rioxarray
+    import xarray as xr
+    from opera_utils.disp._remote import open_file
+    from rasterio.session import AWSSession
 
     widget_width = "400px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
@@ -7367,8 +7372,9 @@ def time_slider_for_gdf(
         zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
         style (dict, optional): Base style for the GeoJSON layer. Defaults to None.
     """
-    import time
     import threading
+    import time
+
     import ipywidgets as widgets
     from ipyleaflet import WidgetControl
 

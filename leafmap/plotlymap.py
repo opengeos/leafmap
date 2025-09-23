@@ -1,15 +1,14 @@
 import os
+from typing import Any, Dict, List, Optional, Tuple, Union
+
+import ipywidgets as widgets
 import numpy as np
 import pandas as pd
-import ipywidgets as widgets
 from IPython.display import display
-
-from .basemaps import xyz_to_plotly
-from . import common
-from . import osm
-from . import examples
-from typing import Optional, List, Union, Dict, Tuple
 from pandas import DataFrame
+
+from . import common, examples, osm
+from .basemaps import xyz_to_plotly
 
 try:
     import plotly.express as px
@@ -221,7 +220,7 @@ class Map(go.FigureWidget):
         """Adds a mapbox layer to the map.
 
         Args:
-            layer (str | dict): Layer to add. Can be "basic", "streets", "outdoors", "light", "dark", "satellite", or "satellite-streets". See https://plotly.com/python/mapbox-layers/ and https://docs.mapbox.com/mapbox-gl-js/style-spec/
+            style (str | dict): Style to add. Can be "basic", "streets", "outdoors", "light", "dark", "satellite", or "satellite-streets". See https://plotly.com/python/mapbox-layers/ and https://docs.mapbox.com/mapbox-gl-js/style-spec/
             access_token (str, optional): The Mapbox Access token. It can be set as an environment variable "MAPBOX_TOKEN". Defaults to None.
         """
 
@@ -408,7 +407,7 @@ class Map(go.FigureWidget):
         opacity: Optional[float] = 1.0,
         bands: Optional[List] = None,
         titiler_endpoint: Optional[str] = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Adds a COG TileLayer to the map.
 
@@ -581,6 +580,7 @@ class Map(go.FigureWidget):
         """
         common.check_package("geopandas")
         import json
+
         import geopandas as gpd
 
         gdf = gpd.read_file(data).to_crs(epsg=4326)
@@ -780,13 +780,14 @@ class Map(go.FigureWidget):
         """Prepare proper and give style for different type of Geometry
 
         Args:
-            in_geojson (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
+            geojson_in (str | dict): The file path or http URL to the input GeoJSON or a dictionary containing the geojson.
             name (str): Name for the Layer
             color (str, optional): Plain name for color (e.g: blue) or color code (e.g: #FF0000)
             opacity(float, optional): opacity of the layer in Map
         """
 
         import json
+
         import requests
 
         if isinstance(geojson_in, dict):
@@ -852,8 +853,8 @@ def fix_widget_error() -> None:
     Fix FigureWidget - 'mapbox._derived' Value Error.
     Adopted from: https://github.com/plotly/plotly.py/issues/2570#issuecomment-738735816
     """
-    import shutil
     import importlib.resources
+    import shutil
 
     pkg_dir = os.path.dirname(importlib.resources.files("plotly") / "plotly.py")
 

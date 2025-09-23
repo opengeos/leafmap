@@ -1,11 +1,7 @@
 import os
-from . import common
-from . import examples
-from . import osm
-from .leafmap import basemaps
-
 from typing import Optional
 
+from . import common, examples, osm
 from .common import (
     add_crs,
     basemap_xyz_tiles,
@@ -61,6 +57,7 @@ from .common import (
     write_lidar,
     zonal_stats,
 )
+from .leafmap import basemaps
 
 try:
     import pydeck as pdk
@@ -90,13 +87,9 @@ class Layer(pdk.Layer):
 
 
 class Map(pdk.Deck):
-    """The Map class inherits pydeck.Deck.
+    """The Map class inherits pydeck.Deck."""
 
-    Returns:
-        object: pydeck.Deck object.
-    """
-
-    def __init__(self, center=(20, 0), zoom=1.2, **kwargs):
+    def __init__(self, center=(20, 0), zoom=1.2, **kwargs) -> None:
         """Initialize a Map object.
 
         Args:
@@ -113,7 +106,7 @@ class Map(pdk.Deck):
 
         super().__init__(**kwargs)
 
-    def add_layer(self, layer, layer_name: Optional[str] = None, **kwargs):
+    def add_layer(self, layer, layer_name: Optional[str] = None, **kwargs) -> None:
         """Add a layer to the map.
 
         Args:
@@ -269,8 +262,8 @@ class Map(pdk.Deck):
         """
 
         try:
-            import geopandas as gpd
             import fiona
+            import geopandas as gpd
 
             if isinstance(data, str):
                 if not data.startswith("http"):

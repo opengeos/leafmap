@@ -1,11 +1,9 @@
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 from box import Box
 
-from typing import Union, List, Dict, Optional, Tuple, Any
+from . import common, map_widgets, plot
 from .basemaps import xyz_to_leaflet
-from . import common
-from . import map_widgets
-from . import plot
-
 from .common import (
     add_crs,
     basemap_xyz_tiles,
@@ -62,10 +60,9 @@ from .common import (
     zonal_stats,
 )
 
-
 try:
-    import lonboard
     import geopandas as gpd
+    import lonboard
 
 except ImportError:
     raise Exception(
@@ -76,11 +73,7 @@ basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 
 class Map(lonboard.Map):
-    """The Map class inherits lonboard.Map.
-
-    Returns:
-        object: lonboard.Map object.
-    """
+    """The Map class inherits lonboard.Map."""
 
     def __init__(
         self,
@@ -90,7 +83,7 @@ class Map(lonboard.Map):
         layers: List = [],
         show_tooltip: bool = True,
         view_state: Optional[Dict] = {},
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         """Initialize a Map object.
 
@@ -160,8 +153,8 @@ class Map(lonboard.Map):
             None
         """
 
-        from lonboard import ScatterplotLayer, PathLayer, SolidPolygonLayer
         import matplotlib.pyplot as plt
+        from lonboard import PathLayer, ScatterplotLayer, SolidPolygonLayer
 
         geom_type = gdf.geometry.iloc[0].geom_type
         kwargs["pickable"] = pickable
@@ -366,8 +359,8 @@ class Map(lonboard.Map):
         width: Optional[int] = None,
         height: Optional[int] = 600,
         scrolling: Optional[bool] = False,
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> Any:
         """Renders `deckgl.Map`in a Streamlit app. This method is a static Streamlit Component, meaning, no information is passed back from Leaflet on browser interaction.
 
         Args:
@@ -389,7 +382,7 @@ class Map(lonboard.Map):
         except Exception as e:
             raise e
 
-    def add_basemap(self, basemap="HYBRID", visible=True, **kwargs) -> None:
+    def add_basemap(self, basemap="HYBRID", visible=True, **kwargs: Any) -> None:
         """Adds a basemap to the map.
 
         Args:
@@ -535,7 +528,6 @@ class Map(lonboard.Map):
             nodata (float, optional): The value from the band to use to interpret as not valid data. Defaults to None.
             attribution (str, optional): Attribution for the source raster. This defaults to a message about it being a local file.. Defaults to None.
             layer_name (str, optional): The layer name to use. Defaults to 'Raster'.
-            layer_index (int, optional): The index of the layer. Defaults to None.
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to True.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
@@ -580,7 +572,13 @@ class Map(lonboard.Map):
             }
 
 
-def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
+def apply_continuous_cmap(
+    values: Any,
+    cmap: Any,
+    alpha: Optional[float] = None,
+    rescale: bool = True,
+    **kwargs: Any,
+) -> Any:
     """
     Apply a continuous colormap to a set of values.
 
@@ -597,8 +595,8 @@ def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
     Returns:
         array: The colors mapped to the input values.
     """
-    import numpy as np
     import matplotlib.pyplot as plt
+    import numpy as np
 
     if rescale:
         values = np.array(values)
@@ -610,7 +608,9 @@ def apply_continuous_cmap(values, cmap, alpha=None, rescale=True, **kwargs):
     return lonboard.colormap.apply_continuous_cmap(values, cmap, alpha=alpha, **kwargs)
 
 
-def apply_categorical_cmap(values, cmap, alpha=None, **kwargs):
+def apply_categorical_cmap(
+    values: Any, cmap: Any, alpha: Optional[float] = None, **kwargs: Any
+) -> Any:
     """
     Apply a categorical colormap to a set of values.
 

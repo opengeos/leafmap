@@ -4,12 +4,14 @@
 
 import os
 import unittest
+from unittest.mock import MagicMock, patch
+
 import geopandas
 import pandas
 import requests
-from leafmap.common import *
-from unittest.mock import patch, MagicMock
 from pmtiles.tile import MagicNumberNotFound
+
+from leafmap.common import *
 
 
 class TestCommon(unittest.TestCase):
