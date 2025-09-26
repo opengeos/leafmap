@@ -4100,6 +4100,7 @@ class Map(MapWidget):
         dpi: Optional[Union[str, float]] = "figure",
         transparent: Optional[bool] = False,
         position: str = "bottom-right",
+        colorbar_args: Optional[Dict[str, Any]] = None,
         **kwargs: Any,
     ) -> str:
         """
@@ -4127,6 +4128,8 @@ class Map(MapWidget):
             dpi (Optional[Union[str, float]]): Resolution in dots per inch. If 'figure', uses the figure's dpi value. Defaults to "figure".
             transparent (Optional[bool]): Whether the background is transparent. Defaults to False.
             position (str): Position of the colorbar on the map. Defaults to "bottom-right".
+            colorbar_args (Optional[Dict[str, Any]]): Additional keyword arguments passed to the colorbar. 
+                Can be colorbar_args={"ticks": list(range(0, 101, 10))}. Defaults to None.
             **kwargs: Additional keyword arguments passed to matplotlib.pyplot.savefig().
 
         Returns:
@@ -4135,6 +4138,9 @@ class Map(MapWidget):
 
         if transparent:
             bg_color = "transparent"
+        
+        if colorbar_args is None:
+            colorbar_args = {}
 
         colorbar = common.save_colorbar(
             None,
@@ -4155,6 +4161,7 @@ class Map(MapWidget):
             dpi,
             transparent,
             show_colorbar=False,
+            **colorbar_args,
         )
 
         html = f'<img src="{colorbar}">'
