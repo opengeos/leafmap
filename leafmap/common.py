@@ -8433,15 +8433,13 @@ def save_colorbar(
     import matplotlib as mpl
     import matplotlib.pyplot as plt
     import numpy as np
-    import matplotlib.ticker as mticker   # <-- add
+    import matplotlib.ticker as mticker  # <-- add
 
     from .colormaps import get_palette, palettes
 
-
-    ticks = kwargs.pop("ticks", None)            # list of tick positions
-    tick_step = kwargs.pop("tick_step", None)    # e.g., 10
+    ticks = kwargs.pop("ticks", None)  # list of tick positions
+    tick_step = kwargs.pop("tick_step", None)  # e.g., 10
     integer_ticks = kwargs.pop("integer_ticks", False)
-
 
     if out_fig is None:
         out_fig = temp_file_path("png")
@@ -8501,7 +8499,6 @@ def save_colorbar(
     # remove minor ticks entirely
     cb.ax.minorticks_off()
 
-
     # --- NEW: force integer ticks/labels ---
     axis = cb.ax.xaxis if orientation == "horizontal" else cb.ax.yaxis
     if ticks is not None:
@@ -8513,7 +8510,7 @@ def save_colorbar(
 
     # always show integers (no decimals) if any of the above applied
     if ticks is not None or tick_step is not None or integer_ticks:
-        axis.set_major_formatter(mticker.StrMethodFormatter('{x:.0f}'))
+        axis.set_major_formatter(mticker.StrMethodFormatter("{x:.0f}"))
     # --------------------------------------
 
     if label is not None:
