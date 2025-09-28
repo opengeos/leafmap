@@ -7316,7 +7316,7 @@ m.add_tile_layer(post_event_tile, name="Post-event", attribution="Maxar")</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_33020296472e57c670822015cfdb5f7c {
+                #map_ba3a15b996a8fa6a04bb1ac74a907a5f {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -7336,14 +7336,14 @@ m.add_tile_layer(post_event_tile, name="Post-event", attribution="Maxar")</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_33020296472e57c670822015cfdb5f7c&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_ba3a15b996a8fa6a04bb1ac74a907a5f&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_33020296472e57c670822015cfdb5f7c = L.map(
-                &quot;map_33020296472e57c670822015cfdb5f7c&quot;,
+            var map_ba3a15b996a8fa6a04bb1ac74a907a5f = L.map(
+                &quot;map_ba3a15b996a8fa6a04bb1ac74a907a5f&quot;,
                 {
                     center: [20.0, 0.0],
                     crs: L.CRS.EPSG3857,
@@ -7354,24 +7354,24 @@ m.add_tile_layer(post_event_tile, name="Post-event", attribution="Maxar")</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_33020296472e57c670822015cfdb5f7c);
+            L.control.scale().addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
 
             
 
         
     
-            var tile_layer_4f51bd3b47c332c03711951ab5d7afca = L.tileLayer(
+            var tile_layer_5c49496b5b2319d78cc4305073ff7eaf = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_4f51bd3b47c332c03711951ab5d7afca.addTo(map_33020296472e57c670822015cfdb5f7c);
+            tile_layer_5c49496b5b2319d78cc4305073ff7eaf.addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_33020296472e57c670822015cfdb5f7c);
+            ).addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
         
     
             var options = {
@@ -7380,14 +7380,14 @@ m.add_tile_layer(post_event_tile, name="Post-event", attribution="Maxar")</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_9b12eafd843f8f80aba1aa634a297d53 = new L.featureGroup().addTo(
-                map_33020296472e57c670822015cfdb5f7c
+            var drawnItems_draw_control_b3cc9ce8551f7ebac55442db45f5f39b = new L.featureGroup().addTo(
+                map_ba3a15b996a8fa6a04bb1ac74a907a5f
             );
-            options.edit.featureGroup = drawnItems_draw_control_9b12eafd843f8f80aba1aa634a297d53;
-            var draw_control_9b12eafd843f8f80aba1aa634a297d53 = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_b3cc9ce8551f7ebac55442db45f5f39b;
+            var draw_control_b3cc9ce8551f7ebac55442db45f5f39b = new L.Control.Draw(
                 options
-            ).addTo( map_33020296472e57c670822015cfdb5f7c );
-            map_33020296472e57c670822015cfdb5f7c.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_ba3a15b996a8fa6a04bb1ac74a907a5f );
+            map_ba3a15b996a8fa6a04bb1ac74a907a5f.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7395,78 +7395,78 @@ m.add_tile_layer(post_event_tile, name="Post-event", attribution="Maxar")</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_9b12eafd843f8f80aba1aa634a297d53.addLayer(layer);
+                drawnItems_draw_control_b3cc9ce8551f7ebac55442db45f5f39b.addLayer(layer);
              });
-            map_33020296472e57c670822015cfdb5f7c.on('draw:created', function(e) {
-                drawnItems_draw_control_9b12eafd843f8f80aba1aa634a297d53.addLayer(e.layer);
+            map_ba3a15b996a8fa6a04bb1ac74a907a5f.on('draw:created', function(e) {
+                drawnItems_draw_control_b3cc9ce8551f7ebac55442db45f5f39b.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_cb1fa10b29e27595e344339bf84fc46f = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_8920d50907c6b5942337ff9b8133aa29 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_cb1fa10b29e27595e344339bf84fc46f = geocoderOpts_geocoder_cb1fa10b29e27595e344339bf84fc46f[&quot;provider&quot;];
+            var geocoderName_geocoder_8920d50907c6b5942337ff9b8133aa29 = geocoderOpts_geocoder_8920d50907c6b5942337ff9b8133aa29[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_cb1fa10b29e27595e344339bf84fc46f = L.Control.Geocoder[ geocoderName_geocoder_cb1fa10b29e27595e344339bf84fc46f ](
-                geocoderOpts_geocoder_cb1fa10b29e27595e344339bf84fc46f['providerOptions']
+            var customGeocoder_geocoder_8920d50907c6b5942337ff9b8133aa29 = L.Control.Geocoder[ geocoderName_geocoder_8920d50907c6b5942337ff9b8133aa29 ](
+                geocoderOpts_geocoder_8920d50907c6b5942337ff9b8133aa29['providerOptions']
             );
-            geocoderOpts_geocoder_cb1fa10b29e27595e344339bf84fc46f[&quot;geocoder&quot;] = customGeocoder_geocoder_cb1fa10b29e27595e344339bf84fc46f;
+            geocoderOpts_geocoder_8920d50907c6b5942337ff9b8133aa29[&quot;geocoder&quot;] = customGeocoder_geocoder_8920d50907c6b5942337ff9b8133aa29;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_cb1fa10b29e27595e344339bf84fc46f
+                geocoderOpts_geocoder_8920d50907c6b5942337ff9b8133aa29
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_cb1fa10b29e27595e344339bf84fc46f['zoom'] || map_33020296472e57c670822015cfdb5f7c.getZoom();
-                map_33020296472e57c670822015cfdb5f7c.setView(e.geocode.center, zoom);
-            }).addTo(map_33020296472e57c670822015cfdb5f7c);
+                var zoom = geocoderOpts_geocoder_8920d50907c6b5942337ff9b8133aa29['zoom'] || map_ba3a15b996a8fa6a04bb1ac74a907a5f.getZoom();
+                map_ba3a15b996a8fa6a04bb1ac74a907a5f.setView(e.geocode.center, zoom);
+            }).addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
 
         
     
-            map_33020296472e57c670822015cfdb5f7c.fitBounds(
+            map_ba3a15b996a8fa6a04bb1ac74a907a5f.fitBounds(
                 [[20, 0], [20, 0]],
                 {&quot;maxZoom&quot;: 2}
             );
         
     
-            var tile_layer_ab48cc48bb6ec32f457840e0d4c2a05e = L.tileLayer(
+            var tile_layer_fb0ec46a799ad8cf20bc39356a6a108c = L.tileLayer(
                 &quot;https://giswqs-titiler-endpoint.hf.space/mosaicjson/anonymous.layer_pqmra/tiles/{z}/{x}/{y}@1x?&quot;,
                 {&quot;attribution&quot;: &quot;Maxar&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_ab48cc48bb6ec32f457840e0d4c2a05e.addTo(map_33020296472e57c670822015cfdb5f7c);
+            tile_layer_fb0ec46a799ad8cf20bc39356a6a108c.addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
         
     
-            var tile_layer_be9d7bb6cb5df419f6b9124febf7252f = L.tileLayer(
+            var tile_layer_d7121d9866207020578936705690cc9e = L.tileLayer(
                 &quot;https://giswqs-titiler-endpoint.hf.space/mosaicjson/anonymous.layer_qdano/tiles/{z}/{x}/{y}@1x?&quot;,
                 {&quot;attribution&quot;: &quot;Maxar&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 30, &quot;maxZoom&quot;: 30, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1.0, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_be9d7bb6cb5df419f6b9124febf7252f.addTo(map_33020296472e57c670822015cfdb5f7c);
+            tile_layer_d7121d9866207020578936705690cc9e.addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
         
     
-            map_33020296472e57c670822015cfdb5f7c.fitBounds(
+            map_ba3a15b996a8fa6a04bb1ac74a907a5f.fitBounds(
                 [[37.0317, -122.0828], [37.0317, -122.0828]],
                 {&quot;maxZoom&quot;: 11}
             );
         
     
-            var layer_control_f0b60b7366200fd015836b52de865592_layers = {
+            var layer_control_7919d53e8b42998bd8c865d916128f13_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_4f51bd3b47c332c03711951ab5d7afca,
+                    &quot;openstreetmap&quot; : tile_layer_5c49496b5b2319d78cc4305073ff7eaf,
                 },
                 overlays :  {
-                    &quot;Pre-event&quot; : tile_layer_ab48cc48bb6ec32f457840e0d4c2a05e,
-                    &quot;Post-event&quot; : tile_layer_be9d7bb6cb5df419f6b9124febf7252f,
+                    &quot;Pre-event&quot; : tile_layer_fb0ec46a799ad8cf20bc39356a6a108c,
+                    &quot;Post-event&quot; : tile_layer_d7121d9866207020578936705690cc9e,
                 },
             };
-            let layer_control_f0b60b7366200fd015836b52de865592 = L.control.layers(
-                layer_control_f0b60b7366200fd015836b52de865592_layers.base_layers,
-                layer_control_f0b60b7366200fd015836b52de865592_layers.overlays,
+            let layer_control_7919d53e8b42998bd8c865d916128f13 = L.control.layers(
+                layer_control_7919d53e8b42998bd8c865d916128f13_layers.base_layers,
+                layer_control_7919d53e8b42998bd8c865d916128f13_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_33020296472e57c670822015cfdb5f7c);
+            ).addTo(map_ba3a15b996a8fa6a04bb1ac74a907a5f);
 
         
 &lt;/script&gt;
@@ -7480,7 +7480,7 @@ m.add_tile_layer(post_event_tile, name="Post-event", attribution="Maxar")</div>
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
 <script type="application/vnd.jupyter.widget-state+json">
-{"state": {"ea0a86f700d1418383bbe2bf349f95c6": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "7d2baaf4e0234e9eb88080892fb3666b": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_ea0a86f700d1418383bbe2bf349f95c6"}}, "d363528f7a874a7f93e903754bda4fac": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "5725cec549bb400ea3594b5efe0c9ac4": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "c892a443dea84ee78c8132082963c9a5": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
+{"state": {"a21a9579aea748cb99d315b31fbe205f": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "db2c3dd2e8f14dfa9efc63f1ac245007": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_a21a9579aea748cb99d315b31fbe205f"}}, "b4366f5db61640bf94d3966701c6db9f": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "54dad4c6391646308c833eb1216f6e2c": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "c5f76ce90efe4efc8f996af4dfe6be52": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
 </script>
 
         <style>
