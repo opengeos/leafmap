@@ -150,7 +150,7 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
 
-            if style.startswith("https"):
+            if style.startswith("http"):
                 response = requests.get(style)
                 if response.status_code != 200:
                     print(
