@@ -8985,7 +8985,9 @@ class LayerManagerWidget(v.ExpansionPanels):
                 opacity = opacity[3]
 
             checkbox = widgets.Checkbox(value=visible, description=name, style=style)
-            checkbox.layout.max_width = "150px"
+            checkbox.layout.flex = "1 1 auto"
+            checkbox.layout.max_width = "200px"
+            checkbox.layout.min_width = "120px"
 
             slider = widgets.FloatSlider(
                 value=opacity,
@@ -8994,7 +8996,7 @@ class LayerManagerWidget(v.ExpansionPanels):
                 step=0.01,
                 readout=False,
                 tooltip="Change layer opacity",
-                layout=widgets.Layout(width="150px", padding=padding),
+                layout=widgets.Layout(flex="1 1 auto", min_width="120px", padding=padding),
             )
 
             settings = widgets.Button(
@@ -9053,7 +9055,8 @@ class LayerManagerWidget(v.ExpansionPanels):
             slider.observe(on_opacity_change, names="value")
 
             row = widgets.HBox(
-                [checkbox, slider, settings, remove], layout=widgets.Layout()
+                [checkbox, slider, settings, remove],
+                layout=widgets.Layout(width="100%", display="flex"),
             )
 
             remove.on_click(
