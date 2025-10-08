@@ -8996,7 +8996,9 @@ class LayerManagerWidget(v.ExpansionPanels):
                 step=0.01,
                 readout=False,
                 tooltip="Change layer opacity",
-                layout=widgets.Layout(flex="1 1 auto", min_width="120px", padding=padding),
+                layout=widgets.Layout(
+                    flex="1 1 auto", min_width="120px", padding=padding
+                ),
             )
 
             settings = widgets.Button(
