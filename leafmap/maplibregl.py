@@ -83,7 +83,8 @@ class Map(MapWidget):
         },
         projection: str = "mercator",
         use_message_queue: bool = None,
-        add_sidebar: bool = True,
+        add_sidebar: bool = False,
+        add_floating_sidebar: bool = True,
         sidebar_visible: bool = False,
         sidebar_width: int = 360,
         sidebar_args: Optional[Dict] = None,
@@ -120,7 +121,9 @@ class Map(MapWidget):
                 is needed to export the map to HTML. If it is set to "False", it will not use the message
                 queue, which is needed to display the map multiple times in the same notebook.
             add_sidebar (bool, optional): Whether to add a sidebar to the map.
-                Defaults to True. If True, the map will be displayed in a sidebar.
+                Defaults to False. If True, the map will be displayed in a sidebar.
+            add_floating_sidebar (bool, optional): Whether to add a floating sidebar to the map.
+                Defaults to True. If True, the map will be displayed in a floating sidebar.
             sidebar_visible (bool, optional): Whether the sidebar is visible. Defaults to False.
             sidebar_width (int, optional): The width of the sidebar in pixels. Defaults to 360.
             sidebar_args (dict, optional): The arguments for the sidebar. It can
@@ -256,7 +259,9 @@ class Map(MapWidget):
         self.sidebar_args = sidebar_args
         self.layer_manager = None
         self.container = None
-        if add_sidebar:
+        self.add_floating_sidebar_flag = add_floating_sidebar
+        self.floating_sidebar_widget = None
+        if add_sidebar or add_floating_sidebar:
             self._ipython_display_ = self._patched_display
 
     def show(
@@ -367,32 +372,62 @@ class Map(MapWidget):
             None
         """
 
-        if self.container is not None:
-            container = self.container
-        else:
-            sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
-            min_width = self.sidebar_args.get("min_width", 360)
-            max_width = self.sidebar_args.get("max_width", 360)
-            expanded = self.sidebar_args.get("expanded", True)
-            if self.layer_manager is None:
-                self.layer_manager = LayerManagerWidget(self, expanded=expanded)
-            container = Container(
-                host_map=self,
-                sidebar_visible=sidebar_visible,
-                min_width=min_width,
-                max_width=max_width,
-                sidebar_content=[self.layer_manager],
-                **kwargs,
-            )
-            container.sidebar_widgets["Layers"] = self.layer_manager
-            self.container = container
+        if self.add_floating_sidebar_flag:
+            # Use floating sidebar
+            if self.floating_sidebar_widget is not None:
+                widget = self.floating_sidebar_widget
+            else:
+                sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+                expanded = self.sidebar_args.get("expanded", True)
+                position = self.sidebar_args.get("position", "top-left")
+                width = self.sidebar_args.get("width", "370px")
+                max_height = self.sidebar_args.get("max_height", "80vh")
+                sidebar_content = self.sidebar_args.get("sidebar_content", None)
 
-        if "google.colab" in sys.modules:
-            import ipyvue as vue
+                widget = self.add_floating_sidebar(
+                    position=position,
+                    width=width,
+                    max_height=max_height,
+                    expanded=expanded,
+                    sidebar_visible=sidebar_visible,
+                    sidebar_content=sidebar_content,
+                )
+                self.floating_sidebar_widget = widget
 
-            display(vue.Html(children=[]), container)
+            if "google.colab" in sys.modules:
+                import ipyvue as vue
+
+                display(vue.Html(children=[]), widget)
+            else:
+                display(widget)
         else:
-            display(container)
+            # Use regular container sidebar
+            if self.container is not None:
+                container = self.container
+            else:
+                sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+                min_width = self.sidebar_args.get("min_width", 360)
+                max_width = self.sidebar_args.get("max_width", 360)
+                expanded = self.sidebar_args.get("expanded", True)
+                if self.layer_manager is None:
+                    self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+                container = Container(
+                    host_map=self,
+                    sidebar_visible=sidebar_visible,
+                    min_width=min_width,
+                    max_width=max_width,
+                    sidebar_content=[self.layer_manager],
+                    **kwargs,
+                )
+                container.sidebar_widgets["Layers"] = self.layer_manager
+                self.container = container
+
+            if "google.colab" in sys.modules:
+                import ipyvue as vue
+
+                display(vue.Html(children=[]), container)
+            else:
+                display(container)
 
     def add_layer_manager(
         self,
