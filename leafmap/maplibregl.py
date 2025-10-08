@@ -4498,7 +4498,18 @@ class Map(MapWidget):
             settings_visible = False
 
         # Convert width string to number for calculation
-        width_num = int(width.replace("px", "")) if "px" in width else 360
+        if isinstance(width, str):
+            if width.endswith("px"):
+                width_num = int(width[:-2])
+            elif width.endswith("%"):
+                # Assume parent container is 1440px wide if not available
+                parent_width = 1440
+                percent = int(width[:-1])
+                width_num = int(parent_width * percent / 100)
+            else:
+                width_num = 360
+        else:
+            width_num = 360
 
         # Create width adjustment slider
         width_slider = widgets.IntSlider(
