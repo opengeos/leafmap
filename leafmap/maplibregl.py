@@ -456,20 +456,43 @@ class Map(MapWidget):
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
-        if self.container is None:
-            self.create_container(**self.sidebar_args)
-        self.container.add_to_sidebar(
-            widget,
-            add_header=add_header,
-            widget_icon=widget_icon,
-            close_icon=close_icon,
-            label=label,
-            background_color=background_color,
-            height=height,
-            expanded=expanded,
-            host_map=self,
-            **kwargs,
-        )
+        # Check if floating sidebar is being used
+        if hasattr(self, "floating_sidebar_content_box"):
+            # Handle floating sidebar case
+            if label in self._floating_sidebar_widgets:
+                self.remove_from_sidebar(name=label)
+
+            if add_header:
+                widget = CustomWidget(
+                    widget,
+                    widget_icon=widget_icon,
+                    close_icon=close_icon,
+                    label=label,
+                    background_color=background_color,
+                    height=height,
+                    expanded=expanded,
+                    host_map=self,
+                    **kwargs,
+                )
+
+            self.floating_sidebar_content_box.children += (widget,)
+            self._floating_sidebar_widgets[label] = widget
+        else:
+            # Handle regular container sidebar case
+            if self.container is None:
+                self.create_container(**self.sidebar_args)
+            self.container.add_to_sidebar(
+                widget,
+                add_header=add_header,
+                widget_icon=widget_icon,
+                close_icon=close_icon,
+                label=label,
+                background_color=background_color,
+                height=height,
+                expanded=expanded,
+                host_map=self,
+                **kwargs,
+            )
 
     def remove_from_sidebar(
         self, widget: widgets.Widget = None, name: str = None
@@ -481,7 +504,25 @@ class Map(MapWidget):
             widget (widgets.Widget): The widget to remove from the sidebar.
             name (str): The name of the widget to remove from the sidebar.
         """
-        if self.container is not None:
+        # Check if floating sidebar is being used
+        if hasattr(self, "floating_sidebar_content_box"):
+            # Handle floating sidebar case
+            key = None
+            for key, value in self._floating_sidebar_widgets.items():
+                if value == widget or key == name:
+                    if widget is None:
+                        widget = self._floating_sidebar_widgets[key]
+                    break
+
+            if key is not None and key in self._floating_sidebar_widgets:
+                self._floating_sidebar_widgets.pop(key)
+            self.floating_sidebar_content_box.children = tuple(
+                child
+                for child in self.floating_sidebar_content_box.children
+                if child != widget
+            )
+        elif self.container is not None:
+            # Handle regular container sidebar case
             self.container.remove_from_sidebar(widget, name)
 
     def set_sidebar_width(self, min_width: int = None, max_width: int = None) -> None:
@@ -4321,6 +4362,259 @@ class Map(MapWidget):
                 css_text=css_text,
             )
             self.add_control(control, position=position)
+
+    def add_floating_sidebar(
+        self,
+        position: str = "top-left",
+        width: str = "370px",
+        max_height: str = "80vh",
+        expanded: bool = True,
+        sidebar_visible: bool = False,
+        sidebar_content: Optional[List[widgets.Widget]] = None,
+        **kwargs: Any,
+    ) -> "widgets.Widget":
+        """
+        Adds a floating sidebar panel overlaid on the map with a toggle button.
+
+        This method creates a floating sidebar that appears as an overlay on the map canvas.
+        The sidebar includes a toggle button to show/hide it, along with the layer manager
+        and any additional content you specify.
+
+        Args:
+            position (str): Position on the map. Can be "top-right", "top-left",
+                "bottom-right", or "bottom-left". Defaults to "top-left".
+            width (str): Width of the sidebar (e.g., "370px", "25%"). Defaults to "370px".
+            max_height (str): Maximum height of the sidebar (e.g., "80vh", "500px").
+                Defaults to "80vh".
+            expanded (bool): Whether the layer manager starts expanded. Defaults to True.
+            sidebar_visible (bool): Whether the sidebar content is initially visible.
+                Defaults to False. The toggle button is always visible.
+            sidebar_content (Optional[List[widgets.Widget]]): Additional widgets to include
+                in the sidebar. Defaults to None (only layer manager).
+            **kwargs: Additional keyword arguments passed to LayerManagerWidget.
+
+        Returns:
+            widgets.Widget: A widget containing the map with the floating sidebar overlay.
+                Display this instead of the map object.
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> m.add_basemap("Esri.WorldImagery")
+            >>> widget = m.add_floating_sidebar(position="top-left", width="360px")
+            >>> widget  # Display the returned widget
+        """
+        # Position styles mapping
+        position_styles = {
+            "top-right": "top: 10px; right: 10px;",
+            "top-left": "top: 10px; left: 10px;",
+            "bottom-right": "bottom: 50px; right: 10px;",
+            "bottom-left": "bottom: 50px; left: 10px;",
+        }
+
+        pos_style = position_styles.get(position, position_styles["top-left"])
+
+        # Create layer manager if it doesn't exist
+        if self.layer_manager is None:
+            self.layer_manager = LayerManagerWidget(self, expanded=expanded, **kwargs)
+
+        # Initialize floating sidebar state
+        if not hasattr(self, "floating_sidebar_content_box"):
+            self.floating_sidebar_content_box = widgets.VBox(children=[])
+
+        if not hasattr(self, "_floating_sidebar_widgets"):
+            self._floating_sidebar_widgets = {}
+
+        # Create sidebar content list
+        content_widgets = [self.layer_manager]
+        if sidebar_content:
+            content_widgets.extend(sidebar_content)
+
+        # Create main sidebar box with layer manager and additional content
+        main_sidebar_box = widgets.VBox(children=content_widgets)
+
+        # Create toggle button
+        toggle_icon = v.Icon(
+            children=["mdi-chevron-left"] if sidebar_visible else ["mdi-chevron-right"],
+            small=True,
+        )
+        toggle_btn = v.Btn(
+            icon=True,
+            children=[toggle_icon],
+            style_="width: 22px; height: 22px; min-width: 22px; padding: 0;",
+        )
+
+        # Create settings/wrench button
+        settings_icon = v.Icon(children=["mdi-wrench"], small=True)
+        settings_btn = v.Btn(
+            icon=True,
+            children=[settings_icon],
+            style_="width: 22px; height: 22px; min-width: 22px; padding: 0;",
+        )
+
+        # Create header row with toggle and settings buttons
+        header_row = v.Row(
+            class_="ma-0 pa-0 d-flex justify-space-between align-center mb-1",
+            children=[toggle_btn, settings_btn],
+        )
+
+        # State tracking for sidebar visibility
+        class SidebarState:
+            visible = sidebar_visible
+            settings_visible = False
+
+        # Convert width string to number for calculation
+        width_num = int(width.replace("px", "")) if "px" in width else 360
+
+        # Create width adjustment slider
+        width_slider = widgets.IntSlider(
+            value=width_num,
+            min=200,
+            max=800,
+            step=10,
+            description="Width:",
+            continuous_update=True,
+            layout=widgets.Layout(width="100%"),
+        )
+
+        # Width change handler
+        def on_width_change(change):
+            new_width = change["new"]
+            if SidebarState.visible:
+                overlay.style_ = f"""
+                    position: absolute;
+                    {pos_style}
+                    width: {new_width}px;
+                    max-height: {max_height};
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    z-index: 1000;
+                    background-color: white;
+                    border-radius: 4px;
+                """
+
+        width_slider.observe(on_width_change, names="value")
+
+        # Create settings widget wrapped in CustomWidget for proper header
+        settings_widget = CustomWidget(
+            width_slider,
+            widget_icon="mdi-cog",
+            label="Sidebar Settings",
+            host_map=self,
+            expanded=True,
+        )
+
+        # Settings button handler - toggle settings widget visibility
+        def on_settings_click(widget, event, data):
+            SidebarState.settings_visible = not SidebarState.settings_visible
+            if SidebarState.settings_visible:
+                # Add settings widget to floating sidebar content box
+                if settings_widget not in self.floating_sidebar_content_box.children:
+                    self.floating_sidebar_content_box.children = (
+                        settings_widget,
+                    ) + self.floating_sidebar_content_box.children
+            else:
+                # Remove settings widget from floating sidebar content box
+                self.floating_sidebar_content_box.children = tuple(
+                    child
+                    for child in self.floating_sidebar_content_box.children
+                    if child != settings_widget
+                )
+
+        settings_btn.on_event("click", on_settings_click)
+
+        # Combine main sidebar with dynamic content box for layer settings and other widgets
+        sidebar_box = widgets.VBox(
+            children=[main_sidebar_box, self.floating_sidebar_content_box]
+        )
+
+        # Toggle function
+        def toggle_sidebar(widget, event, data):
+            SidebarState.visible = not SidebarState.visible
+            toggle_icon.children = [
+                "mdi-chevron-left" if SidebarState.visible else "mdi-chevron-right"
+            ]
+
+            if SidebarState.visible:
+                # Show sidebar content
+                overlay.children = [header_row, sidebar_box]
+                overlay.class_ = "pa-2 ma-0"
+                current_width = width_slider.value
+                overlay.style_ = f"""
+                    position: absolute;
+                    {pos_style}
+                    width: {current_width}px;
+                    max-height: {max_height};
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    z-index: 1000;
+                    background-color: white;
+                    border-radius: 4px;
+                """
+            else:
+                # Hide sidebar content, only show toggle button
+                overlay.children = [toggle_btn]
+                overlay.class_ = "ma-0"
+                overlay.style_ = f"""
+                    position: absolute;
+                    {pos_style}
+                    width: auto;
+                    height: auto;
+                    max-height: none;
+                    overflow: visible;
+                    z-index: 1000;
+                    background-color: white;
+                    border-radius: 4px;
+                    padding: 4px;
+                """
+
+        toggle_btn.on_event("click", toggle_sidebar)
+
+        # Create floating overlay container
+        initial_children = (
+            [header_row, sidebar_box] if sidebar_visible else [toggle_btn]
+        )
+        if sidebar_visible:
+            initial_style = f"""
+                position: absolute;
+                {pos_style}
+                width: {width_num}px;
+                max-height: {max_height};
+                overflow-y: auto;
+                overflow-x: hidden;
+                z-index: 1000;
+                background-color: white;
+                border-radius: 4px;
+            """
+        else:
+            initial_style = f"""
+                position: absolute;
+                {pos_style}
+                width: auto;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                z-index: 1000;
+                background-color: white;
+                border-radius: 4px;
+                padding: 4px;
+            """
+
+        overlay = v.Card(
+            class_="ma-0" if not sidebar_visible else "pa-2 ma-0",
+            elevation=4,
+            flat=False,
+            style_=initial_style,
+            children=initial_children,
+        )
+
+        # Create wrapper with the map and overlay
+        wrapper = v.Html(
+            tag="div",
+            style_="position: relative; width: 100%; height: 100%;",
+            children=[self, overlay],
+        )
+
+        return wrapper
 
     def add_3d_buildings(
         self,
@@ -8697,8 +8991,18 @@ class LayerManagerWidget(v.ExpansionPanels):
                         c for c in self.layers_box.children if c != row_ref
                     )
                 self.layer_items.pop(layer_name, None)
-                if f"Style {layer_name}" in self.m.sidebar_widgets:
-                    self.m.remove_from_sidebar(name=f"Style {layer_name}")
+                # Check if style widget exists in either floating sidebar or regular sidebar
+                style_label = f"Style {layer_name}"
+                if (
+                    hasattr(self.m, "_floating_sidebar_widgets")
+                    and style_label in self.m._floating_sidebar_widgets
+                ):
+                    self.m.remove_from_sidebar(name=style_label)
+                elif (
+                    hasattr(self.m, "sidebar_widgets")
+                    and style_label in self.m.sidebar_widgets
+                ):
+                    self.m.remove_from_sidebar(name=style_label)
 
             def on_settings_clicked(btn, layer_name=name):
                 # if isinstance(self.m.layer_dict[layer_name]["layer"], dict):
