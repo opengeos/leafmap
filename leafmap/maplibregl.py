@@ -4511,6 +4511,7 @@ class Map(MapWidget):
         else:
             width_num = 360
 
+
         # Create width adjustment slider
         width_slider = widgets.IntSlider(
             value=width_num,
