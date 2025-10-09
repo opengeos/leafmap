@@ -6737,6 +6737,338 @@ class Map(MapWidget):
         """
         self.unobserve(self._mapillary_function, names="clicked")
 
+    def add_vector_editor(
+        self,
+        filename: str = None,
+        properties: Optional[Dict[str, List[Any]]] = None,
+        time_format: str = "%Y%m%dT%H%M%S",
+        out_dir: Optional[str] = None,
+        filename_prefix: str = "",
+        file_ext: str = "geojson",
+        add_mapillary: bool = False,
+        style: str = "photo",
+        radius: float = 0.00005,
+        width: int = 300,
+        height: int = 420,
+        frame_border: int = 0,
+        controls: Optional[List[str]] = None,
+        position: str = "top-right",
+        fit_bounds_options: Dict = None,
+        **kwargs: Any,
+    ) -> widgets.VBox:
+        """Generates a widget-based interface for creating and managing vector data on a map.
+
+        This function creates an interactive widget interface that allows users to draw features
+        (points, lines, polygons) on a map, assign properties to these features, and export them
+        as GeoJSON files. The interface includes a map, a sidebar for property management, and
+        buttons for saving, exporting, and resetting the data.
+
+        Args:
+            m (Map, optional): An existing Map object. If not provided, a default map with
+                basemaps and drawing controls will be created. Defaults to None.
+            filename (str or gpd.GeoDataFrame): The path to a GeoJSON file or a GeoDataFrame
+                containing the vector data to be edited. Defaults to None.
+            properties (Dict[str, List[Any]], optional): A dictionary where keys are property names
+                and values are lists of possible values for each property. These properties can be
+                assigned to the drawn features. Defaults to None.
+            time_format (str, optional): The format string for the timestamp used in the exported
+                filename. Defaults to "%Y%m%dT%H%M%S".
+            column_widths (Optional[List[int]], optional): A list of two integers specifying the
+                relative widths of the map and sidebar columns. Defaults to (9, 3).
+            map_height (str, optional): The height of the map widget. Defaults to "600px".
+            out_dir (str, optional): The directory where the exported GeoJSON files will be saved.
+                If not provided, the current working directory is used. Defaults to None.
+            filename_prefix (str, optional): A prefix to be added to the exported filename.
+                Defaults to "".
+            file_ext (str, optional): The file extension for the exported file. Defaults to "geojson".
+            add_mapillary (bool, optional): Whether to add a Mapillary image widget that displays the
+                nearest image to the clicked point on the map. Defaults to False.
+            style (str, optional): The style of the Mapillary image widget. Can be "classic", "photo",
+                or "split". Defaults to "photo".
+            radius (float, optional): The radius (in degrees) used to search for the nearest Mapillary
+                image. Defaults to 0.00005 degrees.
+            width (int, optional): The width of the Mapillary image widget. Defaults to 300.
+            height (int, optional): The height of the Mapillary image widget. Defaults to 420.
+            frame_border (int, optional): The width of the frame border for the Mapillary image widget.
+                Defaults to 0.
+            controls (Optional[List[str]], optional): The drawing controls to be added to the map.
+                Defaults to ["point", "polygon", "line_string", "trash"].
+            position (str, optional): The position of the drawing controls on the map. Defaults to "top-right".
+            **kwargs (Any): Additional keyword arguments that may be passed to the function.
+
+        Returns:
+            widgets.VBox: A vertical box widget containing the map, sidebar, and control buttons.
+        """
+        from datetime import datetime
+
+        main_widget = widgets.VBox()
+        output = widgets.Output()
+
+        if controls is None:
+            controls = ["point", "polygon", "line_string", "trash"]
+
+        if isinstance(filename, str):
+            _, ext = os.path.splitext(filename)
+            ext = ext.lower()
+            if ext in [".parquet", ".pq", ".geoparquet"]:
+                gdf = gpd.read_parquet(filename)
+            else:
+                gdf = gpd.read_file(filename)
+        elif isinstance(filename, dict):
+            gdf = gpd.GeoDataFrame.from_features(filename, crs="EPSG:4326")
+        elif isinstance(filename, gpd.GeoDataFrame):
+            gdf = filename
+        else:
+            raise ValueError("filename must be a string or a GeoDataFrame.")
+
+        gdf = gdf.to_crs(epsg=4326)
+
+        if out_dir is None:
+            out_dir = os.getcwd()
+
+        if properties is None:
+            properties = {}
+            dtypes = gdf.dtypes.to_dict()
+            for key, value in dtypes.items():
+                if key != "geometry":
+                    if value == "object":
+                        if gdf[key].nunique() < 10:
+                            properties[key] = gdf[key].unique().tolist()
+                        else:
+                            properties[key] = ""
+                    elif value == "int32":
+                        properties[key] = 0
+                    elif value == "float64":
+                        properties[key] = 0.0
+                    elif value == "bool":
+                        properties[key] = gdf[key].unique().tolist()
+                    else:
+                        properties[key] = ""
+
+        columns = properties.keys()
+        gdf = gdf[list(columns) + ["geometry"]]
+        geojson = gdf.__geo_interface__
+        bounds = get_bounds(geojson)
+
+        self.add_draw_control(
+            controls=controls,
+            position=position,
+            geojson=geojson,
+        )
+        self.fit_bounds(bounds, fit_bounds_options)
+
+        draw_features = {}
+        for row in gdf.iterrows():
+            draw_feature = {}
+            for prop in properties.keys():
+                if prop in gdf.columns:
+                    draw_feature[prop] = row[1][prop]
+                else:
+                    draw_feature[prop] = properties[prop][0]
+            draw_features[str(row[0])] = draw_feature
+        setattr(self, "draw_features", draw_features)
+        self.draw_feature_collection_all = geojson
+
+        # Expand dropdown options to include values from the GeoJSON
+        for key, values in properties.items():
+            if isinstance(values, list) or isinstance(values, tuple):
+                # Collect unique values from the loaded features
+                existing_values = set()
+                for feature_data in draw_features.values():
+                    if key in feature_data:
+                        val = feature_data[key]
+                        if val is not None:
+                            existing_values.add(val)
+
+                # Merge existing values with provided options
+                options_set = set(values)
+                merged_options = options_set.union(existing_values)
+                # Convert back to list, maintaining order (original options first)
+                merged_list = [val for val in values if val in merged_options]
+                for val in sorted(existing_values):
+                    if val not in options_set:
+                        merged_list.append(val)
+                properties[key] = merged_list
+
+        sidebar_widget = widgets.VBox()
+
+        prop_widgets = widgets.VBox()
+
+        image_widget = widgets.HTML()
+
+        if isinstance(properties, dict):
+            for key, values in properties.items():
+
+                if isinstance(values, list) or isinstance(values, tuple):
+                    prop_widget = widgets.Dropdown(
+                        options=values,
+                        # value=None,
+                        description=key,
+                    )
+                    prop_widgets.children += (prop_widget,)
+                elif isinstance(values, int):
+                    prop_widget = widgets.IntText(
+                        value=values,
+                        description=key,
+                    )
+                    prop_widgets.children += (prop_widget,)
+                elif isinstance(values, float):
+                    prop_widget = widgets.FloatText(
+                        value=values,
+                        description=key,
+                    )
+                    prop_widgets.children += (prop_widget,)
+                else:
+                    prop_widget = widgets.Text(
+                        value=values,
+                        description=key,
+                    )
+                    prop_widgets.children += (prop_widget,)
+
+        def draw_change(lng_lat):
+            if lng_lat.new:
+                if len(self.draw_features_selected) > 0:
+                    output.clear_output()
+                    output.outputs = ()
+                    feature_id = self.draw_features_selected[0]["id"]
+                    if feature_id not in self.draw_features:
+                        self.draw_features[feature_id] = {}
+                        for key, values in properties.items():
+                            if isinstance(values, list) or isinstance(values, tuple):
+                                self.draw_features[feature_id][key] = values[0]
+                            else:
+                                self.draw_features[feature_id][key] = values
+                    else:
+                        for prop_widget in prop_widgets.children:
+                            key = prop_widget.description
+                            value = self.draw_features[feature_id][key]
+                            # For dropdown widgets, only set value if it's in options
+                            if hasattr(prop_widget, "options"):
+                                if value in prop_widget.options:
+                                    prop_widget.value = value
+                                elif len(prop_widget.options) > 0:
+                                    # Fall back to first option if value not found
+                                    prop_widget.value = prop_widget.options[0]
+                            else:
+                                prop_widget.value = value
+
+            else:
+                for prop_widget in prop_widgets.children:
+                    key = prop_widget.description
+                    if isinstance(properties[key], list) or isinstance(
+                        properties[key], tuple
+                    ):
+                        prop_widget.value = properties[key][0]
+                    else:
+                        prop_widget.value = properties[key]
+
+        self.observe(draw_change, names="draw_features_selected")
+
+        def log_lng_lat(lng_lat):
+            lon = lng_lat.new["lng"]
+            lat = lng_lat.new["lat"]
+            image_id = common.search_mapillary_images(lon, lat, radius=radius, limit=1)
+            if len(image_id) > 0:
+                content = f"""
+                <iframe
+                    src="https://www.mapillary.com/embed?image_key={image_id[0]}&style={style}"
+                    height="{height}"
+                    width="{width}"
+                    frameborder="{frame_border}">
+                </iframe>
+                """
+                image_widget.value = content
+            else:
+                image_widget.value = "No Mapillary image found."
+
+        if add_mapillary:
+            self.observe(log_lng_lat, names="clicked")
+
+        button_layout = widgets.Layout(width="97px")
+        save = widgets.Button(
+            description="Save", button_style="primary", layout=button_layout
+        )
+        export = widgets.Button(
+            description="Export", button_style="primary", layout=button_layout
+        )
+        reset = widgets.Button(
+            description="Reset", button_style="primary", layout=button_layout
+        )
+
+        def on_save_click(b):
+
+            output.clear_output()
+            if len(self.draw_features_selected) > 0:
+                feature_id = self.draw_features_selected[0]["id"]
+                for prop_widget in prop_widgets.children:
+                    key = prop_widget.description
+                    self.draw_features[feature_id][key] = prop_widget.value
+                with output:
+                    output.clear_output()
+                    output.outputs = ()
+                    output.append_stdout("Faeature saved.")
+            else:
+                with output:
+                    output.clear_output()
+                    output.outputs = ()
+                    output.append_stdout("Please select a feature to save.")
+
+        save.on_click(on_save_click)
+
+        def on_export_click(b):
+            current_time = datetime.now().strftime(time_format)
+            filename = os.path.join(
+                out_dir, f"{filename_prefix}{current_time}.{file_ext}"
+            )
+
+            for index, feature in enumerate(
+                self.draw_feature_collection_all["features"]
+            ):
+                feature_id = feature["id"]
+                if feature_id in self.draw_features:
+                    self.draw_feature_collection_all["features"][index][
+                        "properties"
+                    ] = self.draw_features[feature_id]
+
+            gdf = gpd.GeoDataFrame.from_features(
+                self.draw_feature_collection_all, crs="EPSG:4326"
+            )
+            gdf.to_file(filename)
+            with output:
+                output.clear_output()
+                output.outputs = ()
+                output.append_stdout(f"Exported: {os.path.basename(filename)}")
+
+        export.on_click(on_export_click)
+
+        def on_reset_click(b):
+            output.clear_output()
+            output.outputs = ()
+            for prop_widget in prop_widgets.children:
+                description = prop_widget.description
+                if description in properties:
+                    if isinstance(properties[description], list) or isinstance(
+                        properties[description], tuple
+                    ):
+                        prop_widget.value = properties[description][0]
+                    else:
+                        prop_widget.value = properties[description]
+
+        reset.on_click(on_reset_click)
+
+        sidebar_widget.children = [
+            prop_widgets,
+            widgets.HBox([save, export, reset]),
+            output,
+            image_widget,
+        ]
+        self.add_to_sidebar(
+            sidebar_widget,
+            label="Vector Editor",
+            widget_icon="mdi-shape-polygon-plus",
+            **kwargs,
+        )
+
 
 class Container(v.Container):
     """
@@ -8644,6 +8976,27 @@ def edit_vector_data(
     setattr(m, "draw_features", draw_features)
     m.draw_feature_collection_all = geojson
 
+    # Expand dropdown options to include values from the GeoJSON
+    for key, values in properties.items():
+        if isinstance(values, list) or isinstance(values, tuple):
+            # Collect unique values from the loaded features
+            existing_values = set()
+            for feature_data in draw_features.values():
+                if key in feature_data:
+                    val = feature_data[key]
+                    if val is not None:
+                        existing_values.add(val)
+
+            # Merge existing values with provided options
+            options_set = set(values)
+            merged_options = options_set.union(existing_values)
+            # Convert back to list, maintaining order (original options first)
+            merged_list = [val for val in values if val in merged_options]
+            for val in sorted(existing_values):
+                if val not in options_set:
+                    merged_list.append(val)
+            properties[key] = merged_list
+
     sidebar_widget = widgets.VBox()
 
     prop_widgets = widgets.VBox()
@@ -8695,7 +9048,16 @@ def edit_vector_data(
                 else:
                     for prop_widget in prop_widgets.children:
                         key = prop_widget.description
-                        prop_widget.value = m.draw_features[feature_id][key]
+                        value = m.draw_features[feature_id][key]
+                        # For dropdown widgets, only set value if it's in options
+                        if hasattr(prop_widget, "options"):
+                            if value in prop_widget.options:
+                                prop_widget.value = value
+                            elif len(prop_widget.options) > 0:
+                                # Fall back to first option if value not found
+                                prop_widget.value = prop_widget.options[0]
+                        else:
+                            prop_widget.value = value
 
         else:
             for prop_widget in prop_widgets.children:
