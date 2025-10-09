@@ -6819,7 +6819,7 @@ class Map(MapWidget):
         elif isinstance(filename, gpd.GeoDataFrame):
             gdf = filename
         else:
-            raise ValueError("filename must be a string or a GeoDataFrame.")
+            raise ValueError("filename must be a string, dict, or GeoDataFrame.")
 
         gdf = gdf.to_crs(epsg=4326)
 
