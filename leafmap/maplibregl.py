@@ -492,8 +492,10 @@ class Map(MapWidget):
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         # Initialize floating sidebar state if needed and we're using floating sidebar
-        if hasattr(self, "add_floating_sidebar_flag") and self.add_floating_sidebar_flag and not hasattr(
-            self, "floating_sidebar_content_box"
+        if (
+            hasattr(self, "add_floating_sidebar_flag")
+            and self.add_floating_sidebar_flag
+            and not hasattr(self, "floating_sidebar_content_box")
         ):
             self.floating_sidebar_content_box = widgets.VBox(children=[])
             self._floating_sidebar_widgets = {}
