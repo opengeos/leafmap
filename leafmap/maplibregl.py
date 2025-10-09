@@ -491,6 +491,13 @@ class Map(MapWidget):
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
+        # Initialize floating sidebar state if needed and we're using floating sidebar
+        if self.add_floating_sidebar_flag and not hasattr(
+            self, "floating_sidebar_content_box"
+        ):
+            self.floating_sidebar_content_box = widgets.VBox(children=[])
+            self._floating_sidebar_widgets = {}
+
         # Check if floating sidebar is being used
         if hasattr(self, "floating_sidebar_content_box"):
             # Handle floating sidebar case
@@ -606,6 +613,8 @@ class Map(MapWidget):
         Returns:
             Dict[str, widgets.Widget]: A dictionary where keys are the labels of the widgets and values are the widgets themselves.
         """
+        if self.container is None:
+            self.create_container()
         return self.container.sidebar_widgets
 
     def add(self, obj: Union[str, Any], **kwargs) -> None:
@@ -5844,9 +5853,18 @@ class Map(MapWidget):
                     self._mapillary_widget.value = ""
                     self.unobserve_mapillary()
 
-            self.sidebar_widgets[widget_label].observe(
-                _on_panel_toggle, names="v_model"
-            )
+            # Get the widget from the appropriate sidebar type
+            if hasattr(self, "floating_sidebar_content_box"):
+                # Floating sidebar
+                sidebar_widget = self._floating_sidebar_widgets.get(widget_label)
+            elif self.container is not None:
+                # Container sidebar
+                sidebar_widget = self.container.sidebar_widgets.get(widget_label)
+            else:
+                sidebar_widget = None
+
+            if sidebar_widget is not None:
+                sidebar_widget.observe(_on_panel_toggle, names="v_model")
 
     def create_mapillary_widget(
         self,
