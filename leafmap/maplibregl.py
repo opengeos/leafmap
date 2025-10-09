@@ -7006,7 +7006,7 @@ class Map(MapWidget):
                 with output:
                     output.clear_output()
                     output.outputs = ()
-                    output.append_stdout("Faeature saved.")
+                    output.append_stdout("Feature saved.")
             else:
                 with output:
                     output.clear_output()
