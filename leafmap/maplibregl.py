@@ -6753,7 +6753,7 @@ class Map(MapWidget):
         frame_border: int = 0,
         controls: Optional[List[str]] = None,
         position: str = "top-right",
-        fit_bounds_options: Dict = None,
+        fit_bounds_options: Optional[Dict] = None,
         **kwargs: Any,
     ) -> widgets.VBox:
         """Generates a widget-based interface for creating and managing vector data on a map.
