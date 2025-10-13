@@ -21,7 +21,8 @@ def view_raster(
     View a raster file interactively in the browser using localtileserver.
 
     Args:
-        file_path (str): Path to the raster file to view.
+        file_path (str): Path or URL to the raster file to view. Supports both local
+            paths and HTTP/HTTPS URLs.
         port (int, optional): Port to use for the tile server. Defaults to None.
         indexes (int, optional): Band index to display (1-based). Defaults to None.
         colormap (str, optional): Colormap name to apply. Defaults to None.
@@ -31,7 +32,7 @@ def view_raster(
         open_browser (bool, optional): Whether to open browser automatically. Defaults to True.
 
     Raises:
-        FileNotFoundError: If the raster file does not exist.
+        FileNotFoundError: If the local raster file does not exist.
         ImportError: If localtileserver is not installed.
     """
     try:
@@ -43,15 +44,19 @@ def view_raster(
         )
         sys.exit(1)
 
-    # Expand and validate file path
-    if file_path.startswith("~"):
-        file_path = os.path.expanduser(file_path)
+    # Check if it's a URL or local file
+    is_url = file_path.startswith("http://") or file_path.startswith("https://")
 
-    file_path = os.path.abspath(file_path)
+    if not is_url:
+        # Expand and validate local file path
+        if file_path.startswith("~"):
+            file_path = os.path.expanduser(file_path)
 
-    if not os.path.exists(file_path):
-        print(f"Error: File not found: {file_path}")
-        sys.exit(1)
+        file_path = os.path.abspath(file_path)
+
+        if not os.path.exists(file_path):
+            print(f"Error: File not found: {file_path}")
+            sys.exit(1)
 
     print(f"Loading raster: {file_path}")
 
@@ -373,13 +378,119 @@ def view_raster(
         print("Goodbye!")
 
 
+def view_vector(
+    file_path: str,
+    style: str = "dark-matter",
+    open_browser: bool = True,
+) -> None:
+    """
+    View a vector file interactively in the browser using maplibregl.
+
+    Args:
+        file_path (str): Path or URL to the vector file to view. Supports both local
+            paths and HTTP/HTTPS URLs.
+        style (str, optional): Map style. Defaults to "dark-matter".
+        open_browser (bool, optional): Whether to open browser automatically. Defaults to True.
+
+    Raises:
+        FileNotFoundError: If the local vector file does not exist.
+        ImportError: If required dependencies are not installed.
+    """
+    try:
+        from leafmap import maplibregl
+    except ImportError:
+        print(
+            "Error: maplibregl dependencies are not installed. "
+            "Install them with: pip install 'leafmap[maplibre]'"
+        )
+        sys.exit(1)
+
+    # Check if it's a URL or local file
+    is_url = file_path.startswith("http://") or file_path.startswith("https://")
+
+    if not is_url:
+        # Expand and validate local file path
+        if file_path.startswith("~"):
+            file_path = os.path.expanduser(file_path)
+
+        file_path = os.path.abspath(file_path)
+
+        if not os.path.exists(file_path):
+            print(f"Error: File not found: {file_path}")
+            sys.exit(1)
+
+    print(f"Loading vector: {file_path}")
+
+    try:
+        import geopandas as gpd
+
+        # Read vector file
+        gdf = gpd.read_file(file_path)
+
+        # Get info
+        n_features = len(gdf)
+        geom_type = gdf.geom_type.iloc[0] if len(gdf) > 0 else "Unknown"
+        crs = gdf.crs.to_string() if gdf.crs else "Unknown"
+        gdf = gdf.to_crs(epsg=4326)
+
+        # Get bounds
+        bounds = gdf.total_bounds  # [minx, miny, maxx, maxy]
+        center_lon = (bounds[0] + bounds[2]) / 2
+        center_lat = (bounds[1] + bounds[3]) / 2
+
+        # Create map
+        m = maplibregl.Map(
+            # center=(center_lon, center_lat),
+            # zoom=10,
+            style=style,
+            height="100%",
+            use_message_queue=True,
+        )
+
+        # Add vector data
+        m.add_vector(gdf, name="Vector Layer")
+        m.add_layer_control()
+
+        # Generate HTML
+        html_content = m.to_html(title="Leafmap Vector Viewer")
+
+        print(f"\nVector viewer created successfully!")
+        print(f"  - Features: {n_features}")
+        print(f"  - Geometry: {geom_type}")
+        print(f"  - CRS: {crs}")
+        print(f"  - Style: {style}")
+
+    except Exception as e:
+        print(f"Error loading vector file: {e}")
+        sys.exit(1)
+
+    # Save HTML to temporary file
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".html", delete=False, encoding="utf-8"
+    ) as f:
+        f.write(html_content)
+        html_file = f.name
+
+    # Open in browser
+    if open_browser:
+        print(f"\nOpening viewer in browser...")
+        webbrowser.open(f"file://{html_file}")
+    else:
+        print(f"\nViewer HTML saved to: {html_file}")
+        print(f"Open it manually in your browser.")
+
+    print("\nViewer is ready. Close the browser when done.")
+
+
 def view_raster_cli():
     """Direct CLI entry point for view-raster command."""
     parser = argparse.ArgumentParser(
         description="View a raster file interactively in the browser",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("file_path", help="Path to the raster file")
+    parser.add_argument("file_path", help="Path or URL to the raster file")
     parser.add_argument(
         "--port", type=int, help="Port for the tile server (default: auto)"
     )
@@ -414,6 +525,33 @@ def view_raster_cli():
     )
 
 
+def view_vector_cli():
+    """Direct CLI entry point for view-vector command."""
+    parser = argparse.ArgumentParser(
+        description="View a vector file interactively in the browser",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("file_path", help="Path or URL to the vector file")
+    parser.add_argument(
+        "--style",
+        default="dark-matter",
+        help="Map style (default: dark-matter). Options: dark-matter, positron, voyager, etc.",
+    )
+    parser.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="Don't open browser automatically",
+    )
+
+    args = parser.parse_args()
+
+    view_vector(
+        file_path=args.file_path,
+        style=args.style,
+        open_browser=not args.no_browser,
+    )
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -424,29 +562,45 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # view-raster command
-    view_parser = subparsers.add_parser(
+    raster_parser = subparsers.add_parser(
         "view-raster", help="View a raster file interactively in the browser"
     )
-    view_parser.add_argument("file_path", help="Path to the raster file")
-    view_parser.add_argument(
+    raster_parser.add_argument("file_path", help="Path or URL to the raster file")
+    raster_parser.add_argument(
         "--port", type=int, help="Port for the tile server (default: auto)"
     )
-    view_parser.add_argument(
+    raster_parser.add_argument(
         "--band",
         "--indexes",
         type=int,
         dest="indexes",
         help="Band index to display (1-based)",
     )
-    view_parser.add_argument("--colormap", help="Colormap name to apply")
-    view_parser.add_argument(
+    raster_parser.add_argument("--colormap", help="Colormap name to apply")
+    raster_parser.add_argument(
         "--vmin", type=float, help="Minimum value for color mapping"
     )
-    view_parser.add_argument(
+    raster_parser.add_argument(
         "--vmax", type=float, help="Maximum value for color mapping"
     )
-    view_parser.add_argument("--nodata", type=float, help="Nodata value")
-    view_parser.add_argument(
+    raster_parser.add_argument("--nodata", type=float, help="Nodata value")
+    raster_parser.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="Don't open browser automatically",
+    )
+
+    # view-vector command
+    vector_parser = subparsers.add_parser(
+        "view-vector", help="View a vector file interactively in the browser"
+    )
+    vector_parser.add_argument("file_path", help="Path or URL to the vector file")
+    vector_parser.add_argument(
+        "--style",
+        default="dark-matter",
+        help="Map style (default: dark-matter)",
+    )
+    vector_parser.add_argument(
         "--no-browser",
         action="store_true",
         help="Don't open browser automatically",
@@ -463,6 +617,12 @@ def main():
             vmin=args.vmin,
             vmax=args.vmax,
             nodata=args.nodata,
+            open_browser=not args.no_browser,
+        )
+    elif args.command == "view-vector":
+        view_vector(
+            file_path=args.file_path,
+            style=args.style,
             open_browser=not args.no_browser,
         )
     else:
