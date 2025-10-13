@@ -40,6 +40,10 @@ ai = ["geopandas", "osmnx", "localtileserver>=0.10.4", "rastervision", "pytorch-
 maplibre = ["anywidget", "geopandas", "fiona", "h3", "ipyvuetify", "localtileserver", "mapclassify", "maplibre>=0.3.1", "pmtiles", "rioxarray", "xarray"]
 gdal = ["gdal", "pyproj"]
 
+[project.scripts]
+leafmap = "leafmap.cli:main"
+view-raster = "leafmap.cli:view_raster_cli"
+
 [tool]
 [tool.setuptools.packages.find]
 include = ["leafmap*"]
