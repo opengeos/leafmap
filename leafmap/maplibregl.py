@@ -1525,7 +1525,7 @@ class Map(MapWidget):
                 if layer_type is None:
                     layer_type = "circle"
                     paint = {
-                        "circle-radius": 5,
+                        "circle-radius": 4,
                         "circle-color": "#3388ff",
                         "circle-stroke-color": "#ffffff",
                         "circle-stroke-width": 1,
