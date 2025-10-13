@@ -5,6 +5,7 @@ import os
 import sys
 import webbrowser
 from typing import Optional
+from .common import read_vector
 
 
 def view_raster(
@@ -422,10 +423,9 @@ def view_vector(
     print(f"Loading vector: {file_path}")
 
     try:
-        import geopandas as gpd
 
         # Read vector file
-        gdf = gpd.read_file(file_path)
+        gdf = read_vector(file_path)
 
         # Get info
         n_features = len(gdf)
@@ -433,15 +433,8 @@ def view_vector(
         crs = gdf.crs.to_string() if gdf.crs else "Unknown"
         gdf = gdf.to_crs(epsg=4326)
 
-        # Get bounds
-        bounds = gdf.total_bounds  # [minx, miny, maxx, maxy]
-        center_lon = (bounds[0] + bounds[2]) / 2
-        center_lat = (bounds[1] + bounds[3]) / 2
-
         # Create map
         m = maplibregl.Map(
-            # center=(center_lon, center_lat),
-            # zoom=10,
             style=style,
             height="100%",
             use_message_queue=True,
