@@ -1856,6 +1856,7 @@ def time_slider(
     position: Optional[str] = "bottomright",
     slider_length: Optional[str] = "150px",
     zoom_to_layer: Optional[bool] = False,
+    tile_args: Optional[Dict] = None,
     **kwargs,
 ):
     """Adds a time slider to the map.
@@ -1867,11 +1868,13 @@ def time_slider(
         position (str, optional): Position to place the time slider, can be any of ['topleft', 'topright', 'bottomleft', 'bottomright']. Defaults to "bottomright".
         slider_length (str, optional): Length of the time slider. Defaults to "150px".
         zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
-
+        tile_args (dict, optional): Additional arguments to pass to the get_local_tile_layer function. Defaults to None.
     """
     import threading
     import time
 
+    if tile_args is None:
+        tile_args = {}
     bounds = None
 
     if isinstance(layers, str):
@@ -1965,14 +1968,22 @@ def time_slider(
 
     keys = list(layers.keys())
     layer = layers[keys[0]]
+    if isinstance(layer, str) and layer.startswith("http"):
+        layer = ipyleaflet.TileLayer(url=layer, **tile_args)
     m.add(layer)
 
     def slider_changed(change):
         m.default_style = {"cursor": "wait"}
         index = slider.value - 1
         label.value = labels[index]
-        layer.url = layers[label.value].url
-        layer.name = layers[label.value].name
+        if isinstance(layers[label.value], str) and layers[label.value].startswith(
+            "http"
+        ):
+            layer.url = layers[label.value]
+            layer.name = labels[index]
+        else:
+            layer.url = layers[label.value].url
+            layer.name = layers[label.value].name
         m.default_style = {"cursor": "default"}
 
     slider.observe(slider_changed, "value")
