@@ -11,7 +11,7 @@ from .common import read_vector
 def view_raster(
     file_path: str,
     port: Optional[int] = None,
-    indexes: Optional[int] = None,
+    indexes: Optional[int | list[int]] = None,
     colormap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
@@ -25,7 +25,8 @@ def view_raster(
         file_path (str): Path or URL to the raster file to view. Supports both local
             paths and HTTP/HTTPS URLs.
         port (int, optional): Port to use for the tile server. Defaults to None.
-        indexes (int, optional): Band index to display (1-based). Defaults to None.
+        indexes (int | list[int], optional): Band index to display (1-based) or list of
+            band indices for RGB visualization (e.g., [3, 2, 1]). Defaults to None.
         colormap (str, optional): Colormap name to apply. Defaults to None.
         vmin (float, optional): Minimum value for color mapping. Defaults to None.
         vmax (float, optional): Maximum value for color mapping. Defaults to None.
@@ -72,28 +73,21 @@ def view_raster(
         print(f"Error creating tile client: {e}")
         sys.exit(1)
 
-    # Build tile URL with parameters
-    tile_url_params = []
+    # Get tile URL with parameters
+    # TileClient.get_tile_url() accepts indexes, colormap, vmin, vmax, nodata as parameters
+    tile_url_kwargs = {}
     if indexes is not None:
-        tile_url_params.append(f"indexes={indexes}")
+        tile_url_kwargs["indexes"] = indexes
     if colormap:
-        tile_url_params.append(f"colormap={colormap}")
+        tile_url_kwargs["colormap"] = colormap
     if vmin is not None:
-        tile_url_params.append(f"vmin={vmin}")
+        tile_url_kwargs["vmin"] = vmin
     if vmax is not None:
-        tile_url_params.append(f"vmax={vmax}")
+        tile_url_kwargs["vmax"] = vmax
     if nodata is not None:
-        tile_url_params.append(f"nodata={nodata}")
+        tile_url_kwargs["nodata"] = nodata
 
-    # Get the base tile URL
-    base_tile_url = tile_client.get_tile_url()
-
-    # Add additional parameters to the URL
-    if tile_url_params:
-        separator = "&" if "?" in base_tile_url else "?"
-        tile_url = base_tile_url + separator + "&".join(tile_url_params)
-    else:
-        tile_url = base_tile_url
+    tile_url = tile_client.get_tile_url(**tile_url_kwargs)
 
     # Get bounds and metadata for the raster
     # bounds() returns (lat_min, lat_max, lon_min, lon_max)
@@ -248,7 +242,7 @@ def view_raster(
         <div class="info-item"><span class="info-label">Width:</span> {width}</div>
         <div class="info-item"><span class="info-label">Height:</span> {height}</div>
         {f'<div class="info-item"><span class="info-label">Colormap:</span> {colormap}</div>' if colormap else ''}
-        {f'<div class="info-item"><span class="info-label">Band:</span> {indexes}</div>' if indexes else ''}
+        {f'<div class="info-item"><span class="info-label">Band{"s" if isinstance(indexes, list) else ""}:</span> {indexes if not isinstance(indexes, list) else str(indexes)}</div>' if indexes else ''}
     </div>
     <div id="map"></div>
     <script>
@@ -352,7 +346,10 @@ def view_raster(
     if colormap:
         print(f"  - Colormap: {colormap}")
     if indexes:
-        print(f"  - Band: {indexes}")
+        if isinstance(indexes, list):
+            print(f"  - Bands (RGB): {indexes}")
+        else:
+            print(f"  - Band: {indexes}")
 
     # Open in browser
     if open_browser:
@@ -490,9 +487,9 @@ def view_raster_cli():
     parser.add_argument(
         "--band",
         "--indexes",
-        type=int,
+        type=str,
         dest="indexes",
-        help="Band index to display (1-based)",
+        help="Band index to display (1-based) or comma-separated list for RGB (e.g., '3,2,1')",
     )
     parser.add_argument("--colormap", help="Colormap name to apply")
     parser.add_argument("--vmin", type=float, help="Minimum value for color mapping")
@@ -506,10 +503,18 @@ def view_raster_cli():
 
     args = parser.parse_args()
 
+    # Parse indexes: can be a single int or comma-separated list
+    indexes = None
+    if args.indexes:
+        if "," in args.indexes:
+            indexes = [int(x.strip()) for x in args.indexes.split(",")]
+        else:
+            indexes = int(args.indexes)
+
     view_raster(
         file_path=args.file_path,
         port=args.port,
-        indexes=args.indexes,
+        indexes=indexes,
         colormap=args.colormap,
         vmin=args.vmin,
         vmax=args.vmax,
@@ -565,9 +570,9 @@ def main():
     raster_parser.add_argument(
         "--band",
         "--indexes",
-        type=int,
+        type=str,
         dest="indexes",
-        help="Band index to display (1-based)",
+        help="Band index to display (1-based) or comma-separated list for RGB (e.g., '3,2,1')",
     )
     raster_parser.add_argument("--colormap", help="Colormap name to apply")
     raster_parser.add_argument(
@@ -602,10 +607,18 @@ def main():
     args = parser.parse_args()
 
     if args.command == "view-raster":
+        # Parse indexes: can be a single int or comma-separated list
+        indexes = None
+        if args.indexes:
+            if "," in args.indexes:
+                indexes = [int(x.strip()) for x in args.indexes.split(",")]
+            else:
+                indexes = int(args.indexes)
+
         view_raster(
             file_path=args.file_path,
             port=args.port,
-            indexes=args.indexes,
+            indexes=indexes,
             colormap=args.colormap,
             vmin=args.vmin,
             vmax=args.vmax,
