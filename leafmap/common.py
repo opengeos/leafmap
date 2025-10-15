@@ -18420,3 +18420,92 @@ def get_ee_tile_url(
         return url
     except Exception as e:
         return f"Error: {str(e)}"
+
+
+def get_wayback_layers(url: str = None) -> dict:
+    """
+    Retrieve all layer dates and tile IDs from the ArcGIS Wayback WMTS capabilities URL.
+
+    Args:
+        url (str): WMTS capabilities URL. Default to
+            https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/mapserver/wmts/1.0.0/wmtscapabilities.xml
+
+    Returns:
+        dict: A dictionary where keys are layer dates (e.g., '2023-01-11')
+              and values are corresponding tile IDs (e.g., '11475').
+    """
+    import requests
+    import xml.etree.ElementTree as ET
+    import re
+
+    if url is None:
+        url = "https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/mapserver/wmts/1.0.0/wmtscapabilities.xml"
+
+    response = requests.get(url)
+    response.raise_for_status()
+
+    root = ET.fromstring(response.content)
+    ns = {
+        "wmts": "https://www.opengis.net/wmts/1.0",
+        "ows": "https://www.opengis.net/ows/1.1",
+    }
+
+    layers = {}
+    for layer in root.findall(".//wmts:Layer", ns):
+        title_elem = layer.find("ows:Title", ns)
+        resource_elem = layer.find("wmts:ResourceURL", ns)
+
+        if title_elem is not None and resource_elem is not None:
+            title_text = title_elem.text
+            tile_url = resource_elem.attrib.get("template", "")
+
+            # Extract date from title using regex (YYYY-MM-DD)
+            date_match = re.search(r"\d{4}-\d{2}-\d{2}", title_text)
+            date = date_match.group(0) if date_match else None
+
+            # Extract tile ID (sequence of digits after /tile/)
+            tile_id = None
+            if "/tile/" in tile_url:
+                try:
+                    tile_id = tile_url.split("/tile/")[1].split("/")[0]
+                except IndexError:
+                    pass
+
+            if date and tile_id:
+                layers[date] = tile_id
+
+    return layers
+
+
+def get_wayback_tile_url(date: str = None, layers: dict = None) -> str:
+    """Generates a URL for Wayback Map Tiles.
+
+    Args:
+        date (str, optional): The date for which to retrieve the tile URL in 'YYYY-MM-DD' format.
+                              If None, the latest available date is used.
+        layers (dict, optional): A dictionary of available layers keyed by date.
+                                 If None, the default layers are retrieved.
+
+    Returns:
+        str: The formatted URL for the Wayback Map Tile corresponding to the specified date.
+
+    Raises:
+        ValueError: If the provided date is not available in the layers.
+
+    Notes:
+        If the specified date is not available, the latest date from the layers will be used.
+    """
+    if layers is None:
+        layers = get_wayback_layers()
+    dates = list(layers.keys())
+
+    if date is None:
+        date = dates[0]
+    elif date not in dates:
+        print(f"{date} is not available. Using the latest date: {dates[0]}")
+        date = dates[0]
+
+    tile_id = layers[date]
+    tile_url = f"https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/{tile_id}/{{z}}/{{y}}/{{x}}"
+
+    return tile_url
