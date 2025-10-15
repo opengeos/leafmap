@@ -6045,8 +6045,8 @@ class Map(ipyleaflet.Map):
         Adds a time series comparison of Wayback (ArcGIS Wayback) layers to the map.
 
         Args:
-            left_year (int, optional): The initial year for the left layer. Defaults to "2014-02-20".
-            right_layer (int, optional): The initial year for the right layer. Defaults to None.
+            left_date (str, optional): The initial date for the left layer in "YYYY-MM-DD" format. Defaults to "2014-02-20".
+            right_date (str, optional): The initial date for the right layer in "YYYY-MM-DD" format. Defaults to None.
             widget_width (str, optional): The width of the date pickers. Defaults to "120px".
             add_layer_control (bool, optional): If True, adds a layer control to the map. Defaults to True.
             **kwargs (Any): Additional keyword arguments to pass to the cog_tile function.
