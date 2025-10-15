@@ -6633,6 +6633,8 @@ class Map(MapWidget):
         slider_width: Optional[str] = "150px",
         button_width: Optional[str] = "45px",
         layer_name: Optional[str] = "Image",
+        before_id: Optional[str] = None,
+        default_index: Optional[int] = 0,
         zoom_to_layer: Optional[bool] = True,
         widget_icon: str = "mdi-image",
         close_icon: str = "mdi-close",
@@ -6650,6 +6652,8 @@ class Map(MapWidget):
             labels (list, optional): The list of labels to be used for the time series. Defaults to None.
             time_interval (int, optional): Time interval in seconds. Defaults to 1.
             layer_name (str, optional): The name of the layer. Defaults to "Image".
+            before_id (str, optional): The ID of an existing layer before which the new layer should be inserted. Defaults to None.
+            default_index (int, optional): The index of the default layer. Defaults to 0.
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
             label_width (str, optional): Width of the label. Defaults to "150px".
             slider_width (str, optional): Width of the slider. Defaults to "150px".
@@ -6662,12 +6666,16 @@ class Map(MapWidget):
             expanded (bool, optional): Whether the widget is expanded by default. Defaults to True.
             **kwargs: Additional keyword arguments to be passed to the add_raster or add_cog_layer function.
         """
+        if before_id is None:
+            before_id = self.first_symbol_layer_id
         widget = TimeSliderWidget(
             self,
             images,
             labels,
             time_interval,
             layer_name,
+            before_id,
+            default_index,
             zoom_to_layer,
             label_width,
             slider_width,
@@ -7067,6 +7075,50 @@ class Map(MapWidget):
             label="Vector Editor",
             widget_icon="mdi-shape-polygon-plus",
             **kwargs,
+        )
+
+    def add_wayback_layer(
+        self,
+        date: str = None,
+        name: str = None,
+        attribution: str = "Esri",
+        before_id: Optional[str] = None,
+        quiet: bool = False,
+        **kwargs,
+    ):
+        """Adds a Wayback layer to the map.
+
+        Args:
+            date (str, optional): The date of the layer. Defaults to None.
+            name (str, optional): The name of the layer. Defaults to None.
+            attribution (str, optional): The attribution of the layer. Defaults to "Esri".
+            **kwargs: Additional keyword arguments to pass to the add_tile_layer method.
+        """
+        layers = common.get_wayback_layers()
+        if date not in layers.keys():
+            new_date = common.find_closest_date(date, layers.keys())
+            if not quiet:
+                print(f"{date} is not available. Using the closest date: {new_date}")
+            date = new_date
+
+        url = common.get_wayback_tile_url(date, layers)
+        if name is None:
+            name = date
+
+        if before_id is None:
+            before_id = self.first_symbol_layer_id
+        self.add_tile_layer(
+            url, name=name, attribution=attribution, before_id=before_id, **kwargs
+        )
+
+    def add_wayback_time_slider(self, default_index: Optional[int] = 0, **kwargs):
+        """Add a time slider for Wayback layers."""
+        tile_dict = common.get_wayback_tile_dict()
+        images = list(tile_dict.values())
+        labels = list(tile_dict.keys())
+
+        self.add_time_slider(
+            images, labels=labels, default_index=default_index, **kwargs
         )
 
 
@@ -10432,6 +10484,8 @@ def TimeSliderWidget(
     labels: Optional[List] = None,
     time_interval: Optional[int] = 1,
     layer_name: Optional[str] = "Image",
+    before_id: Optional[str] = None,
+    default_index: Optional[int] = 0,
     zoom_to_layer: Optional[bool] = True,
     label_width: Optional[str] = "150px",
     slider_width: Optional[str] = "150px",
@@ -10445,6 +10499,8 @@ def TimeSliderWidget(
         labels (list, optional): The list of labels to be used for the time series. Defaults to None.
         time_interval (int, optional): Time interval in seconds. Defaults to 1.
         layer_name (str, optional): The name of the layer. Defaults to "Image".
+        before_id (str, optional): The ID of an existing layer before which the new layer should be inserted. Defaults to None.
+        default_index (int, optional): The index of the default layer. Defaults to 0.
         zoom_to_layer (bool, optional): Whether to zoom to the extent of the layer. Defaults to False.
         label_width (str, optional): Width of the label. Defaults to "150px".
         slider_width (str, optional): Width of the slider. Defaults to "150px".
@@ -10466,15 +10522,21 @@ def TimeSliderWidget(
     if len(labels) != len(images):
         raise ValueError("The length of labels is not equal to that of layers.")
 
+    if default_index >= 0:
+        default_value = default_index + 1
+    else:
+        default_value = len(labels) + default_index + 1
+
     slider = widgets.IntSlider(
         min=1,
         max=len(labels),
         readout=False,
+        value=default_value,
         continuous_update=False,
         layout=widgets.Layout(width=slider_width),
     )
     label = widgets.Label(
-        value=labels[0],
+        value=labels[default_index],
         layout=widgets.Layout(padding="0px 5px 0px 5px", width=label_width),
     )
 
@@ -10516,21 +10578,32 @@ def TimeSliderWidget(
     play_btn.on_click(play_click)
     pause_btn.on_click(pause_click)
 
-    first_image = images[0]
+    first_image = images[default_index]
     if isinstance(first_image, str) and first_image.startswith("http"):
-        m.add_cog_layer(
-            first_image,
-            name=layer_name,
-            overwrite=True,
-            fit_bounds=zoom_to_layer,
-            **kwargs,
-        )
+        if "{z}/{y}/{x}" in first_image:
+            m.add_tile_layer(
+                first_image,
+                name=layer_name,
+                overwrite=True,
+                before_id=before_id,
+                **kwargs,
+            )
+        else:
+            m.add_cog_layer(
+                first_image,
+                name=layer_name,
+                before_id=before_id,
+                overwrite=True,
+                fit_bounds=zoom_to_layer,
+                **kwargs,
+            )
     else:
         m.add_raster(
             first_image,
             name=layer_name,
             overwrite=True,
             fit_bounds=zoom_to_layer,
+            before_id=before_id,
             **kwargs,
         )
 
@@ -10540,19 +10613,30 @@ def TimeSliderWidget(
             label.value = labels[index]
 
             if isinstance(images[index], str) and images[index].startswith("http"):
-                m.add_cog_layer(
-                    images[index],
-                    name=layer_name,
-                    overwrite=True,
-                    fit_bounds=False,
-                    **kwargs,
-                )
+                if "{z}/{y}/{x}" in images[index]:
+                    m.add_tile_layer(
+                        images[index],
+                        name=layer_name,
+                        overwrite=True,
+                        before_id=before_id,
+                        **kwargs,
+                    )
+                else:
+                    m.add_cog_layer(
+                        images[index],
+                        name=layer_name,
+                        overwrite=True,
+                        fit_bounds=False,
+                        before_id=before_id,
+                        **kwargs,
+                    )
             else:
                 m.add_raster(
                     images[index],
                     name=layer_name,
                     overwrite=True,
                     fit_bounds=False,
+                    before_id=before_id,
                     **kwargs,
                 )
 

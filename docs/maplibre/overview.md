@@ -388,6 +388,12 @@ Visualize earthquake frequency by location using a heatmap layer.
 
 [![](https://i.imgur.com/OLCRPKj.png)](https://leafmap.org/maplibre/heatmap_layer)
 
+## Visualize historical satellite imagery
+
+Visualize historical satellite imagery using Wayback layers.
+
+[![](https://github.com/user-attachments/assets/c8ce9f3d-f8df-48c1-bf05-1f573e438424)](https://leafmap.org/maplibre/historical_imagery)
+
 ## Visualize US median housing prices by county
 
 Visualize US median housing prices by county using a choropleth map.
