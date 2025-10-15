@@ -3818,6 +3818,7 @@ class Map(ipyleaflet.Map):
         position: str = "bottomright",
         slider_length: str = "150px",
         zoom_to_layer: Optional[bool] = False,
+        tile_args: Optional[Dict] = None,
         **kwargs,
     ) -> None:
         """Adds a time slider to the map.
@@ -3829,7 +3830,7 @@ class Map(ipyleaflet.Map):
             position (str, optional): Position to place the time slider, can be any of ['topleft', 'topright', 'bottomleft', 'bottomright']. Defaults to "bottomright".
             slider_length (str, optional): Length of the time slider. Defaults to "150px".
             zoom_to_layer (bool, optional): Whether to zoom to the extent of the selected layer. Defaults to False.
-
+            tile_args (dict, optional): Additional arguments to pass to the get_local_tile_layer function. Defaults to None.
         """
         from .toolbar import time_slider
 
@@ -3841,6 +3842,7 @@ class Map(ipyleaflet.Map):
             position,
             slider_length,
             zoom_to_layer,
+            tile_args,
             **kwargs,
         )
 
@@ -6002,6 +6004,123 @@ class Map(ipyleaflet.Map):
 
         left_widget.observe(change_left_year, names="value")
         right_widget.observe(change_right_year, names="value")
+
+    def add_wayback_layer(
+        self,
+        date: str = None,
+        name: str = None,
+        attribution: str = "Esri",
+        quiet: bool = False,
+        **kwargs,
+    ):
+        """Adds a Wayback layer to the map.
+
+        Args:
+            date (str, optional): The date of the layer. Defaults to None.
+            name (str, optional): The name of the layer. Defaults to None.
+            attribution (str, optional): The attribution of the layer. Defaults to "Esri".
+            **kwargs: Additional keyword arguments to pass to the add_tile_layer method.
+        """
+        layers = common.get_wayback_layers()
+        if date not in layers.keys():
+            new_date = common.find_closest_date(date, layers.keys())
+            if not quiet:
+                print(f"{date} is not available. Using the closest date: {new_date}")
+            date = new_date
+
+        url = common.get_wayback_tile_url(date, layers)
+        if name is None:
+            name = date
+        self.add_tile_layer(url, name=name, attribution=attribution, **kwargs)
+
+    def add_wayback_layers(
+        self,
+        left_date: str = "2014-02-20",
+        right_date: str = None,
+        widget_width: str = "120px",
+        add_layer_control: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Adds a time series comparison of Wayback (ArcGIS Wayback) layers to the map.
+
+        Args:
+            left_year (int, optional): The initial year for the left layer. Defaults to "2014-02-20".
+            right_layer (int, optional): The initial year for the right layer. Defaults to None.
+            widget_width (str, optional): The width of the date pickers. Defaults to "120px".
+            add_layer_control (bool, optional): If True, adds a layer control to the map. Defaults to True.
+            **kwargs (Any): Additional keyword arguments to pass to the cog_tile function.
+
+        Returns:
+            None
+        """
+        from datetime import datetime
+
+        layers = common.get_wayback_layers()
+        if right_date is None:
+            right_date = list(layers.keys())[0]
+
+        if left_date not in layers.keys():
+            left_date = common.find_closest_date(left_date, layers.keys())
+
+        if right_date is None:
+            right_date = list(layers.keys())[0]
+        elif right_date not in layers.keys():
+            right_date = common.find_closest_date(right_date, layers.keys())
+
+        left_widget = widgets.DatePicker(
+            value=datetime.strptime(left_date, "%Y-%m-%d"),
+            layout=widgets.Layout(width=widget_width),
+        )
+        right_widget = widgets.DatePicker(
+            value=datetime.strptime(right_date, "%Y-%m-%d"),
+            layout=widgets.Layout(width=widget_width),
+        )
+        left_control = ipyleaflet.WidgetControl(widget=left_widget, position="topleft")
+        right_control = ipyleaflet.WidgetControl(
+            widget=right_widget, position="topright"
+        )
+        self.add(left_control)
+        self.add(right_control)
+
+        left_tile_url = common.get_wayback_tile_url(left_date, layers)
+        right_tile_url = common.get_wayback_tile_url(right_date, layers)
+        left_layer = ipyleaflet.TileLayer(
+            url=left_tile_url, name=f"{left_date}", attribution="Esri"
+        )
+        right_layer = ipyleaflet.TileLayer(
+            url=right_tile_url, name=f"{right_date}", attribution="Esri"
+        )
+        split_control = ipyleaflet.SplitMapControl(
+            left_layer=left_layer, right_layer=right_layer
+        )
+        self.add(split_control)
+        if add_layer_control:
+            self.add_layer_control()
+
+        def change_left_date(change):
+            left_date = change.new.strftime("%Y-%m-%d")
+            new_date = common.find_closest_date(left_date, layers.keys())
+            left_widget.value = datetime.strptime(new_date, "%Y-%m-%d")
+            left_layer.url = common.get_wayback_tile_url(new_date, layers, quiet=True)
+            left_layer.name = f"{new_date}"
+
+        def change_right_date(change):
+            right_date = change.new.strftime("%Y-%m-%d")
+            new_date = common.find_closest_date(right_date, layers.keys())
+            right_widget.value = datetime.strptime(new_date, "%Y-%m-%d")
+            right_layer.url = common.get_wayback_tile_url(new_date, layers, quiet=True)
+            right_layer.name = f"{new_date}"
+
+        left_widget.observe(change_left_date, names="value")
+        right_widget.observe(change_right_date, names="value")
+
+    def add_wayback_time_slider(self, **kwargs):
+        """Add a time slider for Wayback layers."""
+        images = common.get_wayback_tile_dict()
+        if "tile_args" not in kwargs:
+            kwargs["tile_args"] = {"attribution": "Esri"}
+        self.add_time_slider(images, **kwargs)
 
 
 # The functions below are outside the Map class.

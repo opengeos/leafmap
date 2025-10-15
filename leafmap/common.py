@@ -18477,7 +18477,9 @@ def get_wayback_layers(url: str = None) -> dict:
     return layers
 
 
-def get_wayback_tile_url(date: str = None, layers: dict = None) -> str:
+def get_wayback_tile_url(
+    date: str = None, layers: dict = None, quiet: bool = False
+) -> str:
     """Generates a URL for Wayback Map Tiles.
 
     Args:
@@ -18485,7 +18487,7 @@ def get_wayback_tile_url(date: str = None, layers: dict = None) -> str:
                               If None, the latest available date is used.
         layers (dict, optional): A dictionary of available layers keyed by date.
                                  If None, the default layers are retrieved.
-
+        quiet (bool, optional): If True, does not print any messages. Defaults to False.
     Returns:
         str: The formatted URL for the Wayback Map Tile corresponding to the specified date.
 
@@ -18502,10 +18504,70 @@ def get_wayback_tile_url(date: str = None, layers: dict = None) -> str:
     if date is None:
         date = dates[0]
     elif date not in dates:
-        print(f"{date} is not available. Using the latest date: {dates[0]}")
-        date = dates[0]
+        new_date = find_closest_date(date, dates)
+        if not quiet:
+            print(f"{date} is not available. Using the closest date: {new_date}")
+        date = new_date
 
     tile_id = layers[date]
     tile_url = f"https://wayback.maptiles.arcgis.com/arcgis/rest/services/world_imagery/wmts/1.0.0/default028mm/mapserver/tile/{tile_id}/{{z}}/{{y}}/{{x}}"
 
     return tile_url
+
+
+def get_wayback_tile_dict(layers: dict = None) -> dict:
+    """Generates a dictionary of Wayback Map Tiles.
+
+    Args:
+        layers (dict, optional): A dictionary of layers. Defaults to None.
+
+    Returns:
+        dict: A dictionary of Wayback Map Tiles.
+    """
+    if layers is None:
+        layers = get_wayback_layers()
+    return {
+        date: get_wayback_tile_url(date, layers)
+        for date in reversed(list(layers.keys()))
+    }
+
+
+def find_closest_date(
+    target_date: str, date_list: List[str], fmt: str = "%Y-%m-%d"
+) -> Optional[str]:
+    """Finds the closest date string in a list of date strings to a given target date.
+
+    Args:
+        target_date (str): The reference date string to compare against.
+        date_list (List[str]): A list of date strings to search.
+        fmt (str, optional): The date format used for parsing. Defaults to "%Y-%m-%d".
+
+    Returns:
+        Optional[str]: The date string from `date_list` that is closest to `target_date`,
+            or None if `date_list` is empty or invalid.
+    """
+    from datetime import datetime
+    from typing import List, Optional
+
+    if not date_list:
+        return None
+
+    try:
+        date_list = list(date_list)
+    except Exception:
+        print(f"date_list must be a list of date strings: {date_list}")
+        return None
+
+    if target_date is None:
+        return date_list[0]
+
+    try:
+        target = datetime.strptime(target_date, fmt)
+        parsed_dates = [(datetime.strptime(d, fmt), d) for d in date_list]
+    except ValueError as e:
+        print(f"Date parsing error: {e}")
+        return None
+
+    # Find the date with the smallest absolute time difference
+    closest_date = min(parsed_dates, key=lambda x: abs(x[0] - target))[1]
+    return closest_date
