@@ -417,7 +417,7 @@ class Map(MapWidget):
                     sidebar_visible=sidebar_visible,
                     sidebar_content=sidebar_content,
                 )
-                self.floating_sidebar_widget = widget
+                self.container = widget
 
             if "google.colab" in sys.modules:
                 import ipyvue as vue
