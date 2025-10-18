@@ -319,6 +319,8 @@ class Map(MapWidget):
             v.Container: The created container widget with the map and sidebar.
         """
 
+        # Use regular container sidebar
+
         if sidebar_visible is None:
             sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
         if min_width is None:
@@ -340,6 +342,29 @@ class Map(MapWidget):
         )
         self.container = container
         self.container.sidebar_widgets["Layers"] = self.layer_manager
+
+        if self.add_floating_sidebar_flag:
+            # Use floating sidebar
+            if self.floating_sidebar_widget is not None:
+                widget = self.floating_sidebar_widget
+            else:
+                sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+                expanded = self.sidebar_args.get("expanded", True)
+                position = self.sidebar_args.get("position", "top-left")
+                width = self.sidebar_args.get("width", "370px")
+                max_height = self.sidebar_args.get("max_height", "80vh")
+                sidebar_content = self.sidebar_args.get("sidebar_content", None)
+
+                widget = self.add_floating_sidebar(
+                    position=position,
+                    width=width,
+                    max_height=max_height,
+                    expanded=expanded,
+                    sidebar_visible=sidebar_visible,
+                    sidebar_content=sidebar_content,
+                )
+                self.floating_sidebar_widget = widget
+
         return container
 
     def _repr_html_(self, **kwargs: Any) -> None:
