@@ -319,6 +319,30 @@ class Map(MapWidget):
             v.Container: The created container widget with the map and sidebar.
         """
 
+        # Use regular container sidebar
+
+        if sidebar_visible is None:
+            sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
+        if min_width is None:
+            min_width = self.sidebar_args.get("min_width", 360)
+        if max_width is None:
+            max_width = self.sidebar_args.get("max_width", 360)
+        if expanded is None:
+            expanded = self.sidebar_args.get("expanded", True)
+        if self.layer_manager is None:
+            self.layer_manager = LayerManagerWidget(self, expanded=expanded)
+
+        container = Container(
+            host_map=self,
+            sidebar_visible=sidebar_visible,
+            min_width=min_width,
+            max_width=max_width,
+            sidebar_content=[self.layer_manager],
+            **kwargs,
+        )
+        self.container = container
+        self.container.sidebar_widgets["Layers"] = self.layer_manager
+
         if self.add_floating_sidebar_flag:
             # Use floating sidebar
             if self.floating_sidebar_widget is not None:
@@ -339,33 +363,9 @@ class Map(MapWidget):
                     sidebar_visible=sidebar_visible,
                     sidebar_content=sidebar_content,
                 )
-                self.container = widget
-            return widget
-        else:
-            # Use regular container sidebar
+                self.floating_sidebar_widget = widget
 
-            if sidebar_visible is None:
-                sidebar_visible = self.sidebar_args.get("sidebar_visible", False)
-            if min_width is None:
-                min_width = self.sidebar_args.get("min_width", 360)
-            if max_width is None:
-                max_width = self.sidebar_args.get("max_width", 360)
-            if expanded is None:
-                expanded = self.sidebar_args.get("expanded", True)
-            if self.layer_manager is None:
-                self.layer_manager = LayerManagerWidget(self, expanded=expanded)
-
-            container = Container(
-                host_map=self,
-                sidebar_visible=sidebar_visible,
-                min_width=min_width,
-                max_width=max_width,
-                sidebar_content=[self.layer_manager],
-                **kwargs,
-            )
-            self.container = container
-            self.container.sidebar_widgets["Layers"] = self.layer_manager
-            return container
+        return container
 
     def _repr_html_(self, **kwargs: Any) -> None:
         """
@@ -417,7 +417,7 @@ class Map(MapWidget):
                     sidebar_visible=sidebar_visible,
                     sidebar_content=sidebar_content,
                 )
-                self.container = widget
+                self.floating_sidebar_widget = widget
 
             if "google.colab" in sys.modules:
                 import ipyvue as vue
