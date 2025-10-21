@@ -12209,58 +12209,79 @@ def init_duckdb_tiles(
                     con.execute("SET s3_region='us-west-2';")
                     con.execute("SET s3_url_style='path';")
 
-            # Get column names from Parquet file
+            # Get column names and types from Parquet file
             temp_result = con.execute(f"SELECT * FROM '{input_path}' LIMIT 0")
-            all_columns = [desc[0] for desc in temp_result.description]
+            all_columns = [(desc[0], str(desc[1])) for desc in temp_result.description]
 
             # Find geometry column (common names: geometry, geom, wkb_geometry, etc.)
             geom_col_source = None
-            for col in all_columns:
-                if col.lower() in ["geometry", "geom", "wkb_geometry", "shape"]:
-                    geom_col_source = col
+            for col_name, col_type in all_columns:
+                if col_name.lower() in ["geometry", "geom", "wkb_geometry", "shape"]:
+                    geom_col_source = col_name
                     break
 
             if not geom_col_source:
+                col_names = [col[0] for col in all_columns]
                 raise Exception(
-                    f"No geometry column found in Parquet file. Available columns: {all_columns}"
+                    f"No geometry column found in Parquet file. Available columns: {col_names}"
                 )
 
-            # Exclude geometry columns to avoid duplicates
+            # Exclude geometry columns and complex types (STRUCT, LIST, MAP, JSON, etc.)
+            # These types are not supported by ST_AsMVT and can cause issues
             non_geom_columns = [
-                col
-                for col in all_columns
-                if col.lower() not in ["geom", "geometry", "wkb_geometry", "shape"]
+                col_name
+                for col_name, col_type in all_columns
+                if col_name.lower() not in ["geom", "geometry", "wkb_geometry", "shape", "geom_bbox", "bbox"]
+                and not any(complex_type in col_type.upper() for complex_type in ['STRUCT', 'LIST', 'MAP', 'JSON', 'ARRAY'])
             ]
 
-            # Build SELECT clause
+            # Build SELECT clause with quoted column names to handle dots in names
             if non_geom_columns:
-                select_clause = ", ".join(non_geom_columns) + ", "
+                quoted_columns = [f'"{col}"' for col in non_geom_columns]
+                select_clause = ", ".join(quoted_columns) + ", "
             else:
                 select_clause = ""
 
             source_table = f"'{input_path}'"
         else:
             # Use ST_Read for other formats (GeoJSON, Shapefile, etc.)
-            # First, get column names from the source to exclude geometry
+            # First, get column names and types from the source to exclude geometry and complex types
             temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
-            all_columns = [desc[0] for desc in temp_result.description]
+            all_columns = [(desc[0], str(desc[1])) for desc in temp_result.description]
 
-            # Exclude 'geom' and 'geometry' columns to avoid duplicates
+            # Find the geometry column (ST_Read may use 'geom' or 'geometry')
+            geom_col_source = None
+            for col_name, col_type in all_columns:
+                if 'GEOMETRY' in col_type.upper() or col_name.lower() in ['geom', 'geometry', 'wkb_geometry', 'shape']:
+                    geom_col_source = col_name
+                    break
+
+            if not geom_col_source:
+                # Default to 'geom' which is what ST_Read usually uses
+                geom_col_source = "geom"
+
+            # Exclude geometry columns and complex types (STRUCT, LIST, MAP, JSON, etc.)
             non_geom_columns = [
-                col for col in all_columns if col.lower() not in ["geom", "geometry"]
+                col_name
+                for col_name, col_type in all_columns
+                if col_name.lower() not in ["geom", "geometry", "geom_bbox", "bbox", "wkb_geometry", "shape"]
+                and 'GEOMETRY' not in col_type.upper()
+                and not any(complex_type in col_type.upper() for complex_type in ['STRUCT', 'LIST', 'MAP', 'JSON', 'ARRAY'])
             ]
 
-            # Build SELECT clause with non-geometry columns
+            # Build SELECT clause with non-geometry columns (quoted to handle dots in names)
             if non_geom_columns:
-                select_clause = ", ".join(non_geom_columns) + ", "
+                quoted_columns = [f'"{col}"' for col in non_geom_columns]
+                select_clause = ", ".join(quoted_columns) + ", "
             else:
                 select_clause = ""
 
-            geom_col_source = "geom"
             source_table = f"ST_Read('{input_path}')"
 
         # Check if data is already in the target SRID by examining a sample geometry
         # Try to detect the current CRS - if it's already in EPSG:3857, don't transform
+        # NOTE: ST_Transform is broken in DuckDB 1.4.1, always returns infinity
+        # So we skip transformation and keep data in original CRS (typically EPSG:4326)
         try:
             sample_geom = con.execute(
                 f"SELECT {geom_col_source} FROM {source_table} LIMIT 1"
@@ -12371,7 +12392,7 @@ def init_duckdb_tiles(
                         CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                         SELECT
                             {select_clause}
-                            ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_col_source})), '{transform_from_crs}', 'EPSG:{srid}') as {geom_column}
+                            ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_col_source})), '{transform_from_crs}', 'EPSG:{srid}', true) as {geom_column}
                         FROM {source_table};
                     """
                     )
@@ -12428,26 +12449,40 @@ def init_duckdb_tiles(
                 """
                 )
             else:
-                # First, get column names to exclude geometry
+                # First, get column names and types to exclude geometry and complex types
                 temp_result = con.execute(
                     f"SELECT * FROM ST_Read('{input_path}') LIMIT 0"
                 )
-                all_columns = [desc[0] for desc in temp_result.description]
+                all_columns = [(desc[0], str(desc[1])) for desc in temp_result.description]
+
+                # Find the geometry column
+                geom_col_source = None
+                for col_name, col_type in all_columns:
+                    if 'GEOMETRY' in col_type.upper() or col_name.lower() in ['geom', 'geometry', 'wkb_geometry', 'shape']:
+                        geom_col_source = col_name
+                        break
+
+                if not geom_col_source:
+                    geom_col_source = "geom"  # Default
+
                 non_geom_columns = [
-                    col
-                    for col in all_columns
-                    if col.lower() not in ["geom", "geometry"]
+                    col_name
+                    for col_name, col_type in all_columns
+                    if col_name.lower() not in ["geom", "geometry", "geom_bbox", "bbox", "wkb_geometry", "shape"]
+                    and 'GEOMETRY' not in col_type.upper()
+                    and not any(complex_type in col_type.upper() for complex_type in ['STRUCT', 'LIST', 'MAP', 'JSON', 'ARRAY'])
                 ]
 
                 if non_geom_columns:
-                    select_clause = ", ".join(non_geom_columns) + ", "
+                    quoted_columns = [f'"{col}"' for col in non_geom_columns]
+                    select_clause = ", ".join(quoted_columns) + ", "
                 else:
                     select_clause = ""
 
                 con.execute(
                     f"""
                     CREATE TABLE IF NOT EXISTS {table_name} AS
-                    SELECT {select_clause}geom as {geom_column}
+                    SELECT {select_clause}"{geom_col_source}" as {geom_column}
                     FROM ST_Read('{input_path}');
                 """
                 )
@@ -12616,9 +12651,18 @@ def start_duckdb_tile_server(
                     # Build the MVT query
                     # Get all columns except geometry for properties
                     if properties is None:
-                        # Get column names
+                        # Get column names and types, filtering for MVT-compatible types
+                        # ST_AsMVT only supports: VARCHAR, FLOAT, DOUBLE, INTEGER, BIGINT, BOOLEAN
                         columns = con.execute(
-                            f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}' AND column_name != '{geom_column}'"
+                            f"""
+                            SELECT column_name, data_type
+                            FROM information_schema.columns
+                            WHERE table_name = '{table_name}'
+                            AND column_name != '{geom_column}'
+                            AND data_type IN ('VARCHAR', 'FLOAT', 'DOUBLE', 'INTEGER', 'BIGINT', 'BOOLEAN',
+                                             'SMALLINT', 'TINYINT', 'UBIGINT', 'UINTEGER', 'USMALLINT', 'UTINYINT',
+                                             'HUGEINT', 'REAL', 'TEXT')
+                            """
                         ).fetchall()
                         prop_list = [col[0] for col in columns]
                     else:
@@ -12627,7 +12671,7 @@ def start_duckdb_tile_server(
                     # Build property assignments for ST_AsMVT
                     if prop_list:
                         prop_assigns = ", ".join(
-                            [f'"{prop}": {prop}' for prop in prop_list]
+                            [f'"{prop}": "{prop}"' for prop in prop_list]
                         )
                         # Add comma after properties if they exist
                         prop_assigns = prop_assigns + ","
@@ -14357,8 +14401,8 @@ def parquet_to_gdf(
         columns = "*"
 
     if isinstance(columns, list):
-        # Join the columns into a string for SQL query
-        columns = ", ".join([col for col in columns])
+        # Join the columns into a string for SQL query (quote to handle dots in names)
+        columns = ", ".join([f'"{col}"' for col in columns])
         sql = f"SELECT {columns}, {geom_sql} FROM '{input_parquet}'"
     else:
 
@@ -14479,13 +14523,15 @@ def read_parquet(
     if columns is None:
         columns = "*"
     elif isinstance(columns, list):
-        columns = ", ".join(columns)
+        # Quote column names to handle dots in names (e.g., "names.primary")
+        columns = ", ".join([f'"{col}"' for col in columns])
     elif not isinstance(columns, str):
         raise ValueError("columns must be a list or a string.")
 
     if exclude is not None:
         if isinstance(exclude, list):
-            exclude = ", ".join(exclude)
+            # Quote column names in exclude list too
+            exclude = ", ".join([f'"{col}"' for col in exclude])
         elif not isinstance(exclude, str):
             raise ValueError("exclude_columns must be a list or a string.")
         columns = f"{columns} EXCLUDE {exclude}"

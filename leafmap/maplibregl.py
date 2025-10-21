@@ -3336,14 +3336,11 @@ class Map(MapWidget):
 
                         if is_web_mercator:
                             # Data is in Web Mercator (EPSG:3857), transform to WGS84 (EPSG:4326)
-                            # Use MIN/MAX instead of ST_Extent for correct results
-                            # Transform individual bounds to EPSG:4326, then find min/max
-                            # Note: After ST_Transform to EPSG:4326, coordinates are in (lat, lon) order
                             bounds_query = f"""
                                 WITH bounds AS (
                                     SELECT
-                                        ST_Transform(ST_Point(ST_XMin({geom_column}), ST_YMin({geom_column})), 'EPSG:3857', 'EPSG:4326') as sw,
-                                        ST_Transform(ST_Point(ST_XMax({geom_column}), ST_YMax({geom_column})), 'EPSG:3857', 'EPSG:4326') as ne
+                                        ST_Transform(ST_Point(ST_XMin({geom_column}), ST_YMin({geom_column})), 'EPSG:3857', 'EPSG:4326', true) as sw,
+                                        ST_Transform(ST_Point(ST_XMax({geom_column}), ST_YMax({geom_column})), 'EPSG:3857', 'EPSG:4326', true) as ne
                                     FROM {table_name}
                                 )
                                 SELECT
@@ -3354,7 +3351,7 @@ class Map(MapWidget):
                                 FROM bounds
                             """
                         else:
-                            # Data is already in WGS84 or similar, use directly
+                            # Data is in WGS84 (EPSG:4326), use directly
                             # Use MIN/MAX for correct aggregate bounds across all features
                             bounds_query = f"""
                                 SELECT
@@ -3369,7 +3366,7 @@ class Map(MapWidget):
                         con.close()
 
                         if result and all(x is not None for x in result):
-                            min_lon, min_lat, max_lon, max_lat = result
+                            min_lat, min_lon, max_lat, max_lon = result
                             # MapLibre expects [[west, south], [east, north]] = [[minLon, minLat], [maxLon, maxLat]]
                             self.fit_bounds([[min_lon, min_lat], [max_lon, max_lat]])
                     else:
