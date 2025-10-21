@@ -12670,6 +12670,42 @@ def start_duckdb_tile_server(
                 app.logger.disabled = True
                 app.logger.setLevel(logging.CRITICAL)
 
+            # Use a simple connection pool to limit total connections
+            # DuckDB has a global limit on database attachments
+            import threading
+            from queue import Queue
+
+            # Create a pool of connections (limit to avoid "database already attached" errors)
+            max_connections = 4  # Conservative limit
+            connection_pool = Queue(maxsize=max_connections)
+            pool_lock = threading.Lock()
+
+            def create_connection():
+                """Create a new DuckDB connection with extensions loaded."""
+                con = duckdb.connect(database_path, read_only=True)
+                try:
+                    con.execute("INSTALL spatial;")
+                    con.execute("LOAD spatial;")
+                    con.execute("INSTALL httpfs;")
+                    con.execute("LOAD httpfs;")
+                    con.execute("SET s3_region='us-west-2';")
+                    con.execute("SET s3_url_style='path';")
+                except Exception:
+                    pass
+                return con
+
+            # Pre-populate the pool
+            for _ in range(max_connections):
+                connection_pool.put(create_connection())
+
+            def get_db_connection():
+                """Get a connection from the pool."""
+                return connection_pool.get()
+
+            def return_db_connection(con):
+                """Return a connection to the pool."""
+                connection_pool.put(con)
+
             @app.route("/tiles/<int:z>/<int:x>/<int:y>.pbf")
             def get_tile(z, x, y):
                 """Serve vector tiles from DuckDB."""
@@ -12678,19 +12714,8 @@ def start_duckdb_tile_server(
                     # Return empty tile for zoom levels below min_zoom
                     return Response(b"", mimetype="application/x-protobuf")
 
-                con = duckdb.connect(database_path, read_only=True)
-                # Load necessary extensions for views that might reference remote files
-                try:
-                    con.execute("INSTALL spatial;")
-                    con.execute("LOAD spatial;")
-                    con.execute("INSTALL httpfs;")
-                    con.execute("LOAD httpfs;")
-                    # Configure for public S3 buckets
-                    con.execute("SET s3_region='us-west-2';")
-                    con.execute("SET s3_url_style='path';")
-                except Exception:
-                    # Extensions might already be installed/loaded, continue anyway
-                    pass
+                # Get connection from pool
+                con = get_db_connection()
 
                 try:
                     # Build the MVT query
@@ -12750,10 +12775,8 @@ def start_duckdb_tile_server(
                         traceback.print_exc()
                     return Response(b"", mimetype="application/x-protobuf"), 500
                 finally:
-                    try:
-                        con.close()
-                    except:
-                        pass
+                    # Always return connection to pool
+                    return_db_connection(con)
 
             @app.route("/")
             def index():
