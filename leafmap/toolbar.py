@@ -13,7 +13,7 @@ from . import pc
 from .common import *
 
 
-def tool_template(m, opened: Optional[bool] = True) -> widgets.Widget:
+def tool_template(m, opened: Optional[bool] = True) -> Optional[widgets.Widget | None]:
     """Generates a tool GUI template using ipywidgets. Icons can be found at https://fontawesome.com/v4/icons
 
     Args:
