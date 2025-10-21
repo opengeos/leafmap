@@ -12436,14 +12436,19 @@ def start_duckdb_tile_server(
                         prop_list = properties
 
                     # Build property assignments for ST_AsMVT
-                    prop_assigns = ", ".join(
-                        [f'"{prop}": {prop}' for prop in prop_list]
-                    )
+                    if prop_list:
+                        prop_assigns = ", ".join(
+                            [f'"{prop}": {prop}' for prop in prop_list]
+                        )
+                        # Add comma after properties if they exist
+                        prop_assigns = prop_assigns + ","
+                    else:
+                        prop_assigns = ""
 
                     # Query to generate the tile
                     query = f"""
                         SELECT ST_AsMVT({{
-                            {prop_assigns},
+                            {prop_assigns}
                             "geom": ST_AsMVTGeom(
                                 {geom_column},
                                 ST_Extent(ST_TileEnvelope($1, $2, $3))

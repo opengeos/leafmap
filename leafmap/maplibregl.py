@@ -3051,13 +3051,13 @@ class Map(MapWidget):
 
     def add_duckdb_layer(
         self,
-        data,
+        data=None,
         layer_name: Optional[str] = None,
         layer_type: str = "fill",
         paint: Optional[Dict] = None,
         layout: Optional[Dict] = None,
         filter: Optional[Dict] = None,
-        database_path: str = ":memory:",
+        database_path: str = None,
         table_name: str = "features",
         geom_column: str = "geom",
         properties: Optional[List[str]] = None,
@@ -3075,15 +3075,16 @@ class Map(MapWidget):
         Adds a layer served from a DuckDB database via vector tiles.
 
         This method enables visualization of large vector datasets by serving them
-        as vector tiles through a local Flask server backed by DuckDB. The data is
-        loaded into a DuckDB database and served as Mapbox Vector Tiles (MVT) format,
-        which allows efficient rendering of millions of features.
+        as vector tiles through a local Flask server backed by DuckDB. The data can
+        either be loaded from various sources into a new/existing database, or you
+        can connect to an existing database that already contains the data.
 
         Args:
-            data: The spatial data to visualize. Can be:
+            data (optional): The spatial data to visualize. Can be:
                 - Path to a vector file (GeoJSON, Shapefile, etc.)
                 - GeoJSON dictionary
                 - GeoDataFrame
+                - None (if using an existing database with data already loaded)
             layer_name (str, optional): Name for the layer. If None, generates a unique name.
             layer_type (str, optional): MapLibre layer type ('fill', 'line', 'circle', 'symbol').
                 Defaults to 'fill'.
@@ -3091,22 +3092,23 @@ class Map(MapWidget):
                 based on layer_type.
             layout (dict, optional): Layout properties for the layer.
             filter (dict, optional): Filter expression for the layer.
-            database_path (str, optional): Path to DuckDB database file. Use ":memory:"
-                for in-memory database. Defaults to ":memory:".
+            database_path (str, optional): Path to DuckDB database file.
+                - If None and data is provided: creates a temporary database
+                - If provided with data: loads data into this database
+                - If provided without data: uses existing database (data must already be loaded)
             table_name (str, optional): Name of the table in DuckDB. Defaults to "features".
             geom_column (str, optional): Name of geometry column. Defaults to "geom".
             properties (list, optional): List of property columns to include in tiles.
                 If None, includes all columns.
             port (int, optional): Port for the tile server. Defaults to 8000.
+                If port is in use, automatically selects next available port.
             minzoom (int, optional): Minimum zoom level. Defaults to 0.
             maxzoom (int, optional): Maximum zoom level. Defaults to 22.
             visible (bool, optional): Whether layer is visible initially. Defaults to True.
             opacity (float, optional): Layer opacity (0-1). Defaults to 1.0.
             fit_bounds (bool, optional): Whether to zoom to layer extent. Defaults to True.
             tooltip (bool, optional): Whether to add tooltips. Defaults to True.
-            quiet (bool, optional): If True, suppress progress messages. Note: Flask's
-                minimal startup messages ("Serving Flask app...") cannot be suppressed.
-                Defaults to False.
+            quiet (bool, optional): If True, suppress progress messages. Defaults to False.
             **kwargs: Additional arguments passed to the layer configuration.
 
         Returns:
@@ -3114,18 +3116,21 @@ class Map(MapWidget):
 
         Raises:
             ImportError: If duckdb, flask, or flask-cors are not installed.
+            ValueError: If neither data nor database_path is provided.
 
         Example:
             >>> import leafmap.maplibregl as leafmap
             >>> m = leafmap.Map()
-            >>> # From file
+            >>>
+            >>> # Example 1: Load data from file (creates temporary database)
             >>> m.add_duckdb_layer(
             ...     data="large_dataset.geojson",
             ...     layer_name="buildings",
             ...     layer_type="fill",
             ...     paint={"fill-color": "#3388ff", "fill-opacity": 0.7}
             ... )
-            >>> # From GeoDataFrame
+            >>>
+            >>> # Example 2: Load data into a persistent database
             >>> import geopandas as gpd
             >>> gdf = gpd.read_file("data.geojson")
             >>> m.add_duckdb_layer(
@@ -3133,40 +3138,72 @@ class Map(MapWidget):
             ...     layer_name="parcels",
             ...     database_path="parcels.db"
             ... )
+            >>>
+            >>> # Example 3: Use existing database (data already loaded)
+            >>> m.add_duckdb_layer(
+            ...     database_path="existing_data.db",
+            ...     table_name="my_table",
+            ...     geom_column="geometry",
+            ...     layer_name="existing_layer"
+            ... )
         """
 
         try:
+            # Validate inputs
+            if data is None and database_path is None:
+                raise ValueError(
+                    "Either 'data' or 'database_path' must be provided. "
+                    "Provide 'data' to load new data, or 'database_path' to use an existing database."
+                )
+
             # Generate layer name if not provided
             if layer_name is None:
                 layer_name = f"duckdb_layer_{random_string(3)}"
 
-            # For tile serving, we need a persistent database (not in-memory)
-            # because the Flask server needs to access it from background threads
-            if database_path == ":memory:":
-                import tempfile
+            # Determine the database path
+            db_path = database_path
+
+            # If data is provided, we need to load it into the database
+            if data is not None:
+                # For tile serving, we need a persistent database (not in-memory)
+                # because the Flask server needs to access it from background threads
+                if database_path is None:
+                    import tempfile
+                    import os
+
+                    # Create a temporary database file path (don't create the file yet)
+                    temp_fd, db_path = tempfile.mkstemp(
+                        suffix=".db", prefix="leafmap_duckdb_"
+                    )
+                    os.close(temp_fd)  # Close the file descriptor
+                    os.unlink(db_path)  # Remove the empty file
+                    if not quiet:
+                        print(
+                            f"Note: Using temporary database file for tile serving: {db_path}"
+                        )
+
+                # Initialize database and load data
+                if not quiet:
+                    print(f"Initializing DuckDB database for layer '{layer_name}'...")
+                db_path = init_duckdb_tiles(
+                    data=data,
+                    database_path=db_path,
+                    table_name=table_name,
+                    geom_column=geom_column,
+                    quiet=quiet,
+                )
+            else:
+                # Using existing database - verify it exists
                 import os
 
-                # Create a temporary database file path (don't create the file yet)
-                temp_fd, database_path = tempfile.mkstemp(
-                    suffix=".db", prefix="leafmap_duckdb_"
-                )
-                os.close(temp_fd)  # Close the file descriptor
-                os.unlink(database_path)  # Remove the empty file
-                if not quiet:
-                    print(
-                        f"Note: Using temporary database file for tile serving: {database_path}"
+                if not os.path.exists(db_path):
+                    raise FileNotFoundError(
+                        f"Database file not found: {db_path}. "
+                        "Provide 'data' to create a new database, or ensure the database file exists."
                     )
 
-            # Initialize database and load data
-            if not quiet:
-                print(f"Initializing DuckDB database for layer '{layer_name}'...")
-            db_path = init_duckdb_tiles(
-                data=data,
-                database_path=database_path,
-                table_name=table_name,
-                geom_column=geom_column,
-                quiet=quiet,
-            )
+                if not quiet:
+                    print(f"Using existing database: {db_path} (table: {table_name})")
 
             # Start the tile server if not already running
             if not quiet:
@@ -3266,6 +3303,9 @@ class Map(MapWidget):
                 print(
                     "Please install required packages: pip install duckdb flask flask-cors"
                 )
+        except (ValueError, FileNotFoundError):
+            # Re-raise validation errors so users can handle them
+            raise
         except Exception as e:
             if not quiet:
                 print(f"Error adding DuckDB layer: {e}")
