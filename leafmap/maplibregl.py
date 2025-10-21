@@ -3064,11 +3064,14 @@ class Map(MapWidget):
         port: int = 8000,
         minzoom: Optional[int] = 0,
         maxzoom: Optional[int] = 22,
+        min_zoom: Optional[int] = None,
         visible: bool = True,
         opacity: float = 1.0,
         fit_bounds: bool = True,
         tooltip: bool = True,
         quiet: bool = False,
+        use_view: bool = False,
+        src_crs: str = None,
         **kwargs: Any,
     ):
         """
@@ -3107,13 +3110,23 @@ class Map(MapWidget):
                 If None, includes all columns.
             port (int, optional): Port for the tile server. Defaults to 8000.
                 If port is in use, automatically selects next available port.
-            minzoom (int, optional): Minimum zoom level. Defaults to 0.
-            maxzoom (int, optional): Maximum zoom level. Defaults to 22.
+            minzoom (int, optional): Minimum zoom level for the MapLibre layer. Defaults to 0.
+            maxzoom (int, optional): Maximum zoom level for the MapLibre layer. Defaults to 22.
+            min_zoom (int, optional): Minimum zoom level at which to query and serve tiles.
+                Below this zoom level, empty tiles will be returned, preventing memory issues
+                with large datasets. Use this to defer data loading until users zoom in closer.
+                If None, tiles will be served at all zoom levels. Defaults to None.
             visible (bool, optional): Whether layer is visible initially. Defaults to True.
             opacity (float, optional): Layer opacity (0-1). Defaults to 1.0.
             fit_bounds (bool, optional): Whether to zoom to layer extent. Defaults to True.
             tooltip (bool, optional): Whether to add tooltips. Defaults to True.
             quiet (bool, optional): If True, suppress progress messages. Defaults to False.
+            use_view (bool, optional): If True and data is a parquet file, create a view instead
+                of a table. Views avoid data duplication but may be slower for tile serving as they
+                query the source file on each tile request. Only applies to parquet files. Defaults to False.
+            src_crs (str, optional): Source CRS of the input data as an EPSG code (e.g., 'EPSG:5070',
+                'EPSG:4326'). If None, will attempt to auto-detect. Specify this parameter if the data
+                is in a projected CRS that is not Web Mercator to ensure proper transformation. Defaults to None.
             **kwargs: Additional arguments passed to the layer configuration.
 
         Returns:
@@ -3171,6 +3184,15 @@ class Map(MapWidget):
             ...     geom_column="geometry",
             ...     layer_name="existing_layer"
             ... )
+            >>>
+            >>> # Example 7: Large parquet file with min_zoom to prevent memory issues
+            >>> m.add_duckdb_layer(
+            ...     data="huge_dataset.parquet",
+            ...     layer_name="huge_layer",
+            ...     min_zoom=8,  # Only load tiles at zoom level 8 and above
+            ...     layer_type="fill",
+            ...     paint={"fill-color": "#ff0000", "fill-opacity": 0.5}
+            ... )
         """
 
         try:
@@ -3216,6 +3238,8 @@ class Map(MapWidget):
                     table_name=table_name,
                     geom_column=geom_column,
                     quiet=quiet,
+                    use_view=use_view,
+                    src_crs=src_crs,
                 )
             else:
                 # Using existing database - verify it exists
@@ -3241,6 +3265,7 @@ class Map(MapWidget):
                 port=port,
                 background=True,
                 quiet=quiet,
+                min_zoom=min_zoom,
             )
 
             # Create tile URL

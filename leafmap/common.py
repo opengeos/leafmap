@@ -12081,6 +12081,8 @@ def init_duckdb_tiles(
     geom_column: str = "geom",
     srid: int = 3857,
     quiet: bool = False,
+    use_view: bool = False,
+    src_crs: str = None,
 ) -> str:
     """
     Initialize a DuckDB database with spatial data for vector tile serving.
@@ -12109,6 +12111,12 @@ def init_duckdb_tiles(
         geom_column (str, optional): Name of the geometry column. Defaults to "geom".
         srid (int, optional): Target SRID for the geometry. Defaults to 3857 (Web Mercator).
         quiet (bool, optional): If True, suppress progress messages. Defaults to False.
+        use_view (bool, optional): If True and data is a parquet file, create a view instead
+            of a table. Views avoid data duplication but may be slower for tile serving as they
+            query the source file on each request. Only applies to parquet files. Defaults to False.
+        src_crs (str, optional): Source CRS of the input data as an EPSG code (e.g., 'EPSG:5070',
+            'EPSG:4326'). If None, will attempt to auto-detect. Specify this parameter if the data
+            is in a projected CRS that is not Web Mercator. Defaults to None.
 
     Returns:
         str: The path to the created database.
@@ -12258,46 +12266,120 @@ def init_duckdb_tiles(
                 f"SELECT {geom_col_source} FROM {source_table} LIMIT 1"
             ).fetchone()
             if sample_geom and sample_geom[0]:
-                # Check if coordinates are in Web Mercator range (large numbers)
-                coords_check = con.execute(
-                    f"SELECT ST_X(ST_Centroid({geom_col_source})), ST_Y(ST_Centroid({geom_col_source})) FROM {source_table} LIMIT 1"
-                ).fetchone()
-                if coords_check and coords_check[0]:
-                    x, y = coords_check[0], coords_check[1]
-                    # Web Mercator coordinates are typically in range [-20026376, 20026376]
-                    # WGS84 coordinates are in range [-180, 180] for X and [-90, 90] for Y
-                    is_already_web_mercator = abs(x) > 180 or abs(y) > 90
+                # Determine if we need to transform based on user input or auto-detection
+                needs_transform = True
+                transform_from_crs = src_crs if src_crs else "EPSG:4326"
 
-                    if is_already_web_mercator:
-                        # Data is already in Web Mercator, don't transform
-                        con.execute(
-                            f"""
-                            CREATE TABLE IF NOT EXISTS {table_name} AS
-                            SELECT {select_clause}{geom_col_source} as {geom_column}
-                            FROM {source_table};
-                        """
-                        )
+                if src_crs:
+                    # User specified source CRS - always transform unless it's already Web Mercator
+                    if src_crs.upper() in ["EPSG:3857", "3857"]:
+                        needs_transform = False
                         if not quiet:
-                            print(
-                                f"Successfully loaded data into table '{table_name}' (already in Web Mercator)"
-                            )
+                            print(f"Data is already in Web Mercator ({src_crs})")
                     else:
-                        # Data needs transformation from WGS84 to Web Mercator
-                        con.execute(
-                            f"""
-                            CREATE TABLE IF NOT EXISTS {table_name} AS
-                            SELECT
-                                {select_clause}
-                                ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_col_source})), 'EPSG:4326', 'EPSG:{srid}') as {geom_column}
-                            FROM {source_table};
-                        """
-                        )
+                        needs_transform = True
                         if not quiet:
-                            print(
-                                f"Successfully loaded data into table '{table_name}' (transformed to Web Mercator)"
-                            )
+                            print(f"Transforming from {src_crs} to EPSG:3857")
                 else:
-                    raise Exception("Could not determine CRS from sample geometry")
+                    # Auto-detect CRS based on coordinate ranges
+                    coords_check = con.execute(
+                        f"SELECT ST_X(ST_Centroid({geom_col_source})), ST_Y(ST_Centroid({geom_col_source})) FROM {source_table} LIMIT 1"
+                    ).fetchone()
+                    if coords_check and coords_check[0]:
+                        x, y = coords_check[0], coords_check[1]
+                        # Auto-detect based on coordinate ranges
+                        # Reference: https://epsg.io/
+
+                        if abs(x) <= 180 and abs(y) <= 90:
+                            # WGS84 (EPSG:4326) - Geographic coordinates
+                            # Range: X: [-180, 180], Y: [-90, 90]
+                            needs_transform = True
+                            transform_from_crs = "EPSG:4326"
+                            if not quiet:
+                                print("Auto-detected CRS: EPSG:4326 (WGS84)")
+                        elif 160_000 < x < 780_000 and -300_000 < y < 3_700_000:
+                            # Likely UTM zones (various EPSGs)
+                            # UTM coordinates typically in range [160k-780k, 0-10M]
+                            # Without zone info, can't determine exact EPSG
+                            if not quiet:
+                                print(
+                                    f"Warning: Coordinates appear to be in UTM projection"
+                                )
+                                print(f"  Sample: X={x:.2f}, Y={y:.2f}")
+                                print(f"  Cannot determine UTM zone automatically")
+                                print(
+                                    f"  Specify src_crs (e.g., 'EPSG:32618' for UTM Zone 18N)"
+                                )
+                            # Try as if it's already in Web Mercator (will likely fail)
+                            needs_transform = False
+                        elif -2_500_000 < x < 2_500_000 and -2_500_000 < y < 6_300_000:
+                            # Likely EPSG:5070 (NAD83 / Conus Albers)
+                            # Range: X: [-2.3M, 2.5M], Y: [0, 3.2M] for CONUS
+                            # Or EPSG:2163 (US National Atlas Equal Area)
+                            needs_transform = True
+                            transform_from_crs = "EPSG:5070"
+                            if not quiet:
+                                print(
+                                    f"Auto-detected CRS: EPSG:5070 (NAD83 / Conus Albers)"
+                                )
+                                print(f"  Sample coordinates: X={x:.2f}, Y={y:.2f}")
+                                print(
+                                    f"  Use src_crs='EPSG:5070' to override if incorrect"
+                                )
+                        elif abs(x) <= 20037508 and abs(y) <= 20037508:
+                            # Web Mercator (EPSG:3857)
+                            # Range: ±20,037,508 meters (max extent)
+                            needs_transform = False
+                            if not quiet:
+                                print("Auto-detected CRS: EPSG:3857 (Web Mercator)")
+                        else:
+                            # Unknown projected CRS
+                            if not quiet:
+                                print(f"Warning: Could not auto-detect CRS")
+                                print(f"  Sample coordinates: X={x:.2f}, Y={y:.2f}")
+                                print(
+                                    f"  Specify src_crs parameter (e.g., src_crs='EPSG:5070', 'EPSG:32618', etc.)"
+                                )
+                                print(
+                                    f"  Data will be loaded without transformation (may appear in wrong location)"
+                                )
+                            # Load without transformation as fallback
+                            needs_transform = False
+
+                if not needs_transform:
+                    # Data is already in Web Mercator, don't transform
+                    # Use VIEW for Parquet files only if user requested it
+                    table_or_view = "VIEW" if (is_parquet and use_view) else "TABLE"
+                    con.execute(
+                        f"""
+                        CREATE {table_or_view} IF NOT EXISTS {table_name} AS
+                        SELECT {select_clause}{geom_col_source} as {geom_column}
+                        FROM {source_table};
+                    """
+                    )
+                    if not quiet:
+                        view_note = " (using view)" if (is_parquet and use_view) else ""
+                        print(
+                            f"Successfully loaded data into {table_or_view.lower()} '{table_name}' (already in Web Mercator){view_note}"
+                        )
+                else:
+                    # Data needs transformation to Web Mercator
+                    # Use VIEW for Parquet files only if user requested it
+                    table_or_view = "VIEW" if (is_parquet and use_view) else "TABLE"
+                    con.execute(
+                        f"""
+                        CREATE {table_or_view} IF NOT EXISTS {table_name} AS
+                        SELECT
+                            {select_clause}
+                            ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_col_source})), '{transform_from_crs}', 'EPSG:{srid}') as {geom_column}
+                        FROM {source_table};
+                    """
+                    )
+                    if not quiet:
+                        view_note = " (using view)" if (is_parquet and use_view) else ""
+                        print(
+                            f"Successfully loaded data into {table_or_view.lower()} '{table_name}' (transformed from {transform_from_crs} to EPSG:{srid}){view_note}"
+                        )
             else:
                 raise Exception("No geometry data found")
         except Exception as crs_error:
@@ -12306,15 +12388,20 @@ def init_duckdb_tiles(
                 print(
                     f"CRS detection failed ({crs_error}), loading without transformation"
                 )
+            # Use VIEW for Parquet files only if user requested it
+            table_or_view = "VIEW" if (is_parquet and use_view) else "TABLE"
             con.execute(
                 f"""
-                CREATE TABLE IF NOT EXISTS {table_name} AS
+                CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                 SELECT {select_clause}{geom_col_source} as {geom_column}
                 FROM {source_table};
             """
             )
             if not quiet:
-                print(f"Loaded data into table '{table_name}' (original CRS)")
+                view_note = " (using view)" if (is_parquet and use_view) else ""
+                print(
+                    f"Loaded data into {table_or_view.lower()} '{table_name}' (original CRS){view_note}"
+                )
 
         con.commit()
 
@@ -12331,9 +12418,11 @@ def init_duckdb_tiles(
             # Determine if we need to use Parquet-specific handling
             if is_parquet:
                 # For Parquet, we already have the source_table and geom_col_source from above
+                # Use VIEW for Parquet files only if user requested it
+                table_or_view = "VIEW" if use_view else "TABLE"
                 con.execute(
                     f"""
-                    CREATE TABLE IF NOT EXISTS {table_name} AS
+                    CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                     SELECT {select_clause}{geom_col_source} as {geom_column}
                     FROM {source_table};
                 """
@@ -12364,8 +12453,10 @@ def init_duckdb_tiles(
                 )
             con.commit()
             if not quiet:
+                view_or_table = "view" if (is_parquet and use_view) else "table"
+                view_note = " (using view)" if (is_parquet and use_view) else ""
                 print(
-                    f"Loaded data without transformation into table '{table_name}' (original CRS)"
+                    f"Loaded data without transformation into {view_or_table} '{table_name}' (original CRS){view_note}"
                 )
         except Exception as e2:
             raise Exception(f"Failed to load data: {e2}")
@@ -12392,6 +12483,7 @@ def start_duckdb_tile_server(
     background: bool = True,
     quiet: bool = True,
     cors: bool = True,
+    min_zoom: int = None,
 ) -> int:
     """
     Start a Flask server that serves vector tiles from a DuckDB database.
@@ -12417,6 +12509,9 @@ def start_duckdb_tile_server(
             Defaults to True.
         quiet (bool, optional): If True, suppress server logs. Defaults to True.
         cors (bool, optional): Whether to enable CORS. Defaults to True.
+        min_zoom (int, optional): Minimum zoom level at which to query and serve tiles.
+            Below this zoom level, empty tiles will be returned, preventing memory issues
+            with large datasets. If None, tiles will be served at all zoom levels. Defaults to None.
 
     Returns:
         int: The actual port number being used by the server.
@@ -12498,8 +12593,24 @@ def start_duckdb_tile_server(
             @app.route("/tiles/<int:z>/<int:x>/<int:y>.pbf")
             def get_tile(z, x, y):
                 """Serve vector tiles from DuckDB."""
+                # Check if zoom level is below minimum threshold
+                if min_zoom is not None and z < min_zoom:
+                    # Return empty tile for zoom levels below min_zoom
+                    return Response(b"", mimetype="application/x-protobuf")
+
                 con = duckdb.connect(database_path, read_only=True)
-                con.execute("LOAD spatial;")
+                # Load necessary extensions for views that might reference remote files
+                try:
+                    con.execute("INSTALL spatial;")
+                    con.execute("LOAD spatial;")
+                    con.execute("INSTALL httpfs;")
+                    con.execute("LOAD httpfs;")
+                    # Configure for public S3 buckets
+                    con.execute("SET s3_region='us-west-2';")
+                    con.execute("SET s3_url_style='path';")
+                except Exception:
+                    # Extensions might already be installed/loaded, continue anyway
+                    pass
 
                 try:
                     # Build the MVT query
