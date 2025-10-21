@@ -21,7 +21,9 @@ def tool_template(m, opened: Optional[bool] = True) -> Optional[widgets.Widget]:
         opened (bool, optional): Whether to open the toolbar. Defaults to True.
 
     Returns:
-        ipywidgets: The tool GUI widget.
+        Optional[ipywidgets]: The tool GUI widget, or None if map object is provide.
+                              (Assuming it should will be return the widget in all cases)
+                              Or, if it always return a widget, the return type should ipywidgets.
     """
     widget_width = "250px"
     padding = "0px 0px 0px 5px"  # upper, right, bottom, left
