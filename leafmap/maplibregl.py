@@ -3079,9 +3079,14 @@ class Map(MapWidget):
         either be loaded from various sources into a new/existing database, or you
         can connect to an existing database that already contains the data.
 
+        Supports all vector formats that DuckDB's ST_Read can handle, including
+        GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, and many more
+        GDAL-supported formats.
+
         Args:
             data (optional): The spatial data to visualize. Can be:
-                - Path to a vector file (GeoJSON, Shapefile, etc.)
+                - Path to a vector file (any format supported by DuckDB's ST_Read:
+                  GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, etc.)
                 - GeoJSON dictionary
                 - GeoDataFrame
                 - None (if using an existing database with data already loaded)
@@ -3122,7 +3127,7 @@ class Map(MapWidget):
             >>> import leafmap.maplibregl as leafmap
             >>> m = leafmap.Map()
             >>>
-            >>> # Example 1: Load data from file (creates temporary database)
+            >>> # Example 1: Load GeoJSON (creates temporary database)
             >>> m.add_duckdb_layer(
             ...     data="large_dataset.geojson",
             ...     layer_name="buildings",
@@ -3130,16 +3135,36 @@ class Map(MapWidget):
             ...     paint={"fill-color": "#3388ff", "fill-opacity": 0.7}
             ... )
             >>>
-            >>> # Example 2: Load data into a persistent database
-            >>> import geopandas as gpd
-            >>> gdf = gpd.read_file("data.geojson")
+            >>> # Example 2: Load Shapefile
             >>> m.add_duckdb_layer(
-            ...     data=gdf,
+            ...     data="boundaries.shp",
+            ...     layer_name="boundaries",
+            ...     layer_type="line",
+            ...     paint={"line-color": "#ff0000", "line-width": 2}
+            ... )
+            >>>
+            >>> # Example 3: Load GeoPackage
+            >>> m.add_duckdb_layer(
+            ...     data="data.gpkg",
             ...     layer_name="parcels",
             ...     database_path="parcels.db"
             ... )
             >>>
-            >>> # Example 3: Use existing database (data already loaded)
+            >>> # Example 4: Load GeoParquet (very efficient for large datasets)
+            >>> m.add_duckdb_layer(
+            ...     data="large_dataset.parquet",
+            ...     layer_name="large_layer"
+            ... )
+            >>>
+            >>> # Example 5: Load from GeoDataFrame
+            >>> import geopandas as gpd
+            >>> gdf = gpd.read_file("data.geojson")
+            >>> m.add_duckdb_layer(
+            ...     data=gdf,
+            ...     layer_name="from_gdf"
+            ... )
+            >>>
+            >>> # Example 6: Use existing database (no data loading)
             >>> m.add_duckdb_layer(
             ...     database_path="existing_data.db",
             ...     table_name="my_table",

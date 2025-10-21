@@ -12086,13 +12086,20 @@ def init_duckdb_tiles(
     Initialize a DuckDB database with spatial data for vector tile serving.
 
     This function creates a DuckDB database and loads spatial data from various
-    sources (GeoJSON, GeoDataFrame, file path) into a table suitable for serving
-    vector tiles. The geometry is automatically transformed to Web Mercator (EPSG:3857)
-    for tile generation.
+    sources into a table suitable for serving vector tiles. The geometry is
+    automatically transformed to Web Mercator (EPSG:3857) for tile generation.
+
+    Supports all vector formats that DuckDB's ST_Read can handle, including:
+    - GeoJSON (.geojson, .json)
+    - Shapefile (.shp)
+    - GeoPackage (.gpkg)
+    - FlatGeobuf (.fgb)
+    - GeoParquet (.parquet, .geoparquet)
+    - And many more GDAL-supported formats
 
     Args:
         data: The spatial data to load. Can be:
-            - Path to a vector file (str)
+            - Path to a vector file (str) - Any format supported by DuckDB's ST_Read
             - GeoJSON dictionary
             - GeoDataFrame
         database_path (str, optional): Path to the DuckDB database file.
@@ -12118,6 +12125,10 @@ def init_duckdb_tiles(
         ...     database_path="tiles.db",
         ...     table_name="buildings"
         ... )
+        >>> # From Shapefile
+        >>> db_path = leafmap.init_duckdb_tiles("data.shp", database_path="tiles.db")
+        >>> # From GeoPackage
+        >>> db_path = leafmap.init_duckdb_tiles("data.gpkg", database_path="tiles.db")
         >>> # From GeoDataFrame
         >>> import geopandas as gpd
         >>> gdf = gpd.read_file("data.geojson")
@@ -12133,11 +12144,13 @@ def init_duckdb_tiles(
 
     # Handle different input types
     if isinstance(data, str):
-        # File path
+        # File path - ST_Read will handle any format DuckDB supports
+        # (GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, etc.)
         input_path = data
         is_file = True
     else:
-        # GeoDataFrame or GeoJSON dict
+        # GeoDataFrame or GeoJSON dict - convert to temporary GeoJSON file
+        # Note: This only applies to Python objects, not file paths
         try:
             import geopandas as gpd
 
@@ -12150,7 +12163,7 @@ def init_duckdb_tiles(
                     "Data must be a file path, GeoJSON dict, or GeoDataFrame"
                 )
 
-            # Save to temporary file
+            # Save to temporary GeoJSON file for ST_Read to consume
             import tempfile
 
             temp_file = tempfile.NamedTemporaryFile(
