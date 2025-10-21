@@ -12074,6 +12074,454 @@ def start_server(
         run_flask()
 
 
+def init_duckdb_tiles(
+    data,
+    database_path: str = ":memory:",
+    table_name: str = "features",
+    geom_column: str = "geom",
+    srid: int = 3857,
+    quiet: bool = False,
+) -> str:
+    """
+    Initialize a DuckDB database with spatial data for vector tile serving.
+
+    This function creates a DuckDB database and loads spatial data from various
+    sources (GeoJSON, GeoDataFrame, file path) into a table suitable for serving
+    vector tiles. The geometry is automatically transformed to Web Mercator (EPSG:3857)
+    for tile generation.
+
+    Args:
+        data: The spatial data to load. Can be:
+            - Path to a vector file (str)
+            - GeoJSON dictionary
+            - GeoDataFrame
+        database_path (str, optional): Path to the DuckDB database file.
+            Use ":memory:" for an in-memory database. Defaults to ":memory:".
+        table_name (str, optional): Name of the table to create in the database.
+            Defaults to "features".
+        geom_column (str, optional): Name of the geometry column. Defaults to "geom".
+        srid (int, optional): Target SRID for the geometry. Defaults to 3857 (Web Mercator).
+        quiet (bool, optional): If True, suppress progress messages. Defaults to False.
+
+    Returns:
+        str: The path to the created database.
+
+    Raises:
+        ImportError: If duckdb is not installed.
+        Exception: If data loading or transformation fails.
+
+    Example:
+        >>> import leafmap
+        >>> # From GeoJSON file
+        >>> db_path = leafmap.init_duckdb_tiles(
+        ...     "data.geojson",
+        ...     database_path="tiles.db",
+        ...     table_name="buildings"
+        ... )
+        >>> # From GeoDataFrame
+        >>> import geopandas as gpd
+        >>> gdf = gpd.read_file("data.geojson")
+        >>> db_path = leafmap.init_duckdb_tiles(gdf, database_path="tiles.db")
+    """
+    try:
+        import duckdb
+    except ImportError:
+        raise ImportError(
+            "duckdb is required for this function. "
+            "Install it with: pip install duckdb"
+        )
+
+    # Handle different input types
+    if isinstance(data, str):
+        # File path
+        input_path = data
+        is_file = True
+    else:
+        # GeoDataFrame or GeoJSON dict
+        try:
+            import geopandas as gpd
+
+            if isinstance(data, dict):
+                gdf = gpd.GeoDataFrame.from_features(data)
+            elif isinstance(data, gpd.GeoDataFrame):
+                gdf = data
+            else:
+                raise ValueError(
+                    "Data must be a file path, GeoJSON dict, or GeoDataFrame"
+                )
+
+            # Save to temporary file
+            import tempfile
+
+            temp_file = tempfile.NamedTemporaryFile(
+                delete=False, suffix=".geojson", mode="w"
+            )
+            gdf.to_file(temp_file.name, driver="GeoJSON")
+            input_path = temp_file.name
+            is_file = False
+        except ImportError:
+            raise ImportError(
+                "geopandas is required for GeoDataFrame input. "
+                "Install it with: pip install geopandas"
+            )
+
+    # Create or connect to database
+    con = duckdb.connect(database_path, read_only=False)
+
+    try:
+        # Install and load spatial extension
+        con.execute("INSTALL spatial;")
+        con.execute("LOAD spatial;")
+
+        # First, get column names from the source to exclude geometry
+        temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
+        all_columns = [desc[0] for desc in temp_result.description]
+
+        # Exclude 'geom' and 'geometry' columns to avoid duplicates
+        non_geom_columns = [
+            col for col in all_columns if col.lower() not in ["geom", "geometry"]
+        ]
+
+        # Build SELECT clause with non-geometry columns
+        if non_geom_columns:
+            select_clause = ", ".join(non_geom_columns) + ", "
+        else:
+            select_clause = ""
+
+        # Check if data is already in the target SRID by examining a sample geometry
+        # Try to detect the current CRS - if it's already in EPSG:3857, don't transform
+        try:
+            sample_geom = con.execute(
+                f"SELECT geom FROM ST_Read('{input_path}') LIMIT 1"
+            ).fetchone()
+            if sample_geom and sample_geom[0]:
+                # Check if coordinates are in Web Mercator range (large numbers)
+                coords_check = con.execute(
+                    f"SELECT ST_X(ST_Centroid(geom)), ST_Y(ST_Centroid(geom)) FROM ST_Read('{input_path}') LIMIT 1"
+                ).fetchone()
+                if coords_check and coords_check[0]:
+                    x, y = coords_check[0], coords_check[1]
+                    # Web Mercator coordinates are typically in range [-20026376, 20026376]
+                    # WGS84 coordinates are in range [-180, 180] for X and [-90, 90] for Y
+                    is_already_web_mercator = abs(x) > 180 or abs(y) > 90
+
+                    if is_already_web_mercator:
+                        # Data is already in Web Mercator, don't transform
+                        con.execute(
+                            f"""
+                            CREATE TABLE IF NOT EXISTS {table_name} AS
+                            SELECT {select_clause}geom as {geom_column}
+                            FROM ST_Read('{input_path}');
+                        """
+                        )
+                        if not quiet:
+                            print(
+                                f"Successfully loaded data into table '{table_name}' (already in Web Mercator)"
+                            )
+                    else:
+                        # Data needs transformation from WGS84 to Web Mercator
+                        con.execute(
+                            f"""
+                            CREATE TABLE IF NOT EXISTS {table_name} AS
+                            SELECT
+                                {select_clause}
+                                ST_Transform(ST_GeomFromWKB(ST_AsWKB(geom)), 'EPSG:4326', 'EPSG:{srid}') as {geom_column}
+                            FROM ST_Read('{input_path}');
+                        """
+                        )
+                        if not quiet:
+                            print(
+                                f"Successfully loaded data into table '{table_name}' (transformed to Web Mercator)"
+                            )
+                else:
+                    raise Exception("Could not determine CRS from sample geometry")
+            else:
+                raise Exception("No geometry data found")
+        except Exception as crs_error:
+            # If CRS detection fails, try loading without transformation
+            if not quiet:
+                print(
+                    f"CRS detection failed ({crs_error}), loading without transformation"
+                )
+            con.execute(
+                f"""
+                CREATE TABLE IF NOT EXISTS {table_name} AS
+                SELECT {select_clause}geom as {geom_column}
+                FROM ST_Read('{input_path}');
+            """
+            )
+            if not quiet:
+                print(f"Loaded data into table '{table_name}' (original CRS)")
+
+        con.commit()
+
+        # Get row count
+        row_count = con.execute(f"SELECT COUNT(*) FROM {table_name}").fetchone()[0]
+        if not quiet:
+            print(f"Total features: {row_count}")
+
+    except Exception as e:
+        if not quiet:
+            print(f"Error loading data: {e}")
+        # Try alternative approach without transformation
+        try:
+            # First, get column names to exclude geometry
+            temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
+            all_columns = [desc[0] for desc in temp_result.description]
+            non_geom_columns = [
+                col for col in all_columns if col.lower() not in ["geom", "geometry"]
+            ]
+
+            if non_geom_columns:
+                select_clause = ", ".join(non_geom_columns) + ", "
+            else:
+                select_clause = ""
+
+            con.execute(
+                f"""
+                CREATE TABLE IF NOT EXISTS {table_name} AS
+                SELECT {select_clause}geom as {geom_column}
+                FROM ST_Read('{input_path}');
+            """
+            )
+            con.commit()
+            if not quiet:
+                print(
+                    f"Loaded data without transformation into table '{table_name}' (original CRS)"
+                )
+        except Exception as e2:
+            raise Exception(f"Failed to load data: {e2}")
+    finally:
+        con.close()
+        # Clean up temporary file if created
+        if not is_file:
+            import os
+
+            try:
+                os.unlink(input_path)
+            except Exception:
+                pass
+
+    return database_path
+
+
+def start_duckdb_tile_server(
+    database_path: str,
+    table_name: str = "features",
+    geom_column: str = "geom",
+    properties: list = None,
+    port: int = 8000,
+    background: bool = True,
+    quiet: bool = True,
+    cors: bool = True,
+) -> int:
+    """
+    Start a Flask server that serves vector tiles from a DuckDB database.
+
+    This function creates a Flask web server with a vector tile endpoint that
+    generates Mapbox Vector Tiles (MVT) on-the-fly from a DuckDB database using
+    the ST_AsMVT function. The tiles can be consumed by MapLibre GL JS and other
+    vector tile clients.
+
+    If the specified port is already in use, the function will automatically
+    find the next available port.
+
+    Args:
+        database_path (str): Path to the DuckDB database file.
+        table_name (str, optional): Name of the table containing the spatial data.
+            Defaults to "features".
+        geom_column (str, optional): Name of the geometry column. Defaults to "geom".
+        properties (list, optional): List of property columns to include in tiles.
+            If None, includes all columns except geometry. Defaults to None.
+        port (int, optional): Port number for the server. Defaults to 8000.
+            If the port is in use, will automatically use the next available port.
+        background (bool, optional): Whether to run the server in a background thread.
+            Defaults to True.
+        quiet (bool, optional): If True, suppress server logs. Defaults to True.
+        cors (bool, optional): Whether to enable CORS. Defaults to True.
+
+    Returns:
+        int: The actual port number being used by the server.
+
+    Raises:
+        ImportError: If required modules (flask, duckdb) are not installed.
+
+    Example:
+        >>> import leafmap
+        >>> # Initialize database
+        >>> db_path = leafmap.init_duckdb_tiles("data.geojson", database_path="tiles.db")
+        >>> # Start tile server
+        >>> actual_port = leafmap.start_duckdb_tile_server(
+        ...     database_path=db_path,
+        ...     table_name="features",
+        ...     port=8000
+        ... )
+        >>> print(f"Server running on port {actual_port}")
+        >>> # Server is now running at http://127.0.0.1:{actual_port}/tiles/{z}/{x}/{y}.pbf
+    """
+
+    # Find an available port
+    import socket
+
+    def find_available_port(start_port: int, max_attempts: int = 100) -> int:
+        """Find an available port starting from start_port."""
+        for port_to_try in range(start_port, start_port + max_attempts):
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.bind(("127.0.0.1", port_to_try))
+                    return port_to_try
+            except OSError:
+                continue
+        raise RuntimeError(
+            f"Could not find an available port in range {start_port}-{start_port + max_attempts}"
+        )
+
+    actual_port = find_available_port(port)
+    if actual_port != port and not quiet:
+        print(
+            f"Port {port} is in use, using port {actual_port} instead for DuckDB tile server"
+        )
+
+    def run_flask():
+        try:
+            import duckdb
+            from flask import Flask, Response
+
+            if cors:
+                from flask_cors import CORS
+
+            app = Flask(__name__)
+
+            if cors:
+                CORS(app)
+
+            # Always suppress werkzeug's development server warning
+            import logging
+            import warnings
+
+            # Suppress the development server warning
+            warnings.filterwarnings("ignore", message=".*development server.*")
+
+            # Set werkzeug logger to only show errors (suppresses WARNING level)
+            werkzeug_logger = logging.getLogger("werkzeug")
+            werkzeug_logger.setLevel(logging.ERROR)
+
+            if quiet:
+                # Suppress Flask's startup banner messages
+                import flask.cli
+
+                flask.cli.show_server_banner = lambda *args, **kwargs: None
+
+                # Disable werkzeug and Flask loggers completely
+                werkzeug_logger.disabled = True
+                app.logger.disabled = True
+                app.logger.setLevel(logging.CRITICAL)
+
+            @app.route("/tiles/<int:z>/<int:x>/<int:y>.pbf")
+            def get_tile(z, x, y):
+                """Serve vector tiles from DuckDB."""
+                con = duckdb.connect(database_path, read_only=True)
+                con.execute("LOAD spatial;")
+
+                try:
+                    # Build the MVT query
+                    # Get all columns except geometry for properties
+                    if properties is None:
+                        # Get column names
+                        columns = con.execute(
+                            f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}' AND column_name != '{geom_column}'"
+                        ).fetchall()
+                        prop_list = [col[0] for col in columns]
+                    else:
+                        prop_list = properties
+
+                    # Build property assignments for ST_AsMVT
+                    prop_assigns = ", ".join(
+                        [f'"{prop}": {prop}' for prop in prop_list]
+                    )
+
+                    # Query to generate the tile
+                    query = f"""
+                        SELECT ST_AsMVT({{
+                            {prop_assigns},
+                            "geom": ST_AsMVTGeom(
+                                {geom_column},
+                                ST_Extent(ST_TileEnvelope($1, $2, $3))
+                            )
+                        }})
+                        FROM {table_name}
+                        WHERE ST_Intersects({geom_column}, ST_TileEnvelope($1, $2, $3))
+                    """
+
+                    with con.cursor() as cursor:
+                        tile_blob = cursor.execute(query, [z, x, y]).fetchone()
+
+                    tile = tile_blob[0] if tile_blob and tile_blob[0] else b""
+                    return Response(tile, mimetype="application/x-protobuf")
+
+                except Exception as e:
+                    if not quiet:
+                        print(f"Error generating tile {z}/{x}/{y}: {e}")
+                        import traceback
+
+                        traceback.print_exc()
+                    return Response(b"", mimetype="application/x-protobuf"), 500
+                finally:
+                    try:
+                        con.close()
+                    except:
+                        pass
+
+            @app.route("/")
+            def index():
+                """Serve information about the tile server."""
+                return f"""
+                <html>
+                <head><title>DuckDB Vector Tile Server</title></head>
+                <body>
+                    <h2>DuckDB Vector Tile Server</h2>
+                    <p>Tile endpoint: <code>/tiles/{{z}}/{{x}}/{{y}}.pbf</code></p>
+                    <p>Database: {database_path}</p>
+                    <p>Table: {table_name}</p>
+                    <p>Geometry column: {geom_column}</p>
+                </body>
+                </html>
+                """
+
+            if not quiet:
+                print(f"DuckDB tile server running at http://127.0.0.1:{actual_port}/")
+                print(
+                    f"Tiles available at: http://127.0.0.1:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+                )
+
+            # Run Flask app
+            app.run(port=actual_port, threaded=True, use_reloader=False)
+
+        except ImportError as e:
+            if not quiet:
+                print(f"Error importing module: {e}")
+                print(
+                    "Please install required packages: pip install duckdb flask flask-cors"
+                )
+        except Exception as e:
+            if not quiet:
+                print(f"An error occurred: {e}")
+
+    if background:
+        import threading
+
+        t = threading.Thread(target=run_flask, daemon=True)
+        t.start()
+        # Give the server a moment to start
+        import time
+
+        time.sleep(0.5)
+    else:
+        run_flask()
+
+    return actual_port
+
+
 def vector_to_mbtiles(
     source_path: str, target_path: str, max_zoom: int = 5, name: str = None, **kwargs
 ) -> None:

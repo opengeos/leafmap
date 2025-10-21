@@ -47,6 +47,7 @@ from .common import (
     get_bounds,
     get_ee_tile_url,
     get_overture_data,
+    init_duckdb_tiles,
     nasa_data_download,
     nasa_data_login,
     pandas_to_geojson,
@@ -57,6 +58,7 @@ from .common import (
     read_vector,
     sort_files,
     stac_assets,
+    start_duckdb_tile_server,
     start_server,
 )
 from .map_widgets import TabWidget
@@ -3046,6 +3048,230 @@ class Map(MapWidget):
 
         except Exception as e:
             print(e)
+
+    def add_duckdb_layer(
+        self,
+        data,
+        layer_name: Optional[str] = None,
+        layer_type: str = "fill",
+        paint: Optional[Dict] = None,
+        layout: Optional[Dict] = None,
+        filter: Optional[Dict] = None,
+        database_path: str = ":memory:",
+        table_name: str = "features",
+        geom_column: str = "geom",
+        properties: Optional[List[str]] = None,
+        port: int = 8000,
+        minzoom: Optional[int] = 0,
+        maxzoom: Optional[int] = 22,
+        visible: bool = True,
+        opacity: float = 1.0,
+        fit_bounds: bool = True,
+        tooltip: bool = True,
+        quiet: bool = False,
+        **kwargs: Any,
+    ):
+        """
+        Adds a layer served from a DuckDB database via vector tiles.
+
+        This method enables visualization of large vector datasets by serving them
+        as vector tiles through a local Flask server backed by DuckDB. The data is
+        loaded into a DuckDB database and served as Mapbox Vector Tiles (MVT) format,
+        which allows efficient rendering of millions of features.
+
+        Args:
+            data: The spatial data to visualize. Can be:
+                - Path to a vector file (GeoJSON, Shapefile, etc.)
+                - GeoJSON dictionary
+                - GeoDataFrame
+            layer_name (str, optional): Name for the layer. If None, generates a unique name.
+            layer_type (str, optional): MapLibre layer type ('fill', 'line', 'circle', 'symbol').
+                Defaults to 'fill'.
+            paint (dict, optional): Paint properties for the layer. If None, uses defaults
+                based on layer_type.
+            layout (dict, optional): Layout properties for the layer.
+            filter (dict, optional): Filter expression for the layer.
+            database_path (str, optional): Path to DuckDB database file. Use ":memory:"
+                for in-memory database. Defaults to ":memory:".
+            table_name (str, optional): Name of the table in DuckDB. Defaults to "features".
+            geom_column (str, optional): Name of geometry column. Defaults to "geom".
+            properties (list, optional): List of property columns to include in tiles.
+                If None, includes all columns.
+            port (int, optional): Port for the tile server. Defaults to 8000.
+            minzoom (int, optional): Minimum zoom level. Defaults to 0.
+            maxzoom (int, optional): Maximum zoom level. Defaults to 22.
+            visible (bool, optional): Whether layer is visible initially. Defaults to True.
+            opacity (float, optional): Layer opacity (0-1). Defaults to 1.0.
+            fit_bounds (bool, optional): Whether to zoom to layer extent. Defaults to True.
+            tooltip (bool, optional): Whether to add tooltips. Defaults to True.
+            quiet (bool, optional): If True, suppress progress messages. Note: Flask's
+                minimal startup messages ("Serving Flask app...") cannot be suppressed.
+                Defaults to False.
+            **kwargs: Additional arguments passed to the layer configuration.
+
+        Returns:
+            None
+
+        Raises:
+            ImportError: If duckdb, flask, or flask-cors are not installed.
+
+        Example:
+            >>> import leafmap.maplibregl as leafmap
+            >>> m = leafmap.Map()
+            >>> # From file
+            >>> m.add_duckdb_layer(
+            ...     data="large_dataset.geojson",
+            ...     layer_name="buildings",
+            ...     layer_type="fill",
+            ...     paint={"fill-color": "#3388ff", "fill-opacity": 0.7}
+            ... )
+            >>> # From GeoDataFrame
+            >>> import geopandas as gpd
+            >>> gdf = gpd.read_file("data.geojson")
+            >>> m.add_duckdb_layer(
+            ...     data=gdf,
+            ...     layer_name="parcels",
+            ...     database_path="parcels.db"
+            ... )
+        """
+
+        try:
+            # Generate layer name if not provided
+            if layer_name is None:
+                layer_name = f"duckdb_layer_{random_string(3)}"
+
+            # For tile serving, we need a persistent database (not in-memory)
+            # because the Flask server needs to access it from background threads
+            if database_path == ":memory:":
+                import tempfile
+                import os
+
+                # Create a temporary database file path (don't create the file yet)
+                temp_fd, database_path = tempfile.mkstemp(
+                    suffix=".db", prefix="leafmap_duckdb_"
+                )
+                os.close(temp_fd)  # Close the file descriptor
+                os.unlink(database_path)  # Remove the empty file
+                if not quiet:
+                    print(
+                        f"Note: Using temporary database file for tile serving: {database_path}"
+                    )
+
+            # Initialize database and load data
+            if not quiet:
+                print(f"Initializing DuckDB database for layer '{layer_name}'...")
+            db_path = init_duckdb_tiles(
+                data=data,
+                database_path=database_path,
+                table_name=table_name,
+                geom_column=geom_column,
+                quiet=quiet,
+            )
+
+            # Start the tile server if not already running
+            if not quiet:
+                print(f"Starting DuckDB tile server on port {port}...")
+            actual_port = start_duckdb_tile_server(
+                database_path=db_path,
+                table_name=table_name,
+                geom_column=geom_column,
+                properties=properties,
+                port=port,
+                background=True,
+                quiet=quiet,
+            )
+
+            # Create tile URL
+            tile_url = f"http://127.0.0.1:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+
+            # Set default paint properties based on layer type if not provided
+            if paint is None:
+                if layer_type == "fill":
+                    paint = {
+                        "fill-color": "#3388ff",
+                        "fill-opacity": 0.7,
+                        "fill-outline-color": "#ffffff",
+                    }
+                elif layer_type == "line":
+                    paint = {"line-color": "#3388ff", "line-width": 2}
+                elif layer_type == "circle":
+                    paint = {
+                        "circle-radius": 5,
+                        "circle-color": "#3388ff",
+                        "circle-stroke-color": "#ffffff",
+                        "circle-stroke-width": 1,
+                    }
+                elif layer_type == "symbol":
+                    paint = {
+                        "text-color": "#000000",
+                        "text-halo-color": "#ffffff",
+                        "text-halo-width": 1,
+                    }
+
+            # Use the existing add_vector_tile method to add the layer
+            self.add_vector_tile(
+                url=tile_url,
+                layer_id=layer_name,
+                layer_type=layer_type,
+                source_layer="layer",  # DuckDB ST_AsMVT uses 'layer' as default
+                name=layer_name,
+                paint=paint,
+                layout=layout,
+                filter=filter,
+                minzoom=minzoom,
+                maxzoom=maxzoom,
+                visible=visible,
+                opacity=opacity,
+                add_popup=tooltip,
+                **kwargs,
+            )
+
+            # Fit bounds if requested and data is available
+            # Skip fit_bounds for in-memory databases (can't open in read-only mode)
+            if fit_bounds and database_path != ":memory:":
+                try:
+                    import duckdb
+
+                    # Use read_only=True only for file-based databases
+                    con = duckdb.connect(db_path, read_only=True)
+                    con.execute("LOAD spatial;")
+
+                    # Get bounds from the data
+                    # Get bounds in Web Mercator and transform to WGS84
+                    bounds_query = f"""
+                        SELECT
+                            ST_X(ST_Transform(ST_Point(ST_XMin(ST_Extent({geom_column})), ST_YMin(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as minx,
+                            ST_Y(ST_Transform(ST_Point(ST_XMin(ST_Extent({geom_column})), ST_YMin(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as miny,
+                            ST_X(ST_Transform(ST_Point(ST_XMax(ST_Extent({geom_column})), ST_YMax(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as maxx,
+                            ST_Y(ST_Transform(ST_Point(ST_XMax(ST_Extent({geom_column})), ST_YMax(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as maxy
+                        FROM {table_name}
+                    """
+                    result = con.execute(bounds_query).fetchone()
+                    con.close()
+
+                    if result and all(x is not None for x in result):
+                        minx, miny, maxx, maxy = result
+                        # Bounds are now in WGS84 (lat/lon) format
+                        self.fit_bounds([[minx, miny], [maxx, maxy]])
+                except Exception as e:
+                    if not quiet:
+                        print(f"Could not fit bounds: {e}")
+
+            if not quiet:
+                print(f"Layer '{layer_name}' added successfully!")
+
+        except ImportError as e:
+            if not quiet:
+                print(f"Missing required package: {e}")
+                print(
+                    "Please install required packages: pip install duckdb flask flask-cors"
+                )
+        except Exception as e:
+            if not quiet:
+                print(f"Error adding DuckDB layer: {e}")
+                import traceback
+
+                traceback.print_exc()
 
     def add_marker(
         self,
