@@ -3289,8 +3289,7 @@ class Map(MapWidget):
             )
 
             # Fit bounds if requested and data is available
-            # Skip fit_bounds for in-memory databases (can't open in read-only mode)
-            if fit_bounds and database_path != ":memory:":
+            if fit_bounds and db_path:
                 try:
                     import duckdb
 
@@ -3299,22 +3298,59 @@ class Map(MapWidget):
                     con.execute("LOAD spatial;")
 
                     # Get bounds from the data
-                    # Get bounds in Web Mercator and transform to WGS84
-                    bounds_query = f"""
-                        SELECT
-                            ST_X(ST_Transform(ST_Point(ST_XMin(ST_Extent({geom_column})), ST_YMin(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as minx,
-                            ST_Y(ST_Transform(ST_Point(ST_XMin(ST_Extent({geom_column})), ST_YMin(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as miny,
-                            ST_X(ST_Transform(ST_Point(ST_XMax(ST_Extent({geom_column})), ST_YMax(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as maxx,
-                            ST_Y(ST_Transform(ST_Point(ST_XMax(ST_Extent({geom_column})), ST_YMax(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326')) as maxy
-                        FROM {table_name}
-                    """
-                    result = con.execute(bounds_query).fetchone()
-                    con.close()
+                    # First, check if data is in Web Mercator or WGS84 by examining coordinates
+                    sample_coords = con.execute(
+                        f"SELECT ST_X(ST_Centroid({geom_column})), ST_Y(ST_Centroid({geom_column})) FROM {table_name} LIMIT 1"
+                    ).fetchone()
 
-                    if result and all(x is not None for x in result):
-                        minx, miny, maxx, maxy = result
-                        # Bounds are now in WGS84 (lat/lon) format
-                        self.fit_bounds([[minx, miny], [maxx, maxy]])
+                    if sample_coords and sample_coords[0] is not None:
+                        x, y = sample_coords[0], sample_coords[1]
+                        # Web Mercator coordinates are typically > 180 or < -180
+                        # WGS84 coordinates are in range [-180, 180] for X and [-90, 90] for Y
+                        is_web_mercator = abs(x) > 180 or abs(y) > 90
+
+                        if is_web_mercator:
+                            # Data is in Web Mercator (EPSG:3857), transform to WGS84 (EPSG:4326)
+                            # Use MIN/MAX instead of ST_Extent for correct results
+                            # Transform individual bounds to EPSG:4326, then find min/max
+                            # Note: After ST_Transform to EPSG:4326, coordinates are in (lat, lon) order
+                            bounds_query = f"""
+                                WITH bounds AS (
+                                    SELECT
+                                        ST_Transform(ST_Point(ST_XMin({geom_column}), ST_YMin({geom_column})), 'EPSG:3857', 'EPSG:4326') as sw,
+                                        ST_Transform(ST_Point(ST_XMax({geom_column}), ST_YMax({geom_column})), 'EPSG:3857', 'EPSG:4326') as ne
+                                    FROM {table_name}
+                                )
+                                SELECT
+                                    MIN(ST_Y(sw)) as min_lon,
+                                    MIN(ST_X(sw)) as min_lat,
+                                    MAX(ST_Y(ne)) as max_lon,
+                                    MAX(ST_X(ne)) as max_lat
+                                FROM bounds
+                            """
+                        else:
+                            # Data is already in WGS84 or similar, use directly
+                            # Use MIN/MAX for correct aggregate bounds across all features
+                            bounds_query = f"""
+                                SELECT
+                                    MIN(ST_XMin({geom_column})) as min_lon,
+                                    MIN(ST_YMin({geom_column})) as min_lat,
+                                    MAX(ST_XMax({geom_column})) as max_lon,
+                                    MAX(ST_YMax({geom_column})) as max_lat
+                                FROM {table_name}
+                            """
+
+                        result = con.execute(bounds_query).fetchone()
+                        con.close()
+
+                        if result and all(x is not None for x in result):
+                            min_lon, min_lat, max_lon, max_lat = result
+                            # MapLibre expects [[west, south], [east, north]] = [[minLon, minLat], [maxLon, maxLat]]
+                            self.fit_bounds([[min_lon, min_lat], [max_lon, max_lat]])
+                    else:
+                        con.close()
+                        if not quiet:
+                            print("Could not determine bounds: no valid geometry found")
                 except Exception as e:
                     if not quiet:
                         print(f"Could not fit bounds: {e}")
