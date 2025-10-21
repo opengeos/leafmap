@@ -12149,7 +12149,7 @@ def init_duckdb_tiles(
         input_path = data
         is_file = True
         # Check if it's a Parquet file
-        is_parquet = input_path.lower().endswith(('.parquet', '.geoparquet'))
+        is_parquet = input_path.lower().endswith((".parquet", ".geoparquet"))
     else:
         is_parquet = False
         # GeoDataFrame or GeoJSON dict - convert to temporary GeoJSON file
@@ -12193,11 +12193,11 @@ def init_duckdb_tiles(
         if is_parquet:
             # For Parquet files, read directly without ST_Read
             # First check if httpfs extension is needed for remote files
-            if input_path.startswith(('http://', 'https://', 's3://')):
+            if input_path.startswith(("http://", "https://", "s3://")):
                 con.execute("INSTALL httpfs;")
                 con.execute("LOAD httpfs;")
                 # Configure for public S3 buckets
-                if input_path.startswith('s3://'):
+                if input_path.startswith("s3://"):
                     con.execute("SET s3_region='us-west-2';")
                     con.execute("SET s3_url_style='path';")
 
@@ -12208,16 +12208,20 @@ def init_duckdb_tiles(
             # Find geometry column (common names: geometry, geom, wkb_geometry, etc.)
             geom_col_source = None
             for col in all_columns:
-                if col.lower() in ['geometry', 'geom', 'wkb_geometry', 'shape']:
+                if col.lower() in ["geometry", "geom", "wkb_geometry", "shape"]:
                     geom_col_source = col
                     break
 
             if not geom_col_source:
-                raise Exception(f"No geometry column found in Parquet file. Available columns: {all_columns}")
+                raise Exception(
+                    f"No geometry column found in Parquet file. Available columns: {all_columns}"
+                )
 
             # Exclude geometry columns to avoid duplicates
             non_geom_columns = [
-                col for col in all_columns if col.lower() not in ["geom", "geometry", "wkb_geometry", "shape"]
+                col
+                for col in all_columns
+                if col.lower() not in ["geom", "geometry", "wkb_geometry", "shape"]
             ]
 
             # Build SELECT clause
@@ -12336,10 +12340,14 @@ def init_duckdb_tiles(
                 )
             else:
                 # First, get column names to exclude geometry
-                temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
+                temp_result = con.execute(
+                    f"SELECT * FROM ST_Read('{input_path}') LIMIT 0"
+                )
                 all_columns = [desc[0] for desc in temp_result.description]
                 non_geom_columns = [
-                    col for col in all_columns if col.lower() not in ["geom", "geometry"]
+                    col
+                    for col in all_columns
+                    if col.lower() not in ["geom", "geometry"]
                 ]
 
                 if non_geom_columns:
