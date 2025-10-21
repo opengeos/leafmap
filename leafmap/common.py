@@ -12148,7 +12148,10 @@ def init_duckdb_tiles(
         # (GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, etc.)
         input_path = data
         is_file = True
+        # Check if it's a Parquet file
+        is_parquet = input_path.lower().endswith(('.parquet', '.geoparquet'))
     else:
+        is_parquet = False
         # GeoDataFrame or GeoJSON dict - convert to temporary GeoJSON file
         # Note: This only applies to Python objects, not file paths
         try:
@@ -12186,31 +12189,74 @@ def init_duckdb_tiles(
         con.execute("INSTALL spatial;")
         con.execute("LOAD spatial;")
 
-        # First, get column names from the source to exclude geometry
-        temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
-        all_columns = [desc[0] for desc in temp_result.description]
+        # Handle Parquet files differently - use DuckDB's native Parquet reader
+        if is_parquet:
+            # For Parquet files, read directly without ST_Read
+            # First check if httpfs extension is needed for remote files
+            if input_path.startswith(('http://', 'https://', 's3://')):
+                con.execute("INSTALL httpfs;")
+                con.execute("LOAD httpfs;")
+                # Configure for public S3 buckets
+                if input_path.startswith('s3://'):
+                    con.execute("SET s3_region='us-west-2';")
+                    con.execute("SET s3_url_style='path';")
 
-        # Exclude 'geom' and 'geometry' columns to avoid duplicates
-        non_geom_columns = [
-            col for col in all_columns if col.lower() not in ["geom", "geometry"]
-        ]
+            # Get column names from Parquet file
+            temp_result = con.execute(f"SELECT * FROM '{input_path}' LIMIT 0")
+            all_columns = [desc[0] for desc in temp_result.description]
 
-        # Build SELECT clause with non-geometry columns
-        if non_geom_columns:
-            select_clause = ", ".join(non_geom_columns) + ", "
+            # Find geometry column (common names: geometry, geom, wkb_geometry, etc.)
+            geom_col_source = None
+            for col in all_columns:
+                if col.lower() in ['geometry', 'geom', 'wkb_geometry', 'shape']:
+                    geom_col_source = col
+                    break
+
+            if not geom_col_source:
+                raise Exception(f"No geometry column found in Parquet file. Available columns: {all_columns}")
+
+            # Exclude geometry columns to avoid duplicates
+            non_geom_columns = [
+                col for col in all_columns if col.lower() not in ["geom", "geometry", "wkb_geometry", "shape"]
+            ]
+
+            # Build SELECT clause
+            if non_geom_columns:
+                select_clause = ", ".join(non_geom_columns) + ", "
+            else:
+                select_clause = ""
+
+            source_table = f"'{input_path}'"
         else:
-            select_clause = ""
+            # Use ST_Read for other formats (GeoJSON, Shapefile, etc.)
+            # First, get column names from the source to exclude geometry
+            temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
+            all_columns = [desc[0] for desc in temp_result.description]
+
+            # Exclude 'geom' and 'geometry' columns to avoid duplicates
+            non_geom_columns = [
+                col for col in all_columns if col.lower() not in ["geom", "geometry"]
+            ]
+
+            # Build SELECT clause with non-geometry columns
+            if non_geom_columns:
+                select_clause = ", ".join(non_geom_columns) + ", "
+            else:
+                select_clause = ""
+
+            geom_col_source = "geom"
+            source_table = f"ST_Read('{input_path}')"
 
         # Check if data is already in the target SRID by examining a sample geometry
         # Try to detect the current CRS - if it's already in EPSG:3857, don't transform
         try:
             sample_geom = con.execute(
-                f"SELECT geom FROM ST_Read('{input_path}') LIMIT 1"
+                f"SELECT {geom_col_source} FROM {source_table} LIMIT 1"
             ).fetchone()
             if sample_geom and sample_geom[0]:
                 # Check if coordinates are in Web Mercator range (large numbers)
                 coords_check = con.execute(
-                    f"SELECT ST_X(ST_Centroid(geom)), ST_Y(ST_Centroid(geom)) FROM ST_Read('{input_path}') LIMIT 1"
+                    f"SELECT ST_X(ST_Centroid({geom_col_source})), ST_Y(ST_Centroid({geom_col_source})) FROM {source_table} LIMIT 1"
                 ).fetchone()
                 if coords_check and coords_check[0]:
                     x, y = coords_check[0], coords_check[1]
@@ -12223,8 +12269,8 @@ def init_duckdb_tiles(
                         con.execute(
                             f"""
                             CREATE TABLE IF NOT EXISTS {table_name} AS
-                            SELECT {select_clause}geom as {geom_column}
-                            FROM ST_Read('{input_path}');
+                            SELECT {select_clause}{geom_col_source} as {geom_column}
+                            FROM {source_table};
                         """
                         )
                         if not quiet:
@@ -12238,8 +12284,8 @@ def init_duckdb_tiles(
                             CREATE TABLE IF NOT EXISTS {table_name} AS
                             SELECT
                                 {select_clause}
-                                ST_Transform(ST_GeomFromWKB(ST_AsWKB(geom)), 'EPSG:4326', 'EPSG:{srid}') as {geom_column}
-                            FROM ST_Read('{input_path}');
+                                ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_col_source})), 'EPSG:4326', 'EPSG:{srid}') as {geom_column}
+                            FROM {source_table};
                         """
                         )
                         if not quiet:
@@ -12259,8 +12305,8 @@ def init_duckdb_tiles(
             con.execute(
                 f"""
                 CREATE TABLE IF NOT EXISTS {table_name} AS
-                SELECT {select_clause}geom as {geom_column}
-                FROM ST_Read('{input_path}');
+                SELECT {select_clause}{geom_col_source} as {geom_column}
+                FROM {source_table};
             """
             )
             if not quiet:
@@ -12278,25 +12324,36 @@ def init_duckdb_tiles(
             print(f"Error loading data: {e}")
         # Try alternative approach without transformation
         try:
-            # First, get column names to exclude geometry
-            temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
-            all_columns = [desc[0] for desc in temp_result.description]
-            non_geom_columns = [
-                col for col in all_columns if col.lower() not in ["geom", "geometry"]
-            ]
-
-            if non_geom_columns:
-                select_clause = ", ".join(non_geom_columns) + ", "
+            # Determine if we need to use Parquet-specific handling
+            if is_parquet:
+                # For Parquet, we already have the source_table and geom_col_source from above
+                con.execute(
+                    f"""
+                    CREATE TABLE IF NOT EXISTS {table_name} AS
+                    SELECT {select_clause}{geom_col_source} as {geom_column}
+                    FROM {source_table};
+                """
+                )
             else:
-                select_clause = ""
+                # First, get column names to exclude geometry
+                temp_result = con.execute(f"SELECT * FROM ST_Read('{input_path}') LIMIT 0")
+                all_columns = [desc[0] for desc in temp_result.description]
+                non_geom_columns = [
+                    col for col in all_columns if col.lower() not in ["geom", "geometry"]
+                ]
 
-            con.execute(
-                f"""
-                CREATE TABLE IF NOT EXISTS {table_name} AS
-                SELECT {select_clause}geom as {geom_column}
-                FROM ST_Read('{input_path}');
-            """
-            )
+                if non_geom_columns:
+                    select_clause = ", ".join(non_geom_columns) + ", "
+                else:
+                    select_clause = ""
+
+                con.execute(
+                    f"""
+                    CREATE TABLE IF NOT EXISTS {table_name} AS
+                    SELECT {select_clause}geom as {geom_column}
+                    FROM ST_Read('{input_path}');
+                """
+                )
             con.commit()
             if not quiet:
                 print(
