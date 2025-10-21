@@ -12231,8 +12231,19 @@ def init_duckdb_tiles(
             non_geom_columns = [
                 col_name
                 for col_name, col_type in all_columns
-                if col_name.lower() not in ["geom", "geometry", "wkb_geometry", "shape", "geom_bbox", "bbox"]
-                and not any(complex_type in col_type.upper() for complex_type in ['STRUCT', 'LIST', 'MAP', 'JSON', 'ARRAY'])
+                if col_name.lower()
+                not in [
+                    "geom",
+                    "geometry",
+                    "wkb_geometry",
+                    "shape",
+                    "geom_bbox",
+                    "bbox",
+                ]
+                and not any(
+                    complex_type in col_type.upper()
+                    for complex_type in ["STRUCT", "LIST", "MAP", "JSON", "ARRAY"]
+                )
             ]
 
             # Build SELECT clause with quoted column names to handle dots in names
@@ -12252,7 +12263,12 @@ def init_duckdb_tiles(
             # Find the geometry column (ST_Read may use 'geom' or 'geometry')
             geom_col_source = None
             for col_name, col_type in all_columns:
-                if 'GEOMETRY' in col_type.upper() or col_name.lower() in ['geom', 'geometry', 'wkb_geometry', 'shape']:
+                if "GEOMETRY" in col_type.upper() or col_name.lower() in [
+                    "geom",
+                    "geometry",
+                    "wkb_geometry",
+                    "shape",
+                ]:
                     geom_col_source = col_name
                     break
 
@@ -12264,9 +12280,20 @@ def init_duckdb_tiles(
             non_geom_columns = [
                 col_name
                 for col_name, col_type in all_columns
-                if col_name.lower() not in ["geom", "geometry", "geom_bbox", "bbox", "wkb_geometry", "shape"]
-                and 'GEOMETRY' not in col_type.upper()
-                and not any(complex_type in col_type.upper() for complex_type in ['STRUCT', 'LIST', 'MAP', 'JSON', 'ARRAY'])
+                if col_name.lower()
+                not in [
+                    "geom",
+                    "geometry",
+                    "geom_bbox",
+                    "bbox",
+                    "wkb_geometry",
+                    "shape",
+                ]
+                and "GEOMETRY" not in col_type.upper()
+                and not any(
+                    complex_type in col_type.upper()
+                    for complex_type in ["STRUCT", "LIST", "MAP", "JSON", "ARRAY"]
+                )
             ]
 
             # Build SELECT clause with non-geometry columns (quoted to handle dots in names)
@@ -12453,12 +12480,19 @@ def init_duckdb_tiles(
                 temp_result = con.execute(
                     f"SELECT * FROM ST_Read('{input_path}') LIMIT 0"
                 )
-                all_columns = [(desc[0], str(desc[1])) for desc in temp_result.description]
+                all_columns = [
+                    (desc[0], str(desc[1])) for desc in temp_result.description
+                ]
 
                 # Find the geometry column
                 geom_col_source = None
                 for col_name, col_type in all_columns:
-                    if 'GEOMETRY' in col_type.upper() or col_name.lower() in ['geom', 'geometry', 'wkb_geometry', 'shape']:
+                    if "GEOMETRY" in col_type.upper() or col_name.lower() in [
+                        "geom",
+                        "geometry",
+                        "wkb_geometry",
+                        "shape",
+                    ]:
                         geom_col_source = col_name
                         break
 
@@ -12468,9 +12502,20 @@ def init_duckdb_tiles(
                 non_geom_columns = [
                     col_name
                     for col_name, col_type in all_columns
-                    if col_name.lower() not in ["geom", "geometry", "geom_bbox", "bbox", "wkb_geometry", "shape"]
-                    and 'GEOMETRY' not in col_type.upper()
-                    and not any(complex_type in col_type.upper() for complex_type in ['STRUCT', 'LIST', 'MAP', 'JSON', 'ARRAY'])
+                    if col_name.lower()
+                    not in [
+                        "geom",
+                        "geometry",
+                        "geom_bbox",
+                        "bbox",
+                        "wkb_geometry",
+                        "shape",
+                    ]
+                    and "GEOMETRY" not in col_type.upper()
+                    and not any(
+                        complex_type in col_type.upper()
+                        for complex_type in ["STRUCT", "LIST", "MAP", "JSON", "ARRAY"]
+                    )
                 ]
 
                 if non_geom_columns:
