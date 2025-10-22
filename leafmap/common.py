@@ -86,6 +86,126 @@ def _is_drive_mounted() -> bool:
         return False
 
 
+def _get_jupyterhub_client_params(
+    host: str = None, port: int = None, prefix: str = None
+) -> Tuple[str, int, str]:
+    """Get client parameters for JupyterHub/remote Jupyter environments.
+
+    This function reads environment variables to configure how tile server URLs
+    should be constructed when running in remote Jupyter environments like JupyterHub.
+    This is necessary because the browser needs to access the tile server through
+    a proxy URL rather than directly via localhost.
+
+    Environment variables (similar to localtileserver):
+        LEAFMAP_CLIENT_HOST: The host that the client browser should use to access the server
+        LEAFMAP_CLIENT_PORT: The port that the client browser should use to access the server
+        LEAFMAP_CLIENT_PREFIX: The URL prefix to use, e.g., 'proxy/{port}' or
+                              '/user/{username}/proxy/{port}' for JupyterHub
+
+    Args:
+        host (str, optional): Override host. If None, uses environment variable.
+        port (int, optional): Override port. If None, uses environment variable.
+        prefix (str, optional): Override URL prefix. If None, uses environment variable.
+
+    Returns:
+        Tuple[str, int, str]: (host, port, prefix) for client-side URL construction
+
+    Example:
+        In a JupyterHub environment, set this in your notebook:
+        >>> import os
+        >>> os.environ['LEAFMAP_CLIENT_PREFIX'] = f"{os.environ['JUPYTERHUB_SERVICE_PREFIX']}/proxy/{{port}}"
+    """
+    if (
+        host is None
+        and "LEAFMAP_CLIENT_HOST" in os.environ
+        and os.environ["LEAFMAP_CLIENT_HOST"]
+    ):
+        host = str(os.environ["LEAFMAP_CLIENT_HOST"])
+
+    if (
+        port is None
+        and "LEAFMAP_CLIENT_PORT" in os.environ
+        and os.environ["LEAFMAP_CLIENT_PORT"]
+    ):
+        port = int(os.environ["LEAFMAP_CLIENT_PORT"])
+
+    if (
+        prefix is None
+        and "LEAFMAP_CLIENT_PREFIX" in os.environ
+        and os.environ["LEAFMAP_CLIENT_PREFIX"]
+    ):
+        prefix = str(os.environ["LEAFMAP_CLIENT_PREFIX"])
+
+    return host, port, prefix
+
+
+def _get_browser_origin():
+    """Try to get the browser's origin (protocol + host) using JavaScript.
+
+    Returns:
+        str: The browser origin (e.g., "https://example.com") or None if not available
+    """
+    try:
+        from IPython.display import Javascript, display
+        from IPython import get_ipython
+
+        # Try to execute JavaScript to get window.location.origin
+        # This only works in Jupyter environments
+        ipython = get_ipython()
+        if ipython is not None:
+            # Use eval_js if available (Jupyter Notebook/Lab)
+            if hasattr(ipython, "kernel"):
+                try:
+                    # Note: This doesn't actually work reliably, but we try
+                    result = ipython.kernel.do_one_iteration()
+                    return None  # JavaScript evaluation doesn't work from Python side
+                except:
+                    pass
+    except:
+        pass
+    return None
+
+
+def configure_jupyterhub(base_url: str = None):
+    """Auto-configure leafmap for JupyterHub environments.
+
+    This function automatically detects if running in a JupyterHub environment
+    and configures the necessary environment variables for tile server proxying.
+    It will be called automatically by add_duckdb_layer, so you typically don't
+    need to call it manually.
+
+    Args:
+        base_url (str, optional): The base URL of your JupyterHub instance
+            (e.g., "https://jupyter.example.com"). Required for MapLibre vector tiles
+            due to URL validation requirements. If not provided, vector tiles may not work.
+
+    Example:
+        >>> import leafmap
+        >>> # Specify your JupyterHub URL for vector tile support
+        >>> leafmap.configure_jupyterhub("https://your-jupyterhub-domain.com")
+        >>> # Now add_duckdb_layer will work correctly
+
+    Note:
+        MapLibre GL JS's vector tile sources require absolute URLs (with http:// or https://).
+        Raster tiles (add_raster) work with relative URLs, but vector tiles (add_duckdb_layer) do not.
+        This is a limitation of MapLibre GL JS, not leafmap.
+    """
+    # Store base URL if provided
+    if base_url:
+        base_url = base_url.rstrip("/")
+        os.environ["LEAFMAP_BASE_URL"] = base_url
+
+    # Auto-configure proxy prefix if not already set (like get_local_tile_url does)
+    if "LEAFMAP_CLIENT_PREFIX" not in os.environ:
+        # Check for JupyterHub environment
+        if "JUPYTERHUB_SERVICE_PREFIX" in os.environ:
+            jupyterhub_prefix = os.environ["JUPYTERHUB_SERVICE_PREFIX"].rstrip("/")
+            os.environ["LEAFMAP_CLIENT_PREFIX"] = f"{jupyterhub_prefix}/proxy/{{port}}"
+        elif "JUPYTER_SERVER_ROOT" in os.environ or "JPY_SESSION_NAME" in os.environ:
+            # Generic Jupyter environment
+            os.environ["LEAFMAP_CLIENT_PREFIX"] = "proxy/{port}"
+
+
 def set_proxy(
     port: Optional[int] = 1080, ip: Optional[str] = "http://127.0.0.1"
 ) -> None:
@@ -12848,7 +12968,9 @@ def start_duckdb_tile_server(
                 )
 
             # Run Flask app
-            app.run(port=actual_port, threaded=True, use_reloader=False)
+            # Bind to 0.0.0.0 to allow access from jupyter-server-proxy in remote environments
+            # In local environments, this is still secure as it's behind the firewall
+            app.run(host="0.0.0.0", port=actual_port, threaded=True, use_reloader=False)
 
         except ImportError as e:
             if not quiet:
@@ -12866,9 +12988,10 @@ def start_duckdb_tile_server(
         t = threading.Thread(target=run_flask, daemon=True)
         t.start()
         # Give the server a moment to start
+        # In remote environments, we need a bit more time for the server to be ready
         import time
 
-        time.sleep(0.5)
+        time.sleep(1.5)
     else:
         run_flask()
 

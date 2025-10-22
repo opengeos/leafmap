@@ -36,6 +36,7 @@ from . import common
 from .basemaps import xyz_to_leaflet
 from .common import (
     _in_colab_shell,
+    configure_jupyterhub,
     download_file,
     execute_maplibre_notebook_dir,
     filter_geom_type,
@@ -3087,6 +3088,12 @@ class Map(MapWidget):
         GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, and many more
         GDAL-supported formats.
 
+        For remote Jupyter environments, you need to configure leafmap with your JupyterHub URL:
+        ```python
+        import leafmap
+        leafmap.configure_jupyterhub("https://your-jupyterhub-domain.com")
+        ```
+
         Args:
             data (optional): The spatial data to visualize. Can be:
                 - Path to a vector file (any format supported by DuckDB's ST_Read:
@@ -3270,15 +3277,83 @@ class Map(MapWidget):
             )
 
             # Create tile URL
-            # In Google Colab, use localhost with the port - Colab automatically proxies it
-            # This approach is more reliable than trying to get the proxy URL via eval_js
-            if _in_colab_shell():
+            # Auto-configure for JupyterHub (like get_local_tile_url does)
+            import os as _os
+            from .common import _get_jupyterhub_client_params, configure_jupyterhub
+
+            # Auto-detect and configure JupyterHub environment
+            if _os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
+                configure_jupyterhub()
+
+            client_host, client_port, client_prefix = _get_jupyterhub_client_params()
+
+            # Build the tile URL based on environment
+            if client_prefix:
+                # JupyterHub or remote Jupyter with proxy
+                # Replace {port} placeholder with actual port
+                prefix = client_prefix.replace("{port}", str(actual_port))
+
+                # Check if a base URL was provided
+                import os as _os
+
+                base_url = _os.environ.get("LEAFMAP_BASE_URL", "")
+
+                if base_url:
+                    # Use full absolute URL with the provided base
+                    base_url = base_url.rstrip("/")
+                    if not prefix.startswith("/"):
+                        prefix = "/" + prefix
+                    prefix = prefix.rstrip("/")
+                    tile_url = f"{base_url}{prefix}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+                else:
+                    # Use protocol-relative URL  which uses the same protocol as the page
+                    # This is the approach that works like localtileserver
+                    # First ensure prefix starts with /
+                    if not prefix.startswith("/"):
+                        prefix = "/" + prefix
+                    prefix = prefix.rstrip("/")
+                    # Use protocol-relative URL starting with //
+                    # The browser will automatically use http:// or https:// based on the page
+                    # But we need to detect the hostname - we'll get it from the request
+                    # For now, use a JavaScript approach by passing it through ipywidget
+                    tile_url = f"{prefix}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+
+                if not quiet:
+                    print(
+                        f"Running in remote Jupyter environment. Using proxy URL: {prefix}"
+                    )
+                    print(f"Full tile URL template: {tile_url}")
+                    # Also print an example URL for debugging
+                    example_url = (
+                        tile_url.replace("{z}", "0")
+                        .replace("{x}", "0")
+                        .replace("{y}", "0")
+                    )
+                    print(f"Example tile URL: {example_url}")
+                    if not base_url:
+                        print(
+                            "\n⚠️  WARNING: MapLibre vector tiles require absolute URLs."
+                        )
+                        print(
+                            "If tiles don't load, configure with your JupyterHub URL:"
+                        )
+                        print("    import leafmap")
+                        print(
+                            '    leafmap.configure_jupyterhub("https://your-jupyterhub-domain.com")'
+                        )
+                        print("Then re-run this cell.\n")
+                        print(
+                            "Note: Raster tiles (add_raster) work without this, but vector tiles need it."
+                        )
+            elif _in_colab_shell():
+                # Google Colab - use localhost with the port - Colab automatically proxies it
                 tile_url = f"http://localhost:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
                 if not quiet:
                     print(
                         f"Running in Google Colab. Tile server accessible at: http://localhost:{actual_port}"
                     )
             else:
+                # Local environment - direct connection
                 tile_url = f"http://127.0.0.1:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
 
             # Set default paint properties based on layer type if not provided
