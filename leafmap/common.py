@@ -12721,8 +12721,12 @@ def start_duckdb_tile_server(
                     response = Response()
                     if cors:
                         response.headers["Access-Control-Allow-Origin"] = "*"
-                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
-                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                        response.headers["Access-Control-Allow-Methods"] = (
+                            "GET, HEAD, OPTIONS"
+                        )
+                        response.headers["Access-Control-Allow-Headers"] = (
+                            "Content-Type"
+                        )
                     return response
 
                 # Check if zoom level is below minimum threshold
@@ -12731,8 +12735,12 @@ def start_duckdb_tile_server(
                     response = Response(b"", mimetype="application/x-protobuf")
                     if cors:
                         response.headers["Access-Control-Allow-Origin"] = "*"
-                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
-                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                        response.headers["Access-Control-Allow-Methods"] = (
+                            "GET, HEAD, OPTIONS"
+                        )
+                        response.headers["Access-Control-Allow-Headers"] = (
+                            "Content-Type"
+                        )
                     return response
 
                 # Get connection from pool
@@ -12789,8 +12797,12 @@ def start_duckdb_tile_server(
                     response = Response(tile, mimetype="application/x-protobuf")
                     if cors:
                         response.headers["Access-Control-Allow-Origin"] = "*"
-                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
-                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                        response.headers["Access-Control-Allow-Methods"] = (
+                            "GET, HEAD, OPTIONS"
+                        )
+                        response.headers["Access-Control-Allow-Headers"] = (
+                            "Content-Type"
+                        )
                     return response
 
                 except Exception as e:
@@ -12802,8 +12814,12 @@ def start_duckdb_tile_server(
                     response = Response(b"", mimetype="application/x-protobuf")
                     if cors:
                         response.headers["Access-Control-Allow-Origin"] = "*"
-                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
-                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                        response.headers["Access-Control-Allow-Methods"] = (
+                            "GET, HEAD, OPTIONS"
+                        )
+                        response.headers["Access-Control-Allow-Headers"] = (
+                            "Content-Type"
+                        )
                     return response, 500
                 finally:
                     # Always return connection to pool
