@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "leafmap"
-version = "0.54.0"
+version = "0.55.0"
 dynamic = [
     "dependencies",
 ]
@@ -40,6 +40,8 @@ pmtiles = ["pmtiles", "flask", "flask-cors"]
 ai = ["geopandas", "osmnx", "localtileserver>=0.10.4", "rastervision", "pytorch-lightning", "torchgeo"]
 maplibre = ["anywidget", "geopandas", "fiona", "h3", "ipyvuetify", "localtileserver", "mapclassify", "maplibre>=0.3.1", "pmtiles", "rioxarray", "xarray"]
 gdal = ["gdal", "pyproj"]
+duckdb = ["duckdb", "duckdb-engine", "jupysql", "flask", "flask-cors", "jupyter-server-proxy"]
+
 
 [project.scripts]
 leafmap = "leafmap.cli:main"
@@ -59,7 +61,7 @@ dependencies = {file = ["requirements.txt"]}
 universal = true
 
 [tool.bumpversion]
-current_version = "0.54.0"
+current_version = "0.55.0"
 commit = true
 tag = true
 
