@@ -3274,6 +3274,7 @@ class Map(MapWidget):
                 background=True,
                 quiet=quiet,
                 min_zoom=min_zoom,
+                src_crs=src_crs,
             )
 
             # Create tile URL
@@ -3408,56 +3409,65 @@ class Map(MapWidget):
                     con.execute("LOAD spatial;")
 
                     # Get bounds from the data
-                    # First, check if data is in Web Mercator or WGS84 by examining coordinates
-                    sample_coords = con.execute(
-                        f"SELECT ST_X(ST_Centroid({geom_column})), ST_Y(ST_Centroid({geom_column})) FROM {table_name} LIMIT 1"
-                    ).fetchone()
+                    # Determine source CRS for transformation
+                    if src_crs and src_crs.upper() not in ["EPSG:4326", "4326"]:
+                        # User specified a source CRS that's not WGS84, transform from it to WGS84
+                        bounds_query = f"""
+                            SELECT
+                                ST_XMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as min_lon,
+                                ST_YMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as min_lat,
+                                ST_XMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as max_lon,
+                                ST_YMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as max_lat
+                            FROM {table_name}
+                        """
+                    else:
+                        # No src_crs specified or it's already WGS84, auto-detect based on coordinates
+                        sample_coords = con.execute(
+                            f"SELECT ST_X(ST_Centroid({geom_column})), ST_Y(ST_Centroid({geom_column})) FROM {table_name} LIMIT 1"
+                        ).fetchone()
 
-                    if sample_coords and sample_coords[0] is not None:
-                        x, y = sample_coords[0], sample_coords[1]
-                        # Web Mercator coordinates are typically > 180 or < -180
-                        # WGS84 coordinates are in range [-180, 180] for X and [-90, 90] for Y
-                        is_web_mercator = abs(x) > 180 or abs(y) > 90
+                        if sample_coords and sample_coords[0] is not None:
+                            x, y = sample_coords[0], sample_coords[1]
+                            # Web Mercator coordinates are typically > 180 or < -180
+                            # WGS84 coordinates are in range [-180, 180] for X and [-90, 90] for Y
+                            is_web_mercator = abs(x) > 180 or abs(y) > 90
 
-                        if is_web_mercator:
-                            # Data is in Web Mercator (EPSG:3857), transform to WGS84 (EPSG:4326)
-                            bounds_query = f"""
-                                WITH bounds AS (
+                            if is_web_mercator:
+                                # Data is in Web Mercator (EPSG:3857), transform to WGS84 (EPSG:4326)
+                                bounds_query = f"""
                                     SELECT
-                                        ST_Transform(ST_Point(ST_XMin({geom_column}), ST_YMin({geom_column})), 'EPSG:3857', 'EPSG:4326', true) as sw,
-                                        ST_Transform(ST_Point(ST_XMax({geom_column}), ST_YMax({geom_column})), 'EPSG:3857', 'EPSG:4326', true) as ne
+                                        ST_XMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as min_lon,
+                                        ST_YMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as min_lat,
+                                        ST_XMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as max_lon,
+                                        ST_YMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as max_lat
                                     FROM {table_name}
-                                )
-                                SELECT
-                                    MIN(ST_Y(sw)) as min_lon,
-                                    MIN(ST_X(sw)) as min_lat,
-                                    MAX(ST_Y(ne)) as max_lon,
-                                    MAX(ST_X(ne)) as max_lat
-                                FROM bounds
-                            """
+                                """
+                            else:
+                                # Data is in WGS84 (EPSG:4326), use directly
+                                bounds_query = f"""
+                                    SELECT
+                                        MIN(ST_XMin({geom_column})) as min_lon,
+                                        MIN(ST_YMin({geom_column})) as min_lat,
+                                        MAX(ST_XMax({geom_column})) as max_lon,
+                                        MAX(ST_YMax({geom_column})) as max_lat
+                                    FROM {table_name}
+                                """
                         else:
-                            # Data is in WGS84 (EPSG:4326), use directly
-                            # Use MIN/MAX for correct aggregate bounds across all features
-                            bounds_query = f"""
-                                SELECT
-                                    MIN(ST_XMin({geom_column})) as min_lon,
-                                    MIN(ST_YMin({geom_column})) as min_lat,
-                                    MAX(ST_XMax({geom_column})) as max_lon,
-                                    MAX(ST_YMax({geom_column})) as max_lat
-                                FROM {table_name}
-                            """
+                            con.close()
+                            if not quiet:
+                                print(
+                                    "Could not determine bounds: no valid geometry found"
+                                )
+                            bounds_query = None
 
+                    if bounds_query:
                         result = con.execute(bounds_query).fetchone()
                         con.close()
 
                         if result and all(x is not None for x in result):
-                            min_lat, min_lon, max_lat, max_lon = result
+                            min_lon, min_lat, max_lon, max_lat = result
                             # MapLibre expects [[west, south], [east, north]] = [[minLon, minLat], [maxLon, maxLat]]
                             self.fit_bounds([[min_lon, min_lat], [max_lon, max_lat]])
-                    else:
-                        con.close()
-                        if not quiet:
-                            print("Could not determine bounds: no valid geometry found")
                 except Exception as e:
                     if not quiet:
                         print(f"Could not fit bounds: {e}")

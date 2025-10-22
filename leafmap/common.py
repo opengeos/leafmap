@@ -12684,6 +12684,7 @@ def start_duckdb_tile_server(
     quiet: bool = True,
     cors: bool = True,
     min_zoom: int = None,
+    src_crs: str = None,
 ) -> int:
     """
     Start a Flask server that serves vector tiles from a DuckDB database.
@@ -12712,6 +12713,10 @@ def start_duckdb_tile_server(
         min_zoom (int, optional): Minimum zoom level at which to query and serve tiles.
             Below this zoom level, empty tiles will be returned, preventing memory issues
             with large datasets. If None, tiles will be served at all zoom levels. Defaults to None.
+        src_crs (str, optional): Source CRS of the data in the database as an EPSG code
+            (e.g., 'EPSG:26918', 'EPSG:4326'). If provided, geometries will be transformed
+            on-the-fly from this CRS to Web Mercator when serving tiles. Only needed if the
+            data in the database is not already in Web Mercator (EPSG:3857). Defaults to None.
 
     Returns:
         int: The actual port number being used by the server.
@@ -12897,17 +12902,26 @@ def start_duckdb_tile_server(
                     else:
                         prop_assigns = ""
 
+                    # Determine geometry expression
+                    # If src_crs is provided and not already Web Mercator, transform on-the-fly
+                    if src_crs and src_crs.upper() not in ["EPSG:3857", "3857"]:
+                        # Transform geometry from source CRS to Web Mercator for tile serving
+                        geom_expr = f"ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_column})), '{src_crs}', 'EPSG:3857', true)"
+                    else:
+                        # Use geometry as-is (already in Web Mercator or no CRS specified)
+                        geom_expr = geom_column
+
                     # Query to generate the tile
                     query = f"""
                         SELECT ST_AsMVT({{
                             {prop_assigns}
                             "geom": ST_AsMVTGeom(
-                                {geom_column},
+                                {geom_expr},
                                 ST_Extent(ST_TileEnvelope($1, $2, $3))
                             )
                         }})
                         FROM {table_name}
-                        WHERE ST_Intersects({geom_column}, ST_TileEnvelope($1, $2, $3))
+                        WHERE ST_Intersects({geom_expr}, ST_TileEnvelope($1, $2, $3))
                     """
 
                     with con.cursor() as cursor:
