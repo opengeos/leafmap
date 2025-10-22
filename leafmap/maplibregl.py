@@ -35,6 +35,7 @@ from maplibre.utils import get_bounds
 from . import common
 from .basemaps import xyz_to_leaflet
 from .common import (
+    _in_colab_shell,
     download_file,
     execute_maplibre_notebook_dir,
     filter_geom_type,
@@ -3269,7 +3270,16 @@ class Map(MapWidget):
             )
 
             # Create tile URL
-            tile_url = f"http://127.0.0.1:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+            # In Google Colab, use localhost with the port - Colab automatically proxies it
+            # This approach is more reliable than trying to get the proxy URL via eval_js
+            if _in_colab_shell():
+                tile_url = f"http://localhost:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+                if not quiet:
+                    print(
+                        f"Running in Google Colab. Tile server accessible at: http://localhost:{actual_port}"
+                    )
+            else:
+                tile_url = f"http://127.0.0.1:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
 
             # Set default paint properties based on layer type if not provided
             if paint is None:

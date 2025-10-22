@@ -12646,7 +12646,12 @@ def start_duckdb_tile_server(
             app = Flask(__name__)
 
             if cors:
-                CORS(app)
+                CORS(
+                    app,
+                    resources={r"/*": {"origins": "*"}},
+                    allow_headers=["Content-Type"],
+                    methods=["GET", "HEAD", "OPTIONS"],
+                )
 
             # Always suppress werkzeug's development server warning
             import logging
@@ -12706,13 +12711,29 @@ def start_duckdb_tile_server(
                 """Return a connection to the pool."""
                 connection_pool.put(con)
 
-            @app.route("/tiles/<int:z>/<int:x>/<int:y>.pbf")
+            @app.route("/tiles/<int:z>/<int:x>/<int:y>.pbf", methods=["GET", "OPTIONS"])
             def get_tile(z, x, y):
                 """Serve vector tiles from DuckDB."""
+                # Handle CORS preflight requests
+                from flask import request
+
+                if request.method == "OPTIONS":
+                    response = Response()
+                    if cors:
+                        response.headers["Access-Control-Allow-Origin"] = "*"
+                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                    return response
+
                 # Check if zoom level is below minimum threshold
                 if min_zoom is not None and z < min_zoom:
                     # Return empty tile for zoom levels below min_zoom
-                    return Response(b"", mimetype="application/x-protobuf")
+                    response = Response(b"", mimetype="application/x-protobuf")
+                    if cors:
+                        response.headers["Access-Control-Allow-Origin"] = "*"
+                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                    return response
 
                 # Get connection from pool
                 con = get_db_connection()
@@ -12765,7 +12786,12 @@ def start_duckdb_tile_server(
                         tile_blob = cursor.execute(query, [z, x, y]).fetchone()
 
                     tile = tile_blob[0] if tile_blob and tile_blob[0] else b""
-                    return Response(tile, mimetype="application/x-protobuf")
+                    response = Response(tile, mimetype="application/x-protobuf")
+                    if cors:
+                        response.headers["Access-Control-Allow-Origin"] = "*"
+                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                    return response
 
                 except Exception as e:
                     if not quiet:
@@ -12773,7 +12799,12 @@ def start_duckdb_tile_server(
                         import traceback
 
                         traceback.print_exc()
-                    return Response(b"", mimetype="application/x-protobuf"), 500
+                    response = Response(b"", mimetype="application/x-protobuf")
+                    if cors:
+                        response.headers["Access-Control-Allow-Origin"] = "*"
+                        response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+                        response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+                    return response, 500
                 finally:
                     # Always return connection to pool
                     return_db_connection(con)
