@@ -279,6 +279,12 @@ Use the draw control to draw features on the map.
 
 [![](https://i.imgur.com/w8UFssd.png)](https://leafmap.org/maplibre/draw_features)
 
+## Add a DuckDB layer
+
+Add a DuckDB layer to the map.
+
+[![](https://github.com/user-attachments/assets/33362cb3-30e3-4a39-8545-652bc0268745)](https://leafmap.org/maplibre/duckdb_layer)
+
 ## Edit vector data interactively
 
 Edit existing vector data interactively on a map.
@@ -289,14 +295,13 @@ Edit existing vector data interactively on a map.
 
 Use a coalesce expression to display another image when a requested image is not available.
 
-[![](https://i.imgur.com/0A9yuyL.png)](https://leafmap.org/maplibre/fallback_image)
+[![](https://github.com/user-attachments/assets/33362cb3-30e3-4a39-8545-652bc0268745)](https://leafmap.org/maplibre/fallback_image)
 
 ## Visualize Fields of The World
 
 Visualize Agricultural Field Boundary Dataset - Fields of The World.
 
-[![image](https://github.com/user-attachments/assets/933264d9-378b-4943-9611-0e105b250f63)
-](https://leafmap.org/maplibre/fields_of_the_world)
+[![image]()](https://leafmap.org/maplibre/fields_of_the_world)
 
 ## Add a pattern to a polygon
 

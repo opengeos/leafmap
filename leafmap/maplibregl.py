@@ -35,6 +35,8 @@ from maplibre.utils import get_bounds
 from . import common
 from .basemaps import xyz_to_leaflet
 from .common import (
+    _in_colab_shell,
+    configure_jupyterhub,
     download_file,
     execute_maplibre_notebook_dir,
     filter_geom_type,
@@ -47,6 +49,7 @@ from .common import (
     get_bounds,
     get_ee_tile_url,
     get_overture_data,
+    init_duckdb_tiles,
     nasa_data_download,
     nasa_data_login,
     pandas_to_geojson,
@@ -57,6 +60,7 @@ from .common import (
     read_vector,
     sort_files,
     stac_assets,
+    start_duckdb_tile_server,
     start_server,
 )
 from .map_widgets import TabWidget
@@ -3046,6 +3050,446 @@ class Map(MapWidget):
 
         except Exception as e:
             print(e)
+
+    def add_duckdb_layer(
+        self,
+        data=None,
+        layer_name: Optional[str] = None,
+        layer_type: str = "fill",
+        paint: Optional[Dict] = None,
+        layout: Optional[Dict] = None,
+        filter: Optional[Dict] = None,
+        database_path: str = None,
+        table_name: str = "features",
+        geom_column: str = "geom",
+        properties: Optional[List[str]] = None,
+        port: int = 8000,
+        minzoom: Optional[int] = 0,
+        maxzoom: Optional[int] = 22,
+        min_zoom: Optional[int] = None,
+        visible: bool = True,
+        opacity: float = 1.0,
+        fit_bounds: bool = True,
+        tooltip: bool = True,
+        quiet: bool = False,
+        use_view: bool = False,
+        src_crs: str = None,
+        **kwargs: Any,
+    ):
+        """
+        Adds a layer served from a DuckDB database via vector tiles.
+
+        This method enables visualization of large vector datasets by serving them
+        as vector tiles through a local Flask server backed by DuckDB. The data can
+        either be loaded from various sources into a new/existing database, or you
+        can connect to an existing database that already contains the data.
+
+        Supports all vector formats that DuckDB's ST_Read can handle, including
+        GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, and many more
+        GDAL-supported formats.
+
+        For remote Jupyter environments, you need to configure leafmap with your JupyterHub URL:
+        ```python
+        import leafmap
+        leafmap.configure_jupyterhub("https://your-jupyterhub-domain.com")
+        ```
+
+        Args:
+            data (optional): The spatial data to visualize. Can be:
+                - Path to a vector file (any format supported by DuckDB's ST_Read:
+                  GeoJSON, Shapefile, GeoPackage, FlatGeobuf, GeoParquet, etc.)
+                - GeoJSON dictionary
+                - GeoDataFrame
+                - None (if using an existing database with data already loaded)
+            layer_name (str, optional): Name for the layer. If None, generates a unique name.
+            layer_type (str, optional): MapLibre layer type ('fill', 'line', 'circle', 'symbol').
+                Defaults to 'fill'.
+            paint (dict, optional): Paint properties for the layer. If None, uses defaults
+                based on layer_type.
+            layout (dict, optional): Layout properties for the layer.
+            filter (dict, optional): Filter expression for the layer.
+            database_path (str, optional): Path to DuckDB database file.
+                - If None and data is provided: creates a temporary database
+                - If provided with data: loads data into this database
+                - If provided without data: uses existing database (data must already be loaded)
+            table_name (str, optional): Name of the table in DuckDB. Defaults to "features".
+            geom_column (str, optional): Name of geometry column. Defaults to "geom".
+            properties (list, optional): List of property columns to include in tiles.
+                If None, includes all columns.
+            port (int, optional): Port for the tile server. Defaults to 8000.
+                If port is in use, automatically selects next available port.
+            minzoom (int, optional): Minimum zoom level for the MapLibre layer. Defaults to 0.
+            maxzoom (int, optional): Maximum zoom level for the MapLibre layer. Defaults to 22.
+            min_zoom (int, optional): Minimum zoom level at which to query and serve tiles.
+                Below this zoom level, empty tiles will be returned, preventing memory issues
+                with large datasets. Use this to defer data loading until users zoom in closer.
+                If None, tiles will be served at all zoom levels. Defaults to None.
+            visible (bool, optional): Whether layer is visible initially. Defaults to True.
+            opacity (float, optional): Layer opacity (0-1). Defaults to 1.0.
+            fit_bounds (bool, optional): Whether to zoom to layer extent. Defaults to True.
+            tooltip (bool, optional): Whether to add tooltips. Defaults to True.
+            quiet (bool, optional): If True, suppress progress messages. Defaults to False.
+            use_view (bool, optional): If True and data is a parquet file, create a view instead
+                of a table. Views avoid data duplication but may be slower for tile serving as they
+                query the source file on each tile request. Only applies to parquet files. Defaults to False.
+            src_crs (str, optional): Source CRS of the input data as an EPSG code (e.g., 'EPSG:5070',
+                'EPSG:4326'). If None, will attempt to auto-detect. Specify this parameter if the data
+                is in a projected CRS that is not Web Mercator to ensure proper transformation. Defaults to None.
+            **kwargs: Additional arguments passed to the layer configuration.
+
+        Returns:
+            None
+
+        Raises:
+            ImportError: If duckdb, flask, or flask-cors are not installed.
+            ValueError: If neither data nor database_path is provided.
+
+        Example:
+            >>> import leafmap.maplibregl as leafmap
+            >>> m = leafmap.Map()
+            >>>
+            >>> # Example 1: Load GeoJSON (creates temporary database)
+            >>> m.add_duckdb_layer(
+            ...     data="large_dataset.geojson",
+            ...     layer_name="buildings",
+            ...     layer_type="fill",
+            ...     paint={"fill-color": "#3388ff", "fill-opacity": 0.7}
+            ... )
+            >>>
+            >>> # Example 2: Load Shapefile
+            >>> m.add_duckdb_layer(
+            ...     data="boundaries.shp",
+            ...     layer_name="boundaries",
+            ...     layer_type="line",
+            ...     paint={"line-color": "#ff0000", "line-width": 2}
+            ... )
+            >>>
+            >>> # Example 3: Load GeoPackage
+            >>> m.add_duckdb_layer(
+            ...     data="data.gpkg",
+            ...     layer_name="parcels",
+            ...     database_path="parcels.db"
+            ... )
+            >>>
+            >>> # Example 4: Load GeoParquet (very efficient for large datasets)
+            >>> m.add_duckdb_layer(
+            ...     data="large_dataset.parquet",
+            ...     layer_name="large_layer"
+            ... )
+            >>>
+            >>> # Example 5: Load from GeoDataFrame
+            >>> import geopandas as gpd
+            >>> gdf = gpd.read_file("data.geojson")
+            >>> m.add_duckdb_layer(
+            ...     data=gdf,
+            ...     layer_name="from_gdf"
+            ... )
+            >>>
+            >>> # Example 6: Use existing database (no data loading)
+            >>> m.add_duckdb_layer(
+            ...     database_path="existing_data.db",
+            ...     table_name="my_table",
+            ...     geom_column="geometry",
+            ...     layer_name="existing_layer"
+            ... )
+            >>>
+            >>> # Example 7: Large parquet file with min_zoom to prevent memory issues
+            >>> m.add_duckdb_layer(
+            ...     data="huge_dataset.parquet",
+            ...     layer_name="huge_layer",
+            ...     min_zoom=8,  # Only load tiles at zoom level 8 and above
+            ...     layer_type="fill",
+            ...     paint={"fill-color": "#ff0000", "fill-opacity": 0.5}
+            ... )
+        """
+
+        try:
+            # Validate inputs
+            if data is None and database_path is None:
+                raise ValueError(
+                    "Either 'data' or 'database_path' must be provided. "
+                    "Provide 'data' to load new data, or 'database_path' to use an existing database."
+                )
+
+            # Generate layer name if not provided
+            if layer_name is None:
+                layer_name = f"duckdb_layer_{random_string(3)}"
+
+            # Determine the database path
+            db_path = database_path
+
+            # If data is provided, we need to load it into the database
+            if data is not None:
+                # For tile serving, we need a persistent database (not in-memory)
+                # because the Flask server needs to access it from background threads
+                if database_path is None:
+                    import tempfile
+                    import os
+
+                    # Create a temporary database file path (don't create the file yet)
+                    temp_fd, db_path = tempfile.mkstemp(
+                        suffix=".db", prefix="leafmap_duckdb_"
+                    )
+                    os.close(temp_fd)  # Close the file descriptor
+                    os.unlink(db_path)  # Remove the empty file
+                    if not quiet:
+                        print(
+                            f"Note: Using temporary database file for tile serving: {db_path}"
+                        )
+
+                # Initialize database and load data
+                if not quiet:
+                    print(f"Initializing DuckDB database for layer '{layer_name}'...")
+                db_path = init_duckdb_tiles(
+                    data=data,
+                    database_path=db_path,
+                    table_name=table_name,
+                    geom_column=geom_column,
+                    quiet=quiet,
+                    use_view=use_view,
+                    src_crs=src_crs,
+                )
+            else:
+                # Using existing database - verify it exists
+                import os
+
+                if not os.path.exists(db_path):
+                    raise FileNotFoundError(
+                        f"Database file not found: {db_path}. "
+                        "Provide 'data' to create a new database, or ensure the database file exists."
+                    )
+
+                if not quiet:
+                    print(f"Using existing database: {db_path} (table: {table_name})")
+
+            # Start the tile server if not already running
+            if not quiet:
+                print(f"Starting DuckDB tile server on port {port}...")
+            actual_port = start_duckdb_tile_server(
+                database_path=db_path,
+                table_name=table_name,
+                geom_column=geom_column,
+                properties=properties,
+                port=port,
+                background=True,
+                quiet=quiet,
+                min_zoom=min_zoom,
+                src_crs=src_crs,
+            )
+
+            # Create tile URL
+            # Auto-configure for JupyterHub (like get_local_tile_url does)
+            import os as _os
+            from .common import _get_jupyterhub_client_params, configure_jupyterhub
+
+            # Auto-detect and configure JupyterHub environment
+            if _os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
+                configure_jupyterhub()
+
+            client_host, client_port, client_prefix = _get_jupyterhub_client_params()
+
+            # Build the tile URL based on environment
+            if client_prefix:
+                # JupyterHub or remote Jupyter with proxy
+                # Replace {port} placeholder with actual port
+                prefix = client_prefix.replace("{port}", str(actual_port))
+
+                # Check if a base URL was provided
+                import os as _os
+
+                base_url = _os.environ.get("LEAFMAP_BASE_URL", "")
+
+                if base_url:
+                    # Use full absolute URL with the provided base
+                    base_url = base_url.rstrip("/")
+                    if not prefix.startswith("/"):
+                        prefix = "/" + prefix
+                    prefix = prefix.rstrip("/")
+                    tile_url = f"{base_url}{prefix}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+                else:
+                    # Use protocol-relative URL  which uses the same protocol as the page
+                    # This is the approach that works like localtileserver
+                    # First ensure prefix starts with /
+                    if not prefix.startswith("/"):
+                        prefix = "/" + prefix
+                    prefix = prefix.rstrip("/")
+                    # Use protocol-relative URL starting with //
+                    # The browser will automatically use http:// or https:// based on the page
+                    # But we need to detect the hostname - we'll get it from the request
+                    # For now, use a JavaScript approach by passing it through ipywidget
+                    tile_url = f"{prefix}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+
+                if not quiet:
+                    print(
+                        f"Running in remote Jupyter environment. Using proxy URL: {prefix}"
+                    )
+                    print(f"Full tile URL template: {tile_url}")
+                    # Also print an example URL for debugging
+                    example_url = (
+                        tile_url.replace("{z}", "0")
+                        .replace("{x}", "0")
+                        .replace("{y}", "0")
+                    )
+                    print(f"Example tile URL: {example_url}")
+                    if not base_url:
+                        print(
+                            "\n⚠️  WARNING: MapLibre vector tiles require absolute URLs."
+                        )
+                        print(
+                            "If tiles don't load, configure with your JupyterHub URL:"
+                        )
+                        print("    import leafmap")
+                        print(
+                            '    leafmap.configure_jupyterhub("https://your-jupyterhub-domain.com")'
+                        )
+                        print("Then re-run this cell.\n")
+                        print(
+                            "Note: Raster tiles (add_raster) work without this, but vector tiles need it."
+                        )
+            elif _in_colab_shell():
+                # Google Colab - use localhost with the port - Colab automatically proxies it
+                tile_url = f"http://localhost:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+                if not quiet:
+                    print(
+                        f"Running in Google Colab. Tile server accessible at: http://localhost:{actual_port}"
+                    )
+            else:
+                # Local environment - direct connection
+                tile_url = f"http://127.0.0.1:{actual_port}/tiles/{{z}}/{{x}}/{{y}}.pbf"
+
+            # Set default paint properties based on layer type if not provided
+            if paint is None:
+                if layer_type == "fill":
+                    paint = {
+                        "fill-color": "#3388ff",
+                        "fill-opacity": 0.7,
+                        "fill-outline-color": "#ffffff",
+                    }
+                elif layer_type == "line":
+                    paint = {"line-color": "#3388ff", "line-width": 2}
+                elif layer_type == "circle":
+                    paint = {
+                        "circle-radius": 5,
+                        "circle-color": "#3388ff",
+                        "circle-stroke-color": "#ffffff",
+                        "circle-stroke-width": 1,
+                    }
+                elif layer_type == "symbol":
+                    paint = {
+                        "text-color": "#000000",
+                        "text-halo-color": "#ffffff",
+                        "text-halo-width": 1,
+                    }
+
+            # Use the existing add_vector_tile method to add the layer
+            self.add_vector_tile(
+                url=tile_url,
+                layer_id=layer_name,
+                layer_type=layer_type,
+                source_layer="layer",  # DuckDB ST_AsMVT uses 'layer' as default
+                name=layer_name,
+                paint=paint,
+                layout=layout,
+                filter=filter,
+                minzoom=minzoom,
+                maxzoom=maxzoom,
+                visible=visible,
+                opacity=opacity,
+                add_popup=tooltip,
+                **kwargs,
+            )
+
+            # Fit bounds if requested and data is available
+            if fit_bounds and db_path:
+                try:
+                    import duckdb
+
+                    # Use read_only=True only for file-based databases
+                    con = duckdb.connect(db_path, read_only=True)
+                    con.execute("LOAD spatial;")
+
+                    # Get bounds from the data
+                    # Determine source CRS for transformation
+                    if src_crs and src_crs.upper() not in ["EPSG:4326", "4326"]:
+                        # User specified a source CRS that's not WGS84, transform from it to WGS84
+                        bounds_query = f"""
+                            SELECT
+                                ST_XMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as min_lon,
+                                ST_YMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as min_lat,
+                                ST_XMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as max_lon,
+                                ST_YMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), '{src_crs}', 'EPSG:4326', true)) as max_lat
+                            FROM {table_name}
+                        """
+                    else:
+                        # No src_crs specified or it's already WGS84, auto-detect based on coordinates
+                        sample_coords = con.execute(
+                            f"SELECT ST_X(ST_Centroid({geom_column})), ST_Y(ST_Centroid({geom_column})) FROM {table_name} LIMIT 1"
+                        ).fetchone()
+
+                        if sample_coords and sample_coords[0] is not None:
+                            x, y = sample_coords[0], sample_coords[1]
+                            # Web Mercator coordinates are typically > 180 or < -180
+                            # WGS84 coordinates are in range [-180, 180] for X and [-90, 90] for Y
+                            is_web_mercator = abs(x) > 180 or abs(y) > 90
+
+                            if is_web_mercator:
+                                # Data is in Web Mercator (EPSG:3857), transform to WGS84 (EPSG:4326)
+                                bounds_query = f"""
+                                    SELECT
+                                        ST_XMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as min_lon,
+                                        ST_YMin(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as min_lat,
+                                        ST_XMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as max_lon,
+                                        ST_YMax(ST_Transform(ST_GeomFromWKB(ST_AsWKB(ST_Extent({geom_column}))), 'EPSG:3857', 'EPSG:4326', true)) as max_lat
+                                    FROM {table_name}
+                                """
+                            else:
+                                # Data is in WGS84 (EPSG:4326), use directly
+                                bounds_query = f"""
+                                    SELECT
+                                        MIN(ST_XMin({geom_column})) as min_lon,
+                                        MIN(ST_YMin({geom_column})) as min_lat,
+                                        MAX(ST_XMax({geom_column})) as max_lon,
+                                        MAX(ST_YMax({geom_column})) as max_lat
+                                    FROM {table_name}
+                                """
+                        else:
+                            con.close()
+                            if not quiet:
+                                print(
+                                    "Could not determine bounds: no valid geometry found"
+                                )
+                            bounds_query = None
+
+                    if bounds_query:
+                        result = con.execute(bounds_query).fetchone()
+                        con.close()
+
+                        if result and all(x is not None for x in result):
+                            min_lon, min_lat, max_lon, max_lat = result
+                            # MapLibre expects [[west, south], [east, north]] = [[minLon, minLat], [maxLon, maxLat]]
+                            self.fit_bounds([[min_lon, min_lat], [max_lon, max_lat]])
+                except Exception as e:
+                    if not quiet:
+                        print(f"Could not fit bounds: {e}")
+
+            if not quiet:
+                print(f"Layer '{layer_name}' added successfully!")
+
+        except ImportError as e:
+            if not quiet:
+                print(f"Missing required package: {e}")
+                print(
+                    "Please install required packages: pip install duckdb flask flask-cors"
+                )
+        except (ValueError, FileNotFoundError):
+            # Re-raise validation errors so users can handle them
+            raise
+        except Exception as e:
+            if not quiet:
+                print(f"Error adding DuckDB layer: {e}")
+                import traceback
+
+                traceback.print_exc()
 
     def add_marker(
         self,
