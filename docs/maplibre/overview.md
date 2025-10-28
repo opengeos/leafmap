@@ -224,6 +224,12 @@ Use setPaintProperty to change a layer's fill color.
 
 [![](https://i.imgur.com/Q3BbItI.png)](https://leafmap.org/maplibre/color_switcher)
 
+## Visualize Copernicus data interactively
+
+Visualize Copernicus data interactively with Leafmap.
+
+[![](https://github.com/user-attachments/assets/f251654f-efd3-4e35-9e12-11cf790885a3)](https://leafmap.org/maplibre/copernicus)
+
 ## Countries filter
 
 Utilize and refine data from the MapTiler Countries to create a Choropleth map of the US states.

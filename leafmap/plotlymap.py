@@ -423,6 +423,9 @@ class Map(go.FigureWidget):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
         center = common.cog_center(url, titiler_endpoint)  # (lon, lat)
         self.add_tile_layer(tile_url, name, attribution, opacity)

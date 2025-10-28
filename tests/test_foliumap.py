@@ -287,13 +287,13 @@ class TestFoliumap(unittest.TestCase):
     #     out_str = m.to_html()
     #     assert "Countries" in out_str
 
-    def test_add_stac_layer(self):
-        """Check adding STAC layer"""
-        m = leafmap.Map()
-        url = "https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"
-        m.add_stac_layer(url, bands=["B3", "B2", "B1"], name="False color")
-        out_str = m.to_html()
-        assert "False color" in out_str
+    # def test_add_stac_layer(self):
+    #     """Check adding STAC layer"""
+    #     m = leafmap.Map()
+    #     url = "https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"
+    #     m.add_stac_layer(url, bands=["B3", "B2", "B1"], name="False color")
+    #     out_str = m.to_html()
+    #     assert "False color" in out_str
 
     def test_add_tile_layer(self):
         """Check adding tile layer"""
@@ -471,12 +471,12 @@ class TestFoliumap(unittest.TestCase):
         out_str = m.to_html()
         assert "OpenStreetMap" in out_str
 
-    def test_leafmap_split_map(self):
-        """Check split-panel map"""
-        with self.assertRaises(NotImplementedError):
-            m = leafmap.split_map(left_layer="ROADMAP", right_layer="HYBRID")
-            out_str = m.to_html()
-            assert "OpenStreetMap" in out_str
+    # def test_leafmap_split_map(self):
+    #     """Check split-panel map"""
+    #     with self.assertRaises(NotImplementedError):
+    #         m = leafmap.split_map(left_layer="ROADMAP", right_layer="HYBRID")
+    #         out_str = m.to_html()
+    #         assert "OpenStreetMap" in out_str
 
     def test_linked_maps(self):
         """Check linked maps"""

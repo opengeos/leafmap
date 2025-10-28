@@ -151,6 +151,9 @@ def cog_tile(
     Returns:
         The COG tile layer URL and bounds.
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
     import json
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
@@ -260,6 +263,8 @@ def cog_tile_vmin_vmax(
     Returns:
         tuple: Returns the minimum and maximum values.
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     stats = cog_stats(url, titiler_endpoint)
@@ -403,6 +408,8 @@ def cog_bounds(
     Returns:
         list: A list of values representing [left, bottom, right, top]
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     r = requests.get(f"{titiler_endpoint}/cog/bounds", params={"url": url}).json()
@@ -427,6 +434,10 @@ def cog_center(
     Returns:
         A tuple representing (longitude, latitude).
     """
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     bounds = cog_bounds(url, titiler_endpoint)
     center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lat, lon)
@@ -446,6 +457,9 @@ def cog_bands(
     Returns:
         A list of band names.
     """
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     r = requests.get(
@@ -472,6 +486,8 @@ def cog_stats(
     Returns:
         list: A dictionary of band statistics.
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     try:
@@ -509,6 +525,8 @@ def cog_info(
     Returns:
         list: A dictionary of band info.
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     info = "info"
@@ -558,6 +576,8 @@ def cog_pixel_value(
     Returns:
         list: A dictionary of band info.
     """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     kwargs["url"] = url

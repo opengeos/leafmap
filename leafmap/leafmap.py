@@ -1035,6 +1035,9 @@ class Map(ipyleaflet.Map):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         band_names = common.cog_bands(url, titiler_endpoint)
 
         if bands is not None:
@@ -1160,6 +1163,10 @@ class Map(ipyleaflet.Map):
             fit_bounds (bool, optional): A flag indicating whether the map should be zoomed to the layer extent. Defaults to True.
             layer_index (int, optional): The index at which to add the layer. Defaults to None.
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
             kwargs.pop("colormap_name")
 
@@ -1566,6 +1573,9 @@ class Map(ipyleaflet.Map):
         """
         import geopandas as gpd
 
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 30
         if "max_native_zoom" not in left_args:
@@ -1587,7 +1597,7 @@ class Map(ipyleaflet.Map):
         try:
             controls = self.controls
             layers = self.layers
-            self.clear_controls()
+            self.clear()
 
             if zoom_control:
                 self.add(ipyleaflet.ZoomControl())
