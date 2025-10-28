@@ -1212,6 +1212,10 @@ class Map(folium.Map):
                 and https://cogeotiff.github.io/rio-tiler/colormap/. To select a certain bands, use bidx=[1, 2, 3].
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
         bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
@@ -1265,6 +1269,10 @@ class Map(folium.Map):
             shown (bool, optional): A flag indicating whether the layer should be on by default. Defaults to True.
             fit_bounds (bool, optional): A flag indicating whether the map should be zoomed to the layer extent. Defaults to True.
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         tile_url = common.stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
@@ -2584,7 +2592,11 @@ class Map(folium.Map):
             left_array_args (dict, optional): The arguments for array_to_image for the left layer. Defaults to {}.
             right_array_args (dict, optional): The arguments for array_to_image for the right layer. Defaults to {}.
         """
+
         import sys
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
 
         if "google.colab" in sys.modules:
             client_args = {"cors_all": True}

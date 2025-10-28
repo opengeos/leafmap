@@ -2224,6 +2224,9 @@ class Map(MapWidget):
             None
         """
 
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         if name is None:
             name = "COG_" + common.random_string()
 
@@ -2310,6 +2313,9 @@ class Map(MapWidget):
         Returns:
             None
         """
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
 
         if "colormap_name" in kwargs and kwargs["colormap_name"] is None:
             kwargs.pop("colormap_name")
@@ -10331,7 +10337,7 @@ class LayerStyleWidget(widgets.VBox):
                 [
                     self._create_color_picker("Fill Color", "fill-color", "#3388ff"),
                     self._create_number_slider(
-                        "Fill Opacity", "fill-opacity", 0.2, 0, 1, 0.05
+                        "Fill Opacity", "fill-opacity", 0.8, 0, 1, 0.05
                     ),
                     self._create_color_picker(
                         "Fill Outline Color", "fill-outline-color", "#3388ff"

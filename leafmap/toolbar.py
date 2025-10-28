@@ -206,7 +206,7 @@ def tool_template(m, opened: Optional[bool] = True) -> Optional[widgets.Widget]:
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -308,7 +308,7 @@ def tool_header_template(m, opened: Optional[bool] = True):
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
             m.tool_control = toolbar_control
     else:
         return toolbar_widget
@@ -1748,7 +1748,7 @@ def split_basemaps(
 
     controls = m.controls
     layers = m.layers
-    m.clear_controls()
+    m.clear()
 
     add_zoom = True
     add_fullscreen = True
@@ -6433,7 +6433,7 @@ def layer_manager_gui(
         )
 
         if layer_control not in m.controls:
-            m.add_control(layer_control)
+            m.add(layer_control)
             m.layer_manager = layer_control
 
 
@@ -7554,7 +7554,7 @@ def time_slider_for_gdf(
 
     # Add the control to the map
     slider_ctrl = WidgetControl(widget=slider_widget, position=position)
-    m.add_control(slider_ctrl)
+    m.add(slider_ctrl)
     m.slider_ctrl = slider_ctrl  # Store reference to the control
 
     return geojson_layer
