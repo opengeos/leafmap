@@ -134,7 +134,7 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
 
 def cog_tile(
     url,
-    bands: Optional[str | None] = None,
+    bands: Optional[str] = None,
     titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> Tuple:
