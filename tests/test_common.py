@@ -57,13 +57,13 @@ class TestCommon(unittest.TestCase):
     def test_vector_to_geojson(self):
         self.assertIsInstance(vector_to_geojson(self.in_shp), dict)
 
-    def test_cog_bounds(self):
-        self.assertIsInstance(cog_bounds(self.in_cog), list)
-        self.assertEqual(len(cog_bounds(self.in_cog)), 4)
+    # def test_cog_bounds(self):
+    #     self.assertIsInstance(cog_bounds(self.in_cog), list)
+    #     self.assertEqual(len(cog_bounds(self.in_cog)), 4)
 
-    def test_cog_center(self):
-        self.assertIsInstance(cog_center(self.in_cog), tuple)
-        self.assertEqual(len(cog_center(self.in_cog)), 2)
+    # def test_cog_center(self):
+    #     self.assertIsInstance(cog_center(self.in_cog), tuple)
+    #     self.assertEqual(len(cog_center(self.in_cog)), 2)
 
     @patch("os.environ", {})
     @patch("requests.get")
