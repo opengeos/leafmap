@@ -12103,7 +12103,7 @@ def widget_template(
         )
 
         if toolbar_control not in m.controls:
-            m.add_control(toolbar_control)
+            m.add(toolbar_control)
 
             setattr(m, name, toolbar_control)
 
