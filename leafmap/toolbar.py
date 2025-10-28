@@ -1748,7 +1748,7 @@ def split_basemaps(
 
     controls = m.controls
     layers = m.layers
-    m.clear_controls()
+    m.clear()
 
     add_zoom = True
     add_fullscreen = True

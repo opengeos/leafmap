@@ -1594,7 +1594,7 @@ class Map(ipyleaflet.Map):
         try:
             controls = self.controls
             layers = self.layers
-            self.clear_controls()
+            self.clear()
 
             if zoom_control:
                 self.add(ipyleaflet.ZoomControl())
