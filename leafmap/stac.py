@@ -134,7 +134,7 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
 
 def cog_tile(
     url,
-    bands: str = None,
+    bands: Optional[str] = None,
     titiler_endpoint: Optional[str] = None,
     **kwargs,
 ) -> Tuple:
@@ -142,7 +142,7 @@ def cog_tile(
         Source code adapted from https://developmentseed.org/titiler/examples/notebooks/Working_with_CloudOptimizedGeoTIFF_simple/
 
     Args:
-        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
+        url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif. Default to None
         bands (list, optional): List of bands to use. Defaults to None.
         titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
         **kwargs (Any): Additional arguments to pass to the titiler endpoint. For more information about the available arguments, see https://developmentseed.org/titiler/endpoints/cog/#tiles.
