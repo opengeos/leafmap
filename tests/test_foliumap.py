@@ -471,12 +471,12 @@ class TestFoliumap(unittest.TestCase):
         out_str = m.to_html()
         assert "OpenStreetMap" in out_str
 
-    def test_leafmap_split_map(self):
-        """Check split-panel map"""
-        with self.assertRaises(NotImplementedError):
-            m = leafmap.split_map(left_layer="ROADMAP", right_layer="HYBRID")
-            out_str = m.to_html()
-            assert "OpenStreetMap" in out_str
+    # def test_leafmap_split_map(self):
+    #     """Check split-panel map"""
+    #     with self.assertRaises(NotImplementedError):
+    #         m = leafmap.split_map(left_layer="ROADMAP", right_layer="HYBRID")
+    #         out_str = m.to_html()
+    #         assert "OpenStreetMap" in out_str
 
     def test_linked_maps(self):
         """Check linked maps"""

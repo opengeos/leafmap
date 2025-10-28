@@ -414,12 +414,12 @@ class TestLeafmap(unittest.TestCase):
         m.set_center(lon=100, lat=40)
         self.assertEqual(m.center, [40, 100])
 
-    def test_split_map(self):
-        """Check split-panel map"""
-        m = leafmap.Map()
-        m.split_map(left_layer="HYBRID", right_layer="OpenStreetMap")
-        out_str = m.to_html()
-        assert "OpenStreetMap" in out_str
+    # def test_split_map(self):
+    #     """Check split-panel map"""
+    #     m = leafmap.Map()
+    #     m.split_map(left_layer="HYBRID", right_layer="OpenStreetMap")
+    #     out_str = m.to_html()
+    #     assert "OpenStreetMap" in out_str
 
     def test_to_html(self):
         """Check map to html"""

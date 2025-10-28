@@ -1573,6 +1573,9 @@ class Map(ipyleaflet.Map):
         """
         import geopandas as gpd
 
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
         if "max_zoom" not in left_args:
             left_args["max_zoom"] = 30
         if "max_native_zoom" not in left_args:

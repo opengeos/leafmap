@@ -2592,7 +2592,11 @@ class Map(folium.Map):
             left_array_args (dict, optional): The arguments for array_to_image for the left layer. Defaults to {}.
             right_array_args (dict, optional): The arguments for array_to_image for the right layer. Defaults to {}.
         """
+
         import sys
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
 
         if "google.colab" in sys.modules:
             client_args = {"cors_all": True}
