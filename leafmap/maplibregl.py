@@ -37,6 +37,7 @@ from .basemaps import xyz_to_leaflet
 from .common import (
     _in_colab_shell,
     configure_jupyterhub,
+    df_to_gdf,
     download_file,
     execute_maplibre_notebook_dir,
     filter_geom_type,
