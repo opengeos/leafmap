@@ -22,7 +22,7 @@
       
       
       <link rel="icon" href="../../assets/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.23">
     
     
       
@@ -7115,7 +7115,7 @@ m</div>
             &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no&quot; /&gt;
             &lt;style&gt;
-                #map_265cc7c24ceec56b88b487a1b196b2b3 {
+                #map_e2e83e442de3ef842b73418d9398521d {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -7135,14 +7135,14 @@ m</div>
 &lt;body&gt;
     
     
-            &lt;div class=&quot;folium-map&quot; id=&quot;map_265cc7c24ceec56b88b487a1b196b2b3&quot; &gt;&lt;/div&gt;
+            &lt;div class=&quot;folium-map&quot; id=&quot;map_e2e83e442de3ef842b73418d9398521d&quot; &gt;&lt;/div&gt;
         
 &lt;/body&gt;
 &lt;script&gt;
     
     
-            var map_265cc7c24ceec56b88b487a1b196b2b3 = L.map(
-                &quot;map_265cc7c24ceec56b88b487a1b196b2b3&quot;,
+            var map_e2e83e442de3ef842b73418d9398521d = L.map(
+                &quot;map_e2e83e442de3ef842b73418d9398521d&quot;,
                 {
                     center: [40.0, -100.0],
                     crs: L.CRS.EPSG3857,
@@ -7153,24 +7153,24 @@ m</div>
                     layersControl: true,
                 }
             );
-            L.control.scale().addTo(map_265cc7c24ceec56b88b487a1b196b2b3);
+            L.control.scale().addTo(map_e2e83e442de3ef842b73418d9398521d);
 
             
 
         
     
-            var tile_layer_a40d06e0e61a8d4af9346c4e84a359f7 = L.tileLayer(
+            var tile_layer_bdd5f0cc4e57cb4624deb57cc7be7436 = L.tileLayer(
                 &quot;https://tile.openstreetmap.org/{z}/{x}/{y}.png&quot;,
                 {&quot;attribution&quot;: &quot;\u0026copy; \u003ca href=\&quot;https://www.openstreetmap.org/copyright\&quot;\u003eOpenStreetMap\u003c/a\u003e contributors&quot;, &quot;detectRetina&quot;: false, &quot;maxNativeZoom&quot;: 19, &quot;maxZoom&quot;: 24, &quot;minZoom&quot;: 0, &quot;noWrap&quot;: false, &quot;opacity&quot;: 1, &quot;subdomains&quot;: &quot;abc&quot;, &quot;tms&quot;: false}
             );
         
     
-            tile_layer_a40d06e0e61a8d4af9346c4e84a359f7.addTo(map_265cc7c24ceec56b88b487a1b196b2b3);
+            tile_layer_bdd5f0cc4e57cb4624deb57cc7be7436.addTo(map_e2e83e442de3ef842b73418d9398521d);
         
     
             L.control.fullscreen(
                 {&quot;forceSeparateButton&quot;: false, &quot;position&quot;: &quot;topleft&quot;, &quot;title&quot;: &quot;Full Screen&quot;, &quot;titleCancel&quot;: &quot;Exit Full Screen&quot;}
-            ).addTo(map_265cc7c24ceec56b88b487a1b196b2b3);
+            ).addTo(map_e2e83e442de3ef842b73418d9398521d);
         
     
             var options = {
@@ -7179,14 +7179,14 @@ m</div>
               edit: {},
             }
             // FeatureGroup is to store editable layers.
-            var drawnItems_draw_control_51695e0dbc0053403ba4df4d4c19404e = new L.featureGroup().addTo(
-                map_265cc7c24ceec56b88b487a1b196b2b3
+            var drawnItems_draw_control_6539b0e40970acbb321df37d5657d562 = new L.featureGroup().addTo(
+                map_e2e83e442de3ef842b73418d9398521d
             );
-            options.edit.featureGroup = drawnItems_draw_control_51695e0dbc0053403ba4df4d4c19404e;
-            var draw_control_51695e0dbc0053403ba4df4d4c19404e = new L.Control.Draw(
+            options.edit.featureGroup = drawnItems_draw_control_6539b0e40970acbb321df37d5657d562;
+            var draw_control_6539b0e40970acbb321df37d5657d562 = new L.Control.Draw(
                 options
-            ).addTo( map_265cc7c24ceec56b88b487a1b196b2b3 );
-            map_265cc7c24ceec56b88b487a1b196b2b3.on(L.Draw.Event.CREATED, function(e) {
+            ).addTo( map_e2e83e442de3ef842b73418d9398521d );
+            map_e2e83e442de3ef842b73418d9398521d.on(L.Draw.Event.CREATED, function(e) {
                 var layer = e.layer,
                     type = e.layerType;
                 var coords = JSON.stringify(layer.toGeoJSON());
@@ -7194,52 +7194,52 @@ m</div>
                     alert(coords);
                     console.log(coords);
                 });
-                drawnItems_draw_control_51695e0dbc0053403ba4df4d4c19404e.addLayer(layer);
+                drawnItems_draw_control_6539b0e40970acbb321df37d5657d562.addLayer(layer);
              });
-            map_265cc7c24ceec56b88b487a1b196b2b3.on('draw:created', function(e) {
-                drawnItems_draw_control_51695e0dbc0053403ba4df4d4c19404e.addLayer(e.layer);
+            map_e2e83e442de3ef842b73418d9398521d.on('draw:created', function(e) {
+                drawnItems_draw_control_6539b0e40970acbb321df37d5657d562.addLayer(e.layer);
             });
             
         
     
 
-            var geocoderOpts_geocoder_f67186f42688662a38763042c469f976 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
+            var geocoderOpts_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3 = {&quot;collapsed&quot;: true, &quot;defaultMarkGeocode&quot;: true, &quot;position&quot;: &quot;topleft&quot;, &quot;provider&quot;: &quot;nominatim&quot;, &quot;providerOptions&quot;: {}, &quot;zoom&quot;: 11};
 
             // note: geocoder name should start with lowercase
-            var geocoderName_geocoder_f67186f42688662a38763042c469f976 = geocoderOpts_geocoder_f67186f42688662a38763042c469f976[&quot;provider&quot;];
+            var geocoderName_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3 = geocoderOpts_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3[&quot;provider&quot;];
 
-            var customGeocoder_geocoder_f67186f42688662a38763042c469f976 = L.Control.Geocoder[ geocoderName_geocoder_f67186f42688662a38763042c469f976 ](
-                geocoderOpts_geocoder_f67186f42688662a38763042c469f976['providerOptions']
+            var customGeocoder_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3 = L.Control.Geocoder[ geocoderName_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3 ](
+                geocoderOpts_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3['providerOptions']
             );
-            geocoderOpts_geocoder_f67186f42688662a38763042c469f976[&quot;geocoder&quot;] = customGeocoder_geocoder_f67186f42688662a38763042c469f976;
+            geocoderOpts_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3[&quot;geocoder&quot;] = customGeocoder_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3;
 
             L.Control.geocoder(
-                geocoderOpts_geocoder_f67186f42688662a38763042c469f976
+                geocoderOpts_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3
             ).on('markgeocode', function(e) {
-                var zoom = geocoderOpts_geocoder_f67186f42688662a38763042c469f976['zoom'] || map_265cc7c24ceec56b88b487a1b196b2b3.getZoom();
-                map_265cc7c24ceec56b88b487a1b196b2b3.setView(e.geocode.center, zoom);
-            }).addTo(map_265cc7c24ceec56b88b487a1b196b2b3);
+                var zoom = geocoderOpts_geocoder_4667e50beb1dc50a6d7ce44e1c79d0d3['zoom'] || map_e2e83e442de3ef842b73418d9398521d.getZoom();
+                map_e2e83e442de3ef842b73418d9398521d.setView(e.geocode.center, zoom);
+            }).addTo(map_e2e83e442de3ef842b73418d9398521d);
 
         
     
-            map_265cc7c24ceec56b88b487a1b196b2b3.fitBounds(
+            map_e2e83e442de3ef842b73418d9398521d.fitBounds(
                 [[40, -100], [40, -100]],
                 {&quot;maxZoom&quot;: 4}
             );
         
     
-            var layer_control_1ec2d41d8e6c8b568c501c85ea48b6e2_layers = {
+            var layer_control_2981f5b3d5611da519581461f15caee5_layers = {
                 base_layers : {
-                    &quot;openstreetmap&quot; : tile_layer_a40d06e0e61a8d4af9346c4e84a359f7,
+                    &quot;openstreetmap&quot; : tile_layer_bdd5f0cc4e57cb4624deb57cc7be7436,
                 },
                 overlays :  {
                 },
             };
-            let layer_control_1ec2d41d8e6c8b568c501c85ea48b6e2 = L.control.layers(
-                layer_control_1ec2d41d8e6c8b568c501c85ea48b6e2_layers.base_layers,
-                layer_control_1ec2d41d8e6c8b568c501c85ea48b6e2_layers.overlays,
+            let layer_control_2981f5b3d5611da519581461f15caee5 = L.control.layers(
+                layer_control_2981f5b3d5611da519581461f15caee5_layers.base_layers,
+                layer_control_2981f5b3d5611da519581461f15caee5_layers.overlays,
                 {&quot;autoZIndex&quot;: true, &quot;collapsed&quot;: true, &quot;position&quot;: &quot;topright&quot;}
-            ).addTo(map_265cc7c24ceec56b88b487a1b196b2b3);
+            ).addTo(map_e2e83e442de3ef842b73418d9398521d);
 
         
 &lt;/script&gt;
@@ -7478,7 +7478,7 @@ if os.path.exists(out_dir) and os.path.exists(image):
 </div> <!-- jp-Notebook -->
 </div> <!-- jupyter-wrapper -->
 <script type="application/vnd.jupyter.widget-state+json">
-{"state": {"746a7733c9614b10954f0237fd719085": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "c3883f118d47471c80d1344d983c2941": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_746a7733c9614b10954f0237fd719085"}}, "0679bd80a3824efdbfdc04f6b964d84f": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "2aa94fa220b3405dbb320d3f8020c9a2": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "9f71010375634b8aa0950d098b83fa39": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
+{"state": {"9ad5afffa0204e12ba54ee7c6ee49b45": {"model_name": "LayoutModel", "model_module": "@jupyter-widgets\/base", "model_module_version": "1.2.0", "state": {"_model_module": "@jupyter-widgets\/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets\/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "94457eb777e9427eac0e9cf970215db6": {"model_name": "ForceLoadModel", "model_module": "jupyter-vue", "model_module_version": "^1.11.1", "state": {"_dom_classes": [], "_model_module": "jupyter-vue", "_model_module_version": "^1.11.1", "_model_name": "ForceLoadModel", "_view_count": null, "_view_module": null, "_view_module_version": "", "_view_name": null, "layout": "IPY_MODEL_9ad5afffa0204e12ba54ee7c6ee49b45"}}, "9454255fd4b34d4e830873b15ced240c": {"model_name": "ThemeModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeModel", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "dark": null, "dark_effective": null}}, "b819e41c55cf467ea8e44dd927aa643f": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "light", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#82B1FF", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#1976D2", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}, "8a814dff668a4ea4876316f06005596a": {"model_name": "ThemeColorsModel", "model_module": "jupyter-vuetify", "model_module_version": "^1.10.0", "state": {"_model_module": "jupyter-vuetify", "_model_module_version": "^1.10.0", "_model_name": "ThemeColorsModel", "_theme_name": "dark", "_view_count": null, "_view_module": null, "_view_module_version": "^1.10.0", "_view_name": null, "accent": "#FF4081", "anchor": null, "error": "#FF5252", "info": "#2196F3", "primary": "#2196F3", "secondary": "#424242", "success": "#4CAF50", "warning": "#FB8C00"}}}, "version_major": 2, "version_minor": 0}
 </script>
 
         <style>
