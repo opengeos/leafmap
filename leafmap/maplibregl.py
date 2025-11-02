@@ -39,9 +39,11 @@ from .common import (
     configure_jupyterhub,
     df_to_gdf,
     download_file,
+    download_files
     execute_maplibre_notebook_dir,
     filter_geom_type,
     find_files,
+    gdb_to_vector,
     generate_index_html,
     geojson_bounds,
     geojson_to_gdf,
@@ -67,6 +69,7 @@ from .common import (
     stop_martin,
 )
 from .map_widgets import TabWidget
+from .plot import bar_chart, histogram, line_chart, pie_chart
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
