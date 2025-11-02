@@ -18493,7 +18493,7 @@ def read_vector(source, layer=None, **kwargs: Any):
 
     # Handle GeoParquet files
     if ext in [".parquet", ".pq", ".geoparquet"]:
-        return gpd.read_parquet(source, **kwargs)
+        return read_parquet(source, **kwargs)
 
     # Handle common vector formats
     if ext in [".shp", ".geojson", ".json", ".gpkg", ".gml", ".kml", ".gpx"]:
@@ -19104,10 +19104,10 @@ def start_martin(
     cache_dir: Optional[Union[str, Path]] = None,
     extra_args: Optional[list[str]] = None,
     pidfile: Optional[Union[str, Path]] = None,
-    martin_version: str = "v0.18.1",
+    martin_version: str = "v0.20.0",
 ) -> subprocess.Popen:
     """
-    Start Martin v0.18.1 serving from any combo of:
+    Start Martin v0.20.0 serving from any combo of:
       - PostgreSQL (db_url)
       - MBTiles (mbtiles=[...])
       - PMTiles (pmtiles=[...])
@@ -19131,7 +19131,9 @@ def start_martin(
     import stat
     from pathlib import Path
 
-    BASE = f"https://github.com/maplibre/martin/releases/download/{martin_version}"
+    BASE = (
+        f"https://github.com/maplibre/martin/releases/download/martin-{martin_version}"
+    )
 
     # Default cache + pidfile
     if cache_dir is None:
@@ -19139,8 +19141,8 @@ def start_martin(
     if pidfile is None:
         pidfile = cache_dir / f"martin-{martin_version}.pid"
 
-    def _detect_asset_v0181() -> str:
-        """Return the exact tar.gz asset name for v0.18.1 matching the current OS/arch."""
+    def _detect_asset_v0200() -> str:
+        """Return the exact tar.gz asset name for v0.20.0 matching the current OS/arch."""
         sysname = platform.system().lower()
         machine = platform.machine().lower()
 
@@ -19171,11 +19173,13 @@ def start_martin(
     cache_dir = Path(cache_dir).expanduser()
     pidfile = Path(pidfile)
 
-    asset = _detect_asset_v0181()
+    asset = _detect_asset_v0200()
     url = f"{BASE}/{asset}"
     tar_path = cache_dir / martin_version / asset
     bin_dir = cache_dir / martin_version
 
+    print(f"Downloading Martin {martin_version} from {url} to {tar_path}")
+    print(f"Downloading Martin {martin_version} to {bin_dir}")
     # 2) Extract (only once)
     martin_bin = bin_dir / "martin"
     if not martin_bin.exists():
