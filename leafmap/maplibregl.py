@@ -62,7 +62,9 @@ from .common import (
     sort_files,
     stac_assets,
     start_duckdb_tile_server,
+    start_martin,
     start_server,
+    stop_martin,
 )
 from .map_widgets import TabWidget
 
@@ -2058,6 +2060,45 @@ class Map(MapWidget):
             overwrite=overwrite,
             **kwargs,
         )
+
+    def add_nwi(self, data: Union[str, Dict], name: str = "NWI Wetlands", **kwargs):
+        """Adds a National Wetlands Inventory (NWI) layer to the map.
+
+        Args:
+            data (Union[str, Dict]): The data to add. It can be a URL or a dictionary.
+            name (str, optional): The name of the layer. Defaults to "NWI Wetlands".
+            **kwargs: Additional keyword arguments to pass to the add_vector method.
+
+        Returns:
+            None
+        """
+
+        color_map = {
+            "Freshwater Forested/Shrub Wetland": (0, 136, 55),
+            "Freshwater Emergent Wetland": (127, 195, 28),
+            "Freshwater Pond": (104, 140, 192),
+            "Estuarine and Marine Wetland": (102, 194, 165),
+            "Riverine": (1, 144, 191),
+            "Lake": (19, 0, 124),
+            "Estuarine and Marine Deepwater": (0, 124, 136),
+            "Other": (178, 134, 86),
+        }
+
+        def rgba(rgb, a=0.85):
+            r, g, b = rgb
+            return f"rgba({r},{g},{b},{a})"
+
+        # Build a proper match expression WITH a default
+        fill_match = ["match", ["get", "WETLAND_TYPE"]]
+        for k, v in color_map.items():
+            fill_match += [k, rgba(v)]
+        fill_match += ["rgba(200,200,200,0.6)"]  # <-- REQUIRED default
+
+        paint = {
+            "fill-color": fill_match,
+            "fill-outline-color": "rgba(0,0,0,0.25)",
+        }
+        self.add_vector(data, layer_type="fill", paint=paint, name=name, **kwargs)
 
     def add_ee_layer(
         self,
@@ -5404,6 +5445,7 @@ class Map(MapWidget):
                         "paint": {
                             "circle-radius": 4,
                             "circle-color": "#8dd3c7",
+                            "circle-opacity": opacity,
                             "circle-stroke-color": "#8dd3c7",
                             "circle-stroke-width": 1,
                         },
@@ -5419,7 +5461,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#8DD3C7",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5430,7 +5472,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#FFFFB3",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5441,7 +5483,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#BEBADA",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5452,7 +5494,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#FB8072",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5463,7 +5505,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#80B1D3",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5478,7 +5520,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#6ea299",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5489,7 +5531,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#fdfdb2",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5516,7 +5558,7 @@ class Map(MapWidget):
                         "type": "fill",
                         "paint": {
                             "fill-color": "#FFFFB3",
-                            "fill-opacity": 1.0,
+                            "fill-opacity": opacity,
                             "fill-outline-color": "#888888",
                         },
                     },
@@ -5542,6 +5584,7 @@ class Map(MapWidget):
                         "paint": {
                             "circle-radius": 4,
                             "circle-color": "#8dd3c7",
+                            "circle-opacity": opacity,
                             "circle-stroke-color": "#8dd3c7",
                             "circle-stroke-width": 1,
                         },
@@ -5558,6 +5601,7 @@ class Map(MapWidget):
                         "paint": {
                             "line-color": "#ffffb3",
                             "line-width": 1.0,
+                            "line-opacity": opacity,
                         },
                     },
                     {
@@ -5568,6 +5612,7 @@ class Map(MapWidget):
                         "paint": {
                             "circle-radius": 4,
                             "circle-color": "#8dd3c7",
+                            "circle-opacity": opacity,
                             "circle-stroke-color": "#8dd3c7",
                             "circle-stroke-width": 1,
                         },
