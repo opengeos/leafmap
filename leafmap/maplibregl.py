@@ -39,7 +39,7 @@ from .common import (
     configure_jupyterhub,
     df_to_gdf,
     download_file,
-    download_files
+    download_files,
     execute_maplibre_notebook_dir,
     filter_geom_type,
     find_files,
