@@ -243,7 +243,11 @@ def cog_tile(
             params=kwargs,
             timeout=10,
         ).json()
-    return r["tiles"][0]
+    tiles = r["tiles"][0]
+    if titiler_endpoint.startswith("https://") and tiles.startswith("http://"):
+        tiles = tiles.replace("http://", "https://")
+
+    return tiles
 
 
 def cog_tile_vmin_vmax(
