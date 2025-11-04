@@ -5113,6 +5113,91 @@ def clip_image(image, mask, output, to_cog=True):
         image_to_cog(output, output)
 
 
+def clip_raster(
+    image,
+    geometry,
+    geom_crs=None,
+    dst_crs=None,
+    resolution=None,
+    driver="COG",
+    compress="DEFLATE",
+    output=None,
+    **kwargs: Any,
+):
+    """Clip a raster by a geometry.
+
+    Args:
+        image (str): Path to the image file in GeoTIFF format.
+        geometry (str | geopandas.GeoDataFrame | dict | list): The geometry to clip the raster by.
+            It can be a path to vector datasets (e.g., GeoJSON, Shapefile), a geopandas.GeoDataFrame,
+            a dictionary, or a list of 4 numbers (minx, miny, maxx, maxy) representing a bounding box.
+        geom_crs (str, optional): The coordinate reference system of the geometry. Defaults to None.
+        dst_crs (str, optional): The coordinate reference system of the output raster. Defaults to None.
+        resolution (int, optional): The resolution of the output raster. Defaults to None.
+            If a single value is provided, the resolution will be the same in both x and y directions.
+            If a tuple of two values is provided, the first value will be the resolution in the x
+            direction and the second value will be the resolution in the y direction.
+        driver (str, optional): The driver of the output raster. Defaults to "COG".
+        compress (str, optional): The compression of the output raster. Defaults to "DEFLATE".
+        output (str, optional): Path to the output raster file. Defaults to None.
+        **kwargs: Additional keyword arguments to pass to rioxarray.open_rasterio.
+    """
+    import geopandas as gpd
+    import rioxarray as rxr
+    import xarray as xr
+
+    if isinstance(image, str):
+        xds = rxr.open_rasterio(image)
+    elif isinstance(image, xr.DataArray):
+        xds = image
+    else:
+        raise ValueError("image must be a string or xarray.DataArray")
+
+    if isinstance(geometry, str):
+        gdf = gpd.read_file(geometry)
+    elif isinstance(geometry, gpd.GeoDataFrame):
+        gdf = geometry
+    elif isinstance(geometry, dict) and geometry.get("type") == "FeatureCollection":
+        gdf = gpd.GeoDataFrame.from_features(geometry)
+    elif isinstance(geometry, dict) and geometry.get("type") == "Feature":
+        gdf = gpd.GeoDataFrame.from_features([geometry])
+    elif isinstance(geometry, list) and len(geometry) == 4:
+        gdf = bbox_to_gdf(geometry)
+    else:
+        raise ValueError(
+            "geometry must be a string, geopandas.GeoDataFrame, dict, or list of 4 numbers"
+        )
+
+    if geom_crs is not None:
+        gdf.set_crs(geom_crs, inplace=True)
+
+    if type(resolution) in [int, float]:
+        resolution = (resolution, resolution)
+    elif isinstance(resolution, tuple) and len(resolution) == 2:
+        pass
+    elif resolution is not None:
+        raise ValueError("resolution must be a single value or a tuple of two values")
+
+    if dst_crs is None:
+        dst_crs = xds.rio.crs
+
+    if resolution is not None and dst_crs is not None:
+        xds = xds.rio.reproject(dst_crs, resolution=resolution)
+    elif resolution is not None:
+        xds = xds.rio.reproject(dst_crs, resolution=resolution)
+    elif dst_crs is not None:
+        xds = xds.rio.reproject(dst_crs)
+    else:
+        pass
+
+    gdf = gdf.to_crs(dst_crs)
+
+    xds = xds.rio.clip(gdf.geometry, gdf.crs)
+    if output is not None:
+        xds.rio.to_raster(output, driver=driver, compress=compress, **kwargs)
+    return xds
+
+
 def netcdf_to_tif(
     filename,
     output=None,
