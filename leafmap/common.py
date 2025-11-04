@@ -5121,7 +5121,9 @@ def clip_raster(
     resolution=None,
     driver="COG",
     compress="DEFLATE",
+    resampling="nearest",
     output=None,
+    verbose=True,
     **kwargs: Any,
 ):
     """Clip a raster by a geometry.
@@ -5139,6 +5141,7 @@ def clip_raster(
             direction and the second value will be the resolution in the y direction.
         driver (str, optional): The driver of the output raster. Defaults to "COG".
         compress (str, optional): The compression of the output raster. Defaults to "DEFLATE".
+        resampling (str, optional): The resampling method. Defaults to "nearest".
         output (str, optional): Path to the output raster file. Defaults to None.
         **kwargs: Additional keyword arguments to pass to rioxarray.to_raster.
     """
@@ -5182,19 +5185,35 @@ def clip_raster(
         dst_crs = xds.rio.crs
 
     if resolution is not None and dst_crs is not None:
-        xds = xds.rio.reproject(dst_crs, resolution=resolution)
+        if verbose:
+            print(
+                f"Reprojecting the raster to {dst_crs} at {resolution} resolution ..."
+            )
+        xds = xds.rio.reproject(dst_crs, resolution=resolution, resampling=resampling)
     elif resolution is not None:
-        xds = xds.rio.reproject(dst_crs, resolution=resolution)
-    elif dst_crs is not None:
-        xds = xds.rio.reproject(dst_crs)
+        if verbose:
+            print(
+                f"Reprojecting the raster to {dst_crs} at {resolution} resolution ..."
+            )
+        xds = xds.rio.reproject(dst_crs, resolution=resolution, resampling=resampling)
+    elif dst_crs is not None and dst_crs != xds.rio.crs:
+        if verbose:
+            print(f"Reprojecting the raster to {dst_crs} ...")
+        xds = xds.rio.reproject(dst_crs, resampling=resampling)
     else:
         pass
 
     gdf = gdf.to_crs(dst_crs)
 
+    if verbose:
+        print(f"Clipping the raster to the geometry ...")
     xds = xds.rio.clip(gdf.geometry, gdf.crs)
     if output is not None:
+        if verbose:
+            print(f"Saving the raster to {output} ...")
         xds.rio.to_raster(output, driver=driver, compress=compress, **kwargs)
+    if verbose:
+        print(f"The output raster is saved to {output}")
     return xds
 
 
