@@ -5140,7 +5140,7 @@ def clip_raster(
         driver (str, optional): The driver of the output raster. Defaults to "COG".
         compress (str, optional): The compression of the output raster. Defaults to "DEFLATE".
         output (str, optional): Path to the output raster file. Defaults to None.
-        **kwargs: Additional keyword arguments to pass to rioxarray.open_rasterio.
+        **kwargs: Additional keyword arguments to pass to rioxarray.to_raster.
     """
     import geopandas as gpd
     import rioxarray as rxr
