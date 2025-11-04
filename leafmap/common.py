@@ -5171,7 +5171,7 @@ def clip_raster(
     if geom_crs is not None:
         gdf.set_crs(geom_crs, inplace=True)
 
-    if type(resolution) in [int, float]:
+    if isinstance(resolution, (int, float)):
         resolution = (resolution, resolution)
     elif isinstance(resolution, tuple) and len(resolution) == 2:
         pass
