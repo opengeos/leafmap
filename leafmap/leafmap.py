@@ -2758,7 +2758,7 @@ class Map(ipyleaflet.Map):
                     gdf = gpd.read_file(in_geojson, encoding=encoding)
 
             elif isinstance(in_geojson, dict):
-                if "type" in in_geojson and in_geojson["type"] == "Feature":
+                if in_geojson.get("type") == "Feature":
                     gdf = gpd.GeoDataFrame.from_features([in_geojson])
                 else:
                     gdf = gpd.GeoDataFrame.from_features(in_geojson)
