@@ -5121,7 +5121,8 @@ def clip_raster(
     resolution=None,
     driver="COG",
     compress="DEFLATE",
-    resampling="nearest",
+    bands=None,
+    match_raster=None,
     output=None,
     verbose=True,
     **kwargs: Any,
@@ -5141,13 +5142,22 @@ def clip_raster(
             direction and the second value will be the resolution in the y direction.
         driver (str, optional): The driver of the output raster. Defaults to "COG".
         compress (str, optional): The compression of the output raster. Defaults to "DEFLATE".
-        resampling (str, optional): The resampling method. Defaults to "nearest".
+        bands (list, optional): The indices of the bands to clip. Defaults to None. Start from 1.
+        match_raster (str, optional): Path to the raster to match the resolution and CRS of the output raster. Defaults to None.
         output (str, optional): Path to the output raster file. Defaults to None.
-        **kwargs: Additional keyword arguments to pass to rioxarray.to_raster.
+        **kwargs: Additional keyword arguments to pass to rasterio.reproject.
     """
     import geopandas as gpd
     import rioxarray as rxr
     import xarray as xr
+
+    if match_raster is not None:
+        if isinstance(match_raster, str):
+            match_raster = rxr.open_rasterio(match_raster)
+        elif isinstance(match_raster, xr.DataArray):
+            match_raster = match_raster
+        else:
+            raise ValueError("match_raster must be a string or xarray.DataArray")
 
     if isinstance(image, str):
         xds = rxr.open_rasterio(image)
@@ -5155,6 +5165,12 @@ def clip_raster(
         xds = image
     else:
         raise ValueError("image must be a string or xarray.DataArray")
+
+    if bands is not None:
+        xds = xds.sel(band=bands)
+
+    if match_raster is not None:
+        xds = xds.rio.reproject_match(match_raster)
 
     if isinstance(geometry, str):
         gdf = gpd.read_file(geometry)
@@ -5189,17 +5205,17 @@ def clip_raster(
             print(
                 f"Reprojecting the raster to {dst_crs} at {resolution} resolution ..."
             )
-        xds = xds.rio.reproject(dst_crs, resolution=resolution, resampling=resampling)
+        xds = xds.rio.reproject(dst_crs, resolution=resolution, **kwargs)
     elif resolution is not None:
         if verbose:
             print(
                 f"Reprojecting the raster to {dst_crs} at {resolution} resolution ..."
             )
-        xds = xds.rio.reproject(dst_crs, resolution=resolution, resampling=resampling)
+        xds = xds.rio.reproject(dst_crs, resolution=resolution, **kwargs)
     elif dst_crs is not None and dst_crs != xds.rio.crs:
         if verbose:
             print(f"Reprojecting the raster to {dst_crs} ...")
-        xds = xds.rio.reproject(dst_crs, resampling=resampling)
+        xds = xds.rio.reproject(dst_crs, **kwargs)
     else:
         pass
 
@@ -5211,7 +5227,7 @@ def clip_raster(
     if output is not None:
         if verbose:
             print(f"Saving the raster to {output} ...")
-        xds.rio.to_raster(output, driver=driver, compress=compress, **kwargs)
+        xds.rio.to_raster(output, driver=driver, compress=compress)
     if verbose:
         print(f"The output raster is saved to {output}")
     return xds
@@ -19619,3 +19635,97 @@ def find_closest_date(
     # Find the date with the smallest absolute time difference
     closest_date = min(parsed_dates, key=lambda x: abs(x[0] - target))[1]
     return closest_date
+
+
+def get_raster_resolution(image_path: str) -> Tuple[float, float]:
+    """Get pixel resolution from the raster using rasterio.
+
+    Args:
+        image_path: The path to the raster image.
+
+    Returns:
+        A tuple of (x resolution, y resolution).
+    """
+    import rasterio
+
+    with rasterio.open(image_path) as src:
+        res = src.res
+    return res
+
+
+def stack_bands(
+    input_files: List[str],
+    output_file: str,
+    resolution: Optional[float] = None,
+    dtype: Optional[str] = None,  # e.g., "UInt16", "Float32"
+    temp_vrt: str = "stack.vrt",
+    overwrite: bool = False,
+    compress: str = "DEFLATE",
+    output_format: str = "COG",
+    extra_gdal_translate_args: Optional[List[str]] = None,
+) -> str:
+    """
+    Stack bands from multiple images into a single multi-band GeoTIFF.
+
+    Args:
+        input_files (List[str]): List of input image paths.
+        output_file (str): Path to the output stacked image.
+        resolution (float, optional): Output resolution. If None, inferred from first image.
+        dtype (str, optional): Output data type (e.g., "UInt16", "Float32").
+        temp_vrt (str): Temporary VRT filename.
+        overwrite (bool): Whether to overwrite the output file.
+        compress (str): Compression method.
+        output_format (str): GDAL output format (default is "COG").
+        extra_gdal_translate_args (List[str], optional): Extra arguments for gdal_translate.
+
+    Returns:
+        str: Path to the output file.
+    """
+
+    if not input_files:
+        raise ValueError("No input files provided.")
+    elif isinstance(input_files, str):
+        input_files = find_files(input_files, ".tif")
+
+    if os.path.exists(output_file) and not overwrite:
+        print(f"Output file already exists: {output_file}")
+        return output_file
+
+    # Infer resolution if not provided
+    if resolution is None:
+        resolution_x, resolution_y = get_raster_resolution(input_files[0])
+    else:
+        resolution_x = resolution_y = resolution
+
+    # Step 1: Build VRT
+    vrt_cmd = ["gdalbuildvrt", "-separate", temp_vrt] + input_files
+    subprocess.run(vrt_cmd, check=True)
+
+    # Step 2: Translate VRT to output GeoTIFF
+    translate_cmd = [
+        "gdal_translate",
+        "-tr",
+        str(resolution_x),
+        str(resolution_y),
+        temp_vrt,
+        output_file,
+        "-of",
+        output_format,
+        "-co",
+        f"COMPRESS={compress}",
+    ]
+
+    if dtype:
+        translate_cmd.insert(1, "-ot")
+        translate_cmd.insert(2, dtype)
+
+    if extra_gdal_translate_args:
+        translate_cmd += extra_gdal_translate_args
+
+    subprocess.run(translate_cmd, check=True)
+
+    # Step 3: Clean up VRT
+    if os.path.exists(temp_vrt):
+        os.remove(temp_vrt)
+
+    return output_file
