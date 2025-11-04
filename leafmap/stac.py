@@ -890,13 +890,19 @@ def stac_bounds(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_bounds(), params=kwargs).json()
+    try:
+        if isinstance(titiler_endpoint, str):
+            r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
+        else:
+            r = requests.get(
+                titiler_endpoint.url_for_stac_bounds(), params=kwargs
+            ).json()
 
-    bounds = r["bounds"]
-    return bounds
+        bounds = r["bounds"]
+        return bounds
+    except Exception as e:
+        print(e)
+        return None
 
 
 def stac_center(
