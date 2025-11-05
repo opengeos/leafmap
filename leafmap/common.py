@@ -5626,8 +5626,10 @@ def classify(
     binning = mapclassify.classify(
         np.asarray(values[~nan_idx]), scheme, **classification_kwds
     )
-    df["category"] = binning.yb
-    df["color"] = [colors[i] for i in df["category"]]
+    df["category"] = np.nan
+    df.loc[~nan_idx, "category"] = binning.yb
+    df["color"] = None
+    df.loc[~nan_idx, "color"] = [colors[int(i)] for i in df.loc[~nan_idx, "category"]]
 
     if legend_kwds is None:
         legend_kwds = {}
@@ -5675,7 +5677,7 @@ def classify(
         raise ValueError("labels must be a list or None.")
 
     legend_dict = dict(zip(labels, colors))
-    df["category"] = df["category"] + 1
+    df.loc[~nan_idx, "category"] = df.loc[~nan_idx, "category"] + 1
     return df, legend_dict
 
 
