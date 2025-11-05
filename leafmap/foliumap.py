@@ -723,8 +723,11 @@ class Map(folium.Map):
         resolution: int = 128,
         georaster_options: Optional[Dict[str, Any]] = None,
         palette: Optional[Union[str, Sequence[str]]] = None,
-        value_range: Optional[Sequence[float]] = None,
         nodata_color: Optional[str] = None,
+        indexes: Optional[Sequence[int]] = None,
+        vmin: Optional[float] = None,
+        vmax: Optional[float] = None,
+        **kwargs,
     ) -> None:
         """Adds a remote Cloud Optimized GeoTIFF (COG) directly to the map.
 
@@ -751,6 +754,12 @@ class Map(folium.Map):
                 mapped to the palette. Defaults to the GeoTIFF min/max.
             nodata_color (str, optional): Color used when encountering nodata or NaN
                 values. Defaults to transparent.
+            indexes (Sequence[int], optional): List of band indexes to visualize
+                (e.g., [1, 2, 3] for RGB or [4, 3, 2] for false color). Band indexes
+                are 1-based. Defaults to None (all bands).
+            vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            kwargs (dict, optional): Additional arguments to pass to the GeoTIFFLayer. Defaults to {}.
         """
         if palette is not None:
             if isinstance(palette, str):
@@ -760,16 +769,26 @@ class Map(folium.Map):
         else:
             palette_colors = []
 
-        if value_range is not None:
-            if (
-                not isinstance(value_range, Sequence)
-                or len(value_range) != 2
-                or value_range[0] == value_range[1]
-            ):
-                raise ValueError(
-                    "value_range must be a two-element sequence with distinct values."
-                )
-            value_range = [float(value_range[0]), float(value_range[1])]
+        if vmin is not None and vmax is not None:
+            value_range = [float(vmin), float(vmax)]
+        else:
+            value_range = None
+
+        if "bidx" in kwargs:
+            indexes = kwargs.pop("bidx")
+        if "colormap_name" in kwargs:
+            palette_colors = kwargs.pop("colormap_name")
+        if "colormap" in kwargs:
+            palette_colors = kwargs.pop("colormap")
+        if "rescale" in kwargs:
+            if isinstance(kwargs["rescale"], str):
+                value_range = kwargs["rescale"].split(",")
+            elif isinstance(kwargs["rescale"], list):
+                value_range = kwargs["rescale"]
+            vmin = float(value_range[0])
+            vmax = float(value_range[1])
+            value_range = [vmin, vmax]
+            kwargs.pop("rescale")
 
         nodata_color = (
             common.check_color(nodata_color) if isinstance(nodata_color, str) else None
@@ -792,6 +811,7 @@ class Map(folium.Map):
             palette=palette_colors,
             value_range=value_range,
             nodata_color=nodata_color,
+            indexes=indexes,
             sequence=sequence,
         )
         layer.add_to(self)
@@ -1600,7 +1620,18 @@ class Map(folium.Map):
                 apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
         """
 
-        if os.environ.get("USE_MKDOCS") is not None:
+        if titiler_endpoint is None:
+            if bands is not None:
+                kwargs["indexes"] = bands
+            self.add_geotiff(
+                url,
+                name=name,
+                attribution=attribution,
+                opacity=opacity,
+                shown=shown,
+                fit_bounds=zoom_to_layer,
+                **kwargs,
+            )
             return
 
         tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
@@ -4332,6 +4363,18 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
 
                 try {
                     await waitForGeoRaster();
+                    const mapRef = {{ this._parent.get_name() }};
+                    const layerSequence = {{ this.sequence|tojson }};
+
+                    // Create a custom pane for this GeoTIFF layer with explicit z-index
+                    const paneName = 'geotiff-pane-' + layerSequence;
+                    if (!mapRef.getPane(paneName)) {
+                        const pane = mapRef.createPane(paneName);
+                        // Set z-index: 400 is default for overlays, add sequence for ordering
+                        pane.style.zIndex = 400 + layerSequence;
+                    }
+
+                    const indexes = {{ this.indexes|tojson }};
                     const georaster = await window.parseGeoraster({{ this.url|tojson }});
                     const palette = {{ this.palette|tojson }};
                     const hasPalette = Array.isArray(palette) && palette.length > 0;
@@ -4339,7 +4382,84 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                     const suppliedRange = {{ this.value_range|tojson }};
                     const layerOptions = {{ this.layer_options|tojson }};
                     layerOptions.georaster = georaster;
-                    if (hasPalette && georaster.numberOfRasters === 1) {
+                    layerOptions.pane = paneName;
+
+                    // Handle custom band selection for multi-band display
+                    const hasCustomIndexes = Array.isArray(indexes) && indexes.length > 0;
+                    if (hasCustomIndexes && !hasPalette) {
+                        const bandIndices = indexes.map(i => i - 1); // Convert to 0-indexed
+                        if (bandIndices.length === 3 || bandIndices.length === 4) {
+                            // RGB or RGBA display with custom band selection
+                            // Determine min/max for normalization
+                            let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
+                            let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
+                            let useSuppliedRange = vmin !== null && vmax !== null && Number.isFinite(vmin) && Number.isFinite(vmax) && vmin !== vmax;
+
+                            layerOptions.pixelValuesToColorFn = function(values) {
+                                if (!Array.isArray(values)) return null;
+                                // Extract selected bands
+                                const r = values[bandIndices[0]];
+                                const g = values[bandIndices[1]];
+                                const b = values[bandIndices[2]];
+                                // Check for nodata
+                                if (r === null || r === undefined || Number.isNaN(r) ||
+                                    g === null || g === undefined || Number.isNaN(g) ||
+                                    b === null || b === undefined || Number.isNaN(b)) {
+                                    return nodataColor || null;
+                                }
+                                // Normalize values to 0-255 range
+                                let minR, maxR, minG, maxG, minB, maxB;
+                                if (useSuppliedRange) {
+                                    minR = minG = minB = vmin;
+                                    maxR = maxG = maxB = vmax;
+                                } else {
+                                    minR = georaster.mins && georaster.mins[bandIndices[0]] ? georaster.mins[bandIndices[0]] : 0;
+                                    maxR = georaster.maxs && georaster.maxs[bandIndices[0]] ? georaster.maxs[bandIndices[0]] : 255;
+                                    minG = georaster.mins && georaster.mins[bandIndices[1]] ? georaster.mins[bandIndices[1]] : 0;
+                                    maxG = georaster.maxs && georaster.maxs[bandIndices[1]] ? georaster.maxs[bandIndices[1]] : 255;
+                                    minB = georaster.mins && georaster.mins[bandIndices[2]] ? georaster.mins[bandIndices[2]] : 0;
+                                    maxB = georaster.maxs && georaster.maxs[bandIndices[2]] ? georaster.maxs[bandIndices[2]] : 255;
+                                }
+                                const nr = Math.round(Math.max(0, Math.min(255, ((r - minR) / (maxR - minR)) * 255)));
+                                const ng = Math.round(Math.max(0, Math.min(255, ((g - minG) / (maxG - minG)) * 255)));
+                                const nb = Math.round(Math.max(0, Math.min(255, ((b - minB) / (maxB - minB)) * 255)));
+                                if (bandIndices.length === 4) {
+                                    const a = values[bandIndices[3]];
+                                    if (a === null || a === undefined || Number.isNaN(a)) return nodataColor || null;
+                                    let minA, maxA;
+                                    if (useSuppliedRange) {
+                                        minA = vmin;
+                                        maxA = vmax;
+                                    } else {
+                                        minA = georaster.mins && georaster.mins[bandIndices[3]] ? georaster.mins[bandIndices[3]] : 0;
+                                        maxA = georaster.maxs && georaster.maxs[bandIndices[3]] ? georaster.maxs[bandIndices[3]] : 255;
+                                    }
+                                    const na = (a - minA) / (maxA - minA);
+                                    return `rgba(${nr},${ng},${nb},${na})`;
+                                }
+                                return `rgb(${nr},${ng},${nb})`;
+                            };
+                        } else if (bandIndices.length === 1) {
+                            // Single band with custom index (grayscale)
+                            // Determine min/max for normalization
+                            let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
+                            let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
+                            if (vmin === null || vmax === null || !Number.isFinite(vmin) || !Number.isFinite(vmax) || vmin === vmax) {
+                                vmin = georaster.mins && georaster.mins[bandIndices[0]] ? georaster.mins[bandIndices[0]] : 0;
+                                vmax = georaster.maxs && georaster.maxs[bandIndices[0]] ? georaster.maxs[bandIndices[0]] : 255;
+                            }
+
+                            layerOptions.pixelValuesToColorFn = function(values) {
+                                if (!Array.isArray(values)) return null;
+                                const val = values[bandIndices[0]];
+                                if (val === null || val === undefined || Number.isNaN(val)) {
+                                    return nodataColor || null;
+                                }
+                                const normalized = Math.round(Math.max(0, Math.min(255, ((val - vmin) / (vmax - vmin)) * 255)));
+                                return `rgb(${normalized},${normalized},${normalized})`;
+                            };
+                        }
+                    } else if (hasPalette && georaster.numberOfRasters === 1) {
                         let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
                         let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
                         if (
@@ -4384,24 +4504,11 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                         geotiffLayer.options.attribution = {{ this.attribution|tojson }};
                     }
                     {% endif %}
-                    const mapRef = {{ this._parent.get_name() }};
-                    const layerSequence = {{ this.sequence|tojson }};
-                    const targetZIndex = layerOptions.zIndex || layerSequence || 0;
-                    if (typeof geotiffLayer.setZIndex === "function") {
-                        geotiffLayer.setZIndex(targetZIndex);
-                    } else if (geotiffLayer.options) {
-                        geotiffLayer.options.zIndex = targetZIndex;
-                    }
-                    mapRef._leafmapGeoTiffSeq = mapRef._leafmapGeoTiffSeq || 0;
+
                     {{ this.get_name() }}.clearLayers();
                     {{ this.get_name() }}.addLayer(geotiffLayer);
-                    if (layerSequence >= mapRef._leafmapGeoTiffSeq) {
-                        mapRef._leafmapGeoTiffSeq = layerSequence;
-                        if (geotiffLayer.bringToFront) {
-                            geotiffLayer.bringToFront();
-                        }
-                    }
                     {{ this.get_name() }}._georasterLayer = geotiffLayer;
+
                     if (!{{ this.overlay|tojson }}) {
                         mapRef.addLayer({{ this.get_name() }});
                     } else if (mapRef.hasLayer({{ this.get_name() }}) || {{ this.show|tojson }}) {
@@ -4442,6 +4549,7 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         palette: Optional[Sequence[str]] = None,
         value_range: Optional[Sequence[float]] = None,
         nodata_color: Optional[str] = None,
+        indexes: Optional[Sequence[int]] = None,
         sequence: int = 0,
         **kwargs,
     ) -> None:
@@ -4464,6 +4572,7 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         self.palette = list(palette or [])
         self.value_range = list(value_range) if value_range else None
         self.nodata_color = nodata_color
+        self.indexes = list(indexes) if indexes is not None else None
         self.sequence = int(sequence)
 
         options = dict(georaster_options or {})
