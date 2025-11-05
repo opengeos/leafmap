@@ -1900,6 +1900,7 @@ class Map(folium.Map):
         layer_name: Optional[str] = "Untitled",
         encoding: Optional[str] = "utf-8",
         info_mode: Optional[str] = "on_hover",
+        opacity: Optional[float] = 1.0,
         zoom_to_layer: Optional[bool] = True,
         **kwargs,
     ):
@@ -1911,6 +1912,7 @@ class Map(folium.Map):
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
             info_mode (str, optional): Displays the attributes by either on_hover or on_click.
                 Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to True.
 
         Raises:
@@ -1979,7 +1981,7 @@ class Map(folium.Map):
                     # "stroke": True,
                     "color": "#3388ff",
                     "weight": 2,
-                    "opacity": 1,
+                    "opacity": opacity,
                     # "fill": True,
                     # "fillColor": "#ffffff",
                     "fillOpacity": 0,
@@ -2040,6 +2042,7 @@ class Map(folium.Map):
         layer_name: Optional[str] = "Untitled",
         zoom_to_layer: Optional[bool] = True,
         info_mode: Optional[str] = "on_hover",
+        opacity: Optional[float] = 1.0,
         **kwargs,
     ):
         """Adds a GeoPandas GeoDataFrameto the map.
@@ -2049,6 +2052,7 @@ class Map(folium.Map):
             layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
             zoom_to_layer (bool, optional): Whether to zoom to the layer.
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
 
         """
 
@@ -2060,6 +2064,7 @@ class Map(folium.Map):
             gdf,
             layer_name=layer_name,
             info_mode=info_mode,
+            opacity=opacity,
             zoom_to_layer=zoom_to_layer,
             **kwargs,
         )
@@ -2141,6 +2146,7 @@ class Map(folium.Map):
         rows: Optional[Union[int, slice]] = None,
         info_mode: Optional[str] = "on_hover",
         zoom_to_layer: Optional[bool] = True,
+        opacity: Optional[float] = 1.0,
         **kwargs,
     ):
         """Adds any geopandas-supported vector dataset to the map.
@@ -2153,6 +2159,7 @@ class Map(folium.Map):
             rows (int or slice, optional): Load in specific rows by passing an integer (first n rows) or a slice() object.. Defaults to None.
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
 
         """
         import fiona
@@ -2180,6 +2187,7 @@ class Map(folium.Map):
             layer_name,
             zoom_to_layer,
             info_mode,
+            opacity,
             **kwargs,
         )
 
@@ -3225,6 +3233,7 @@ class Map(folium.Map):
         layer_name: Optional[str] = "Untitled",
         info_mode: Optional[str] = "on_hover",
         encoding: Optional[str] = "utf-8",
+        opacity: Optional[float] = 1.0,
         **kwargs,
     ):
         """Add vector data to the map with a variety of classification schemes.
@@ -3283,6 +3292,7 @@ class Map(folium.Map):
                 highlight_function = lambda feat: {"fillColor": feat["properties"]["color"]}
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
             encoding (str, optional): The encoding of the GeoJSON file. Defaults to "utf-8".
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             **kwargs: Additional keyword arguments to pass to the GeoJSON class, such as fields, which can be a list of column names to be included in the popup.
         """
 
@@ -3329,10 +3339,10 @@ class Map(folium.Map):
                 # "stroke": False,
                 # "color": "#ff0000",
                 "weight": 1,
-                "opacity": 1,
+                "opacity": opacity,
                 # "fill": True,
                 # "fillColor": "#ffffff",
-                "fillOpacity": 1.0,
+                "fillOpacity": opacity,
                 # "dashArray": "9"
                 # "clickable": True,
                 "fillColor": feat["properties"]["color"],
@@ -3351,10 +3361,16 @@ class Map(folium.Map):
             highlight_function=highlight_function,
             info_mode=info_mode,
             encoding=encoding,
+            opacity=opacity,
             **kwargs,
         )
         if add_legend:
-            self.add_legend(title=legend_title, legend_dict=legend_dict)
+            self.add_legend(
+                title=legend_title,
+                legend_dict=legend_dict,
+                position=legend_position,
+                draggable=True,
+            )
 
     def add_image(
         self,
