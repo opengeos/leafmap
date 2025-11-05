@@ -4051,7 +4051,7 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         georaster_options: Optional[Dict[str, Any]] = None,
         **kwargs,
     ) -> None:
-        """Initialise the layer."""
+        """Initialize the layer."""
         layer_name = name if name else "GeoTIFF"
         super().__init__(
             name=layer_name,
