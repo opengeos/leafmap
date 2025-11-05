@@ -757,6 +757,9 @@ class Map(folium.Map):
             indexes (Sequence[int], optional): List of band indexes to visualize
                 (e.g., [1, 2, 3] for RGB or [4, 3, 2] for false color). Band indexes
                 are 1-based. Defaults to None (all bands).
+            vmin (float, optional): The minimum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            vmax (float, optional): The maximum value to use when colormapping the palette when plotting a single band. Defaults to None.
+            kwargs (dict, optional): Additional arguments to pass to the GeoTIFFLayer. Defaults to {}.
         """
         if palette is not None:
             if isinstance(palette, str):
