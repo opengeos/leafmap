@@ -81,7 +81,7 @@ from .common import (
 from .legends import builtin_legends
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
@@ -722,6 +722,9 @@ class Map(folium.Map):
         fit_bounds: bool = True,
         resolution: int = 128,
         georaster_options: Optional[Dict[str, Any]] = None,
+        palette: Optional[Union[str, Sequence[str]]] = None,
+        value_range: Optional[Sequence[float]] = None,
+        nodata_color: Optional[str] = None,
     ) -> None:
         """Adds a remote Cloud Optimized GeoTIFF (COG) directly to the map.
 
@@ -742,7 +745,39 @@ class Map(folium.Map):
             fit_bounds (bool, optional): Fit the map view to the layer bounds once loaded. Defaults to True.
             resolution (int, optional): Internal resolution passed to the GeoRaster layer. Defaults to 128.
             georaster_options (Dict[str, Any], optional): Extra options forwarded to GeoRasterLayer.
+            palette (str | Sequence[str], optional): Name of a built-in palette or a
+                sequence of color hex strings to visualize single-band rasters.
+            value_range (Sequence[float], optional): Two values defining the data range
+                mapped to the palette. Defaults to the GeoTIFF min/max.
+            nodata_color (str, optional): Color used when encountering nodata or NaN
+                values. Defaults to transparent.
         """
+        if palette is not None:
+            if isinstance(palette, str):
+                palette_colors = common.get_palette_colors(palette, 256, hashtag=True)
+            else:
+                palette_colors = [common.check_color(color) for color in palette]
+        else:
+            palette_colors = []
+
+        if value_range is not None:
+            if (
+                not isinstance(value_range, Sequence)
+                or len(value_range) != 2
+                or value_range[0] == value_range[1]
+            ):
+                raise ValueError(
+                    "value_range must be a two-element sequence with distinct values."
+                )
+            value_range = [float(value_range[0]), float(value_range[1])]
+
+        nodata_color = (
+            common.check_color(nodata_color) if isinstance(nodata_color, str) else None
+        )
+
+        sequence = getattr(self, "_leafmap_geotiff_sequence", 0) + 1
+        self._leafmap_geotiff_sequence = sequence
+
         layer = GeoTIFFLayer(
             url=url,
             name=name,
@@ -754,6 +789,10 @@ class Map(folium.Map):
             fit_bounds=fit_bounds,
             resolution=resolution,
             georaster_options=georaster_options or {},
+            palette=palette_colors,
+            value_range=value_range,
+            nodata_color=nodata_color,
+            sequence=sequence,
         )
         layer.add_to(self)
 
@@ -4294,8 +4333,48 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                 try {
                     await waitForGeoRaster();
                     const georaster = await window.parseGeoraster({{ this.url|tojson }});
+                    const palette = {{ this.palette|tojson }};
+                    const hasPalette = Array.isArray(palette) && palette.length > 0;
+                    const nodataColor = {{ this.nodata_color|tojson }};
+                    const suppliedRange = {{ this.value_range|tojson }};
                     const layerOptions = {{ this.layer_options|tojson }};
                     layerOptions.georaster = georaster;
+                    if (hasPalette && georaster.numberOfRasters === 1) {
+                        let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
+                        let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
+                        if (
+                            vmin === null ||
+                            vmax === null ||
+                            !Number.isFinite(vmin) ||
+                            !Number.isFinite(vmax) ||
+                            vmin === vmax
+                        ) {
+                            if (Array.isArray(georaster.mins) && georaster.mins.length) {
+                                vmin = georaster.mins[0];
+                            }
+                            if (Array.isArray(georaster.maxs) && georaster.maxs.length) {
+                                vmax = georaster.maxs[0];
+                            }
+                        }
+                        if (!Number.isFinite(vmin)) {
+                            vmin = 0;
+                        }
+                        if (!Number.isFinite(vmax) || vmax === vmin) {
+                            vmax = vmin + palette.length;
+                        }
+                        const span = vmax - vmin || palette.length || 1;
+                        const lastIndex = palette.length - 1;
+                        const nullColor = nodataColor || null;
+                        layerOptions.pixelValuesToColorFn = function(values) {
+                            const val = Array.isArray(values) ? values[0] : values;
+                            if (val === null || val === undefined || Number.isNaN(val)) {
+                                return nullColor;
+                            }
+                            const ratio = (val - vmin) / span;
+                            const idx = Math.max(0, Math.min(lastIndex, Math.round(ratio * lastIndex)));
+                            return palette[idx];
+                        };
+                    }
                     var geotiffLayer = new window.GeoRasterLayer(layerOptions);
                     geotiffLayer.options.name = {{ this.layer_name|tojson }};
                     {% if this.attribution %}
@@ -4305,13 +4384,24 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                         geotiffLayer.options.attribution = {{ this.attribution|tojson }};
                     }
                     {% endif %}
+                    const mapRef = {{ this._parent.get_name() }};
+                    const layerSequence = {{ this.sequence|tojson }};
+                    const targetZIndex = layerOptions.zIndex || layerSequence || 0;
+                    if (typeof geotiffLayer.setZIndex === "function") {
+                        geotiffLayer.setZIndex(targetZIndex);
+                    } else if (geotiffLayer.options) {
+                        geotiffLayer.options.zIndex = targetZIndex;
+                    }
+                    mapRef._leafmapGeoTiffSeq = mapRef._leafmapGeoTiffSeq || 0;
                     {{ this.get_name() }}.clearLayers();
                     {{ this.get_name() }}.addLayer(geotiffLayer);
-                    if (geotiffLayer.bringToFront) {
-                        geotiffLayer.bringToFront();
+                    if (layerSequence >= mapRef._leafmapGeoTiffSeq) {
+                        mapRef._leafmapGeoTiffSeq = layerSequence;
+                        if (geotiffLayer.bringToFront) {
+                            geotiffLayer.bringToFront();
+                        }
                     }
                     {{ this.get_name() }}._georasterLayer = geotiffLayer;
-                    const mapRef = {{ this._parent.get_name() }};
                     if (!{{ this.overlay|tojson }}) {
                         mapRef.addLayer({{ this.get_name() }});
                     } else if (mapRef.hasLayer({{ this.get_name() }}) || {{ this.show|tojson }}) {
@@ -4349,6 +4439,10 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         fit_bounds: bool = True,
         resolution: int = 128,
         georaster_options: Optional[Dict[str, Any]] = None,
+        palette: Optional[Sequence[str]] = None,
+        value_range: Optional[Sequence[float]] = None,
+        nodata_color: Optional[str] = None,
+        sequence: int = 0,
         **kwargs,
     ) -> None:
         """Initialize the layer."""
@@ -4367,13 +4461,20 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         self.control = control
         self.fit_bounds = fit_bounds
         self.show = show
+        self.palette = list(palette or [])
+        self.value_range = list(value_range) if value_range else None
+        self.nodata_color = nodata_color
+        self.sequence = int(sequence)
 
         options = dict(georaster_options or {})
         options.setdefault("resolution", resolution)
         options.setdefault("opacity", opacity)
         options.setdefault("name", layer_name)
         if "zIndex" not in options:
-            options["zIndex"] = 500
+            base_zindex = 500
+            options["zIndex"] = (
+                base_zindex + self.sequence if self.sequence else base_zindex
+            )
         if self.attribution:
             options.setdefault("attribution", self.attribution)
 
