@@ -4370,8 +4370,9 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                     const paneName = 'geotiff-pane-' + layerSequence;
                     if (!mapRef.getPane(paneName)) {
                         const pane = mapRef.createPane(paneName);
-                        // Set z-index: 400 is default for overlays, add sequence for ordering
-                        pane.style.zIndex = 400 + layerSequence;
+                        // Set z-index: 400 is default for overlays (vectors), use 300-399 range
+                        // for GeoTIFF layers so they appear below vector layers
+                        pane.style.zIndex = 300 + layerSequence;
                     }
 
                     const indexes = {{ this.indexes|tojson }};
