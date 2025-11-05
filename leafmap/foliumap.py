@@ -799,7 +799,7 @@ class Map(folium.Map):
     def add_opacity_control(
         self,
         layer: Optional[str] = None,
-        position: str = "topright",
+        position: str = "bottomright",
         min_opacity: float = 0.0,
         max_opacity: float = 1.0,
         step: float = 0.05,
@@ -809,7 +809,7 @@ class Map(folium.Map):
         Args:
             layer (str, optional): Name of the layer to preselect. Defaults to the
                 first available layer.
-            position (str, optional): Leaflet control position. Defaults to ``"topright"``.
+            position (str, optional): Leaflet control position. Defaults to ``"bottomright"``.
             min_opacity (float, optional): Minimum slider value. Defaults to 0.0.
             max_opacity (float, optional): Maximum slider value. Defaults to 1.0.
             step (float, optional): Slider step. Defaults to 0.05.
