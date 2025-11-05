@@ -6,7 +6,7 @@ import folium.plugins as plugins
 from box import Box
 from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
-from folium.map import Layer
+from folium.map import Layer, LayerControl
 from jinja2 import Template
 
 from . import common, examples, map_widgets, osm, plot
@@ -756,6 +756,306 @@ class Map(folium.Map):
             georaster_options=georaster_options or {},
         )
         layer.add_to(self)
+
+    def add_opacity_control(
+        self,
+        layer: Optional[str] = None,
+        position: str = "topright",
+        min_opacity: float = 0.0,
+        max_opacity: float = 1.0,
+        step: float = 0.05,
+    ) -> None:
+        """Adds a Leaflet-based opacity control for Folium layers.
+
+        Args:
+            layer (str, optional): Name of the layer to preselect. Defaults to the
+                first available layer.
+            position (str, optional): Leaflet control position. Defaults to ``"topright"``.
+            min_opacity (float, optional): Minimum slider value. Defaults to 0.0.
+            max_opacity (float, optional): Maximum slider value. Defaults to 1.0.
+            step (float, optional): Slider step. Defaults to 0.05.
+        """
+
+        class _OpacityControl(JSCSSMixin, Layer):
+            _template = Template(
+                """
+                {% macro head(this, kwargs) %}
+                    <style>
+                        .leaflet-control.leafmap-opacity-control {
+                            background-color: #fff;
+                            padding: 8px 10px;
+                            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+                            font-size: 13px;
+                        }
+                        .leaflet-control.leafmap-opacity-control label {
+                            display: block;
+                            margin-bottom: 4px;
+                            font-weight: 600;
+                        }
+                        .leaflet-control.leafmap-opacity-control select,
+                        .leaflet-control.leafmap-opacity-control input[type="range"] {
+                            width: 100%;
+                            margin-bottom: 6px;
+                        }
+                        .leaflet-control.leafmap-opacity-control .leafmap-opacity-status {
+                            font-size: 12px;
+                            color: #333;
+                        }
+                    </style>
+                {% endmacro %}
+                {% macro script(this, kwargs) %}
+                    (function(){
+                        const map = {{ this._parent.get_name() }};
+                        const entries = {{ this.entries|tojson }};
+                        let selected = {{ this.default_entry|tojson }};
+                        const min = {{ this.min }};
+                        const max = {{ this.max }};
+                        const step = {{ this.step }};
+                        const clamp = (val) => Math.max(min, Math.min(max, val));
+
+                        const resolveLayer = (entry) => {
+                            if (!entry || !entry.varName) return null;
+                            return window[entry.varName] || null;
+                        };
+
+                        const readOpacity = (layer) => {
+                            if (!layer) return max;
+                            if (layer._georasterLayer) {
+                                return readOpacity(layer._georasterLayer);
+                            }
+                            if (layer.options) {
+                                if (typeof layer.options.opacity === "number") {
+                                    return layer.options.opacity;
+                                }
+                                if (typeof layer.options.fillOpacity === "number") {
+                                    return layer.options.fillOpacity;
+                                }
+                            }
+                            if (layer.eachLayer) {
+                                let value;
+                                layer.eachLayer((sub) => {
+                                    if (value === undefined) {
+                                        value = readOpacity(sub);
+                                    }
+                                });
+                                if (value !== undefined) {
+                                    return value;
+                                }
+                            }
+                            return max;
+                        };
+
+                        const applyOpacity = (layer, value) => {
+                            if (!layer) return;
+                            if (layer._georasterLayer) {
+                                applyOpacity(layer._georasterLayer, value);
+                                return;
+                            }
+                            if (typeof layer.setOpacity === 'function') {
+                                layer.setOpacity(value);
+                            } else if (typeof layer.eachLayer === 'function') {
+                                layer.eachLayer((sub) => applyOpacity(sub, value));
+                            } else if (typeof layer.setStyle === 'function') {
+                                layer.setStyle({opacity: value, fillOpacity: value});
+                            }
+                            if (layer.options) {
+                                layer.options.opacity = value;
+                                if ('fillOpacity' in layer.options) {
+                                    layer.options.fillOpacity = value;
+                                }
+                            }
+                        };
+
+                        if (!map._leafmapOpacityControls) {
+                            map._leafmapOpacityControls = [];
+                        }
+                        const control = L.control({position: {{ this.position|tojson }}});
+                        control.onAdd = function() {
+                            const container = L.DomUtil.create('div', 'leaflet-control leafmap-opacity-control');
+                            L.DomEvent.disableClickPropagation(container);
+                            L.DomEvent.disableScrollPropagation(container);
+
+                            const selectLabel = L.DomUtil.create('label', '', container);
+                            selectLabel.innerHTML = 'Layer';
+                            const select = L.DomUtil.create('select', '', container);
+                            entries.forEach((entry) => {
+                                const option = document.createElement('option');
+                                option.value = entry.varName;
+                                option.textContent = entry.label;
+                                if (entry.varName === selected.varName) {
+                                    option.selected = true;
+                                }
+                                select.appendChild(option);
+                            });
+
+                            const rangeLabel = L.DomUtil.create('label', '', container);
+                            rangeLabel.innerHTML = 'Opacity';
+                            const slider = L.DomUtil.create('input', '', container);
+                            slider.type = 'range';
+                            slider.min = min;
+                            slider.max = max;
+                            slider.step = step;
+
+                            const status = L.DomUtil.create('div', 'leafmap-opacity-status', container);
+
+                            const layerObj = resolveLayer(selected);
+                            const currentOpacity = clamp(readOpacity(layerObj));
+                            slider.value = currentOpacity;
+                            status.innerHTML = `Opacity: ${currentOpacity.toFixed(2)}`;
+
+                            const updateSelection = (varName) => {
+                                const entry = entries.find((item) => item.varName === varName);
+                                if (!entry) {
+                                    return;
+                                }
+                                selected = entry;
+                                const layer = resolveLayer(selected);
+                                const value = clamp(readOpacity(layer));
+                                slider.value = value;
+                                status.innerHTML = `Opacity: ${value.toFixed(2)}`;
+                            };
+
+                            const handleSlider = () => {
+                                const value = clamp(parseFloat(slider.value));
+                                slider.value = value;
+                                const layer = resolveLayer(selected);
+                                applyOpacity(layer, value);
+                                status.innerHTML = `Opacity: ${value.toFixed(2)}`;
+                            };
+
+                            L.DomEvent.on(select, 'change', (event) => {
+                                L.DomEvent.stopPropagation(event);
+                                updateSelection(select.value);
+                            });
+
+                            L.DomEvent.on(slider, 'input', (event) => {
+                                L.DomEvent.stopPropagation(event);
+                                handleSlider();
+                            });
+
+                            ['mousedown', 'touchstart', 'dblclick'].forEach((evt) => {
+                                L.DomEvent.on(slider, evt, L.DomEvent.stopPropagation);
+                                L.DomEvent.on(select, evt, L.DomEvent.stopPropagation);
+                            });
+
+                            return container;
+                        };
+
+                        control.addTo(map);
+                        map._leafmapOpacityControls.push(control);
+
+                        const opacityContainer = control.getContainer();
+                        const layerControl = map.layerControl || map.layersControl || null;
+                        if (layerControl && typeof layerControl.getContainer === 'function') {
+                            const layerContainer = layerControl.getContainer();
+                            if (
+                                layerContainer &&
+                                layerContainer.parentNode &&
+                                opacityContainer &&
+                                opacityContainer.parentNode === layerContainer.parentNode
+                            ) {
+                                layerContainer.parentNode.insertBefore(
+                                    opacityContainer,
+                                    layerContainer.nextSibling
+                                );
+                            }
+                        }
+                    })();
+                {% endmacro %}
+                """
+            )
+
+            def __init__(
+                self,
+                entries: List[Dict[str, Any]],
+                default_entry: Dict[str, Any],
+                position: str,
+                min_value: float,
+                max_value: float,
+                step_value: float,
+            ):
+                super().__init__(control=False)
+                self._name = "OpacityControl"
+                self.entries = entries
+                self.default_entry = default_entry
+                self.position = position
+                self.min = min_value
+                self.max = max_value
+                self.step = step_value
+
+        label_counts: Dict[str, int] = {}
+        entries: List[Dict[str, Any]] = []
+
+        for child in self._children.values():
+            if not isinstance(child, Layer) or isinstance(child, LayerControl):
+                continue
+
+            var_name = child.get_name()
+            base_label = (
+                getattr(child, "layer_name", None)
+                or getattr(child, "name", None)
+                or (
+                    child.options.get("name")
+                    if isinstance(getattr(child, "options", None), dict)
+                    else None
+                )
+                or var_name
+            )
+
+            index = label_counts.get(base_label, 0)
+            label_counts[base_label] = index + 1
+            display_label = f"{base_label} ({index})" if index else base_label
+
+            options = getattr(child, "options", {})
+            opacity_candidate: Optional[float] = None
+            if isinstance(options, dict):
+                opacity_candidate = options.get("opacity")
+                if opacity_candidate is None:
+                    opacity_candidate = options.get("fillOpacity")
+            if opacity_candidate is None and hasattr(child, "opacity"):
+                try:
+                    opacity_candidate = float(getattr(child, "opacity"))
+                except Exception:
+                    opacity_candidate = None
+            if opacity_candidate is None:
+                opacity_candidate = 1.0
+            opacity_value = float(opacity_candidate)
+
+            entries.append(
+                {
+                    "varName": var_name,
+                    "label": display_label,
+                    "baseLabel": base_label,
+                    "opacity": opacity_value,
+                }
+            )
+
+        if not entries:
+            raise RuntimeError(
+                "No folium layers are available for opacity adjustment on this map."
+            )
+
+        default_entry = next(
+            (
+                entry
+                for entry in entries
+                if entry["baseLabel"] == layer or entry["label"] == layer
+            ),
+            None,
+        )
+        if default_entry is None:
+            default_entry = entries[-1]
+
+        control = _OpacityControl(
+            entries=entries,
+            default_entry=default_entry,
+            position=position,
+            min_value=min_opacity,
+            max_value=max_opacity,
+            step_value=step,
+        )
+        control.add_to(self)
+        self.opacity_control = control
 
     def add_netcdf(
         self,
