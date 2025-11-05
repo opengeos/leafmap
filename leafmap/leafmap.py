@@ -2536,6 +2536,66 @@ class Map(ipyleaflet.Map):
 
     add_local_tile = add_raster
 
+    def add_geotiff(
+        self,
+        url: str,
+        name: str = "GeoTIFF",
+        attribution: str = "",
+        opacity: float = 1.0,
+        shown: bool = True,
+        bands: Optional[Sequence[Union[int, str]]] = None,
+        titiler_endpoint: Optional[str] = None,
+        zoom_to_layer: bool = True,
+        layer_index: Optional[int] = None,
+        overwrite: bool = False,
+        **kwargs,
+    ) -> None:
+        """Adds a Cloud Optimized GeoTIFF (COG) to the map.
+
+        This helper wraps :meth:`add_cog_layer` so that users can quickly load a
+        remote GeoTIFF/COG by simply providing its URL. By default it relies on
+        the TiTiler endpoint configured for the map (the public demo endpoint is
+        used when none is provided).
+
+        Args:
+            url (str): The HTTP URL of the GeoTIFF/COG.
+            name (str, optional): Layer name to display in the layer tree.
+                Defaults to ``"GeoTIFF"``.
+            attribution (str, optional): Attribution text for the layer.
+                Defaults to ``""``.
+            opacity (float, optional): Layer opacity between 0.0 and 1.0.
+                Defaults to 1.0.
+            shown (bool, optional): Whether the layer should be visible when
+                first added. Defaults to True.
+            bands (Sequence[Union[int, str]], optional): Specific band indices
+                (1-based) or band names to render. Defaults to None which lets
+                Leafmap pick sensible defaults.
+            titiler_endpoint (str, optional): Custom TiTiler endpoint to use.
+                Defaults to the library's configured endpoint.
+            zoom_to_layer (bool, optional): Whether to fit the map view to the
+                layer bounds after it loads. Defaults to True.
+            layer_index (int, optional): Stack index at which to insert the
+                layer. Defaults to None (append).
+            overwrite (bool, optional): When True, an existing layer with the
+                same name is replaced. Defaults to False.
+            **kwargs: Additional keyword arguments forwarded to
+                :meth:`add_cog_layer` (e.g., ``bidx``, ``expression``,
+                ``rescale``).
+        """
+        self.add_cog_layer(
+            url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            shown=shown,
+            bands=bands,
+            titiler_endpoint=titiler_endpoint,
+            zoom_to_layer=zoom_to_layer,
+            layer_index=layer_index,
+            overwrite=overwrite,
+            **kwargs,
+        )
+
     def add_remote_tile(
         self,
         source: str,

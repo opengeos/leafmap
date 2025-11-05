@@ -1,3 +1,4 @@
+import json
 import os
 
 import folium
@@ -166,7 +167,7 @@ class Map(folium.Map):
             plugins.Fullscreen().add_to(self)
 
         if "draw_control" not in kwargs:
-            kwargs["draw_control"] = True
+            kwargs["draw_control"] = False
         if kwargs["draw_control"]:
             plugins.Draw(export=kwargs.pop("draw_export")).add_to(self)
 
@@ -191,7 +192,7 @@ class Map(folium.Map):
             plugins.MiniMap().add_to(self)
 
         if "search_control" not in kwargs:
-            kwargs["search_control"] = True
+            kwargs["search_control"] = False
         if kwargs["search_control"]:
             plugins.Geocoder(collapsed=True, position="topleft").add_to(self)
 
@@ -708,6 +709,53 @@ class Map(folium.Map):
             )
         else:
             raise Exception("The source must be a URL.")
+
+    def add_geotiff(
+        self,
+        url: str,
+        name: Optional[str] = "GeoTIFF",
+        attribution: Optional[str] = "",
+        opacity: float = 1.0,
+        shown: bool = True,
+        overlay: bool = True,
+        control: bool = True,
+        fit_bounds: bool = True,
+        resolution: int = 128,
+        georaster_options: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Adds a remote Cloud Optimized GeoTIFF (COG) directly to the map.
+
+        The layer is rendered client-side with the georaster-layer-for-leaflet
+        plugin, letting Leaflet read and display Cloud Optimized GeoTIFFs
+        without relying on an intermediate tiling service.
+
+        Args:
+            url (str): HTTP URL to the GeoTIFF/COG resource.
+            name (str, optional): Name for the layer control entry. Defaults to "GeoTIFF".
+            attribution (str, optional): Attribution text for the layer. Defaults to "".
+            opacity (float, optional): Layer opacity between 0.0 and 1.0. Defaults to 1.0.
+            shown (bool, optional): Whether the layer is visible on load. Defaults to True.
+            overlay (bool, optional): Whether the layer is an overlay (True) or base layer (False).
+                Defaults to True.
+            control (bool, optional): Whether to register the layer with the map's layer control.
+                Defaults to True.
+            fit_bounds (bool, optional): Fit the map view to the layer bounds once loaded. Defaults to True.
+            resolution (int, optional): Internal resolution passed to the GeoRaster layer. Defaults to 128.
+            georaster_options (Dict[str, Any], optional): Extra options forwarded to GeoRasterLayer.
+        """
+        layer = GeoTIFFLayer(
+            url=url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            show=shown,
+            overlay=overlay,
+            control=control,
+            fit_bounds=fit_bounds,
+            resolution=resolution,
+            georaster_options=georaster_options or {},
+        )
+        layer.add_to(self)
 
     def add_netcdf(
         self,
@@ -3907,6 +3955,137 @@ def geojson_layer(
         data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
     )
     return geojson
+
+
+class GeoTIFFLayer(JSCSSMixin, Layer):
+    """Leaflet layer that renders Cloud Optimized GeoTIFFs client-side."""
+
+    _template = Template(
+        """
+            {% macro script(this, kwargs) %}
+            var {{ this.get_name() }} = L.layerGroup();
+            {% if this.control %}
+            (function() {
+                var layerName = {{ this.layer_name|tojson }};
+                if ({{ this.overlay|tojson }}) {
+                    {{ this.get_name() }}._layerControlName = layerName;
+                    {{ this._parent.get_name() }}.layerControlEntries = {{ this._parent.get_name() }}.layerControlEntries || [];
+                    {{ this._parent.get_name() }}.layerControlEntries.push({ layer: {{ this.get_name() }}, name: layerName });
+                }
+            })();
+            {% endif %}
+            (async function() {
+                const waitForGeoRaster = (maxAttempts = 60, delay = 200) =>
+                    new Promise((resolve, reject) => {
+                        let attempts = 0;
+                        const check = () => {
+                            if (window.parseGeoraster && window.GeoRasterLayer) {
+                                resolve();
+                            } else if (attempts >= maxAttempts) {
+                                reject(new Error("GeoRaster libraries failed to load"));
+                            } else {
+                                attempts += 1;
+                                setTimeout(check, delay);
+                            }
+                        };
+                        check();
+                    });
+
+                try {
+                    await waitForGeoRaster();
+                    const georaster = await window.parseGeoraster({{ this.url|tojson }});
+                    const layerOptions = {{ this.layer_options|tojson }};
+                    layerOptions.georaster = georaster;
+                    var geotiffLayer = new window.GeoRasterLayer(layerOptions);
+                    geotiffLayer.options.name = {{ this.layer_name|tojson }};
+                    {% if this.attribution %}
+                    if (geotiffLayer.getAttribution) {
+                        geotiffLayer.getAttribution = function() { return {{ this.attribution|tojson }}; };
+                    } else {
+                        geotiffLayer.options.attribution = {{ this.attribution|tojson }};
+                    }
+                    {% endif %}
+                    {{ this.get_name() }}.clearLayers();
+                    {{ this.get_name() }}.addLayer(geotiffLayer);
+                    if (geotiffLayer.bringToFront) {
+                        geotiffLayer.bringToFront();
+                    }
+                    {{ this.get_name() }}._georasterLayer = geotiffLayer;
+                    const mapRef = {{ this._parent.get_name() }};
+                    if (!{{ this.overlay|tojson }}) {
+                        mapRef.addLayer({{ this.get_name() }});
+                    } else if (mapRef.hasLayer({{ this.get_name() }}) || {{ this.show|tojson }}) {
+                        mapRef.addLayer({{ this.get_name() }});
+                    }
+                    {% if this.fit_bounds %}
+                    mapRef.fitBounds(geotiffLayer.getBounds());
+                    {% endif %}
+                } catch (error) {
+                    console.error("leafmap: failed to load GeoTIFF layer", error);
+                }
+            })();
+            {% endmacro %}
+        """
+    )
+
+    default_js = [
+        ("proj4", "https://cdn.jsdelivr.net/npm/proj4@2.8.1/dist/proj4.js"),
+        ("georaster", "https://cdn.jsdelivr.net/npm/georaster@1.6.0"),
+        (
+            "georasterlayer",
+            "https://cdn.jsdelivr.net/npm/georaster-layer-for-leaflet@4.1.2/dist/georaster-layer-for-leaflet.min.js",
+        ),
+    ]
+
+    def __init__(
+        self,
+        url: str,
+        name: Optional[str] = None,
+        attribution: Optional[str] = "",
+        opacity: float = 1.0,
+        overlay: bool = True,
+        control: bool = True,
+        show: bool = True,
+        fit_bounds: bool = True,
+        resolution: int = 128,
+        georaster_options: Optional[Dict[str, Any]] = None,
+        **kwargs,
+    ) -> None:
+        """Initialise the layer."""
+        layer_name = name if name else "GeoTIFF"
+        super().__init__(
+            name=layer_name,
+            overlay=overlay,
+            control=control,
+            show=show,
+            **kwargs,
+        )
+        self.url = url
+        self.layer_name = layer_name
+        self.attribution = attribution or ""
+        self.overlay = overlay
+        self.control = control
+        self.fit_bounds = fit_bounds
+        self.show = show
+
+        options = dict(georaster_options or {})
+        options.setdefault("resolution", resolution)
+        options.setdefault("opacity", opacity)
+        options.setdefault("name", layer_name)
+        if "zIndex" not in options:
+            options["zIndex"] = 500
+        if self.attribution:
+            options.setdefault("attribution", self.attribution)
+
+        # Verify options are JSON serialisable so they can be embedded safely.
+        try:
+            json.dumps(options)
+        except TypeError as exc:
+            raise ValueError(
+                "georaster_options must contain only JSON-serialisable values."
+            ) from exc
+
+        self.layer_options = options
 
 
 class PMTilesLayer(JSCSSMixin, Layer):
