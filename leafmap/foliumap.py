@@ -1217,6 +1217,8 @@ class Map(folium.Map):
             return
 
         tile_url = common.cog_tile(url, bands, titiler_endpoint, **kwargs)
+        if tile_url is None:
+            return
         bounds = common.cog_bounds(url, titiler_endpoint)
         self.add_tile_layer(
             url=tile_url,
@@ -1225,7 +1227,7 @@ class Map(folium.Map):
             opacity=opacity,
             shown=shown,
         )
-        if zoom_to_layer:
+        if zoom_to_layer and bounds is not None:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
@@ -1276,6 +1278,8 @@ class Map(folium.Map):
         tile_url = common.stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
+        if tile_url is None:
+            return
         bounds = common.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(
             url=tile_url,
@@ -1285,7 +1289,7 @@ class Map(folium.Map):
             shown=shown,
         )
 
-        if fit_bounds:
+        if fit_bounds and bounds is not None:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
@@ -2638,7 +2642,8 @@ class Map(folium.Map):
                 elif left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = common.cog_tile(left_layer, **left_args)
                     bbox = common.cog_bounds(left_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=url,
                         name=left_name,
@@ -2650,7 +2655,8 @@ class Map(folium.Map):
                 elif left_layer.startswith("http") and left_layer.endswith(".json"):
                     left_tile_url = common.stac_tile(left_layer, **left_args)
                     bbox = common.stac_bounds(left_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = folium.raster_layers.TileLayer(
                         tiles=left_tile_url,
                         name=left_name,
@@ -2701,7 +2707,8 @@ class Map(folium.Map):
                 elif right_layer.startswith("http") and right_layer.endswith(".tif"):
                     url = common.cog_tile(right_layer, **right_args)
                     bbox = common.cog_bounds(right_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=url,
                         name=right_name,
@@ -2713,7 +2720,8 @@ class Map(folium.Map):
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
                     right_tile_url = common.stac_tile(right_layer, **left_args)
                     bbox = common.stac_bounds(right_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = folium.raster_layers.TileLayer(
                         tiles=right_tile_url,
                         name=right_name,
