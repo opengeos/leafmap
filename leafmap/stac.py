@@ -205,7 +205,7 @@ def cog_tile(
             titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
             stats = cog_stats(url, titiler_endpoint)
 
-        if "message" not in stats:
+        if stats is not None and "message" not in stats:
             try:
                 rescale = []
                 for i in band_names:
@@ -237,12 +237,8 @@ def cog_tile(
             timeout=10,
         ).json()
     except Exception as e:
-        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-        r = requests.get(
-            f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json",
-            params=kwargs,
-            timeout=10,
-        ).json()
+        print(e)
+        return None
     tiles = r["tiles"][0]
     if titiler_endpoint.startswith("https://") and tiles.startswith("http://"):
         tiles = tiles.replace("http://", "https://")
@@ -416,13 +412,12 @@ def cog_bounds(
         return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    r = requests.get(f"{titiler_endpoint}/cog/bounds", params={"url": url}).json()
-
-    if "bounds" in r.keys():
-        bounds = r["bounds"]
-    else:
-        bounds = None
-    return bounds
+    try:
+        r = requests.get(f"{titiler_endpoint}/cog/bounds", params={"url": url}).json()
+        return r["bounds"]
+    except Exception as e:
+        print(e)
+        return None
 
 
 def cog_center(
@@ -444,8 +439,14 @@ def cog_center(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     bounds = cog_bounds(url, titiler_endpoint)
-    center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lat, lon)
-    return center
+    if bounds is None:
+        return (None, None)
+    else:
+        center = (
+            (bounds[0] + bounds[2]) / 2,
+            (bounds[1] + bounds[3]) / 2,
+        )  # (lat, lon)
+        return center
 
 
 def cog_bands(
@@ -466,15 +467,19 @@ def cog_bands(
         return None
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    r = requests.get(
-        f"{titiler_endpoint}/cog/info",
-        params={
-            "url": url,
-        },
-    ).json()
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/cog/info",
+            params={
+                "url": url,
+            },
+        ).json()
 
-    bands = [b[0] for b in r["band_descriptions"]]
-    return bands
+        bands = [b[0] for b in r["band_descriptions"]]
+        return bands
+    except Exception as e:
+        print(e)
+        return []
 
 
 def cog_stats(
@@ -502,17 +507,10 @@ def cog_stats(
             },
             timeout=10,
         ).json()
+        return r
     except Exception as e:
-        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-        r = requests.get(
-            f"{titiler_endpoint}/cog/statistics",
-            params={
-                "url": url,
-            },
-            timeout=10,
-        ).json()
-
-    return r
+        print(e)
+        return None
 
 
 def cog_info(
@@ -771,12 +769,8 @@ def stac_tile(
                     titiler_endpoint=titiler_endpoint,
                 )
             except Exception as e:
-                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-                stats = stac_stats(
-                    url=url,
-                    assets=assets,
-                    titiler_endpoint=titiler_endpoint,
-                )
+                print(e)
+                return None
 
             if "detail" not in stats:
                 try:
@@ -890,13 +884,19 @@ def stac_bounds(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
 
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_bounds(), params=kwargs).json()
+    try:
+        if isinstance(titiler_endpoint, str):
+            r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
+        else:
+            r = requests.get(
+                titiler_endpoint.url_for_stac_bounds(), params=kwargs
+            ).json()
 
-    bounds = r["bounds"]
-    return bounds
+        bounds = r["bounds"]
+        return bounds
+    except Exception as e:
+        print(e)
+        return None
 
 
 def stac_center(
@@ -925,8 +925,14 @@ def stac_center(
             print(e)
 
     bounds = stac_bounds(url, collection, item, titiler_endpoint, **kwargs)
-    center = ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)  # (lon, lat)
-    return center
+    if bounds is None:
+        return (None, None)
+    else:
+        center = (
+            (bounds[0] + bounds[2]) / 2,
+            (bounds[1] + bounds[3]) / 2,
+        )  # (lon, lat)
+        return center
 
 
 def stac_bands(
@@ -968,12 +974,18 @@ def stac_bands(
         kwargs["item"] = item
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
-    if isinstance(titiler_endpoint, str):
-        r = requests.get(f"{titiler_endpoint}/stac/assets", params=kwargs).json()
-    else:
-        r = requests.get(titiler_endpoint.url_for_stac_assets(), params=kwargs).json()
+    try:
+        if isinstance(titiler_endpoint, str):
+            r = requests.get(f"{titiler_endpoint}/stac/assets", params=kwargs).json()
+        else:
+            r = requests.get(
+                titiler_endpoint.url_for_stac_assets(), params=kwargs
+            ).json()
 
-    return r
+        return r
+    except Exception as e:
+        print(e)
+        return []
 
 
 def stac_stats(

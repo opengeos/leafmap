@@ -2294,7 +2294,8 @@ class Map(MapWidget):
         )
         if fit_bounds:
             bounds = common.cog_bounds(url, titiler_endpoint)
-            self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
+            if bounds is not None:
+                self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
 
     def add_stac_layer(
         self,
@@ -2385,7 +2386,7 @@ class Map(MapWidget):
             before_id=before_id,
             overwrite=overwrite,
         )
-        if fit_bounds:
+        if fit_bounds and bounds is not None:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
 
     def add_raster(

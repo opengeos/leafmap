@@ -1039,6 +1039,8 @@ class Map(ipyleaflet.Map):
             return
 
         band_names = common.cog_bands(url, titiler_endpoint)
+        if len(band_names) == 0:
+            return
 
         if bands is not None:
             if not isinstance(bands, list):
@@ -1075,7 +1077,7 @@ class Map(ipyleaflet.Map):
                 self.remove_layer(layer)
 
         self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
-        if zoom_to_layer:
+        if zoom_to_layer and bounds is not None:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
@@ -1173,9 +1175,11 @@ class Map(ipyleaflet.Map):
         tile_url = common.stac_tile(
             url, collection, item, assets, bands, titiler_endpoint, **kwargs
         )
+        if tile_url is None:
+            return
         bounds = common.stac_bounds(url, collection, item, titiler_endpoint)
         self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
-        if fit_bounds:
+        if fit_bounds and bounds is not None:
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
@@ -1620,7 +1624,8 @@ class Map(ipyleaflet.Map):
                 elif left_layer.startswith("http") and left_layer.endswith(".tif"):
                     url = common.cog_tile(left_layer, **left_args)
                     bbox = common.cog_bounds(left_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = ipyleaflet.TileLayer(
                         url=url,
                         name=left_name,
@@ -1630,7 +1635,8 @@ class Map(ipyleaflet.Map):
                 elif left_layer.startswith("http") and left_layer.endswith(".json"):
                     left_tile_url = common.stac_tile(left_layer, **left_args)
                     bbox = common.stac_bounds(left_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     left_layer = ipyleaflet.TileLayer(
                         url=left_tile_url,
                         name=left_name,
@@ -1697,7 +1703,8 @@ class Map(ipyleaflet.Map):
                         **right_args,
                     )
                     bbox = common.cog_bounds(right_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=url,
                         name=right_name,
@@ -1708,7 +1715,8 @@ class Map(ipyleaflet.Map):
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
                     right_tile_url = common.stac_tile(right_layer, **left_args)
                     bbox = common.stac_bounds(right_layer)
-                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                    if bbox is not None:
+                        bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                     right_layer = ipyleaflet.TileLayer(
                         url=right_tile_url,
                         name=right_name,
@@ -6380,7 +6388,8 @@ def split_map(
             if left_layer.startswith("http") and left_layer.endswith(".tif"):
                 url = common.cog_tile(left_layer, **left_args)
                 bbox = common.cog_bounds(left_layer)
-                bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                if bbox is not None:
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                 left_layer = ipyleaflet.TileLayer(
                     url=url,
                     name="Left Layer",
@@ -6432,7 +6441,8 @@ def split_map(
                     **right_args,
                 )
                 bbox = common.cog_bounds(right_layer)
-                bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
+                if bbox is not None:
+                    bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
                 right_layer = ipyleaflet.TileLayer(
                     url=url,
                     name="Right Layer",
