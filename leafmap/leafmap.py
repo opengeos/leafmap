@@ -2536,6 +2536,183 @@ class Map(ipyleaflet.Map):
 
     add_local_tile = add_raster
 
+    def add_geotiff(
+        self,
+        url: str,
+        name: str = "GeoTIFF",
+        attribution: str = "",
+        opacity: float = 1.0,
+        shown: bool = True,
+        bands: Optional[Sequence[Union[int, str]]] = None,
+        titiler_endpoint: Optional[str] = None,
+        zoom_to_layer: bool = True,
+        layer_index: Optional[int] = None,
+        overwrite: bool = False,
+        **kwargs,
+    ) -> None:
+        """Adds a Cloud Optimized GeoTIFF (COG) to the map.
+
+        This helper wraps :meth:`add_cog_layer` so that users can quickly load a
+        remote GeoTIFF/COG by simply providing its URL. By default it relies on
+        the TiTiler endpoint configured for the map (the public demo endpoint is
+        used when none is provided).
+
+        Args:
+            url (str): The HTTP URL of the GeoTIFF/COG.
+            name (str, optional): Layer name to display in the layer tree.
+                Defaults to ``"GeoTIFF"``.
+            attribution (str, optional): Attribution text for the layer.
+                Defaults to ``""``.
+            opacity (float, optional): Layer opacity between 0.0 and 1.0.
+                Defaults to 1.0.
+            shown (bool, optional): Whether the layer should be visible when
+                first added. Defaults to True.
+            bands (Sequence[Union[int, str]], optional): Specific band indices
+                (1-based) or band names to render. Defaults to None which lets
+                Leafmap pick sensible defaults.
+            titiler_endpoint (str, optional): Custom TiTiler endpoint to use.
+                Defaults to the library's configured endpoint.
+            zoom_to_layer (bool, optional): Whether to fit the map view to the
+                layer bounds after it loads. Defaults to True.
+            layer_index (int, optional): Stack index at which to insert the
+                layer. Defaults to None (append).
+            overwrite (bool, optional): When True, an existing layer with the
+                same name is replaced. Defaults to False.
+            **kwargs: Additional keyword arguments forwarded to
+                :meth:`add_cog_layer` (e.g., ``bidx``, ``expression``,
+                ``rescale``).
+        """
+        self.add_cog_layer(
+            url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            shown=shown,
+            bands=bands,
+            titiler_endpoint=titiler_endpoint,
+            zoom_to_layer=zoom_to_layer,
+            layer_index=layer_index,
+            overwrite=overwrite,
+            **kwargs,
+        )
+
+    def add_opacity_control(
+        self,
+        layer: Optional[Union[str, ipyleaflet.Layer]] = None,
+        position: str = "topright",
+        min_opacity: float = 0.0,
+        max_opacity: float = 1.0,
+        step: float = 0.05,
+    ) -> None:
+        """Adds an interactive opacity control panel to the map.
+
+        The panel provides a dropdown to choose from the map layers that expose
+        an ``opacity`` attribute and a slider to adjust the selected layer's
+        transparency.
+
+        Args:
+            layer (str | ipyleaflet.Layer, optional): Layer (or layer name) to
+                select initially. Defaults to the first available layer.
+            position (str, optional): Location for the widget control.
+                Defaults to ``"topright"``.
+            min_opacity (float, optional): Minimum slider value. Defaults to 0.0.
+            max_opacity (float, optional): Maximum slider value. Defaults to 1.0.
+            step (float, optional): Slider step size. Defaults to 0.05.
+        """
+
+        def build_label(base: str, count: int) -> str:
+            return f"{base} ({count})" if count else base
+
+        layer_lookup: Dict[str, ipyleaflet.Layer] = {}
+        occurrence: Dict[str, int] = {}
+
+        for lyr in self.layers:
+            if hasattr(lyr, "opacity"):
+                base = getattr(lyr, "name", None) or lyr.__class__.__name__
+                occurrence.setdefault(base, 0)
+                label = build_label(base, occurrence[base])
+                occurrence[base] += 1
+                layer_lookup[label] = lyr
+
+        if not layer_lookup:
+            raise RuntimeError(
+                "No map layers with an 'opacity' attribute are available."
+            )
+
+        if isinstance(layer, ipyleaflet.Layer):
+            default_label = next(
+                (lbl for lbl, lyr in layer_lookup.items() if lyr is layer), None
+            )
+        elif isinstance(layer, str):
+            default_label = next((lbl for lbl in layer_lookup if lbl == layer), None)
+            if default_label is None:
+                default_label = next(
+                    (lbl for lbl in layer_lookup if lbl.startswith(layer)), None
+                )
+        else:
+            default_label = None
+
+        if default_label is None:
+            default_label = list(layer_lookup.keys())[-1]
+
+        dropdown = widgets.Dropdown(
+            options=list(layer_lookup.keys()),
+            value=default_label,
+            description="Layer",
+            layout=widgets.Layout(width="260px"),
+        )
+
+        selected_layer = layer_lookup[dropdown.value]
+        current_opacity = getattr(selected_layer, "opacity", max_opacity)
+        slider = widgets.FloatSlider(
+            value=max(min(current_opacity, max_opacity), min_opacity),
+            min=min_opacity,
+            max=max_opacity,
+            step=step,
+            description="Opacity",
+            readout=True,
+            readout_format=".2f",
+            layout=widgets.Layout(width="260px"),
+        )
+
+        status = widgets.Label()
+
+        def set_status(msg: str) -> None:
+            status.value = msg
+
+        def apply_opacity(target: ipyleaflet.Layer, value: float) -> None:
+            try:
+                setattr(target, "opacity", value)
+            except Exception as exc:  # pragma: no cover - defensive
+                set_status(f"Failed to set opacity: {exc}")
+            else:
+                set_status(f"{target.__class__.__name__} opacity: {value:.2f}")
+
+        def on_slider(change: Dict[str, Any]) -> None:
+            if change["name"] != "value" or change["new"] == change["old"]:
+                return
+            lyr = layer_lookup[dropdown.value]
+            apply_opacity(lyr, change["new"])
+
+        def on_dropdown(change: Dict[str, Any]) -> None:
+            if change["name"] != "value" or change["new"] == change["old"]:
+                return
+            lyr = layer_lookup[change["new"]]
+            slider.value = max(
+                min(getattr(lyr, "opacity", slider.value), max_opacity), min_opacity
+            )
+            apply_opacity(lyr, slider.value)
+
+        slider.observe(on_slider, "value")
+        dropdown.observe(on_dropdown, "value")
+
+        apply_opacity(selected_layer, slider.value)
+
+        panel = widgets.VBox([dropdown, slider])
+        control = ipyleaflet.WidgetControl(widget=panel, position=position)
+        self.add(control)
+        self.opacity_control = control
+
     def add_remote_tile(
         self,
         source: str,

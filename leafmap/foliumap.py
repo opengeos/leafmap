@@ -1,3 +1,4 @@
+import json
 import os
 
 import folium
@@ -5,7 +6,7 @@ import folium.plugins as plugins
 from box import Box
 from branca.element import Figure, JavascriptLink, MacroElement
 from folium.elements import JSCSSMixin
-from folium.map import Layer
+from folium.map import Layer, LayerControl
 from jinja2 import Template
 
 from . import common, examples, map_widgets, osm, plot
@@ -80,7 +81,7 @@ from .common import (
 from .legends import builtin_legends
 
 basemaps = Box(xyz_to_folium(), frozen_box=True)
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import pandas as pd
 
@@ -166,7 +167,7 @@ class Map(folium.Map):
             plugins.Fullscreen().add_to(self)
 
         if "draw_control" not in kwargs:
-            kwargs["draw_control"] = True
+            kwargs["draw_control"] = False
         if kwargs["draw_control"]:
             plugins.Draw(export=kwargs.pop("draw_export")).add_to(self)
 
@@ -191,7 +192,7 @@ class Map(folium.Map):
             plugins.MiniMap().add_to(self)
 
         if "search_control" not in kwargs:
-            kwargs["search_control"] = True
+            kwargs["search_control"] = False
         if kwargs["search_control"]:
             plugins.Geocoder(collapsed=True, position="topleft").add_to(self)
 
@@ -708,6 +709,392 @@ class Map(folium.Map):
             )
         else:
             raise Exception("The source must be a URL.")
+
+    def add_geotiff(
+        self,
+        url: str,
+        name: Optional[str] = "GeoTIFF",
+        attribution: Optional[str] = "",
+        opacity: float = 1.0,
+        shown: bool = True,
+        overlay: bool = True,
+        control: bool = True,
+        fit_bounds: bool = True,
+        resolution: int = 128,
+        georaster_options: Optional[Dict[str, Any]] = None,
+        palette: Optional[Union[str, Sequence[str]]] = None,
+        value_range: Optional[Sequence[float]] = None,
+        nodata_color: Optional[str] = None,
+    ) -> None:
+        """Adds a remote Cloud Optimized GeoTIFF (COG) directly to the map.
+
+        The layer is rendered client-side with the georaster-layer-for-leaflet
+        plugin, letting Leaflet read and display Cloud Optimized GeoTIFFs
+        without relying on an intermediate tiling service.
+
+        Args:
+            url (str): HTTP URL to the GeoTIFF/COG resource.
+            name (str, optional): Name for the layer control entry. Defaults to "GeoTIFF".
+            attribution (str, optional): Attribution text for the layer. Defaults to "".
+            opacity (float, optional): Layer opacity between 0.0 and 1.0. Defaults to 1.0.
+            shown (bool, optional): Whether the layer is visible on load. Defaults to True.
+            overlay (bool, optional): Whether the layer is an overlay (True) or base layer (False).
+                Defaults to True.
+            control (bool, optional): Whether to register the layer with the map's layer control.
+                Defaults to True.
+            fit_bounds (bool, optional): Fit the map view to the layer bounds once loaded. Defaults to True.
+            resolution (int, optional): Internal resolution passed to the GeoRaster layer. Defaults to 128.
+            georaster_options (Dict[str, Any], optional): Extra options forwarded to GeoRasterLayer.
+            palette (str | Sequence[str], optional): Name of a built-in palette or a
+                sequence of color hex strings to visualize single-band rasters.
+            value_range (Sequence[float], optional): Two values defining the data range
+                mapped to the palette. Defaults to the GeoTIFF min/max.
+            nodata_color (str, optional): Color used when encountering nodata or NaN
+                values. Defaults to transparent.
+        """
+        if palette is not None:
+            if isinstance(palette, str):
+                palette_colors = common.get_palette_colors(palette, 256, hashtag=True)
+            else:
+                palette_colors = [common.check_color(color) for color in palette]
+        else:
+            palette_colors = []
+
+        if value_range is not None:
+            if (
+                not isinstance(value_range, Sequence)
+                or len(value_range) != 2
+                or value_range[0] == value_range[1]
+            ):
+                raise ValueError(
+                    "value_range must be a two-element sequence with distinct values."
+                )
+            value_range = [float(value_range[0]), float(value_range[1])]
+
+        nodata_color = (
+            common.check_color(nodata_color) if isinstance(nodata_color, str) else None
+        )
+
+        sequence = getattr(self, "_leafmap_geotiff_sequence", 0) + 1
+        self._leafmap_geotiff_sequence = sequence
+
+        layer = GeoTIFFLayer(
+            url=url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            show=shown,
+            overlay=overlay,
+            control=control,
+            fit_bounds=fit_bounds,
+            resolution=resolution,
+            georaster_options=georaster_options or {},
+            palette=palette_colors,
+            value_range=value_range,
+            nodata_color=nodata_color,
+            sequence=sequence,
+        )
+        layer.add_to(self)
+
+    def add_opacity_control(
+        self,
+        layer: Optional[str] = None,
+        position: str = "bottomright",
+        min_opacity: float = 0.0,
+        max_opacity: float = 1.0,
+        step: float = 0.05,
+    ) -> None:
+        """Adds a Leaflet-based opacity control for Folium layers.
+
+        Args:
+            layer (str, optional): Name of the layer to preselect. Defaults to the
+                first available layer.
+            position (str, optional): Leaflet control position. Defaults to ``"bottomright"``.
+            min_opacity (float, optional): Minimum slider value. Defaults to 0.0.
+            max_opacity (float, optional): Maximum slider value. Defaults to 1.0.
+            step (float, optional): Slider step. Defaults to 0.05.
+        """
+
+        class _OpacityControl(JSCSSMixin, Layer):
+            _template = Template(
+                """
+                {% macro head(this, kwargs) %}
+                    <style>
+                        .leaflet-control.leafmap-opacity-control {
+                            background-color: #fff;
+                            padding: 8px 10px;
+                            box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+                            font-size: 13px;
+                        }
+                        .leaflet-control.leafmap-opacity-control label {
+                            display: block;
+                            margin-bottom: 4px;
+                            font-weight: 600;
+                        }
+                        .leaflet-control.leafmap-opacity-control select,
+                        .leaflet-control.leafmap-opacity-control input[type="range"] {
+                            width: 100%;
+                            margin-bottom: 6px;
+                        }
+                        .leaflet-control.leafmap-opacity-control .leafmap-opacity-status {
+                            font-size: 12px;
+                            color: #333;
+                        }
+                    </style>
+                {% endmacro %}
+                {% macro script(this, kwargs) %}
+                    (function(){
+                        const map = {{ this._parent.get_name() }};
+                        const entries = {{ this.entries|tojson }};
+                        let selected = {{ this.default_entry|tojson }};
+                        const min = {{ this.min }};
+                        const max = {{ this.max }};
+                        const step = {{ this.step }};
+                        const clamp = (val) => Math.max(min, Math.min(max, val));
+
+                        const resolveLayer = (entry) => {
+                            if (!entry || !entry.varName) return null;
+                            return window[entry.varName] || null;
+                        };
+
+                        const readOpacity = (layer) => {
+                            if (!layer) return max;
+                            if (layer._georasterLayer) {
+                                return readOpacity(layer._georasterLayer);
+                            }
+                            if (layer.options) {
+                                if (typeof layer.options.opacity === "number") {
+                                    return layer.options.opacity;
+                                }
+                                if (typeof layer.options.fillOpacity === "number") {
+                                    return layer.options.fillOpacity;
+                                }
+                            }
+                            if (layer.eachLayer) {
+                                let value;
+                                layer.eachLayer((sub) => {
+                                    if (value === undefined) {
+                                        value = readOpacity(sub);
+                                    }
+                                });
+                                if (value !== undefined) {
+                                    return value;
+                                }
+                            }
+                            return max;
+                        };
+
+                        const applyOpacity = (layer, value) => {
+                            if (!layer) return;
+                            if (layer._georasterLayer) {
+                                applyOpacity(layer._georasterLayer, value);
+                                return;
+                            }
+                            if (typeof layer.setOpacity === 'function') {
+                                layer.setOpacity(value);
+                            } else if (typeof layer.eachLayer === 'function') {
+                                layer.eachLayer((sub) => applyOpacity(sub, value));
+                            } else if (typeof layer.setStyle === 'function') {
+                                layer.setStyle({opacity: value, fillOpacity: value});
+                            }
+                            if (layer.options) {
+                                layer.options.opacity = value;
+                                if ('fillOpacity' in layer.options) {
+                                    layer.options.fillOpacity = value;
+                                }
+                            }
+                        };
+
+                        if (!map._leafmapOpacityControls) {
+                            map._leafmapOpacityControls = [];
+                        }
+                        const control = L.control({position: {{ this.position|tojson }}});
+                        control.onAdd = function() {
+                            const container = L.DomUtil.create('div', 'leaflet-control leafmap-opacity-control');
+                            L.DomEvent.disableClickPropagation(container);
+                            L.DomEvent.disableScrollPropagation(container);
+
+                            const selectLabel = L.DomUtil.create('label', '', container);
+                            selectLabel.innerHTML = 'Layer';
+                            const select = L.DomUtil.create('select', '', container);
+                            entries.forEach((entry) => {
+                                const option = document.createElement('option');
+                                option.value = entry.varName;
+                                option.textContent = entry.label;
+                                if (entry.varName === selected.varName) {
+                                    option.selected = true;
+                                }
+                                select.appendChild(option);
+                            });
+
+                            const rangeLabel = L.DomUtil.create('label', '', container);
+                            rangeLabel.innerHTML = 'Opacity';
+                            const slider = L.DomUtil.create('input', '', container);
+                            slider.type = 'range';
+                            slider.min = min;
+                            slider.max = max;
+                            slider.step = step;
+
+                            const status = L.DomUtil.create('div', 'leafmap-opacity-status', container);
+
+                            const layerObj = resolveLayer(selected);
+                            const currentOpacity = clamp(readOpacity(layerObj));
+                            slider.value = currentOpacity;
+                            status.innerHTML = `Opacity: ${currentOpacity.toFixed(2)}`;
+
+                            const updateSelection = (varName) => {
+                                const entry = entries.find((item) => item.varName === varName);
+                                if (!entry) {
+                                    return;
+                                }
+                                selected = entry;
+                                const layer = resolveLayer(selected);
+                                const value = clamp(readOpacity(layer));
+                                slider.value = value;
+                                status.innerHTML = `Opacity: ${value.toFixed(2)}`;
+                            };
+
+                            const handleSlider = () => {
+                                const value = clamp(parseFloat(slider.value));
+                                slider.value = value;
+                                const layer = resolveLayer(selected);
+                                applyOpacity(layer, value);
+                                status.innerHTML = `Opacity: ${value.toFixed(2)}`;
+                            };
+
+                            L.DomEvent.on(select, 'change', (event) => {
+                                L.DomEvent.stopPropagation(event);
+                                updateSelection(select.value);
+                            });
+
+                            L.DomEvent.on(slider, 'input', (event) => {
+                                L.DomEvent.stopPropagation(event);
+                                handleSlider();
+                            });
+
+                            ['mousedown', 'touchstart', 'dblclick'].forEach((evt) => {
+                                L.DomEvent.on(slider, evt, L.DomEvent.stopPropagation);
+                                L.DomEvent.on(select, evt, L.DomEvent.stopPropagation);
+                            });
+
+                            return container;
+                        };
+
+                        control.addTo(map);
+                        map._leafmapOpacityControls.push(control);
+
+                        const opacityContainer = control.getContainer();
+                        const layerControl = map.layerControl || map.layersControl || null;
+                        if (layerControl && typeof layerControl.getContainer === 'function') {
+                            const layerContainer = layerControl.getContainer();
+                            if (
+                                layerContainer &&
+                                layerContainer.parentNode &&
+                                opacityContainer &&
+                                opacityContainer.parentNode === layerContainer.parentNode
+                            ) {
+                                layerContainer.parentNode.insertBefore(
+                                    opacityContainer,
+                                    layerContainer.nextSibling
+                                );
+                            }
+                        }
+                    })();
+                {% endmacro %}
+                """
+            )
+
+            def __init__(
+                self,
+                entries: List[Dict[str, Any]],
+                default_entry: Dict[str, Any],
+                position: str,
+                min_value: float,
+                max_value: float,
+                step_value: float,
+            ):
+                super().__init__(control=False)
+                self._name = "OpacityControl"
+                self.entries = entries
+                self.default_entry = default_entry
+                self.position = position
+                self.min = min_value
+                self.max = max_value
+                self.step = step_value
+
+        label_counts: Dict[str, int] = {}
+        entries: List[Dict[str, Any]] = []
+
+        for child in self._children.values():
+            if not isinstance(child, Layer) or isinstance(child, LayerControl):
+                continue
+
+            var_name = child.get_name()
+            base_label = (
+                getattr(child, "layer_name", None)
+                or getattr(child, "name", None)
+                or (
+                    child.options.get("name")
+                    if isinstance(getattr(child, "options", None), dict)
+                    else None
+                )
+                or var_name
+            )
+
+            index = label_counts.get(base_label, 0)
+            label_counts[base_label] = index + 1
+            display_label = f"{base_label} ({index})" if index else base_label
+
+            options = getattr(child, "options", {})
+            opacity_candidate: Optional[float] = None
+            if isinstance(options, dict):
+                opacity_candidate = options.get("opacity")
+                if opacity_candidate is None:
+                    opacity_candidate = options.get("fillOpacity")
+            if opacity_candidate is None and hasattr(child, "opacity"):
+                try:
+                    opacity_candidate = float(getattr(child, "opacity"))
+                except Exception:
+                    opacity_candidate = None
+            if opacity_candidate is None:
+                opacity_candidate = 1.0
+            opacity_value = float(opacity_candidate)
+
+            entries.append(
+                {
+                    "varName": var_name,
+                    "label": display_label,
+                    "baseLabel": base_label,
+                    "opacity": opacity_value,
+                }
+            )
+
+        if not entries:
+            raise RuntimeError(
+                "No folium layers are available for opacity adjustment on this map."
+            )
+
+        default_entry = next(
+            (
+                entry
+                for entry in entries
+                if entry["baseLabel"] == layer or entry["label"] == layer
+            ),
+            None,
+        )
+        if default_entry is None:
+            default_entry = entries[-1]
+
+        control = _OpacityControl(
+            entries=entries,
+            default_entry=default_entry,
+            position=position,
+            min_value=min_opacity,
+            max_value=max_opacity,
+            step_value=step,
+        )
+        control.add_to(self)
+        self.opacity_control = control
 
     def add_netcdf(
         self,
@@ -3907,6 +4294,199 @@ def geojson_layer(
         data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
     )
     return geojson
+
+
+class GeoTIFFLayer(JSCSSMixin, Layer):
+    """Leaflet layer that renders Cloud Optimized GeoTIFFs client-side."""
+
+    _template = Template(
+        """
+            {% macro script(this, kwargs) %}
+            var {{ this.get_name() }} = L.layerGroup();
+            {% if this.control %}
+            (function() {
+                var layerName = {{ this.layer_name|tojson }};
+                if ({{ this.overlay|tojson }}) {
+                    {{ this.get_name() }}._layerControlName = layerName;
+                    {{ this._parent.get_name() }}.layerControlEntries = {{ this._parent.get_name() }}.layerControlEntries || [];
+                    {{ this._parent.get_name() }}.layerControlEntries.push({ layer: {{ this.get_name() }}, name: layerName });
+                }
+            })();
+            {% endif %}
+            (async function() {
+                const waitForGeoRaster = (maxAttempts = 60, delay = 200) =>
+                    new Promise((resolve, reject) => {
+                        let attempts = 0;
+                        const check = () => {
+                            if (window.parseGeoraster && window.GeoRasterLayer) {
+                                resolve();
+                            } else if (attempts >= maxAttempts) {
+                                reject(new Error("GeoRaster libraries failed to load"));
+                            } else {
+                                attempts += 1;
+                                setTimeout(check, delay);
+                            }
+                        };
+                        check();
+                    });
+
+                try {
+                    await waitForGeoRaster();
+                    const georaster = await window.parseGeoraster({{ this.url|tojson }});
+                    const palette = {{ this.palette|tojson }};
+                    const hasPalette = Array.isArray(palette) && palette.length > 0;
+                    const nodataColor = {{ this.nodata_color|tojson }};
+                    const suppliedRange = {{ this.value_range|tojson }};
+                    const layerOptions = {{ this.layer_options|tojson }};
+                    layerOptions.georaster = georaster;
+                    if (hasPalette && georaster.numberOfRasters === 1) {
+                        let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
+                        let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
+                        if (
+                            vmin === null ||
+                            vmax === null ||
+                            !Number.isFinite(vmin) ||
+                            !Number.isFinite(vmax) ||
+                            vmin === vmax
+                        ) {
+                            if (Array.isArray(georaster.mins) && georaster.mins.length) {
+                                vmin = georaster.mins[0];
+                            }
+                            if (Array.isArray(georaster.maxs) && georaster.maxs.length) {
+                                vmax = georaster.maxs[0];
+                            }
+                        }
+                        if (!Number.isFinite(vmin)) {
+                            vmin = 0;
+                        }
+                        if (!Number.isFinite(vmax) || vmax === vmin) {
+                            vmax = vmin + palette.length;
+                        }
+                        const span = vmax - vmin || palette.length || 1;
+                        const lastIndex = palette.length - 1;
+                        const nullColor = nodataColor || null;
+                        layerOptions.pixelValuesToColorFn = function(values) {
+                            const val = Array.isArray(values) ? values[0] : values;
+                            if (val === null || val === undefined || Number.isNaN(val)) {
+                                return nullColor;
+                            }
+                            const ratio = (val - vmin) / span;
+                            const idx = Math.max(0, Math.min(lastIndex, Math.round(ratio * lastIndex)));
+                            return palette[idx];
+                        };
+                    }
+                    var geotiffLayer = new window.GeoRasterLayer(layerOptions);
+                    geotiffLayer.options.name = {{ this.layer_name|tojson }};
+                    {% if this.attribution %}
+                    if (geotiffLayer.getAttribution) {
+                        geotiffLayer.getAttribution = function() { return {{ this.attribution|tojson }}; };
+                    } else {
+                        geotiffLayer.options.attribution = {{ this.attribution|tojson }};
+                    }
+                    {% endif %}
+                    const mapRef = {{ this._parent.get_name() }};
+                    const layerSequence = {{ this.sequence|tojson }};
+                    const targetZIndex = layerOptions.zIndex || layerSequence || 0;
+                    if (typeof geotiffLayer.setZIndex === "function") {
+                        geotiffLayer.setZIndex(targetZIndex);
+                    } else if (geotiffLayer.options) {
+                        geotiffLayer.options.zIndex = targetZIndex;
+                    }
+                    mapRef._leafmapGeoTiffSeq = mapRef._leafmapGeoTiffSeq || 0;
+                    {{ this.get_name() }}.clearLayers();
+                    {{ this.get_name() }}.addLayer(geotiffLayer);
+                    if (layerSequence >= mapRef._leafmapGeoTiffSeq) {
+                        mapRef._leafmapGeoTiffSeq = layerSequence;
+                        if (geotiffLayer.bringToFront) {
+                            geotiffLayer.bringToFront();
+                        }
+                    }
+                    {{ this.get_name() }}._georasterLayer = geotiffLayer;
+                    if (!{{ this.overlay|tojson }}) {
+                        mapRef.addLayer({{ this.get_name() }});
+                    } else if (mapRef.hasLayer({{ this.get_name() }}) || {{ this.show|tojson }}) {
+                        mapRef.addLayer({{ this.get_name() }});
+                    }
+                    {% if this.fit_bounds %}
+                    mapRef.fitBounds(geotiffLayer.getBounds());
+                    {% endif %}
+                } catch (error) {
+                    console.error("leafmap: failed to load GeoTIFF layer", error);
+                }
+            })();
+            {% endmacro %}
+        """
+    )
+
+    default_js = [
+        ("proj4", "https://cdn.jsdelivr.net/npm/proj4@2.8.1/dist/proj4.js"),
+        ("georaster", "https://cdn.jsdelivr.net/npm/georaster@1.6.0"),
+        (
+            "georasterlayer",
+            "https://cdn.jsdelivr.net/npm/georaster-layer-for-leaflet@4.1.2/dist/georaster-layer-for-leaflet.min.js",
+        ),
+    ]
+
+    def __init__(
+        self,
+        url: str,
+        name: Optional[str] = None,
+        attribution: Optional[str] = "",
+        opacity: float = 1.0,
+        overlay: bool = True,
+        control: bool = True,
+        show: bool = True,
+        fit_bounds: bool = True,
+        resolution: int = 128,
+        georaster_options: Optional[Dict[str, Any]] = None,
+        palette: Optional[Sequence[str]] = None,
+        value_range: Optional[Sequence[float]] = None,
+        nodata_color: Optional[str] = None,
+        sequence: int = 0,
+        **kwargs,
+    ) -> None:
+        """Initialize the layer."""
+        layer_name = name if name else "GeoTIFF"
+        super().__init__(
+            name=layer_name,
+            overlay=overlay,
+            control=control,
+            show=show,
+            **kwargs,
+        )
+        self.url = url
+        self.layer_name = layer_name
+        self.attribution = attribution or ""
+        self.overlay = overlay
+        self.control = control
+        self.fit_bounds = fit_bounds
+        self.show = show
+        self.palette = list(palette or [])
+        self.value_range = list(value_range) if value_range else None
+        self.nodata_color = nodata_color
+        self.sequence = int(sequence)
+
+        options = dict(georaster_options or {})
+        options.setdefault("resolution", resolution)
+        options.setdefault("opacity", opacity)
+        options.setdefault("name", layer_name)
+        if "zIndex" not in options:
+            base_zindex = 500
+            options["zIndex"] = (
+                base_zindex + self.sequence if self.sequence else base_zindex
+            )
+        if self.attribution:
+            options.setdefault("attribution", self.attribution)
+
+        # Verify options are JSON serialisable so they can be embedded safely.
+        try:
+            json.dumps(options)
+        except TypeError as exc:
+            raise ValueError(
+                "georaster_options must contain only JSON-serialisable values."
+            ) from exc
+
+        self.layer_options = options
 
 
 class PMTilesLayer(JSCSSMixin, Layer):
