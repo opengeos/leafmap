@@ -727,6 +727,7 @@ class Map(folium.Map):
         indexes: Optional[Sequence[int]] = None,
         vmin: Optional[float] = None,
         vmax: Optional[float] = None,
+        **kwargs,
     ) -> None:
         """Adds a remote Cloud Optimized GeoTIFF (COG) directly to the map.
 
@@ -769,6 +770,22 @@ class Map(folium.Map):
             value_range = [float(vmin), float(vmax)]
         else:
             value_range = None
+
+        if "bidx" in kwargs:
+            indexes = kwargs.pop("bidx")
+        if "colormap_name" in kwargs:
+            palette_colors = kwargs.pop("colormap_name")
+        if "colormap" in kwargs:
+            palette_colors = kwargs.pop("colormap")
+        if "rescale" in kwargs:
+            if isinstance(kwargs["rescale"], str):
+                value_range = kwargs["rescale"].split(",")
+            elif isinstance(kwargs["rescale"], list):
+                value_range = kwargs["rescale"]
+            vmin = float(value_range[0])
+            vmax = float(value_range[1])
+            value_range = [vmin, vmax]
+            kwargs.pop("rescale")
 
         nodata_color = (
             common.check_color(nodata_color) if isinstance(nodata_color, str) else None
@@ -4370,6 +4387,11 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                         const bandIndices = indexes.map(i => i - 1); // Convert to 0-indexed
                         if (bandIndices.length === 3 || bandIndices.length === 4) {
                             // RGB or RGBA display with custom band selection
+                            // Determine min/max for normalization
+                            let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
+                            let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
+                            let useSuppliedRange = vmin !== null && vmax !== null && Number.isFinite(vmin) && Number.isFinite(vmax) && vmin !== vmax;
+
                             layerOptions.pixelValuesToColorFn = function(values) {
                                 if (!Array.isArray(values)) return null;
                                 // Extract selected bands
@@ -4383,31 +4405,54 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                                     return nodataColor || null;
                                 }
                                 // Normalize values to 0-255 range
-                                const maxR = georaster.maxs && georaster.maxs[bandIndices[0]] ? georaster.maxs[bandIndices[0]] : 255;
-                                const maxG = georaster.maxs && georaster.maxs[bandIndices[1]] ? georaster.maxs[bandIndices[1]] : 255;
-                                const maxB = georaster.maxs && georaster.maxs[bandIndices[2]] ? georaster.maxs[bandIndices[2]] : 255;
-                                const nr = Math.round((r / maxR) * 255);
-                                const ng = Math.round((g / maxG) * 255);
-                                const nb = Math.round((b / maxB) * 255);
+                                let minR, maxR, minG, maxG, minB, maxB;
+                                if (useSuppliedRange) {
+                                    minR = minG = minB = vmin;
+                                    maxR = maxG = maxB = vmax;
+                                } else {
+                                    minR = georaster.mins && georaster.mins[bandIndices[0]] ? georaster.mins[bandIndices[0]] : 0;
+                                    maxR = georaster.maxs && georaster.maxs[bandIndices[0]] ? georaster.maxs[bandIndices[0]] : 255;
+                                    minG = georaster.mins && georaster.mins[bandIndices[1]] ? georaster.mins[bandIndices[1]] : 0;
+                                    maxG = georaster.maxs && georaster.maxs[bandIndices[1]] ? georaster.maxs[bandIndices[1]] : 255;
+                                    minB = georaster.mins && georaster.mins[bandIndices[2]] ? georaster.mins[bandIndices[2]] : 0;
+                                    maxB = georaster.maxs && georaster.maxs[bandIndices[2]] ? georaster.maxs[bandIndices[2]] : 255;
+                                }
+                                const nr = Math.round(Math.max(0, Math.min(255, ((r - minR) / (maxR - minR)) * 255)));
+                                const ng = Math.round(Math.max(0, Math.min(255, ((g - minG) / (maxG - minG)) * 255)));
+                                const nb = Math.round(Math.max(0, Math.min(255, ((b - minB) / (maxB - minB)) * 255)));
                                 if (bandIndices.length === 4) {
                                     const a = values[bandIndices[3]];
                                     if (a === null || a === undefined || Number.isNaN(a)) return nodataColor || null;
-                                    const maxA = georaster.maxs && georaster.maxs[bandIndices[3]] ? georaster.maxs[bandIndices[3]] : 255;
-                                    const na = a / maxA;
+                                    let minA, maxA;
+                                    if (useSuppliedRange) {
+                                        minA = vmin;
+                                        maxA = vmax;
+                                    } else {
+                                        minA = georaster.mins && georaster.mins[bandIndices[3]] ? georaster.mins[bandIndices[3]] : 0;
+                                        maxA = georaster.maxs && georaster.maxs[bandIndices[3]] ? georaster.maxs[bandIndices[3]] : 255;
+                                    }
+                                    const na = (a - minA) / (maxA - minA);
                                     return `rgba(${nr},${ng},${nb},${na})`;
                                 }
                                 return `rgb(${nr},${ng},${nb})`;
                             };
                         } else if (bandIndices.length === 1) {
                             // Single band with custom index (grayscale)
+                            // Determine min/max for normalization
+                            let vmin = Array.isArray(suppliedRange) ? suppliedRange[0] : null;
+                            let vmax = Array.isArray(suppliedRange) ? suppliedRange[1] : null;
+                            if (vmin === null || vmax === null || !Number.isFinite(vmin) || !Number.isFinite(vmax) || vmin === vmax) {
+                                vmin = georaster.mins && georaster.mins[bandIndices[0]] ? georaster.mins[bandIndices[0]] : 0;
+                                vmax = georaster.maxs && georaster.maxs[bandIndices[0]] ? georaster.maxs[bandIndices[0]] : 255;
+                            }
+
                             layerOptions.pixelValuesToColorFn = function(values) {
                                 if (!Array.isArray(values)) return null;
                                 const val = values[bandIndices[0]];
                                 if (val === null || val === undefined || Number.isNaN(val)) {
                                     return nodataColor || null;
                                 }
-                                const maxVal = georaster.maxs && georaster.maxs[bandIndices[0]] ? georaster.maxs[bandIndices[0]] : 255;
-                                const normalized = Math.round((val / maxVal) * 255);
+                                const normalized = Math.round(Math.max(0, Math.min(255, ((val - vmin) / (vmax - vmin)) * 255)));
                                 return `rgb(${normalized},${normalized},${normalized})`;
                             };
                         }
