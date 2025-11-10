@@ -19750,6 +19750,11 @@ def ee_initialize(
     if key_data is None:
         raise ValueError("No key data found")
 
-    email = json.loads(key_data)["client_email"]
+    try:
+        email = json.loads(key_data)["client_email"]
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON for key_data: {e}")
+    except KeyError:
+        raise ValueError("key_data JSON does not contain 'client_email'")
     credentials = ee.ServiceAccountCredentials(email=email, key_data=key_data)
     ee.Initialize(credentials)
