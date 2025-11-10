@@ -19749,7 +19749,9 @@ def ee_initialize(
     if key_data is None:
         key_data = get_api_key(token_name)
     if key_data is None:
-        raise ValueError(f'No key data found in parameter or environment variable "{token_name}"')
+        raise ValueError(
+            f'No key data found in parameter or environment variable "{token_name}"'
+        )
 
     try:
         email = json.loads(key_data)["client_email"]
