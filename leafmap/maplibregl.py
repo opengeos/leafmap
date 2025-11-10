@@ -40,6 +40,7 @@ from .common import (
     df_to_gdf,
     download_file,
     download_files,
+    ee_initialize,
     execute_maplibre_notebook_dir,
     filter_geom_type,
     find_files,

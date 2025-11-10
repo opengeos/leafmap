@@ -19731,3 +19731,33 @@ def stack_bands(
         os.remove(temp_vrt)
 
     return output_file
+
+
+def ee_initialize(
+    key_data: Optional[str] = None, token_name: str = "EE_SERVICE_ACCOUNT"
+):
+    """
+    Initialize the Earth Engine API.
+
+    Args:
+        key_data: The key data to use for authentication. Must be a JSON string containing service account credentials,
+            with at least a 'client_email' field (e.g., the contents of a Google service account key file).
+        token_name: The name of the environment variable to use for authentication.
+    """
+    import ee
+
+    if key_data is None:
+        key_data = get_api_key(token_name)
+    if key_data is None:
+        raise ValueError(
+            f'No key data found in parameter or environment variable "{token_name}"'
+        )
+
+    try:
+        email = json.loads(key_data)["client_email"]
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON for key_data: {e}")
+    except KeyError:
+        raise ValueError("key_data JSON does not contain 'client_email'")
+    credentials = ee.ServiceAccountCredentials(email=email, key_data=key_data)
+    ee.Initialize(credentials)
