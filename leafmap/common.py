@@ -19731,3 +19731,25 @@ def stack_bands(
         os.remove(temp_vrt)
 
     return output_file
+
+
+def ee_initialize(
+    key_data: Optional[str] = None, token_name: str = "EE_SERVICE_ACCOUNT"
+):
+    """
+    Initialize the Earth Engine API.
+
+    Args:
+        key_data: The key data to use for authentication.
+        token_name: The name of the environment variable to use for authentication.
+    """
+    import ee
+
+    if key_data is None:
+        key_data = os.environ.get(token_name)
+    if key_data is None:
+        raise ValueError("No key data found")
+
+    email = json.loads(key_data)["client_email"]
+    credentials = ee.ServiceAccountCredentials(email=email, key_data=key_data)
+    ee.Initialize(credentials)
