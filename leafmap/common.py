@@ -19740,7 +19740,8 @@ def ee_initialize(
     Initialize the Earth Engine API.
 
     Args:
-        key_data: The key data to use for authentication.
+        key_data: The key data to use for authentication. Must be a JSON string containing service account credentials,
+            with at least a 'client_email' field (e.g., the contents of a Google service account key file).
         token_name: The name of the environment variable to use for authentication.
     """
     import ee
