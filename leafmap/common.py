@@ -19746,7 +19746,7 @@ def ee_initialize(
     import ee
 
     if key_data is None:
-        key_data = os.environ.get(token_name)
+        key_data = get_api_key(token_name)
     if key_data is None:
         raise ValueError("No key data found")
 
