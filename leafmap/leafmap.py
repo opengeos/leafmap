@@ -1078,8 +1078,8 @@ class Map(ipyleaflet.Map):
 
         self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
         if zoom_to_layer and bounds is not None:
-            # self.center = common.cog_center(url, titiler_endpoint)
-            # self.zoom = 19
+            self.center = common.cog_center(url, titiler_endpoint)
+            self.zoom = 19
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
