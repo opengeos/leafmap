@@ -37,7 +37,7 @@ class TitilerEndpoint:
         return f"{self.endpoint}/{self.name}/assets"
 
     def url_for_stac_bounds(self):
-        return f"{self.endpoint}/{self.name}/bounds"
+        return f"{self.endpoint}/{self.name}/info.geojson"
 
     def url_for_stac_info(self):
         return f"{self.endpoint}/{self.name}/info"
@@ -413,8 +413,10 @@ def cog_bounds(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     try:
-        r = requests.get(f"{titiler_endpoint}/cog/bounds", params={"url": url}).json()
-        return r["bounds"]
+        r = requests.get(
+            f"{titiler_endpoint}/cog/info.geojson", params={"url": url}
+        ).json()
+        return r["bbox"]
     except Exception as e:
         print(e)
         return None
@@ -886,13 +888,15 @@ def stac_bounds(
 
     try:
         if isinstance(titiler_endpoint, str):
-            r = requests.get(f"{titiler_endpoint}/stac/bounds", params=kwargs).json()
+            r = requests.get(
+                f"{titiler_endpoint}/stac/info.geojson", params=kwargs
+            ).json()
         else:
             r = requests.get(
                 titiler_endpoint.url_for_stac_bounds(), params=kwargs
             ).json()
 
-        bounds = r["bounds"]
+        bounds = r["bbox"]
         return bounds
     except Exception as e:
         print(e)
