@@ -1,0 +1,10796 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A Python package for interactive mapping and geospatial analysis with minimal coding in a Jupyter environment">
+      
+      
+        <meta name="author" content="Qiusheng Wu">
+      
+      
+        <link rel="canonical" href="https://leafmap.org/maplibre/overview/">
+      
+      
+        <link rel="prev" href="../../workshops/CVPR_2025/">
+      
+      
+        <link rel="next" href="../3d_buildings/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Overview - leafmap</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Google+Sans:300,300i,400,400i,700,700i%7CRegular:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Google Sans";--md-code-font:"Regular"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../css/timeago.css">
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-B1C88N45QG"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-B1C88N45QG",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-B1C88N45QG",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="leafmap" class="md-header__button md-logo" aria-label="leafmap" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            leafmap
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/opengeos/leafmap" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="leafmap" class="md-nav__button md-logo" aria-label="leafmap" data-md-component="logo">
+      
+  <img src="../../assets/logo.png" alt="logo">
+
+    </a>
+    leafmap
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/opengeos/leafmap" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://book.leafmap.org" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Book
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/00_key_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://huggingface.co/spaces/giswqs/solara-geospatial" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web App
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://youtube.com/@giswqs" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YouTube Channel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/opengeos/leafmap/issues" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Report Issues
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_13" id="__nav_13_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../basemaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    basemaps module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bokehmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    bokehmap module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../colormaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    colormaps module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../common/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    common module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    deck module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deckgl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    deckgl module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../download/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    download module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    examples module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../foliumap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    foliumap module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kepler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    kepler module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../maplibregl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    maplibregl module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../leafmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    leafmap module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../legends/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    legends module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../map_widgets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    map_widgets module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../osm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    osm module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pc/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    pc module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plot module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../plotlymap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    plotlymap module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../deck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    deck module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../stac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    stac module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../toolbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    toolbar module
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_14" id="__nav_14_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workshops
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workshops
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/FOSS4G_2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FOSS4G 2021
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/SIGSPATIAL_2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SIGSPATIAL 2021
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/YouthMappers_2021/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YouthMappers 2021
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/ICRW_2023/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ICRW 2023
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/EarthCube_2023/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EarthCube 2023
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/Taiwan_2024/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Taiwan 2024
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/HGAC_2024/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    HGAC 2024
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../workshops/CVPR_2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CVPR 2025
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_15" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_15" id="__nav_15_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MapLibre
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_15_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    MapLibre
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#video-tutorials-on-youtube" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video tutorials on YouTube
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-buildings-in-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display buildings in 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-3d-choropleth-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a 3D choropleth map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extrude-polygons-for-3d-indoor-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extrude polygons for 3D indoor mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-pmtiles-in-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize PMTiles in 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#construct-3d-map-styles-with-maptiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construct 3D map styles with MapTiler
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3d-terrain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3D Terrain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-3d-buildings-and-gif-animations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add 3D buildings and GIF animations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-default-marker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a default marker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-colorbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a colorbar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-components-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add components to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-deckgl-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add deck.gl layers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-gif-animations-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add GIF animations to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-html-content-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add HTML content to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-directional-icon-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a directional icon to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-an-icon-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add an icon to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-generated-icon-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a generated icon to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-labels-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add labels to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-legend-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a legend to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-logo-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a logo to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-text-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add text to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-alphaearth-satellite-embeddings-in-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize AlphaEarth satellite embeddings in 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a line
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-map-camera-around-a-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate map camera around a point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-series-of-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a series of images
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-point-along-a-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a point along a route
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-arc-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Arc Layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-the-default-position-for-attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the default position for attribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customize-basemaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customize basemaps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#center-the-map-on-a-clicked-symbol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Center the map on a clicked symbol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-building-color-based-on-zoom-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change building color based on zoom level
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-the-case-of-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the case of labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-choropleth-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create choropleth maps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-optimized-geotiff-cog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud Optimized GeoTIFF (COG)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-and-style-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create and style clusters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-a-layers-color-with-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change a layer's color with buttons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-copernicus-data-interactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize Copernicus data interactively
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#countries-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Countries filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-vector-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create vector data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customize-marker-icon-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customize marker icon image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#style-lines-with-a-data-driven-property" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style lines with a data-driven property
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disable-scroll-zoom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable scroll zoom
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-and-style-rich-text-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display and style rich text labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-draggable-marker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a draggable Marker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#draw-features-on-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draw features on the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-duckdb-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a DuckDB layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-vector-data-interactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edit vector data interactively
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-a-fallback-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use a fallback image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-fields-of-the-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize Fields of The World
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-pattern-to-a-polygon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a pattern to a polygon
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fit-a-map-to-a-bounding-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fit a map to a bounding box
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fly-to-a-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fly to a location
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#slowly-fly-to-a-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slowly fly to a location
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-a-fullscreen-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View a fullscreen map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-new-layer-below-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a new layer below labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-geojson-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a GeoJSON line
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#draw-geojson-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draw GeoJSON points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-geojson-polygon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a GeoJSON polygon
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-geopandas-geodataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a GeoPandas GeoDataFrame
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#globe-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Globe Projection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-raster-tiles-for-rendering-in-google-earth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create raster tiles for rendering in Google Earth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#google-earth-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Earth Engine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-gps-trace-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize GPS Trace Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-heatmap-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a heatmap layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-historical-satellite-imagery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize historical satellite imagery
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-us-median-housing-prices-by-county" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize US median housing prices by county
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-a-non-interactive-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display a non-interactive map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jump-to-a-series-of-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jump to a series of locations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-a-maps-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change a map's language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-layer-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a layer control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-layer-group-toggle-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create layer group toggle buttons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-layer-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a layer manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#style-a-layer-interactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style a layer interactively
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-gradient-line-using-an-expression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a gradient line using an expression
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-live-realtime-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add live realtime data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-a-feature-in-realtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update a feature in realtime
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-local-geojson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View local GeoJSON
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-local-raster-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View local raster datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#locate-the-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Locate the user
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-raster-tile-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a raster tile source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-mapillary-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize Mapillary data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-maptiler-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use MapTiler styles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-the-military-grid-reference-system-mgrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize the Military Grid Reference System (MGRS)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-coordinates-of-the-mouse-pointer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get coordinates of the mouse pointer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-multiple-geometries-from-one-geojson-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add multiple geometries from one GeoJSON source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#search-and-visualize-nasa-opera-data-products" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Search and visualize NASA OPERA data products
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-map-navigation-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display map navigation controls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocean-bathymetry-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ocean Bathymetry 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-openfreemap-vector-tiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use OpenFreeMap vector tiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-openstreetmap-vector-tiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use OpenStreetMap vector tiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualze-overture-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualze Overture data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pmtiles-source-and-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PMTiles source and protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restrict-map-panning-to-an-area" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrict map panning to an area
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-a-satellite-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display a satellite map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-search-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a search control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-pitch-and-bearing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set pitch and bearing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-terrain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set terrain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-sidebar-widget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a sidebar widget
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#similarity-search-with-alphaearth-satellite-embeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Similarity Search with AlphaEarth Satellite Embeddings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-spatiotemporal-asset-catalog-stac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize SpatioTemporal Asset Catalog (STAC)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-time-slider-for-visualizing-time-series-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a time slider for visualizing time series data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#export-3d-maps-as-html-files-for-website-hosting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export 3D maps as HTML files for website hosting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-label-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable label placement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-label-placement-with-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable label placement with offset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-vector-tile-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a vector tile source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a video
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-population-density" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize population density
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-wms-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a WMS source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fit-to-the-bounds-of-a-linestring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fit to the bounds of a LineString
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d_buildings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3d buildings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d_choropleth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3d choropleth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d_indoor_mapping/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3d indoor mapping
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d_pmtiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3d pmtiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d_style/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3d style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../3d_terrain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3d terrain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_3d_buildings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add 3d buildings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_a_marker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a marker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_colorbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add colorbar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_deckgl_layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add deckgl layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_gif/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add gif
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_html/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add html
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_icon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add icon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_image/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add image
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_image_generated/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add image generated
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add labels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_legend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add legend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_logo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add logo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../add_text/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add text
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../AlphaEarth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AlphaEarth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animate_a_line/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animate a line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animate_camera_around_point/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animate camera around point
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animate_images/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animate images
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animate_point_along_line/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animate point along line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../animate_point_along_route/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Animate point along route
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../arc_layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arc layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../attribution_position/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Attribution position
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../basemaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basemaps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../center_on_symbol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Center on symbol
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../change_building_color/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change building color
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../change_case_of_labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Change case of labels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../choropleth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Choropleth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cloud_optimized_geotiff/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud optimized geotiff
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cluster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cluster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../color_switcher/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Color switcher
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../copernicus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Copernicus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../countries_filter/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Countries filter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../create_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Create vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../custom_marker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom marker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dashboard/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_driven_lines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data driven lines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../disable_scroll_zoom/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disable scroll zoom
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../display_rich_text/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Display rich text
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../drag_a_marker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Drag a marker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../draw_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Draw features
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../duckdb_layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Duckdb layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edit_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Edit vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fallback_image/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fallback image
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fields_of_the_world/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fields of the world
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fit_bounds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fit bounds
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fill_pattern/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fill pattern
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../floating_sidebar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Floating sidebar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fly_to/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fly to
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fly_to_options/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fly to options
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fullscreen/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fullscreen
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geojson_layer_in_stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geojson layer in stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geojson_line/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geojson line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geojson_points/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geojson points
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geojson_polygon/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geojson polygon
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../geopandas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Geopandas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../globe_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Globe control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../google_earth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google earth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../google_earth_engine/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Google earth engine
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gps_trace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gps trace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../heatmap_layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Heatmap layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../historical_imagery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Historical imagery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../housing_prices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Housing prices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interactive_false/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive false
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jump_to/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Jump to
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../language_switch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language switch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../layer_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layer control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../layer_groups/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layer groups
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../layer_manager/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layer manager
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../layer_styling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Layer styling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../line_gradient/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Line gradient
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../live_geojson/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live geojson
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../live_update_feature/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Live update feature
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../local_geojson/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local geojson
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../local_raster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local raster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../locate_user/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Locate user
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../map_tiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Map tiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mapillary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mapillary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maptiler_styles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Maptiler styles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MGRS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MGRS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mouse_position/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mouse position
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multiple_geometries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multiple geometries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../nasa_opera/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Nasa opera
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../navigation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Navigation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ocean_bathymetry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ocean bathymetry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openfreemap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Openfreemap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openstreetmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Openstreetmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pmtiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pmtiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../restrict_bounds/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restrict bounds
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../satellite_map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Satellite map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../search_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../set_pitch_bearing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Set pitch bearing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../set_terrain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Set terrain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sidebar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sidebar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../similarity_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Similarity search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Stac
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../time_slider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Time slider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../to_html/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    To html
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variable_label_placement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable label placement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variable_offset_label_placement/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variable offset label placement
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vector_tile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector tile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../video_on_a_map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Video on a map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../visualize_population_density/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visualize population density
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wms_source/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wms source
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../zoom_to_linestring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Zoom to linestring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_16" id="__nav_16_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notebooks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Notebooks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/00_key_features/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/01_leafmap_intro/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 leafmap intro
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/02_using_basemaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 using basemaps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/03_cog_stac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 cog stac
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/04_cog_mosaic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 cog mosaic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/05_load_raster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 load raster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/06_legend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 legend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/07_colorbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 colorbar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/08_whitebox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 whitebox
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/09_csv_to_points/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 csv to points
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/10_add_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 add vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/11_linked_maps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 linked maps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/12_split_map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 split map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/13_geopandas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 geopandas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/14_postgis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 postgis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/15_openstreetmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 openstreetmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/16_heremap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    16 heremap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/17_vector_tile_layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    17 vector tile layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/18_point_layer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    18 point layer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/19_map_to_html/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    19 map to html
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/20_planet_imagery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20 planet imagery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/21_ts_inspector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    21 ts inspector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/22_time_slider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    22 time slider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/23_colormaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    23 colormaps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/24_heatmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    24 heatmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/25_map_title/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    25 map title
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/26_kepler_gl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    26 kepler gl
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/27_basemap_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    27 basemap gallery
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/28_publish_map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    28 publish map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/29_pydeck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    29 pydeck
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/30_census_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    30 census data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/31_search_basemaps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    31 search basemaps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/32_local_tile/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    32 local tile
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/33_image_overlay/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    33 image overlay
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/34_add_points_from_xy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    34 add points from xy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/35_circle_markers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    35 circle markers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/36_add_labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    36 add labels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/37_planetary_computer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    37 planetary computer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/38_plotly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    38 plotly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/39_inspector_tool/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    39 inspector tool
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/40_plotly_gui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    40 plotly gui
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/41_raster_gui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    41 raster gui
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/42_create_cog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    42 create cog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/43_search_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    43 search control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/44_attribute_table/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    44 attribute table
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/45_create_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    45 create vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/46_edit_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    46 edit vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/47_numpy_to_cog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    47 numpy to cog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/48_lidar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    48 lidar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/49_split_control/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    49 split control
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/50_marker_cluster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    50 marker cluster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/51_clip_image/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    51 clip image
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/52_netcdf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    52 netcdf
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/53_choropleth/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    53 choropleth
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/54_plot_raster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    54 plot raster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/55_lidar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    55 lidar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/56_download_ned/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    56 download ned
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/57_national_map/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    57 national map
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/58_bokeh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    58 bokeh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/59_create_legend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    59 create legend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/60_add_widget/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    60 add widget
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/61_vector_to_gif/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    61 vector to gif
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/62_folium_colorbar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    62 folium colorbar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/63_arcgis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    63 arcgis
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/64_stac_search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    64 stac search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/65_sagemaker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    65 sagemaker
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/66_gradio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    66 gradio
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/67_maxar_open_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    67 maxar open data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/68_openaerialmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    68 openaerialmap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/69_turkey_earthquake/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    69 turkey earthquake
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/70_zonal_stats/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    70 zonal stats
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/71_aws_s3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    71 aws s3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/72_timelapse/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    72 timelapse
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/73_custom_stac/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    73 custom stac
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/74_map_tiles_to_geotiff/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    74 map tiles to geotiff
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/75_segment_anything/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    75 segment anything
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/76_image_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    76 image comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/77_split_raster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    77 split raster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/78_read_raster/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    78 read raster
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/79_timeseries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    79 timeseries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/80_solar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    80 solar
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/81_buildings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    81 buildings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/82_pmtiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    82 pmtiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/83_vector_viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    83 vector viz
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/84_read_parquet/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    84 read parquet
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/85_gedi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    85 gedi
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/86_add_markers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    86 add markers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/87_actinia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    87 actinia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/88_nasa_earth_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    88 nasa earth data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/89_image_array_viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    89 image array viz
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/90_pixel_inspector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    90 pixel inspector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/91_raster_viz_gui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    91 raster viz gui
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/92_maplibre/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    92 maplibre
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/93_maplibre_pmtiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    93 maplibre pmtiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/94_mapbox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    94 mapbox
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/95_edit_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    95 edit vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/96_batch_edit_vector/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    96 batch edit vector
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/97_overture_data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    97 overture data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/98_watershed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    98 watershed
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/99_wetlands/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    99 wetlands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/100_nlcd/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100 nlcd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/101_nasa_opera/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    101 nasa opera
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/102_fused/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    102 fused
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/103_raster_colormap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    103 raster colormap
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/104_point_style/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    104 point style
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/105_vector_time_slider/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    105 vector time slider
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/106_aws_s3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    106 aws s3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/107_copernicus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    107 copernicus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../notebooks/108_add_geotiff/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    108 add geotiff
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#video-tutorials-on-youtube" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Video tutorials on YouTube
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-buildings-in-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display buildings in 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-3d-choropleth-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a 3D choropleth map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extrude-polygons-for-3d-indoor-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extrude polygons for 3D indoor mapping
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-pmtiles-in-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize PMTiles in 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#construct-3d-map-styles-with-maptiler" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construct 3D map styles with MapTiler
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3d-terrain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3D Terrain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-3d-buildings-and-gif-animations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add 3D buildings and GIF animations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-default-marker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a default marker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-colorbar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a colorbar
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-components-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add components to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-deckgl-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add deck.gl layers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-gif-animations-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add GIF animations to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-html-content-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add HTML content to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-directional-icon-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a directional icon to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-an-icon-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add an icon to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-generated-icon-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a generated icon to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-labels-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add labels to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-legend-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a legend to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-logo-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a logo to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-text-to-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add text to the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-alphaearth-satellite-embeddings-in-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize AlphaEarth satellite embeddings in 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a line
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-map-camera-around-a-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate map camera around a point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-series-of-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a series of images
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a point
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#animate-a-point-along-a-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Animate a point along a route
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-arc-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add Arc Layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-the-default-position-for-attribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the default position for attribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customize-basemaps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customize basemaps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#center-the-map-on-a-clicked-symbol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Center the map on a clicked symbol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-building-color-based-on-zoom-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change building color based on zoom level
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-the-case-of-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change the case of labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-choropleth-maps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create choropleth maps
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloud-optimized-geotiff-cog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloud Optimized GeoTIFF (COG)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-and-style-clusters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create and style clusters
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-a-layers-color-with-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change a layer's color with buttons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-copernicus-data-interactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize Copernicus data interactively
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#countries-filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Countries filter
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-vector-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create vector data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customize-marker-icon-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customize marker icon image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a dashboard
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#style-lines-with-a-data-driven-property" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style lines with a data-driven property
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disable-scroll-zoom" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable scroll zoom
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-and-style-rich-text-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display and style rich text labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-draggable-marker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a draggable Marker
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#draw-features-on-the-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draw features on the map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-duckdb-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a DuckDB layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edit-vector-data-interactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edit vector data interactively
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-a-fallback-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use a fallback image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-fields-of-the-world" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize Fields of The World
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-pattern-to-a-polygon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a pattern to a polygon
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fit-a-map-to-a-bounding-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fit a map to a bounding box
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fly-to-a-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fly to a location
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#slowly-fly-to-a-location" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slowly fly to a location
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-a-fullscreen-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View a fullscreen map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-new-layer-below-labels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a new layer below labels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-geojson-line" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a GeoJSON line
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#draw-geojson-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Draw GeoJSON points
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-geojson-polygon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a GeoJSON polygon
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-geopandas-geodataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a GeoPandas GeoDataFrame
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#globe-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Globe Projection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-raster-tiles-for-rendering-in-google-earth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create raster tiles for rendering in Google Earth
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#google-earth-engine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Earth Engine
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-gps-trace-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize GPS Trace Data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-heatmap-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a heatmap layer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-historical-satellite-imagery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize historical satellite imagery
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-us-median-housing-prices-by-county" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize US median housing prices by county
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-a-non-interactive-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display a non-interactive map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jump-to-a-series-of-locations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jump to a series of locations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-a-maps-language" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change a map's language
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-layer-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a layer control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-layer-group-toggle-buttons" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create layer group toggle buttons
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-layer-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a layer manager
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#style-a-layer-interactively" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Style a layer interactively
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#create-a-gradient-line-using-an-expression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a gradient line using an expression
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-live-realtime-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add live realtime data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#update-a-feature-in-realtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update a feature in realtime
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-local-geojson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View local GeoJSON
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-local-raster-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View local raster datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#locate-the-user" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Locate the user
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-raster-tile-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a raster tile source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-mapillary-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize Mapillary data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-maptiler-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use MapTiler styles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-the-military-grid-reference-system-mgrs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize the Military Grid Reference System (MGRS)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-coordinates-of-the-mouse-pointer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get coordinates of the mouse pointer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-multiple-geometries-from-one-geojson-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add multiple geometries from one GeoJSON source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#search-and-visualize-nasa-opera-data-products" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Search and visualize NASA OPERA data products
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-map-navigation-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display map navigation controls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ocean-bathymetry-3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ocean Bathymetry 3D
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-openfreemap-vector-tiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use OpenFreeMap vector tiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-openstreetmap-vector-tiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use OpenStreetMap vector tiles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualze-overture-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualze Overture data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pmtiles-source-and-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PMTiles source and protocol
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#restrict-map-panning-to-an-area" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restrict map panning to an area
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#display-a-satellite-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Display a satellite map
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-search-control" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a search control
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-pitch-and-bearing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set pitch and bearing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#set-terrain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Set terrain
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-sidebar-widget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a sidebar widget
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#similarity-search-with-alphaearth-satellite-embeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Similarity Search with AlphaEarth Satellite Embeddings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-spatiotemporal-asset-catalog-stac" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize SpatioTemporal Asset Catalog (STAC)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-time-slider-for-visualizing-time-series-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a time slider for visualizing time series data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#export-3d-maps-as-html-files-for-website-hosting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Export 3D maps as HTML files for website hosting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-label-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable label placement
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-label-placement-with-offset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable label placement with offset
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-vector-tile-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a vector tile source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-video" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a video
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visualize-population-density" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Visualize population density
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#add-a-wms-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Add a WMS source
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fit-to-the-bounds-of-a-linestring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fit to the bounds of a LineString
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+
+
+
+                  
+
+
+  
+  
+
+
+<h1 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h1>
+<p>This page contains examples of using <a href="https://maplibre.org">MapLibre</a> with Leafmap. Built on top of the <a href="https://github.com/eodaGmbH/py-maplibregl">py-maplibregl</a> Python package, Leafmap makes it much easier to create stunning 3D maps with MapLibre in just a few lines of code. Some examples are adapted from the <a href="https://maplibre.org/maplibre-gl-js/docs/examples/">MapLibre documentation</a> and <a href="https://eodagmbh.github.io/py-maplibregl/examples/every_person_in_manhattan/">py-maplibregl examples</a>. Credits to the original authors.</p>
+<p>To preview the examples, visit <a href="https://maps.gishub.org">https://maps.gishub.org</a>.</p>
+<h2 id="video-tutorials-on-youtube">Video tutorials on YouTube<a class="headerlink" href="#video-tutorials-on-youtube" title="Permanent link">&para;</a></h2>
+<p>Video tutorials on how to use Leafmap with MapLibre are available on YouTube: <a href="https://bit.ly/maplibre">https://bit.ly/maplibre</a></p>
+<p><a href="https://bit.ly/maplibre"><img alt="" src="https://i.imgur.com/dsxACGG.png" /></a></p>
+<h2 id="display-buildings-in-3d">Display buildings in 3D<a class="headerlink" href="#display-buildings-in-3d" title="Permanent link">&para;</a></h2>
+<p>Use extrusions to display buildings' height in 3D.</p>
+<p><a href="https://leafmap.org/maplibre/3d_buildings"><img alt="" src="https://i.imgur.com/9QeicaE.png" /></a></p>
+<h2 id="create-a-3d-choropleth-map">Create a 3D choropleth map<a class="headerlink" href="#create-a-3d-choropleth-map" title="Permanent link">&para;</a></h2>
+<p>Create a 3D choropleth map of Europe with countries extruded</p>
+<p><a href="https://leafmap.org/maplibre/3d_choropleth"><img alt="" src="https://i.imgur.com/fLgqYTa.png" /></a></p>
+<h2 id="extrude-polygons-for-3d-indoor-mapping">Extrude polygons for 3D indoor mapping<a class="headerlink" href="#extrude-polygons-for-3d-indoor-mapping" title="Permanent link">&para;</a></h2>
+<p>Create a 3D indoor map with the fill-extrude-height paint property.</p>
+<p><a href="https://leafmap.org/maplibre/3d_indoor_mapping"><img alt="" src="https://i.imgur.com/eYhSWaT.png" /></a></p>
+<h2 id="visualize-pmtiles-in-3d">Visualize PMTiles in 3D<a class="headerlink" href="#visualize-pmtiles-in-3d" title="Permanent link">&para;</a></h2>
+<p>Visualize polygons from a PMTiles source in 3D.</p>
+<p><a href="https://leafmap.org/maplibre/3d_pmtiles"><img alt="" src="https://i.imgur.com/113bGei.png" /></a></p>
+<h2 id="construct-3d-map-styles-with-maptiler">Construct 3D map styles with MapTiler<a class="headerlink" href="#construct-3d-map-styles-with-maptiler" title="Permanent link">&para;</a></h2>
+<p><a href="https://leafmap.org/maplibre/3d_style"><img alt="" src="https://i.imgur.com/3Q2Q3CG.png" /></a></p>
+<h2 id="3d-terrain">3D Terrain<a class="headerlink" href="#3d-terrain" title="Permanent link">&para;</a></h2>
+<p>Go beyond hillshade and show elevation in actual 3D.</p>
+<p><a href="https://leafmap.org/maplibre/3d_terrain"><img alt="" src="https://i.imgur.com/sjXZ2Jm.jpeg" /></a></p>
+<h2 id="add-3d-buildings-and-gif-animations">Add 3D buildings and GIF animations<a class="headerlink" href="#add-3d-buildings-and-gif-animations" title="Permanent link">&para;</a></h2>
+<p>Add 3D buildings and GIF animations to the map.</p>
+<p><a href="https://leafmap.org/maplibre/3d_buildings_gif"><img alt="" src="https://i.imgur.com/qadwFXm.png" /></a></p>
+<h2 id="add-a-default-marker">Add a default marker<a class="headerlink" href="#add-a-default-marker" title="Permanent link">&para;</a></h2>
+<p>Add a default marker to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_a_marker"><img alt="" src="https://i.imgur.com/ufmqTzx.png" /></a></p>
+<h2 id="add-a-colorbar">Add a colorbar<a class="headerlink" href="#add-a-colorbar" title="Permanent link">&para;</a></h2>
+<p>Add a colorbar to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_colorbar"><img alt="" src="https://i.imgur.com/84t0Sum.png" /></a></p>
+<h2 id="add-components-to-the-map">Add components to the map<a class="headerlink" href="#add-components-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add various components to the map, including legends, colorbars, text, and HTML content.</p>
+<p><a href="https://leafmap.org/maplibre/add_components"><img alt="" src="https://i.imgur.com/ZWmiKAF.png" /></a></p>
+<h2 id="add-deckgl-layers">Add deck.gl layers<a class="headerlink" href="#add-deckgl-layers" title="Permanent link">&para;</a></h2>
+<p>Add deck.gl layers to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_deckgl_layer"><img alt="" src="https://i.imgur.com/rQR4687.png" /></a></p>
+<h2 id="add-gif-animations-to-the-map">Add GIF animations to the map<a class="headerlink" href="#add-gif-animations-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add GIF animations to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_gif"><img alt="" src="https://i.imgur.com/auytBtD.png" /></a></p>
+<h2 id="add-html-content-to-the-map">Add HTML content to the map<a class="headerlink" href="#add-html-content-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add HTML content to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_html"><img alt="" src="https://i.imgur.com/TgalNOv.png" /></a></p>
+<h2 id="add-a-directional-icon-to-the-map">Add a directional icon to the map<a class="headerlink" href="#add-a-directional-icon-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add a directional icon to streams.</p>
+<p><a href="https://leafmap.org/maplibre/add_icon"><img alt="" src="https://github.com/user-attachments/assets/b4082d29-b604-4f52-a7e7-88d15d37c7fc" /></a></p>
+<h2 id="add-an-icon-to-the-map">Add an icon to the map<a class="headerlink" href="#add-an-icon-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add an icon to the map from an external URL and use it in a symbol layer.</p>
+<p><a href="https://leafmap.org/maplibre/add_image"><img alt="" src="https://i.imgur.com/Nq1uV9d.png" /></a></p>
+<h2 id="add-a-generated-icon-to-the-map">Add a generated icon to the map<a class="headerlink" href="#add-a-generated-icon-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add an icon to the map that was generated at runtime.</p>
+<p><a href="https://leafmap.org/maplibre/add_image_generated"><img alt="" src="https://i.imgur.com/qWWlnAm.png" /></a></p>
+<h2 id="add-labels-to-the-map">Add labels to the map<a class="headerlink" href="#add-labels-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add labels from vector data to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_labels"><img alt="image" src="https://github.com/user-attachments/assets/f71924c3-dd9a-4a34-9748-909b9fd941c1" /></a></p>
+<h2 id="add-a-legend-to-the-map">Add a legend to the map<a class="headerlink" href="#add-a-legend-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add a custom legend to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_legend"><img alt="" src="https://i.imgur.com/dy60trf.png" /></a></p>
+<h2 id="add-a-logo-to-the-map">Add a logo to the map<a class="headerlink" href="#add-a-logo-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add an image to the map as a logo.</p>
+<p><a href="https://leafmap.org/maplibre/add_logo"><img alt="" src="https://i.imgur.com/Pp9U4Li.png" /></a></p>
+<h2 id="add-text-to-the-map">Add text to the map<a class="headerlink" href="#add-text-to-the-map" title="Permanent link">&para;</a></h2>
+<p>Add text to the map.</p>
+<p><a href="https://leafmap.org/maplibre/add_text"><img alt="" src="https://i.imgur.com/UAtlh3r.png" /></a></p>
+<h2 id="visualize-alphaearth-satellite-embeddings-in-3d">Visualize AlphaEarth satellite embeddings in 3D<a class="headerlink" href="#visualize-alphaearth-satellite-embeddings-in-3d" title="Permanent link">&para;</a></h2>
+<p>Visualize AlphaEarth satellite embeddings in 3D.</p>
+<p><a href="https://leafmap.org/maplibre/AlphaEarth"><img alt="" src="https://github.com/user-attachments/assets/fdcf844e-6385-4e62-a49f-363c00fa0998" /></a></p>
+<h2 id="animate-a-line">Animate a line<a class="headerlink" href="#animate-a-line" title="Permanent link">&para;</a></h2>
+<p>Animate a line by updating a GeoJSON source on each frame.</p>
+<p><a href="https://leafmap.org/maplibre/animate_a_line"><img alt="" src="https://i.imgur.com/LRwfBl9.png" /></a></p>
+<h2 id="animate-map-camera-around-a-point">Animate map camera around a point<a class="headerlink" href="#animate-map-camera-around-a-point" title="Permanent link">&para;</a></h2>
+<p>Animate the map camera around a point.</p>
+<p><a href="https://leafmap.org/maplibre/animate_camera_around_point"><img alt="" src="https://i.imgur.com/odCwtjT.png" /></a></p>
+<h2 id="animate-a-series-of-images">Animate a series of images<a class="headerlink" href="#animate-a-series-of-images" title="Permanent link">&para;</a></h2>
+<p>Use a series of image sources to create an animation.</p>
+<p><a href="https://leafmap.org/maplibre/animate_images"><img alt="" src="https://i.imgur.com/2CY0in2.png" /></a></p>
+<h2 id="animate-a-point">Animate a point<a class="headerlink" href="#animate-a-point" title="Permanent link">&para;</a></h2>
+<p>Animate the position of a point by updating a GeoJSON source on each frame.</p>
+<p><a href="https://leafmap.org/maplibre/animate_point_along_line"><img alt="" src="https://i.imgur.com/EAxNQx4.png" /></a></p>
+<h2 id="animate-a-point-along-a-route">Animate a point along a route<a class="headerlink" href="#animate-a-point-along-a-route" title="Permanent link">&para;</a></h2>
+<p>Animate a point along the distance of a line.</p>
+<p><a href="https://leafmap.org/maplibre/animate_point_along_route"><img alt="" src="https://i.imgur.com/kdP1oT1.png" /></a></p>
+<h2 id="add-arc-layer">Add Arc Layer<a class="headerlink" href="#add-arc-layer" title="Permanent link">&para;</a></h2>
+<p>Add an ArcLayer to the map.</p>
+<p><a href="https://leafmap.org/maplibre/arc_layer"><img alt="" src="https://github.com/user-attachments/assets/467c0b25-4459-43cf-abb3-7e99815bf160" /></a></p>
+<h2 id="change-the-default-position-for-attribution">Change the default position for attribution<a class="headerlink" href="#change-the-default-position-for-attribution" title="Permanent link">&para;</a></h2>
+<p>Place attribution in the top-left position when initializing a map.</p>
+<p><a href="https://leafmap.org/maplibre/attribution_position"><img alt="" src="https://i.imgur.com/DsmqIOy.png" /></a></p>
+<h2 id="customize-basemaps">Customize basemaps<a class="headerlink" href="#customize-basemaps" title="Permanent link">&para;</a></h2>
+<p>Customize basemaps with MapTiler and xyzservices.</p>
+<p><a href="https://leafmap.org/maplibre/basemaps"><img alt="" src="https://i.imgur.com/inM3a7w.png" /></a></p>
+<h2 id="center-the-map-on-a-clicked-symbol">Center the map on a clicked symbol<a class="headerlink" href="#center-the-map-on-a-clicked-symbol" title="Permanent link">&para;</a></h2>
+<p>Use events and flyTo to center the map on a symbol.</p>
+<p><a href="https://leafmap.org/maplibre/center_on_symbol"><img alt="" src="https://i.imgur.com/kfU5VLm.png" /></a></p>
+<h2 id="change-building-color-based-on-zoom-level">Change building color based on zoom level<a class="headerlink" href="#change-building-color-based-on-zoom-level" title="Permanent link">&para;</a></h2>
+<p>Use the interpolate expression to ease-in the building layer and smoothly fade from one color to the next.</p>
+<p><a href="https://leafmap.org/maplibre/change_building_color"><img alt="" src="https://i.imgur.com/PayiTON.png" /></a></p>
+<h2 id="change-the-case-of-labels">Change the case of labels<a class="headerlink" href="#change-the-case-of-labels" title="Permanent link">&para;</a></h2>
+<p>Use the upcase and downcase expressions to change the case of labels.</p>
+<p><a href="https://leafmap.org/maplibre/change_case_of_labels"><img alt="" src="https://i.imgur.com/FzGOovv.png" /></a></p>
+<h2 id="create-choropleth-maps">Create choropleth maps<a class="headerlink" href="#create-choropleth-maps" title="Permanent link">&para;</a></h2>
+<p>Create choropleth maps with a variety of classification schemes.</p>
+<p><a href="https://leafmap.org/maplibre/choropleth"><img alt="" src="https://github.com/user-attachments/assets/35ca3e17-956e-4d88-9e24-7e94c9e322f8" /></a></p>
+<h2 id="cloud-optimized-geotiff-cog">Cloud Optimized GeoTIFF (COG)<a class="headerlink" href="#cloud-optimized-geotiff-cog" title="Permanent link">&para;</a></h2>
+<p>Visualize Cloud Optimized GeoTIFF (COG) files with TiTiler.</p>
+<p><a href="https://leafmap.org/maplibre/cloud_optimized_geotiff"><img alt="" src="https://i.imgur.com/t3nX3vj.png" /></a></p>
+<h2 id="create-and-style-clusters">Create and style clusters<a class="headerlink" href="#create-and-style-clusters" title="Permanent link">&para;</a></h2>
+<p>Use MapLibre GL JS' built-in functions to visualize points as clusters.</p>
+<p><a href="https://leafmap.org/maplibre/cluster"><img alt="" src="https://i.imgur.com/VWvJKwl.png" /></a></p>
+<h2 id="change-a-layers-color-with-buttons">Change a layer's color with buttons<a class="headerlink" href="#change-a-layers-color-with-buttons" title="Permanent link">&para;</a></h2>
+<p>Use setPaintProperty to change a layer's fill color.</p>
+<p><a href="https://leafmap.org/maplibre/color_switcher"><img alt="" src="https://i.imgur.com/Q3BbItI.png" /></a></p>
+<h2 id="visualize-copernicus-data-interactively">Visualize Copernicus data interactively<a class="headerlink" href="#visualize-copernicus-data-interactively" title="Permanent link">&para;</a></h2>
+<p>Visualize Copernicus data interactively with Leafmap.</p>
+<p><a href="https://leafmap.org/maplibre/copernicus"><img alt="" src="https://github.com/user-attachments/assets/f251654f-efd3-4e35-9e12-11cf790885a3" /></a></p>
+<h2 id="countries-filter">Countries filter<a class="headerlink" href="#countries-filter" title="Permanent link">&para;</a></h2>
+<p>Utilize and refine data from the MapTiler Countries to create a Choropleth map of the US states.</p>
+<p><a href="https://leafmap.org/maplibre/countries_filter"><img alt="" src="https://i.imgur.com/k1d6k9I.png" /></a></p>
+<h2 id="create-vector-data">Create vector data<a class="headerlink" href="#create-vector-data" title="Permanent link">&para;</a></h2>
+<p>Create vector data interactively on a map.</p>
+<p><a href="https://leafmap.org/maplibre/create_vector"><img alt="image" src="https://github.com/user-attachments/assets/70518d0a-d78e-4e21-94ab-2c18a9fa8f64" />
+</a></p>
+<h2 id="customize-marker-icon-image">Customize marker icon image<a class="headerlink" href="#customize-marker-icon-image" title="Permanent link">&para;</a></h2>
+<p>Use the icon-image property to change the icon image of a marker.</p>
+<p><a href="https://leafmap.org/maplibre/custom_marker"><img alt="" src="https://i.imgur.com/yEVKJlA.png" /></a></p>
+<h2 id="create-a-dashboard">Create a dashboard<a class="headerlink" href="#create-a-dashboard" title="Permanent link">&para;</a></h2>
+<p>Create a dashboard with maps, widgets, and buttons.</p>
+<p><a href="https://leafmap.org/maplibre/dashboard"><img alt="" src="https://github.com/user-attachments/assets/f98d9261-650f-4e53-b8d0-f35a3a7e875a" /></a></p>
+<h2 id="style-lines-with-a-data-driven-property">Style lines with a data-driven property<a class="headerlink" href="#style-lines-with-a-data-driven-property" title="Permanent link">&para;</a></h2>
+<p>Create a visualization with a data expression for line-color.</p>
+<p><a href="https://leafmap.org/maplibre/data_driven_lines"><img alt="" src="https://i.imgur.com/GY2ZVtf.png" /></a></p>
+<h2 id="disable-scroll-zoom">Disable scroll zoom<a class="headerlink" href="#disable-scroll-zoom" title="Permanent link">&para;</a></h2>
+<p>Prevent scroll from zooming a map.</p>
+<p><a href="https://leafmap.org/maplibre/disable_scroll_zoom"><img alt="" src="https://i.imgur.com/ShhYGaq.png" /></a></p>
+<h2 id="display-and-style-rich-text-labels">Display and style rich text labels<a class="headerlink" href="#display-and-style-rich-text-labels" title="Permanent link">&para;</a></h2>
+<p>Use the format expression to display country labels in both English and in the local language.</p>
+<p><a href="https://leafmap.org/maplibre/display_rich_text"><img alt="" src="https://i.imgur.com/cUiD0XX.png" /></a></p>
+<h2 id="create-a-draggable-marker">Create a draggable Marker<a class="headerlink" href="#create-a-draggable-marker" title="Permanent link">&para;</a></h2>
+<p>Drag the marker to a new location on a map and populate its coordinates in a display.</p>
+<p><a href="https://leafmap.org/maplibre/drag_a_marker"><img alt="" src="https://i.imgur.com/9RNVuRf.png" /></a></p>
+<h2 id="draw-features-on-the-map">Draw features on the map<a class="headerlink" href="#draw-features-on-the-map" title="Permanent link">&para;</a></h2>
+<p>Use the draw control to draw features on the map.</p>
+<p><a href="https://leafmap.org/maplibre/draw_features"><img alt="" src="https://i.imgur.com/w8UFssd.png" /></a></p>
+<h2 id="add-a-duckdb-layer">Add a DuckDB layer<a class="headerlink" href="#add-a-duckdb-layer" title="Permanent link">&para;</a></h2>
+<p>Add a DuckDB layer to the map.</p>
+<p><a href="https://leafmap.org/maplibre/duckdb_layer"><img alt="" src="https://github.com/user-attachments/assets/33362cb3-30e3-4a39-8545-652bc0268745" /></a></p>
+<h2 id="edit-vector-data-interactively">Edit vector data interactively<a class="headerlink" href="#edit-vector-data-interactively" title="Permanent link">&para;</a></h2>
+<p>Edit existing vector data interactively on a map.</p>
+<p><a href="https://leafmap.org/maplibre/edit_vector"><img alt="" src="https://github.com/user-attachments/assets/c86f78ee-1f50-418e-981e-b01fe61b2b53" /></a></p>
+<h2 id="use-a-fallback-image">Use a fallback image<a class="headerlink" href="#use-a-fallback-image" title="Permanent link">&para;</a></h2>
+<p>Use a coalesce expression to display another image when a requested image is not available.</p>
+<p><a href="https://leafmap.org/maplibre/fallback_image"><img alt="" src="https://github.com/user-attachments/assets/33362cb3-30e3-4a39-8545-652bc0268745" /></a></p>
+<h2 id="visualize-fields-of-the-world">Visualize Fields of The World<a class="headerlink" href="#visualize-fields-of-the-world" title="Permanent link">&para;</a></h2>
+<p>Visualize Agricultural Field Boundary Dataset - Fields of The World.</p>
+<p><a href="https://leafmap.org/maplibre/fields_of_the_world"><img alt="image" src="" /></a></p>
+<h2 id="add-a-pattern-to-a-polygon">Add a pattern to a polygon<a class="headerlink" href="#add-a-pattern-to-a-polygon" title="Permanent link">&para;</a></h2>
+<p>Use fill-pattern to draw a polygon from a repeating image pattern.</p>
+<p><a href="https://leafmap.org/maplibre/fill_pattern"><img alt="" src="https://i.imgur.com/ZEV5gbI.png" /></a></p>
+<h2 id="fit-a-map-to-a-bounding-box">Fit a map to a bounding box<a class="headerlink" href="#fit-a-map-to-a-bounding-box" title="Permanent link">&para;</a></h2>
+<p>Fit the map to a specific area, regardless of the pixel size of the map.</p>
+<p><a href="https://leafmap.org/maplibre/fit_bounds"><img alt="" src="https://i.imgur.com/ufrSWfP.png" /></a></p>
+<h2 id="fly-to-a-location">Fly to a location<a class="headerlink" href="#fly-to-a-location" title="Permanent link">&para;</a></h2>
+<p>Use flyTo to smoothly interpolate between locations.</p>
+<p><a href="https://leafmap.org/maplibre/fly_to"><img alt="" src="https://i.imgur.com/UVlvpi9.png" /></a></p>
+<h2 id="slowly-fly-to-a-location">Slowly fly to a location<a class="headerlink" href="#slowly-fly-to-a-location" title="Permanent link">&para;</a></h2>
+<p>Use flyTo with flyOptions to slowly zoom to a location.</p>
+<p><a href="https://leafmap.org/maplibre/fly_to_options"><img alt="" src="https://i.imgur.com/ZzOzfP5.png" /></a></p>
+<h2 id="view-a-fullscreen-map">View a fullscreen map<a class="headerlink" href="#view-a-fullscreen-map" title="Permanent link">&para;</a></h2>
+<p>Toggle between current view and fullscreen mode.</p>
+<p><a href="https://leafmap.org/maplibre/fullscreen"><img alt="" src="https://i.imgur.com/Vn3carH.png" /></a></p>
+<h2 id="add-a-new-layer-below-labels">Add a new layer below labels<a class="headerlink" href="#add-a-new-layer-below-labels" title="Permanent link">&para;</a></h2>
+<p>Use the second argument of addLayer to add a layer below labels.</p>
+<p><a href="https://leafmap.org/maplibre/geojson_layer_in_stack"><img alt="" src="https://i.imgur.com/TelRIyZ.png" /></a></p>
+<h2 id="add-a-geojson-line">Add a GeoJSON line<a class="headerlink" href="#add-a-geojson-line" title="Permanent link">&para;</a></h2>
+<p>Add a GeoJSON line to a map using addSource, then style it using addLayer’s paint properties.</p>
+<p><a href="https://leafmap.org/maplibre/geojson_line"><img alt="" src="https://i.imgur.com/03ylQm0.png" /></a></p>
+<h2 id="draw-geojson-points">Draw GeoJSON points<a class="headerlink" href="#draw-geojson-points" title="Permanent link">&para;</a></h2>
+<p>Draw points from a GeoJSON collection to a map.</p>
+<p><a href="https://leafmap.org/maplibre/geojson_points"><img alt="" src="https://i.imgur.com/cJsnBby.png" /></a></p>
+<h2 id="add-a-geojson-polygon">Add a GeoJSON polygon<a class="headerlink" href="#add-a-geojson-polygon" title="Permanent link">&para;</a></h2>
+<p>Style a polygon with the fill layer type.</p>
+<p><a href="https://leafmap.org/maplibre/geojson_polygon"><img alt="" src="https://i.imgur.com/ZRFTymo.png" /></a></p>
+<h2 id="add-a-geopandas-geodataframe">Add a GeoPandas GeoDataFrame<a class="headerlink" href="#add-a-geopandas-geodataframe" title="Permanent link">&para;</a></h2>
+<p>Add a GeoPandas GeoDataFrame to a map.</p>
+<p><a href="https://leafmap.org/maplibre/geopandas"><img alt="" src="https://i.imgur.com/CQHcD7N.png" /></a></p>
+<h2 id="globe-projection">Globe Projection<a class="headerlink" href="#globe-projection" title="Permanent link">&para;</a></h2>
+<p>Use globe projection to visualize a 3D globe.</p>
+<p><a href="https://leafmap.org/maplibre/globe_projection"><img alt="" src="https://github.com/user-attachments/assets/d8d1ba3b-1e69-45ca-93c2-0d696c269b01" /></a></p>
+<h2 id="create-raster-tiles-for-rendering-in-google-earth">Create raster tiles for rendering in Google Earth<a class="headerlink" href="#create-raster-tiles-for-rendering-in-google-earth" title="Permanent link">&para;</a></h2>
+<p>Create raster tiles for rendering in Google Earth at https://earth.google.com.</p>
+<p><a href="https://leafmap.org/maplibre/google_earth"><img alt="" src="https://github.com/user-attachments/assets/e2c8039a-d445-46ed-94e6-12bb83e472b3" /></a></p>
+<h2 id="google-earth-engine">Google Earth Engine<a class="headerlink" href="#google-earth-engine" title="Permanent link">&para;</a></h2>
+<p>Add Google Earth Engine data layers to a map.</p>
+<p><a href="https://leafmap.org/maplibre/google_earth_engine"><img alt="" src="https://i.imgur.com/oHQDf79.png" /></a></p>
+<h2 id="visualize-gps-trace-data">Visualize GPS Trace Data<a class="headerlink" href="#visualize-gps-trace-data" title="Permanent link">&para;</a></h2>
+<p>Add a GPS trace to a map.</p>
+<p><a href="https://leafmap.org/maplibre/gps_trace"><img alt="" src="https://github.com/user-attachments/assets/2a669b4d-c43f-4382-bf66-8918b4719b48" /></a></p>
+<h2 id="create-a-heatmap-layer">Create a heatmap layer<a class="headerlink" href="#create-a-heatmap-layer" title="Permanent link">&para;</a></h2>
+<p>Visualize earthquake frequency by location using a heatmap layer.</p>
+<p><a href="https://leafmap.org/maplibre/heatmap_layer"><img alt="" src="https://i.imgur.com/OLCRPKj.png" /></a></p>
+<h2 id="visualize-historical-satellite-imagery">Visualize historical satellite imagery<a class="headerlink" href="#visualize-historical-satellite-imagery" title="Permanent link">&para;</a></h2>
+<p>Visualize historical satellite imagery using Wayback layers.</p>
+<p><a href="https://leafmap.org/maplibre/historical_imagery"><img alt="" src="https://github.com/user-attachments/assets/c8ce9f3d-f8df-48c1-bf05-1f573e438424" /></a></p>
+<h2 id="visualize-us-median-housing-prices-by-county">Visualize US median housing prices by county<a class="headerlink" href="#visualize-us-median-housing-prices-by-county" title="Permanent link">&para;</a></h2>
+<p>Visualize US median housing prices by county using a choropleth map.</p>
+<p><a href="https://leafmap.org/maplibre/housing_prices"><img alt="" src="https://github.com/user-attachments/assets/9052e391-a26a-4a75-9ffe-d4abac3c0fce" /></a></p>
+<h2 id="display-a-non-interactive-map">Display a non-interactive map<a class="headerlink" href="#display-a-non-interactive-map" title="Permanent link">&para;</a></h2>
+<p>Disable interactivity to create a static map.</p>
+<p><a href="https://leafmap.org/maplibre/interactive_false"><img alt="" src="https://i.imgur.com/qZw8g3C.png" /></a></p>
+<h2 id="jump-to-a-series-of-locations">Jump to a series of locations<a class="headerlink" href="#jump-to-a-series-of-locations" title="Permanent link">&para;</a></h2>
+<p>Use the jumpTo function to showcase multiple locations.</p>
+<p><a href="https://leafmap.org/maplibre/jump_to"><img alt="" src="https://i.imgur.com/kzzegQ8.png" /></a></p>
+<h2 id="change-a-maps-language">Change a map's language<a class="headerlink" href="#change-a-maps-language" title="Permanent link">&para;</a></h2>
+<p>Use setLayoutProperty to switch languages dynamically.</p>
+<p><a href="https://leafmap.org/maplibre/language_switch"><img alt="" src="https://i.imgur.com/gIRDqQK.png" /></a></p>
+<h2 id="add-a-layer-control">Add a layer control<a class="headerlink" href="#add-a-layer-control" title="Permanent link">&para;</a></h2>
+<p>Control layer visibility with a layer control.</p>
+<p><a href="https://leafmap.org/maplibre/layer_control"><img alt="" src="https://i.imgur.com/NffngdY.png" /></a></p>
+<h2 id="create-layer-group-toggle-buttons">Create layer group toggle buttons<a class="headerlink" href="#create-layer-group-toggle-buttons" title="Permanent link">&para;</a></h2>
+<p>Create layer group toggle buttons for the layer manager.</p>
+<p><a href="https://leafmap.org/maplibre/layer_groups"><img alt="image" src="https://github.com/user-attachments/assets/313f60da-1ee7-4bc1-b125-7a3c0a0c3850" /></a></p>
+<h2 id="add-a-layer-manager">Add a layer manager<a class="headerlink" href="#add-a-layer-manager" title="Permanent link">&para;</a></h2>
+<p>Control layer visibility and opacity with a layer manager.</p>
+<p><a href="https://leafmap.org/maplibre/layer_manager"><img alt="image" src="https://github.com/user-attachments/assets/d6624b02-332c-4df2-805e-ee39772081f1" /></a></p>
+<h2 id="style-a-layer-interactively">Style a layer interactively<a class="headerlink" href="#style-a-layer-interactively" title="Permanent link">&para;</a></h2>
+<p>Style a layer interactively with a widget.</p>
+<p><a href="https://leafmap.org/maplibre/layer_styling"><img alt="image" src="https://github.com/user-attachments/assets/d0f034d9-4896-4d7a-92ac-500f5e26c17d" /></a></p>
+<h2 id="create-a-gradient-line-using-an-expression">Create a gradient line using an expression<a class="headerlink" href="#create-a-gradient-line-using-an-expression" title="Permanent link">&para;</a></h2>
+<p>Use the line-gradient paint property and an expression to visualize distance from the starting point of a line.</p>
+<p><a href="https://leafmap.org/maplibre/line_gradient"><img alt="" src="https://i.imgur.com/I91N6Sk.png" /></a></p>
+<h2 id="add-live-realtime-data">Add live realtime data<a class="headerlink" href="#add-live-realtime-data" title="Permanent link">&para;</a></h2>
+<p>Use realtime GeoJSON data streams to move a symbol on your map.</p>
+<p><a href="https://leafmap.org/maplibre/live_geojson"><img alt="" src="https://i.imgur.com/dayWZIG.png" /></a></p>
+<h2 id="update-a-feature-in-realtime">Update a feature in realtime<a class="headerlink" href="#update-a-feature-in-realtime" title="Permanent link">&para;</a></h2>
+<p>Change an existing feature on your map in real-time by updating its data.</p>
+<p><a href="https://leafmap.org/maplibre/live_update_feature"><img alt="" src="https://i.imgur.com/FPB5j6V.png" /></a></p>
+<h2 id="view-local-geojson">View local GeoJSON<a class="headerlink" href="#view-local-geojson" title="Permanent link">&para;</a></h2>
+<p>View local GeoJSON without server upload.</p>
+<p><a href="https://leafmap.org/maplibre/local_geojson"><img alt="" src="https://i.imgur.com/w3mbV2O.png" /></a></p>
+<h2 id="view-local-raster-datasets">View local raster datasets<a class="headerlink" href="#view-local-raster-datasets" title="Permanent link">&para;</a></h2>
+<p>View local raster datasets with localtileserver</p>
+<p><a href="https://leafmap.org/maplibre/local_raster"><img alt="" src="https://i.imgur.com/Q9sQLCP.png" /></a></p>
+<h2 id="locate-the-user">Locate the user<a class="headerlink" href="#locate-the-user" title="Permanent link">&para;</a></h2>
+<p>Geolocate the user and then track their current location on the map using the GeolocateControl.</p>
+<p><a href="https://leafmap.org/maplibre/locate_user"><img alt="" src="https://i.imgur.com/nqYXzbN.png" /></a></p>
+<h2 id="add-a-raster-tile-source">Add a raster tile source<a class="headerlink" href="#add-a-raster-tile-source" title="Permanent link">&para;</a></h2>
+<p>Add a third-party raster source to the map.</p>
+<p><a href="https://leafmap.org/maplibre/map_tiles"><img alt="" src="https://i.imgur.com/GX7reQP.png" /></a></p>
+<h2 id="visualize-mapillary-data">Visualize Mapillary data<a class="headerlink" href="#visualize-mapillary-data" title="Permanent link">&para;</a></h2>
+<p>Visualize Mapillary vector tiles on a map.</p>
+<p><a href="https://leafmap.org/maplibre/mapillary"><img alt="image" src="https://github.com/user-attachments/assets/db9fac4f-4d67-4ccb-8f2d-06d665bdd521" /></a></p>
+<h2 id="use-maptiler-styles">Use MapTiler styles<a class="headerlink" href="#use-maptiler-styles" title="Permanent link">&para;</a></h2>
+<p>Use MapTiler styles to customize the look of your map.</p>
+<p><a href="https://leafmap.org/maplibre/maptiler_styles"><img alt="" src="https://i.imgur.com/0CKEFBx.png" /></a></p>
+<h2 id="visualize-the-military-grid-reference-system-mgrs">Visualize the Military Grid Reference System (MGRS)<a class="headerlink" href="#visualize-the-military-grid-reference-system-mgrs" title="Permanent link">&para;</a></h2>
+<p>visualize the Military Grid Reference System (MGRS) on a map.</p>
+<p><a href="https://leafmap.org/maplibre/MGRS"><img alt="image" src="https://github.com/user-attachments/assets/f2fd827c-406f-4738-b659-882fca9d29b1" /></a></p>
+<h2 id="get-coordinates-of-the-mouse-pointer">Get coordinates of the mouse pointer<a class="headerlink" href="#get-coordinates-of-the-mouse-pointer" title="Permanent link">&para;</a></h2>
+<p>Show mouse position on hover with pixel and latitude and longitude coordinates.</p>
+<p><a href="https://leafmap.org/maplibre/mouse_position"><img alt="" src="https://i.imgur.com/jd2hBSz.png" /></a></p>
+<h2 id="add-multiple-geometries-from-one-geojson-source">Add multiple geometries from one GeoJSON source<a class="headerlink" href="#add-multiple-geometries-from-one-geojson-source" title="Permanent link">&para;</a></h2>
+<p>Add a polygon and circle layer from the same GeoJSON source.</p>
+<p><a href="https://leafmap.org/maplibre/multiple_geometries"><img alt="" src="https://i.imgur.com/9q7npbO.png" /></a></p>
+<h2 id="search-and-visualize-nasa-opera-data-products">Search and visualize NASA OPERA data products<a class="headerlink" href="#search-and-visualize-nasa-opera-data-products" title="Permanent link">&para;</a></h2>
+<p>Search and visualize NASA OPERA data products interactively</p>
+<p><a href="https://leafmap.org/maplibre/nasa_opera"><img alt="image" src="https://github.com/user-attachments/assets/bca2f4de-84d2-4429-b076-a982279d3eaa" /></a></p>
+<h2 id="display-map-navigation-controls">Display map navigation controls<a class="headerlink" href="#display-map-navigation-controls" title="Permanent link">&para;</a></h2>
+<p>Add zoom and rotation controls to the map.</p>
+<p><a href="https://leafmap.org/maplibre/navigation"><img alt="" src="https://i.imgur.com/0A2o0oI.png" /></a></p>
+<h2 id="ocean-bathymetry-3d">Ocean Bathymetry 3D<a class="headerlink" href="#ocean-bathymetry-3d" title="Permanent link">&para;</a></h2>
+<p>Visualize ocean bathymetry in 3D.</p>
+<p><a href="https://leafmap.org/maplibre/ocean_bathymetry"><img alt="" src="https://i.imgur.com/m6NwSWG.png" /></a></p>
+<h2 id="use-openfreemap-vector-tiles">Use OpenFreeMap vector tiles<a class="headerlink" href="#use-openfreemap-vector-tiles" title="Permanent link">&para;</a></h2>
+<p>Use free vector tiles from OpenFreeMap.</p>
+<p><a href="https://leafmap.org/maplibre/openfreemap"><img alt="" src="https://github.com/user-attachments/assets/0a9c8cb8-2b7e-4ca5-ba7b-183b8b3f54a6" /></a></p>
+<h2 id="use-openstreetmap-vector-tiles">Use OpenStreetMap vector tiles<a class="headerlink" href="#use-openstreetmap-vector-tiles" title="Permanent link">&para;</a></h2>
+<p>Use free vector tiles from OpenStreetMap.</p>
+<p><a href="https://leafmap.org/maplibre/openstreetmap"><img alt="" src="https://github.com/user-attachments/assets/af350646-d668-4eeb-a611-8ca270631d2d" /></a></p>
+<h2 id="visualze-overture-data">Visualze Overture data<a class="headerlink" href="#visualze-overture-data" title="Permanent link">&para;</a></h2>
+<p>Visualize Overture Maps data.</p>
+<p><a href="https://leafmap.org/maplibre/overture"><img alt="" src="https://github.com/user-attachments/assets/e07986eb-cc5a-4f25-b7e0-bed480a415d3" /></a></p>
+<h2 id="pmtiles-source-and-protocol">PMTiles source and protocol<a class="headerlink" href="#pmtiles-source-and-protocol" title="Permanent link">&para;</a></h2>
+<p>Uses the PMTiles plugin and protocol to present a map.</p>
+<p><a href="https://leafmap.org/maplibre/pmtiles"><img alt="" src="https://i.imgur.com/9gQQreo.png" /></a></p>
+<h2 id="restrict-map-panning-to-an-area">Restrict map panning to an area<a class="headerlink" href="#restrict-map-panning-to-an-area" title="Permanent link">&para;</a></h2>
+<p>Prevent a map from being panned to a different place by setting max_bounds.</p>
+<p><a href="https://leafmap.org/maplibre/restrict_bounds"><img alt="" src="https://i.imgur.com/RH5O9d3.png" /></a></p>
+<h2 id="display-a-satellite-map">Display a satellite map<a class="headerlink" href="#display-a-satellite-map" title="Permanent link">&para;</a></h2>
+<p>Display a satellite raster baselayer.</p>
+<p><a href="https://leafmap.org/maplibre/satellite_map"><img alt="" src="https://i.imgur.com/S17IRDh.png" /></a></p>
+<h2 id="add-a-search-control">Add a search control<a class="headerlink" href="#add-a-search-control" title="Permanent link">&para;</a></h2>
+<p>Use MapTiler Geocoding API to add a search control to the map.</p>
+<p><a href="https://leafmap.org/maplibre/search_control"><img alt="" src="https://github.com/user-attachments/assets/219b101a-8757-48a2-98c1-2467f78b4d04" /></a></p>
+<h2 id="set-pitch-and-bearing">Set pitch and bearing<a class="headerlink" href="#set-pitch-and-bearing" title="Permanent link">&para;</a></h2>
+<p>Initialize a map with pitch and bearing camera options.</p>
+<p><a href="https://leafmap.org/maplibre/set_pitch_bearing"><img alt="" src="https://i.imgur.com/onKRYXz.png" /></a></p>
+<h2 id="set-terrain">Set terrain<a class="headerlink" href="#set-terrain" title="Permanent link">&para;</a></h2>
+<p>Set terrain on the map.</p>
+<p><a href="https://leafmap.org/maplibre/set_terrain"><img alt="" src="https://github.com/user-attachments/assets/5527dfa5-8a06-47b8-b123-c353005b72c0" /></a></p>
+<h2 id="add-a-sidebar-widget">Add a sidebar widget<a class="headerlink" href="#add-a-sidebar-widget" title="Permanent link">&para;</a></h2>
+<p>Create a sidebar widget to display the layer manager and custom widgets.</p>
+<p><a href="https://leafmap.org/maplibre/sidebar"><img alt="image" src="https://github.com/user-attachments/assets/50250de3-fb3c-49d9-921c-b80c8f32ccb5" /></a></p>
+<h2 id="similarity-search-with-alphaearth-satellite-embeddings">Similarity Search with AlphaEarth Satellite Embeddings<a class="headerlink" href="#similarity-search-with-alphaearth-satellite-embeddings" title="Permanent link">&para;</a></h2>
+<p>Use the similarity search widget to search for similar satellite images.</p>
+<p><a href="https://leafmap.org/maplibre/similarity_search"><img alt="" src="https://github.com/user-attachments/assets/51a5a1c0-5784-48da-9790-a84704ed2187" /></a></p>
+<h2 id="visualize-spatiotemporal-asset-catalog-stac">Visualize SpatioTemporal Asset Catalog (STAC)<a class="headerlink" href="#visualize-spatiotemporal-asset-catalog-stac" title="Permanent link">&para;</a></h2>
+<p>Visualize SpatioTemporal Asset Catalog (STAC) items with TiTiler.</p>
+<p><a href="https://leafmap.org/maplibre/stac"><img alt="" src="https://i.imgur.com/zWsNXSF.png" /></a></p>
+<h2 id="add-a-time-slider-for-visualizing-time-series-data">Add a time slider for visualizing time series data<a class="headerlink" href="#add-a-time-slider-for-visualizing-time-series-data" title="Permanent link">&para;</a></h2>
+<p>Add a time slider for visualizing time series data.</p>
+<p><a href="https://leafmap.org/maplibre/time_slider"><img alt="" src="https://github.com/user-attachments/assets/2bfd5ad9-cf2e-43ce-96c0-278ea57fa020" /></a></p>
+<h2 id="export-3d-maps-as-html-files-for-website-hosting">Export 3D maps as HTML files for website hosting<a class="headerlink" href="#export-3d-maps-as-html-files-for-website-hosting" title="Permanent link">&para;</a></h2>
+<p>Export 3D maps as HTML files for website hosting.</p>
+<p><a href="https://leafmap.org/maplibre/to_html"><img alt="" src="https://i.imgur.com/1h8tKqw.png" /></a></p>
+<h2 id="variable-label-placement">Variable label placement<a class="headerlink" href="#variable-label-placement" title="Permanent link">&para;</a></h2>
+<p>Use text-variable-anchor to allow high priority labels to shift position to stay on the map.</p>
+<p><a href="https://leafmap.org/maplibre/variable_label_placement"><img alt="" src="https://i.imgur.com/4fo0ODF.png" /></a></p>
+<h2 id="variable-label-placement-with-offset">Variable label placement with offset<a class="headerlink" href="#variable-label-placement-with-offset" title="Permanent link">&para;</a></h2>
+<p>Use text-variable-anchor-offset to allow high priority labels to shift position to stay on the map.</p>
+<p><a href="https://leafmap.org/maplibre/variable_offset_label_placement"><img alt="" src="https://i.imgur.com/HKfcsoc.png" /></a></p>
+<h2 id="add-a-vector-tile-source">Add a vector tile source<a class="headerlink" href="#add-a-vector-tile-source" title="Permanent link">&para;</a></h2>
+<p>Add a vector source to a map.</p>
+<p><a href="https://leafmap.org/maplibre/vector_tile"><img alt="" src="https://i.imgur.com/svfZwFh.jpeg" /></a></p>
+<h2 id="add-a-video">Add a video<a class="headerlink" href="#add-a-video" title="Permanent link">&para;</a></h2>
+<p>Display a video on top of a satellite raster baselayer.</p>
+<p><a href="https://leafmap.org/maplibre/video_on_a_map"><img alt="" src="https://i.imgur.com/8YGYanS.jpeg" /></a></p>
+<h2 id="visualize-population-density">Visualize population density<a class="headerlink" href="#visualize-population-density" title="Permanent link">&para;</a></h2>
+<p>Use a variable binding expression to calculate and display population density.</p>
+<p><a href="https://leafmap.org/maplibre/visualize_population_density"><img alt="" src="https://i.imgur.com/7qpnvOP.png" /></a></p>
+<h2 id="add-a-wms-source">Add a WMS source<a class="headerlink" href="#add-a-wms-source" title="Permanent link">&para;</a></h2>
+<p>Add an external Web Map Service raster layer to the map using addSource's tiles option.</p>
+<p><a href="https://leafmap.org/maplibre/wms_source"><img alt="" src="https://i.imgur.com/itFOq8z.png" /></a></p>
+<h2 id="fit-to-the-bounds-of-a-linestring">Fit to the bounds of a LineString<a class="headerlink" href="#fit-to-the-bounds-of-a-linestring" title="Permanent link">&para;</a></h2>
+<p>Get the bounds of a LineString.</p>
+<p><a href="https://leafmap.org/maplibre/zoom_to_linestring"><img alt="" src="https://i.imgur.com/DEnUdXS.png" /></a></p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="October 28, 2025 16:55:23 UTC"><span class="timeago" datetime="2025-10-28T16:55:23+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="October 28, 2025 16:55:23 UTC">2025-10-28</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="June 19, 2024 20:05:37 UTC"><span class="timeago" datetime="2024-06-19T20:05:37+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="June 19, 2024 20:05:37 UTC">2024-06-19</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+
+                
+
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2021 - 2025 Qiusheng Wu
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.top", "search.highlight", "search.share"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+        <script src="../../js/timeago.min.js"></script>
+      
+        <script src="../../js/timeago_mkdocs_material.js"></script>
+      
+    
+  </body>
+</html>
