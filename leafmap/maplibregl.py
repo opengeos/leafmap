@@ -62,6 +62,7 @@ from .common import (
     random_string,
     read_geojson,
     read_vector,
+    run_titiler,
     sort_files,
     stac_assets,
     start_duckdb_tile_server,

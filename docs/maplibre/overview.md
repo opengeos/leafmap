@@ -483,6 +483,12 @@ View local raster datasets with localtileserver
 
 [![](https://i.imgur.com/Q9sQLCP.png)](https://leafmap.org/maplibre/local_raster)
 
+## Start a TiTiler server
+
+Start a local TiTiler server for visualizing COGs.
+
+[![](https://github.com/user-attachments/assets/73d77340-93d5-47a7-8c1a-373d2c154110)](https://leafmap.org/maplibre/local_titiler)
+
 ## Locate the user
 
 Geolocate the user and then track their current location on the map using the GeolocateControl.
