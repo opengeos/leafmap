@@ -119,7 +119,7 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
         The titiler endpoint.
     """
     if titiler_endpoint is not None and titiler_endpoint.lower() == "local":
-        titiler_endpoint, _, _ = run_titiler(show_logs=False)
+        titiler_endpoint = run_titiler(show_logs=False)
     elif titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
             titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
