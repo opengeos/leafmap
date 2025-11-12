@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import TYPE_CHECKING
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -245,6 +246,10 @@ def cog_tile(
     if titiler_endpoint.startswith("https://") and tiles.startswith("http://"):
         tiles = tiles.replace("http://", "https://")
 
+    # Convert 127.0.0.1 to localhost for Google Colab browser access
+    if "google.colab" in sys.modules and "127.0.0.1" in tiles:
+        tiles = tiles.replace("http://127.0.0.1", "https://localhost")
+
     return tiles
 
 
@@ -346,7 +351,13 @@ def cog_mosaic(
             f"{titiler_endpoint}/mosaicjson/{username}.{layername}/tilejson.json",
         ).json()
 
-        return r2["tiles"][0]
+        tiles = r2["tiles"][0]
+
+        # Convert 127.0.0.1 to localhost for Google Colab browser access
+        if "google.colab" in sys.modules and "127.0.0.1" in tiles:
+            tiles = tiles.replace("http://127.0.0.1", "https://localhost")
+
+        return tiles
 
     except Exception as e:
         raise Exception(e)
@@ -839,7 +850,13 @@ def stac_tile(
                 titiler_endpoint.url_for_stac_item(), params=kwargs, timeout=10
             ).json()
 
-    return r["tiles"][0]
+    tiles = r["tiles"][0]
+
+    # Convert 127.0.0.1 to localhost for Google Colab browser access
+    if "google.colab" in sys.modules and "127.0.0.1" in tiles:
+        tiles = tiles.replace("http://127.0.0.1", "https://localhost")
+
+    return tiles
 
 
 def stac_bounds(
@@ -2526,6 +2543,9 @@ def run_titiler(
 ):
     """Run TiTiler as a background service on an available port.
 
+    This function automatically detects Google Colab and adjusts the endpoint URL
+    to use localhost remapping (https://localhost:{port}) for compatibility.
+
     Args:
         show_logs (bool): If True, stream logs to the notebook output.
         start_port (int): First port to try.
@@ -2583,8 +2603,15 @@ def run_titiler(
 
     # Wait a bit for startup
     time.sleep(2)
+
+    # Always use http://127.0.0.1 for the endpoint so Python requests work
+    # In Google Colab, tile URLs will be converted to https://localhost for browser access
     endpoint = f"http://127.0.0.1:{port}"
-    print(f"🚀 TiTiler is running at {endpoint}")
+
+    if "google.colab" in sys.modules:
+        print(f"🚀 TiTiler is running at {endpoint} (Google Colab mode)")
+    else:
+        print(f"🚀 TiTiler is running at {endpoint}")
 
     # Register cleanup on kernel shutdown
     def stop_titiler():
