@@ -57,6 +57,7 @@ from .common import (
     read_netcdf,
     read_raster,
     read_rasters,
+    run_titiler,
     save_colorbar,
     search_qms,
     search_xyz_services,
