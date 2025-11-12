@@ -2543,13 +2543,6 @@ def run_titiler(
     import time
     import threading
 
-    # 💡 Disable OpenTelemetry to dodge the StopIteration/context issue
-    os.environ.setdefault("OTEL_SDK_DISABLED", "true")
-    # (Optional extra hardening)
-    os.environ.setdefault("OTEL_TRACES_EXPORTER", "none")
-    os.environ.setdefault("OTEL_METRICS_EXPORTER", "none")
-    os.environ.setdefault("OTEL_LOGS_EXPORTER", "none")
-
     def find_free_port(start, end):
         for port in range(start, end):
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
