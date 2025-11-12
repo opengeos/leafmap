@@ -118,7 +118,9 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
     Returns:
         The titiler endpoint.
     """
-    if titiler_endpoint is None:
+    if titiler_endpoint is not None and titiler_endpoint.lower() == "local":
+        titiler_endpoint = run_titiler(show_logs=False)
+    elif titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
             titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
 
@@ -2514,3 +2516,91 @@ def get_cog_link_from_stac_item(item_url: str) -> str:
     except Exception as e:
         print(f"Failed to retrieve STAC item: {e}")
         return None
+
+
+def run_titiler(
+    show_logs: bool = False,
+    start_port: int = 8000,
+    max_port: int = 8100,
+    return_titiler_endpoint: bool = False,
+):
+    """Run TiTiler as a background service on an available port.
+
+    Args:
+        show_logs (bool): If True, stream logs to the notebook output.
+        start_port (int): First port to try.
+        max_port (int): Last port to try (exclusive).
+        return_titiler_endpoint (bool): If True, return the titiler endpoint. Defaults to False.
+
+    Returns:
+        tuple: (endpoint, port, process)
+    """
+
+    import subprocess
+    import socket
+    import atexit
+    import signal
+    import time
+    import threading
+
+    def find_free_port(start, end):
+        for port in range(start, end):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                try:
+                    s.bind(("127.0.0.1", port))
+                    return port
+                except OSError:
+                    continue
+        raise RuntimeError(f"No free port found between {start} and {end}")
+
+    port = find_free_port(start_port, max_port)
+
+    cmd = [
+        "uvicorn",
+        "titiler.application.main:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(port),
+        "--log-level",
+        "info",
+    ]
+
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE if show_logs else subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+    )
+
+    # Optionally stream logs in a background thread
+    if show_logs:
+
+        def stream_logs():
+            for line in iter(proc.stdout.readline, b""):
+                print(line.decode().rstrip())
+
+        threading.Thread(target=stream_logs, daemon=True).start()
+
+    # Wait a bit for startup
+    time.sleep(2)
+    endpoint = f"http://127.0.0.1:{port}"
+    print(f"🚀 TiTiler is running at {endpoint}")
+
+    # Register cleanup on kernel shutdown
+    def stop_titiler():
+        if proc.poll() is None:
+            print("🛑 Stopping TiTiler...")
+            proc.send_signal(signal.SIGINT)
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+
+    atexit.register(stop_titiler)
+
+    os.environ["TITILER_ENDPOINT"] = endpoint
+    os.environ["TITILER_PORT"] = str(port)
+    os.environ["TITILER_PROCESS"] = str(proc)
+
+    if return_titiler_endpoint:
+        return endpoint, port, proc
