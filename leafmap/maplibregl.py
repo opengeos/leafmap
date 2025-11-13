@@ -53,6 +53,7 @@ from .common import (
     get_bounds,
     get_ee_tile_url,
     get_overture_data,
+    get_overture_latest_release,
     init_duckdb_tiles,
     nasa_data_download,
     nasa_data_login,
