@@ -13168,7 +13168,7 @@ def close_duckdb_connections(database_path: str = None, quiet: bool = True):
         >>> import leafmap
         >>> # After using add_duckdb_layer
         >>> m = leafmap.Map()
-        >>> m.add_duckdb_layer("data.geojson")
+        >>> m.add_duckdb_layer("tiles.db")
         >>> # Later, close the connections
         >>> leafmap.close_duckdb_connections()
         >>> # Or close connections for a specific database
