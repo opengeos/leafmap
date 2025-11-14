@@ -19850,3 +19850,78 @@ def ee_initialize(
         raise ValueError("key_data JSON does not contain 'client_email'")
     credentials = ee.ServiceAccountCredentials(email=email, key_data=key_data)
     ee.Initialize(credentials)
+
+
+def generate_latlon_grid(extent, dx=0.1, dy=0.1, crs="EPSG:4326", output=None):
+    """
+    Generate a rectangular lat/lon grid as polygons over a given extent.
+
+    Parameters
+    ----------
+    extent : tuple
+        (xmin, ymin, xmax, ymax) in degrees, e.g. (-180, -60, 180, 85)
+    dx : float
+        Longitude interval in degrees (cell width)
+    dy : float
+        Latitude interval in degrees (cell height)
+    crs : str or dict
+        Coordinate reference system for the output GeoDataFrame
+
+    Returns
+    -------
+    GeoDataFrame
+        Columns: id, lon_min, lat_min, lon_max, lat_max, geometry
+    """
+
+    import numpy as np
+    import geopandas as gpd
+    from shapely.geometry import Polygon
+
+    xmin, ymin, xmax, ymax = extent
+
+    # Ensure increasing order
+    if xmax <= xmin or ymax <= ymin:
+        raise ValueError("Invalid extent: xmax must be > xmin and ymax > ymin")
+
+    # Generate grid coordinates (we’ll allow partial cells at the edges)
+    lons = np.arange(xmin, xmax, dx)
+    lats = np.arange(ymin, ymax, dy)
+
+    polygons = []
+    records = []
+
+    cell_id = 0
+    for lon in lons:
+        for lat in lats:
+            # Clip cells to the exact extent at the upper/right edges
+            lon_max = min(lon + dx, xmax)
+            lat_max = min(lat + dy, ymax)
+
+            poly = Polygon(
+                [
+                    (lon, lat),
+                    (lon_max, lat),
+                    (lon_max, lat_max),
+                    (lon, lat_max),
+                    (lon, lat),
+                ]
+            )
+
+            polygons.append(poly)
+            records.append(
+                {
+                    "id": cell_id,
+                    "lon_min": lon,
+                    "lat_min": lat,
+                    "lon_max": lon_max,
+                    "lat_max": lat_max,
+                }
+            )
+            cell_id += 1
+
+    gdf = gpd.GeoDataFrame(records, geometry=polygons, crs=crs)
+
+    if output is not None:
+        gdf.to_file(output)
+
+    return gdf
