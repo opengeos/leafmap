@@ -12798,6 +12798,11 @@ def init_duckdb_tiles(
     return database_path
 
 
+# Global registry to track DuckDB connection pools for each database
+# Key: database_path, Value: dict with 'pool' and 'lock'
+_duckdb_connection_pools = {}
+
+
 def start_duckdb_tile_server(
     database_path: str,
     table_name: str = "features",
@@ -12951,6 +12956,13 @@ def start_duckdb_tile_server(
             # Pre-populate the pool
             for _ in range(max_connections):
                 connection_pool.put(create_connection())
+
+            # Register the connection pool in the global registry
+            _duckdb_connection_pools[database_path] = {
+                "pool": connection_pool,
+                "lock": pool_lock,
+                "max_connections": max_connections,
+            }
 
             def get_db_connection():
                 """Get a connection from the pool."""
@@ -13134,6 +13146,78 @@ def start_duckdb_tile_server(
         run_flask()
 
     return actual_port
+
+
+def close_duckdb_connections(database_path: str = None, quiet: bool = True):
+    """
+    Close DuckDB connections for a specific database or all databases.
+
+    This function closes all connections in the connection pool for the specified
+    database, allowing other programs to access the database file. This is useful
+    when you're done using the database and want to release the file lock.
+
+    Args:
+        database_path (str, optional): Path to the DuckDB database file.
+            If None, closes connections for all databases. Defaults to None.
+        quiet (bool, optional): If True, suppress status messages. Defaults to True.
+
+    Returns:
+        None
+
+    Example:
+        >>> import leafmap
+        >>> # After using add_duckdb_layer
+        >>> m = leafmap.Map()
+        >>> m.add_duckdb_layer("data.geojson")
+        >>> # Later, close the connections
+        >>> leafmap.close_duckdb_connections()
+        >>> # Or close connections for a specific database
+        >>> leafmap.close_duckdb_connections("tiles.db")
+    """
+    global _duckdb_connection_pools
+
+    if database_path is None:
+        # Close all connections
+        databases_to_close = list(_duckdb_connection_pools.keys())
+    else:
+        # Close connections for specific database
+        databases_to_close = (
+            [database_path] if database_path in _duckdb_connection_pools else []
+        )
+
+    for db_path in databases_to_close:
+        pool_info = _duckdb_connection_pools.get(db_path)
+        if pool_info:
+            connection_pool = pool_info["pool"]
+            max_connections = pool_info["max_connections"]
+
+            if not quiet:
+                print(f"Closing DuckDB connections for: {db_path}")
+
+            # Close all connections in the pool
+            closed_count = 0
+            while not connection_pool.empty():
+                try:
+                    con = connection_pool.get_nowait()
+                    con.close()
+                    closed_count += 1
+                except Exception as e:
+                    if not quiet:
+                        print(f"Error closing connection: {e}")
+
+            # Remove from registry
+            del _duckdb_connection_pools[db_path]
+
+            if not quiet:
+                print(
+                    f"Closed {closed_count}/{max_connections} connections for {db_path}"
+                )
+
+    if not quiet and len(databases_to_close) == 0:
+        if database_path is None:
+            print("No active DuckDB connections to close.")
+        else:
+            print(f"No active connections found for database: {database_path}")
 
 
 def vector_to_mbtiles(
