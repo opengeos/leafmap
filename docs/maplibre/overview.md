@@ -393,6 +393,12 @@ Add a GPS trace to a map.
 
 [![](https://github.com/user-attachments/assets/2a669b4d-c43f-4382-bf66-8918b4719b48)](https://leafmap.org/maplibre/gps_trace)
 
+## H3 Hexagonal Grid
+
+Visualize H3 hexagonal grid.
+
+[![](https://github.com/user-attachments/assets/0cbf3e5d-83a6-43b1-a77a-064326b4378d)](https://leafmap.org/maplibre/H3)
+
 ## Create a heatmap layer
 
 Visualize earthquake frequency by location using a heatmap layer.
