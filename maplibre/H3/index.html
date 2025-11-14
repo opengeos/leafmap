@@ -8500,7 +8500,7 @@ gdf</div>
 </clipboard-copy>
 </div>
 <div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
-<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"Esri.WorldImagery"</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"Esri.WorldImagery"</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">first_symbol_layer_id</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span>
     <span class="n">gdf</span><span class="p">,</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">"building_count"</span><span class="p">,</span>
@@ -8508,11 +8508,12 @@ gdf</div>
     <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span>
     <span class="n">outline_color</span><span class="o">=</span><span class="s2">"rgba(255, 255, 255, 0)"</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">"H3 Hexagon"</span><span class="p">,</span>
+    <span class="n">before_id</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">first_symbol_layer_id</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
 <div class="clipboard-copy-txt" id="cell-4">m = leafmap.Map()
-m.add_basemap("Esri.WorldImagery", visible=False)
+m.add_basemap("Esri.WorldImagery", before_id=m.first_symbol_layer_id, visible=False)
 m.add_data(
     gdf,
     column="building_count",
@@ -8520,6 +8521,7 @@ m.add_data(
     cmap="inferno",
     outline_color="rgba(255, 255, 255, 0)",
     name="H3 Hexagon",
+    before_id=m.first_symbol_layer_id,
 )
 m</div>
 </div>
@@ -8534,7 +8536,71 @@ m</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<p><img alt="" src="https://github.com/user-attachments/assets/0cbf3e5d-83a6-43b1-a77a-064326b4378d"/></p>
+<p><img alt="" src="https://github.com/user-attachments/assets/4b489d3f-1ed8-4648-b797-90d7e98b08db"/></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div><div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="CodeMirror cm-s-jupyter">
+<div class="zeroclipboard-container">
+<clipboard-copy ,="" aria-label="Copy to Clipboard" for="cell-5">
+<div>
+<span class="notice" hidden="">Copied!</span>
+<svg aria-hidden="true" class="clipboard-copy-icon" data-view-component="true" height="20" version="1.1" viewbox="0 0 16 16" width="20">
+<path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+<path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+</clipboard-copy>
+</div>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">7.062832</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.144790</span><span class="p">],</span> <span class="n">pitch</span><span class="o">=</span><span class="mf">45.5</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mf">1.57</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="s2">"Esri.WorldImagery"</span><span class="p">,</span> <span class="n">before_id</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">first_symbol_layer_id</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">"building_count"</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">"JenksCaspall"</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">"inferno"</span><span class="p">,</span>
+    <span class="n">outline_color</span><span class="o">=</span><span class="s2">"rgba(255, 255, 255, 0)"</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"H3 Hexagon"</span><span class="p">,</span>
+    <span class="n">before_id</span><span class="o">=</span><span class="n">m</span><span class="o">.</span><span class="n">first_symbol_layer_id</span><span class="p">,</span>
+    <span class="n">extrude</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fit_bounds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+<div class="clipboard-copy-txt" id="cell-5">m = leafmap.Map(center=[7.062832, -4.144790], pitch=45.5, zoom=1.57)
+m.add_basemap("Esri.WorldImagery", before_id=m.first_symbol_layer_id, visible=False)
+m.add_data(
+    gdf,
+    column="building_count",
+    scheme="JenksCaspall",
+    cmap="inferno",
+    outline_color="rgba(255, 255, 255, 0)",
+    name="H3 Hexagon",
+    before_id=m.first_symbol_layer_id,
+    extrude=True,
+    fit_bounds=False,
+)
+m</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p><img alt="" src="https://github.com/user-attachments/assets/68fb9893-5e3e-40a9-bd43-8a5e3a6d595b"/></p>
 </div>
 </div>
 </div>
@@ -8568,7 +8634,7 @@ m</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="November 14, 2025 04:13:51 UTC"><span class="timeago" datetime="2025-11-14T04:13:51+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="November 14, 2025 04:13:51 UTC">2025-11-14</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="November 14, 2025 04:42:59 UTC"><span class="timeago" datetime="2025-11-14T04:42:59+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="November 14, 2025 04:42:59 UTC">2025-11-14</span>
   </span>
 
     
