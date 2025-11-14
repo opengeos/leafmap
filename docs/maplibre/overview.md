@@ -397,7 +397,7 @@ Add a GPS trace to a map.
 
 Visualize H3 hexagonal grid.
 
-[![](https://github.com/user-attachments/assets/0cbf3e5d-83a6-43b1-a77a-064326b4378d)](https://leafmap.org/maplibre/H3)
+[![](https://github.com/user-attachments/assets/68fb9893-5e3e-40a9-bd43-8a5e3a6d595b)](https://leafmap.org/maplibre/H3)
 
 ## Create a heatmap layer
 
