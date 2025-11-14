@@ -3572,7 +3572,7 @@ class Map(MapWidget):
         Example:
             >>> import leafmap.maplibregl as leafmap
             >>> m = leafmap.Map()
-            >>> m.add_duckdb_layer("data.geojson")
+            >>> m.add_duckdb_layer("tiles.db")
             >>> # Later, close the connections
             >>> m.close_db_connections()
             >>> # Or close connections for a specific database
