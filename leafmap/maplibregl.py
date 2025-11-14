@@ -6053,6 +6053,7 @@ class Map(MapWidget):
         scale_factor: Optional[float] = 1.0,
         filter: Optional[Dict] = None,
         paint: Optional[Dict] = None,
+        outline_color: Optional[str] = "rgba(255, 255, 255, 255)",
         name: Optional[str] = None,
         fit_bounds: bool = True,
         visible: bool = True,
@@ -6108,6 +6109,7 @@ class Map(MapWidget):
                 no filter is applied.
             paint (dict, optional): The paint properties to apply to the layer.
                 If None, no paint properties are applied.
+            outline_color (str, optional): The color of the outline of the layer. Defaults to "rgba(255, 255, 255, 255)".
             name (str, optional): The name of the layer. If None, a random name
                 is generated.
             fit_bounds (bool, optional): Whether to adjust the viewport of the
@@ -6146,7 +6148,7 @@ class Map(MapWidget):
                 paint = {
                     "circle-color": ["get", "color"],
                     "circle-radius": 5,
-                    "circle-stroke-color": "#ffffff",
+                    "circle-stroke-color": outline_color,
                     "circle-stroke-width": 1,
                     "circle-opacity": opacity,
                 }
@@ -6200,7 +6202,7 @@ class Map(MapWidget):
                     paint = {
                         "fill-color": ["get", "color"],
                         "fill-opacity": opacity,
-                        "fill-outline-color": "#ffffff",
+                        "fill-outline-color": outline_color,
                     }
         else:
             raise ValueError("Geometry type not recognized.")

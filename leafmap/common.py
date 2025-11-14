@@ -668,6 +668,8 @@ def check_color(in_color: Union[str, Tuple, List]) -> str:
 
     # Handle string color input
     elif isinstance(in_color, str):
+        if in_color.startswith("rgba"):
+            return in_color
         try:
             # Try converting directly (handles color names and hex with #)
             return colors.to_hex(in_color)
