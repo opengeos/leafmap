@@ -243,6 +243,7 @@ class Map(MapWidget):
         self._deck_layers = []
         self._deck_layer_ids = []
         self._deck_layer_tooltips = {}
+        self._duckdb_databases = []  # Track database paths for cleanup
 
         if projection.lower() == "globe":
             self.add_globe_control()
@@ -3332,6 +3333,10 @@ class Map(MapWidget):
                 src_crs=src_crs,
             )
 
+            # Track the database path for cleanup
+            if db_path not in self._duckdb_databases:
+                self._duckdb_databases.append(db_path)
+
             # Create tile URL
             # Auto-configure for JupyterHub (like get_local_tile_url does)
             import os as _os
@@ -3545,6 +3550,47 @@ class Map(MapWidget):
                 import traceback
 
                 traceback.print_exc()
+
+    def close_db_connections(self, database_path: str = None, quiet: bool = False):
+        """
+        Close DuckDB connections for databases used by this map.
+
+        This method closes all connections in the connection pool for the specified
+        database or all databases used by this map instance, allowing other programs
+        to access the database files. This is useful when you're done using the
+        database and want to release the file lock.
+
+        Args:
+            database_path (str, optional): Path to the DuckDB database file.
+                If None, closes connections for all databases used by this map.
+                Defaults to None.
+            quiet (bool, optional): If True, suppress status messages. Defaults to False.
+
+        Returns:
+            None
+
+        Example:
+            >>> import leafmap.maplibregl as leafmap
+            >>> m = leafmap.Map()
+            >>> m.add_duckdb_layer("tiles.db")
+            >>> # Later, close the connections
+            >>> m.close_db_connections()
+            >>> # Or close connections for a specific database
+            >>> m.close_db_connections("tiles.db")
+        """
+        from .common import close_duckdb_connections
+
+        if database_path is None:
+            # Close connections for all databases used by this map
+            for db_path in self._duckdb_databases:
+                close_duckdb_connections(db_path, quiet=quiet)
+        else:
+            # Close connections for specific database
+            if database_path in self._duckdb_databases:
+                close_duckdb_connections(database_path, quiet=quiet)
+            else:
+                if not quiet:
+                    print(f"Database not tracked by this map: {database_path}")
 
     def add_marker(
         self,
