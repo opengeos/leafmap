@@ -13189,29 +13189,32 @@ def close_duckdb_connections(database_path: str = None, quiet: bool = True):
         pool_info = _duckdb_connection_pools.get(db_path)
         if pool_info:
             connection_pool = pool_info["pool"]
+            pool_lock = pool_info["lock"]
             max_connections = pool_info["max_connections"]
 
             if not quiet:
                 print(f"Closing DuckDB connections for: {db_path}")
 
-            # Close all connections in the pool
-            closed_count = 0
-            while not connection_pool.empty():
-                try:
-                    con = connection_pool.get_nowait()
-                    con.close()
-                    closed_count += 1
-                except Exception as e:
-                    if not quiet:
-                        print(f"Error closing connection: {e}")
+            # Acquire the pool lock before closing connections
+            with pool_lock:
+                # Close all connections in the pool
+                closed_count = 0
+                while not connection_pool.empty():
+                    try:
+                        con = connection_pool.get_nowait()
+                        con.close()
+                        closed_count += 1
+                    except Exception as e:
+                        if not quiet:
+                            print(f"Error closing connection: {e}")
 
-            # Remove from registry
-            del _duckdb_connection_pools[db_path]
+                # Remove from registry
+                del _duckdb_connection_pools[db_path]
 
-            if not quiet:
-                print(
-                    f"Closed {closed_count}/{max_connections} connections for {db_path}"
-                )
+                if not quiet:
+                    print(
+                        f"Closed {closed_count}/{max_connections} connections for {db_path}"
+                    )
 
     if not quiet and len(databases_to_close) == 0:
         if database_path is None:
