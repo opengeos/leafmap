@@ -435,6 +435,12 @@ Use setLayoutProperty to switch languages dynamically.
 
 [![](https://i.imgur.com/gIRDqQK.png)](https://leafmap.org/maplibre/language_switch)
 
+## Generate a lat-lon grid
+
+Generate a lat-lon grid.
+
+[![](https://github.com/user-attachments/assets/acb5c800-8b1e-4af0-beda-a7eb2f4e2b7c)](https://leafmap.org/maplibre/latlon_grid)
+
 ## Add a layer control
 
 Control layer visibility with a layer control.
