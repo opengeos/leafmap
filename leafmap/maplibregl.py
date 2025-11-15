@@ -6183,6 +6183,7 @@ class Map(MapWidget):
             legend_kwds=legend_kwds,
             classification_kwds=classification_kwds,
         )
+        setattr(self, "legend_dict", legend_dict)
 
         if legend_title is None:
             legend_title = column
