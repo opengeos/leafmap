@@ -97,8 +97,8 @@ class Map(MapWidget):
         },
         projection: str = "mercator",
         use_message_queue: bool = None,
-        add_sidebar: bool = False,
-        add_floating_sidebar: bool = True,
+        add_sidebar: Optional[bool] = None,
+        add_floating_sidebar: Optional[bool] = None,
         sidebar_visible: bool = False,
         sidebar_width: int = 360,
         sidebar_args: Optional[Dict] = None,
@@ -259,6 +259,17 @@ class Map(MapWidget):
                     "mercator",
                 ]
             )
+
+        if add_sidebar is None and add_floating_sidebar is None:
+            add_sidebar = False
+            add_floating_sidebar = True
+        elif add_sidebar:
+            add_floating_sidebar = False
+        elif add_floating_sidebar:
+            add_sidebar = False
+        else:
+            add_sidebar = False
+            add_floating_sidebar = False
 
         if sidebar_args is None:
             sidebar_args = {}
