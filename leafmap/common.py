@@ -5528,7 +5528,8 @@ def classify(
         or isinstance(data, pd.DataFrame)
         or isinstance(data, pd.Series)
     ):
-        df = data
+        # copy user provided data to avoid pandas SettingWithCopy warnings
+        df = data.copy()
     else:
         try:
             df = gpd.read_file(data)
