@@ -106,7 +106,7 @@ class Map(lonboard.Map):
         kwargs["view_state"] = view_state
 
         super().__init__(
-            _height=height,
+            height=height,
             show_tooltip=show_tooltip,
             layers=layers,
             **kwargs,
