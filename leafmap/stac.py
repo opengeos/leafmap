@@ -2159,9 +2159,9 @@ def maxar_search(
             crs="epsg:4326",
         )
         if within:
-            data = data[data.within(bbox.unary_union, align=align)]
+            data = data[data.within(bbox.union_all(), align=align)]
         else:
-            data = data[data.intersects(bbox.unary_union, align=align)]
+            data = data[data.intersects(bbox.union_all(), align=align)]
 
     date_field = "datetime"
     new_field = f"{date_field}_temp"

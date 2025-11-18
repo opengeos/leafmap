@@ -9082,9 +9082,9 @@ def filter_bounds(data, bbox, within=False, align=True, **kwargs: Any) -> Any:
         bbox = gpd.read_file(bbox, **kwargs)
 
     if within:
-        result = data[data.within(bbox.unary_union, align=align)]
+        result = data[data.within(bbox.union_all(), align=align)]
     else:
-        result = data[data.intersects(bbox.unary_union, align=align)]
+        result = data[data.intersects(bbox.union_all(), align=align)]
 
     return result
 
@@ -10827,7 +10827,7 @@ def get_3dep_dem(
     if isinstance(geometry, gpd.GeoDataFrame):
         if src_crs is None:
             src_crs = geometry.crs
-        geometry = geometry.geometry.unary_union
+        geometry = geometry.geometry.union_all()
 
     if src_crs is None:
         src_crs = "EPSG:4326"
@@ -17087,9 +17087,9 @@ def get_nhd(
         crs = f"EPSG:{geo_crs}"
         geometry = construct_bbox(*geometry, buffer=buffer, crs=crs, return_gdf=False)
     elif isinstance(geometry, gpd.GeoDataFrame):
-        geometry = geometry.unary_union
+        geometry = geometry.union_all()
     elif isinstance(geometry, str):
-        geometry = gpd.read_file(geometry).unary_union
+        geometry = gpd.read_file(geometry).union_all()
 
     water_data = WaterData(dataset)
 
