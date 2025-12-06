@@ -69,7 +69,7 @@ class TestLeafmap(unittest.TestCase):
         """Check GeoDataFrame"""
         m = leafmap.Map()
         gdf = gpd.read_file(
-            "https://github.com/opengeos/leafmap/raw/master/examples/data/cable_geo.geojson"
+            "https://github.com/opengeos/datasets/releases/download/vector/cables.geojson"
         )
         m.add_gdf(gdf, layer_name="Cable lines")
         out_str = m.to_html()
@@ -463,7 +463,7 @@ class TestLeafmap(unittest.TestCase):
         """Check zoom to GeoDataFrame"""
         m = leafmap.Map()
         gdf = gpd.read_file(
-            "https://github.com/opengeos/leafmap/raw/master/examples/data/cable_geo.geojson"
+            "https://github.com/opengeos/datasets/releases/download/vector/cables.geojson"
         )
         m.zoom_to_gdf(gdf)
         out_str = m.to_html()
