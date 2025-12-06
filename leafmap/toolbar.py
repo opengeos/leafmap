@@ -2788,8 +2788,8 @@ def inspector_gui(
 
     def handle_interaction(**kwargs):
         latlon = kwargs.get("coordinates")
-        lat = round(latlon[0], 4)
-        lon = round(latlon[1], 4)
+        lat = round(latlon[0], 8)
+        lon = round(latlon[1], 8)
         if (
             kwargs.get("type") == "click"
             and hasattr(m, "inspector_mode")
@@ -2825,7 +2825,7 @@ def inspector_gui(
                     with output:
                         output.clear_output()
                         output.outputs = ()
-                        output.append_stdout(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
+                        output.append_stdout(f"lat: {lat:.8f}\nlon: {lon:.8f}\n")
                         for key in result:
                             output.append_stdout(f"{key}: {result[key]}\n")
 
@@ -2859,7 +2859,7 @@ def inspector_gui(
                     with output:
                         output.clear_output()
                         output.outputs = ()
-                        output.append_stdout(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
+                        output.append_stdout(f"lat: {lat:.8f}\nlon: {lon:.8f}\n")
                         for key in result:
                             output.append_stdout(f"{key}: {result[key]}\n")
 
@@ -2904,7 +2904,7 @@ def inspector_gui(
                     with output:
                         output.clear_output()
                         output.outputs = ()
-                        output.append_stdout(f"lat, lon: {lat:.4f}, {lon:.4f}\n")
+                        output.append_stdout(f"lat: {lat:.8f}\nlon: {lon:.8f}\n")
                         for key in result:
                             output.append_stdout(f"{key}: {result[key]}\n")
 
