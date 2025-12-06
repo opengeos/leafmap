@@ -8389,7 +8389,7 @@
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -8897,8 +8897,8 @@
 <span class="normal">530</span>
 <span class="normal">531</span>
 <span class="normal">532</span>
-<span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Map</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Map</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">center</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
         <span class="n">zoom</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
@@ -8933,7 +8933,7 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">fig</span><span class="o">.</span><span class="n">add_tile</span><span class="p">(</span><span class="n">xyz</span><span class="o">.</span><span class="n">OpenStreetMap</span><span class="o">.</span><span class="n">Mapnik</span><span class="p">,</span> <span class="n">retina</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-                    <span class="kn">from</span> <span class="nn">bokeh.tile_providers</span> <span class="kn">import</span> <span class="n">get_provider</span>
+                    <span class="kn">from</span><span class="w"> </span><span class="nn">bokeh.tile_providers</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_provider</span>
 
                     <span class="n">fig</span><span class="o">.</span><span class="n">add_tile</span><span class="p">(</span><span class="n">get_provider</span><span class="p">(</span><span class="n">xyz</span><span class="o">.</span><span class="n">OpenStreetMap</span><span class="o">.</span><span class="n">Mapnik</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -8946,14 +8946,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">output_notebook</span> <span class="o">=</span> <span class="n">output_notebook</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_notebook_done</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_repr_mimebundle_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Display the bokeh map. Reference: https://ipython.readthedocs.io/en/stable/config/integrating.html#MyObject._repr_mimebundle_&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_notebook</span> <span class="ow">and</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OUTPUT_NOTEBOOK&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;False&quot;</span><span class="p">):</span>
             <span class="n">output_notebook</span><span class="p">()</span>
             <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OUTPUT_NOTEBOOK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span>
         <span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_basemap</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">basemap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;OpenStreetMap&quot;</span><span class="p">,</span>
         <span class="n">retina</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -8966,7 +8966,7 @@
 <span class="sd">            retina (bool, optional): Whether to use retina tiles. Defaults to True.</span>
 <span class="sd">            **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">xyzservices</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">xyzservices</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">):</span>
             <span class="n">url</span> <span class="o">=</span> <span class="n">basemap</span><span class="o">.</span><span class="n">build_url</span><span class="p">()</span>
@@ -8998,7 +8998,7 @@
         <span class="k">elif</span> <span class="n">basemap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please specify a valid basemap&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds a tile to the map.</span>
 
 <span class="sd">        Args:</span>
@@ -9012,7 +9012,7 @@
                 <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;retina&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">add_tile</span><span class="p">(</span><span class="n">tile</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_cog_layer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_cog_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">attribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -9046,7 +9046,7 @@
         <span class="k">if</span> <span class="n">fit_bounds</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">cog_bounds</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">add_raster</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_raster</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">indexes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9109,7 +9109,7 @@
             <span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_stac_layer</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_stac_layer</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">collection</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9150,7 +9150,7 @@
         <span class="k">if</span> <span class="n">fit_bounds</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">common</span><span class="o">.</span><span class="n">stac_bounds</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">item</span><span class="p">,</span> <span class="n">titiler_endpoint</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_gdf</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">gdf</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">to_crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:3857&quot;</span><span class="p">,</span>
@@ -9167,7 +9167,7 @@
 <span class="sd">            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gdf must be a GeoDataFrame&quot;</span><span class="p">)</span>
@@ -9200,7 +9200,7 @@
         <span class="k">if</span> <span class="n">fit_bounds</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fit_bounds</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">total_bounds</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_geojson</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -9222,7 +9222,7 @@
 <span class="sd">            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">github_raw_url</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -9232,7 +9232,7 @@
             <span class="n">gdf</span><span class="p">,</span> <span class="n">to_crs</span><span class="o">=</span><span class="n">to_crs</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_shp</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_shp</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -9254,9 +9254,9 @@
 <span class="sd">            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">glob</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">github_raw_url</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -9285,7 +9285,7 @@
             <span class="n">gdf</span><span class="p">,</span> <span class="n">to_crs</span><span class="o">=</span><span class="n">to_crs</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_vector</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -9307,7 +9307,7 @@
 <span class="sd">            **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">                https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
         <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">github_raw_url</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -9321,7 +9321,7 @@
             <span class="n">gdf</span><span class="p">,</span> <span class="n">to_crs</span><span class="o">=</span><span class="n">to_crs</span><span class="p">,</span> <span class="n">tooltips</span><span class="o">=</span><span class="n">tooltips</span><span class="p">,</span> <span class="n">fit_bounds</span><span class="o">=</span><span class="n">fit_bounds</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_html</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Converts the map to HTML.</span>
@@ -9333,7 +9333,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">fit_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fits the map to the specified bounds in the form of [xmin, ymin, xmax, ymax].</span>
 
 <span class="sd">        Args:</span>
@@ -9347,7 +9347,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">y_range</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">to_streamlit</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_streamlit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -9362,7 +9362,7 @@
 <span class="sd">            use_container_width (bool, optional): A flag indicating whether to use the full width of the container. Defaults to True.</span>
 <span class="sd">            **kwargs (Any): Arbitrary keyword arguments for bokeh.plotting.show().</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
@@ -9377,7 +9377,7 @@
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -9510,7 +9510,7 @@
 <span class="normal">155</span>
 <span class="normal">156</span>
 <span class="normal">157</span>
-<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_basemap</span><span class="p">(</span>
+<span class="normal">158</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_basemap</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">basemap</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;OpenStreetMap&quot;</span><span class="p">,</span>
     <span class="n">retina</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -9523,7 +9523,7 @@
 <span class="sd">        retina (bool, optional): Whether to use retina tiles. Defaults to True.</span>
 <span class="sd">        **kwargs: Arbitrary keyword arguments for bokeh.figure.add_tile() function, such as alpha, visible, etc.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">xyzservices</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">xyzservices</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">xyzservices</span><span class="o">.</span><span class="n">TileProvider</span><span class="p">):</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">basemap</span><span class="o">.</span><span class="n">build_url</span><span class="p">()</span>
@@ -9722,7 +9722,7 @@ apply a rescaling to multiple bands, use something like <code>rescale=["164,223"
 <span class="normal">203</span>
 <span class="normal">204</span>
 <span class="normal">205</span>
-<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_cog_layer</span><span class="p">(</span>
+<span class="normal">206</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_cog_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">attribution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
@@ -9905,7 +9905,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">357</span>
 <span class="normal">358</span>
 <span class="normal">359</span>
-<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_gdf</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">gdf</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="n">to_crs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;epsg:3857&quot;</span><span class="p">,</span>
@@ -9922,7 +9922,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="sd">        **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">            https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gdf must be a GeoDataFrame&quot;</span><span class="p">)</span>
@@ -10134,7 +10134,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">389</span>
 <span class="normal">390</span>
 <span class="normal">391</span>
-<span class="normal">392</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
+<span class="normal">392</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_geojson</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -10156,7 +10156,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="sd">        **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">            https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
     <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">github_raw_url</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -10445,7 +10445,7 @@ os.environ[&#39;LOCALTILESERVER_CLIENT_PREFIX&#39;] = &#39;proxy/{port}&#39;
 <span class="normal">266</span>
 <span class="normal">267</span>
 <span class="normal">268</span>
-<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_raster</span><span class="p">(</span>
+<span class="normal">269</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_raster</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">source</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">indexes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -10708,7 +10708,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">442</span>
 <span class="normal">443</span>
 <span class="normal">444</span>
-<span class="normal">445</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_shp</span><span class="p">(</span>
+<span class="normal">445</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_shp</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -10730,9 +10730,9 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="sd">        **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">            https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">glob</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
     <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">github_raw_url</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -10996,7 +10996,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">307</span>
 <span class="normal">308</span>
 <span class="normal">309</span>
-<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_stac_layer</span><span class="p">(</span>
+<span class="normal">310</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_stac_layer</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">collection</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11117,7 +11117,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span>
-<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tile</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a tile to the map.</span>
 
 <span class="sd">    Args:</span>
@@ -11314,7 +11314,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">478</span>
 <span class="normal">479</span>
 <span class="normal">480</span>
-<span class="normal">481</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
+<span class="normal">481</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_vector</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">encoding</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">,</span>
@@ -11336,7 +11336,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="sd">        **kwargs (Any): Arbitrary keyword arguments for bokeh.figure.circle, multi_line, and patches. For more info, see</span>
 <span class="sd">            https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plotting.figure</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
     <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">common</span><span class="o">.</span><span class="n">github_raw_url</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -11414,7 +11414,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">504</span>
 <span class="normal">505</span>
 <span class="normal">506</span>
-<span class="normal">507</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="normal">507</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fit_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bounds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fits the map to the specified bounds in the form of [xmin, ymin, xmax, ymax].</span>
 
 <span class="sd">    Args:</span>
@@ -11522,7 +11522,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">490</span>
 <span class="normal">491</span>
 <span class="normal">492</span>
-<span class="normal">493</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
+<span class="normal">493</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_html</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts the map to HTML.</span>
@@ -11658,7 +11658,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="normal">530</span>
 <span class="normal">531</span>
 <span class="normal">532</span>
-<span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_streamlit</span><span class="p">(</span>
+<span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_streamlit</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -11673,7 +11673,7 @@ https://docs.bokeh.org/en/latest/docs/reference/plotting/figure.html#bokeh.plott
 <span class="sd">        use_container_width (bool, optional): A flag indicating whether to use the full width of the container. Defaults to True.</span>
 <span class="sd">        **kwargs (Any): Arbitrary keyword arguments for bokeh.plotting.show().</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>  <span class="c1"># pylint: disable=E0401</span>
 
     <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>

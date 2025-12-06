@@ -8536,7 +8536,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -8672,7 +8672,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">37</span>
 <span class="normal">38</span>
 <span class="normal">39</span>
-<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_address</span><span class="p">(</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_address</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create GeoDataFrame of OSM entities within some distance N, S, E, W of address.</span>
@@ -8688,7 +8688,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;osmnx package is required. Please install it using &#39;pip install osmnx&#39;&quot;</span>
@@ -8862,7 +8862,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">303</span>
 <span class="normal">304</span>
 <span class="normal">305</span>
-<span class="normal">306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_bbox</span><span class="p">(</span>
+<span class="normal">306</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_bbox</span><span class="p">(</span>
     <span class="n">north</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">south</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">east</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">west</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a GeoDataFrame of OSM entities within a N, S, E, W bounding box.</span>
@@ -8879,7 +8879,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;osmnx package is required. Please install it using &#39;pip install osmnx&#39;&quot;</span>
@@ -9036,7 +9036,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">399</span>
 <span class="normal">400</span>
 <span class="normal">401</span>
-<span class="normal">402</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_geocode</span><span class="p">(</span>
+<span class="normal">402</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_geocode</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
     <span class="n">which_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">by_osmid</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -9056,7 +9056,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/&quot;</span><span class="p">)</span>
 
-    <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
 
     <span class="n">gdf</span> <span class="o">=</span> <span class="n">ox</span><span class="o">.</span><span class="n">geocode_to_gdf</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">which_result</span><span class="p">,</span> <span class="n">by_osmid</span><span class="p">,</span> <span class="n">buffer_dist</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gdf</span>
@@ -9213,7 +9213,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">106</span>
 <span class="normal">107</span>
 <span class="normal">108</span>
-<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_place</span><span class="p">(</span>
+<span class="normal">109</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_place</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
     <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">which_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9232,7 +9232,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;osmnx package is required. Please install it using &#39;pip install osmnx&#39;&quot;</span>
@@ -9373,7 +9373,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span>
-<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_point</span><span class="p">(</span>
+<span class="normal">181</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_point</span><span class="p">(</span>
     <span class="n">center_point</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create GeoDataFrame of OSM entities within some distance N, S, E, W of a point.</span>
@@ -9388,7 +9388,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;osmnx package is required. Please install it using &#39;pip install osmnx&#39;&quot;</span>
@@ -9507,7 +9507,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">242</span>
 <span class="normal">243</span>
 <span class="normal">244</span>
-<span class="normal">245</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="normal">245</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create GeoDataFrame of OSM entities within boundaries of a (multi)polygon.</span>
 
 <span class="sd">    Args:</span>
@@ -9519,7 +9519,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;osmnx package is required. Please install it using &#39;pip install osmnx&#39;&quot;</span>
@@ -9657,7 +9657,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">373</span>
 <span class="normal">374</span>
 <span class="normal">375</span>
-<span class="normal">376</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_gdf_from_xml</span><span class="p">(</span>
+<span class="normal">376</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_gdf_from_xml</span><span class="p">(</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">polygon</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a GeoDataFrame of OSM entities in an OSM-formatted XML file.</span>
@@ -9672,7 +9672,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_package</span><span class="p">(</span><span class="s2">&quot;osmnx&quot;</span><span class="p">,</span> <span class="s2">&quot;https://osmnx.readthedocs.io/en/stable/#installation&quot;</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">osmnx</span> <span class="k">as</span> <span class="nn">ox</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ox</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;osmnx package is required. Please install it using &#39;pip install osmnx&#39;&quot;</span>
@@ -9822,7 +9822,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">74</span>
 <span class="normal">75</span>
 <span class="normal">76</span>
-<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_geojson_from_address</span><span class="p">(</span>
+<span class="normal">77</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_geojson_from_address</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Download OSM entities within some distance N, S, E, W of address as a GeoJSON.</span>
@@ -10021,7 +10021,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">348</span>
 <span class="normal">349</span>
 <span class="normal">350</span>
-<span class="normal">351</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_geojson_from_bbox</span><span class="p">(</span>
+<span class="normal">351</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_geojson_from_bbox</span><span class="p">(</span>
     <span class="n">north</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">south</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="n">east</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -10209,7 +10209,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">445</span>
 <span class="normal">446</span>
 <span class="normal">447</span>
-<span class="normal">448</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_geojson_from_geocode</span><span class="p">(</span>
+<span class="normal">448</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_geojson_from_geocode</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">which_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -10397,7 +10397,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">153</span>
 <span class="normal">154</span>
 <span class="normal">155</span>
-<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_geojson_from_place</span><span class="p">(</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_geojson_from_place</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
     <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -10567,7 +10567,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">220</span>
 <span class="normal">221</span>
 <span class="normal">222</span>
-<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_geojson_from_point</span><span class="p">(</span>
+<span class="normal">223</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_geojson_from_point</span><span class="p">(</span>
     <span class="n">center_point</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -10714,7 +10714,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_geojson_from_polygon</span><span class="p">(</span>
+<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_geojson_from_polygon</span><span class="p">(</span>
     <span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Download OSM entities within boundaries of a (multi)polygon as a GeoJSON.</span>
@@ -10846,7 +10846,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span>
-<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_shp_from_address</span><span class="p">(</span>
+<span class="normal">56</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_shp_from_address</span><span class="p">(</span>
     <span class="n">address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Download OSM entities within some distance N, S, E, W of address as a shapefile.</span>
@@ -11007,7 +11007,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">320</span>
 <span class="normal">321</span>
 <span class="normal">322</span>
-<span class="normal">323</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_shp_from_bbox</span><span class="p">(</span>
+<span class="normal">323</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_shp_from_bbox</span><span class="p">(</span>
     <span class="n">north</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">south</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">east</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">west</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Download OSM entities within a N, S, E, W bounding box as a shapefile.</span>
@@ -11156,7 +11156,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">419</span>
 <span class="normal">420</span>
 <span class="normal">421</span>
-<span class="normal">422</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_shp_from_geocode</span><span class="p">(</span>
+<span class="normal">422</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_shp_from_geocode</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">which_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -11308,7 +11308,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">126</span>
 <span class="normal">127</span>
 <span class="normal">128</span>
-<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_shp_from_place</span><span class="p">(</span>
+<span class="normal">129</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_shp_from_place</span><span class="p">(</span>
     <span class="n">query</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">],</span>
     <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -11442,7 +11442,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
-<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_shp_from_point</span><span class="p">(</span>
+<span class="normal">199</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_shp_from_point</span><span class="p">(</span>
     <span class="n">center_point</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
     <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
     <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -11552,7 +11552,7 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
-<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_shp_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">257</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_shp_from_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">tags</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Download OSM entities within boundaries of a (multi)polygon as a shapefile.</span>
 
 <span class="sd">    Args:</span>
@@ -11588,9 +11588,9 @@ https://wiki.openstreetmap.org/wiki/Map_features</p>
 <span class="normal">452</span>
 <span class="normal">453</span>
 <span class="normal">454</span>
-<span class="normal">455</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">osm_tags_list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="normal">455</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">osm_tags_list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open a browser to see all tags of OSM features.&quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">webbrowser</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">webbrowser</span>
 
     <span class="n">webbrowser</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="s2">&quot;https://wiki.openstreetmap.org/wiki/Map_features&quot;</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>

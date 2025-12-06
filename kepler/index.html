@@ -8411,7 +8411,7 @@
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -9018,14 +9018,14 @@
 <span class="normal">571</span>
 <span class="normal">572</span>
 <span class="normal">573</span>
-<span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">keplergl</span><span class="o">.</span><span class="n">KeplerGl</span><span class="p">):</span>
+<span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Map</span><span class="p">(</span><span class="n">keplergl</span><span class="o">.</span><span class="n">KeplerGl</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;The Map class inherits keplergl.KeperGl.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        object: keplergl.KeperGl map object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s2">&quot;center&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;center&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 
@@ -9104,7 +9104,7 @@
     <span class="c1">#     #     bundle[&quot;text/html&quot;] = self.display_html()</span>
     <span class="c1">#     # return bundle</span>
 
-    <span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_geojson</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_geojson</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9122,7 +9122,7 @@
 <span class="sd">            FileNotFoundError: The provided GeoJSON file could not be found.</span>
 <span class="sd">            TypeError: The input geojson must be a type of str or dict.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">shutil</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
         <span class="k">if</span> <span class="s2">&quot;encoding&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">encoding</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">]</span>
@@ -9133,7 +9133,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">in_geojson</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">is_jupyterlite</span><span class="p">():</span>
-                        <span class="kn">import</span> <span class="nn">pyodide</span>
+                        <span class="kn">import</span><span class="w"> </span><span class="nn">pyodide</span>
 
                         <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">)</span>
 
@@ -9165,7 +9165,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">layer_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_shp</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_shp</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_shp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9183,7 +9183,7 @@
 <span class="sd">            FileNotFoundError: The provided shapefile could not be found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">import</span> <span class="nn">glob</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 
         <span class="k">if</span> <span class="n">in_shp</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">in_shp</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">):</span>
             <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;./cache/shp&quot;</span><span class="p">)</span>
@@ -9210,7 +9210,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_gdf</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">gdf</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9230,7 +9230,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_geojson</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">layer_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_df</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_df</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9251,7 +9251,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_csv</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_csv</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_csv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9270,7 +9270,7 @@
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">in_csv</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_df</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">layer_name</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_vector</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9317,7 +9317,7 @@
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_kml</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_kml</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">in_kml</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9357,7 +9357,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_gdf_from_postgis</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_gdf_from_postgis</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">con</span><span class="p">,</span>
@@ -9383,7 +9383,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">static_map</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">static_map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">950</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -9424,7 +9424,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The provided map is not a kepler.gl map.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_html</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">outfile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">read_only</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -9469,7 +9469,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">to_streamlit</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_streamlit</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
         <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -9493,8 +9493,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
-            <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">streamlit.components.v1</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">components</span>
 
             <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">responsive</span><span class="p">:</span>
@@ -9513,7 +9513,7 @@
                 <span class="s2">&quot;streamlit is not installed. You need to install streamlitusing &#39;pip install streamlit&#39;. Seehttps://docs.streamlit.io/library/get-started/installation&quot;</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loads a kepler.gl config file.</span>
 
 <span class="sd">        Args:</span>
@@ -9539,7 +9539,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The provided config is not a dictionary or filepath.&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_json</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_json</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Saves a kepler.gl config file.</span>
 
 <span class="sd">        Args:</span>
@@ -9571,7 +9571,7 @@
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
 
 
 
@@ -9678,7 +9678,7 @@
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_csv</span><span class="p">(</span>
+<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_csv</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">in_csv</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9800,7 +9800,7 @@
 <span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
-<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_df</span><span class="p">(</span>
+<span class="normal">258</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_df</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -9923,7 +9923,7 @@
 <span class="normal">234</span>
 <span class="normal">235</span>
 <span class="normal">236</span>
-<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gdf</span><span class="p">(</span>
+<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_gdf</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">gdf</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -10067,7 +10067,7 @@
 <span class="normal">387</span>
 <span class="normal">388</span>
 <span class="normal">389</span>
-<span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_gdf_from_postgis</span><span class="p">(</span>
+<span class="normal">390</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_gdf_from_postgis</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">sql</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">con</span><span class="p">,</span>
@@ -10269,7 +10269,7 @@
 <span class="normal">169</span>
 <span class="normal">170</span>
 <span class="normal">171</span>
-<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_geojson</span><span class="p">(</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_geojson</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">in_geojson</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -10287,7 +10287,7 @@
 <span class="sd">        FileNotFoundError: The provided GeoJSON file could not be found.</span>
 <span class="sd">        TypeError: The input geojson must be a type of str or dict.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">import</span> <span class="nn">shutil</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
 
     <span class="k">if</span> <span class="s2">&quot;encoding&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
         <span class="n">encoding</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;encoding&quot;</span><span class="p">]</span>
@@ -10298,7 +10298,7 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">in_geojson</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">common</span><span class="o">.</span><span class="n">is_jupyterlite</span><span class="p">():</span>
-                    <span class="kn">import</span> <span class="nn">pyodide</span>
+                    <span class="kn">import</span><span class="w"> </span><span class="nn">pyodide</span>
 
                     <span class="n">output</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_geojson</span><span class="p">)</span>
 
@@ -10475,7 +10475,7 @@
 <span class="normal">361</span>
 <span class="normal">362</span>
 <span class="normal">363</span>
-<span class="normal">364</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_kml</span><span class="p">(</span>
+<span class="normal">364</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_kml</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">in_kml</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -10665,7 +10665,7 @@
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
-<span class="normal">217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_shp</span><span class="p">(</span>
+<span class="normal">217</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_shp</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">in_shp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -10683,7 +10683,7 @@
 <span class="sd">        FileNotFoundError: The provided shapefile could not be found.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="kn">import</span> <span class="nn">glob</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">glob</span>
 
     <span class="k">if</span> <span class="n">in_shp</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">in_shp</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zip&quot;</span><span class="p">):</span>
         <span class="n">out_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="s2">&quot;./cache/shp&quot;</span><span class="p">)</span>
@@ -10839,7 +10839,7 @@
 <span class="normal">321</span>
 <span class="normal">322</span>
 <span class="normal">323</span>
-<span class="normal">324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">add_vector</span><span class="p">(</span>
+<span class="normal">324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_vector</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">layer_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Untitled&quot;</span><span class="p">,</span>
@@ -10995,7 +10995,7 @@
 <span class="normal">543</span>
 <span class="normal">544</span>
 <span class="normal">545</span>
-<span class="normal">546</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="normal">546</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">load_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Loads a kepler.gl config file.</span>
 
 <span class="sd">    Args:</span>
@@ -11132,7 +11132,7 @@
 <span class="normal">571</span>
 <span class="normal">572</span>
 <span class="normal">573</span>
-<span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_json</span><span class="p">):</span>
+<span class="normal">574</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">save_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_json</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Saves a kepler.gl config file.</span>
 
 <span class="sd">    Args:</span>
@@ -11225,7 +11225,7 @@
 <span class="normal">428</span>
 <span class="normal">429</span>
 <span class="normal">430</span>
-<span class="normal">431</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">static_map</span><span class="p">(</span>
+<span class="normal">431</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">static_map</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">950</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -11377,7 +11377,7 @@
 <span class="normal">473</span>
 <span class="normal">474</span>
 <span class="normal">475</span>
-<span class="normal">476</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_html</span><span class="p">(</span>
+<span class="normal">476</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_html</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">outfile</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">read_only</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -11609,7 +11609,7 @@
 <span class="normal">517</span>
 <span class="normal">518</span>
 <span class="normal">519</span>
-<span class="normal">520</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_streamlit</span><span class="p">(</span>
+<span class="normal">520</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_streamlit</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">800</span><span class="p">,</span>
     <span class="n">height</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
@@ -11633,8 +11633,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">streamlit</span> <span class="k">as</span> <span class="nn">st</span>
-        <span class="kn">import</span> <span class="nn">streamlit.components.v1</span> <span class="k">as</span> <span class="nn">components</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">streamlit</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">st</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">streamlit.components.v1</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">components</span>
 
         <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_repr_html_</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">responsive</span><span class="p">:</span>
