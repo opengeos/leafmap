@@ -108,7 +108,7 @@ class TestFoliumap(unittest.TestCase):
     def test_add_geojson(self):
         """Check GeoJSON"""
         m = leafmap.Map()
-        in_geojson = "https://raw.githubusercontent.com/opengeos/leafmap/master/examples/data/cable_geo.geojson"
+        in_geojson = "https://github.com/opengeos/datasets/releases/download/vector/cables.geojson"
         m.add_geojson(in_geojson, layer_name="Cable lines")
         out_str = m.to_html()
         assert "Cable lines" in out_str
