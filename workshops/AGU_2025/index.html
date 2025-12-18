@@ -94,7 +94,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#2-interactive-visualization-of-raster-and-vector-data" class="md-skip">
+        <a href="#interactive-visualization-of-raster-and-vector-data" class="md-skip">
           Skip to content
         </a>
       
@@ -1610,17 +1610,6 @@
     <span class="md-ellipsis">
       
         Useful Resources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Table of Contents
       
     </span>
   </a>
@@ -8600,17 +8589,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#table-of-contents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Table of Contents
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#installation-and-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9562,8 +9540,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h1 id="2-interactive-visualization-of-raster-and-vector-data">👁️ 2 - Interactive visualization of raster and vector data<a class="anchor-link" href="#2-interactive-visualization-of-raster-and-vector-data">¶</a></h1><p><a href="https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/workshops/AGU_2025.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"/></a></p>
-<h2 id="introduction">Introduction<a class="anchor-link" href="#introduction">¶</a></h2><p>This notebook is for the workshop (<a href="https://geojupyter.github.io/workshop-open-source-geospatial">Open Source Geospatial Workflows in the Cloud</a>) presented at the <a href="https://agu.confex.com/agu/agu25/meetingapp.cgi/Session/252640">AGU Fall Meeting 2025</a>.</p>
+<h1 id="interactive-visualization-of-raster-and-vector-data">Interactive visualization of raster and vector data<a class="anchor-link" href="#interactive-visualization-of-raster-and-vector-data">¶</a></h1><p><a href="https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/workshops/AGU_2025.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"/></a></p>
+<h2 id="introduction">Introduction<a class="anchor-link" href="#introduction">¶</a></h2><p>This notebook is for the workshop (<a href="https://agu2025.workshops.geojupyter.org/">Open Source Geospatial Workflows in the Cloud</a>) presented at the <a href="https://agu.confex.com/agu/agu25/meetingapp.cgi/Session/252640">AGU Fall Meeting 2025</a>.</p>
 <h3 id="learning-objectives">Learning Objectives<a class="anchor-link" href="#learning-objectives">¶</a></h3><p>By the end of this workshop, you will be able to:</p>
 <ul>
 <li>Create interactive maps with MapLibre using Python</li>
@@ -9580,53 +9558,6 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <li><a href="https://leafmap.org/maplibre/overview">MapLibre in Leafmap</a>: Examples and tutorials for MapLibre in Leafmap.</li>
 <li><a href="https://bit.ly/maplibre">Video Tutorials</a>: Video guides for practical MapLibre skills.</li>
 <li><a href="https://maps.gishub.org">MapLibre Demos</a>: Interactive demos showcasing MapLibre's capabilities.</li>
-</ul>
-<h2 id="table-of-contents">Table of Contents<a class="anchor-link" href="#table-of-contents">¶</a></h2><ul>
-<li><a href="#installation-and-setup">Installation and Setup</a></li>
-<li><a href="#creating-interactive-maps">Creating Interactive Maps</a><ul>
-<li><a href="#basic-map-setup">Basic Map Setup</a></li>
-<li><a href="#customizing-the-maps-center-and-zoom-level">Customizing the Map's Center and Zoom Level</a></li>
-<li><a href="#choosing-a-basemap-style">Choosing a Basemap Style</a></li>
-</ul>
-</li>
-<li><a href="#adding-map-controls">Adding Map Controls</a></li>
-<li><a href="#adding-layers">Adding Layers</a><ul>
-<li><a href="#adding-basemaps">Adding Basemaps</a></li>
-<li><a href="#adding-xyz-tile-layer">Adding XYZ Tile Layer</a></li>
-<li><a href="#adding-wms-layer">Adding WMS Layer</a></li>
-</ul>
-</li>
-<li><a href="#3d-terrain">3D Terrain</a><ul>
-<li><a href="#3d-terrain">3D Terrain</a></li>
-<li><a href="#3d-buildings">3D Buildings</a></li>
-<li><a href="#3d-indoor-mapping">3D Indoor Mapping</a></li>
-</ul>
-</li>
-<li><a href="#visualizing-vector-data">Visualizing Vector Data</a><ul>
-<li><a href="#point-data">Point Data</a></li>
-<li><a href="#line-data">Line Data</a></li>
-<li><a href="#polygon-data">Polygon Data</a></li>
-</ul>
-</li>
-<li><a href="#visualizing-remote-sensing-data">Visualizing Remote Sensing Data</a><ul>
-<li><a href="#local-raster-data">Local Raster Data</a></li>
-<li><a href="#cloud-optimized-geotiff-cog">Cloud Optimized GeoTIFF (COG)</a></li>
-<li><a href="#stac-layer">STAC Layer</a></li>
-</ul>
-</li>
-<li><a href="#adding-components-to-the-map">Adding Components to the Map</a><ul>
-<li><a href="#adding-color-bar">Adding Color bar</a></li>
-<li><a href="#adding-legend">Adding Legend</a></li>
-<li><a href="#adding-video">Adding Video</a></li>
-</ul>
-</li>
-<li><a href="#pmtiles">PMTiles</a><ul>
-<li><a href="#building-footprint-data">Building Footprint Data</a></li>
-<li><a href="#fields-of-the-world">Fields of The World</a></li>
-<li><a href="#3d-pmtiles">3D PMTiles</a></li>
-</ul>
-</li>
-<li><a href="#h3-hexagonal-grid">H3 Hexagonal Grid</a></li>
 </ul>
 <h2 id="installation-and-setup">Installation and Setup<a class="anchor-link" href="#installation-and-setup">¶</a></h2><p>To install the required packages, uncomment and run the line below.</p>
 </div>
@@ -9651,9 +9582,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %pip install -U leafmap</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="c1"># %pip install -U leafmap localtileserver rioxarray mapclassify pmtiles</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-1"># %pip install -U leafmap</div>
+<div class="clipboard-copy-txt" id="cell-1"># %pip install -U leafmap localtileserver rioxarray mapclassify pmtiles</div>
 </div>
 </div>
 </div>
@@ -10840,12 +10771,12 @@ leafmap.download_file(url, filepath, quiet=True)</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"streets"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
 <span class="n">m</span><span class="o">.</span><span class="n">add_raster</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Landsat-321"</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">add_raster</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Landsat-432"</span><span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-29">m = leafmap.Map(style="streets")
+<div class="clipboard-copy-txt" id="cell-29">m = leafmap.Map()
 m.add_raster(filepath, indexes=[3, 2, 1], vmin=0, vmax=100, name="Landsat-321")
 m.add_raster(filepath, indexes=[4, 3, 2], vmin=0, vmax=100, name="Landsat-432")
 m</div>
@@ -11021,13 +10952,13 @@ m</div>
 </div>
 </clipboard-copy>
 </div>
-<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">"streets"</span><span class="p">)</span>
+<div class="highlight-ipynb hl-python"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">()</span>
 <span class="n">url</span> <span class="o">=</span> <span class="s2">"https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"</span>
 <span class="n">m</span><span class="o">.</span><span class="n">add_stac_layer</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="p">[</span><span class="s2">"pan"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Panchromatic"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">add_stac_layer</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">bands</span><span class="o">=</span><span class="p">[</span><span class="s2">"B4"</span><span class="p">,</span> <span class="s2">"B3"</span><span class="p">,</span> <span class="s2">"B2"</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="s2">"RGB"</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
 <span class="n">m</span>
 </pre></div>
-<div class="clipboard-copy-txt" id="cell-33">m = leafmap.Map(style="streets")
+<div class="clipboard-copy-txt" id="cell-33">m = leafmap.Map()
 url = "https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json"
 m.add_stac_layer(url, bands=["pan"], name="Panchromatic", vmin=0, vmax=150)
 m.add_stac_layer(url, bands=["B4", "B3", "B2"], name="RGB", vmin=0, vmax=150)
@@ -11693,7 +11624,7 @@ m</div>
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<h3 id="building-footprint-data">Building Footprint Data<a class="anchor-link" href="#building-footprint-data">¶</a></h3><p>Visualize the <a href="https://beta.source.coop/repositories/vida/google-microsoft-open-buildings/description">Google-Microsoft Open Buildings dataset</a>, managed by VIDA, in PMTiles format. Fetch metadata to identify available layers, apply custom styles to the building footprints, and render them with semi-transparent colors for a clear visualization.</p>
+<h3 id="building-footprint-data">Building Footprint Data<a class="anchor-link" href="#building-footprint-data">¶</a></h3><p>Visualize the <a href="https://source.coop/vida/google-microsoft-osm-open-buildings">Google-Microsoft Open Buildings dataset</a>, managed by VIDA, in PMTiles format. Fetch metadata to identify available layers, apply custom styles to the building footprints, and render them with semi-transparent colors for a clear visualization.</p>
 </div>
 </div>
 </div>
@@ -12463,7 +12394,7 @@ m</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="November 16, 2025 06:44:41 UTC"><span class="timeago" datetime="2025-11-16T06:44:41+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="November 16, 2025 06:44:41 UTC">2025-11-16</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="December 18, 2025 04:18:54 UTC"><span class="timeago" datetime="2025-12-18T04:18:54+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="December 18, 2025 04:18:54 UTC">2025-12-18</span>
   </span>
 
     
