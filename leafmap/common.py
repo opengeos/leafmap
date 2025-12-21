@@ -2950,8 +2950,14 @@ def wms_to_geotiff(
             with rasterio.open(io.BytesIO(img_data)) as src:
                 if src.crs is not None:
                     # Valid GeoTIFF with CRS, write it directly
-                    with open(output, "wb") as f:
+                    output_temp = temp_file_path(extension=".tif")
+                    with open(output_temp, "wb") as f:
                         f.write(img_data)
+                    image_to_cog(output_temp, output, nodata=None)
+                    try:
+                        os.remove(output_temp)
+                    except Exception:
+                        pass
                     if not quiet:
                         print(f"GeoTIFF saved to {output}")
                     return output
@@ -2983,7 +2989,7 @@ def wms_to_geotiff(
 
     # Write the GeoTIFF
     profile = {
-        "driver": "COG",
+        "driver": "GTiff",
         "dtype": img_array.dtype,
         "width": width,
         "height": height,
@@ -2993,9 +2999,15 @@ def wms_to_geotiff(
         "compress": "deflate",
     }
 
-    with rasterio.open(output, "w", **profile) as dst:
+    output_temp = temp_file_path(extension=".tif")
+    with rasterio.open(output_temp, "w", **profile) as dst:
         dst.write(img_array)
 
+    image_to_cog(output_temp, output, nodata=None)
+    try:
+        os.remove(output_temp)
+    except Exception:
+        pass
     if not quiet:
         print(f"GeoTIFF saved to {output}")
 
@@ -4250,7 +4262,9 @@ def image_to_geotiff(image, dst_path, dtype=None, to_cog=True, **kwargs) -> None
         image_to_cog(dst_path, dst_path)
 
 
-def image_to_cog(source, dst_path=None, profile="deflate", BIGTIFF=None, **kwargs: Any):
+def image_to_cog(
+    source, dst_path=None, profile="deflate", BIGTIFF=None, nodata=None, **kwargs: Any
+):
     """Converts an image to a COG file.
 
     Args:
@@ -4258,6 +4272,9 @@ def image_to_cog(source, dst_path=None, profile="deflate", BIGTIFF=None, **kwarg
         dst_path (str, optional): An output dataset path or or PathLike object. Defaults to None.
         profile (str, optional): COG profile. More at https://cogeotiff.github.io/rio-cogeo/profile. Defaults to "deflate".
         BIGTIFF (str, optional): Create a BigTIFF file. Can be "IF_SAFER" or "YES". Defaults to None.
+        nodata (int, float, or None, optional): NoData value for the output COG. Set to None
+            to prevent any value from being treated as NoData (avoids 255 being changed to 254
+            in uint8 images). Defaults to None.
 
     Raises:
         ImportError: If rio-cogeo is not installed.
@@ -4292,7 +4309,7 @@ def image_to_cog(source, dst_path=None, profile="deflate", BIGTIFF=None, **kwarg
 
     if BIGTIFF is not None:
         dst_profile.update({"BIGTIFF": BIGTIFF})
-    cog_translate(source, dst_path, dst_profile, **kwargs)
+    cog_translate(source, dst_path, dst_profile, nodata=nodata, **kwargs)
 
 
 def cog_validate(source, verbose=False) -> Tuple[bool, List[str], List[str]]:
