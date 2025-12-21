@@ -2973,7 +2973,7 @@ def wms_to_geotiff(
         img_array = img_array.reshape((1, img_array.shape[0], img_array.shape[1]))
     elif img_array.ndim == 3:
         # RGB or RGBA
-        count = img_array.shape[2]
+        count = 3
         img_array = np.transpose(img_array, (2, 0, 1))
     else:
         raise ValueError(f"Unexpected image array dimensions: {img_array.ndim}")
@@ -2983,7 +2983,7 @@ def wms_to_geotiff(
 
     # Write the GeoTIFF
     profile = {
-        "driver": "GTiff",
+        "driver": "COG",
         "dtype": img_array.dtype,
         "width": width,
         "height": height,
@@ -2991,6 +2991,7 @@ def wms_to_geotiff(
         "crs": output_crs,
         "transform": transform,
         "compress": "deflate",
+        
     }
 
     with rasterio.open(output, "w", **profile) as dst:
