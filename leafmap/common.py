@@ -2911,10 +2911,22 @@ def wms_to_geotiff(
     # Connect to WMS service
     wms = WebMapService(url, version=version)
 
+    # Determine correct coordinate reference system parameter name based on WMS version
+    crs_param = "srs"
+    if version is not None:
+        try:
+            version_parts = tuple(int(part) for part in str(version).split("."))
+            if version_parts >= (1, 3, 0):
+                crs_param = "crs"
+        except Exception:
+            # Fallback: simple string prefix check if parsing fails
+            if str(version).startswith("1.3"):
+                crs_param = "crs"
+
     # Build GetMap request parameters
     request_params = {
         "layers": [layers] if "," not in layers else layers.split(","),
-        "srs": output_crs,
+        crs_param: output_crs,
         "bbox": (minx, miny, maxx, maxy),
         "size": (width, height),
         "format": format,
