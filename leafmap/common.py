@@ -2855,8 +2855,18 @@ def wms_to_geotiff(
     if len(bbox) != 4:
         raise ValueError("bbox must be a list of 4 values: [minx, miny, maxx, maxy]")
 
-    minx, miny, maxx, maxy = bbox
+    # Ensure bbox values are numeric and ordered correctly: minx < maxx, miny < maxy
+    try:
+        minx, miny, maxx, maxy = map(float, bbox)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(
+            "bbox coordinates must be numeric values: [minx, miny, maxx, maxy]"
+        ) from exc
 
+    if not (minx < maxx and miny < maxy):
+        raise ValueError(
+            "bbox coordinates must be in order: minx < maxx and miny < maxy"
+        )
     # Transform bbox if bbox_crs differs from output_crs
     if bbox_crs.upper() != output_crs.upper():
         try:
