@@ -681,6 +681,12 @@ Add an external Web Map Service raster layer to the map using addSource's tiles 
 
 [![](https://i.imgur.com/itFOq8z.png)](https://leafmap.org/maplibre/wms_source)
 
+## Export GeoTIFF from WMS
+
+Export a GeoTIFF image from a Web Map Service (WMS) within a specified bounding box and scale using the `wms_to_geotiff` function.
+
+[![](https://github.com/user-attachments/assets/01c24828-4535-4352-8398-894955a6ca90)](https://leafmap.org/maplibre/wms_to_geotiff)
+
 ## Fit to the bounds of a LineString
 
 Get the bounds of a LineString.
