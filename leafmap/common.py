@@ -2769,6 +2769,239 @@ def get_wms_layers(url):
     return layers
 
 
+def wms_to_geotiff(
+    url: str,
+    layers: str,
+    bbox: List[float],
+    output: str,
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    scale: Optional[float] = None,
+    bbox_crs: str = "EPSG:4326",
+    output_crs: Optional[str] = None,
+    format: str = "image/tiff",
+    version: str = "1.1.1",
+    styles: str = "",
+    transparent: bool = True,
+    quiet: bool = False,
+    **kwargs: Any,
+) -> str:
+    """Export a GeoTIFF from a WMS service within a specified bounding box and scale.
+
+    Args:
+        url (str): The URL of the WMS service.
+        layers (str): Comma-separated list of WMS layers to request.
+        bbox (List[float]): Bounding box in the format [minx, miny, maxx, maxy].
+            The coordinates should be in the CRS specified by 'bbox_crs'.
+        output (str): The output file path for the GeoTIFF.
+        width (int, optional): Width of the output image in pixels. If not provided,
+            will be calculated from scale. Either width/height or scale must be provided.
+        height (int, optional): Height of the output image in pixels. If not provided,
+            will be calculated from scale. Either width/height or scale must be provided.
+        scale (float, optional): The scale (resolution) in units of the output CRS per pixel.
+            For EPSG:4326, this is degrees per pixel. For projected CRS like EPSG:3857,
+            this is meters per pixel. Either width/height or scale must be provided.
+        bbox_crs (str, optional): The coordinate reference system of the input bbox.
+            Defaults to "EPSG:4326".
+        output_crs (str, optional): The coordinate reference system for the output GeoTIFF
+            and WMS request. If None, uses the same CRS as bbox_crs. Defaults to None.
+        format (str, optional): The image format to request from WMS. Defaults to "image/tiff".
+            Some WMS servers may support "image/geotiff" or only "image/png".
+        version (str, optional): WMS version. Defaults to "1.1.1".
+        styles (str, optional): WMS styles parameter. Defaults to "".
+        transparent (bool, optional): Request transparent background. Defaults to True.
+        quiet (bool, optional): Suppress output messages. Defaults to False.
+        **kwargs: Additional keyword arguments to pass to the WMS GetMap request.
+
+    Returns:
+        str: The output file path.
+
+    Raises:
+        ValueError: If neither width/height nor scale is provided.
+        ImportError: If required packages are not installed.
+        Exception: If the WMS request fails.
+
+    Example:
+        >>> url = "https://img.nj.gov/imagerywms/Natural2015"
+        >>> layers = "Natural2015"
+        >>> bbox = [-74.6, 40.5, -74.4, 40.7]  # [minx, miny, maxx, maxy] in EPSG:4326
+        >>> wms_to_geotiff(url, layers, bbox, "output.tif", scale=0.0001)
+        >>> # Export with different output CRS
+        >>> wms_to_geotiff(url, layers, bbox, "output_3857.tif", scale=10, output_crs="EPSG:3857")
+    """
+    import io
+
+    try:
+        from owslib.wms import WebMapService
+    except ImportError:
+        raise ImportError("Please install owslib using 'pip install owslib'.")
+
+    try:
+        import rasterio
+        from rasterio.transform import from_bounds
+    except ImportError:
+        raise ImportError("Please install rasterio using 'pip install rasterio'.")
+
+    try:
+        from PIL import Image
+    except ImportError:
+        raise ImportError("Please install Pillow using 'pip install Pillow'.")
+
+    # Set output_crs to bbox_crs if not provided
+    if output_crs is None:
+        output_crs = bbox_crs
+
+    # Validate inputs
+    if len(bbox) != 4:
+        raise ValueError("bbox must be a list of 4 values: [minx, miny, maxx, maxy]")
+
+    minx, miny, maxx, maxy = bbox
+
+    # Transform bbox if bbox_crs differs from output_crs
+    if bbox_crs.upper() != output_crs.upper():
+        try:
+            from pyproj import Transformer
+        except ImportError:
+            raise ImportError(
+                "Please install pyproj using 'pip install pyproj' for CRS transformation."
+            )
+
+        transformer = Transformer.from_crs(bbox_crs, output_crs, always_xy=True)
+        minx, miny = transformer.transform(minx, miny)
+        maxx, maxy = transformer.transform(maxx, maxy)
+
+        if not quiet:
+            print(
+                f"Transformed bbox from {bbox_crs} to {output_crs}: [{minx}, {miny}, {maxx}, {maxy}]"
+            )
+
+    bbox_width = maxx - minx
+    bbox_height = maxy - miny
+
+    if width is None and height is None and scale is None:
+        raise ValueError(
+            "Either width/height or scale must be provided to determine output size."
+        )
+
+    # Calculate width/height from scale if not provided
+    if scale is not None:
+        if width is None:
+            width = int(bbox_width / scale)
+        if height is None:
+            height = int(bbox_height / scale)
+
+    # Ensure minimum size
+    width = max(1, width)
+    height = max(1, height)
+
+    # Some servers have maximum size limits, cap at reasonable values
+    max_size = 8192
+    if width > max_size or height > max_size:
+        ratio = min(max_size / width, max_size / height)
+        width = int(width * ratio)
+        height = int(height * ratio)
+        if not quiet:
+            print(f"Image size capped to {width}x{height} due to server limits.")
+
+    if not quiet:
+        print(f"Requesting WMS image: {width}x{height} pixels")
+        print(f"Bounding box ({output_crs}): [{minx}, {miny}, {maxx}, {maxy}]")
+        print(f"Scale: {scale if scale else 'calculated from dimensions'}")
+
+    # Connect to WMS service
+    wms = WebMapService(url, version=version)
+
+    # Build GetMap request parameters
+    request_params = {
+        "layers": [layers] if "," not in layers else layers.split(","),
+        "srs": output_crs,
+        "bbox": (minx, miny, maxx, maxy),
+        "size": (width, height),
+        "format": format,
+        "styles": [styles] if styles else [""],
+        "transparent": transparent,
+    }
+    request_params.update(kwargs)
+
+    # Make the WMS GetMap request
+    try:
+        response = wms.getmap(**request_params)
+    except Exception as e:
+        raise Exception(f"WMS GetMap request failed: {str(e)}")
+
+    # Read the response
+    img_data = response.read()
+
+    # Check if the response is a valid image
+    if b"ServiceException" in img_data or b"Exception" in img_data[:1000]:
+        raise Exception(
+            f"WMS service returned an exception: {img_data[:500].decode('utf-8', errors='ignore')}"
+        )
+
+    output = check_file_path(output)
+
+    # Determine if response is already a GeoTIFF or needs conversion
+    is_geotiff = format.lower() in ["image/tiff", "image/geotiff", "image/tif"]
+
+    if is_geotiff:
+        # Try to save directly as GeoTIFF
+        try:
+            # First, check if it's a valid GeoTIFF with georeferencing
+            with rasterio.open(io.BytesIO(img_data)) as src:
+                if src.crs is not None:
+                    # Valid GeoTIFF with CRS, write it directly
+                    with open(output, "wb") as f:
+                        f.write(img_data)
+                    if not quiet:
+                        print(f"GeoTIFF saved to {output}")
+                    return output
+        except Exception:
+            pass  # Fall through to manual georeferencing
+
+    # Convert image to GeoTIFF with georeferencing
+    try:
+        # Open as PIL Image
+        img = Image.open(io.BytesIO(img_data))
+        img_array = np.array(img)
+    except Exception as e:
+        raise Exception(f"Failed to process image data: {str(e)}")
+
+    # Handle different image modes
+    if img_array.ndim == 2:
+        # Grayscale
+        count = 1
+        img_array = img_array.reshape((1, img_array.shape[0], img_array.shape[1]))
+    elif img_array.ndim == 3:
+        # RGB or RGBA
+        count = img_array.shape[2]
+        img_array = np.transpose(img_array, (2, 0, 1))
+    else:
+        raise ValueError(f"Unexpected image array dimensions: {img_array.ndim}")
+
+    # Create the transform
+    transform = from_bounds(minx, miny, maxx, maxy, width, height)
+
+    # Write the GeoTIFF
+    profile = {
+        "driver": "GTiff",
+        "dtype": img_array.dtype,
+        "width": width,
+        "height": height,
+        "count": count,
+        "crs": output_crs,
+        "transform": transform,
+        "compress": "deflate",
+    }
+
+    with rasterio.open(output, "w", **profile) as dst:
+        dst.write(img_array)
+
+    if not quiet:
+        print(f"GeoTIFF saved to {output}")
+
+    return output
+
+
 def streamlit_legend(html, width=None, height=None, scrolling=True):
     """Streamlit function to display a legend.
 
