@@ -2991,7 +2991,6 @@ def wms_to_geotiff(
         "crs": output_crs,
         "transform": transform,
         "compress": "deflate",
-        
     }
 
     with rasterio.open(output, "w", **profile) as dst:
