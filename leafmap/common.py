@@ -1115,16 +1115,10 @@ def create_code_cell(code: str = "", where: str = "below") -> None:
     #     pass
 
     encoded_code = (base64.b64encode(str.encode(code))).decode()
-    display(
-        Javascript(
-            """
+    display(Javascript("""
         var code = IPython.notebook.insert_cell_{0}('code');
         code.set_text(atob("{1}"));
-    """.format(
-                where, encoded_code
-            )
-        )
-    )
+    """.format(where, encoded_code)))
 
 
 def local_tile_pixel_value(
@@ -12915,13 +12909,11 @@ def init_duckdb_tiles(
                     # Data is already in Web Mercator, don't transform
                     # Use VIEW for Parquet files only if user requested it
                     table_or_view = "VIEW" if (is_parquet and use_view) else "TABLE"
-                    con.execute(
-                        f"""
+                    con.execute(f"""
                         CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                         SELECT {select_clause}{geom_col_source} as {geom_column}
                         FROM {source_table};
-                    """
-                    )
+                    """)
                     if not quiet:
                         view_note = " (using view)" if (is_parquet and use_view) else ""
                         print(
@@ -12931,15 +12923,13 @@ def init_duckdb_tiles(
                     # Data needs transformation to Web Mercator
                     # Use VIEW for Parquet files only if user requested it
                     table_or_view = "VIEW" if (is_parquet and use_view) else "TABLE"
-                    con.execute(
-                        f"""
+                    con.execute(f"""
                         CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                         SELECT
                             {select_clause}
                             ST_Transform(ST_GeomFromWKB(ST_AsWKB({geom_col_source})), '{transform_from_crs}', 'EPSG:{srid}', true) as {geom_column}
                         FROM {source_table};
-                    """
-                    )
+                    """)
                     if not quiet:
                         view_note = " (using view)" if (is_parquet and use_view) else ""
                         print(
@@ -12955,13 +12945,11 @@ def init_duckdb_tiles(
                 )
             # Use VIEW for Parquet files only if user requested it
             table_or_view = "VIEW" if (is_parquet and use_view) else "TABLE"
-            con.execute(
-                f"""
+            con.execute(f"""
                 CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                 SELECT {select_clause}{geom_col_source} as {geom_column}
                 FROM {source_table};
-            """
-            )
+            """)
             if not quiet:
                 view_note = " (using view)" if (is_parquet and use_view) else ""
                 print(
@@ -12985,13 +12973,11 @@ def init_duckdb_tiles(
                 # For Parquet, we already have the source_table and geom_col_source from above
                 # Use VIEW for Parquet files only if user requested it
                 table_or_view = "VIEW" if use_view else "TABLE"
-                con.execute(
-                    f"""
+                con.execute(f"""
                     CREATE {table_or_view} IF NOT EXISTS {table_name} AS
                     SELECT {select_clause}{geom_col_source} as {geom_column}
                     FROM {source_table};
-                """
-                )
+                """)
             else:
                 # First, get column names and types to exclude geometry and complex types
                 temp_result = con.execute(
@@ -13041,13 +13027,11 @@ def init_duckdb_tiles(
                 else:
                     select_clause = ""
 
-                con.execute(
-                    f"""
+                con.execute(f"""
                     CREATE TABLE IF NOT EXISTS {table_name} AS
                     SELECT {select_clause}"{geom_col_source}" as {geom_column}
                     FROM ST_Read('{input_path}');
-                """
-                )
+                """)
             con.commit()
             if not quiet:
                 view_or_table = "view" if (is_parquet and use_view) else "table"
@@ -13286,8 +13270,7 @@ def start_duckdb_tile_server(
                     if properties is None:
                         # Get column names and types, filtering for MVT-compatible types
                         # ST_AsMVT only supports: VARCHAR, FLOAT, DOUBLE, INTEGER, BIGINT, BOOLEAN
-                        columns = con.execute(
-                            f"""
+                        columns = con.execute(f"""
                             SELECT column_name, data_type
                             FROM information_schema.columns
                             WHERE table_name = '{table_name}'
@@ -13295,8 +13278,7 @@ def start_duckdb_tile_server(
                             AND data_type IN ('VARCHAR', 'FLOAT', 'DOUBLE', 'INTEGER', 'BIGINT', 'BOOLEAN',
                                              'SMALLINT', 'TINYINT', 'UBIGINT', 'UINTEGER', 'USMALLINT', 'UTINYINT',
                                              'HUGEINT', 'REAL', 'TEXT')
-                            """
-                        ).fetchall()
+                            """).fetchall()
                         prop_list = [col[0] for col in columns]
                     else:
                         prop_list = properties
@@ -14520,13 +14502,11 @@ def vector_to_parquet_batch(
 
         try:
             # Execute the conversion
-            conn.execute(
-                f"""
+            conn.execute(f"""
                 COPY (
                     SELECT * FROM ST_Read('{file}')
                 ) TO '{parquet_file}' (FORMAT PARQUET)
-            """
-            )
+            """)
         except Exception as e:
             print(f"Error converting {base_name}: {str(e)}")
 
@@ -14588,13 +14568,11 @@ def vector_to_gpkg_batch(
 
         try:
             # Execute the conversion
-            conn.execute(
-                f"""
+            conn.execute(f"""
                 COPY (
                     SELECT * FROM ST_Read('{file}')
                 ) TO '{gpkg_file}' (FORMAT GDAL, DRIVER 'GPKG')
-            """
-            )
+            """)
         except Exception as e:
             print(f"Error converting {base_name}: {str(e)}")
 
@@ -14654,13 +14632,11 @@ def vector_to_geojson_batch(input_dir, output_dir=None, file_ext=".shp", **kwarg
 
         try:
             # Execute the conversion
-            conn.execute(
-                f"""
+            conn.execute(f"""
                 COPY (
                     SELECT * FROM ST_Read('{file}')
                 ) TO '{gpkg_file}' (FORMAT GDAL, DRIVER 'GeoJSON')
-            """
-            )
+            """)
         except Exception as e:
             print(f"Error converting {base_name}: {str(e)}")
 
@@ -15063,11 +15039,9 @@ def split_parquet_by_geometries(
         read_str = f"ST_Read('{input_vector}')"
 
     # Get all state IDs from the parquet file
-    state_ids = con.execute(
-        f"""
+    state_ids = con.execute(f"""
         SELECT {column} FROM {read_str}
-        """
-    ).fetchall()
+        """).fetchall()
 
     state_ids.sort()
 
@@ -16697,9 +16671,7 @@ def generate_index_html(directory: str, output: str = "index.html") -> None:
 <body>
     <h1>Index of {directory}</h1>
     <ul>
-""".format(
-        directory=directory
-    )
+""".format(directory=directory)
 
     # Add each file to the HTML list
     for file in files:

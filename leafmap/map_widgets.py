@@ -1085,14 +1085,12 @@ class TabWidget:
         )
 
         # Help dialog (default content)
-        default_help = widgets.HTML(
-            """
+        default_help = widgets.HTML("""
             <div style="line-height:1.5">
               <h3 style="margin:0 0 .5rem 0">Help</h3>
               <p>Add your own help content via <code>set_help_content(widget)</code>.</p>
             </div>
-            """
-        )
+            """)
         self._help_title = v.CardTitle(class_="text-h6", children=["Help"])
         self._help_cardtext = v.CardText(class_="py-4", children=[default_help])
         self._help_close_btn = v.Btn(text=True, color="primary", children=["Close"])
@@ -1113,8 +1111,7 @@ class TabWidget:
         # Global style
         self._style = v.Html(
             tag="style",
-            children=[
-                """
+            children=["""
                 .rounded-xl { border-radius: 16px; }
                 .v-tab { border-radius: 8px; margin-right: 6px; }
                 .v-tab--active { background: rgba(33,150,243,.08); }
@@ -1122,8 +1119,7 @@ class TabWidget:
                 .mdi-spin { -webkit-animation: mdi-spin 2s infinite linear; animation: mdi-spin 2s infinite linear; }
                 @-webkit-keyframes mdi-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
                 @keyframes mdi-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-                """
-            ],
+                """],
         )
 
         # Build initial tabs
