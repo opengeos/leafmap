@@ -837,8 +837,7 @@ class Map(folium.Map):
         """
 
         class _OpacityControl(JSCSSMixin, Layer):
-            _template = Template(
-                """
+            _template = Template("""
                 {% macro head(this, kwargs) %}
                     <style>
                         .leaflet-control.leafmap-opacity-control {
@@ -1022,8 +1021,7 @@ class Map(folium.Map):
                         }
                     })();
                 {% endmacro %}
-                """
-            )
+                """)
 
             def __init__(
                 self,
@@ -2436,15 +2434,11 @@ class Map(folium.Map):
         if style is None:
             title_html = """
                     <h3 align={} style="font-size:{}"><b>{}</b></h3>
-                    """.format(
-                align, font_size, title
-            )
+                    """.format(align, font_size, title)
         else:
             title_html = """
                 <h3 align={} style={}><b>{}</b></h3>
-                """.format(
-                align, style, title
-            )
+                """.format(align, style, title)
         self.get_root().html.add_child(folium.Element(title_html))
 
     def static_map(
@@ -3990,15 +3984,13 @@ class SplitControl(Layer):
     >>> sidebyside.add_to(m)
     """
 
-    _template = Template(
-        """
+    _template = Template("""
         {% macro script(this, kwargs) %}
             var {{ this.get_name() }} = L.control.sideBySide(
                 {{ this.layer_left.get_name() }}, {{ this.layer_right.get_name() }}
             ).addTo({{ this._parent.get_name() }});
         {% endmacro %}
-        """
-    )
+        """)
 
     def __init__(
         self, layer_left, layer_right, name=None, overlay=True, control=True, show=True
@@ -4046,15 +4038,13 @@ class SideBySideLayers(JSCSSMixin, Layer):
     >>> sidebyside.add_to(m)
     """
 
-    _template = Template(
-        """
+    _template = Template("""
         {% macro script(this, kwargs) %}
             var {{ this.get_name() }} = L.control.sideBySide(
                 {{ this.layer_left.get_name() }}, {{ this.layer_right.get_name() }}
             ).addTo({{ this._parent.get_name() }});
         {% endmacro %}
-        """
-    )
+        """)
 
     default_js = [
         (
@@ -4076,8 +4066,7 @@ class CustomControl(MacroElement):
 
     """
 
-    _template = Template(
-        """
+    _template = Template("""
         {% macro script(this, kwargs) %}
         L.Control.CustomControl = L.Control.extend({
             onAdd: function(map) {
@@ -4096,8 +4085,7 @@ class CustomControl(MacroElement):
             { position: "{{ this.position }}" }
         ).addTo({{ this._parent.get_name() }});
         {% endmacro %}
-    """
-    )
+    """)
 
     def __init__(self, html, position="bottomleft"):
         def escape_backticks(text):
@@ -4114,8 +4102,7 @@ class CustomControl(MacroElement):
 class FloatText(MacroElement):
     """Adds a floating image in HTML canvas on top of the map."""
 
-    _template = Template(
-        """
+    _template = Template("""
             {% macro header(this,kwargs) %}
                 <style>
                     #{{this.get_name()}} {
@@ -4153,8 +4140,7 @@ class FloatText(MacroElement):
                 }
             </style>
             {% endmacro %}
-            """
-    )
+            """)
 
     def __init__(self, text, bottom=75, left=75):
         super(FloatText, self).__init__()
@@ -4347,8 +4333,7 @@ def geojson_layer(
 class GeoTIFFLayer(JSCSSMixin, Layer):
     """Leaflet layer that renders Cloud Optimized GeoTIFFs client-side."""
 
-    _template = Template(
-        """
+    _template = Template("""
             {% macro script(this, kwargs) %}
             var {{ this.get_name() }} = L.layerGroup();
             {% if this.control %}
@@ -4540,8 +4525,7 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                 }
             })();
             {% endmacro %}
-        """
-    )
+        """)
 
     default_js = [
         ("proj4", "https://cdn.jsdelivr.net/npm/proj4@2.8.1/dist/proj4.js"),
@@ -4621,8 +4605,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
     Adapted from https://github.com/jtmiclat/folium-pmtiles. Credits to @jtmiclat.
     """
 
-    _template = Template(
-        """
+    _template = Template("""
             {% macro script(this, kwargs) -%}
             var protocol = new pmtiles.Protocol();
             maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -4639,8 +4622,7 @@ class PMTilesLayer(JSCSSMixin, Layer):
             }).addTo({{ this._parent.get_name() }});
 
             {%- endmacro %}
-            """
-    )
+            """)
     default_css = [
         ("maplibre_css", "https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css")
     ]
@@ -4705,8 +4687,7 @@ class PMTilesMapLibreTooltip(JSCSSMixin, MacroElement):
     Adapted from https://github.com/jtmiclat/folium-pmtiles. Credits to @jtmiclat.
     """
 
-    _template = Template(
-        """
+    _template = Template("""
             {% macro header(this, kwargs) %}
             <style>
             .maplibregl-popup {
@@ -4773,8 +4754,7 @@ class PMTilesMapLibreTooltip(JSCSSMixin, MacroElement):
                     setTooltipForPMTilesMapLibreLayer_{{ this.get_name() }}({{ this._parent.get_name() }});
                 });
             {%- endmacro %}
-            """
-    )
+            """)
 
     def __init__(self, name=None, **kwargs):
         # super().__init__(name=name if name else "PMTilesTooltip", **kwargs)
