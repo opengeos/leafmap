@@ -8561,38 +8561,30 @@ import ipywidgets as widgets</div>
 
 <span class="c1"># Customize dialog</span>
 <span class="n">tw</span><span class="o">.</span><span class="n">set_help_title</span><span class="p">(</span><span class="s2">"About this dashboard"</span><span class="p">)</span>
-<span class="n">tw</span><span class="o">.</span><span class="n">set_help_content</span><span class="p">(</span>
-    <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span>
-<span class="w">        </span><span class="sd">"""</span>
-<span class="sd">      &lt;p&gt;&lt;b&gt;Shortcuts&lt;/b&gt;&lt;/p&gt;</span>
-<span class="sd">      &lt;ul&gt;</span>
-<span class="sd">        &lt;li&gt;1 / 2 / 3 — switch tabs&lt;/li&gt;</span>
-<span class="sd">        &lt;li&gt;R — refresh&lt;/li&gt;</span>
-<span class="sd">        &lt;li&gt;? — help&lt;/li&gt;</span>
-<span class="sd">      &lt;/ul&gt;</span>
-<span class="sd">    """</span>
-    <span class="p">)</span>
-<span class="p">)</span>
+<span class="n">tw</span><span class="o">.</span><span class="n">set_help_content</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">      &lt;p&gt;&lt;b&gt;Shortcuts&lt;/b&gt;&lt;/p&gt;</span>
+<span class="s2">      &lt;ul&gt;</span>
+<span class="s2">        &lt;li&gt;1 / 2 / 3 — switch tabs&lt;/li&gt;</span>
+<span class="s2">        &lt;li&gt;R — refresh&lt;/li&gt;</span>
+<span class="s2">        &lt;li&gt;? — help&lt;/li&gt;</span>
+<span class="s2">      &lt;/ul&gt;</span>
+<span class="s2">    """</span><span class="p">))</span>
 
 <span class="n">m</span> <span class="o">=</span> <span class="n">leafmap</span><span class="o">.</span><span class="n">Map</span><span class="p">(</span>
     <span class="n">projection</span><span class="o">=</span><span class="s2">"globe"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"liberty"</span><span class="p">,</span> <span class="n">sidebar_visible</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s2">"800px"</span>
 <span class="p">)</span>
 <span class="n">m</span><span class="o">.</span><span class="n">create_container</span><span class="p">()</span>
 
-<span class="n">home_tab</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    &lt;h1&gt;Welcome to the Leafmap Visualization Dashboard&lt;/h1&gt;</span>
-<span class="sd">    &lt;p&gt;This is the home tab.&lt;/p&gt;</span>
-<span class="sd">    &lt;img src="https://assets.gishub.org/images/geog-312.png" width="100%"&gt;</span>
-<span class="sd">    """</span>
-<span class="p">)</span>
+<span class="n">home_tab</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">    &lt;h1&gt;Welcome to the Leafmap Visualization Dashboard&lt;/h1&gt;</span>
+<span class="s2">    &lt;p&gt;This is the home tab.&lt;/p&gt;</span>
+<span class="s2">    &lt;img src="https://assets.gishub.org/images/geog-312.png" width="100%"&gt;</span>
+<span class="s2">    """</span><span class="p">)</span>
 
-<span class="n">settings_tab</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    &lt;h1&gt;Settings&lt;/h1&gt;</span>
-<span class="sd">    &lt;p&gt;This is the settings tab.&lt;/p&gt;</span>
-<span class="sd">    """</span>
-<span class="p">)</span>
+<span class="n">settings_tab</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">    &lt;h1&gt;Settings&lt;/h1&gt;</span>
+<span class="s2">    &lt;p&gt;This is the settings tab.&lt;/p&gt;</span>
+<span class="s2">    """</span><span class="p">)</span>
 
 <span class="n">tw</span><span class="o">.</span><span class="n">set_tab_content</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">home_tab</span><span class="p">)</span>
 <span class="n">tw</span><span class="o">.</span><span class="n">set_tab_content</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">container</span><span class="p">)</span>
@@ -8609,38 +8601,30 @@ import ipywidgets as widgets</div>
 
 # Customize dialog
 tw.set_help_title("About this dashboard")
-tw.set_help_content(
-    widgets.HTML(
-        """
+tw.set_help_content(widgets.HTML("""
       <p><b>Shortcuts</b></p>
 <ul>
 <li>1 / 2 / 3 — switch tabs</li>
 <li>R — refresh</li>
 <li>? — help</li>
 </ul>
-    """
-    )
-)
+    """))
 
 m = leafmap.Map(
     projection="globe", style="liberty", sidebar_visible=True, height="800px"
 )
 m.create_container()
 
-home_tab = widgets.HTML(
-    """
+home_tab = widgets.HTML("""
     <h1>Welcome to the Leafmap Visualization Dashboard</h1>
 <p>This is the home tab.</p>
 <img alt="No description has been provided for this image" src="https://assets.gishub.org/images/geog-312.png" width="100%"/>
-    """
-)
+    """)
 
-settings_tab = widgets.HTML(
-    """
+settings_tab = widgets.HTML("""
     <h1>Settings</h1>
 <p>This is the settings tab.</p>
-    """
-)
+    """)
 
 tw.set_tab_content(0, home_tab)
 tw.set_tab_content(1, m.container)
@@ -8693,7 +8677,7 @@ display(tw.widget)</div>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="August 21, 2025 02:13:49 UTC"><span class="timeago" datetime="2025-08-21T02:13:49+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="August 21, 2025 02:13:49 UTC">2025-08-21</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="January 20, 2026 04:23:34 UTC"><span class="timeago" datetime="2026-01-20T04:23:34+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="January 20, 2026 04:23:34 UTC">2026-01-20</span>
   </span>
 
     
