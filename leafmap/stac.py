@@ -119,7 +119,11 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
     Returns:
         The titiler endpoint.
     """
-    if titiler_endpoint is not None and titiler_endpoint.lower() == "local":
+    if (
+        titiler_endpoint is not None
+        and isinstance(titiler_endpoint, str)
+        and titiler_endpoint.lower() == "local"
+    ):
         titiler_endpoint = run_titiler(show_logs=False)
     elif titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
@@ -129,8 +133,12 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
                 titiler_endpoint = PlanetaryComputerEndpoint()
         else:
             titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-    elif titiler_endpoint in ["planetary-computer", "pc"]:
+    elif isinstance(titiler_endpoint, str) and titiler_endpoint in [
+        "planetary-computer",
+        "pc",
+    ]:
         titiler_endpoint = PlanetaryComputerEndpoint()
+    # If it's already an endpoint object, just return it as-is
 
     return titiler_endpoint
 
@@ -706,12 +714,12 @@ def stac_tile(
                     titiler_endpoint=titiler_endpoint,
                 )
             except Exception as e:
-                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+                fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
                 stats = stac_stats(
                     collection=collection,
                     item=item,
                     assets=assets,
-                    titiler_endpoint=titiler_endpoint,
+                    titiler_endpoint=fallback_endpoint,
                 )
 
             if "detail" not in stats:
@@ -732,8 +740,6 @@ def stac_tile(
                         ]
                     )
                 kwargs["rescale"] = f"{percentile_2},{percentile_98}"
-            else:
-                print(stats["detail"])  # When operation times out.
 
     else:
         data = requests.get(url).json()
@@ -850,6 +856,26 @@ def stac_tile(
                 titiler_endpoint.url_for_stac_item(), params=kwargs, timeout=10
             ).json()
 
+    # Check if the response contains tiles
+    if "tiles" not in r:
+        # Try to provide helpful error message from the API response
+        if "detail" in r:
+            error_msg = f"TiTiler endpoint error: {r['detail']}"
+        elif isinstance(r, list) and len(r) > 0:
+            # Handle validation errors (list of error dicts)
+            if isinstance(r[0], dict) and "msg" in r[0]:
+                errors = []
+                for e in r:
+                    loc = "->".join(str(x) for x in e.get("loc", []))
+                    msg = e.get("msg", "")
+                    errors.append(f"{loc}: {msg}")
+                error_msg = f"TiTiler endpoint validation failed: {'; '.join(errors)}"
+            else:
+                error_msg = f"TiTiler endpoint returned error list: {r}"
+        else:
+            error_msg = f"TiTiler endpoint returned unexpected response (missing 'tiles' key): {r}"
+        raise ValueError(error_msg)
+
     tiles = r["tiles"][0]
 
     # Convert 127.0.0.1 to localhost for Google Colab browser access
@@ -915,7 +941,29 @@ def stac_bounds(
                 titiler_endpoint.url_for_stac_bounds(), params=kwargs
             ).json()
 
-        bounds = r["bbox"]
+        # Try to get bounds from different response formats
+        if "bbox" in r:
+            bounds = r["bbox"]
+        elif "properties" in r and isinstance(r["properties"], dict):
+            # Handle GeoJSON Feature format (Planetary Computer)
+            # Try to get bounds from properties.{asset}.bounds
+            for key, value in r["properties"].items():
+                if isinstance(value, dict) and "bounds" in value:
+                    bounds = value["bounds"]
+                    break
+            else:
+                # Fallback to geometry bbox if available
+                if "geometry" in r and "coordinates" in r["geometry"]:
+                    # Calculate bbox from geometry coordinates
+                    coords = r["geometry"]["coordinates"][0]  # Assuming Polygon
+                    lons = [c[0] for c in coords]
+                    lats = [c[1] for c in coords]
+                    bounds = [min(lons), min(lats), max(lons), max(lats)]
+                else:
+                    return None
+        else:
+            return None
+
         return bounds
     except Exception as e:
         print(e)
