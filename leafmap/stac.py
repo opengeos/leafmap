@@ -935,7 +935,29 @@ def stac_bounds(
                 titiler_endpoint.url_for_stac_bounds(), params=kwargs
             ).json()
 
-        bounds = r["bbox"]
+        # Try to get bounds from different response formats
+        if "bbox" in r:
+            bounds = r["bbox"]
+        elif "properties" in r and isinstance(r["properties"], dict):
+            # Handle GeoJSON Feature format (Planetary Computer)
+            # Try to get bounds from properties.{asset}.bounds
+            for key, value in r["properties"].items():
+                if isinstance(value, dict) and "bounds" in value:
+                    bounds = value["bounds"]
+                    break
+            else:
+                # Fallback to geometry bbox if available
+                if "geometry" in r and "coordinates" in r["geometry"]:
+                    # Calculate bbox from geometry coordinates
+                    coords = r["geometry"]["coordinates"][0]  # Assuming Polygon
+                    lons = [c[0] for c in coords]
+                    lats = [c[1] for c in coords]
+                    bounds = [min(lons), min(lats), max(lons), max(lats)]
+                else:
+                    return None
+        else:
+            return None
+            
         return bounds
     except Exception as e:
         print(e)
