@@ -957,7 +957,7 @@ def stac_bounds(
                     return None
         else:
             return None
-            
+
         return bounds
     except Exception as e:
         print(e)
