@@ -119,7 +119,11 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
     Returns:
         The titiler endpoint.
     """
-    if titiler_endpoint is not None and titiler_endpoint.lower() == "local":
+    if (
+        titiler_endpoint is not None
+        and isinstance(titiler_endpoint, str)
+        and titiler_endpoint.lower() == "local"
+    ):
         titiler_endpoint = run_titiler(show_logs=False)
     elif titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
@@ -129,8 +133,12 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
                 titiler_endpoint = PlanetaryComputerEndpoint()
         else:
             titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-    elif titiler_endpoint in ["planetary-computer", "pc"]:
+    elif isinstance(titiler_endpoint, str) and titiler_endpoint in [
+        "planetary-computer",
+        "pc",
+    ]:
         titiler_endpoint = PlanetaryComputerEndpoint()
+    # If it's already an endpoint object, just return it as-is
 
     return titiler_endpoint
 
@@ -698,7 +706,6 @@ def stac_tile(
             and ("expression" not in kwargs)
             and ("rescale" not in kwargs)
         ):
-            stats = None
             try:
                 stats = stac_stats(
                     collection=collection,
@@ -706,21 +713,16 @@ def stac_tile(
                     assets=assets,
                     titiler_endpoint=titiler_endpoint,
                 )
-            except Exception:
-                # Try fallback endpoint if primary fails
-                try:
-                    fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-                    stats = stac_stats(
-                        collection=collection,
-                        item=item,
-                        assets=assets,
-                        titiler_endpoint=fallback_endpoint,
-                    )
-                except Exception:
-                    # Stats not available, continue without rescaling
-                    stats = None
+            except Exception as e:
+                fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+                stats = stac_stats(
+                    collection=collection,
+                    item=item,
+                    assets=assets,
+                    titiler_endpoint=fallback_endpoint,
+                )
 
-            if stats and "detail" not in stats:
+            if "detail" not in stats:
                 try:
                     percentile_2 = min([stats[s]["percentile_2"] for s in stats])
                     percentile_98 = max([stats[s]["percentile_98"] for s in stats])
@@ -738,7 +740,6 @@ def stac_tile(
                         ]
                     )
                 kwargs["rescale"] = f"{percentile_2},{percentile_98}"
-            # Silently continue without stats if they're not available
 
     else:
         data = requests.get(url).json()
