@@ -698,6 +698,7 @@ def stac_tile(
             and ("expression" not in kwargs)
             and ("rescale" not in kwargs)
         ):
+            stats = None
             try:
                 stats = stac_stats(
                     collection=collection,
@@ -705,16 +706,21 @@ def stac_tile(
                     assets=assets,
                     titiler_endpoint=titiler_endpoint,
                 )
-            except Exception as e:
-                fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
-                stats = stac_stats(
-                    collection=collection,
-                    item=item,
-                    assets=assets,
-                    titiler_endpoint=fallback_endpoint,
-                )
+            except Exception:
+                # Try fallback endpoint if primary fails
+                try:
+                    fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+                    stats = stac_stats(
+                        collection=collection,
+                        item=item,
+                        assets=assets,
+                        titiler_endpoint=fallback_endpoint,
+                    )
+                except Exception:
+                    # Stats not available, continue without rescaling
+                    stats = None
 
-            if "detail" not in stats:
+            if stats and "detail" not in stats:
                 try:
                     percentile_2 = min([stats[s]["percentile_2"] for s in stats])
                     percentile_98 = max([stats[s]["percentile_98"] for s in stats])
@@ -732,8 +738,7 @@ def stac_tile(
                         ]
                     )
                 kwargs["rescale"] = f"{percentile_2},{percentile_98}"
-            else:
-                print(stats["detail"])  # When operation times out.
+            # Silently continue without stats if they're not available
 
     else:
         data = requests.get(url).json()
