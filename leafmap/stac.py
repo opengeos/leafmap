@@ -706,12 +706,12 @@ def stac_tile(
                     titiler_endpoint=titiler_endpoint,
                 )
             except Exception as e:
-                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+                fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
                 stats = stac_stats(
                     collection=collection,
                     item=item,
                     assets=assets,
-                    titiler_endpoint=titiler_endpoint,
+                    titiler_endpoint=fallback_endpoint,
                 )
 
             if "detail" not in stats:
@@ -849,6 +849,26 @@ def stac_tile(
             r = requests.get(
                 titiler_endpoint.url_for_stac_item(), params=kwargs, timeout=10
             ).json()
+
+    # Check if the response contains tiles
+    if "tiles" not in r:
+        # Try to provide helpful error message from the API response
+        if "detail" in r:
+            error_msg = f"TiTiler endpoint error: {r['detail']}"
+        elif isinstance(r, list) and len(r) > 0:
+            # Handle validation errors (list of error dicts)
+            if isinstance(r[0], dict) and "msg" in r[0]:
+                errors = []
+                for e in r:
+                    loc = "->".join(str(x) for x in e.get("loc", []))
+                    msg = e.get("msg", "")
+                    errors.append(f"{loc}: {msg}")
+                error_msg = f"TiTiler endpoint validation failed: {'; '.join(errors)}"
+            else:
+                error_msg = f"TiTiler endpoint returned error list: {r}"
+        else:
+            error_msg = f"TiTiler endpoint returned unexpected response (missing 'tiles' key): {r}"
+        raise ValueError(error_msg)
 
     tiles = r["tiles"][0]
 
