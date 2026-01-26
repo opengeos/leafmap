@@ -2998,8 +2998,12 @@ def zarr_statistics(
     if os.environ.get("USE_MKDOCS") is not None:
         return None
 
-    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+    # Check for xarray-specific endpoint
+    if titiler_endpoint is None:
+        titiler_endpoint = os.environ.get("TITILER_XARRAY_ENDPOINT")
 
+    if titiler_endpoint is None:
+        titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     params = {"url": url, "decode_times": str(decode_times).lower()}
     if variable is not None:
         params["variable"] = variable
