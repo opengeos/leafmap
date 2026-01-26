@@ -3330,8 +3330,10 @@ class Map(ipyleaflet.Map):
         # Try WKB first (most common for Polars-ST)
         if pdf[geometry].dtype == object:
             # Check if first non-null value is bytes
-            first_valid = geom_col.dropna().iloc[0] if len(geom_col.dropna()) > 0 else None
-            
+            first_valid = (
+                geom_col.dropna().iloc[0] if len(geom_col.dropna()) > 0 else None
+            )
+
             if first_valid is not None and isinstance(first_valid, bytes):
                 # Use vectorized from_wkb for better performance
                 try:
@@ -3374,7 +3376,7 @@ class Map(ipyleaflet.Map):
                 f"No CRS specified for geometry column '{geometry}'. "
                 "Defaulting to EPSG:4326. Use the 'crs' parameter to specify a different CRS.",
                 UserWarning,
-                stacklevel=2
+                stacklevel=2,
             )
             gdf.crs = "EPSG:4326"
 
