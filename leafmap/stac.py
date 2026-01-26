@@ -2679,3 +2679,507 @@ def run_titiler(
 
     if return_titiler_endpoint:
         return endpoint, port, proc
+
+
+def zarr_tile(
+    url: str,
+    variable: Optional[str] = None,
+    titiler_endpoint: Optional[str] = None,
+    group: Optional[str] = None,
+    decode_times: bool = False,
+    time_index: Optional[int] = 0,
+    **kwargs,
+) -> str:
+    """Get a tile layer URL from a Zarr dataset using titiler-xarray.
+
+    This function requires a TiTiler endpoint with titiler-xarray support.
+    The default titiler endpoint does NOT support Zarr/xarray datasets.
+    You need to either:
+    1. Set up your own titiler-xarray endpoint
+    2. Use `leafmap.run_titiler_xarray()` to start a local server
+
+    Args:
+        url (str): HTTP URL to a Zarr dataset, e.g., https://example.com/data.zarr
+            or s3://bucket/data.zarr
+        variable (str, optional): The variable name to visualize. Required for
+            multi-variable datasets. Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
+            Must have titiler-xarray installed. Defaults to environment variable
+            TITILER_XARRAY_ENDPOINT or prompts user to start a local server.
+        group (str, optional): The Zarr group path within the dataset.
+            Defaults to None.
+        decode_times (bool, optional): Whether to decode times in the dataset.
+            Defaults to False.
+        time_index (int, optional): Index of the time dimension to visualize.
+            Required for datasets with a time dimension. Defaults to 0 (first time step).
+            Set to None to disable time selection (for datasets without time dimension).
+        **kwargs (Any): Additional arguments to pass to the titiler endpoint.
+            Common options include:
+            - rescale (str): Comma-delimited Min,Max range (e.g., "0,255")
+            - colormap_name (str): Name of a colormap (e.g., "viridis")
+            - colormap (str): JSON encoded custom colormap
+            - nodata (float): Nodata value
+            - sel (str): Dimension selection in format "dim=value" (e.g., "time=0")
+            - TileMatrixSetId (str): Tile matrix set ID (default: "WebMercatorQuad")
+
+    Returns:
+        str: The Zarr tile layer URL, or None if the endpoint doesn't support Zarr.
+
+    Example:
+        >>> # Start local titiler-xarray server first
+        >>> endpoint = leafmap.run_titiler_xarray()
+        >>> url = "https://example.com/data.zarr"
+        >>> tile_url = zarr_tile(url, variable="temperature", titiler_endpoint=endpoint)
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    # Check for xarray-specific endpoint
+    if titiler_endpoint is None:
+        titiler_endpoint = os.environ.get("TITILER_XARRAY_ENDPOINT")
+
+    if titiler_endpoint is None:
+        titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+
+    kwargs["url"] = url
+
+    if variable is not None:
+        kwargs["variable"] = variable
+
+    if group is not None:
+        kwargs["group"] = group
+
+    kwargs["decode_times"] = str(decode_times).lower()
+
+    # Add time selection if time_index is specified
+    # This is required for datasets with a time dimension
+    if time_index is not None and "sel" not in kwargs:
+        kwargs["sel"] = f"time={time_index}"
+
+    if "palette" in kwargs:
+        kwargs["colormap_name"] = kwargs["palette"].lower()
+        del kwargs["palette"]
+
+    # Ensure colormap_name is lowercase (required by titiler)
+    if "colormap_name" in kwargs and kwargs["colormap_name"]:
+        kwargs["colormap_name"] = kwargs["colormap_name"].lower()
+
+    TileMatrixSetId = "WebMercatorQuad"
+    if "TileMatrixSetId" in kwargs:
+        TileMatrixSetId = kwargs["TileMatrixSetId"]
+        kwargs.pop("TileMatrixSetId")
+
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/md/{TileMatrixSetId}/tilejson.json",
+            params=kwargs,
+            timeout=30,
+        ).json()
+
+        # Check for various error conditions
+        if "detail" in r:
+            detail = r["detail"]
+            if detail == "Not Found":
+                print(
+                    "Error: The titiler endpoint does not support Zarr/xarray datasets.\n"
+                    "The '/md/' endpoint is not available. Please:\n"
+                    "  1. Use a titiler endpoint with titiler-xarray installed, or\n"
+                    "  2. Start a local titiler-xarray server with: leafmap.run_titiler_xarray()\n"
+                    "  3. Set TITILER_XARRAY_ENDPOINT environment variable"
+                )
+                return None
+            else:
+                # Handle validation errors or other API errors
+                print(f"Error from titiler endpoint: {detail}")
+                return None
+
+        if "tiles" not in r:
+            print(f"Unexpected response from titiler: {r}")
+            return None
+
+        tiles = r["tiles"][0]
+        if titiler_endpoint.startswith("https://") and tiles.startswith("http://"):
+            tiles = tiles.replace("http://", "https://")
+
+        # Convert 127.0.0.1 to localhost for Google Colab browser access
+        if "google.colab" in sys.modules and "127.0.0.1" in tiles:
+            tiles = tiles.replace("http://127.0.0.1", "https://localhost")
+
+        return tiles
+    except KeyError as e:
+        print(f"Error getting Zarr tile URL: missing key {e}")
+        return None
+    except Exception as e:
+        print(f"Error getting Zarr tile URL: {e}")
+        return None
+
+
+def zarr_info(
+    url: str,
+    variable: Optional[str] = None,
+    titiler_endpoint: Optional[str] = None,
+    group: Optional[str] = None,
+    decode_times: bool = False,
+    **kwargs,
+) -> dict:
+    """Get information about a Zarr dataset.
+
+    Args:
+        url (str): HTTP URL to a Zarr dataset.
+        variable (str, optional): The variable name. Required by titiler-xarray.
+            Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
+            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        group (str, optional): The Zarr group path within the dataset.
+            Defaults to None.
+        decode_times (bool, optional): Whether to decode times in the dataset.
+            Defaults to False.
+        **kwargs: Additional arguments to pass to the titiler endpoint.
+
+    Returns:
+        dict: Information about the Zarr dataset including bounds, CRS, and variables.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    # Check for xarray-specific endpoint
+    if titiler_endpoint is None:
+        titiler_endpoint = os.environ.get("TITILER_XARRAY_ENDPOINT")
+
+    if titiler_endpoint is None:
+        titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+
+    params = {"url": url, "decode_times": str(decode_times).lower()}
+    if variable is not None:
+        params["variable"] = variable
+    if group is not None:
+        params["group"] = group
+    params.update(kwargs)
+
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/md/info",
+            params=params,
+            timeout=30,
+        ).json()
+        return r
+    except Exception as e:
+        print(f"Error getting Zarr info: {e}")
+        return None
+
+
+def zarr_bounds(
+    url: str,
+    variable: Optional[str] = None,
+    titiler_endpoint: Optional[str] = None,
+    group: Optional[str] = None,
+    decode_times: bool = False,
+    **kwargs,
+) -> list:
+    """Get the bounds of a Zarr dataset.
+
+    Args:
+        url (str): HTTP URL to a Zarr dataset.
+        variable (str, optional): The variable name. Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
+            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        group (str, optional): The Zarr group path within the dataset.
+            Defaults to None.
+        decode_times (bool, optional): Whether to decode times in the dataset.
+            Defaults to False.
+        **kwargs: Additional arguments to pass to the titiler endpoint.
+
+    Returns:
+        list: Bounds as [minx, miny, maxx, maxy] in WGS84.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    # Check for xarray-specific endpoint
+    if titiler_endpoint is None:
+        titiler_endpoint = os.environ.get("TITILER_XARRAY_ENDPOINT")
+
+    if titiler_endpoint is None:
+        titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+
+    params = {"url": url, "decode_times": str(decode_times).lower()}
+    if variable is not None:
+        params["variable"] = variable
+    if group is not None:
+        params["group"] = group
+    params.update(kwargs)
+
+    try:
+        # Use /info endpoint since /bounds may not exist in titiler-xarray
+        r = requests.get(
+            f"{titiler_endpoint}/md/info",
+            params=params,
+            timeout=30,
+        ).json()
+        return r.get("bounds", None)
+    except Exception as e:
+        print(f"Error getting Zarr bounds: {e}")
+        return None
+
+
+def zarr_variables(
+    url: str,
+    titiler_endpoint: Optional[str] = None,
+    group: Optional[str] = None,
+    decode_times: bool = False,
+    **kwargs,
+) -> list:
+    """Get the list of variables from a Zarr dataset.
+
+    Args:
+        url (str): HTTP URL to a Zarr dataset.
+        titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
+            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        group (str, optional): The Zarr group path within the dataset.
+            Defaults to None.
+        decode_times (bool, optional): Whether to decode times in the dataset.
+            Defaults to False.
+        **kwargs: Additional arguments to pass to the titiler endpoint.
+
+    Returns:
+        list: List of variable names in the Zarr dataset.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    # Check for xarray-specific endpoint
+    if titiler_endpoint is None:
+        titiler_endpoint = os.environ.get("TITILER_XARRAY_ENDPOINT")
+
+    if titiler_endpoint is None:
+        titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+
+    params = {"url": url, "decode_times": str(decode_times).lower()}
+    if group is not None:
+        params["group"] = group
+    params.update(kwargs)
+
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/md/variables",
+            params=params,
+            timeout=30,
+        ).json()
+        return r
+    except Exception as e:
+        print(f"Error getting Zarr variables: {e}")
+        return None
+
+
+def zarr_statistics(
+    url: str,
+    variable: Optional[str] = None,
+    titiler_endpoint: Optional[str] = None,
+    group: Optional[str] = None,
+    decode_times: bool = False,
+    **kwargs,
+) -> dict:
+    """Get statistics for a Zarr dataset variable.
+
+    Args:
+        url (str): HTTP URL to a Zarr dataset.
+        variable (str, optional): The variable name. Required for multi-variable datasets.
+        titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
+            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        group (str, optional): The Zarr group path within the dataset.
+            Defaults to None.
+        decode_times (bool, optional): Whether to decode times in the dataset.
+            Defaults to False.
+        **kwargs: Additional arguments to pass to the titiler endpoint.
+
+    Returns:
+        dict: Statistics including min, max, mean, std, etc.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
+
+    params = {"url": url, "decode_times": str(decode_times).lower()}
+    if variable is not None:
+        params["variable"] = variable
+    if group is not None:
+        params["group"] = group
+    params.update(kwargs)
+
+    try:
+        r = requests.get(
+            f"{titiler_endpoint}/md/statistics",
+            params=params,
+            timeout=30,
+        ).json()
+        return r
+    except Exception as e:
+        print(f"Error getting Zarr statistics: {e}")
+        return None
+
+
+def run_titiler_xarray(
+    show_logs: bool = False,
+    start_port: int = 8000,
+    max_port: int = 8100,
+) -> str:
+    """Start a local titiler-xarray server for Zarr/NetCDF visualization.
+
+    This function starts a local titiler-xarray server that enables dynamic
+    tile serving from Zarr and NetCDF datasets. The server runs in the background
+    and will be automatically stopped when the Python kernel is terminated.
+
+    Requirements:
+        - titiler.xarray package: pip install "titiler.xarray[full]"
+        - uvicorn: pip install uvicorn
+
+    Args:
+        show_logs (bool): If True, stream server logs to notebook output.
+            Defaults to False.
+        start_port (int): First port to try. Defaults to 8000.
+        max_port (int): Last port to try (exclusive). Defaults to 8100.
+
+    Returns:
+        str: The endpoint URL of the running titiler-xarray server.
+
+    Example:
+        >>> endpoint = leafmap.run_titiler_xarray()
+        >>> m = leafmap.Map()
+        >>> m.add_zarr(url, variable="temperature", titiler_endpoint=endpoint)
+    """
+    import subprocess
+    import socket
+    import atexit
+    import signal
+    import time
+    import threading
+
+    def find_free_port(start, end):
+        for port in range(start, end):
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                try:
+                    s.bind(("127.0.0.1", port))
+                    return port
+                except OSError:
+                    continue
+        raise RuntimeError(f"No free port found between {start} and {end}")
+
+    port = find_free_port(start_port, max_port)
+
+    # Create a simple titiler-xarray app inline
+    app_code = """
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from titiler.xarray.factory import TilerFactory
+from titiler.xarray.extensions import VariablesExtension
+
+app = FastAPI(
+    title="TiTiler-XArray",
+    description="TiTiler application for Zarr/NetCDF datasets",
+)
+
+# Add CORS middleware to allow requests from any origin
+# This is necessary for Jupyter notebooks and VSCode webviews
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+md = TilerFactory(
+    router_prefix="/md",
+    extensions=[VariablesExtension()],
+)
+app.include_router(md.router, prefix="/md", tags=["Multi Dimensional"])
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+"""
+
+    # Write the app to a temporary file
+    import tempfile
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+        f.write(app_code)
+        app_file = f.name
+
+    module_name = os.path.splitext(os.path.basename(app_file))[0]
+
+    cmd = [
+        sys.executable,
+        "-m",
+        "uvicorn",
+        f"{module_name}:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(port),
+        "--log-level",
+        "info",
+    ]
+
+    # Change to the temp directory so uvicorn can find the module
+    cwd = os.path.dirname(app_file)
+
+    proc = subprocess.Popen(
+        cmd,
+        stdout=subprocess.PIPE if show_logs else subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+        cwd=cwd,
+    )
+
+    # Optionally stream logs in a background thread
+    if show_logs:
+
+        def stream_logs():
+            for line in iter(proc.stdout.readline, b""):
+                print(line.decode().rstrip())
+
+        threading.Thread(target=stream_logs, daemon=True).start()
+
+    # Wait a bit for startup
+    time.sleep(3)
+
+    # Check if the server is running
+    endpoint = f"http://127.0.0.1:{port}"
+
+    try:
+        response = requests.get(f"{endpoint}/health", timeout=5)
+        if response.status_code != 200:
+            raise RuntimeError("Server health check failed")
+    except Exception as e:
+        proc.kill()
+        raise RuntimeError(
+            f"Failed to start titiler-xarray server: {e}\n"
+            "Make sure titiler.xarray is installed: pip install 'titiler.xarray[full]'"
+        )
+
+    if "google.colab" in sys.modules:
+        print(f"🚀 TiTiler-XArray is running at {endpoint} (Google Colab mode)")
+    else:
+        print(f"🚀 TiTiler-XArray is running at {endpoint}")
+
+    # Register cleanup on kernel shutdown
+    def stop_server():
+        if proc.poll() is None:
+            print("🛑 Stopping TiTiler-XArray...")
+            proc.send_signal(signal.SIGINT)
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+        # Clean up temp file
+        try:
+            os.unlink(app_file)
+        except Exception:
+            pass
+
+    atexit.register(stop_server)
+
+    os.environ["TITILER_XARRAY_ENDPOINT"] = endpoint
+
+    return endpoint

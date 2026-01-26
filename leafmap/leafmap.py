@@ -1238,6 +1238,149 @@ class Map(ipyleaflet.Map):
 
         self.cog_layer_dict[name] = params
 
+    def add_zarr(
+        self,
+        url: str,
+        variable: Optional[str] = None,
+        name: str = "Zarr Layer",
+        attribution: str = "",
+        opacity: float = 1.0,
+        shown: bool = True,
+        titiler_endpoint: Optional[str] = None,
+        fit_bounds: bool = True,
+        layer_index: Optional[int] = None,
+        group: Optional[str] = None,
+        decode_times: bool = False,
+        time_index: Optional[int] = 0,
+        **kwargs,
+    ) -> None:
+        """Adds a Zarr dataset to the map as a tile layer.
+
+        This method uses titiler-xarray to dynamically serve tiles from Zarr
+        datasets (local or remote). It supports both single-variable and
+        multi-variable datasets.
+
+        Args:
+            url (str): URL to a Zarr dataset (HTTP, S3, or local path).
+                Examples:
+                - "https://example.com/data.zarr"
+                - "s3://bucket/data.zarr"
+            variable (str, optional): The variable name to visualize. Required for
+                multi-variable datasets. Defaults to None.
+            name (str, optional): The layer name. Defaults to "Zarr Layer".
+            attribution (str, optional): Attribution for the layer. Defaults to "".
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            shown (bool, optional): Whether the layer is visible. Defaults to True.
+            titiler_endpoint (str, optional): TiTiler endpoint that supports xarray.
+                Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            fit_bounds (bool, optional): Zoom to layer extent. Defaults to True.
+            layer_index (int, optional): Index to insert the layer. Defaults to None.
+            group (str, optional): Zarr group path within the dataset. Defaults to None.
+            decode_times (bool, optional): Whether to decode times. Defaults to False.
+            time_index (int, optional): Index of the time dimension to visualize.
+                Required for datasets with a time dimension. Defaults to 0 (first time step).
+                Set to None if the dataset has no time dimension.
+            **kwargs: Additional arguments passed to the titiler endpoint:
+                - rescale (str): Value range, e.g., "0,255"
+                - colormap_name (str): Colormap name, e.g., "viridis", "terrain"
+                - colormap (str): JSON-encoded custom colormap
+                - nodata (float): Nodata value
+                - resampling (str): Resampling method (nearest, bilinear, etc.)
+                - sel (str): Custom dimension selection, e.g., "time=5"
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> url = "https://example.com/temperature.zarr"
+            >>> m.add_zarr(url, variable="temperature", colormap_name="viridis")
+        """
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tile_url = common.zarr_tile(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            time_index=time_index,
+            group=group,
+            decode_times=decode_times,
+            **kwargs,
+        )
+
+        if tile_url is None:
+            print("Failed to get Zarr tile URL")
+            return
+
+        bounds = common.zarr_bounds(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            group=group,
+            decode_times=decode_times,
+        )
+
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
+
+        if fit_bounds and bounds is not None:
+            # Clamp bounds to valid lat/lng ranges
+            # bounds format: [minx, miny, maxx, maxy] = [min_lon, min_lat, max_lon, max_lat]
+            clamped_bounds = [
+                max(-180.0, min(180.0, bounds[0])),  # minx (longitude)
+                max(-90.0, min(90.0, bounds[1])),  # miny (latitude)
+                max(-180.0, min(180.0, bounds[2])),  # maxx (longitude)
+                max(-90.0, min(90.0, bounds[3])),  # maxy (latitude)
+            ]
+            self.fit_bounds(
+                [
+                    [clamped_bounds[1], clamped_bounds[0]],
+                    [clamped_bounds[3], clamped_bounds[2]],
+                ]
+            )
+            common.arc_zoom_to_extent(
+                clamped_bounds[0],
+                clamped_bounds[1],
+                clamped_bounds[2],
+                clamped_bounds[3],
+            )
+
+        if not hasattr(self, "cog_layer_dict"):
+            self.cog_layer_dict = {}
+
+        if "rescale" in kwargs:
+            rescale = kwargs["rescale"]
+            if isinstance(rescale, str):
+                vmin, vmax = [float(v) for v in rescale.split(",")]
+            else:
+                vmin, vmax = rescale[0], rescale[1]
+        else:
+            vmin, vmax = None, None
+
+        if "colormap_name" in kwargs:
+            colormap = kwargs["colormap_name"]
+        else:
+            colormap = None
+
+        if "nodata" in kwargs:
+            nodata = kwargs["nodata"]
+        else:
+            nodata = None
+
+        params = {
+            "url": url,
+            "titiler_endpoint": titiler_endpoint,
+            "variable": variable,
+            "tile_layer": self.find_layer(name),
+            "bounds": bounds,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "colormap": colormap,
+            "opacity": opacity,
+            "layer_name": name,
+            "type": "ZARR",
+        }
+
+        self.cog_layer_dict[name] = params
+
     def add_mosaic_layer(
         self,
         url=None,
