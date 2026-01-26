@@ -2882,7 +2882,9 @@ def zarr_bounds(
         url (str): HTTP URL to a Zarr dataset.
         variable (str, optional): The variable name. Defaults to None.
         titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
-            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            If not provided, the function first checks the ``TITILER_XARRAY_ENDPOINT``
+            environment variable; if that is not set, it falls back to the default
+            endpoint returned by :func:`check_titiler_endpoint`.
         group (str, optional): The Zarr group path within the dataset.
             Defaults to None.
         decode_times (bool, optional): Whether to decode times in the dataset.
