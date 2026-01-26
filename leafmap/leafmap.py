@@ -1271,8 +1271,11 @@ class Map(ipyleaflet.Map):
             attribution (str, optional): Attribution for the layer. Defaults to "".
             opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
             shown (bool, optional): Whether the layer is visible. Defaults to True.
-            titiler_endpoint (str, optional): TiTiler endpoint that supports xarray.
-                Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            titiler_endpoint (str, optional): TiTiler endpoint URL that supports
+                titiler-xarray. If not provided, the endpoint is resolved
+                automatically: the TITILER_XARRAY_ENDPOINT environment variable
+                is checked first, and if it is not set, the library's default
+                TiTiler endpoint is used.
             fit_bounds (bool, optional): Zoom to layer extent. Defaults to True.
             layer_index (int, optional): Index to insert the layer. Defaults to None.
             group (str, optional): Zarr group path within the dataset. Defaults to None.
