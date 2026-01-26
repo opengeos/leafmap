@@ -30,6 +30,33 @@ Optionally, you can install some [Jupyter notebook extensions](https://github.co
 conda install jupyter_contrib_nbextensions -c conda-forge
 ```
 
+## Optional Dependencies
+
+Leafmap has various optional dependencies to enable additional features. You can install them as needed:
+
+### Polars Support
+
+To enable Polars DataFrame support for modern, high-performance geospatial workflows:
+
+```bash
+pip install "leafmap[polars]"
+```
+
+This enables the `add_polars()` method for visualizing Polars DataFrames with geometry columns (e.g., from Polars-ST or polars-h3).
+
+### Other Optional Dependencies
+
+Install other optional features:
+
+```bash
+pip install "leafmap[vector]"     # Vector analysis tools
+pip install "leafmap[raster]"     # Raster data support
+pip install "leafmap[lidar]"      # LiDAR data analysis
+pip install "leafmap[backends]"   # All mapping backends
+pip install "leafmap[maplibre]"   # MapLibre GL backend
+pip install "leafmap[ai]"         # AI/ML features
+```
+
 ## Install from GitHub
 
 To install the development version from GitHub using [Git](https://git-scm.com/), run the following command in your terminal:

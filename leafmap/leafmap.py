@@ -3216,6 +3216,184 @@ class Map(ipyleaflet.Map):
             **kwargs,
         )
 
+    def add_polars(
+        self,
+        df,
+        geometry: Optional[str] = "geometry",
+        crs: Optional[str] = None,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[List[str]] = None,
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = False,
+        encoding: Optional[str] = "utf-8",
+        **kwargs,
+    ) -> None:
+        """Adds a Polars DataFrame with geometry to the map.
+
+        This method supports Polars-ST DataFrames with spatial geometry columns
+        and enables direct visualization of Polars-based geospatial data without
+        manual conversion to GeoPandas.
+
+        Args:
+            df: A Polars DataFrame with a geometry column (e.g., from Polars-ST).
+            geometry (str, optional): The name of the geometry column. Defaults to "geometry".
+            crs (str, optional): The CRS of the geometry data (e.g., "EPSG:4326").
+                If None, defaults to EPSG:4326. For Polars-ST DataFrames, specify the CRS explicitly.
+            layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
+            encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
+            **kwargs: Additional keyword arguments to pass to add_gdf.
+
+        Raises:
+            ImportError: If polars or required dependencies are not installed.
+            ValueError: If the specified geometry column is not found or contains invalid data.
+            TypeError: If the input is not a Polars DataFrame.
+
+        Examples:
+            >>> import polars as pl
+            >>> # With Polars-ST
+            >>> df = pl.read_parquet("data.geoparquet")
+            >>> m = leafmap.Map()
+            >>> m.add_polars(df, geometry="geometry", crs="EPSG:4326")
+        """
+        import warnings
+
+        try:
+            import polars as pl
+        except ImportError:
+            raise ImportError(
+                "polars is required for add_polars(). "
+                "Install it with: pip install polars"
+            )
+
+        try:
+            import geopandas as gpd
+            from shapely import wkb, wkt
+        except ImportError:
+            raise ImportError(
+                "geopandas and shapely are required. "
+                "Install them with: pip install geopandas shapely"
+            )
+
+        # Validate input
+        if not isinstance(df, pl.DataFrame):
+            raise TypeError(
+                f"Expected a Polars DataFrame, got {type(df).__name__}. "
+                "Use add_gdf() for GeoPandas DataFrames."
+            )
+
+        # Check if geometry column exists
+        if geometry not in df.columns:
+            raise ValueError(
+                f"Geometry column '{geometry}' not found. "
+                f"Available columns: {df.columns}"
+            )
+
+        # Check for null/empty geometry column
+        if df[geometry].null_count() == len(df):
+            raise ValueError(
+                f"Geometry column '{geometry}' contains only null values. "
+                "Please provide valid geometry data."
+            )
+
+        # Convert Polars DataFrame to pandas
+        pdf = df.to_pandas()
+
+        # Handle datetime columns (same as add_gdf)
+        for col in pdf.columns:
+            try:
+                if pdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+                    pdf[col] = pdf[col].astype(str)
+            except Exception:
+                pass
+
+        # Handle geometry column - could be WKB binary or WKT string
+        geom_col = pdf[geometry]
+
+        # Try to convert geometries using vectorized operations where possible
+        geometries = None
+        parse_error = None
+
+        # Try WKB first (most common for Polars-ST)
+        if pdf[geometry].dtype == object:
+            # Check if first non-null value is bytes
+            first_valid = (
+                geom_col.dropna().iloc[0] if len(geom_col.dropna()) > 0 else None
+            )
+
+            if first_valid is not None and isinstance(first_valid, bytes):
+                # Use vectorized from_wkb for better performance
+                try:
+                    geometries = gpd.GeoSeries.from_wkb(geom_col)
+                except (TypeError, ValueError) as e:
+                    parse_error = f"WKB parsing failed: {e}"
+            else:
+                # Try WKT string parsing
+                try:
+                    geometries = gpd.GeoSeries.from_wkt(geom_col)
+                except (TypeError, ValueError) as e:
+                    # Last resort: assume it's already shapely geometries
+                    try:
+                        geometries = gpd.GeoSeries(geom_col)
+                    except (TypeError, ValueError) as e2:
+                        parse_error = f"WKT parsing failed: {e}, Shapely geometry: {e2}"
+        else:
+            # Might be serialized as bytes dtype
+            try:
+                geometries = gpd.GeoSeries.from_wkb(geom_col)
+            except (TypeError, ValueError) as e:
+                parse_error = f"WKB parsing failed for bytes dtype: {e}"
+
+        if geometries is None or parse_error:
+            raise ValueError(
+                f"Failed to parse geometry column '{geometry}'. "
+                f"Expected WKB binary or WKT string format. {parse_error or ''}"
+            )
+
+        # Drop the original geometry column and create GeoDataFrame
+        pdf = pdf.drop(columns=[geometry])
+        gdf = gpd.GeoDataFrame(pdf, geometry=geometries)
+
+        # Set CRS
+        if crs is not None:
+            gdf.crs = crs
+        elif gdf.crs is None:
+            # Default to EPSG:4326 with warning
+            warnings.warn(
+                f"No CRS specified for geometry column '{geometry}'. "
+                "Defaulting to EPSG:4326. Use the 'crs' parameter to specify a different CRS.",
+                UserWarning,
+                stacklevel=2,
+            )
+            gdf.crs = "EPSG:4326"
+
+        # Now use the existing add_gdf method
+        self.add_gdf(
+            gdf,
+            layer_name=layer_name,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            fill_colors=fill_colors,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            encoding=encoding,
+            **kwargs,
+        )
+
     def add_gdf_time_slider(
         self,
         gdf: "gpd.GeoDataFrame",
