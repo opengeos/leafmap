@@ -2613,7 +2613,10 @@ class Map(MapWidget):
             opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
             visible (bool, optional): Whether the layer is visible. Defaults to True.
             titiler_endpoint (str, optional): TiTiler endpoint that supports xarray.
-                Defaults to "https://giswqs-titiler-endpoint.hf.space".
+                If not provided, the function first checks the
+                ``TITILER_XARRAY_ENDPOINT`` environment variable; if that is not
+                set, it falls back to the default endpoint resolved by
+                ``check_titiler_endpoint``.
             fit_bounds (bool, optional): Zoom to layer extent. Defaults to True.
             before_id (str, optional): Layer id to insert before. Defaults to None.
             group (str, optional): Zarr group path within the dataset. Defaults to None.
