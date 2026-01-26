@@ -65,12 +65,18 @@ from .common import (
     read_geojson,
     read_vector,
     run_titiler,
+    run_titiler_xarray,
     sort_files,
     stac_assets,
     start_duckdb_tile_server,
     start_martin,
     start_server,
     stop_martin,
+    zarr_bounds,
+    zarr_info,
+    zarr_statistics,
+    zarr_tile,
+    zarr_variables,
 )
 from .map_widgets import TabWidget
 from .plot import bar_chart, histogram, line_chart, pie_chart
@@ -2571,6 +2577,119 @@ class Map(MapWidget):
         )
         if fit_bounds and bounds is not None:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
+
+    def add_zarr(
+        self,
+        url: str,
+        variable: Optional[str] = None,
+        name: str = "Zarr Layer",
+        attribution: str = "",
+        opacity: float = 1.0,
+        visible: bool = True,
+        titiler_endpoint: Optional[str] = None,
+        fit_bounds: bool = True,
+        before_id: Optional[str] = None,
+        group: Optional[str] = None,
+        decode_times: bool = False,
+        time_index: Optional[int] = 0,
+        overwrite: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Adds a Zarr dataset to the map as a tile layer.
+
+        This method uses titiler-xarray to dynamically serve tiles from Zarr
+        datasets (local or remote). It supports both single-variable and
+        multi-variable datasets.
+
+        Args:
+            url (str): URL to a Zarr dataset (HTTP, S3, or local path).
+                Examples:
+                - "https://example.com/data.zarr"
+                - "s3://bucket/data.zarr"
+            variable (str, optional): The variable name to visualize. Required for
+                multi-variable datasets. Defaults to None.
+            name (str, optional): The layer name. Defaults to "Zarr Layer".
+            attribution (str, optional): Attribution for the layer. Defaults to "".
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            visible (bool, optional): Whether the layer is visible. Defaults to True.
+            titiler_endpoint (str, optional): TiTiler endpoint that supports xarray.
+                If not provided, the function first checks the
+                ``TITILER_XARRAY_ENDPOINT`` environment variable; if that is not
+                set, it falls back to the default endpoint resolved by
+                ``check_titiler_endpoint``.
+            fit_bounds (bool, optional): Zoom to layer extent. Defaults to True.
+            before_id (str, optional): Layer id to insert before. Defaults to None.
+            group (str, optional): Zarr group path within the dataset. Defaults to None.
+            decode_times (bool, optional): Whether to decode times. Defaults to False.
+            time_index (int, optional): Index of the time dimension to visualize.
+                Required for datasets with a time dimension. Defaults to 0 (first time step).
+                Set to None if the dataset has no time dimension.
+            overwrite (bool, optional): Whether to overwrite an existing layer.
+                Defaults to False.
+            **kwargs: Additional arguments passed to the titiler endpoint:
+                - rescale (str): Value range, e.g., "0,255"
+                - colormap_name (str): Colormap name, e.g., "viridis", "terrain"
+                - colormap (str): JSON-encoded custom colormap
+                - nodata (float): Nodata value
+                - resampling (str): Resampling method (nearest, bilinear, etc.)
+                - sel (str): Custom dimension selection, e.g., "time=5"
+
+        Example:
+            >>> import leafmap.maplibregl as leafmap
+            >>> m = leafmap.Map()
+            >>> url = "https://example.com/temperature.zarr"
+            >>> m.add_zarr(url, variable="temperature", colormap_name="viridis")
+        """
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tile_url = common.zarr_tile(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            group=group,
+            decode_times=decode_times,
+            time_index=time_index,
+            **kwargs,
+        )
+
+        if tile_url is None:
+            print("Failed to get Zarr tile URL")
+            return
+
+        bounds = common.zarr_bounds(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            group=group,
+            decode_times=decode_times,
+        )
+
+        self.add_tile_layer(
+            tile_url,
+            name,
+            attribution,
+            opacity,
+            visible,
+            before_id=before_id,
+            overwrite=overwrite,
+        )
+
+        if fit_bounds and bounds is not None:
+            # Clamp bounds to valid lat/lng ranges
+            # bounds format: [minx, miny, maxx, maxy] = [min_lon, min_lat, max_lon, max_lat]
+            clamped_bounds = [
+                max(-180.0, min(180.0, bounds[0])),  # minx (longitude)
+                max(-90.0, min(90.0, bounds[1])),  # miny (latitude)
+                max(-180.0, min(180.0, bounds[2])),  # maxx (longitude)
+                max(-90.0, min(90.0, bounds[3])),  # maxy (latitude)
+            ]
+            self.fit_bounds(
+                [
+                    [clamped_bounds[0], clamped_bounds[1]],
+                    [clamped_bounds[2], clamped_bounds[3]],
+                ]
+            )
 
     def add_raster(
         self,
