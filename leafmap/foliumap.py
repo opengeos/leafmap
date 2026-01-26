@@ -2068,7 +2068,6 @@ class Map(folium.Map):
             **kwargs,
         )
 
-
     def add_polars(
         self,
         df,
@@ -2155,18 +2154,25 @@ class Map(folium.Map):
             if pdf[geometry].dtype == object:
                 # Try WKB first (most common for Polars-ST)
                 try:
-                    geometries = geom_col.apply(lambda x: wkb.loads(bytes(x)) if x is not None else None)
+                    geometries = geom_col.apply(
+                        lambda x: wkb.loads(bytes(x)) if x is not None else None
+                    )
                 except Exception:
                     # Try WKT
                     try:
                         from shapely import wkt
-                        geometries = geom_col.apply(lambda x: wkt.loads(str(x)) if x is not None else None)
+
+                        geometries = geom_col.apply(
+                            lambda x: wkt.loads(str(x)) if x is not None else None
+                        )
                     except Exception:
                         # Assume it's already shapely geometry
                         geometries = geom_col
             else:
                 # Might be serialized as bytes
-                geometries = geom_col.apply(lambda x: wkb.loads(x) if x is not None else None)
+                geometries = geom_col.apply(
+                    lambda x: wkb.loads(x) if x is not None else None
+                )
         except Exception as e:
             raise ValueError(
                 f"Failed to parse geometry column '{geometry}'. "
@@ -2185,8 +2191,11 @@ class Map(folium.Map):
             # Polars-ST stores CRS in column metadata
             try:
                 # Check if the original Polars column has metadata
-                if hasattr(df[geometry], '_metadata') and 'crs' in df[geometry]._metadata:
-                    gdf.crs = df[geometry]._metadata['crs']
+                if (
+                    hasattr(df[geometry], "_metadata")
+                    and "crs" in df[geometry]._metadata
+                ):
+                    gdf.crs = df[geometry]._metadata["crs"]
                 else:
                     # Default to EPSG:4326
                     gdf.crs = "EPSG:4326"
