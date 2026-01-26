@@ -415,6 +415,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#optional-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional Dependencies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional Dependencies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#polars-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polars Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-optional-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Optional Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#install-from-github" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8086,6 +8125,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../notebooks/110_polars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    110 polars
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -8138,6 +8205,45 @@
       
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional Dependencies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optional Dependencies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#polars-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Polars Support
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-optional-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other Optional Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -8226,6 +8332,27 @@ mamba<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </
 <p>Optionally, you can install some <a href="https://github.com/ipython-contrib/jupyter_contrib_nbextensions">Jupyter notebook extensions</a>, which can improve your productivity in the notebook environment. Some useful extensions include Table of Contents, Gist-it, Autopep8, Variable Inspector, etc. See this <a href="https://towardsdatascience.com/jupyter-notebook-extensions-517fa69d2231">post</a> for more information.</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>conda<span class="w"> </span>install<span class="w"> </span>jupyter_contrib_nbextensions<span class="w"> </span>-c<span class="w"> </span>conda-forge
 </code></pre></div></td></tr></table></div>
+<h2 id="optional-dependencies">Optional Dependencies<a class="headerlink" href="#optional-dependencies" title="Permanent link">&para;</a></h2>
+<p>Leafmap has various optional dependencies to enable additional features. You can install them as needed:</p>
+<h3 id="polars-support">Polars Support<a class="headerlink" href="#polars-support" title="Permanent link">&para;</a></h3>
+<p>To enable Polars DataFrame support for modern, high-performance geospatial workflows:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[polars]&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>This enables the <code>add_polars()</code> method for visualizing Polars DataFrames with geometry columns (e.g., from Polars-ST or polars-h3).</p>
+<h3 id="other-optional-dependencies">Other Optional Dependencies<a class="headerlink" href="#other-optional-dependencies" title="Permanent link">&para;</a></h3>
+<p>Install other optional features:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[vector]&quot;</span><span class="w">     </span><span class="c1"># Vector analysis tools</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[raster]&quot;</span><span class="w">     </span><span class="c1"># Raster data support</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[lidar]&quot;</span><span class="w">      </span><span class="c1"># LiDAR data analysis</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[backends]&quot;</span><span class="w">   </span><span class="c1"># All mapping backends</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[maplibre]&quot;</span><span class="w">   </span><span class="c1"># MapLibre GL backend</span>
+pip<span class="w"> </span>install<span class="w"> </span><span class="s2">&quot;leafmap[ai]&quot;</span><span class="w">         </span><span class="c1"># AI/ML features</span>
+</code></pre></div></td></tr></table></div>
 <h2 id="install-from-github">Install from GitHub<a class="headerlink" href="#install-from-github" title="Permanent link">&para;</a></h2>
 <p>To install the development version from GitHub using <a href="https://git-scm.com/">Git</a>, run the following command in your terminal:</p>
 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/opengeos/leafmap
@@ -8289,7 +8416,7 @@ jupyter nbextension enable --py --sys-prefix ipyleaflet
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="November 13, 2023 04:25:39 UTC"><span class="timeago" datetime="2023-11-13T04:25:39+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="November 13, 2023 04:25:39 UTC">2023-11-13</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-timeago" title="January 26, 2026 19:18:39 UTC"><span class="timeago" datetime="2026-01-26T19:18:39+00:00" locale="en"></span></span><span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-iso_date" title="January 26, 2026 19:18:39 UTC">2026-01-26</span>
   </span>
 
     
