@@ -3181,8 +3181,9 @@ def health():
         # Clean up temp file
         try:
             os.unlink(app_file)
-        except Exception:
-            pass
+        except Exception as e:
+            # Best-effort cleanup; ignore failures but log for debugging
+            print(f"Warning: failed to remove temporary TiTiler-XArray app file {app_file}: {e}")
 
     atexit.register(stop_server)
 
