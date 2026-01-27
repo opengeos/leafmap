@@ -65,12 +65,18 @@ from .common import (
     read_geojson,
     read_vector,
     run_titiler,
+    run_titiler_xarray,
     sort_files,
     stac_assets,
     start_duckdb_tile_server,
     start_martin,
     start_server,
     stop_martin,
+    zarr_bounds,
+    zarr_info,
+    zarr_statistics,
+    zarr_tile,
+    zarr_variables,
 )
 from .map_widgets import TabWidget
 from .plot import bar_chart, histogram, line_chart, pie_chart
@@ -166,7 +172,6 @@ class Map(MapWidget):
             "positron2",
         ]
         if isinstance(style, str):
-
             if style.startswith("http"):
                 response = requests.get(style)
                 if response.status_code != 200:
@@ -823,7 +828,6 @@ class Map(MapWidget):
         self._deck_layer_tooltips = tooltip
 
         for layer in layers:
-
             self.layer_dict[layer["id"]] = {
                 "layer": layer,
                 "opacity": layer.get("opacity", 1.0),
@@ -1809,6 +1813,173 @@ class Map(MapWidget):
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
+    def add_polars(
+        self,
+        df,
+        geometry: Optional[str] = "geometry",
+        crs: Optional[str] = None,
+        layer_type: Optional[str] = None,
+        filter: Optional[Dict] = None,
+        paint: Optional[Dict] = None,
+        name: Optional[str] = None,
+        fit_bounds: bool = True,
+        visible: bool = True,
+        before_id: Optional[str] = None,
+        source_args: Dict = {},
+        overwrite: bool = False,
+        **kwargs: Any,
+    ):
+        """
+        Adds a Polars DataFrame with geometry to the map.
+
+        This method supports Polars-ST DataFrames with spatial geometry columns
+        and enables direct visualization of Polars-based geospatial data without
+        manual conversion to GeoPandas.
+
+        Args:
+            df: A Polars DataFrame with a geometry column (e.g., from Polars-ST).
+            geometry (str, optional): The name of the geometry column. Defaults to "geometry".
+            crs (str, optional): The CRS of the geometry data (e.g., "EPSG:4326").
+                If None, will try to detect from Polars-ST metadata or default to EPSG:4326.
+            layer_type (str, optional): The type of the layer. If None, the type
+                is inferred from the GeoJSON data.
+            filter (dict, optional): The filter to apply to the layer. If None,
+                no filter is applied.
+            paint (dict, optional): The paint properties to apply to the layer.
+                If None, no paint properties are applied.
+            name (str, optional): The name of the layer. If None, a random name
+                is generated.
+            fit_bounds (bool, optional): Whether to adjust the viewport of the
+                map to fit the bounds of the GeoJSON data. Defaults to True.
+            visible (bool, optional): Whether the layer is visible or not.
+                Defaults to True.
+            before_id (str, optional): The ID of an existing layer before which
+                the new layer should be inserted.
+            source_args (dict, optional): Additional keyword arguments that are
+                passed to the GeoJSONSource class.
+            overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
+                Defaults to False.
+            **kwargs: Additional keyword arguments that are passed to the Layer class.
+
+        Raises:
+            ImportError: If polars or required dependencies are not installed.
+            ValueError: If the specified geometry column is not found.
+            TypeError: If the input is not a Polars DataFrame.
+
+        Examples:
+            >>> import polars as pl
+            >>> # With Polars-ST
+            >>> df = pl.read_parquet("data.geoparquet")
+            >>> m = leafmap.Map()
+            >>> m.add_polars(df, geometry="geometry", crs="EPSG:4326")
+        """
+        try:
+            import polars as pl
+        except ImportError:
+            raise ImportError(
+                "polars is required for add_polars(). "
+                "Install it with: pip install polars"
+            )
+
+        try:
+            import geopandas as gpd
+            from shapely import wkb
+        except ImportError:
+            raise ImportError(
+                "geopandas and shapely are required. "
+                "Install them with: pip install geopandas shapely"
+            )
+
+        # Validate input
+        if not isinstance(df, pl.DataFrame):
+            raise TypeError(
+                f"Expected a Polars DataFrame, got {type(df).__name__}. "
+                "Use add_gdf() for GeoPandas DataFrames."
+            )
+
+        # Check if geometry column exists
+        if geometry not in df.columns:
+            raise ValueError(
+                f"Geometry column '{geometry}' not found. "
+                f"Available columns: {df.columns}"
+            )
+
+        # Convert Polars DataFrame to GeoPandas
+        # Strategy: Convert to pandas first, then create GeoDataFrame
+        pdf = df.to_pandas()
+
+        # Handle geometry column - could be WKB binary or WKT string
+        geom_col = pdf[geometry]
+
+        # Try to convert geometries
+        try:
+            # Check if it's binary (WKB from Polars-ST)
+            if pdf[geometry].dtype == object:
+                # Try WKB first (most common for Polars-ST)
+                try:
+                    geometries = geom_col.apply(
+                        lambda x: wkb.loads(bytes(x)) if x is not None else None
+                    )
+                except Exception:
+                    # Try WKT
+                    try:
+                        from shapely import wkt
+
+                        geometries = geom_col.apply(
+                            lambda x: wkt.loads(str(x)) if x is not None else None
+                        )
+                    except Exception:
+                        # Assume it's already shapely geometry
+                        geometries = geom_col
+            else:
+                # Might be serialized as bytes
+                geometries = geom_col.apply(
+                    lambda x: wkb.loads(x) if x is not None else None
+                )
+        except Exception as e:
+            raise ValueError(
+                f"Failed to parse geometry column '{geometry}'. "
+                f"Expected WKB binary or WKT string format. Error: {e}"
+            )
+
+        # Drop the original geometry column and create GeoDataFrame
+        pdf = pdf.drop(columns=[geometry])
+        gdf = gpd.GeoDataFrame(pdf, geometry=geometries)
+
+        # Set CRS
+        if crs is not None:
+            gdf.crs = crs
+        elif gdf.crs is None:
+            # Try to detect CRS from Polars-ST metadata
+            # Polars-ST stores CRS in column metadata
+            try:
+                # Check if the original Polars column has metadata
+                if (
+                    hasattr(df[geometry], "_metadata")
+                    and "crs" in df[geometry]._metadata
+                ):
+                    gdf.crs = df[geometry]._metadata["crs"]
+                else:
+                    # Default to EPSG:4326
+                    gdf.crs = "EPSG:4326"
+            except Exception:
+                gdf.crs = "EPSG:4326"
+
+        # Now use the existing add_gdf method
+        self.add_gdf(
+            gdf,
+            layer_type=layer_type,
+            filter=filter,
+            paint=paint,
+            name=name,
+            fit_bounds=fit_bounds,
+            visible=visible,
+            before_id=before_id,
+            source_args=source_args,
+            overwrite=overwrite,
+            **kwargs,
+        )
+
     def add_vector_tile(
         self,
         url: str,
@@ -2207,7 +2378,6 @@ class Map(MapWidget):
                     **kwargs,
                 )
             else:
-
                 try:
                     import geemap
                     from geemap.ee_tile_layers import _get_tile_url_format
@@ -2405,6 +2575,119 @@ class Map(MapWidget):
         if fit_bounds and bounds is not None:
             self.fit_bounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]])
 
+    def add_zarr(
+        self,
+        url: str,
+        variable: Optional[str] = None,
+        name: str = "Zarr Layer",
+        attribution: str = "",
+        opacity: float = 1.0,
+        visible: bool = True,
+        titiler_endpoint: Optional[str] = None,
+        fit_bounds: bool = True,
+        before_id: Optional[str] = None,
+        group: Optional[str] = None,
+        decode_times: bool = False,
+        time_index: Optional[int] = 0,
+        overwrite: bool = False,
+        **kwargs: Any,
+    ) -> None:
+        """Adds a Zarr dataset to the map as a tile layer.
+
+        This method uses titiler-xarray to dynamically serve tiles from Zarr
+        datasets (local or remote). It supports both single-variable and
+        multi-variable datasets.
+
+        Args:
+            url (str): URL to a Zarr dataset (HTTP, S3, or local path).
+                Examples:
+                - "https://example.com/data.zarr"
+                - "s3://bucket/data.zarr"
+            variable (str, optional): The variable name to visualize. Required for
+                multi-variable datasets. Defaults to None.
+            name (str, optional): The layer name. Defaults to "Zarr Layer".
+            attribution (str, optional): Attribution for the layer. Defaults to "".
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            visible (bool, optional): Whether the layer is visible. Defaults to True.
+            titiler_endpoint (str, optional): TiTiler endpoint that supports xarray.
+                If not provided, the function first checks the
+                ``TITILER_XARRAY_ENDPOINT`` environment variable; if that is not
+                set, it falls back to the default endpoint resolved by
+                ``check_titiler_endpoint``.
+            fit_bounds (bool, optional): Zoom to layer extent. Defaults to True.
+            before_id (str, optional): Layer id to insert before. Defaults to None.
+            group (str, optional): Zarr group path within the dataset. Defaults to None.
+            decode_times (bool, optional): Whether to decode times. Defaults to False.
+            time_index (int, optional): Index of the time dimension to visualize.
+                Required for datasets with a time dimension. Defaults to 0 (first time step).
+                Set to None if the dataset has no time dimension.
+            overwrite (bool, optional): Whether to overwrite an existing layer.
+                Defaults to False.
+            **kwargs: Additional arguments passed to the titiler endpoint:
+                - rescale (str): Value range, e.g., "0,255"
+                - colormap_name (str): Colormap name, e.g., "viridis", "terrain"
+                - colormap (str): JSON-encoded custom colormap
+                - nodata (float): Nodata value
+                - resampling (str): Resampling method (nearest, bilinear, etc.)
+                - sel (str): Custom dimension selection, e.g., "time=5"
+
+        Example:
+            >>> import leafmap.maplibregl as leafmap
+            >>> m = leafmap.Map()
+            >>> url = "https://example.com/temperature.zarr"
+            >>> m.add_zarr(url, variable="temperature", colormap_name="viridis")
+        """
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tile_url = common.zarr_tile(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            group=group,
+            decode_times=decode_times,
+            time_index=time_index,
+            **kwargs,
+        )
+
+        if tile_url is None:
+            print("Failed to get Zarr tile URL")
+            return
+
+        bounds = common.zarr_bounds(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            group=group,
+            decode_times=decode_times,
+        )
+
+        self.add_tile_layer(
+            tile_url,
+            name,
+            attribution,
+            opacity,
+            visible,
+            before_id=before_id,
+            overwrite=overwrite,
+        )
+
+        if fit_bounds and bounds is not None:
+            # Clamp bounds to valid lat/lng ranges
+            # bounds format: [minx, miny, maxx, maxy] = [min_lon, min_lat, max_lon, max_lat]
+            clamped_bounds = [
+                max(-180.0, min(180.0, bounds[0])),  # minx (longitude)
+                max(-90.0, min(90.0, bounds[1])),  # miny (latitude)
+                max(-180.0, min(180.0, bounds[2])),  # maxx (longitude)
+                max(-90.0, min(90.0, bounds[3])),  # maxy (latitude)
+            ]
+            self.fit_bounds(
+                [
+                    [clamped_bounds[0], clamped_bounds[1]],
+                    [clamped_bounds[2], clamped_bounds[3]],
+                ]
+            )
+
     def add_raster(
         self,
         source,
@@ -2584,7 +2867,6 @@ class Map(MapWidget):
             output = os.getenv("MAPLIBRE_OUTPUT", None)
 
         if output:
-
             if not overwrite and os.path.exists(output):
                 import glob
 
@@ -3065,7 +3347,6 @@ class Map(MapWidget):
         """
 
         try:
-
             if "sources" in kwargs:
                 del kwargs["sources"]
 
@@ -3093,7 +3374,6 @@ class Map(MapWidget):
             style = common.replace_hyphens_in_keys(style)
 
             for params in style["layers"]:
-
                 if exclude_mask and params.get("source_layer") == "mask":
                     continue
 
@@ -3807,7 +4087,6 @@ class Map(MapWidget):
             super().add_call("addImage", id, image_dict)
 
             if coordinates is not None:
-
                 source = {
                     "type": "geojson",
                     "data": {
@@ -4389,7 +4668,7 @@ class Map(MapWidget):
             kwargs["box-shadow"] = "none"
 
         css_text = f"""font-size: {fontsize}px; color: {fontcolor};
-        font-weight: {'bold' if bold else 'normal'}; padding: {padding};
+        font-weight: {"bold" if bold else "normal"}; padding: {padding};
         background-color: {bg_color}; border-radius: {border_radius};"""
 
         for key, value in kwargs.items():
@@ -4983,7 +5262,6 @@ class Map(MapWidget):
             css_text = "padding: 5px; border: 1px solid darkgrey; border-radius: 4px;"
 
         if len(layer_ids) > 0:
-
             control = LayerSwitcherControl(
                 layer_ids=layer_ids,
                 theme=theme,
@@ -5880,7 +6158,6 @@ class Map(MapWidget):
         )
 
         if "colormap" not in kwargs:
-
             kwargs["colormap"] = {
                 "11": "#466b9f",
                 "12": "#d1def8",
@@ -6255,7 +6532,6 @@ class Map(MapWidget):
                         )
 
             else:
-
                 layer_type = "fill"
                 if paint is None:
                     paint = {
@@ -6554,7 +6830,6 @@ class Map(MapWidget):
             )
             return row
         else:
-
             return widget
 
     def add_labels(
@@ -7495,7 +7770,6 @@ class Map(MapWidget):
 
         if isinstance(properties, dict):
             for key, values in properties.items():
-
                 if isinstance(values, list) or isinstance(values, tuple):
                     prop_widget = widgets.Dropdown(
                         options=values,
@@ -7593,7 +7867,6 @@ class Map(MapWidget):
         )
 
         def on_save_click(b):
-
             output.clear_output()
             if len(self.draw_features_selected) > 0:
                 feature_id = self.draw_features_selected[0]["id"]
@@ -8034,7 +8307,6 @@ class Container(v.Container):
         self.update_sidebar_content()
 
     def toggle_width_slider(self, *args: Any) -> None:
-
         if self.settings_widget not in self.sidebar_content_box.children:
             self.add_to_sidebar(self.settings_widget, add_header=False)
 
@@ -8169,7 +8441,6 @@ def maptiler_3d_style(
         style = None
 
     if tile_type is None:
-
         image_types = {
             "aquarelle": "webp",
             "backdrop": "png",
@@ -8505,7 +8776,6 @@ def edit_gps_trace(
             categories = m.gdf[ann_column].value_counts()
             keys = list(colormap.keys())[:-1]
             for index, cat in enumerate(keys):
-
                 fig.axes = [
                     bq.Axis(scale=x_sc, label="Time"),
                     bq.Axis(scale=y_sc, orientation="vertical", label=feature.value),
@@ -8615,13 +8885,11 @@ def edit_gps_trace(
 
     def features_change(change):
         if change["new"]:
-
             selected_features = multi_select.value
             children = []
             additonal_scatters.clear()
             if selected_features:
                 for selected_feature in selected_features:
-
                     x = m.gps_trace.index
                     y = m.gps_trace[selected_feature]
                     if sync_plots:
@@ -8633,7 +8901,6 @@ def edit_gps_trace(
                     # Create scatter plots for each annotation category with the appropriate colors and labels
                     scatters = []
                     for cat, color in colormap.items():
-
                         if (
                             cat != "selected"
                         ):  # Exclude 'selected' from data points (only for highlighting selection)
@@ -9263,7 +9530,6 @@ def create_vector_data(
 
     if isinstance(properties, dict):
         for key, values in properties.items():
-
             if isinstance(values, list) or isinstance(values, tuple):
                 prop_widget = widgets.Dropdown(
                     options=values,
@@ -9320,9 +9586,7 @@ def create_vector_data(
                 )
 
         if isinstance(name, str):
-
             if name not in m.layer_dict.keys():
-
                 m.add_geojson(
                     m.draw_feature_collection_all,
                     layer_type="circle",
@@ -9373,7 +9637,6 @@ def create_vector_data(
     )
 
     def on_save_click(b):
-
         output.clear_output()
         output.outputs = ()
         if len(m.draw_features_selected) > 0:
@@ -9453,7 +9716,6 @@ def create_vector_data(
     if return_sidebar:
         return sidebar_widget
     else:
-
         left_col_layout = v.Col(
             cols=column_widths[0],
             children=[m],
@@ -9646,7 +9908,6 @@ def edit_vector_data(
 
     if isinstance(properties, dict):
         for key, values in properties.items():
-
             if isinstance(values, list) or isinstance(values, tuple):
                 prop_widget = widgets.Dropdown(
                     options=values,
@@ -9744,7 +10005,6 @@ def edit_vector_data(
     )
 
     def on_save_click(b):
-
         output.clear_output()
         if len(m.draw_features_selected) > 0:
             feature_id = m.draw_features_selected[0]["id"]
@@ -9845,7 +10105,6 @@ class MapWidget(v.Row):
     """
 
     def __init__(self, left_obj, right_obj, column_widths=(5, 1), **kwargs):
-
         self.left_obj = left_obj
         self.right_obj = right_obj
 

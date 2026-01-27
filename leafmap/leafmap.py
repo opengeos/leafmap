@@ -469,7 +469,6 @@ class Map(ipyleaflet.Map):
         import pandas as pd
 
         if isinstance(asset_id, str):
-
             df = pd.read_csv(
                 "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
                 sep="\t",
@@ -1234,6 +1233,152 @@ class Map(ipyleaflet.Map):
             "opacity": opacity,
             "layer_name": name,
             "type": "STAC",
+        }
+
+        self.cog_layer_dict[name] = params
+
+    def add_zarr(
+        self,
+        url: str,
+        variable: Optional[str] = None,
+        name: str = "Zarr Layer",
+        attribution: str = "",
+        opacity: float = 1.0,
+        shown: bool = True,
+        titiler_endpoint: Optional[str] = None,
+        fit_bounds: bool = True,
+        layer_index: Optional[int] = None,
+        group: Optional[str] = None,
+        decode_times: bool = False,
+        time_index: Optional[int] = 0,
+        **kwargs,
+    ) -> None:
+        """Adds a Zarr dataset to the map as a tile layer.
+
+        This method uses titiler-xarray to dynamically serve tiles from Zarr
+        datasets (local or remote). It supports both single-variable and
+        multi-variable datasets.
+
+        Args:
+            url (str): URL to a Zarr dataset (HTTP, S3, or local path).
+                Examples:
+                - "https://example.com/data.zarr"
+                - "s3://bucket/data.zarr"
+            variable (str, optional): The variable name to visualize. Required for
+                multi-variable datasets. Defaults to None.
+            name (str, optional): The layer name. Defaults to "Zarr Layer".
+            attribution (str, optional): Attribution for the layer. Defaults to "".
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            shown (bool, optional): Whether the layer is visible. Defaults to True.
+            titiler_endpoint (str, optional): TiTiler endpoint URL that supports
+                titiler-xarray. If not provided, the endpoint is resolved
+                automatically: the TITILER_XARRAY_ENDPOINT environment variable
+                is checked first, and if it is not set, the library's default
+                TiTiler endpoint is used.
+            fit_bounds (bool, optional): Zoom to layer extent. Defaults to True.
+            layer_index (int, optional): Index to insert the layer. Defaults to None.
+            group (str, optional): Zarr group path within the dataset. Defaults to None.
+            decode_times (bool, optional): Whether to decode times. Defaults to False.
+            time_index (int, optional): Index of the time dimension to visualize.
+                Required for datasets with a time dimension. Defaults to 0 (first time step).
+                Set to None if the dataset has no time dimension.
+            **kwargs: Additional arguments passed to the titiler endpoint:
+                - rescale (str): Value range, e.g., "0,255"
+                - colormap_name (str): Colormap name, e.g., "viridis", "terrain"
+                - colormap (str): JSON-encoded custom colormap
+                - nodata (float): Nodata value
+                - resampling (str): Resampling method (nearest, bilinear, etc.)
+                - sel (str): Custom dimension selection, e.g., "time=5"
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> url = "https://example.com/temperature.zarr"
+            >>> m.add_zarr(url, variable="temperature", colormap_name="viridis")
+        """
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tile_url = common.zarr_tile(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            time_index=time_index,
+            group=group,
+            decode_times=decode_times,
+            **kwargs,
+        )
+
+        if tile_url is None:
+            print("Failed to get Zarr tile URL")
+            return
+
+        bounds = common.zarr_bounds(
+            url,
+            variable=variable,
+            titiler_endpoint=titiler_endpoint,
+            group=group,
+            decode_times=decode_times,
+        )
+
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
+
+        if fit_bounds and bounds is not None:
+            # Clamp bounds to valid lat/lng ranges
+            # bounds format: [minx, miny, maxx, maxy] = [min_lon, min_lat, max_lon, max_lat]
+            clamped_bounds = [
+                max(-180.0, min(180.0, bounds[0])),  # minx (longitude)
+                max(-90.0, min(90.0, bounds[1])),  # miny (latitude)
+                max(-180.0, min(180.0, bounds[2])),  # maxx (longitude)
+                max(-90.0, min(90.0, bounds[3])),  # maxy (latitude)
+            ]
+            self.fit_bounds(
+                [
+                    [clamped_bounds[1], clamped_bounds[0]],
+                    [clamped_bounds[3], clamped_bounds[2]],
+                ]
+            )
+            common.arc_zoom_to_extent(
+                clamped_bounds[0],
+                clamped_bounds[1],
+                clamped_bounds[2],
+                clamped_bounds[3],
+            )
+
+        if not hasattr(self, "cog_layer_dict"):
+            self.cog_layer_dict = {}
+
+        if "rescale" in kwargs:
+            rescale = kwargs["rescale"]
+            if isinstance(rescale, str):
+                vmin, vmax = [float(v) for v in rescale.split(",")]
+            else:
+                vmin, vmax = rescale[0], rescale[1]
+        else:
+            vmin, vmax = None, None
+
+        if "colormap_name" in kwargs:
+            colormap = kwargs["colormap_name"]
+        else:
+            colormap = None
+
+        if "nodata" in kwargs:
+            nodata = kwargs["nodata"]
+        else:
+            nodata = None
+
+        params = {
+            "url": url,
+            "titiler_endpoint": titiler_endpoint,
+            "variable": variable,
+            "tile_layer": self.find_layer(name),
+            "bounds": bounds,
+            "vmin": vmin,
+            "vmax": vmax,
+            "nodata": nodata,
+            "colormap": colormap,
+            "opacity": opacity,
+            "layer_name": name,
+            "type": "ZARR",
         }
 
         self.cog_layer_dict[name] = params
@@ -2033,7 +2178,6 @@ class Map(ipyleaflet.Map):
             legend_text = legend_text.replace("height: 16px", "height: 3px")
 
         try:
-
             legend_widget = widgets.HTML(value=legend_text)
             legend_control = ipyleaflet.WidgetControl(
                 widget=legend_widget, position=position
@@ -3213,6 +3357,184 @@ class Map(ipyleaflet.Map):
             info_mode,
             zoom_to_layer,
             encoding,
+            **kwargs,
+        )
+
+    def add_polars(
+        self,
+        df,
+        geometry: Optional[str] = "geometry",
+        crs: Optional[str] = None,
+        layer_name: Optional[str] = "Untitled",
+        style: Optional[dict] = {},
+        hover_style: Optional[dict] = {},
+        style_callback: Optional[Callable] = None,
+        fill_colors: Optional[List[str]] = None,
+        info_mode: Optional[str] = "on_hover",
+        zoom_to_layer: Optional[bool] = False,
+        encoding: Optional[str] = "utf-8",
+        **kwargs,
+    ) -> None:
+        """Adds a Polars DataFrame with geometry to the map.
+
+        This method supports Polars-ST DataFrames with spatial geometry columns
+        and enables direct visualization of Polars-based geospatial data without
+        manual conversion to GeoPandas.
+
+        Args:
+            df: A Polars DataFrame with a geometry column (e.g., from Polars-ST).
+            geometry (str, optional): The name of the geometry column. Defaults to "geometry".
+            crs (str, optional): The CRS of the geometry data (e.g., "EPSG:4326").
+                If None, defaults to EPSG:4326. For Polars-ST DataFrames, specify the CRS explicitly.
+            layer_name (str, optional): The layer name to be used. Defaults to "Untitled".
+            style (dict, optional): A dictionary specifying the style to be used. Defaults to {}.
+            hover_style (dict, optional): Hover style dictionary. Defaults to {}.
+            style_callback (function, optional): Styling function that is called
+                for each feature, and should return the feature style. This
+                styling function takes the feature as argument. Defaults to None.
+            fill_colors (list, optional): The random colors to use for filling
+                polygons. Defaults to ["black"].
+            info_mode (str, optional): Displays the attributes by either on_hover
+                or on_click. Any value other than "on_hover" or "on_click" will
+                be treated as None. Defaults to "on_hover".
+            zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
+            encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
+            **kwargs: Additional keyword arguments to pass to add_gdf.
+
+        Raises:
+            ImportError: If polars or required dependencies are not installed.
+            ValueError: If the specified geometry column is not found or contains invalid data.
+            TypeError: If the input is not a Polars DataFrame.
+
+        Examples:
+            >>> import polars as pl
+            >>> # With Polars-ST
+            >>> df = pl.read_parquet("data.geoparquet")
+            >>> m = leafmap.Map()
+            >>> m.add_polars(df, geometry="geometry", crs="EPSG:4326")
+        """
+        import warnings
+
+        try:
+            import polars as pl
+        except ImportError:
+            raise ImportError(
+                "polars is required for add_polars(). "
+                "Install it with: pip install polars"
+            )
+
+        try:
+            import geopandas as gpd
+            from shapely import wkb, wkt
+        except ImportError:
+            raise ImportError(
+                "geopandas and shapely are required. "
+                "Install them with: pip install geopandas shapely"
+            )
+
+        # Validate input
+        if not isinstance(df, pl.DataFrame):
+            raise TypeError(
+                f"Expected a Polars DataFrame, got {type(df).__name__}. "
+                "Use add_gdf() for GeoPandas DataFrames."
+            )
+
+        # Check if geometry column exists
+        if geometry not in df.columns:
+            raise ValueError(
+                f"Geometry column '{geometry}' not found. "
+                f"Available columns: {df.columns}"
+            )
+
+        # Check for null/empty geometry column
+        if df[geometry].null_count() == len(df):
+            raise ValueError(
+                f"Geometry column '{geometry}' contains only null values. "
+                "Please provide valid geometry data."
+            )
+
+        # Convert Polars DataFrame to pandas
+        pdf = df.to_pandas()
+
+        # Handle datetime columns (same as add_gdf)
+        for col in pdf.columns:
+            try:
+                if pdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+                    pdf[col] = pdf[col].astype(str)
+            except Exception:
+                pass
+
+        # Handle geometry column - could be WKB binary or WKT string
+        geom_col = pdf[geometry]
+
+        # Try to convert geometries using vectorized operations where possible
+        geometries = None
+        parse_error = None
+
+        # Try WKB first (most common for Polars-ST)
+        if pdf[geometry].dtype == object:
+            # Check if first non-null value is bytes
+            first_valid = (
+                geom_col.dropna().iloc[0] if len(geom_col.dropna()) > 0 else None
+            )
+
+            if first_valid is not None and isinstance(first_valid, bytes):
+                # Use vectorized from_wkb for better performance
+                try:
+                    geometries = gpd.GeoSeries.from_wkb(geom_col)
+                except (TypeError, ValueError) as e:
+                    parse_error = f"WKB parsing failed: {e}"
+            else:
+                # Try WKT string parsing
+                try:
+                    geometries = gpd.GeoSeries.from_wkt(geom_col)
+                except (TypeError, ValueError) as e:
+                    # Last resort: assume it's already shapely geometries
+                    try:
+                        geometries = gpd.GeoSeries(geom_col)
+                    except (TypeError, ValueError) as e2:
+                        parse_error = f"WKT parsing failed: {e}, Shapely geometry: {e2}"
+        else:
+            # Might be serialized as bytes dtype
+            try:
+                geometries = gpd.GeoSeries.from_wkb(geom_col)
+            except (TypeError, ValueError) as e:
+                parse_error = f"WKB parsing failed for bytes dtype: {e}"
+
+        if geometries is None or parse_error:
+            raise ValueError(
+                f"Failed to parse geometry column '{geometry}'. "
+                f"Expected WKB binary or WKT string format. {parse_error or ''}"
+            )
+
+        # Drop the original geometry column and create GeoDataFrame
+        pdf = pdf.drop(columns=[geometry])
+        gdf = gpd.GeoDataFrame(pdf, geometry=geometries)
+
+        # Set CRS
+        if crs is not None:
+            gdf.crs = crs
+        elif gdf.crs is None:
+            # Default to EPSG:4326 with warning
+            warnings.warn(
+                f"No CRS specified for geometry column '{geometry}'. "
+                "Defaulting to EPSG:4326. Use the 'crs' parameter to specify a different CRS.",
+                UserWarning,
+                stacklevel=2,
+            )
+            gdf.crs = "EPSG:4326"
+
+        # Now use the existing add_gdf method
+        self.add_gdf(
+            gdf,
+            layer_name=layer_name,
+            style=style,
+            hover_style=hover_style,
+            style_callback=style_callback,
+            fill_colors=fill_colors,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            encoding=encoding,
             **kwargs,
         )
 
@@ -4684,11 +5006,11 @@ class Map(ipyleaflet.Map):
         """
 
         if background:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {"bold" if bold else "normal"};
             padding: {padding}; background-color: {bg_color};
             border-radius: {border_radius};">{text}</div>"""
         else:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {"bold" if bold else "normal"};
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)
@@ -5327,7 +5649,6 @@ class Map(ipyleaflet.Map):
             self.add_layer(popup)
 
             def save_changes(_):
-
                 original_data = copy.deepcopy(geojson_layer.data)
                 original_feature = copy.deepcopy(feature)
                 # Update the properties with the new values
@@ -6063,7 +6384,6 @@ class Map(ipyleaflet.Map):
         url = "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
 
         if "colormap" not in kwargs:
-
             kwargs["colormap"] = {
                 "11": "#466b9f",
                 "12": "#d1def8",

@@ -393,7 +393,6 @@ class Map(lonboard.Map):
         import xyzservices
 
         try:
-
             map_dict = {
                 "ROADMAP": "Google Maps",
                 "SATELLITE": "Google Satellite",

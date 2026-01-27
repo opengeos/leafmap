@@ -98,7 +98,7 @@ def download_naip(
         # Get the RGB asset URL
         rgb_asset = signed_item.assets.get("image")
         if not rgb_asset:
-            print(f"No RGB asset found for item {i+1}")
+            print(f"No RGB asset found for item {i + 1}")
             continue
 
         # Use the original filename from the asset
@@ -111,7 +111,7 @@ def download_naip(
             downloaded_files.append(output_path)
             continue
 
-        print(f"Downloading item {i+1}/{len(items)}: {original_filename}")
+        print(f"Downloading item {i + 1}/{len(items)}: {original_filename}")
 
         try:
             # Open and save the data with progress bar
@@ -133,7 +133,7 @@ def download_naip(
                 preview_raster(data)
 
         except Exception as e:
-            print(f"Error downloading item {i+1}: {str(e)}")
+            print(f"Error downloading item {i + 1}: {str(e)}")
 
     return downloaded_files
 
@@ -405,7 +405,6 @@ def extract_building_stats(data: str) -> Dict[str, Any]:
         if isinstance(data, gpd.GeoDataFrame):
             gdf = data
         else:
-
             gdf = gpd.read_file(data)
 
         # Calculate statistics
@@ -1212,9 +1211,7 @@ def view_pc_items(
     if basemap is not None:
         m.add_basemap(basemap)
     if isinstance(items, list):
-
         for item in items:
-
             if isinstance(item, pystac.Item):
                 collection = item.collection_id
                 if assets is None:
