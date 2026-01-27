@@ -9110,6 +9110,31 @@ def arc_add_layer(url, name=None, shown=True, opacity=1.0):
                     layer.transparency = 100 - (opacity * 100)
 
 
+def is_global_bounds(bounds, tolerance=1.0):
+    """Check if bounds represent global extent.
+
+    Args:
+        bounds (list): Bounding box as [minx, miny, maxx, maxy].
+        tolerance (float): Tolerance for comparing bounds to global extent.
+            Defaults to 1.0 degree.
+
+    Returns:
+        bool: True if bounds are approximately global [-180, -90, 180, 90].
+    """
+    if bounds is None or len(bounds) != 4:
+        return False
+
+    minx, miny, maxx, maxy = bounds
+    global_bounds = [-180.0, -90.0, 180.0, 90.0]
+
+    return (
+        abs(minx - global_bounds[0]) <= tolerance
+        and abs(miny - global_bounds[1]) <= tolerance
+        and abs(maxx - global_bounds[2]) <= tolerance
+        and abs(maxy - global_bounds[3]) <= tolerance
+    )
+
+
 def arc_zoom_to_extent(xmin, ymin, xmax, ymax):
     """Zoom to an extent in ArcGIS Pro.
 

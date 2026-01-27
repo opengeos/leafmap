@@ -1237,6 +1237,235 @@ class Map(ipyleaflet.Map):
 
         self.cog_layer_dict[name] = params
 
+    def add_cmr_layer(
+        self,
+        concept_id: str,
+        datetime: Optional[str] = None,
+        backend: str = "rasterio",
+        variable: Optional[str] = None,
+        bands: Optional[Union[str, List[str]]] = None,
+        bands_regex: Optional[str] = None,
+        expression: Optional[str] = None,
+        name: str = "CMR Layer",
+        attribution: str = "NASA Earthdata",
+        opacity: float = 1.0,
+        shown: bool = True,
+        rescale: Optional[Union[str, List]] = None,
+        colormap_name: Optional[str] = None,
+        color_formula: Optional[str] = None,
+        titiler_cmr_endpoint: Optional[str] = None,
+        zoom_to_layer: bool = True,
+        layer_index: Optional[int] = None,
+        **kwargs,
+    ) -> None:
+        """Adds a NASA Earthdata CMR layer to the map using TiTiler CMR.
+
+        This method allows you to visualize NASA Earthdata collections directly
+        on the map using the TiTiler CMR endpoint.
+
+        Args:
+            concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+            datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or
+                '2024-01-01/2024-01-31'). Defaults to None.
+            backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for
+                NetCDF/Zarr. Defaults to 'rasterio'.
+            variable (str, optional): Variable name for xarray backend datasets. Required
+                when using backend='xarray'.
+            bands (str | list, optional): Band name(s) for rasterio backend.
+            bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+            expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+            name (str, optional): The layer name. Defaults to 'CMR Layer'.
+            attribution (str, optional): Attribution text. Defaults to 'NASA Earthdata'.
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            shown (bool, optional): Whether the layer is visible. Defaults to True.
+            rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305'
+                or [[270, 305]]).
+            colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+            color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+            titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            layer_index (int, optional): Index to insert the layer. Defaults to None.
+            **kwargs: Additional arguments passed to the TiTiler CMR endpoint.
+
+        Examples:
+            >>> # Sea Surface Temperature using xarray backend
+            >>> m = leafmap.Map()
+            >>> m.add_cmr_layer(
+            ...     concept_id="C2036881735-POCLOUD",
+            ...     datetime="2024-01-15",
+            ...     backend="xarray",
+            ...     variable="analysed_sst",
+            ...     rescale="270,305",
+            ...     colormap_name="thermal",
+            ...     name="Sea Surface Temperature"
+            ... )
+
+            >>> # HLS Landsat using rasterio backend
+            >>> m.add_cmr_layer(
+            ...     concept_id="C2021957657-LPCLOUD",
+            ...     datetime="2024-06-20T00:00:00Z/2024-06-27T23:59:59Z",
+            ...     backend="rasterio",
+            ...     bands=["B04", "B03", "B02"],
+            ...     bands_regex="B[0-9][0-9]",
+            ...     color_formula="Gamma RGB 3.5 Saturation 1.7 Sigmoidal RGB 15 0.35",
+            ...     name="HLS Landsat"
+            ... )
+        """
+        from .stac import cmr_tile, cmr_bounds
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tile_url = cmr_tile(
+            concept_id=concept_id,
+            datetime=datetime,
+            backend=backend,
+            variable=variable,
+            bands=bands,
+            bands_regex=bands_regex,
+            expression=expression,
+            rescale=rescale,
+            colormap_name=colormap_name,
+            color_formula=color_formula,
+            titiler_cmr_endpoint=titiler_cmr_endpoint,
+            **kwargs,
+        )
+
+        if tile_url is None:
+            print("Failed to get CMR tile URL")
+            return
+
+        self.add_tile_layer(tile_url, name, attribution, opacity, shown, layer_index)
+
+        if zoom_to_layer:
+            bounds = cmr_bounds(
+                concept_id=concept_id,
+                datetime=datetime,
+                backend=backend,
+                variable=variable,
+                titiler_cmr_endpoint=titiler_cmr_endpoint,
+            )
+            # Skip zooming if bounds are global (TiTiler CMR returns global bounds
+            # when actual data bounds are not available)
+            if bounds is not None and not common.is_global_bounds(bounds):
+                self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+                common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+
+    def add_cmr_timeseries(
+        self,
+        concept_id: str,
+        datetime: str,
+        step: str = "P1D",
+        temporal_mode: str = "point",
+        backend: str = "rasterio",
+        variable: Optional[str] = None,
+        bands: Optional[Union[str, List[str]]] = None,
+        bands_regex: Optional[str] = None,
+        expression: Optional[str] = None,
+        rescale: Optional[Union[str, List]] = None,
+        colormap_name: Optional[str] = None,
+        color_formula: Optional[str] = None,
+        name_prefix: str = "CMR",
+        attribution: str = "NASA Earthdata",
+        opacity: float = 1.0,
+        time_interval: int = 1,
+        position: str = "bottomright",
+        slider_length: str = "150px",
+        titiler_cmr_endpoint: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        """Adds a NASA Earthdata CMR time series layer with an interactive time slider.
+
+        This method creates multiple tile layers for different time steps and adds
+        a time slider control to navigate through the time series.
+
+        Args:
+            concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+            datetime (str): RFC3339 datetime range (e.g., '2024-01-01/2024-01-31').
+            step (str, optional): ISO 8601 duration for time steps (e.g., 'P1D' for 1 day,
+                'P1M' for 1 month, 'P2W' for 2 weeks). Defaults to 'P1D'.
+            temporal_mode (str, optional): Temporal mode - 'point' or 'range'. Defaults to 'point'.
+            backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for
+                NetCDF/Zarr. Defaults to 'rasterio'.
+            variable (str, optional): Variable name for xarray backend datasets.
+            bands (str | list, optional): Band name(s) for rasterio backend.
+            bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+            expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+            rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305'
+                or [[270, 305]]).
+            colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+            color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+            name_prefix (str, optional): Prefix for layer names. Defaults to 'CMR'.
+            attribution (str, optional): Attribution text. Defaults to 'NASA Earthdata'.
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            time_interval (int, optional): Time interval in seconds between frames. Defaults to 1.
+            position (str, optional): Position of the time slider ('topleft', 'topright',
+                'bottomleft', 'bottomright'). Defaults to 'bottomright'.
+            slider_length (str, optional): Length of the time slider. Defaults to '150px'.
+            titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+            **kwargs: Additional arguments passed to the TiTiler CMR endpoint.
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> m.add_cmr_timeseries(
+            ...     concept_id="C2036881735-POCLOUD",
+            ...     datetime="2023-11-01/2024-10-30",
+            ...     step="P1M",
+            ...     backend="xarray",
+            ...     variable="sea_ice_fraction",
+            ...     colormap_name="blues_r",
+            ...     rescale="0,1"
+            ... )
+        """
+        from .stac import cmr_timeseries_tilejson
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tilejsons = cmr_timeseries_tilejson(
+            concept_id=concept_id,
+            datetime=datetime,
+            step=step,
+            temporal_mode=temporal_mode,
+            backend=backend,
+            variable=variable,
+            bands=bands,
+            bands_regex=bands_regex,
+            expression=expression,
+            rescale=rescale,
+            colormap_name=colormap_name,
+            color_formula=color_formula,
+            titiler_cmr_endpoint=titiler_cmr_endpoint,
+            **kwargs,
+        )
+
+        if tilejsons is None:
+            print("Failed to get CMR time series TileJSON")
+            return
+
+        layers_dict = {}
+
+        for dt_str, tilejson in tilejsons.items():
+            if "tiles" in tilejson:
+                tile_url = tilejson["tiles"][0]
+                # Format the datetime string for display (extract date portion)
+                if "T" in dt_str:
+                    label = dt_str.split("T")[0]
+                else:
+                    label = dt_str
+                layers_dict[label] = tile_url
+
+        if len(layers_dict) == 0:
+            print("No valid time series layers found")
+            return
+
+        self.add_time_slider(
+            layers=layers_dict,
+            time_interval=time_interval,
+            position=position,
+            slider_length=slider_length,
+        )
+
     def add_zarr(
         self,
         url: str,

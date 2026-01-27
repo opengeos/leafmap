@@ -1709,6 +1709,113 @@ class Map(folium.Map):
             self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
             common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
 
+    def add_cmr_layer(
+        self,
+        concept_id: str,
+        datetime: Optional[str] = None,
+        backend: str = "rasterio",
+        variable: Optional[str] = None,
+        bands: Optional[Union[str, List[str]]] = None,
+        bands_regex: Optional[str] = None,
+        expression: Optional[str] = None,
+        name: Optional[str] = "CMR Layer",
+        attribution: Optional[str] = "NASA Earthdata",
+        opacity: Optional[float] = 1.0,
+        shown: Optional[bool] = True,
+        rescale: Optional[Union[str, List]] = None,
+        colormap_name: Optional[str] = None,
+        color_formula: Optional[str] = None,
+        titiler_cmr_endpoint: Optional[str] = None,
+        zoom_to_layer: Optional[bool] = True,
+        **kwargs,
+    ) -> None:
+        """Adds a NASA Earthdata CMR layer to the map using TiTiler CMR.
+
+        This method allows you to visualize NASA Earthdata collections directly
+        on the map using the TiTiler CMR endpoint.
+
+        Args:
+            concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+            datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or
+                '2024-01-01/2024-01-31'). Defaults to None.
+            backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for
+                NetCDF/Zarr. Defaults to 'rasterio'.
+            variable (str, optional): Variable name for xarray backend datasets. Required
+                when using backend='xarray'.
+            bands (str | list, optional): Band name(s) for rasterio backend.
+            bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+            expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+            name (str, optional): The layer name. Defaults to 'CMR Layer'.
+            attribution (str, optional): Attribution text. Defaults to 'NASA Earthdata'.
+            opacity (float, optional): Layer opacity (0.0 to 1.0). Defaults to 1.0.
+            shown (bool, optional): Whether the layer is visible. Defaults to True.
+            rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305'
+                or [[270, 305]]).
+            colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+            color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+            titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+            zoom_to_layer (bool, optional): Whether to zoom to the layer extent. Defaults to True.
+            **kwargs: Additional arguments passed to the TiTiler CMR endpoint.
+
+        Examples:
+            >>> import leafmap.foliumap as leafmap
+            >>> m = leafmap.Map()
+            >>> m.add_cmr_layer(
+            ...     concept_id="C2036881735-POCLOUD",
+            ...     datetime="2024-01-15",
+            ...     backend="xarray",
+            ...     variable="analysed_sst",
+            ...     rescale="270,305",
+            ...     colormap_name="thermal",
+            ...     name="Sea Surface Temperature"
+            ... )
+        """
+        from .stac import cmr_tile, cmr_bounds
+
+        if os.environ.get("USE_MKDOCS") is not None:
+            return
+
+        tile_url = cmr_tile(
+            concept_id=concept_id,
+            datetime=datetime,
+            backend=backend,
+            variable=variable,
+            bands=bands,
+            bands_regex=bands_regex,
+            expression=expression,
+            rescale=rescale,
+            colormap_name=colormap_name,
+            color_formula=color_formula,
+            titiler_cmr_endpoint=titiler_cmr_endpoint,
+            **kwargs,
+        )
+
+        if tile_url is None:
+            print("Failed to get CMR tile URL")
+            return
+
+        self.add_tile_layer(
+            url=tile_url,
+            name=name,
+            attribution=attribution,
+            opacity=opacity,
+            shown=shown,
+        )
+
+        if zoom_to_layer:
+            bounds = cmr_bounds(
+                concept_id=concept_id,
+                datetime=datetime,
+                backend=backend,
+                variable=variable,
+                titiler_cmr_endpoint=titiler_cmr_endpoint,
+            )
+            # Skip zooming if bounds are global (TiTiler CMR returns global bounds
+            # when actual data bounds are not available)
+            if bounds is not None and not common.is_global_bounds(bounds):
+                self.fit_bounds([[bounds[1], bounds[0]], [bounds[3], bounds[2]]])
+                common.arc_zoom_to_extent(bounds[0], bounds[1], bounds[2], bounds[3])
+
     def add_mosaic_layer(
         self,
         url: str,
