@@ -4206,6 +4206,271 @@ class Map(folium.Map):
         """
         print(f"The folium plotting backend does not support this function.")
 
+    def add_fire_data(
+        self,
+        data: Optional[Union[str, "gpd.GeoDataFrame"]] = None,
+        bbox: Optional[List[float]] = None,
+        place: Optional[str] = None,
+        collection: str = "snapshot_perimeter_nrt",
+        datetime: Optional[str] = None,
+        farea_min: Optional[float] = None,
+        layer_name: str = "Fire Perimeters",
+        style: Optional[Dict] = None,
+        style_callback: Optional[Callable] = None,
+        info_mode: str = "on_hover",
+        zoom_to_layer: bool = True,
+        **kwargs,
+    ) -> None:
+        """Add NASA fire perimeter data to the map.
+
+        This method fetches and displays fire perimeter data from the NASA Fire
+        Event Data Suite (FEDs) via the OpenVEDA OGC API Features.
+
+        Args:
+            data: Pre-loaded fire data as a file path or GeoDataFrame. If provided,
+                bbox and place are ignored.
+            bbox: Bounding box [west, south, east, north] in EPSG:4326.
+            place: Place name to geocode (e.g., "California").
+            collection: Fire collection ID. Options:
+                - "snapshot_perimeter_nrt": 20-day recent fire perimeters (default)
+                - "lf_perimeter_nrt": Current year large fires (>5 km²)
+                - "lf_perimeter_archive": 2018-2021 Western US archived fires
+                - "lf_fireline_nrt": Active fire lines
+                - "lf_newfirepix_nrt": New fire pixels
+            datetime: ISO 8601 date/time or interval (e.g., "2024-07-01/2024-07-31").
+            farea_min: Minimum fire area in km² to filter results.
+            layer_name: Name for the layer. Defaults to "Fire Perimeters".
+            style: Style dictionary for the fire perimeters. Defaults to orange/red.
+            style_callback: Styling function called for each feature.
+            info_mode: Display attributes "on_hover" or "on_click".
+            zoom_to_layer: Whether to zoom to the layer bounds.
+            **kwargs: Additional keyword arguments for add_gdf().
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> m.add_fire_data(place="California", datetime="2024-07-01/2024-07-31")
+            >>> m
+        """
+        from . import fire as fire_module
+
+        if data is not None:
+            # Use provided data
+            if isinstance(data, str):
+                import geopandas as gpd
+
+                gdf = gpd.read_file(data)
+            else:
+                gdf = data
+        elif bbox is not None or place is not None:
+            # Fetch fire data
+            gdf = fire_module.search_fires(
+                bbox=bbox,
+                place=place,
+                collection=collection,
+                datetime=datetime,
+                farea_min=farea_min,
+            )
+        else:
+            raise ValueError("Either data, bbox, or place must be provided")
+
+        if gdf.empty:
+            print("No fire data found for the specified parameters.")
+            return
+
+        # Default fire styling
+        if style is None:
+            style = {
+                "color": "#FF4500",
+                "weight": 2,
+                "fillColor": "#FF6347",
+                "fillOpacity": 0.5,
+            }
+
+        self.add_gdf(
+            gdf,
+            layer_name=layer_name,
+            style=style,
+            style_callback=style_callback,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
+
+    def add_fire_perimeters(
+        self,
+        bbox: Optional[List[float]] = None,
+        place: Optional[str] = None,
+        collection: str = "snapshot_perimeter_nrt",
+        datetime: Optional[str] = None,
+        farea_min: Optional[float] = None,
+        color_column: Optional[str] = "farea",
+        cmap: str = "YlOrRd",
+        layer_name: str = "Fire Perimeters",
+        style: Optional[Dict] = None,
+        info_mode: str = "on_hover",
+        zoom_to_layer: bool = True,
+        add_legend: bool = True,
+        legend_title: str = "Fire Area (km²)",
+        **kwargs,
+    ) -> None:
+        """Add fire perimeters with color scaling based on fire attributes.
+
+        Args:
+            bbox: Bounding box [west, south, east, north] in EPSG:4326.
+            place: Place name to geocode (e.g., "California").
+            collection: Fire collection ID. Defaults to "snapshot_perimeter_nrt".
+            datetime: ISO 8601 date/time or interval.
+            farea_min: Minimum fire area in km² to filter results.
+            color_column: Column to use for color scaling. Defaults to "farea".
+            cmap: Colormap name for color scaling. Defaults to "YlOrRd".
+            layer_name: Name for the layer.
+            style: Base style dictionary (color will be overridden by colormap).
+            info_mode: Display attributes "on_hover" or "on_click".
+            zoom_to_layer: Whether to zoom to the layer bounds.
+            add_legend: Whether to add a legend. Defaults to True.
+            legend_title: Title for the legend.
+            **kwargs: Additional keyword arguments for add_gdf().
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> m.add_fire_perimeters(
+            ...     place="California",
+            ...     datetime="2024-07-01/2024-07-31",
+            ...     color_column="farea"
+            ... )
+            >>> m
+        """
+        from . import fire as fire_module
+
+        gdf = fire_module.search_fires(
+            bbox=bbox,
+            place=place,
+            collection=collection,
+            datetime=datetime,
+            farea_min=farea_min,
+        )
+
+        if gdf.empty:
+            print("No fire data found for the specified parameters.")
+            return
+
+        # Create color-scaled styling based on the specified column
+        if color_column and color_column in gdf.columns:
+            try:
+                import matplotlib.pyplot as plt
+                import matplotlib.colors as mcolors
+
+                colormap = plt.get_cmap(cmap)
+                values = gdf[color_column].fillna(0)
+                vmin, vmax = values.min(), values.max()
+
+                if vmax > vmin:
+                    norm = mcolors.Normalize(vmin=vmin, vmax=vmax)
+
+                    def style_callback(feature):
+                        value = feature["properties"].get(color_column, 0)
+                        if value is None:
+                            value = 0
+                        rgba = colormap(norm(value))
+                        hex_color = mcolors.rgb2hex(rgba)
+                        base_style = style or {}
+                        return {
+                            "color": hex_color,
+                            "weight": base_style.get("weight", 2),
+                            "fillColor": hex_color,
+                            "fillOpacity": base_style.get("fillOpacity", 0.5),
+                        }
+
+                    self.add_gdf(
+                        gdf,
+                        layer_name=layer_name,
+                        style_callback=style_callback,
+                        info_mode=info_mode,
+                        zoom_to_layer=zoom_to_layer,
+                        **kwargs,
+                    )
+
+                    if add_legend:
+                        self.add_colormap(
+                            cmap=cmap,
+                            vmin=vmin,
+                            vmax=vmax,
+                            label=legend_title,
+                        )
+                    return
+            except ImportError:
+                pass
+
+        # Fallback to default styling
+        if style is None:
+            style = {
+                "color": "#FF4500",
+                "weight": 2,
+                "fillColor": "#FF6347",
+                "fillOpacity": 0.5,
+            }
+
+        self.add_gdf(
+            gdf,
+            layer_name=layer_name,
+            style=style,
+            info_mode=info_mode,
+            zoom_to_layer=zoom_to_layer,
+            **kwargs,
+        )
+
+    def add_fire_timeseries(
+        self,
+        fire_id: str,
+        collection: str = "snapshot_perimeter_nrt",
+        datetime: Optional[str] = None,
+        time_column: str = "t",
+        layer_name: str = "Fire Evolution",
+        style: Optional[Dict] = None,
+        **kwargs,
+    ) -> None:
+        """Add fire perimeter evolution over time.
+
+        Note: Time slider functionality is not supported in the folium backend.
+        This method displays all perimeters as a single layer.
+
+        Args:
+            fire_id: The fire ID to track over time.
+            collection: Fire collection ID. Defaults to "snapshot_perimeter_nrt".
+            datetime: ISO 8601 date/time or interval to filter by.
+            time_column: Column containing timestamps. Defaults to "t".
+            layer_name: Name for the layer.
+            style: Style dictionary for the fire perimeters.
+            **kwargs: Additional keyword arguments for add_gdf().
+
+        Example:
+            >>> m = leafmap.Map()
+            >>> m.add_fire_timeseries(fire_id="2024_CA_001")
+            >>> m
+        """
+        from . import fire as fire_module
+
+        gdf = fire_module.fire_timeseries(
+            fire_id=fire_id,
+            collection=collection,
+            datetime=datetime,
+        )
+
+        if gdf.empty:
+            print(f"No fire data found for fire ID: {fire_id}")
+            return
+
+        # Default fire styling
+        if style is None:
+            style = {
+                "color": "#FF4500",
+                "weight": 2,
+                "fillColor": "#FF6347",
+                "fillOpacity": 0.5,
+            }
+
+        self.add_gdf(gdf, layer_name=layer_name, style=style, **kwargs)
+
 
 class SplitControl(Layer):
     """
