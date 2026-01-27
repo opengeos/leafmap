@@ -1354,7 +1354,6 @@ def stac_pixel_value(
 
     titiler_endpoint = check_titiler_endpoint(titiler_endpoint)
     if isinstance(titiler_endpoint, str):
-
         r = requests.get(
             f"{titiler_endpoint}/stac/point/{lon},{lat}", params=kwargs
         ).json()
@@ -1433,7 +1432,9 @@ def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) ->
             return (
                 (root.get_href() if root else item.get_self_href(), collection_id)
                 if return_col_id
-                else root.get_href() if root else item.get_self_href()
+                else root.get_href()
+                if root
+                else item.get_self_href()
             )
 
         # Handle STAC API objects (Collection, Catalog, etc.)
@@ -2137,7 +2138,7 @@ def maxar_all_items(
     for index, child_id in enumerate(child_ids):
         if verbose:
             print(
-                f"Processing ({str(index+1).zfill(len(str(len(child_ids))))} out of {len(child_ids)}): {child_id} ..."
+                f"Processing ({str(index + 1).zfill(len(str(len(child_ids))))} out of {len(child_ids)}): {child_id} ..."
             )
         items = maxar_items(collection_id, child_id, return_gdf, assets, **kwargs)
         if return_gdf:
@@ -2350,7 +2351,7 @@ def maxar_download(
             continue
         if not quiet:
             print(
-                f"Downloading {str(index+1).zfill(len(str(len(images))))} out of {len(images)}: {dir_name}/{file_name}"
+                f"Downloading {str(index + 1).zfill(len(str(len(images))))} out of {len(images)}: {dir_name}/{file_name}"
             )
 
         gdown.download(
