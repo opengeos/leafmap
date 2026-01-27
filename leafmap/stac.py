@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 from typing import TYPE_CHECKING
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -111,6 +112,648 @@ class PlanetaryComputerEndpoint(TitilerEndpoint):
 
     def url_for_mosaic_lat_lon_assets(self, searchid, lon, lat):
         return f"{self.endpoint}/mosaic/{searchid}/{lon},{lat}/assets"
+
+
+class TitilerCMREndpoint:
+    """This class contains the methods for the TiTiler CMR endpoint."""
+
+    def __init__(
+        self,
+        endpoint: Optional[str] = None,
+        TileMatrixSetId: Optional[str] = "WebMercatorQuad",
+    ):
+        """Initialize the TitilerCMREndpoint object.
+
+        Args:
+            endpoint (str, optional): The TiTiler CMR endpoint URL.
+                Defaults to "https://staging.openveda.cloud/api/titiler-cmr".
+            TileMatrixSetId (str, optional): The TileMatrixSetId. Defaults to "WebMercatorQuad".
+        """
+        if endpoint is None:
+            endpoint = os.environ.get(
+                "TITILER_CMR_ENDPOINT",
+                "https://staging.openveda.cloud/api/titiler-cmr",
+            )
+        self.endpoint = endpoint
+        self.TileMatrixSetId = TileMatrixSetId
+
+    def url_for_tilejson(self):
+        """Get the URL for the TileJSON endpoint.
+
+        Returns:
+            str: The TileJSON endpoint URL.
+        """
+        return f"{self.endpoint}/{self.TileMatrixSetId}/tilejson.json"
+
+    def url_for_timeseries_tilejson(self):
+        """Get the URL for the time series TileJSON endpoint.
+
+        Returns:
+            str: The time series TileJSON endpoint URL.
+        """
+        return f"{self.endpoint}/timeseries/{self.TileMatrixSetId}/tilejson.json"
+
+    def url_for_timeseries_gif(self, bbox, width=512, height=512):
+        """Get the URL for the time series animated GIF endpoint.
+
+        Args:
+            bbox (list | tuple): Bounding box as [minx, miny, maxx, maxy].
+            width (int, optional): Width of the GIF in pixels. Defaults to 512.
+            height (int, optional): Height of the GIF in pixels. Defaults to 512.
+
+        Returns:
+            str: The time series GIF endpoint URL.
+        """
+        minx, miny, maxx, maxy = bbox
+        return f"{self.endpoint}/timeseries/bbox/{minx},{miny},{maxx},{maxy}/{width}x{height}.gif"
+
+    def url_for_statistics(self):
+        """Get the URL for the statistics endpoint.
+
+        Returns:
+            str: The statistics endpoint URL.
+        """
+        return f"{self.endpoint}/statistics"
+
+    def url_for_timeseries_statistics(self):
+        """Get the URL for the time series statistics endpoint.
+
+        Returns:
+            str: The time series statistics endpoint URL.
+        """
+        return f"{self.endpoint}/timeseries/statistics"
+
+    def url_for_timeseries(self):
+        """Get the URL for the time series endpoint.
+
+        Returns:
+            str: The time series endpoint URL.
+        """
+        return f"{self.endpoint}/timeseries"
+
+
+def check_titiler_cmr_endpoint(
+    titiler_cmr_endpoint: Optional[str] = None,
+) -> TitilerCMREndpoint:
+    """Returns the TiTiler CMR endpoint.
+
+    Args:
+        titiler_cmr_endpoint (str, optional): The TiTiler CMR endpoint URL. Defaults to None.
+
+    Returns:
+        TitilerCMREndpoint: The TiTiler CMR endpoint object.
+    """
+    if titiler_cmr_endpoint is None:
+        titiler_cmr_endpoint = os.environ.get(
+            "TITILER_CMR_ENDPOINT",
+            "https://staging.openveda.cloud/api/titiler-cmr",
+        )
+
+    if isinstance(titiler_cmr_endpoint, str):
+        return TitilerCMREndpoint(endpoint=titiler_cmr_endpoint)
+    elif isinstance(titiler_cmr_endpoint, TitilerCMREndpoint):
+        return titiler_cmr_endpoint
+    else:
+        return TitilerCMREndpoint()
+
+
+def cmr_tilejson(
+    concept_id: str,
+    datetime: Optional[str] = None,
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    bands: Optional[Union[str, List[str]]] = None,
+    bands_regex: Optional[str] = None,
+    expression: Optional[str] = None,
+    rescale: Optional[Union[str, List]] = None,
+    colormap_name: Optional[str] = None,
+    color_formula: Optional[str] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> Dict:
+    """Fetch TileJSON metadata from TiTiler CMR.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or '2024-01-01/2024-01-31').
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        bands (str | list, optional): Band name(s) for rasterio backend.
+        bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+        expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+        rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305' or [[270, 305]]).
+        colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+        color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters to pass to the TiTiler CMR endpoint.
+
+    Returns:
+        dict: TileJSON metadata dict with tiles, bounds, center, minzoom, maxzoom.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    endpoint = check_titiler_cmr_endpoint(titiler_cmr_endpoint)
+
+    params = {"concept_id": concept_id, "backend": backend}
+
+    if datetime is not None:
+        params["datetime"] = datetime
+
+    if variable is not None:
+        params["variable"] = variable
+
+    if bands is not None:
+        if isinstance(bands, list):
+            # Pass bands as a list so requests encodes as bands=B04&bands=B03&bands=B02
+            params["bands"] = bands
+        else:
+            params["bands"] = [bands]
+    elif expression is not None:
+        # Extract band names from expression (e.g., "(B05-B04)/(B05+B04)" -> ["B05", "B04"])
+        # Band names typically match patterns like B01, B02, B8A, etc.
+        band_pattern = r"\b(B[0-9][0-9A-Za-z]?)\b"
+        extracted_bands = list(dict.fromkeys(re.findall(band_pattern, expression)))
+        if extracted_bands:
+            params["bands"] = extracted_bands
+
+    if bands_regex is not None:
+        params["bands_regex"] = bands_regex
+
+    if expression is not None:
+        params["expression"] = expression
+
+    if rescale is not None:
+        if isinstance(rescale, list):
+            if isinstance(rescale[0], list):
+                params["rescale"] = ",".join([f"{r[0]},{r[1]}" for r in rescale])
+            else:
+                params["rescale"] = ",".join([str(r) for r in rescale])
+        else:
+            params["rescale"] = rescale
+
+    if colormap_name is not None:
+        params["colormap_name"] = colormap_name
+
+    if color_formula is not None:
+        params["color_formula"] = color_formula
+
+    params.update(kwargs)
+
+    try:
+        r = requests.get(endpoint.url_for_tilejson(), params=params, timeout=30).json()
+        return r
+    except Exception as e:
+        print(f"Error fetching TileJSON from TiTiler CMR: {e}")
+        return None
+
+
+def cmr_tile(
+    concept_id: str,
+    datetime: Optional[str] = None,
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    bands: Optional[Union[str, List[str]]] = None,
+    bands_regex: Optional[str] = None,
+    expression: Optional[str] = None,
+    rescale: Optional[Union[str, List]] = None,
+    colormap_name: Optional[str] = None,
+    color_formula: Optional[str] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> str:
+    """Get tile URL from TiTiler CMR.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or '2024-01-01/2024-01-31').
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        bands (str | list, optional): Band name(s) for rasterio backend.
+        bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+        expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+        rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305' or [[270, 305]]).
+        colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+        color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters to pass to the TiTiler CMR endpoint.
+
+    Returns:
+        str: The tile URL template.
+    """
+    tilejson = cmr_tilejson(
+        concept_id=concept_id,
+        datetime=datetime,
+        backend=backend,
+        variable=variable,
+        bands=bands,
+        bands_regex=bands_regex,
+        expression=expression,
+        rescale=rescale,
+        colormap_name=colormap_name,
+        color_formula=color_formula,
+        titiler_cmr_endpoint=titiler_cmr_endpoint,
+        **kwargs,
+    )
+
+    if tilejson is None or "tiles" not in tilejson:
+        return None
+
+    return tilejson["tiles"][0]
+
+
+def cmr_bounds(
+    concept_id: str,
+    datetime: Optional[str] = None,
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> List[float]:
+    """Get bounding box from TiTiler CMR TileJSON.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or '2024-01-01/2024-01-31').
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters.
+
+    Returns:
+        list: Bounding box as [minx, miny, maxx, maxy].
+    """
+    tilejson = cmr_tilejson(
+        concept_id=concept_id,
+        datetime=datetime,
+        backend=backend,
+        variable=variable,
+        titiler_cmr_endpoint=titiler_cmr_endpoint,
+        **kwargs,
+    )
+
+    if tilejson is None or "bounds" not in tilejson:
+        return None
+
+    return tilejson["bounds"]
+
+
+def cmr_center(
+    concept_id: str,
+    datetime: Optional[str] = None,
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> Tuple[float, float]:
+    """Get center coordinates from TiTiler CMR TileJSON.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or '2024-01-01/2024-01-31').
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters.
+
+    Returns:
+        tuple: Center coordinates as (longitude, latitude).
+    """
+    tilejson = cmr_tilejson(
+        concept_id=concept_id,
+        datetime=datetime,
+        backend=backend,
+        variable=variable,
+        titiler_cmr_endpoint=titiler_cmr_endpoint,
+        **kwargs,
+    )
+
+    if tilejson is None or "center" not in tilejson:
+        bounds = cmr_bounds(
+            concept_id=concept_id,
+            datetime=datetime,
+            backend=backend,
+            variable=variable,
+            titiler_cmr_endpoint=titiler_cmr_endpoint,
+            **kwargs,
+        )
+        if bounds is not None:
+            return ((bounds[0] + bounds[2]) / 2, (bounds[1] + bounds[3]) / 2)
+        return (None, None)
+
+    center = tilejson["center"]
+    return (center[0], center[1])
+
+
+def cmr_timeseries_tilejson(
+    concept_id: str,
+    datetime: str,
+    step: str = "P1D",
+    temporal_mode: str = "point",
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    bands: Optional[Union[str, List[str]]] = None,
+    bands_regex: Optional[str] = None,
+    expression: Optional[str] = None,
+    rescale: Optional[Union[str, List]] = None,
+    colormap_name: Optional[str] = None,
+    color_formula: Optional[str] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> Dict[str, Dict]:
+    """Get time series TileJSON dict from TiTiler CMR.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str): RFC3339 datetime range (e.g., '2024-01-01/2024-01-31').
+        step (str, optional): ISO 8601 duration for time steps (e.g., 'P1D' for 1 day,
+            'P1M' for 1 month, 'P2W' for 2 weeks). Defaults to 'P1D'.
+        temporal_mode (str, optional): Temporal mode - 'point' or 'range'. Defaults to 'point'.
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        bands (str | list, optional): Band name(s) for rasterio backend.
+        bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+        expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+        rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305' or [[270, 305]]).
+        colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+        color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters.
+
+    Returns:
+        dict: Dictionary mapping datetime strings to TileJSON metadata.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    endpoint = check_titiler_cmr_endpoint(titiler_cmr_endpoint)
+
+    params = {
+        "concept_id": concept_id,
+        "datetime": datetime,
+        "step": step,
+        "temporal_mode": temporal_mode,
+        "backend": backend,
+    }
+
+    if variable is not None:
+        params["variable"] = variable
+
+    if bands is not None:
+        if isinstance(bands, list):
+            # Pass bands as a list so requests encodes as bands=B04&bands=B03&bands=B02
+            params["bands"] = bands
+        else:
+            params["bands"] = [bands]
+    elif expression is not None:
+        # Extract band names from expression (e.g., "(B05-B04)/(B05+B04)" -> ["B05", "B04"])
+        # Band names typically match patterns like B01, B02, B8A, etc.
+        band_pattern = r"\b(B[0-9][0-9A-Za-z]?)\b"
+        extracted_bands = list(dict.fromkeys(re.findall(band_pattern, expression)))
+        if extracted_bands:
+            params["bands"] = extracted_bands
+
+    if bands_regex is not None:
+        params["bands_regex"] = bands_regex
+
+    if expression is not None:
+        params["expression"] = expression
+
+    if rescale is not None:
+        if isinstance(rescale, list):
+            if isinstance(rescale[0], list):
+                params["rescale"] = ",".join([f"{r[0]},{r[1]}" for r in rescale])
+            else:
+                params["rescale"] = ",".join([str(r) for r in rescale])
+        else:
+            params["rescale"] = rescale
+
+    if colormap_name is not None:
+        params["colormap_name"] = colormap_name
+
+    if color_formula is not None:
+        params["color_formula"] = color_formula
+
+    params.update(kwargs)
+
+    try:
+        r = requests.get(
+            endpoint.url_for_timeseries_tilejson(), params=params, timeout=60
+        ).json()
+        return r
+    except Exception as e:
+        print(f"Error fetching time series TileJSON from TiTiler CMR: {e}")
+        return None
+
+
+def cmr_animated_gif(
+    concept_id: str,
+    datetime: str,
+    bbox: Union[List[float], Tuple[float, float, float, float]],
+    width: int = 512,
+    height: int = 512,
+    step: str = "P1D",
+    temporal_mode: str = "point",
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    bands: Optional[Union[str, List[str]]] = None,
+    bands_regex: Optional[str] = None,
+    expression: Optional[str] = None,
+    rescale: Optional[Union[str, List]] = None,
+    colormap_name: Optional[str] = None,
+    color_formula: Optional[str] = None,
+    fps: int = 1,
+    output: Optional[str] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> str:
+    """Generate animated GIF for time series from TiTiler CMR.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str): RFC3339 datetime range (e.g., '2024-01-01/2024-01-31').
+        bbox (list | tuple): Bounding box as [minx, miny, maxx, maxy].
+        width (int, optional): Width of the GIF in pixels. Defaults to 512.
+        height (int, optional): Height of the GIF in pixels. Defaults to 512.
+        step (str, optional): ISO 8601 duration for time steps (e.g., 'P1D' for 1 day,
+            'P1M' for 1 month). Defaults to 'P1D'.
+        temporal_mode (str, optional): Temporal mode - 'point' or 'range'. Defaults to 'point'.
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        bands (str | list, optional): Band name(s) for rasterio backend.
+        bands_regex (str, optional): Regex pattern for selecting bands (e.g., 'B[0-9][0-9]').
+        expression (str, optional): Band math expression (e.g., '(B05-B04)/(B05+B04)').
+        rescale (str | list, optional): Min/max values for rescaling (e.g., '270,305' or [[270, 305]]).
+        colormap_name (str, optional): Name of colormap (e.g., 'thermal', 'viridis').
+        color_formula (str, optional): Color formula (e.g., 'Gamma RGB 3.5 Saturation 1.7').
+        fps (int, optional): Frames per second for the GIF. Defaults to 1.
+        output (str, optional): Output file path. If None, returns the URL.
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters.
+
+    Returns:
+        str: The GIF URL or output file path.
+    """
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    endpoint = check_titiler_cmr_endpoint(titiler_cmr_endpoint)
+
+    params = {
+        "concept_id": concept_id,
+        "datetime": datetime,
+        "step": step,
+        "temporal_mode": temporal_mode,
+        "backend": backend,
+        "fps": fps,
+    }
+
+    if variable is not None:
+        params["variable"] = variable
+
+    if bands is not None:
+        if isinstance(bands, list):
+            # Pass bands as a list so requests encodes as bands=B04&bands=B03&bands=B02
+            params["bands"] = bands
+        else:
+            params["bands"] = [bands]
+    elif expression is not None:
+        # Extract band names from expression (e.g., "(B05-B04)/(B05+B04)" -> ["B05", "B04"])
+        # Band names typically match patterns like B01, B02, B8A, etc.
+        band_pattern = r"\b(B[0-9][0-9A-Za-z]?)\b"
+        extracted_bands = list(dict.fromkeys(re.findall(band_pattern, expression)))
+        if extracted_bands:
+            params["bands"] = extracted_bands
+
+    if bands_regex is not None:
+        params["bands_regex"] = bands_regex
+
+    if expression is not None:
+        params["expression"] = expression
+
+    if rescale is not None:
+        if isinstance(rescale, list):
+            if isinstance(rescale[0], list):
+                params["rescale"] = ",".join([f"{r[0]},{r[1]}" for r in rescale])
+            else:
+                params["rescale"] = ",".join([str(r) for r in rescale])
+        else:
+            params["rescale"] = rescale
+
+    if colormap_name is not None:
+        params["colormap_name"] = colormap_name
+
+    if color_formula is not None:
+        params["color_formula"] = color_formula
+
+    params.update(kwargs)
+
+    url = endpoint.url_for_timeseries_gif(bbox, width, height)
+
+    if output is not None:
+        try:
+            response = requests.get(url, params=params, timeout=120)
+            response.raise_for_status()
+            with open(output, "wb") as f:
+                f.write(response.content)
+            return output
+        except Exception as e:
+            print(f"Error downloading GIF from TiTiler CMR: {e}")
+            return None
+    else:
+        # Return the full URL with parameters
+        from urllib.parse import urlencode
+
+        return f"{url}?{urlencode(params)}"
+
+
+def cmr_statistics(
+    concept_id: str,
+    datetime: Optional[str] = None,
+    geojson: Optional[Union[Dict, str]] = None,
+    backend: str = "rasterio",
+    variable: Optional[str] = None,
+    bands: Optional[Union[str, List[str]]] = None,
+    titiler_cmr_endpoint: Optional[str] = None,
+    **kwargs,
+) -> Dict:
+    """Calculate statistics for an AOI from TiTiler CMR.
+
+    Args:
+        concept_id (str): NASA CMR collection concept ID (e.g., 'C2036881735-POCLOUD').
+        datetime (str, optional): RFC3339 datetime or range (e.g., '2024-01-15' or '2024-01-01/2024-01-31').
+        geojson (dict | str, optional): GeoJSON geometry or file path for the AOI.
+        backend (str, optional): Backend to use - 'rasterio' for COGs or 'xarray' for NetCDF/Zarr.
+            Defaults to 'rasterio'.
+        variable (str, optional): Variable name for xarray backend datasets.
+        bands (str | list, optional): Band name(s) for rasterio backend.
+        titiler_cmr_endpoint (str, optional): TiTiler CMR endpoint URL.
+        **kwargs: Additional parameters.
+
+    Returns:
+        dict: Statistics for the AOI.
+    """
+    import json
+
+    if os.environ.get("USE_MKDOCS") is not None:
+        return None
+
+    endpoint = check_titiler_cmr_endpoint(titiler_cmr_endpoint)
+
+    params = {"concept_id": concept_id, "backend": backend}
+
+    if datetime is not None:
+        params["datetime"] = datetime
+
+    if variable is not None:
+        params["variable"] = variable
+
+    if bands is not None:
+        if isinstance(bands, list):
+            # Pass bands as a list so requests encodes as bands=B04&bands=B03&bands=B02
+            params["bands"] = bands
+        else:
+            params["bands"] = [bands]
+
+    params.update(kwargs)
+
+    # Handle GeoJSON input
+    if geojson is not None:
+        if isinstance(geojson, str):
+            if os.path.exists(geojson):
+                with open(geojson, "r") as f:
+                    geojson = json.load(f)
+            else:
+                geojson = json.loads(geojson)
+
+        try:
+            response = requests.post(
+                endpoint.url_for_statistics(),
+                params=params,
+                json=geojson,
+                timeout=60,
+            )
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            print(f"Error fetching statistics from TiTiler CMR: {e}")
+            return None
+    else:
+        try:
+            response = requests.get(
+                endpoint.url_for_statistics(), params=params, timeout=60
+            )
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            print(f"Error fetching statistics from TiTiler CMR: {e}")
+            return None
 
 
 def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:

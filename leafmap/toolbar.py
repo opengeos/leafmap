@@ -1978,14 +1978,15 @@ def time_slider(
         m.default_style = {"cursor": "wait"}
         index = slider.value - 1
         label.value = labels[index]
-        if isinstance(layers[label.value], str) and layers[label.value].startswith(
-            "http"
-        ):
-            layer.url = layers[label.value]
+        # Use keys[index] instead of label.value to avoid potential mismatch
+        # between label widget value and dictionary keys
+        layer_key = keys[index]
+        if isinstance(layers[layer_key], str) and layers[layer_key].startswith("http"):
+            layer.url = layers[layer_key]
             layer.name = labels[index]
         else:
-            layer.url = layers[label.value].url
-            layer.name = layers[label.value].name
+            layer.url = layers[layer_key].url
+            layer.name = layers[layer_key].name
         m.default_style = {"cursor": "default"}
 
     slider.observe(slider_changed, "value")
