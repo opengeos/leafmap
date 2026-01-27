@@ -469,7 +469,6 @@ class Map(ipyleaflet.Map):
         import pandas as pd
 
         if isinstance(asset_id, str):
-
             df = pd.read_csv(
                 "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
                 sep="\t",
@@ -2179,7 +2178,6 @@ class Map(ipyleaflet.Map):
             legend_text = legend_text.replace("height: 16px", "height: 3px")
 
         try:
-
             legend_widget = widgets.HTML(value=legend_text)
             legend_control = ipyleaflet.WidgetControl(
                 widget=legend_widget, position=position
@@ -5008,11 +5006,11 @@ class Map(ipyleaflet.Map):
         """
 
         if background:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {"bold" if bold else "normal"};
             padding: {padding}; background-color: {bg_color};
             border-radius: {border_radius};">{text}</div>"""
         else:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {"bold" if bold else "normal"};
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)
@@ -5651,7 +5649,6 @@ class Map(ipyleaflet.Map):
             self.add_layer(popup)
 
             def save_changes(_):
-
                 original_data = copy.deepcopy(geojson_layer.data)
                 original_feature = copy.deepcopy(feature)
                 # Update the properties with the new values
@@ -6387,7 +6384,6 @@ class Map(ipyleaflet.Map):
         url = "https://www.mrlc.gov/downloads/sciweb1/shared/mrlc/data-bundles/Annual_NLCD_LndCov_{}_CU_C1V0.tif"
 
         if "colormap" not in kwargs:
-
             kwargs["colormap"] = {
                 "11": "#466b9f",
                 "12": "#d1def8",

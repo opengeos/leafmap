@@ -6301,7 +6301,7 @@ class The_national_map_USGS:
             file_name = os.path.basename(link)
             out_name = os.path.join(out_dir, file_name)
             if i < 5 or (i < 50 and not (i % 5)) or not (i % 20):
-                print(f"Downloading {i+1} of {T}: {file_name}")
+                print(f"Downloading {i + 1} of {T}: {file_name}")
             try:
                 download_file(link, out_name, **download_args)
                 done += 1
@@ -6310,7 +6310,7 @@ class The_national_map_USGS:
                 break
             except Exception:
                 errors += 1
-                print(f"Failed to download {i+1} of {T}: {file_name}")
+                print(f"Failed to download {i + 1} of {T}: {file_name}")
 
         print(
             f"{done} Downloads completed, {errors} downloads failed, {T} files available"
@@ -6560,7 +6560,7 @@ def mosaic(
 
     for index, p in enumerate(raster_files):
         if verbose:
-            print(f"Reading {index+1}/{len(raster_files)}: {os.path.basename(p)}")
+            print(f"Reading {index + 1}/{len(raster_files)}: {os.path.basename(p)}")
         raster = rio.open(p, **kwargs)
         raster_to_mosiac.append(raster)
 
@@ -6987,7 +6987,6 @@ def sort_files(
         The sorted or filtered list of files.
     """
     if names is None:
-
         return sorted(files)
     else:
         filenames = []
@@ -8208,8 +8207,9 @@ def add_image_to_gif(
         logo_raw_size[1] / image_size[1],
     )
     image_resize = (int(logo_raw_size[0] / ratio), int(logo_raw_size[1] / ratio))
-    image_size = min(logo_raw_size[0], image_size[0]), min(
-        logo_raw_size[1], image_size[1]
+    image_size = (
+        min(logo_raw_size[0], image_size[0]),
+        min(logo_raw_size[1], image_size[1]),
     )
 
     logo_image = logo_raw_image.convert("RGBA")
@@ -8480,7 +8480,7 @@ def create_timelapse(
             else:
                 basename = os.path.basename(image).replace(ext, out_ext)
             if not quiet:
-                print(f"Processing {index+1}/{len(images)}: {basename} ...")
+                print(f"Processing {index + 1}/{len(images)}: {basename} ...")
 
             # ignore GDAL warnings
             with output:
@@ -8701,13 +8701,13 @@ def gif_fading(in_gif, out_gif, duration=1, verbose=True):
             )
         else:
             filters.append(
-                f"[{i}:v][{i-1}:v]blend=all_expr='A*(if(gte(T,3),1,T/3))+B*(1-(if(gte(T,3),1,T/3)))'[v{i-1}];"
+                f"[{i}:v][{i - 1}:v]blend=all_expr='A*(if(gte(T,3),1,T/3))+B*(1-(if(gte(T,3),1,T/3)))'[v{i - 1}];"
             )
 
     last_filter = ""
     for i in range(count - 1):
         last_filter += f"[v{i}]"
-    last_filter += f'concat=n={count-1}:v=1:a=0[v]" -map "[v]"'
+    last_filter += f'concat=n={count - 1}:v=1:a=0[v]" -map "[v]"'
     filters.append(last_filter)
     filters = " ".join(filters)
 
@@ -8856,7 +8856,7 @@ def vector_to_gif(
 
     for index, v in enumerate(options):
         if verbose:
-            print(f"Processing {index+1}/{len(options)}: {v}...")
+            print(f"Processing {index + 1}/{len(options)}: {v}...")
         yrdf = gdf[gdf[colname] <= v]
         fig, ax = plt.subplots()
         ax = yrdf.plot(facecolor=facecolor, figsize=figsize, **plot_args)
@@ -9719,7 +9719,7 @@ def s3_download_files(
             outfile = key.split("/")[-1]
 
         if not quiet:
-            print(f"Downloading {index+1} of {len(keys)}: {outfile}")
+            print(f"Downloading {index + 1} of {len(keys)}: {outfile}")
         s3_download_file(bucket=bucket, key=key, outfile=outfile, **kwargs)
 
 
@@ -9834,7 +9834,7 @@ def s3_get_objects(
         )
 
     for index, key in enumerate(keys):
-        print(f"Downloading {index+1} of {len(keys)}: {key}")
+        print(f"Downloading {index + 1} of {len(keys)}: {key}")
         output = os.path.join(out_dir, key.split("/")[-1])
         s3_get_object(
             bucket, key, output, chunk_size, request_payer, quiet, client_args, **kwargs
@@ -10971,7 +10971,7 @@ def image_comparison(
         <style>body {{ margin: unset; }}</style>
         {css_block}
         {js_block}
-        <div id="foo" style="height: {height}; width: {width or '100%'};"></div>
+        <div id="foo" style="height: {height}; width: {width or "100%"};"></div>
         <script>
         slider = new juxtapose.JXSlider('#foo',
             [
@@ -10986,10 +10986,10 @@ def image_comparison(
             ],
             {{
                 animate: true,
-                showLabels: {'true' if show_labels else 'false'},
+                showLabels: {"true" if show_labels else "false"},
                 showCredits: true,
                 startingPosition: "{starting_position}%",
-                makeResponsive: {'true' if make_responsive else 'false'},
+                makeResponsive: {"true" if make_responsive else "false"},
             }});
         </script>
         </head>
@@ -11835,7 +11835,6 @@ def array_to_image(
             and (array.rio.crs is not None)
             and (array.rio.transform() is not None)
         ):
-
             if "latitude" in array.dims and "longitude" in array.dims:
                 array = array.rename({"latitude": "y", "longitude": "x"})
             elif "lat" in array.dims and "lon" in array.dims:
@@ -12103,7 +12102,7 @@ def get_solar_data(
         if isinstance(links[link], list):
             for i, url in enumerate(links[link]):
                 filename = (
-                    f"{basename}_{link.replace('Urls', '')}_{str(i+1).zfill(2)}.tif"
+                    f"{basename}_{link.replace('Urls', '')}_{str(i + 1).zfill(2)}.tif"
                 )
                 if out_dir is not None:
                     filename = os.path.join(out_dir, filename)
@@ -12163,7 +12162,7 @@ def merge_vector(
     gdfs = []
     for index, filename in enumerate(files):
         if not quiet:
-            print(f"Reading {index+1} of {len(files)}: {filename}")
+            print(f"Reading {index + 1} of {len(files)}: {filename}")
         gdf = gpd.read_file(filename, **kwargs)
         if crs is None:
             crs = gdf.crs
@@ -12657,8 +12656,7 @@ def init_duckdb_tiles(
         import duckdb
     except ImportError:
         raise ImportError(
-            "duckdb is required for this function. "
-            "Install it with: pip install duckdb"
+            "duckdb is required for this function. Install it with: pip install duckdb"
         )
 
     # Handle different input types
@@ -14701,11 +14699,11 @@ def geojsonl_to_parquet_batch(
 
     # Process files in batches
     for batch_num in range(num_batches):
-        print(f"\nProcessing batch {batch_num+1}/{num_batches}")
+        print(f"\nProcessing batch {batch_num + 1}/{num_batches}")
 
         # Generate output filename
         output_file = os.path.join(
-            output_dir, f"{filename_predix}{batch_num+1:04d}.parquet"
+            output_dir, f"{filename_predix}{batch_num + 1:04d}.parquet"
         )
         if os.path.exists(output_file):
             print(f"Output file already exists: {output_file}")
@@ -14765,7 +14763,7 @@ def geojsonl_to_parquet_batch(
                 failed_files += 1
 
         if not records:
-            print(f"No valid records found in batch {batch_num+1}")
+            print(f"No valid records found in batch {batch_num + 1}")
             continue
 
         # Create a GeoDataFrame with the correct CRS
@@ -14776,7 +14774,7 @@ def geojsonl_to_parquet_batch(
         successful_parquets += 1
 
         # Print summary for this batch
-        print(f"Created GeoParquet file {batch_num+1}/{num_batches}: {output_file}")
+        print(f"Created GeoParquet file {batch_num + 1}/{num_batches}: {output_file}")
         print(f"  - Number of features: {len(gdf)}")
         print(f"  - Columns: {list(gdf.columns)}")
         if len(gdf) > 0:
@@ -15095,7 +15093,6 @@ def parquet_to_gdf(
     limit=None,
     **kwargs: Any,
 ):
-
     import duckdb
 
     if db_con is None:
@@ -15115,7 +15112,6 @@ def parquet_to_gdf(
         columns = ", ".join([f'"{col}"' for col in columns])
         sql = f"SELECT {columns}, {geom_sql} FROM '{input_parquet}'"
     else:
-
         sql = f"SELECT {columns} EXCLUDE {geometry}, {geom_sql} FROM '{input_parquet}'"
     if limit is not None:
         sql += f" LIMIT {limit}"
@@ -15849,7 +15845,7 @@ def gedi_download_files(
         os.makedirs(outdir)
 
     for index, url in enumerate(urls):
-        print(f"Downloading file {index+1} of {len(urls)}...")
+        print(f"Downloading file {index + 1} of {len(urls)}...")
 
         if url is None:
             continue
@@ -16219,12 +16215,10 @@ def nasa_data_download(
         return
 
     if keywords is None:
-
         earthaccess.download(
             granules, local_path=out_dir, provider=provider, threads=threads
         )
     else:
-
         # Collect file URLs that match any keyword
         filtered_links = []
         for granule in granules:
@@ -18387,7 +18381,6 @@ def download_mapillary_image(
         image_id, resolution=resolution, access_token=access_token
     )
     if output is None:
-
         output = f"{image_id}.jpg"
     download_file(image_url, output, quiet=quiet, **kwargs)
 
@@ -19767,7 +19760,6 @@ def get_ee_tile_url(
     """
 
     if isinstance(endpoint, str):
-
         if endpoint == "default":
             endpoint = "https://giswqs-ee-tile-request.hf.space/tile"
 
@@ -19778,7 +19770,6 @@ def get_ee_tile_url(
         return response.json()["tile_url"]
 
     try:
-
         import ee
         from geemap.ee_tile_layers import _get_tile_url_format, _validate_palette
 

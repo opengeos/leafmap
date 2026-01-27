@@ -241,8 +241,8 @@ def view_raster(
         <div class="info-item"><span class="info-label">Bands:</span> {n_bands}</div>
         <div class="info-item"><span class="info-label">Width:</span> {width}</div>
         <div class="info-item"><span class="info-label">Height:</span> {height}</div>
-        {f'<div class="info-item"><span class="info-label">Colormap:</span> {colormap}</div>' if colormap else ''}
-        {f'<div class="info-item"><span class="info-label">Band{"s" if isinstance(indexes, list) else ""}:</span> {indexes if not isinstance(indexes, list) else str(indexes)}</div>' if indexes else ''}
+        {f'<div class="info-item"><span class="info-label">Colormap:</span> {colormap}</div>' if colormap else ""}
+        {f'<div class="info-item"><span class="info-label">Band{"s" if isinstance(indexes, list) else ""}:</span> {indexes if not isinstance(indexes, list) else str(indexes)}</div>' if indexes else ""}
     </div>
     <div id="map"></div>
     <script>
@@ -420,7 +420,6 @@ def view_vector(
     print(f"Loading vector: {file_path}")
 
     try:
-
         # Read vector file
         gdf = read_vector(file_path)
 
