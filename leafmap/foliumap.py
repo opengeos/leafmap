@@ -265,7 +265,6 @@ class Map(folium.Map):
         import pandas as pd
 
         if isinstance(asset_id, str):
-
             df = pd.read_csv(
                 "https://raw.githubusercontent.com/opengeos/ee-tile-layers/main/datasets.tsv",
                 sep="\t",
@@ -542,7 +541,7 @@ class Map(folium.Map):
                         right: 50px;
                         z-index:9999;
                         ">
-                <img src="{ url }" alt="legend" style="width: 100%; height: 100%;">
+                <img src="{url}" alt="legend" style="width: 100%; height: 100%;">
             </div>
             {{% endmacro %}}
         """
@@ -3634,11 +3633,11 @@ class Map(folium.Map):
         """
 
         if background:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {"bold" if bold else "normal"};
             padding: {padding}; background-color: {bg_color};
             border-radius: {border_radius};">{text}</div>"""
         else:
-            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {'bold' if bold else 'normal'};
+            text = f"""<div style="font-size: {fontsize}px; color: {fontcolor}; font-weight: {"bold" if bold else "normal"};
             padding: {padding};">{text}</div>"""
 
         self.add_html(text, position=position, **kwargs)
@@ -3877,7 +3876,6 @@ class Map(folium.Map):
         )
 
         if "colormap" not in kwargs:
-
             kwargs["colormap"] = {
                 "11": "#466b9f",
                 "12": "#d1def8",
@@ -4150,9 +4148,9 @@ class SplitControl(Layer):
         super(SplitControl, self).render()
 
         figure = self.get_root()
-        assert isinstance(figure, Figure), (
-            "You cannot render this Element " "if it is not in a Figure."
-        )
+        assert isinstance(
+            figure, Figure
+        ), "You cannot render this Element if it is not in a Figure."
 
         figure.header.add_child(
             JavascriptLink(

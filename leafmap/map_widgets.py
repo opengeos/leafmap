@@ -475,7 +475,6 @@ class LayerEditor(widgets.VBox):
         self._embedded_widget.on_import_click()
 
     def _on_apply_click(self, _):
-
         def loading_change(change):
             if change["new"]:
                 self._layer_spinner.tooltip = "Loading ..."
@@ -770,7 +769,7 @@ class RasterLayerEditor(widgets.VBox):
 
             if len(self._palette_label.value) > 0 and "," in self._palette_label.value:
                 labels = [
-                    f"Class {i+1}"
+                    f"Class {i + 1}"
                     for i in range(len(self._palette_label.value.split(",")))
                 ]
 
@@ -808,7 +807,7 @@ class RasterLayerEditor(widgets.VBox):
 
             if len(self._palette_label.value) > 0 and "," in self._palette_label.value:
                 labels = [
-                    f"Class {i+1}"
+                    f"Class {i + 1}"
                     for i in range(len(self._palette_label.value.split(",")))
                 ]
 
@@ -838,7 +837,7 @@ class RasterLayerEditor(widgets.VBox):
                 vis["assets"] = self._layer_dict["assets"]
                 if len(vis["assets"]) == 1:
                     vis["colormap_name"] = vis["colormap"]
-            vis["rescale"] = f'{vis["vmin"]},{vis["vmax"]}'
+            vis["rescale"] = f"{vis['vmin']},{vis['vmax']}"
             vis.pop("vmin", None)
             vis.pop("vmax", None)
             vis.pop("indexes", None)
@@ -882,7 +881,6 @@ class RasterLayerEditor(widgets.VBox):
 
         # Add support for hyperspectral data via HyperCoast
         if self._xds is not None:
-
             r_index = self._band_1_dropdown.index
             g_index = self._band_2_dropdown.index
             b_index = self._band_3_dropdown.index
@@ -934,7 +932,7 @@ class RasterLayerEditor(widgets.VBox):
                 self._layer_dict["url"],
                 bidx=vis["indexes"],
                 colormap_name=vis["colormap"],
-                rescale=f'{vis["vmin"]},{vis["vmax"]}',
+                rescale=f"{vis['vmin']},{vis['vmax']}",
                 opacity=vis["opacity"],
                 name=self._layer_name,
                 zoom_to_layer=False,
@@ -948,7 +946,7 @@ class RasterLayerEditor(widgets.VBox):
                 item=self._layer_dict["item"],
                 assets=[self._layer_dict["band_names"][i - 1] for i in vis["indexes"]],
                 colormap_name=vis["colormap"],
-                rescale=f'{vis["vmin"]},{vis["vmax"]}',
+                rescale=f"{vis['vmin']},{vis['vmax']}",
                 opacity=vis["opacity"],
                 name=self._layer_name,
                 fit_bounds=False,
@@ -1178,7 +1176,7 @@ class TabWidget:
     def select(self, index: int) -> None:
         n = len(self._tabs_header.children)
         if not (0 <= index < n):
-            raise IndexError(f"index {index} out of range (0..{n-1})")
+            raise IndexError(f"index {index} out of range (0..{n - 1})")
         self._tabs_header.v_model = int(index)
 
     def on_tab_change(self, handler: Callable[[int], None]) -> None:
@@ -1224,7 +1222,7 @@ class TabWidget:
         items = list(self._tabs_items.children)
         n = len(hdr)
         if not (0 <= index < n):
-            raise IndexError(f"index {index} out of range (0..{n-1})")
+            raise IndexError(f"index {index} out of range (0..{n - 1})")
         del hdr[index]
         del items[index]
         self._tabs_header.children = tuple(hdr)
@@ -1624,7 +1622,6 @@ class SimilaritySearch(widgets.VBox):
         year_widget.observe(year_change, names="value")
 
         def apply_button_click(change):
-
             with output:
                 if len(m.draw_features_selected) == 0:
                     print("Please create a point on the map")

@@ -172,7 +172,6 @@ class Map(MapWidget):
             "positron2",
         ]
         if isinstance(style, str):
-
             if style.startswith("http"):
                 response = requests.get(style)
                 if response.status_code != 200:
@@ -829,7 +828,6 @@ class Map(MapWidget):
         self._deck_layer_tooltips = tooltip
 
         for layer in layers:
-
             self.layer_dict[layer["id"]] = {
                 "layer": layer,
                 "opacity": layer.get("opacity", 1.0),
@@ -2380,7 +2378,6 @@ class Map(MapWidget):
                     **kwargs,
                 )
             else:
-
                 try:
                     import geemap
                     from geemap.ee_tile_layers import _get_tile_url_format
@@ -2870,7 +2867,6 @@ class Map(MapWidget):
             output = os.getenv("MAPLIBRE_OUTPUT", None)
 
         if output:
-
             if not overwrite and os.path.exists(output):
                 import glob
 
@@ -3351,7 +3347,6 @@ class Map(MapWidget):
         """
 
         try:
-
             if "sources" in kwargs:
                 del kwargs["sources"]
 
@@ -3379,7 +3374,6 @@ class Map(MapWidget):
             style = common.replace_hyphens_in_keys(style)
 
             for params in style["layers"]:
-
                 if exclude_mask and params.get("source_layer") == "mask":
                     continue
 
@@ -4093,7 +4087,6 @@ class Map(MapWidget):
             super().add_call("addImage", id, image_dict)
 
             if coordinates is not None:
-
                 source = {
                     "type": "geojson",
                     "data": {
@@ -4675,7 +4668,7 @@ class Map(MapWidget):
             kwargs["box-shadow"] = "none"
 
         css_text = f"""font-size: {fontsize}px; color: {fontcolor};
-        font-weight: {'bold' if bold else 'normal'}; padding: {padding};
+        font-weight: {"bold" if bold else "normal"}; padding: {padding};
         background-color: {bg_color}; border-radius: {border_radius};"""
 
         for key, value in kwargs.items():
@@ -5269,7 +5262,6 @@ class Map(MapWidget):
             css_text = "padding: 5px; border: 1px solid darkgrey; border-radius: 4px;"
 
         if len(layer_ids) > 0:
-
             control = LayerSwitcherControl(
                 layer_ids=layer_ids,
                 theme=theme,
@@ -6166,7 +6158,6 @@ class Map(MapWidget):
         )
 
         if "colormap" not in kwargs:
-
             kwargs["colormap"] = {
                 "11": "#466b9f",
                 "12": "#d1def8",
@@ -6541,7 +6532,6 @@ class Map(MapWidget):
                         )
 
             else:
-
                 layer_type = "fill"
                 if paint is None:
                     paint = {
@@ -6840,7 +6830,6 @@ class Map(MapWidget):
             )
             return row
         else:
-
             return widget
 
     def add_labels(
@@ -7781,7 +7770,6 @@ class Map(MapWidget):
 
         if isinstance(properties, dict):
             for key, values in properties.items():
-
                 if isinstance(values, list) or isinstance(values, tuple):
                     prop_widget = widgets.Dropdown(
                         options=values,
@@ -7879,7 +7867,6 @@ class Map(MapWidget):
         )
 
         def on_save_click(b):
-
             output.clear_output()
             if len(self.draw_features_selected) > 0:
                 feature_id = self.draw_features_selected[0]["id"]
@@ -8320,7 +8307,6 @@ class Container(v.Container):
         self.update_sidebar_content()
 
     def toggle_width_slider(self, *args: Any) -> None:
-
         if self.settings_widget not in self.sidebar_content_box.children:
             self.add_to_sidebar(self.settings_widget, add_header=False)
 
@@ -8455,7 +8441,6 @@ def maptiler_3d_style(
         style = None
 
     if tile_type is None:
-
         image_types = {
             "aquarelle": "webp",
             "backdrop": "png",
@@ -8791,7 +8776,6 @@ def edit_gps_trace(
             categories = m.gdf[ann_column].value_counts()
             keys = list(colormap.keys())[:-1]
             for index, cat in enumerate(keys):
-
                 fig.axes = [
                     bq.Axis(scale=x_sc, label="Time"),
                     bq.Axis(scale=y_sc, orientation="vertical", label=feature.value),
@@ -8901,13 +8885,11 @@ def edit_gps_trace(
 
     def features_change(change):
         if change["new"]:
-
             selected_features = multi_select.value
             children = []
             additonal_scatters.clear()
             if selected_features:
                 for selected_feature in selected_features:
-
                     x = m.gps_trace.index
                     y = m.gps_trace[selected_feature]
                     if sync_plots:
@@ -8919,7 +8901,6 @@ def edit_gps_trace(
                     # Create scatter plots for each annotation category with the appropriate colors and labels
                     scatters = []
                     for cat, color in colormap.items():
-
                         if (
                             cat != "selected"
                         ):  # Exclude 'selected' from data points (only for highlighting selection)
@@ -9549,7 +9530,6 @@ def create_vector_data(
 
     if isinstance(properties, dict):
         for key, values in properties.items():
-
             if isinstance(values, list) or isinstance(values, tuple):
                 prop_widget = widgets.Dropdown(
                     options=values,
@@ -9606,9 +9586,7 @@ def create_vector_data(
                 )
 
         if isinstance(name, str):
-
             if name not in m.layer_dict.keys():
-
                 m.add_geojson(
                     m.draw_feature_collection_all,
                     layer_type="circle",
@@ -9659,7 +9637,6 @@ def create_vector_data(
     )
 
     def on_save_click(b):
-
         output.clear_output()
         output.outputs = ()
         if len(m.draw_features_selected) > 0:
@@ -9739,7 +9716,6 @@ def create_vector_data(
     if return_sidebar:
         return sidebar_widget
     else:
-
         left_col_layout = v.Col(
             cols=column_widths[0],
             children=[m],
@@ -9932,7 +9908,6 @@ def edit_vector_data(
 
     if isinstance(properties, dict):
         for key, values in properties.items():
-
             if isinstance(values, list) or isinstance(values, tuple):
                 prop_widget = widgets.Dropdown(
                     options=values,
@@ -10030,7 +10005,6 @@ def edit_vector_data(
     )
 
     def on_save_click(b):
-
         output.clear_output()
         if len(m.draw_features_selected) > 0:
             feature_id = m.draw_features_selected[0]["id"]
@@ -10131,7 +10105,6 @@ class MapWidget(v.Row):
     """
 
     def __init__(self, left_obj, right_obj, column_widths=(5, 1), **kwargs):
-
         self.left_obj = left_obj
         self.right_obj = right_obj
 

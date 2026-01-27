@@ -2846,7 +2846,6 @@ def inspector_gui(
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
             elif layer_dict["type"] == "COG":
-
                 if m.inspector_bands_chk.value:
                     indexes = layer_dict["indexes"]
                 else:
@@ -6011,7 +6010,6 @@ def stac_custom_gui(
     if backend != "ipyleaflet":
         return toolbar_footer
     else:
-
         toolbar_button.value = True
         if m is not None:
             toolbar_control = ipyleaflet.WidgetControl(
@@ -6812,7 +6810,6 @@ def nasa_opera_gui(
     cmap_options.sort()
 
     if not hasattr(m, "_NASA_DATA"):
-
         data = {
             "ShortName": [
                 "OPERA_L2_CSLC-S1-STATIC_V1",
