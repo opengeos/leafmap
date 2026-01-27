@@ -1,0 +1,3 @@
+# fire module
+
+::: leafmap.fire
