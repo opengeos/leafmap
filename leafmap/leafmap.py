@@ -6146,9 +6146,9 @@ class Map(ipyleaflet.Map):
                         original_data["features"][index]["properties"]["style"] = style
                     else:
                         highlighted_features.append(index)
-                        original_data["features"][index]["properties"]["style"] = (
-                            highlight_style
-                        )
+                        original_data["features"][index]["properties"][
+                            "style"
+                        ] = highlight_style
 
             geojson_layer.data = original_data
 
@@ -6198,9 +6198,9 @@ class Map(ipyleaflet.Map):
                         else:
                             value = widget.value
                         original_data["features"][index]["properties"][key] = value
-                        original_data["features"][index]["properties"]["style"] = (
-                            changed_style
-                        )
+                        original_data["features"][index]["properties"][
+                            "style"
+                        ] = changed_style
 
             geojson_layer.data = original_data
             self._geojson_data = original_data

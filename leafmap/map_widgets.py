@@ -1109,8 +1109,7 @@ class TabWidget:
         # Global style
         self._style = v.Html(
             tag="style",
-            children=[
-                """
+            children=["""
                 .rounded-xl { border-radius: 16px; }
                 .v-tab { border-radius: 8px; margin-right: 6px; }
                 .v-tab--active { background: rgba(33,150,243,.08); }
@@ -1118,8 +1117,7 @@ class TabWidget:
                 .mdi-spin { -webkit-animation: mdi-spin 2s infinite linear; animation: mdi-spin 2s infinite linear; }
                 @-webkit-keyframes mdi-spin { 0% { -webkit-transform: rotate(0deg); } 100% { -webkit-transform: rotate(360deg); } }
                 @keyframes mdi-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-                """
-            ],
+                """],
         )
 
         # Build initial tabs

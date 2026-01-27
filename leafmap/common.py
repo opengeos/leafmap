@@ -1115,14 +1115,10 @@ def create_code_cell(code: str = "", where: str = "below") -> None:
     #     pass
 
     encoded_code = (base64.b64encode(str.encode(code))).decode()
-    display(
-        Javascript(
-            """
+    display(Javascript("""
         var code = IPython.notebook.insert_cell_{0}('code');
         code.set_text(atob("{1}"));
-    """.format(where, encoded_code)
-        )
-    )
+    """.format(where, encoded_code)))
 
 
 def local_tile_pixel_value(
@@ -10305,8 +10301,12 @@ def transform_bbox_coords(bbox, src_crs, dst_crs, **kwargs: Any):
     """
     x1, y1, x2, y2 = bbox
 
-    x1, y1 = transform_coords(x1, y1, src_crs, dst_crs, **kwargs)  # pylint: disable=E0633
-    x2, y2 = transform_coords(x2, y2, src_crs, dst_crs, **kwargs)  # pylint: disable=E0633
+    x1, y1 = transform_coords(
+        x1, y1, src_crs, dst_crs, **kwargs
+    )  # pylint: disable=E0633
+    x2, y2 = transform_coords(
+        x2, y2, src_crs, dst_crs, **kwargs
+    )  # pylint: disable=E0633
 
     return [x1, y1, x2, y2]
 
@@ -10350,7 +10350,9 @@ def coords_to_xy(
             width = src.width
             height = src.height
             if coord_crs != src.crs:
-                xs, ys = transform_coords(xs, ys, coord_crs, src.crs, **kwargs)  # pylint: disable=E0633
+                xs, ys = transform_coords(
+                    xs, ys, coord_crs, src.crs, **kwargs
+                )  # pylint: disable=E0633
             rows, cols = rasterio.transform.rowcol(src.transform, xs, ys, **kwargs)
         result = [[col, row] for col, row in zip(cols, rows)]
 

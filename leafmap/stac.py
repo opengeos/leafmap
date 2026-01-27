@@ -1432,9 +1432,7 @@ def stac_root_link(url: str, return_col_id: Optional[bool] = False, **kwargs) ->
             return (
                 (root.get_href() if root else item.get_self_href(), collection_id)
                 if return_col_id
-                else root.get_href()
-                if root
-                else item.get_self_href()
+                else root.get_href() if root else item.get_self_href()
             )
 
         # Handle STAC API objects (Collection, Catalog, etc.)
