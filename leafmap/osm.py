@@ -520,7 +520,9 @@ def quackosm_gdf_from_place(
 
     # Try using osm_extract_source first if specified
     if osm_extract_source:
-        source = getattr(OsmExtractSource, osm_extract_source.upper(), osm_extract_source)
+        source = getattr(
+            OsmExtractSource, osm_extract_source.upper(), osm_extract_source
+        )
         gdf = qosm.convert_osm_extract_to_geodataframe(
             query, osm_extract_source=source, tags_filter=tags_filter, **kwargs
         )
@@ -727,9 +729,7 @@ def quackosm_gdf_from_pbf(
     if geometry is not None:
         kwargs["geometry_filter"] = geometry
 
-    gdf = qosm.convert_pbf_to_geodataframe(
-        pbf_path, tags_filter=tags_filter, **kwargs
-    )
+    gdf = qosm.convert_pbf_to_geodataframe(pbf_path, tags_filter=tags_filter, **kwargs)
 
     return gdf
 
@@ -829,7 +829,10 @@ def quackosm_to_parquet(
         except Exception:
             geometry = qosm.geocode_to_geometry(source)
             parquet_path = qosm.convert_geometry_to_parquet(
-                geometry, result_file_path=output_path, tags_filter=tags_filter, **kwargs
+                geometry,
+                result_file_path=output_path,
+                tags_filter=tags_filter,
+                **kwargs,
             )
     elif isinstance(source, (tuple, list)) and len(source) == 4:
         # Bounding box
