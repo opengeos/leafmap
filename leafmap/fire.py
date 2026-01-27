@@ -11,7 +11,9 @@ from typing import Any, Dict, List, Optional, Union
 import os
 
 # Base API endpoint for OpenVEDA OGC API Features
-OPENVEDA_ENDPOINT = os.getenv("OPENVEDA_API_ENDPOINT", "https://openveda.cloud/api/features")
+OPENVEDA_ENDPOINT = os.getenv(
+    "OPENVEDA_API_ENDPOINT", "https://openveda.cloud/api/features"
+)
 
 # Available fire collections with descriptions
 # The full collection IDs use the prefix "public.eis_fire_"
