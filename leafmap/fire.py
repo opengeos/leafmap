@@ -391,8 +391,7 @@ def fire_gdf_from_place(
         import geopandas as gpd
     except ImportError:
         raise ImportError(
-            "geopandas is required. "
-            "Install with: pip install geopandas"
+            "geopandas is required. " "Install with: pip install geopandas"
         )
 
     try:
