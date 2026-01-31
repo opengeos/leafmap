@@ -8792,9 +8792,7 @@ print(f"Found {len(gdf)} fires")</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>leafmap/fire.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">233</span>
-<span class="normal">234</span>
-<span class="normal">235</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
 <span class="normal">238</span>
@@ -8905,7 +8903,9 @@ print(f"Found {len(gdf)} fires")</p>
 <span class="normal">343</span>
 <span class="normal">344</span>
 <span class="normal">345</span>
-<span class="normal">346</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fire_gdf_from_bbox</span><span class="p">(</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fire_gdf_from_bbox</span><span class="p">(</span>
     <span class="n">bbox</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
     <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;snapshot_perimeter_nrt&quot;</span><span class="p">,</span>
     <span class="n">datetime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9029,7 +9029,7 @@ print(f"Found {len(gdf)} fires")</p>
 
 
 <h2 id="leafmap.fire.fire_gdf_from_place" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">fire_gdf_from_place</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s1">&#39;snapshot_perimeter_nrt&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">farea_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">farea_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meanfrp_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">buffer_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">fire_gdf_from_place</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="n">collection</span><span class="o">=</span><span class="s1">&#39;snapshot_perimeter_nrt&#39;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">farea_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">farea_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">duration_max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">meanfrp_min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">buffer_dist</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
 <a href="#leafmap.fire.fire_gdf_from_place" class="headerlink" title="Permanent link">&para;</a></h2>
 
@@ -9141,6 +9141,22 @@ print(f"Found {len(gdf)} fires")</p>
             <td>
               <div class="doc-md-description">
                 <p>Minimum fire duration in days.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>duration_max</code>
+            </td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Maximum fire duration in days.</p>
               </div>
             </td>
             <td>
@@ -9269,9 +9285,7 @@ print(f"Found {len(gdf)} fires")</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>leafmap/fire.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">349</span>
-<span class="normal">350</span>
-<span class="normal">351</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">351</span>
 <span class="normal">352</span>
 <span class="normal">353</span>
 <span class="normal">354</span>
@@ -9350,13 +9364,17 @@ print(f"Found {len(gdf)} fires")</p>
 <span class="normal">427</span>
 <span class="normal">428</span>
 <span class="normal">429</span>
-<span class="normal">430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fire_gdf_from_place</span><span class="p">(</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fire_gdf_from_place</span><span class="p">(</span>
     <span class="n">place</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;snapshot_perimeter_nrt&quot;</span><span class="p">,</span>
     <span class="n">datetime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">farea_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">farea_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">duration_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">duration_max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">meanfrp_min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
     <span class="n">buffer_dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9372,6 +9390,7 @@ print(f"Found {len(gdf)} fires")</p>
 <span class="sd">        farea_min: Minimum fire area in km².</span>
 <span class="sd">        farea_max: Maximum fire area in km².</span>
 <span class="sd">        duration_min: Minimum fire duration in days.</span>
+<span class="sd">        duration_max: Maximum fire duration in days.</span>
 <span class="sd">        meanfrp_min: Minimum mean Fire Radiative Power.</span>
 <span class="sd">        limit: Maximum number of features to return.</span>
 <span class="sd">        buffer_dist: Distance to buffer around the place geometry, in meters.</span>
@@ -9389,11 +9408,9 @@ print(f"Found {len(gdf)} fires")</p>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">box</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-            <span class="s2">&quot;geopandas and shapely are required. &quot;</span>
-            <span class="s2">&quot;Install with: pip install geopandas shapely&quot;</span>
+            <span class="s2">&quot;geopandas is required. &quot;</span> <span class="s2">&quot;Install with: pip install geopandas&quot;</span>
         <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
@@ -9427,6 +9444,7 @@ print(f"Found {len(gdf)} fires")</p>
         <span class="n">farea_min</span><span class="o">=</span><span class="n">farea_min</span><span class="p">,</span>
         <span class="n">farea_max</span><span class="o">=</span><span class="n">farea_max</span><span class="p">,</span>
         <span class="n">duration_min</span><span class="o">=</span><span class="n">duration_min</span><span class="p">,</span>
+        <span class="n">duration_max</span><span class="o">=</span><span class="n">duration_max</span><span class="p">,</span>
         <span class="n">meanfrp_min</span><span class="o">=</span><span class="n">meanfrp_min</span><span class="p">,</span>
         <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
     <span class="p">)</span>
@@ -9553,10 +9571,7 @@ print(f"Found {len(gdf)} perimeter snapshots")</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>leafmap/fire.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span>
-<span class="normal">482</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">482</span>
 <span class="normal">483</span>
 <span class="normal">484</span>
 <span class="normal">485</span>
@@ -9580,7 +9595,10 @@ print(f"Found {len(gdf)} perimeter snapshots")</p>
 <span class="normal">503</span>
 <span class="normal">504</span>
 <span class="normal">505</span>
-<span class="normal">506</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fire_timeseries</span><span class="p">(</span>
+<span class="normal">506</span>
+<span class="normal">507</span>
+<span class="normal">508</span>
+<span class="normal">509</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fire_timeseries</span><span class="p">(</span>
     <span class="n">fire_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;snapshot_perimeter_nrt&quot;</span><span class="p">,</span>
     <span class="n">datetime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -9727,10 +9745,7 @@ print(f"Found {len(gdf)} perimeter snapshots")</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>leafmap/fire.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">436</span>
 <span class="normal">437</span>
 <span class="normal">438</span>
 <span class="normal">439</span>
@@ -9770,7 +9785,10 @@ print(f"Found {len(gdf)} perimeter snapshots")</p>
 <span class="normal">473</span>
 <span class="normal">474</span>
 <span class="normal">475</span>
-<span class="normal">476</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_fire_by_id</span><span class="p">(</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_fire_by_id</span><span class="p">(</span>
     <span class="n">fire_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
     <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;snapshot_perimeter_nrt&quot;</span><span class="p">,</span>
     <span class="n">datetime</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -10245,10 +10263,7 @@ gdf = search_fires(bbox=bbox, farea_min=10, datetime="2024-07-01/2024-07-31")</p
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>leafmap/fire.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">509</span>
-<span class="normal">510</span>
-<span class="normal">511</span>
-<span class="normal">512</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">512</span>
 <span class="normal">513</span>
 <span class="normal">514</span>
 <span class="normal">515</span>
@@ -10313,7 +10328,11 @@ gdf = search_fires(bbox=bbox, farea_min=10, datetime="2024-07-01/2024-07-31")</p
 <span class="normal">574</span>
 <span class="normal">575</span>
 <span class="normal">576</span>
-<span class="normal">577</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">search_fires</span><span class="p">(</span>
+<span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">search_fires</span><span class="p">(</span>
     <span class="n">bbox</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">place</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">collection</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;snapshot_perimeter_nrt&quot;</span><span class="p">,</span>
@@ -10367,6 +10386,7 @@ gdf = search_fires(bbox=bbox, farea_min=10, datetime="2024-07-01/2024-07-31")</p
             <span class="n">farea_min</span><span class="o">=</span><span class="n">farea_min</span><span class="p">,</span>
             <span class="n">farea_max</span><span class="o">=</span><span class="n">farea_max</span><span class="p">,</span>
             <span class="n">duration_min</span><span class="o">=</span><span class="n">duration_min</span><span class="p">,</span>
+            <span class="n">duration_max</span><span class="o">=</span><span class="n">duration_max</span><span class="p">,</span>
             <span class="n">meanfrp_min</span><span class="o">=</span><span class="n">meanfrp_min</span><span class="p">,</span>
             <span class="n">limit</span><span class="o">=</span><span class="n">limit</span><span class="p">,</span>
         <span class="p">)</span>
