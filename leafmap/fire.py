@@ -211,7 +211,9 @@ def _apply_client_filters(
     if gdf.empty:
         return gdf
 
-    mask = [True] * len(gdf)
+    import pandas as pd
+
+    mask = pd.Series(True, index=gdf.index)
 
     if farea_min is not None and "farea" in gdf.columns:
         mask = mask & (gdf["farea"] >= farea_min)
@@ -353,6 +355,7 @@ def fire_gdf_from_place(
     farea_min: Optional[float] = None,
     farea_max: Optional[float] = None,
     duration_min: Optional[float] = None,
+    duration_max: Optional[float] = None,
     meanfrp_min: Optional[float] = None,
     limit: int = 1000,
     buffer_dist: Optional[float] = None,
@@ -368,6 +371,7 @@ def fire_gdf_from_place(
         farea_min: Minimum fire area in km².
         farea_max: Maximum fire area in km².
         duration_min: Minimum fire duration in days.
+        duration_max: Maximum fire duration in days.
         meanfrp_min: Minimum mean Fire Radiative Power.
         limit: Maximum number of features to return.
         buffer_dist: Distance to buffer around the place geometry, in meters.
@@ -385,11 +389,9 @@ def fire_gdf_from_place(
     """
     try:
         import geopandas as gpd
-        from shapely.geometry import box
     except ImportError:
         raise ImportError(
-            "geopandas and shapely are required. "
-            "Install with: pip install geopandas shapely"
+            "geopandas is required. " "Install with: pip install geopandas"
         )
 
     try:
@@ -423,6 +425,7 @@ def fire_gdf_from_place(
         farea_min=farea_min,
         farea_max=farea_max,
         duration_min=duration_min,
+        duration_max=duration_max,
         meanfrp_min=meanfrp_min,
         limit=limit,
     )
@@ -560,6 +563,7 @@ def search_fires(
             farea_min=farea_min,
             farea_max=farea_max,
             duration_min=duration_min,
+            duration_max=duration_max,
             meanfrp_min=meanfrp_min,
             limit=limit,
         )
