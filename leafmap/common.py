@@ -16108,7 +16108,8 @@ def nasa_data_granules_to_gdf(
 
     df = pd.json_normalize([dict(i.items()) for i in granules])
     df.columns = [col.split(".")[-1] for col in df.columns]
-    df = df.drop("Version", axis=1)
+    if "Version" in df.columns:
+        df = df.drop("Version", axis=1)
 
     def get_bbox(rectangles):
         xmin = min(rectangle["WestBoundingCoordinate"] for rectangle in rectangles)
@@ -16136,9 +16137,10 @@ def nasa_data_granules_to_gdf(
     elif "GPolygons" in df.columns:
         df["geometry"] = df["GPolygons"].apply(get_polygon)
 
-    gdf = gpd.GeoDataFrame(df, geometry="geometry")
-
-    gdf.crs = crs
+    if "geometry" in df.columns:
+        gdf = gpd.GeoDataFrame(df, geometry="geometry", crs=crs)
+    else:
+        gdf = gpd.GeoDataFrame(df)
 
     if output is not None:
         for column in gdf.columns:
