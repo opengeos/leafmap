@@ -13,11 +13,17 @@ Example:
     >>> items = terrascope.search_ndvi(bbox=[5.0, 51.2, 5.1, 51.3], start="2025-05-01", end="2025-06-01")
     >>> m = leafmap.Map()
     >>> m.add_raster(items[0].assets["NDVI"].href, colormap="RdYlGn")
+
+Note:
+    Authentication uses OAuth2 Resource Owner Password Credentials Grant.
+    Credentials are transmitted securely to Terrascope's SSO endpoint and
+    are not stored locally. Only the resulting tokens are cached.
 """
 
 from __future__ import annotations
 
 import json
+import logging
 import os
 import subprocess
 import threading
@@ -32,10 +38,8 @@ except ImportError:
 
 try:
     from pystac_client import Client
-    from pystac import ItemCollection
 except ImportError:
     Client = None
-    ItemCollection = None
 
 
 # Constants
@@ -46,12 +50,17 @@ STAC_URL = "https://stac.terrascope.be"
 TOKEN_CACHE_PATH = os.path.expanduser("~/.terrascope_tokens.json")
 HEADER_FILE_PATH = os.path.expanduser("~/.gdal_http_headers")
 REFRESH_INTERVAL = 240  # Refresh every 4 minutes (token expires in 5)
+REQUEST_TIMEOUT = 30  # Timeout for HTTP requests in seconds
 
 # Module state
 _token_cache: dict = {}
+_token_lock = threading.Lock()  # Protects _token_cache and token files
 _refresh_thread: threading.Thread | None = None
 _refresh_stop = threading.Event()
 _stac_client: Any = None
+
+# Logger for this module
+_logger = logging.getLogger(__name__)
 
 
 def _check_dependencies():
@@ -106,7 +115,12 @@ def _update_header_file(token: str) -> None:
 
 
 def _get_token_with_password(username: str, password: str) -> str:
-    """Get new tokens using password grant."""
+    """Get new tokens using password grant.
+
+    Note: This uses OAuth2 Resource Owner Password Credentials Grant.
+    The password is transmitted securely over HTTPS to Terrascope's
+    SSO endpoint and is not stored locally.
+    """
     _check_dependencies()
     response = requests.post(
         TOKEN_URL,
@@ -116,6 +130,7 @@ def _get_token_with_password(username: str, password: str) -> str:
             "username": username,
             "password": password,
         },
+        timeout=REQUEST_TIMEOUT,
     )
     response.raise_for_status()
     data = response.json()
@@ -138,6 +153,7 @@ def _refresh_access_token(refresh_token: str) -> str:
             "client_id": "public",
             "refresh_token": refresh_token,
         },
+        timeout=REQUEST_TIMEOUT,
     )
     response.raise_for_status()
     data = response.json()
@@ -154,10 +170,12 @@ def _background_refresher() -> None:
     """Background thread that refreshes token periodically."""
     while not _refresh_stop.wait(REFRESH_INTERVAL):
         try:
-            token = get_token()
-            _update_header_file(token)
-        except Exception:
-            pass  # Silent fail, will retry next interval
+            with _token_lock:
+                token = get_token()
+                _update_header_file(token)
+        except Exception as e:
+            # Log the error but continue - will retry on next interval
+            _logger.debug(f"Background token refresh failed: {e}")
 
 
 def get_token(
@@ -186,31 +204,34 @@ def get_token(
     global _token_cache
     _check_dependencies()
 
-    if not _token_cache:
-        _load_cached_tokens()
+    with _token_lock:
+        if not _token_cache:
+            _load_cached_tokens()
 
-    now = time.time()
+        now = time.time()
 
-    # Check if access token is still valid
-    if _token_cache.get("access_expires_at", 0) > now:
-        return _token_cache["access_token"]
+        # Check if access token is still valid
+        if _token_cache.get("access_expires_at", 0) > now:
+            return _token_cache["access_token"]
 
-    # Try to refresh if refresh token is still valid
-    if _token_cache.get("refresh_expires_at", 0) > now:
-        try:
-            return _refresh_access_token(_token_cache["refresh_token"])
-        except Exception:
-            pass  # Fall through to password auth
+        # Try to refresh if refresh token is still valid
+        if _token_cache.get("refresh_expires_at", 0) > now:
+            try:
+                return _refresh_access_token(_token_cache["refresh_token"])
+            except Exception:
+                # Fall through to password auth
+                pass
 
-    # Need fresh login with credentials
-    username = username or os.environ.get("TERRASCOPE_USERNAME")
-    password = password or os.environ.get("TERRASCOPE_PASSWORD")
-    if not username or not password:
-        raise ValueError(
-            "Terrascope credentials required. Either pass username/password "
-            "or set TERRASCOPE_USERNAME and TERRASCOPE_PASSWORD environment variables."
-        )
-    return _get_token_with_password(username, password)
+        # Need fresh login with credentials
+        username = username or os.environ.get("TERRASCOPE_USERNAME")
+        password = password or os.environ.get("TERRASCOPE_PASSWORD")
+        if not username or not password:
+            raise ValueError(
+                "Terrascope credentials required. Either pass username/password "
+                "or set TERRASCOPE_USERNAME and TERRASCOPE_PASSWORD environment "
+                "variables."
+            )
+        return _get_token_with_password(username, password)
 
 
 def login(
@@ -243,7 +264,9 @@ def login(
     global _refresh_thread, _refresh_stop
 
     token = get_token(username, password)
-    _update_header_file(token)
+
+    with _token_lock:
+        _update_header_file(token)
 
     os.environ["GDAL_HTTP_HEADER_FILE"] = HEADER_FILE_PATH
     os.environ["GDAL_DISABLE_READDIR_ON_OPEN"] = "EMPTY_DIR"
@@ -260,10 +283,14 @@ def login(
         display_username = username or os.environ.get("TERRASCOPE_USERNAME", "(cached)")
         print(f"Authenticated as: {display_username}")
 
+    return token
+
 
 def logout() -> None:
     """
     Stop background token refresh and clear cached tokens.
+
+    Also unsets GDAL environment variables that were configured during login.
     """
     global _refresh_thread, _token_cache
     _refresh_stop.set()
@@ -271,11 +298,16 @@ def logout() -> None:
         _refresh_thread.join(timeout=1)
         _refresh_thread = None
 
-    _token_cache = {}
-    if os.path.exists(TOKEN_CACHE_PATH):
-        os.remove(TOKEN_CACHE_PATH)
-    if os.path.exists(HEADER_FILE_PATH):
-        os.remove(HEADER_FILE_PATH)
+    with _token_lock:
+        _token_cache = {}
+        if os.path.exists(TOKEN_CACHE_PATH):
+            os.remove(TOKEN_CACHE_PATH)
+        if os.path.exists(HEADER_FILE_PATH):
+            os.remove(HEADER_FILE_PATH)
+
+    # Unset GDAL environment variables configured in login()
+    os.environ.pop("GDAL_HTTP_HEADER_FILE", None)
+    os.environ.pop("GDAL_DISABLE_READDIR_ON_OPEN", None)
 
     print("Logged out from Terrascope")
 
@@ -287,10 +319,17 @@ def cleanup_tile_servers() -> None:
     This is useful when switching between visualizations to avoid
     authentication errors from old tile server processes that have
     cached expired tokens.
+
+    Note:
+        This uses pkill which is Unix-specific and will terminate all
+        localtileserver processes for the current user, not just those
+        started by this session.
     """
     try:
         subprocess.run(["pkill", "-f", "localtileserver"], capture_output=True)
     except Exception:
+        # Ignore errors: pkill may not exist on all platforms (e.g., Windows),
+        # or no matching processes may be found. This cleanup is best-effort.
         pass
 
 
