@@ -39,7 +39,9 @@ except ImportError:
 
 
 # Constants
-TOKEN_URL = "https://sso.terrascope.be/auth/realms/terrascope/protocol/openid-connect/token"
+TOKEN_URL = (
+    "https://sso.terrascope.be/auth/realms/terrascope/protocol/openid-connect/token"
+)
 STAC_URL = "https://stac.terrascope.be"
 TOKEN_CACHE_PATH = os.path.expanduser("~/.terrascope_tokens.json")
 HEADER_FILE_PATH = os.path.expanduser("~/.gdal_http_headers")
