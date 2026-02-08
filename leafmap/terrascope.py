@@ -260,8 +260,6 @@ def login(
         display_username = username or os.environ.get("TERRASCOPE_USERNAME", "(cached)")
         print(f"Authenticated as: {display_username}")
 
-    return token
-
 
 def logout() -> None:
     """
