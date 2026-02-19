@@ -457,7 +457,7 @@ class Map(keplergl.KeplerGl):
                 if not os.path.exists(out_dir):
                     os.makedirs(out_dir)
             else:
-                outfile = os.path.abspath(common.random_string() + ".html")
+                outfile = common.temp_file_path(".html")
                 save = False
 
             output = widgets.Output()
@@ -469,11 +469,13 @@ class Map(keplergl.KeplerGl):
                 with open(outfile) as f:
                     lines = f.readlines()
                     out_html = "".join(lines)
-                os.remove(outfile)
                 return out_html
 
         except Exception as e:
             raise Exception(e)
+        finally:
+            if not save and os.path.exists(outfile):
+                os.remove(outfile)
 
     def to_streamlit(
         self,

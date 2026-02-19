@@ -2515,14 +2515,17 @@ class Map(folium.Map):
                 os.makedirs(out_dir)
             self.save(outfile, **kwargs)
         else:
-            outfile = os.path.abspath(common.random_string() + ".html")
-            self.save(outfile, **kwargs)
-            out_html = ""
-            with open(outfile) as f:
-                lines = f.readlines()
-                out_html = "".join(lines)
-            os.remove(outfile)
-            return out_html
+            outfile = common.temp_file_path(".html")
+            try:
+                self.save(outfile, **kwargs)
+                out_html = ""
+                with open(outfile) as f:
+                    lines = f.readlines()
+                    out_html = "".join(lines)
+                return out_html
+            finally:
+                if os.path.exists(outfile):
+                    os.remove(outfile)
 
     def to_streamlit(
         self,

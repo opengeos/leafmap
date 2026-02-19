@@ -426,6 +426,25 @@ class TestFoliumap(unittest.TestCase):
         out_str = m.to_html()
         assert "OpenStreetMap" in out_str
 
+    @unittest.skipUnless(os.name != "nt", "chmod not reliable on Windows")
+    def test_to_html_readonly_cwd(self):
+        """Check to_html works when CWD is read-only (#1295)"""
+        import stat
+        import tempfile
+
+        tmpdir = tempfile.mkdtemp()
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmpdir)
+            os.chmod(tmpdir, stat.S_IRUSR | stat.S_IXUSR)
+            m = leafmap.Map()
+            out_str = m.to_html()
+            assert "OpenStreetMap" in out_str
+        finally:
+            os.chmod(tmpdir, stat.S_IRWXU)
+            os.chdir(original_cwd)
+            os.rmdir(tmpdir)
+
     def test_to_image(self):
         """Check map to image"""
         with self.assertRaises(NotImplementedError):
