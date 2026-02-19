@@ -20,7 +20,6 @@ from . import examples
 from .basemaps import xyz_to_heremap
 from .common import (
     gdf_to_geojson,
-    random_string,
     shp_to_geojson,
     temp_file_path,
     vector_to_geojson,
@@ -635,11 +634,13 @@ class Map(here_map_widget.Map):
                 with open(outfile) as f:
                     lines = f.readlines()
                     out_html = "".join(lines)
-                os.remove(outfile)
                 return out_html
 
         except Exception as e:
             raise Exception(e)
+        finally:
+            if not save and os.path.exists(outfile):
+                os.remove(outfile)
 
     def to_streamlit(
         self,

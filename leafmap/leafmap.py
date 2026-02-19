@@ -2697,11 +2697,13 @@ class Map(ipyleaflet.Map):
                 with open(outfile) as f:
                     lines = f.readlines()
                     out_html = "".join(lines)
-                os.remove(outfile)
                 return out_html
 
         except Exception as e:
             raise Exception(e)
+        finally:
+            if not save and os.path.exists(outfile):
+                os.remove(outfile)
 
     def to_image(
         self, outfile: Optional[str] = None, monitor: Optional[int] = 1

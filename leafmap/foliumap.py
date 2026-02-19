@@ -2516,13 +2516,16 @@ class Map(folium.Map):
             self.save(outfile, **kwargs)
         else:
             outfile = common.temp_file_path(".html")
-            self.save(outfile, **kwargs)
-            out_html = ""
-            with open(outfile) as f:
-                lines = f.readlines()
-                out_html = "".join(lines)
-            os.remove(outfile)
-            return out_html
+            try:
+                self.save(outfile, **kwargs)
+                out_html = ""
+                with open(outfile) as f:
+                    lines = f.readlines()
+                    out_html = "".join(lines)
+                return out_html
+            finally:
+                if os.path.exists(outfile):
+                    os.remove(outfile)
 
     def to_streamlit(
         self,
