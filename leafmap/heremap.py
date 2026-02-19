@@ -18,7 +18,13 @@ from geopandas import GeoDataFrame, GeoSeries
 
 from . import examples
 from .basemaps import xyz_to_heremap
-from .common import gdf_to_geojson, random_string, shp_to_geojson, vector_to_geojson
+from .common import (
+    gdf_to_geojson,
+    random_string,
+    shp_to_geojson,
+    temp_file_path,
+    vector_to_geojson,
+)
 
 try:
     import here_map_widget
@@ -594,7 +600,7 @@ class Map(here_map_widget.Map):
                 if not os.path.exists(out_dir):
                     os.makedirs(out_dir)
             else:
-                outfile = os.path.abspath(random_string() + ".html")
+                outfile = temp_file_path(".html")
                 save = False
 
             before_width = self.layout.width

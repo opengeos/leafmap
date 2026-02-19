@@ -2657,7 +2657,7 @@ class Map(ipyleaflet.Map):
                 if not os.path.exists(out_dir):
                     os.makedirs(out_dir)
             else:
-                outfile = os.path.abspath(common.random_string() + ".html")
+                outfile = common.temp_file_path(".html")
                 save = False
 
             if add_layer_control and self.layer_control is None:

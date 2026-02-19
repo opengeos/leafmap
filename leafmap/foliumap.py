@@ -2515,7 +2515,7 @@ class Map(folium.Map):
                 os.makedirs(out_dir)
             self.save(outfile, **kwargs)
         else:
-            outfile = os.path.abspath(common.random_string() + ".html")
+            outfile = common.temp_file_path(".html")
             self.save(outfile, **kwargs)
             out_html = ""
             with open(outfile) as f:
