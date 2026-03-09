@@ -2151,6 +2151,29 @@ class Map(ipyleaflet.Map):
                 raise ValueError(
                     f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
                 )
+            if isinstance(left_layer, ipyleaflet.GeoJSON) and isinstance(
+                right_layer, ipyleaflet.TileLayer
+            ):
+                bg = ipyleaflet.TileLayer(
+                    url=right_layer.url,
+                    name=right_layer.name,
+                    attribution=right_layer.attribution,
+                    max_zoom=right_layer.max_zoom,
+                )
+                left_layer = [bg, left_layer]
+
+            if isinstance(right_layer, ipyleaflet.GeoJSON) and isinstance(
+                left_layer, (ipyleaflet.TileLayer, list)
+            ):
+                source = left_layer[0] if isinstance(left_layer, list) else left_layer
+                bg = ipyleaflet.TileLayer(
+                    url=source.url,
+                    name=source.name,
+                    attribution=source.attribution,
+                    max_zoom=source.max_zoom,
+                )
+                right_layer = [bg, right_layer]
+
             control = ipyleaflet.SplitMapControl(
                 left_layer=left_layer, right_layer=right_layer
             )
@@ -7515,6 +7538,29 @@ def split_map(
             raise ValueError(
                 f"right_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
             )
+        if isinstance(left_layer, ipyleaflet.GeoJSON) and isinstance(
+            right_layer, ipyleaflet.TileLayer
+        ):
+            bg = ipyleaflet.TileLayer(
+                url=right_layer.url,
+                name=right_layer.name,
+                attribution=right_layer.attribution,
+                max_zoom=right_layer.max_zoom,
+            )
+            left_layer = [bg, left_layer]
+
+        if isinstance(right_layer, ipyleaflet.GeoJSON) and isinstance(
+            left_layer, (ipyleaflet.TileLayer, list)
+        ):
+            source = left_layer[0] if isinstance(left_layer, list) else left_layer
+            bg = ipyleaflet.TileLayer(
+                url=source.url,
+                name=source.name,
+                attribution=source.attribution,
+                max_zoom=source.max_zoom,
+            )
+            right_layer = [bg, right_layer]
+
         control = ipyleaflet.SplitMapControl(
             left_layer=left_layer, right_layer=right_layer
         )
