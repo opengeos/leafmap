@@ -4774,7 +4774,7 @@ def mosaic_tile(url, titiler_endpoint=None, **kwargs: Any):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org". Defaults to None.
 
     Returns:
         The tile URL.
@@ -4803,7 +4803,7 @@ def mosaic_bounds(url, titiler_endpoint=None, **kwargs: Any):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org". Defaults to None.
 
     Returns:
         A list of values representing [left, bottom, right, top].
@@ -4832,7 +4832,7 @@ def mosaic_info(url, titiler_endpoint=None, **kwargs: Any):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org". Defaults to None.
 
     Returns:
         A dictionary containing bounds, center, minzoom, maxzoom, and name as keys.
@@ -4861,7 +4861,7 @@ def mosaic_info_geojson(url, titiler_endpoint=None, **kwargs: Any):
 
     Args:
         url (str): HTTP URL to a MosaicJSON.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org". Defaults to None.
 
     Returns:
         A dictionary representing a dict of GeoJSON.
@@ -16999,7 +16999,7 @@ def d2s_tile(url: str, titiler_endpoint: str = None, **kwargs: Any) -> str:
 
     if titiler_endpoint is None:
         titiler_endpoint = os.environ.get(
-            "TITILER_ENDPOINT", "https://giswqs-titiler-endpoint.hf.space"
+            "TITILER_ENDPOINT", "https://titiler.opengeos.org"
         )
 
     stats = cog_stats(url, titiler_endpoint=titiler_endpoint, **kwargs)
