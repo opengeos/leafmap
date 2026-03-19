@@ -24,7 +24,7 @@ class TitilerEndpoint:
         """Initialize the TiTilerEndpoint object.
 
         Args:
-            endpoint (str, optional): The endpoint of the titiler server. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            endpoint (str, optional): The endpoint of the titiler server. Defaults to "https://titiler.opengeos.org".
             name (str, optional): The name to be used in the file path. Defaults to "stac".
             TileMatrixSetId (str, optional): The TileMatrixSetId to be used in the file path. Defaults to "WebMercatorQuad".
         """
@@ -775,7 +775,7 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
             if titiler_endpoint == "planetary-computer":
                 titiler_endpoint = PlanetaryComputerEndpoint()
         else:
-            titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+            titiler_endpoint = "https://titiler.opengeos.org"
     elif isinstance(titiler_endpoint, str) and titiler_endpoint in [
         "planetary-computer",
         "pc",
@@ -798,7 +798,7 @@ def cog_tile(
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif. Default to None
         bands (list, optional): List of bands to use. Defaults to None.
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
         **kwargs (Any): Additional arguments to pass to the titiler endpoint. For more information about the available arguments, see https://developmentseed.org/titiler/endpoints/cog/#tiles.
             For example, to apply a rescaling to multiple bands, use something like `rescale=["164,223","130,211","99,212"]`.
 
@@ -817,7 +817,7 @@ def cog_tile(
     try:
         band_names = cog_bands(url, titiler_endpoint)
     except Exception as e:
-        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+        titiler_endpoint = "https://titiler.opengeos.org"
         band_names = cog_bands(url, titiler_endpoint)
 
     if isinstance(bands, str):
@@ -856,7 +856,7 @@ def cog_tile(
         try:
             stats = cog_stats(url, titiler_endpoint)
         except Exception as e:
-            titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+            titiler_endpoint = "https://titiler.opengeos.org"
             stats = cog_stats(url, titiler_endpoint)
 
         if stats is not None and "message" not in stats:
@@ -916,7 +916,7 @@ def cog_tile_vmin_vmax(
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
         bands (list, optional): List of bands to use. Defaults to None.
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
         percentile (bool, optional): Whether to use percentiles or not. Defaults to True.
     Returns:
         tuple: Returns the minimum and maximum values.
@@ -956,7 +956,7 @@ def cog_mosaic(
 
     Args:
         links (list): A list containing COG HTTP URLs.
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
         username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
         layername ([type], optional): Layer name to use. Defaults to None.
         overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
@@ -1029,7 +1029,7 @@ def cog_mosaic_from_file(
     Args:
         filepath (str): Local path or HTTP URL to the csv/txt file containing COG URLs.
         skip_rows (int, optional): The number of rows to skip in the file. Defaults to 0.
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
         username (str, optional): User name for the titiler endpoint. Defaults to "anonymous".
         layername ([type], optional): Layer name to use. Defaults to None.
         overwrite (bool, optional): Whether to overwrite the layer name if existing. Defaults to False.
@@ -1067,7 +1067,7 @@ def cog_bounds(
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
 
     Returns:
         list: A list of values representing [left, bottom, right, top]
@@ -1094,7 +1094,7 @@ def cog_center(
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
 
     Returns:
         A tuple representing (longitude, latitude).
@@ -1123,7 +1123,7 @@ def cog_bands(
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
 
     Returns:
         A list of band names.
@@ -1156,7 +1156,7 @@ def cog_stats(
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
 
     Returns:
         list: A dictionary of band statistics.
@@ -1188,7 +1188,7 @@ def cog_info(
 
     Args:
         url (str): HTTP URL to a COG, e.g., https://opendata.digitalglobe.com/events/mauritius-oil-spill/post-event/2020-08-12/105001001F1B5B00/105001001F1B5B00.tif
-        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://giswqs-titiler-endpoint.hf.space".
+        titiler_endpoint (str, optional): TiTiler endpoint. Defaults to "https://titiler.opengeos.org".
 
     Returns:
         list: A dictionary of band info.
@@ -1210,7 +1210,7 @@ def cog_info(
             timeout=10,
         ).json()
     except Exception as e:
-        titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+        titiler_endpoint = "https://titiler.opengeos.org"
         r = requests.get(
             f"{titiler_endpoint}/cog/{info}",
             params={
@@ -1238,7 +1238,7 @@ def cog_pixel_value(
         lat (float): Latitude of the pixel.
         url (str): HTTP URL to a COG, e.g., 'https://github.com/opengeos/data/releases/download/raster/Libya-2023-07-01.tif'
         bidx (str, optional): Dataset band indexes (e.g bidx=1, bidx=1&bidx=2&bidx=3). Defaults to None.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
         verbose (bool, optional): Print status messages. Defaults to True.
 
     Returns:
@@ -1288,7 +1288,7 @@ def stac_tile(
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
         bands (list): A list of band names, e.g., ["SR_B7", "SR_B5", "SR_B4"]
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "https://planetarycomputer.microsoft.com/api/data/v1", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         The STAC tile layer URL.
@@ -1357,7 +1357,7 @@ def stac_tile(
                     titiler_endpoint=titiler_endpoint,
                 )
             except Exception as e:
-                fallback_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+                fallback_endpoint = "https://titiler.opengeos.org"
                 stats = stac_stats(
                     collection=collection,
                     item=item,
@@ -1473,7 +1473,7 @@ def stac_tile(
                 timeout=10,
             ).json()
         except Exception as e:
-            titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+            titiler_endpoint = "https://titiler.opengeos.org"
             r = requests.get(
                 f"{titiler_endpoint}/mosaicjson/{TileMatrixSetId}/tilejson.json",
                 params=kwargs,
@@ -1488,7 +1488,7 @@ def stac_tile(
                     timeout=10,
                 ).json()
             except Exception as e:
-                titiler_endpoint = "https://giswqs-titiler-endpoint.hf.space"
+                titiler_endpoint = "https://titiler.opengeos.org"
                 r = requests.get(
                     f"{titiler_endpoint}/stac/{TileMatrixSetId}/tilejson.json",
                     params=kwargs,
@@ -1541,7 +1541,7 @@ def stac_bounds(
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A list of values representing [left, bottom, right, top]
@@ -1626,7 +1626,7 @@ def stac_center(
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         tuple: A tuple representing (longitude, latitude)
@@ -1662,7 +1662,7 @@ def stac_bands(
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A list of band names
@@ -1717,7 +1717,7 @@ def stac_stats(
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A dictionary of band statistics.
@@ -1770,7 +1770,7 @@ def stac_min_max(
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A dictionary of band statistics.
@@ -1804,7 +1804,7 @@ def stac_info(
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A dictionary of band info.
@@ -1855,7 +1855,7 @@ def stac_info_geojson(
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A dictionary of band info.
@@ -1906,7 +1906,7 @@ def stac_assets(
         url (str): HTTP URL to a STAC item, e.g., https://canada-spot-ortho.s3.amazonaws.com/canada_spot_orthoimages/canada_spot5_orthoimages/S5_2007/S5_11055_6057_20070622/S5_11055_6057_20070622.json
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
 
     Returns:
         list: A list of assets.
@@ -1960,7 +1960,7 @@ def stac_pixel_value(
         collection (str): The Microsoft Planetary Computer STAC collection ID, e.g., landsat-8-c2-l2.
         item (str): The Microsoft Planetary Computer STAC item ID, e.g., LC08_L2SP_047027_20201204_02_T1.
         assets (str | list): The Microsoft Planetary Computer STAC asset ID, e.g., ["SR_B7", "SR_B5", "SR_B4"].
-        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space", "planetary-computer", "pc". Defaults to None.
+        titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org", "planetary-computer", "pc". Defaults to None.
         verbose (bool, optional): Print out the error message. Defaults to True.
 
     Returns:
@@ -3471,7 +3471,7 @@ def zarr_info(
         variable (str, optional): The variable name. Required by titiler-xarray.
             Defaults to None.
         titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
-            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            Defaults to "https://titiler.opengeos.org".
         group (str, optional): The Zarr group path within the dataset.
             Defaults to None.
         decode_times (bool, optional): Whether to decode times in the dataset.
@@ -3578,7 +3578,7 @@ def zarr_variables(
     Args:
         url (str): HTTP URL to a Zarr dataset.
         titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
-            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            Defaults to "https://titiler.opengeos.org".
         group (str, optional): The Zarr group path within the dataset.
             Defaults to None.
         decode_times (bool, optional): Whether to decode times in the dataset.
@@ -3629,7 +3629,7 @@ def zarr_statistics(
         url (str): HTTP URL to a Zarr dataset.
         variable (str, optional): The variable name. Required for multi-variable datasets.
         titiler_endpoint (str, optional): TiTiler endpoint that supports xarray/Zarr.
-            Defaults to "https://giswqs-titiler-endpoint.hf.space".
+            Defaults to "https://titiler.opengeos.org".
         group (str, optional): The Zarr group path within the dataset.
             Defaults to None.
         decode_times (bool, optional): Whether to decode times in the dataset.

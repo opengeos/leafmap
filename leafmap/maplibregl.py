@@ -2439,7 +2439,7 @@ class Map(MapWidget):
                 Defaults to None.
             nodata (float, optional): The nodata value to use for the layer.
             titiler_endpoint (str, optional): The endpoint of the titiler service.
-                Defaults to "https://giswqs-titiler-endpoint.hf.space".
+                Defaults to "https://titiler.opengeos.org".
             fit_bounds (bool, optional): Whether to adjust the viewport of
                 the map to fit the bounds of the layer. Defaults to True.
             overwrite (bool, optional): Whether to overwrite an existing layer with the same name.
@@ -2521,7 +2521,7 @@ class Map(MapWidget):
             bands (list, optional): A list of band names, e.g.,
                 ["SR_B7", "SR_B5", "SR_B4"]. Defaults to None.
             nodata (int | float, optional): The nodata value to use for the layer.
-            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://giswqs-titiler-endpoint.hf.space",
+            titiler_endpoint (str, optional): TiTiler endpoint, e.g., "https://titiler.opengeos.org",
                 "https://planetarycomputer.microsoft.com/api/data/v1",
                 "planetary-computer", "pc". Defaults to None.
             name (str, optional): The layer name to use for the layer. Defaults to 'STAC Layer'.
