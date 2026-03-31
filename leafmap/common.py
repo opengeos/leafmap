@@ -3316,21 +3316,23 @@ def get_local_tile_layer(
     for key in client_args:
         kwargs[key] = client_args[key]
 
-    # Make it compatible with binder and JupyterHub
-    if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
-            f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
-        )
-
-    if is_studio_lab():
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
-            f"studiolab/default/jupyter/proxy/{{port}}"
-        )
-    elif is_on_aws():
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
-    elif "prefix" in kwargs:
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
-        kwargs.pop("prefix")
+    # Only override LOCALTILESERVER_CLIENT_PREFIX if it's unset
+    if os.environ.get("LOCALTILESERVER_CLIENT_PREFIX") is None:
+        # Make it compatible with binder and JupyterHub
+        if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+                f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}proxy/{{port}}"
+            )
+    
+        if is_studio_lab():
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+                f"studiolab/default/jupyter/proxy/{{port}}"
+            )
+        elif is_on_aws():
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
+        elif "prefix" in kwargs:
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
+            kwargs.pop("prefix")
 
     from localtileserver import (
         TileClient,
