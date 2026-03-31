@@ -3323,7 +3323,7 @@ def get_local_tile_layer(
             os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
                 f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}proxy/{{port}}"
             )
-    
+
         if is_studio_lab():
             os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
                 f"studiolab/default/jupyter/proxy/{{port}}"
