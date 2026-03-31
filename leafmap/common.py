@@ -3321,7 +3321,7 @@ def get_local_tile_layer(
         # Make it compatible with binder and JupyterHub
         if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
             os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
-                f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}proxy/{{port}}"
+                f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].strip('/')}/proxy/{{port}}"
             )
 
         if is_studio_lab():
@@ -3330,9 +3330,11 @@ def get_local_tile_layer(
             )
         elif is_on_aws():
             os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
-        elif "prefix" in kwargs:
-            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
-            kwargs.pop("prefix")
+
+    # The prefix kwarg has final precedence
+    if "prefix" in kwargs:
+        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
+        kwargs.pop("prefix")
 
     from localtileserver import (
         TileClient,
