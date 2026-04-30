@@ -5472,7 +5472,7 @@ class Map(MapWidget):
             icon=True,
             children=[toggle_icon],
             style_=(
-                "width: 22px; height: 22px; min-width: 22px; padding: 0; "
+                f"width: 22px; height: 22px; min-width: 22px; padding: 0; "
                 f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
             ),
         )
@@ -5487,7 +5487,7 @@ class Map(MapWidget):
             icon=True,
             children=[settings_icon],
             style_=(
-                "width: 22px; height: 22px; min-width: 22px; padding: 0; "
+                f"width: 22px; height: 22px; min-width: 22px; padding: 0; "
                 f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
             ),
         )
@@ -5540,7 +5540,8 @@ class Map(MapWidget):
                     overflow-y: auto;
                     overflow-x: hidden;
                     z-index: 1000;
-                    background-color: white;
+                    background-color: {SIDEBAR_PANEL_BACKGROUND};
+                    color: {SIDEBAR_PANEL_TEXT_COLOR};
                     border-radius: 4px;
                     {SIDEBAR_SCROLLBAR_STYLE}
                 """
@@ -5601,7 +5602,8 @@ class Map(MapWidget):
                     overflow-y: auto;
                     overflow-x: hidden;
                     z-index: 1000;
-                    background-color: white;
+                    background-color: {SIDEBAR_PANEL_BACKGROUND};
+                    color: {SIDEBAR_PANEL_TEXT_COLOR};
                     border-radius: 4px;
                     {SIDEBAR_SCROLLBAR_STYLE}
                 """
@@ -5617,7 +5619,8 @@ class Map(MapWidget):
                     max-height: none;
                     overflow: visible;
                     z-index: 1000;
-                    background-color: white;
+                    background-color: {SIDEBAR_PANEL_BACKGROUND};
+                    color: {SIDEBAR_PANEL_TEXT_COLOR};
                     border-radius: 4px;
                     padding: 4px;
                     {SIDEBAR_SCROLLBAR_STYLE}
@@ -5638,7 +5641,8 @@ class Map(MapWidget):
                 overflow-y: auto;
                 overflow-x: hidden;
                 z-index: 1000;
-                background-color: white;
+                background-color: {SIDEBAR_PANEL_BACKGROUND};
+                color: {SIDEBAR_PANEL_TEXT_COLOR};
                 border-radius: 4px;
                 {SIDEBAR_SCROLLBAR_STYLE}
             """
@@ -5651,7 +5655,8 @@ class Map(MapWidget):
                 max-height: none;
                 overflow: visible;
                 z-index: 1000;
-                background-color: white;
+                background-color: {SIDEBAR_PANEL_BACKGROUND};
+                color: {SIDEBAR_PANEL_TEXT_COLOR};
                 border-radius: 4px;
                 padding: 4px;
                 {SIDEBAR_SCROLLBAR_STYLE}
@@ -8209,7 +8214,7 @@ class Container(v.Container):
             icon=True,
             children=[self.toggle_icon],
             style_=(
-                "width: 48px; height: 48px; min-width: 48px; "
+                f"width: 48px; height: 48px; min-width: 48px; "
                 f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
             ),
         )
@@ -8223,9 +8228,7 @@ class Container(v.Container):
         self.settings_btn = v.Btn(
             icon=True,
             children=[self.settings_icon],
-            style_=(
-                "width: 36px; height: 36px; " f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
-            ),
+            style_=f"width: 36px; height: 36px; color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         self.settings_btn.on_event("click", self.toggle_width_slider)
 
@@ -10303,6 +10306,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         close_icon: str = "mdi-close",
         label="Layers",
         background_color: str = "#f5f5f5",
+        text_color: str = SIDEBAR_PANEL_TEXT_COLOR,
         groups: dict = None,
         *args: Any,
         **kwargs: Any,
@@ -10318,6 +10322,9 @@ class LayerManagerWidget(v.ExpansionPanels):
             close_icon (str): The icon for the close button. Defaults to "mdi-close".
             label (str): The label for the layer manager. Defaults to "Layers".
             background_color (str): The background color of the header. Defaults to "#f5f5f5".
+            text_color (str): The color used for header text and icons. Defaults to
+                ``SIDEBAR_PANEL_TEXT_COLOR``. Override this when passing a darker
+                ``background_color`` so the header stays readable.
             groups (dict): A dictionary of layer groups, such as {"Group 1": ["layer1", "layer2"],
                 "Group 2": ["layer3", "layer4"]}. A group layer toggle will be created for each group.
                 Defaults to None.
@@ -10356,11 +10363,11 @@ class LayerManagerWidget(v.ExpansionPanels):
             icon=True,
             small=True,
             class_="ma-0",
-            style_=f"min-width: 24px; width: 24px; color: {SIDEBAR_PANEL_TEXT_COLOR};",
+            style_=f"min-width: 24px; width: 24px; color: {text_color};",
             children=[
                 v.Icon(
                     children=[close_icon],
-                    style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                    style_=f"color: {text_color};",
                 )
             ],
         )
@@ -10370,7 +10377,7 @@ class LayerManagerWidget(v.ExpansionPanels):
             style_=(
                 f"height: {height}; min-height: {height}; "
                 f"background-color: {background_color}; "
-                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                f"color: {text_color};"
             ),
             children=[
                 v.Row(
@@ -10380,7 +10387,7 @@ class LayerManagerWidget(v.ExpansionPanels):
                         v.Icon(
                             children=[layer_icon],
                             class_="ml-1",
-                            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                            style_=f"color: {text_color};",
                         ),
                         v.Spacer(),  # push title to center
                         v.Html(tag="span", children=[label], class_="text-subtitle-2"),
@@ -10395,7 +10402,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         panel = v.ExpansionPanel(
             style_=(
                 f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                f"color: {text_color}; "
                 f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
             ),
             children=[
@@ -10403,7 +10410,7 @@ class LayerManagerWidget(v.ExpansionPanels):
                 v.ExpansionPanelContent(
                     style_=(
                         f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                        f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                        f"color: {text_color}; "
                         f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
                     ),
                     children=[
@@ -10622,6 +10629,7 @@ class CustomWidget(v.ExpansionPanels):
         close_icon: str = "mdi-close",
         label: str = "My Tools",
         background_color: str = "#f5f5f5",
+        text_color: str = SIDEBAR_PANEL_TEXT_COLOR,
         height: str = "40px",
         expanded: bool = True,
         host_map: Optional[Any] = None,
@@ -10636,6 +10644,9 @@ class CustomWidget(v.ExpansionPanels):
             widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
             close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
             background_color (str): Background color of the header. Defaults to "#f5f5f5".
+            text_color (str): Color used for header text and icons. Defaults to
+                ``SIDEBAR_PANEL_TEXT_COLOR``. Override this when passing a darker
+                ``background_color`` so the header stays readable.
             label (str): Text label for the header. Defaults to "My Tools".
             height (str): Height of the header. Defaults to "40px".
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
@@ -10658,11 +10669,11 @@ class CustomWidget(v.ExpansionPanels):
             icon=True,
             small=True,
             class_="ma-0",
-            style_=f"min-width: 24px; width: 24px; color: {SIDEBAR_PANEL_TEXT_COLOR};",
+            style_=f"min-width: 24px; width: 24px; color: {text_color};",
             children=[
                 v.Icon(
                     children=[close_icon],
-                    style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                    style_=f"color: {text_color};",
                 )
             ],
         )
@@ -10672,7 +10683,7 @@ class CustomWidget(v.ExpansionPanels):
             style_=(
                 f"height: {height}; min-height: {height}; "
                 f"background-color: {background_color}; "
-                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                f"color: {text_color};"
             ),
             children=[
                 v.Row(
@@ -10682,7 +10693,7 @@ class CustomWidget(v.ExpansionPanels):
                         v.Icon(
                             children=[widget_icon],
                             class_="ml-1",
-                            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                            style_=f"color: {text_color};",
                         ),
                         v.Spacer(),  # push title to center
                         v.Html(tag="span", children=[label], class_="text-subtitle-2"),
@@ -10697,7 +10708,7 @@ class CustomWidget(v.ExpansionPanels):
         self.panel = v.ExpansionPanel(
             style_=(
                 f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                f"color: {text_color}; "
                 f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
             ),
             children=[
@@ -10705,7 +10716,7 @@ class CustomWidget(v.ExpansionPanels):
                 v.ExpansionPanelContent(
                     style_=(
                         f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                        f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                        f"color: {text_color}; "
                         f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
                     ),
                     children=[self.content_box],
