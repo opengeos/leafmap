@@ -83,6 +83,9 @@ from .plot import bar_chart, histogram, line_chart, pie_chart
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
+SIDEBAR_PANEL_BACKGROUND = "#ffffff"
+SIDEBAR_PANEL_TEXT_COLOR = "#212121"
+
 
 class Map(MapWidget):
     """The Map class inherits from the MapWidget class of the maplibre.ipywidget module."""
@@ -5455,19 +5458,30 @@ class Map(MapWidget):
         toggle_icon = v.Icon(
             children=["mdi-chevron-left"] if sidebar_visible else ["mdi-chevron-right"],
             small=True,
+            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         toggle_btn = v.Btn(
             icon=True,
             children=[toggle_icon],
-            style_="width: 22px; height: 22px; min-width: 22px; padding: 0;",
+            style_=(
+                "width: 22px; height: 22px; min-width: 22px; padding: 0; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
         )
 
         # Create settings/wrench button
-        settings_icon = v.Icon(children=["mdi-wrench"], small=True)
+        settings_icon = v.Icon(
+            children=["mdi-wrench"],
+            small=True,
+            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+        )
         settings_btn = v.Btn(
             icon=True,
             children=[settings_icon],
-            style_="width: 22px; height: 22px; min-width: 22px; padding: 0;",
+            style_=(
+                "width: 22px; height: 22px; min-width: 22px; padding: 0; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
         )
 
         # Create header row with toggle and settings buttons
@@ -8172,21 +8186,30 @@ class Container(v.Container):
 
         # Toggle button
         self.toggle_icon = v.Icon(
-            children=["mdi-chevron-right"] if sidebar_visible else ["mdi-chevron-left"]
+            children=["mdi-chevron-right"] if sidebar_visible else ["mdi-chevron-left"],
+            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         self.toggle_btn = v.Btn(
             icon=True,
             children=[self.toggle_icon],
-            style_="width: 48px; height: 48px; min-width: 48px;",
+            style_=(
+                "width: 48px; height: 48px; min-width: 48px; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
         )
         self.toggle_btn.on_event("click", self.toggle_sidebar)
 
         # Settings icon
-        self.settings_icon = v.Icon(children=["mdi-wrench"])
+        self.settings_icon = v.Icon(
+            children=["mdi-wrench"],
+            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+        )
         self.settings_btn = v.Btn(
             icon=True,
             children=[self.settings_icon],
-            style_="width: 36px; height: 36px;",
+            style_=(
+                "width: 36px; height: 36px; " f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
         )
         self.settings_btn.on_event("click", self.toggle_width_slider)
 
@@ -10317,19 +10340,32 @@ class LayerManagerWidget(v.ExpansionPanels):
             icon=True,
             small=True,
             class_="ma-0",
-            style_="min-width: 24px; width: 24px;",
-            children=[v.Icon(children=[close_icon])],
+            style_=f"min-width: 24px; width: 24px; color: {SIDEBAR_PANEL_TEXT_COLOR};",
+            children=[
+                v.Icon(
+                    children=[close_icon],
+                    style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                )
+            ],
         )
         close_btn.on_event("click", self._handle_close)
 
         header = v.ExpansionPanelHeader(
-            style_=f"height: {height}; min-height: {height}; background-color: {background_color};",
+            style_=(
+                f"height: {height}; min-height: {height}; "
+                f"background-color: {background_color}; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
             children=[
                 v.Row(
                     align="center",
                     class_="d-flex flex-grow-1 align-center",
                     children=[
-                        v.Icon(children=[layer_icon], class_="ml-1"),
+                        v.Icon(
+                            children=[layer_icon],
+                            class_="ml-1",
+                            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                        ),
                         v.Spacer(),  # push title to center
                         v.Html(tag="span", children=[label], class_="text-subtitle-2"),
                         v.Spacer(),  # push close to right
@@ -10341,16 +10377,24 @@ class LayerManagerWidget(v.ExpansionPanels):
         )
 
         panel = v.ExpansionPanel(
+            style_=(
+                f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
             children=[
                 header,
                 v.ExpansionPanelContent(
+                    style_=(
+                        f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
+                        f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                    ),
                     children=[
                         widgets.VBox(
                             [self.master_toggle, self.group_toggles, self.layers_box]
                         )
-                    ]
+                    ],
                 ),
-            ]
+            ],
         )
 
         if expanded:
@@ -10591,19 +10635,32 @@ class CustomWidget(v.ExpansionPanels):
             icon=True,
             small=True,
             class_="ma-0",
-            style_="min-width: 24px; width: 24px;",
-            children=[v.Icon(children=[close_icon])],
+            style_=f"min-width: 24px; width: 24px; color: {SIDEBAR_PANEL_TEXT_COLOR};",
+            children=[
+                v.Icon(
+                    children=[close_icon],
+                    style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                )
+            ],
         )
         close_btn.on_event("click", self._handle_close)
 
         header = v.ExpansionPanelHeader(
-            style_=f"height: {height}; min-height: {height}; background-color: {background_color};",
+            style_=(
+                f"height: {height}; min-height: {height}; "
+                f"background-color: {background_color}; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
             children=[
                 v.Row(
                     align="center",
                     class_="d-flex flex-grow-1 align-center",
                     children=[
-                        v.Icon(children=[widget_icon], class_="ml-1"),
+                        v.Icon(
+                            children=[widget_icon],
+                            class_="ml-1",
+                            style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
+                        ),
                         v.Spacer(),  # push title to center
                         v.Html(tag="span", children=[label], class_="text-subtitle-2"),
                         v.Spacer(),  # push close to right
@@ -10615,10 +10672,20 @@ class CustomWidget(v.ExpansionPanels):
         )
 
         self.panel = v.ExpansionPanel(
+            style_=(
+                f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            ),
             children=[
                 header,
-                v.ExpansionPanelContent(children=[self.content_box]),
-            ]
+                v.ExpansionPanelContent(
+                    style_=(
+                        f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
+                        f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                    ),
+                    children=[self.content_box],
+                ),
+            ],
         )
 
         super().__init__(
