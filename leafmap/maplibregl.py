@@ -85,6 +85,7 @@ basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
 SIDEBAR_PANEL_BACKGROUND = "#ffffff"
 SIDEBAR_PANEL_TEXT_COLOR = "#212121"
+SIDEBAR_SCROLLBAR_STYLE = "scrollbar-color: #bdbdbd #f5f5f5; scrollbar-width: thin;"
 
 
 class Map(MapWidget):
@@ -556,7 +557,9 @@ class Map(MapWidget):
             and self.add_floating_sidebar_flag
             and not hasattr(self, "floating_sidebar_content_box")
         ):
-            self.floating_sidebar_content_box = widgets.VBox(children=[])
+            self.floating_sidebar_content_box = widgets.VBox(
+                children=[], layout=widgets.Layout(width="100%", overflow="hidden")
+            )
             self._floating_sidebar_widgets = {}
 
         # Check if floating sidebar is being used
@@ -5441,7 +5444,9 @@ class Map(MapWidget):
 
         # Initialize floating sidebar state
         if not hasattr(self, "floating_sidebar_content_box"):
-            self.floating_sidebar_content_box = widgets.VBox(children=[])
+            self.floating_sidebar_content_box = widgets.VBox(
+                children=[], layout=widgets.Layout(width="100%", overflow="hidden")
+            )
 
         if not hasattr(self, "_floating_sidebar_widgets"):
             self._floating_sidebar_widgets = {}
@@ -5452,7 +5457,10 @@ class Map(MapWidget):
             content_widgets.extend(sidebar_content)
 
         # Create main sidebar box with layer manager and additional content
-        main_sidebar_box = widgets.VBox(children=content_widgets)
+        main_sidebar_box = widgets.VBox(
+            children=content_widgets,
+            layout=widgets.Layout(width="100%", overflow="hidden"),
+        )
 
         # Create toggle button
         toggle_icon = v.Icon(
@@ -5517,7 +5525,7 @@ class Map(MapWidget):
             step=10,
             description="Width:",
             continuous_update=True,
-            layout=widgets.Layout(width="100%"),
+            layout=widgets.Layout(width="100%", min_width="0"),
         )
 
         # Width change handler
@@ -5534,6 +5542,7 @@ class Map(MapWidget):
                     z-index: 1000;
                     background-color: white;
                     border-radius: 4px;
+                    {SIDEBAR_SCROLLBAR_STYLE}
                 """
 
         width_slider.observe(on_width_change, names="value")
@@ -5568,7 +5577,8 @@ class Map(MapWidget):
 
         # Combine main sidebar with dynamic content box for layer settings and other widgets
         sidebar_box = widgets.VBox(
-            children=[main_sidebar_box, self.floating_sidebar_content_box]
+            children=[main_sidebar_box, self.floating_sidebar_content_box],
+            layout=widgets.Layout(width="100%", overflow="hidden"),
         )
 
         # Toggle function
@@ -5593,6 +5603,7 @@ class Map(MapWidget):
                     z-index: 1000;
                     background-color: white;
                     border-radius: 4px;
+                    {SIDEBAR_SCROLLBAR_STYLE}
                 """
             else:
                 # Hide sidebar content, only show toggle button
@@ -5609,6 +5620,7 @@ class Map(MapWidget):
                     background-color: white;
                     border-radius: 4px;
                     padding: 4px;
+                    {SIDEBAR_SCROLLBAR_STYLE}
                 """
 
         toggle_btn.on_event("click", toggle_sidebar)
@@ -5628,6 +5640,7 @@ class Map(MapWidget):
                 z-index: 1000;
                 background-color: white;
                 border-radius: 4px;
+                {SIDEBAR_SCROLLBAR_STYLE}
             """
         else:
             initial_style = f"""
@@ -5641,6 +5654,7 @@ class Map(MapWidget):
                 background-color: white;
                 border-radius: 4px;
                 padding: 4px;
+                {SIDEBAR_SCROLLBAR_STYLE}
             """
 
         overlay = v.Card(
@@ -8180,7 +8194,9 @@ class Container(v.Container):
         self.map_stack.children = [m]
 
         # Sidebar content container
-        self.sidebar_content_box = widgets.VBox()
+        self.sidebar_content_box = widgets.VBox(
+            layout=widgets.Layout(width="100%", overflow="hidden")
+        )
         if sidebar_content:
             self.set_sidebar_content(sidebar_content)
 
@@ -10379,14 +10395,16 @@ class LayerManagerWidget(v.ExpansionPanels):
         panel = v.ExpansionPanel(
             style_=(
                 f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
             ),
             children=[
                 header,
                 v.ExpansionPanelContent(
                     style_=(
                         f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                        f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                        f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                        f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
                     ),
                     children=[
                         widgets.VBox(
@@ -10436,8 +10454,8 @@ class LayerManagerWidget(v.ExpansionPanels):
 
             checkbox = widgets.Checkbox(value=visible, description=name, style=style)
             checkbox.layout.flex = "1 1 auto"
-            checkbox.layout.max_width = "200px"
-            checkbox.layout.min_width = "120px"
+            checkbox.layout.min_width = "0"
+            checkbox.layout.overflow = "hidden"
 
             slider = widgets.FloatSlider(
                 value=opacity,
@@ -10447,7 +10465,10 @@ class LayerManagerWidget(v.ExpansionPanels):
                 readout=False,
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
-                    flex="1 1 auto", min_width="120px", padding=padding
+                    flex="0 0 150px",
+                    width="150px",
+                    min_width="100px",
+                    padding=padding,
                 ),
             )
 
@@ -10622,7 +10643,9 @@ class CustomWidget(v.ExpansionPanels):
             **kwargs (Any): Additional keyword arguments for the parent class.
         """
         # Wrap content in a mutable VBox
-        self.content_box = widgets.VBox()
+        self.content_box = widgets.VBox(
+            layout=widgets.Layout(width="100%", overflow="hidden")
+        )
         self.host_map = host_map
         if widget:
             if isinstance(widget, (list, tuple)):
@@ -10674,14 +10697,16 @@ class CustomWidget(v.ExpansionPanels):
         self.panel = v.ExpansionPanel(
             style_=(
                 f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
             ),
             children=[
                 header,
                 v.ExpansionPanelContent(
                     style_=(
                         f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
-                        f"color: {SIDEBAR_PANEL_TEXT_COLOR};"
+                        f"color: {SIDEBAR_PANEL_TEXT_COLOR}; "
+                        f"overflow-x: hidden; {SIDEBAR_SCROLLBAR_STYLE}"
                     ),
                     children=[self.content_box],
                 ),
