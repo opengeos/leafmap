@@ -2805,7 +2805,7 @@ def inspector_gui(
 
                 layer_dict = m.cog_layer_dict[dropdown.value]
 
-            if layer_dict["type"] == "STAC":
+            if layer_dict.get("type") == "STAC":
                 if bands_chk.value:
                     assets = layer_dict["assets"]
                 else:
@@ -2846,7 +2846,7 @@ def inspector_gui(
                         output.append_stdout("No pixel value available")
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
-            elif layer_dict["type"] == "COG":
+            elif layer_dict.get("type") == "COG":
                 if m.inspector_bands_chk.value:
                     indexes = layer_dict["indexes"]
                 else:
@@ -2879,7 +2879,7 @@ def inspector_gui(
                         bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         m.zoom_to_bounds(bounds)
 
-            elif layer_dict["type"] == "LOCAL":
+            elif layer_dict.get("type") == "LOCAL":
                 try:
                     data = local_tile_pixel_value(
                         lon, lat, layer_dict["tile_client"], verbose=False
@@ -2924,6 +2924,11 @@ def inspector_gui(
                         output.append_stdout(e)
                         # bounds = m.cog_layer_dict[m.inspector_dropdown.value]["bounds"]
                         # m.zoom_to_bounds(bounds)
+            else:
+                with output:
+                    output.clear_output()
+                    output.outputs = ()
+                    output.append_stdout("Unsupported layer type")
 
             m.default_style = {"cursor": "crosshair"}
 
