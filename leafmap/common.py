@@ -3951,10 +3951,15 @@ def geojson_to_gdf(in_geojson, encoding="utf-8", **kwargs: Any):
             json.dump(in_geojson, f)
             in_geojson = out_file
     elif isinstance(in_geojson, str) and in_geojson.startswith("http"):
-        data = requests.get(in_geojson).json()
-        if data.get("type") == "Feature":
-            return gpd.GeoDataFrame.from_features([data], **kwargs)
-        return gpd.GeoDataFrame.from_features(data, **kwargs)
+        try:
+            return gpd.read_file(in_geojson, encoding=encoding, **kwargs)
+        except Exception:
+            response = requests.get(in_geojson, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            if isinstance(data, dict) and data.get("type") == "Feature":
+                return gpd.GeoDataFrame.from_features([data], **kwargs)
+            return gpd.GeoDataFrame.from_features(data, **kwargs)
 
     gdf = gpd.read_file(in_geojson, encoding=encoding, **kwargs)
     return gdf
