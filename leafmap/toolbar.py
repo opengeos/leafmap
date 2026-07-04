@@ -548,7 +548,10 @@ def main_toolbar(m) -> widgets.Widget:
     toolbar_footer.children = [toolbar_grid]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -2077,7 +2080,10 @@ def census_widget(m) -> widgets.Widget:
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -2261,7 +2267,10 @@ def search_basemaps(m):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -2469,7 +2478,10 @@ def download_osm(m):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -2669,7 +2681,10 @@ def inspector_gui(
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def chk_change(change):
@@ -3092,7 +3107,10 @@ def plotly_toolbar(
     toolbar_footer.children = [toolbar_grid]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -3271,7 +3289,10 @@ def plotly_tool_template(canvas):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -3486,7 +3507,10 @@ def plotly_search_basemaps(canvas):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -3600,7 +3624,10 @@ def plotly_whitebox_gui(canvas):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -3726,7 +3753,10 @@ def search_geojson_gui(m):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def layer_change(change):
@@ -3906,7 +3936,10 @@ def select_table_gui(m=None):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -4182,7 +4215,10 @@ def show_table_gui(m, df):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -4369,7 +4405,10 @@ def edit_draw_gui(m):
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -4913,7 +4952,10 @@ def stac_gui(
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def update_bands():
@@ -5608,7 +5650,10 @@ def stac_custom_gui(
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def update_bands():
@@ -6149,7 +6194,10 @@ def oam_search_gui(
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -6596,7 +6644,10 @@ def nasa_data_gui(
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
@@ -7007,7 +7058,10 @@ def nasa_opera_gui(
     ]
 
     toolbar_event = ipyevents.Event(
-        source=toolbar_widget, watched_events=["mouseenter", "mouseleave"]
+        source=toolbar_widget,
+        watched_events=["mouseenter", "mouseleave"],
+        wait=250,
+        throttle_or_debounce="debounce",
     )
 
     def handle_toolbar_event(event):
