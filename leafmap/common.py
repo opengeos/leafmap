@@ -3950,6 +3950,11 @@ def geojson_to_gdf(in_geojson, encoding="utf-8", **kwargs: Any):
         with open(out_file, "w") as f:
             json.dump(in_geojson, f)
             in_geojson = out_file
+    elif isinstance(in_geojson, str) and in_geojson.startswith("http"):
+        data = requests.get(in_geojson).json()
+        if data.get("type") == "Feature":
+            return gpd.GeoDataFrame.from_features([data], **kwargs)
+        return gpd.GeoDataFrame.from_features(data, **kwargs)
 
     gdf = gpd.read_file(in_geojson, encoding=encoding, **kwargs)
     return gdf

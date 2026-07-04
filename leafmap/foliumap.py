@@ -2046,10 +2046,10 @@ class Map(folium.Map):
                         with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
-                        gdf = gpd.read_file(in_geojson, encoding=encoding)
+                        gdf = geojson_to_gdf(in_geojson, encoding=encoding)
 
                 else:
-                    gdf = gpd.read_file(in_geojson, encoding=encoding)
+                    gdf = geojson_to_gdf(in_geojson, encoding=encoding)
 
             elif isinstance(in_geojson, dict):
                 gdf = gpd.GeoDataFrame.from_features(in_geojson)

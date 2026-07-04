@@ -1555,7 +1555,7 @@ class Map(MapWidget):
 
         if isinstance(data, str):
             if os.path.isfile(data) or data.startswith("http"):
-                data = gpd.read_file(data).__geo_interface__
+                data = geojson_to_gdf(data).__geo_interface__
                 if fit_bounds:
                     bounds = get_bounds(data)
                 source = GeoJSONSource(data=data, **source_args)
@@ -1678,7 +1678,10 @@ class Map(MapWidget):
         """
 
         if not isinstance(data, gpd.GeoDataFrame):
-            data = gpd.read_file(data).__geo_interface__
+            if isinstance(data, str) and data.startswith("http"):
+                data = geojson_to_gdf(data).__geo_interface__
+            else:
+                data = gpd.read_file(data).__geo_interface__
         else:
             data = data.__geo_interface__
 
@@ -4339,7 +4342,10 @@ class Map(MapWidget):
             elif source in self.source_names:
                 source_name = source
             else:
-                geojson = gpd.read_file(source).__geo_interface__
+                if source.startswith("http"):
+                    geojson = geojson_to_gdf(source).__geo_interface__
+                else:
+                    geojson = gpd.read_file(source).__geo_interface__
                 geojson_source = {"type": "geojson", "data": geojson}
                 source_name = common.get_unique_name(
                     "source", self.source_names, overwrite=False
@@ -7830,6 +7836,8 @@ class Map(MapWidget):
             ext = ext.lower()
             if ext in [".parquet", ".pq", ".geoparquet"]:
                 gdf = gpd.read_parquet(filename)
+            elif filename.startswith("http"):
+                gdf = geojson_to_gdf(filename)
             else:
                 gdf = gpd.read_file(filename)
         elif isinstance(filename, dict):
@@ -9652,7 +9660,7 @@ def create_vector_data(
         }
 
     if geojson is not None and isinstance(geojson, str):
-        geojson = gpd.read_file(geojson).__geo_interface__
+        geojson = geojson_to_gdf(geojson).__geo_interface__
         setattr(m, "geojson", geojson)
 
     setattr(m, "draw_feature_collection_initial", geojson)
@@ -9966,6 +9974,8 @@ def edit_vector_data(
         ext = ext.lower()
         if ext in [".parquet", ".pq", ".geoparquet"]:
             gdf = gpd.read_parquet(filename)
+        elif filename.startswith("http"):
+            gdf = geojson_to_gdf(filename)
         else:
             gdf = gpd.read_file(filename)
     elif isinstance(filename, dict):
@@ -11103,7 +11113,10 @@ class DateFilterWidget(widgets.VBox):
                 if source is None:
                     gdfs.append(None)
                     continue
-                gdf = gpd.read_file(source)
+                if isinstance(source, str) and source.startswith("http"):
+                    gdf = geojson_to_gdf(source)
+                else:
+                    gdf = gpd.read_file(source)
                 gdfs.append(gdf)
 
                 style = styles[names[index]]
