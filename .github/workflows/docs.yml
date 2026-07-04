@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: ["3.12"]
+                python-version: ["3.13"]
 
         env:
             PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
@@ -50,15 +50,15 @@ jobs:
 
             - name: Test import
               run: |
-                  uv run python -c "import leafmap; print('leafmap import successful')"
-              #   uv run python -c "from osgeo import gdal; print('gdal import successful')"
-              #   uv run gdalinfo --version
+                  .venv/bin/python -c "import leafmap; print('leafmap import successful')"
+              #   .venv/bin/python -c "from osgeo import gdal; print('gdal import successful')"
+              #   .venv/bin/gdalinfo --version
 
             - name: Running pytest
               run: |
-                  uv run pytest . --verbose
+                  .venv/bin/pytest . --verbose
 
             - name: Install mkdocs
               run: |
                   uv pip install -r requirements_docs.txt
-                  uv run mkdocs gh-deploy --force
+                  .venv/bin/mkdocs gh-deploy --force

@@ -2046,10 +2046,10 @@ class Map(folium.Map):
                         with open(output, "r") as fd:
                             data = json.load(fd)
                     else:
-                        gdf = gpd.read_file(in_geojson, encoding=encoding)
+                        gdf = geojson_to_gdf(in_geojson, encoding=encoding)
 
                 else:
-                    gdf = gpd.read_file(in_geojson, encoding=encoding)
+                    gdf = geojson_to_gdf(in_geojson, encoding=encoding)
 
             elif isinstance(in_geojson, dict):
                 gdf = gpd.GeoDataFrame.from_features(in_geojson)
@@ -2067,7 +2067,7 @@ class Map(folium.Map):
             gdf.crs = "EPSG:4326"
         elif gdf.crs != "EPSG:4326":
             gdf = gdf.to_crs("EPSG:4326")
-        data = gdf.__geo_interface__
+        data = common.sanitize_geojson(gdf.__geo_interface__)
 
         # interchangeable parameters between ipyleaflet and folium.
 
@@ -2411,11 +2411,16 @@ class Map(folium.Map):
             opacity (float, optional): The opacity of the layer. Defaults to 1.0.
 
         """
-        import fiona
         import geopandas as gpd
 
         if isinstance(filename, str) and filename.endswith(".kml"):
-            fiona.drvsupport.supported_drivers["KML"] = "rw"
+            try:
+                import fiona
+
+                fiona.drvsupport.supported_drivers["KML"] = "rw"
+            except ImportError:
+                # fiona is optional; the default pyogrio engine reads KML natively.
+                pass
             gdf = gpd.read_file(
                 filename,
                 bbox=bbox,

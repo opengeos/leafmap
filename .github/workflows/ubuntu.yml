@@ -13,7 +13,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python-version: ["3.9", "3.10", "3.11", "3.12"]
+                python-version: ["3.11", "3.12", "3.13", "3.14"]
 
         env:
             PLANET_API_KEY: ${{ secrets.PLANET_API_KEY }}
@@ -33,7 +33,7 @@ jobs:
             - name: Install uv
               uses: astral-sh/setup-uv@v7
               with:
-                  version: "0.4.16"
+                  version: "latest"
                   # enable-cache: true
 
             - name: Set up Python ${{ matrix.python-version }}
@@ -52,10 +52,10 @@ jobs:
 
             - name: Test import
               run: |
-                  uv run python -c "import leafmap; print('leafmap import successful')"
-              #   uv run python -c "from osgeo import gdal; print('gdal import successful')"
-              #   uv run gdalinfo --version
+                  .venv/bin/python -c "import leafmap; print('leafmap import successful')"
+              #   .venv/bin/python -c "from osgeo import gdal; print('gdal import successful')"
+              #   .venv/bin/gdalinfo --version
 
             - name: Running pytest
               run: |
-                  uv run pytest . --verbose
+                  .venv/bin/pytest . --verbose
