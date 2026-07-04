@@ -266,6 +266,24 @@ class Map(ipyleaflet.Map):
         if zoom is not None:
             self.zoom = zoom
 
+    def fit_bounds(self, bounds) -> None:
+        """Fits the map view to the given bounds.
+
+        Wraps ipyleaflet's ``fit_bounds``, which schedules an asyncio task via
+        ``asyncio.ensure_future``. On Python 3.14+ there is no implicit current
+        event loop outside a running loop, so ensure one exists first.
+
+        Args:
+            bounds (list): Bounds in the form [[south, west], [north, east]].
+        """
+        import asyncio
+
+        try:
+            asyncio.get_event_loop()
+        except RuntimeError:
+            asyncio.set_event_loop(asyncio.new_event_loop())
+        super().fit_bounds(bounds)
+
     def zoom_to_bounds(self, bounds) -> None:
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
 
@@ -3361,7 +3379,7 @@ class Map(ipyleaflet.Map):
             gdf.crs = "EPSG:4326"
         elif gdf.crs != "EPSG:4326":
             gdf = gdf.to_crs("EPSG:4326")
-        data = gdf.__geo_interface__
+        data = common.sanitize_geojson(gdf.__geo_interface__)
 
         try:
             first_feature = data["features"][0]
@@ -3961,12 +3979,17 @@ class Map(ipyleaflet.Map):
             encoding (str, optional): The encoding to use to read the file. Defaults to "utf-8".
 
         """
-        import fiona
         import geopandas as gpd
 
         if isinstance(filename, str) and filename.endswith(".kml"):
-            fiona.drvsupport.supported_drivers["KML"] = "rw"
             kwargs["driver"] = "KML"
+            try:
+                import fiona
+
+                fiona.drvsupport.supported_drivers["KML"] = "rw"
+            except ImportError:
+                # fiona is optional; the default pyogrio engine reads KML natively.
+                pass
 
         gdf = gpd.read_file(
             filename, bbox=bbox, mask=mask, rows=rows, encoding=encoding, **kwargs
@@ -4076,7 +4099,6 @@ class Map(ipyleaflet.Map):
 
         warnings.filterwarnings("ignore")
         common.check_package(name="geopandas", URL="https://geopandas.org")
-        import fiona
         import geopandas as gpd
 
         self.default_style = {"cursor": "wait"}
@@ -4088,7 +4110,13 @@ class Map(ipyleaflet.Map):
                 filename = os.path.abspath(filename)
             ext = os.path.splitext(filename)[1].lower()
             if ext == ".kml":
-                fiona.drvsupport.supported_drivers["KML"] = "rw"
+                try:
+                    import fiona
+
+                    fiona.drvsupport.supported_drivers["KML"] = "rw"
+                except ImportError:
+                    # fiona is optional; the default pyogrio engine reads KML natively.
+                    pass
                 gdf = gpd.read_file(filename, driver="KML", **kwargs)
             else:
                 gdf = gpd.read_file(filename, **kwargs)
