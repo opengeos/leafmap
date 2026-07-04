@@ -3538,19 +3538,23 @@ def get_local_tile_url(
     for key in client_args:
         kwargs[key] = client_args[key]
 
-    # Make it compatible with binder and JupyterHub
-    if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
-            f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].lstrip('/')}/proxy/{{port}}"
-        )
+    # Only override LOCALTILESERVER_CLIENT_PREFIX if it's unset
+    if os.environ.get("LOCALTILESERVER_CLIENT_PREFIX") is None:
+        # Make it compatible with binder and JupyterHub
+        if os.environ.get("JUPYTERHUB_SERVICE_PREFIX") is not None:
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+                f"{os.environ['JUPYTERHUB_SERVICE_PREFIX'].strip('/')}/proxy/{{port}}"
+            )
 
-    if is_studio_lab():
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
-            f"studiolab/default/jupyter/proxy/{{port}}"
-        )
-    elif is_on_aws():
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
-    elif "prefix" in kwargs:
+        if is_studio_lab():
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
+                f"studiolab/default/jupyter/proxy/{{port}}"
+            )
+        elif is_on_aws():
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
+
+    # The prefix kwarg has final precedence
+    if "prefix" in kwargs:
         os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
         kwargs.pop("prefix")
 
@@ -3583,6 +3587,20 @@ def get_local_tile_url(
         colormap = colormap.lower()
 
     client = TileClient(source, port=port, **client_args)
+
+    # Route tile URLs through the jupyter-loopback comm bridge so that rasters
+    # render in webview-based frontends (VS Code, Colab, Solara, marimo, etc.)
+    # and in containerized/remote Jupyter environments where the browser cannot
+    # reach the jupyter-server origin directly. The `get_leaflet_tile_layer` and
+    # `get_folium_tile_layer` helpers used by `get_local_tile_layer` do this
+    # automatically, but a bare `TileClient` does not. See
+    # https://github.com/opengeos/leafmap/issues/1331
+    if hasattr(client, "enable_jupyter_loopback"):
+        try:
+            client.enable_jupyter_loopback()
+        except Exception:
+            pass
+
     url = client.get_tile_url(
         indexes=indexes,
         colormap=colormap,
