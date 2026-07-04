@@ -3548,15 +3548,16 @@ def get_local_tile_url(
 
         if is_studio_lab():
             os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = (
-                f"studiolab/default/jupyter/proxy/{{port}}"
+                "studiolab/default/jupyter/proxy/{port}"
             )
         elif is_on_aws():
             os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = "proxy/{port}"
 
     # The prefix kwarg has final precedence
     if "prefix" in kwargs:
-        os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = kwargs["prefix"]
-        kwargs.pop("prefix")
+        prefix = kwargs.pop("prefix")
+        if prefix is not None:
+            os.environ["LOCALTILESERVER_CLIENT_PREFIX"] = str(prefix)
 
     from localtileserver import TileClient
 
@@ -3598,8 +3599,10 @@ def get_local_tile_url(
     if hasattr(client, "enable_jupyter_loopback"):
         try:
             client.enable_jupyter_loopback()
-        except Exception:
-            pass
+        except Exception as e:
+            warnings.warn(
+                f"Failed to enable jupyter loopback for the local tile client: {e}"
+            )
 
     url = client.get_tile_url(
         indexes=indexes,

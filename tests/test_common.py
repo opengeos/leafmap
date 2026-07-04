@@ -76,6 +76,55 @@ class TestCommon(unittest.TestCase):
         self.assertEqual(os.environ["HTTPS_PROXY"], "http://192.168.0.1:8080")
         mock_get.assert_called_once_with("https://google.com")
 
+    def _mock_localtileserver(self):
+        """Return a fake ``localtileserver`` module with a mocked TileClient."""
+        fake_client = MagicMock()
+        fake_client.get_tile_url.return_value = (
+            "http://127.0.0.1:0/api/tiles/{z}/{x}/{y}.png"
+        )
+        fake_module = MagicMock()
+        fake_module.TileClient.return_value = fake_client
+        return fake_module, fake_client
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_get_local_tile_url_enables_jupyter_loopback(self):
+        """enable_jupyter_loopback is invoked when the client supports it."""
+        fake_module, fake_client = self._mock_localtileserver()
+        with patch.dict("sys.modules", {"localtileserver": fake_module}):
+            url = get_local_tile_url("test.tif")
+        fake_client.enable_jupyter_loopback.assert_called_once()
+        self.assertEqual(url, "http://127.0.0.1:0/api/tiles/{z}/{x}/{y}.png")
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_get_local_tile_url_without_loopback_support(self):
+        """A client lacking enable_jupyter_loopback must not raise."""
+        fake_client = MagicMock(spec=["get_tile_url"])
+        fake_client.get_tile_url.return_value = "http://tile"
+        fake_module = MagicMock()
+        fake_module.TileClient.return_value = fake_client
+        with patch.dict("sys.modules", {"localtileserver": fake_module}):
+            url = get_local_tile_url("test.tif")
+        self.assertFalse(hasattr(fake_client, "enable_jupyter_loopback"))
+        self.assertEqual(url, "http://tile")
+
+    @patch.dict(os.environ, {}, clear=True)
+    def test_get_local_tile_url_prefix_precedence(self):
+        """The prefix kwarg takes final precedence over the env var."""
+        fake_module, _ = self._mock_localtileserver()
+        with patch.dict("sys.modules", {"localtileserver": fake_module}):
+            get_local_tile_url("test.tif", prefix="proxy/{port}")
+        self.assertEqual(os.environ["LOCALTILESERVER_CLIENT_PREFIX"], "proxy/{port}")
+
+    @patch.dict(
+        os.environ, {"LOCALTILESERVER_CLIENT_PREFIX": "keep/{port}"}, clear=True
+    )
+    def test_get_local_tile_url_prefix_none_ignored(self):
+        """prefix=None is ignored and does not overwrite an existing env var."""
+        fake_module, _ = self._mock_localtileserver()
+        with patch.dict("sys.modules", {"localtileserver": fake_module}):
+            get_local_tile_url("test.tif", prefix=None)
+        self.assertEqual(os.environ["LOCALTILESERVER_CLIENT_PREFIX"], "keep/{port}")
+
     # def test_pmtile_metadata_validates_pmtiles_suffix(self):
     #     with self.assertRaises(ValueError) as cm:
     #         pmtiles_metadata("/some/path/to/pmtiles.pmtiles")
