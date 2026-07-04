@@ -1678,10 +1678,7 @@ class Map(MapWidget):
         """
 
         if not isinstance(data, gpd.GeoDataFrame):
-            if isinstance(data, str) and data.startswith("http"):
-                data = geojson_to_gdf(data).__geo_interface__
-            else:
-                data = gpd.read_file(data).__geo_interface__
+            data = geojson_to_gdf(data).__geo_interface__
         else:
             data = data.__geo_interface__
 
@@ -4342,10 +4339,7 @@ class Map(MapWidget):
             elif source in self.source_names:
                 source_name = source
             else:
-                if source.startswith("http"):
-                    geojson = geojson_to_gdf(source).__geo_interface__
-                else:
-                    geojson = gpd.read_file(source).__geo_interface__
+                geojson = geojson_to_gdf(source).__geo_interface__
                 geojson_source = {"type": "geojson", "data": geojson}
                 source_name = common.get_unique_name(
                     "source", self.source_names, overwrite=False
@@ -11113,10 +11107,7 @@ class DateFilterWidget(widgets.VBox):
                 if source is None:
                     gdfs.append(None)
                     continue
-                if isinstance(source, str) and source.startswith("http"):
-                    gdf = geojson_to_gdf(source)
-                else:
-                    gdf = gpd.read_file(source)
+                gdf = geojson_to_gdf(source)
                 gdfs.append(gdf)
 
                 style = styles[names[index]]
