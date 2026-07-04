@@ -52,10 +52,10 @@ jobs:
 
             - name: Test import
               run: |
-                  .venv/bin/python -c "import leafmap; print('leafmap import successful')"
-              #   .venv/bin/python -c "from osgeo import gdal; print('gdal import successful')"
-              #   .venv/bin/gdalinfo --version
+                  uv run python -c "import leafmap; print('leafmap import successful')"
+              #   uv run python -c "from osgeo import gdal; print('gdal import successful')"
+              #   uv run gdalinfo --version
 
             - name: Running pytest
               run: |
-                  .venv/bin/pytest . --verbose
+                  uv run pytest . --verbose
