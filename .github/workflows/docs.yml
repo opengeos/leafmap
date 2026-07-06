@@ -8,6 +8,9 @@ on:
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        # Required so peaceiris/actions-gh-pages can push the built site to gh-pages.
+        permissions:
+            contents: write
         strategy:
             matrix:
                 python-version: ["3.13"]
@@ -58,7 +61,15 @@ jobs:
               run: |
                   .venv/bin/pytest . --verbose
 
-            - name: Install mkdocs
+            - name: Build docs
               run: |
                   uv pip install -r requirements_docs.txt
-                  .venv/bin/mkdocs gh-deploy --force
+                  .venv/bin/python scripts/convert_notebooks.py
+                  .venv/bin/zensical build
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.0.0
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./site
+                  force_orphan: true

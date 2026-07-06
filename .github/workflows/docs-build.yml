@@ -59,10 +59,11 @@ jobs:
               run: |
                   .venv/bin/pytest . --verbose
 
-            - name: Install mkdocs
+            - name: Build docs
               run: |
                   uv pip install -r requirements_docs.txt
-                  .venv/bin/mkdocs build
+                  .venv/bin/python scripts/convert_notebooks.py
+                  .venv/bin/zensical build
 
             - name: Deploy to Netlify
               uses: nwtgck/actions-netlify@v4.0
