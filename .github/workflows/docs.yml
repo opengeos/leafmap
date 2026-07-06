@@ -58,7 +58,15 @@ jobs:
               run: |
                   .venv/bin/pytest . --verbose
 
-            - name: Install mkdocs
+            - name: Build docs
               run: |
                   uv pip install -r requirements_docs.txt
-                  .venv/bin/mkdocs gh-deploy --force
+                  .venv/bin/python scripts/convert_notebooks.py
+                  .venv/bin/zensical build
+
+            - name: Deploy to GitHub Pages
+              uses: peaceiris/actions-gh-pages@v4
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./site
+                  force_orphan: true
