@@ -16,6 +16,9 @@ pygments
 pymdown-extensions
 PyYAML
 sphinx
+# tomli>=2.2 ships mypyc-compiled wheels that crash on Python 3.13 when
+# imported by zensical (https://github.com/python/cpython/issues/123880)
+tomli<2.2
 tox
 twine
 watchdog
