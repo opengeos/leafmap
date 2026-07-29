@@ -16122,6 +16122,11 @@ def h5_to_gdf(
 
     out_df = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
+    if lat not in out_df.columns or lon not in out_df.columns:
+        raise ValueError(
+            f"No {lat}/{lon} data found in dataset {dataset} of the input file(s)."
+        )
+
     if nodata is not None and columns is not None:
         out_df = out_df[out_df[columns[0]] != nodata]
 
