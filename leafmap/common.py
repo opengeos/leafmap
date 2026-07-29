@@ -16107,20 +16107,18 @@ def h5_to_gdf(
     dfs = []
 
     for file in files:
-        h5 = h5py.File(file, "r")
-        try:
-            data = h5[dataset]
-        except KeyError:
-            print(f"Dataset {dataset} not found in file {file}. Skipping...")
-            h5.close()
-            continue
-        col_data = {
-            key: value[:]
-            for key, value in data.items()
-            if columns is None or key in columns or key == lat or key == lon
-        }
-        dfs.append(pd.DataFrame(col_data))
-        h5.close()
+        with h5py.File(file, "r") as h5:
+            try:
+                data = h5[dataset]
+            except KeyError:
+                print(f"Dataset {dataset} not found in file {file}. Skipping...")
+                continue
+            col_data = {
+                key: value[:]
+                for key, value in data.items()
+                if columns is None or key in columns or key in (lat, lon)
+            }
+            dfs.append(pd.DataFrame(col_data))
 
     out_df = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
