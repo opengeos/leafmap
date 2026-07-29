@@ -16069,7 +16069,7 @@ def h5_to_gdf(
 
     Raises:
         ImportError: Raised if h5py is not installed.
-        ValueError: Raised if the provided filenames argument is not a valid type or if a specified file does not exist.
+        ValueError: Raised if the provided filenames argument is not a valid type, if a specified file does not exist, or if no latitude/longitude data is found in the input file(s).
 
     Example:
         >>> gdf = h5_to_gdf('data.h5', 'dataset1', 'lat', 'lon', columns=['column1', 'column2'], crs='EPSG:4326')
