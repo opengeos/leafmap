@@ -16104,7 +16104,7 @@ def h5_to_gdf(
     else:
         raise ValueError("h5_file must be a string or a list of strings.")
 
-    out_df = pd.DataFrame()
+    dfs = []
 
     for file in files:
         h5 = h5py.File(file, "r")
@@ -16112,18 +16112,17 @@ def h5_to_gdf(
             data = h5[dataset]
         except KeyError:
             print(f"Dataset {dataset} not found in file {file}. Skipping...")
+            h5.close()
             continue
-        col_names = []
-        col_val = []
-
-        for key, value in data.items():
-            if columns is None or key in columns or key == lat or key == lon:
-                col_names.append(key)
-                col_val.append(value[:].tolist())
-
-        df = pd.DataFrame(map(list, zip(*col_val)), columns=col_names)
-        out_df = pd.concat([out_df, df])
+        col_data = {
+            key: value[:]
+            for key, value in data.items()
+            if columns is None or key in columns or key == lat or key == lon
+        }
+        dfs.append(pd.DataFrame(col_data))
         h5.close()
+
+    out_df = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
     if nodata is not None and columns is not None:
         out_df = out_df[out_df[columns[0]] != nodata]
@@ -16522,16 +16521,14 @@ def pandas_to_geojson(
     if properties is None:
         properties = [col for col in df.columns if col not in coordinates]
 
-    for _, row in df.iterrows():
+    coord_rows = df[coordinates].to_numpy().tolist()
+    prop_cols = {prop: df[prop].tolist() for prop in properties}
+    for i, coords in enumerate(coord_rows):
         feature = {
             "type": "Feature",
-            "properties": {},
-            "geometry": {"type": geometry_type, "coordinates": []},
+            "properties": {prop: values[i] for prop, values in prop_cols.items()},
+            "geometry": {"type": geometry_type, "coordinates": coords},
         }
-        feature["geometry"]["coordinates"] = list(row[coordinates])
-        for prop in properties:
-            feature["properties"][prop] = row[prop]
-
         geojson["features"].append(feature)
 
     if output:
@@ -17175,7 +17172,7 @@ def convert_to_gdf(
         data[geometry] = data[geometry].apply(convert_geometry)
     elif lat and lon:
         # Create a geometry column from latitude and longitude
-        data["geometry"] = data.apply(lambda row: Point(row[lon], row[lat]), axis=1)
+        data["geometry"] = gpd.points_from_xy(data[lon], data[lat])
         geometry = "geometry"
     else:
         raise ValueError(
