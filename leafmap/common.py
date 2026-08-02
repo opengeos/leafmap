@@ -16118,6 +16118,12 @@ def h5_to_gdf(
                 for key, value in data.items()
                 if columns is None or key in columns or key in (lat, lon)
             }
+            if lat not in col_data or lon not in col_data:
+                print(
+                    f"Dataset {dataset} in file {file} does not contain the "
+                    f"{lat}/{lon} columns. Skipping..."
+                )
+                continue
             dfs.append(pd.DataFrame(col_data))
 
     out_df = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
@@ -17119,7 +17125,7 @@ def convert_to_gdf(
         ValueError: If the file format is unsupported or required columns are not provided.
     """
     import geopandas as gpd
-    from shapely.geometry import Point, shape
+    from shapely.geometry import shape
 
     if open_args is None:
         open_args = {}
