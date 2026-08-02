@@ -16069,7 +16069,7 @@ def h5_to_gdf(
 
     Raises:
         ImportError: Raised if h5py is not installed.
-        ValueError: Raised if the provided filenames argument is not a valid type or if a specified file does not exist.
+        ValueError: Raised if the provided filenames argument is not a valid type, if a specified file does not exist, or if no latitude/longitude data is found in the input file(s).
 
     Example:
         >>> gdf = h5_to_gdf('data.h5', 'dataset1', 'lat', 'lon', columns=['column1', 'column2'], crs='EPSG:4326')
@@ -16104,26 +16104,34 @@ def h5_to_gdf(
     else:
         raise ValueError("h5_file must be a string or a list of strings.")
 
-    out_df = pd.DataFrame()
+    dfs = []
 
     for file in files:
-        h5 = h5py.File(file, "r")
-        try:
-            data = h5[dataset]
-        except KeyError:
-            print(f"Dataset {dataset} not found in file {file}. Skipping...")
-            continue
-        col_names = []
-        col_val = []
+        with h5py.File(file, "r") as h5:
+            try:
+                data = h5[dataset]
+            except KeyError:
+                print(f"Dataset {dataset} not found in file {file}. Skipping...")
+                continue
+            col_data = {
+                key: value[:]
+                for key, value in data.items()
+                if columns is None or key in columns or key in (lat, lon)
+            }
+            if lat not in col_data or lon not in col_data:
+                print(
+                    f"Dataset {dataset} in file {file} does not contain the "
+                    f"{lat}/{lon} columns. Skipping..."
+                )
+                continue
+            dfs.append(pd.DataFrame(col_data))
 
-        for key, value in data.items():
-            if columns is None or key in columns or key == lat or key == lon:
-                col_names.append(key)
-                col_val.append(value[:].tolist())
+    out_df = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
-        df = pd.DataFrame(map(list, zip(*col_val)), columns=col_names)
-        out_df = pd.concat([out_df, df])
-        h5.close()
+    if lat not in out_df.columns or lon not in out_df.columns:
+        raise ValueError(
+            f"No {lat}/{lon} data found in dataset {dataset} of the input file(s)."
+        )
 
     if nodata is not None and columns is not None:
         out_df = out_df[out_df[columns[0]] != nodata]
@@ -16522,16 +16530,14 @@ def pandas_to_geojson(
     if properties is None:
         properties = [col for col in df.columns if col not in coordinates]
 
-    for _, row in df.iterrows():
+    coord_rows = df[coordinates].to_numpy().tolist()
+    prop_cols = {prop: df[prop].tolist() for prop in properties}
+    for i, coords in enumerate(coord_rows):
         feature = {
             "type": "Feature",
-            "properties": {},
-            "geometry": {"type": geometry_type, "coordinates": []},
+            "properties": {prop: values[i] for prop, values in prop_cols.items()},
+            "geometry": {"type": geometry_type, "coordinates": coords},
         }
-        feature["geometry"]["coordinates"] = list(row[coordinates])
-        for prop in properties:
-            feature["properties"][prop] = row[prop]
-
         geojson["features"].append(feature)
 
     if output:
@@ -17119,7 +17125,7 @@ def convert_to_gdf(
         ValueError: If the file format is unsupported or required columns are not provided.
     """
     import geopandas as gpd
-    from shapely.geometry import Point, shape
+    from shapely.geometry import shape
 
     if open_args is None:
         open_args = {}
@@ -17175,7 +17181,7 @@ def convert_to_gdf(
         data[geometry] = data[geometry].apply(convert_geometry)
     elif lat and lon:
         # Create a geometry column from latitude and longitude
-        data["geometry"] = data.apply(lambda row: Point(row[lon], row[lat]), axis=1)
+        data["geometry"] = gpd.points_from_xy(data[lon], data[lat])
         geometry = "geometry"
     else:
         raise ValueError(
