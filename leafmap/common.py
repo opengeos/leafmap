@@ -6296,17 +6296,19 @@ class The_national_map_USGS:
             return []
 
     @property
-    def prodFormats(self) -> list:
+    def prodFormats(self) -> set:
         """
         Return all datatypes available in any of the collections.
         Note that "All" is only peculiar to one dataset.
         """
-        return set(i["displayName"] for ds in self.DS for i in ds["formats"])
+        return set(
+            i["displayName"] for ds in self.DS if "formats" in ds for i in ds["formats"]
+        )
 
     @property
-    def datasets(self) -> list:
+    def datasets(self) -> set:
         """
-        Returns a list of dataset tags (most common human readable self description for specific datasets).
+        Returns a set of dataset tags (most common human readable self description for specific datasets).
         """
         return set(y["sbDatasetTag"] for x in self.DS for y in x["tags"])
 
