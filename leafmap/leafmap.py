@@ -5585,7 +5585,7 @@ class Map(ipyleaflet.Map):
         return None
 
     def remove(self, widget: Any) -> None:
-        """Removes a widget to the map."""
+        """Removes a widget from the map."""
 
         basic_controls: Dict[str, ipyleaflet.Control] = {
             "layer_editor": map_widgets.LayerEditor,
