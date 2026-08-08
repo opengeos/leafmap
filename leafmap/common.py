@@ -6301,9 +6301,7 @@ class The_national_map_USGS:
         Return all datatypes available in any of the collections.
         Note that "All" is only peculiar to one dataset.
         """
-        return set(
-            i["displayName"] for ds in self.DS if "formats" in ds for i in ds["formats"]
-        )
+        return {i["displayName"] for ds in self.DS for i in ds.get("formats", [])}
 
     @property
     def datasets(self) -> set:
