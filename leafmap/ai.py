@@ -49,6 +49,7 @@ __all__ = [
     "repair_code",
     "REPAIR_SYSTEM_PROMPT",
     "LLMConfig",
+    "demo",
 ]
 
 DEFAULT_SYSTEM_PROMPT = """你是一个专业的地理空间制图专家。用户会用自然语言描述一张地图，你需要生成完整的 Python 代码来绘制这张地图。
@@ -316,6 +317,50 @@ def _chat_with_retry(messages, config: LLMConfig, retries: int = 2):
 
 
 # ---------------------------------------------------------------------------
+# 成功案例缓存
+# ---------------------------------------------------------------------------
+
+import hashlib
+
+CACHE_FILENAME = "leafmap_ai_cache.json"
+
+
+def _cache_path(custom_path=None):
+    """返回缓存文件路径：默认 ~/.leafmap/leafmap_ai_cache.json。"""
+    if custom_path:
+        return str(custom_path)
+    home = Path.home() / ".leafmap"
+    home.mkdir(parents=True, exist_ok=True)
+    return str(home / CACHE_FILENAME)
+
+
+def _cache_load(cache_path=None):
+    """读取缓存 JSON；不存在或损坏时返回空字典。"""
+    p = Path(_cache_path(cache_path))
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _cache_save(cache, cache_path=None):
+    """写回缓存 JSON（失败静默，不阻塞主流程）。"""
+    p = Path(_cache_path(cache_path))
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _cache_key(description: str) -> str:
+    """根据描述生成缓存键（前 16 位 sha256，足够区分）。"""
+    return hashlib.sha256(description.strip().encode("utf-8")).hexdigest()[:16]
+
+
+# ---------------------------------------------------------------------------
 # 代码修复（Repair Loop）
 # ---------------------------------------------------------------------------
 
@@ -339,6 +384,7 @@ def repair_code(
     description: str = "",
     config: LLMConfig = None,
     system_prompt: str = None,
+    history: list = None,
 ) -> str:
     """将失败代码 + 错误信息回喂给 LLM，返回修复后的代码。
 
@@ -356,6 +402,10 @@ def repair_code(
         LLM 配置。
     system_prompt : str, optional
         自定义修复提示词。
+    history : list, optional
+        历史修复记录列表，每项为 dict：
+        {"attempt": int, "error": str, "traceback": str}。
+        携带历史错误可避免 LLM 重复犯同样的错。
 
     Returns
     -------
@@ -368,9 +418,17 @@ def repair_code(
         f"原始地图描述：{description}\n\n"
         f"--- 失败的代码 ---\n```python\n{code}\n```\n\n"
         f"--- 错误信息 ---\n{error}\n\n"
-        f"--- Traceback ---\n```\n{traceback_text}\n```\n\n"
-        f"请输出修复后的完整 Python 代码。"
+        f"--- Traceback ---\n```\n{traceback_text}\n```\n"
     )
+    if history:
+        user_prompt += "\n--- 之前的失败尝试（请避免重复同样的错误）---\n"
+        for h in history:
+            user_prompt += (
+                f"\n[第 {h.get('attempt', '?')} 次尝试]\n"
+                f"错误: {h.get('error', '')}\n"
+                f"Traceback:\n```\n{h.get('traceback', '')}\n```\n"
+            )
+    user_prompt += "\n请输出修复后的完整 Python 代码。"
     messages = [
         {"role": "system", "content": sys_prompt},
         {"role": "user", "content": user_prompt},
@@ -556,12 +614,20 @@ def natural_map(
         print(f"[leafmap.ai] 配置: {config}")
         print(f"[leafmap.ai] 描述: {description}")
 
-    code = generate_code(
-        description,
-        config=config,
-        system_prompt=system_prompt,
-        extra_context=extra_context,
-    )
+    # 成功案例缓存：相同描述命中时直接复用，跳过 LLM 调用
+    cache = _cache_load()
+    cached = cache.get(_cache_key(description)) if cache else None
+    if cached and cached.get("code"):
+        if verbose:
+            print("[leafmap.ai] 命中成功案例缓存，直接复用代码")
+        code = cached["code"]
+    else:
+        code = generate_code(
+            description,
+            config=config,
+            system_prompt=system_prompt,
+            extra_context=extra_context,
+        )
 
     if verbose:
         print("[leafmap.ai] 生成的代码:")
@@ -578,6 +644,7 @@ def natural_map(
 
     result = run_safe_code(code, output_path=output)
     attempt = 0
+    history = []  # 错误历史记忆：累积每次修复的 error/traceback，帮助 LLM 避免重复犯错
 
     # 失败自修复循环：把报错回喂 LLM，修复后重跑
     while (not result["ok"]) and (attempt < max_repairs):
@@ -592,6 +659,7 @@ def natural_map(
                 description=description,
                 config=config,
                 system_prompt=system_prompt,
+                history=history,
             )
         except Exception as e:
             if verbose:
@@ -603,8 +671,18 @@ def natural_map(
             print(code)
             print("-" * 60)
         result = run_safe_code(code, output_path=output)
+        # 记录本次错误，供后续修复参考
+        history.append(
+            {
+                "attempt": attempt,
+                "error": result.get("error", ""),
+                "traceback": result.get("traceback", ""),
+            }
+        )
 
     if result["ok"]:
+        # 成功案例缓存：保存本次成功的代码，下次相同描述直接复用
+        _cache_save(_cache_key(description), code)
         if verbose:
             print(f"[leafmap.ai] 成功！地图已保存: {output}")
             if attempt > 0:
@@ -636,6 +714,64 @@ def main():
         output=args.output,
         execute=not args.no_execute,
     )
+
+
+def demo():
+    """启动 Gradio Web Demo：在浏览器中通过自然语言生成地图。
+
+    运行方式:
+        python -m leafmap.ai.demo 或 leafmap ai-demo
+    """
+    try:
+        import gradio as gr
+    except ImportError as e:
+        raise ImportError(
+            "Gradio 未安装，请先执行: pip install gradio"
+        ) from e
+
+    def _generate(description: str, max_repairs: int, show_code: bool):
+        if not description.strip():
+            return "请输入地图描述", None
+        code, result = natural_map(
+            description,
+            output=None,
+            execute=True,
+            max_repairs=max_repairs,
+            verbose=False,
+        )
+        if result["ok"]:
+            html_path = result.get("output") or code
+            return f"✅ 生成成功: {html_path}", (html_path if show_code else None)
+        return f"❌ 执行失败: {result.get('error')}", code if show_code else None
+
+    with gr.Blocks(title="leafmap.ai - 自然语言制图") as app:
+        gr.Markdown(
+            "# leafmap.ai\n\n"
+            "输入地图描述（如 `南京市河流分布图`），自动生成交互式地图 HTML。"
+        )
+        with gr.Row():
+            description = gr.Textbox(
+                label="地图描述",
+                placeholder="例如：南京市河流分布图 / 中国省会城市点图",
+                lines=2,
+            )
+        with gr.Row():
+            max_repairs = gr.Slider(
+                minimum=0, maximum=5, value=2, step=1, label="最大自修复次数"
+            )
+            show_code = gr.Checkbox(label="同时显示生成的代码", value=False)
+        with gr.Row():
+            btn = gr.Button("生成地图", variant="primary")
+        output = gr.Markdown(label="结果")
+        code_box = gr.Code(label="生成的代码", language="python")
+
+        btn.click(
+            _generate,
+            inputs=[description, max_repairs, show_code],
+            outputs=[output, code_box],
+        )
+
+    app.launch()
 
 
 if __name__ == "__main__":

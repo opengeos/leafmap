@@ -48,6 +48,22 @@ def ai_map(
     )
 
 
+def ai_demo() -> None:
+    """
+    Launch the Gradio web demo for natural language map generation.
+
+    Runs ``leafmap.ai.demo()`` which starts a local web UI (default
+    http://127.0.0.1:7860). Requires the ``gradio`` package.
+    """
+    try:
+        from .ai import demo
+    except ImportError as e:
+        raise ImportError(
+            "leafmap.ai 模块不可用，请确认已安装依赖。"
+        ) from e
+    demo()
+
+
 def view_raster(
     file_path: str,
     port: Optional[int] = None,
