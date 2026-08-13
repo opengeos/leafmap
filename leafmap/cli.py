@@ -34,9 +34,7 @@ def ai_map(
     try:
         from .ai import natural_map
     except ImportError as e:
-        raise ImportError(
-            "leafmap.ai 模块不可用，请确认已安装依赖。"
-        ) from e
+        raise ImportError("leafmap.ai 模块不可用，请确认已安装依赖。") from e
 
     natural_map(
         description,
@@ -58,9 +56,7 @@ def ai_demo() -> None:
     try:
         from .ai import demo
     except ImportError as e:
-        raise ImportError(
-            "leafmap.ai 模块不可用，请确认已安装依赖。"
-        ) from e
+        raise ImportError("leafmap.ai 模块不可用，请确认已安装依赖。") from e
     demo()
 
 
@@ -663,7 +659,9 @@ def main():
     ai_parser = subparsers.add_parser(
         "ai-map", help="Generate a map from natural language using LLM"
     )
-    ai_parser.add_argument("description", help="Map description, e.g. '南京市河流分布图'")
+    ai_parser.add_argument(
+        "description", help="Map description, e.g. '南京市河流分布图'"
+    )
     ai_parser.add_argument(
         "--output",
         help="Output HTML file path (default: auto temp file)",

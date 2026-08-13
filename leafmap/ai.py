@@ -60,13 +60,13 @@ DEFAULT_SYSTEM_PROMPT = """你是一个专业的地理空间制图专家。用�
 3. 代码结构必须是：
    import leafmap
    # 可选：import geopandas as gpd, pandas as pd, numpy as np, matplotlib...
-   
+
    m = leafmap.Map(center=[纬度, 经度], zoom=缩放级别)
    # ... 添加图层、数据、标注 ...
-   
+
    # 最后一行导出 HTML（OUTPUT_PATH 变量会自动替换为输出路径）
    m.to_html(OUTPUT_PATH)
-   
+
 4. 必须通过变量 OUTPUT_PATH 保存地图，不要硬编码其他输出路径
 5. 如果用户描述中需要真实地理数据（如河流、行政边界等），优先尝试使用内置数据或示例数据：
    - leafmap 自带示例数据可通过 leafmap.sample_data 或 folium 内置 GeoJSON 获取
@@ -100,9 +100,7 @@ class LLMConfig:
             or os.environ.get("LEAFMAP_LLM_BASE_URL")
             or "https://api.deepseek.com/v1"
         )
-        self.api_key = (
-            api_key or os.environ.get("LEAFMAP_LLM_API_KEY") or ""
-        )
+        self.api_key = api_key or os.environ.get("LEAFMAP_LLM_API_KEY") or ""
         self.model = model or os.environ.get("LEAFMAP_LLM_MODEL") or "deepseek-chat"
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -231,9 +229,7 @@ def _check_ast_safety(code: str) -> None:
                 raise SafetyError(f"检测到危险魔法属性引用: {node.value!r}")
 
 
-def _safe_import(
-    name, globals=None, locals=None, fromlist=(), level=0
-):
+def _safe_import(name, globals=None, locals=None, fromlist=(), level=0):
     """受限 __import__：仅允许白名单模块导入（运行时兜底，防动态导入绕过）。"""
     root = name.split(".")[0]
     if root not in ALLOWED_IMPORTS and name not in ALLOWED_IMPORTS:
@@ -650,7 +646,9 @@ def natural_map(
     while (not result["ok"]) and (attempt < max_repairs):
         attempt += 1
         if verbose:
-            print(f"[leafmap.ai] 第 {attempt}/{max_repairs} 次修复: {result.get('error')}")
+            print(
+                f"[leafmap.ai] 第 {attempt}/{max_repairs} 次修复: {result.get('error')}"
+            )
         try:
             code = repair_code(
                 code,
@@ -725,9 +723,7 @@ def demo():
     try:
         import gradio as gr
     except ImportError as e:
-        raise ImportError(
-            "Gradio 未安装，请先执行: pip install gradio"
-        ) from e
+        raise ImportError("Gradio 未安装，请先执行: pip install gradio") from e
 
     def _generate(description: str, max_repairs: int, show_code: bool):
         if not description.strip():
