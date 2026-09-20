@@ -36,11 +36,20 @@ name: Claude Code Review
 #   - First-time contributors (FIRST_TIME_CONTRIBUTOR / FIRST_TIMER / NONE) are
 #     NOT reviewed automatically. This blocks the low-effort economic-DoS vector
 #     where throwaway accounts spam PRs to burn CLAUDE_CODE_OAUTH_TOKEN budget.
-#     A maintainer opts such a PR in by commenting `/claude-review` on it; only
-#     comments from OWNER / MEMBER / COLLABORATOR accounts are honored.
+#     A maintainer opts such a PR in either by commenting `/claude-review` on it
+#     (only OWNER / MEMBER / COLLABORATOR comments are honored) or by applying
+#     the `claude-review` label. Labelling needs no author_association check:
+#     GitHub only lets accounts with write or triage access add a label, so a
+#     fork author cannot self-trigger a review. It is still restricted to human
+#     senders, so a future auto-labeler cannot become an indirect opt-in.
+#
+#     Both opt-ins are one-shot: they review the head as it stands. Later pushes
+#     to a first-timer PR are not re-reviewed (that would hand a throwaway
+#     account an unbounded budget drain once opted in) — re-trigger by
+#     commenting again, or by removing and re-adding the label.
 on:
   pull_request_target:
-    types: [opened, synchronize, ready_for_review, reopened]
+    types: [opened, synchronize, ready_for_review, reopened, labeled]
   issue_comment:
     types: [created]
 
@@ -56,18 +65,69 @@ on:
 #     (shared across pushes, so cancel-in-progress dedupes rapid synchronizes)
 #   - issue_comment on PR N               -> claude-review-issue_comment-N-<comment id>
 #     (unique per comment, so it never cancels — and is never cancelled by — anything)
+#   - `labeled` on PR N                   -> claude-review-pull_request_target-N-label-<label name>
+#     (keyed on the label NAME, not a shared `label` slot: the GitHub UI fires
+#     one `labeled` event per label, so a shared slot would let adding `bug`
+#     cancel an in-flight `claude-review` run — the second run skips at `if:`,
+#     but cancel-in-progress has already killed the first. Per-name keeps the
+#     review isolated from every other label, while remove-and-re-add of
+#     `claude-review` still supersedes its own older run, which is what we want.)
 concurrency:
-  group: claude-review-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number }}-${{ github.event.comment.id || 'push' }}
+  group: claude-review-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number }}-${{ github.event.comment.id || (github.event.action == 'labeled' && format('label-{0}', github.event.label.name)) || 'push' }}
   cancel-in-progress: true
 
 jobs:
   claude-review:
-    # Run when EITHER:
-    #  (a) a known author (not a first-timer) opens/updates a PR, OR
-    #  (b) a maintainer comments `/claude-review` on a PR (this is the opt-in
-    #      path for first-time-contributor PRs).
+    # Run when ANY of:
+    #  (a) a known author (not a first-timer) opens/updates a PR,
+    #  (b) a maintainer comments `/claude-review` on a PR, OR
+    #  (c) a maintainer applies the `claude-review` label to a PR.
+    # (b) and (c) are the opt-in paths for first-time-contributor PRs.
+    #
     # author_association on the comment gates (b): only OWNER/MEMBER/COLLABORATOR
     # accounts — i.e. people with write/admin on the repo — can trigger a review.
+    # (c) needs no such check: GitHub itself restricts labelling to accounts with
+    # write or triage access, so the event cannot originate from a fork author.
+    # It does check the label NAME, because `labeled` fires for every label —
+    # without it, tagging a PR `bug` would spend a review.
+    #
+    # (c) also requires a human sender. GitHub's write/triage restriction covers
+    # people, but automation with write access can label too, so an auto-labeler
+    # that keys off PR title/paths (i.e. attacker-controlled content) would
+    # become an indirect way for a first-timer to self-trigger a paid review.
+    # Nothing here auto-labels today; the check keeps that from silently becoming
+    # a hole if something ever does. If you later WANT a bot to apply this label,
+    # drop the check deliberately and re-reason about the economic-DoS guard
+    # rather than just deleting it.
+    #
+    # Note the limit of that check: it tests the actor TYPE, so it stops a
+    # GitHub App or `GITHUB_TOKEN` workflow, but automation driven by a PAT acts
+    # as a real user and is indistinguishable from a human click. GitHub exposes
+    # nothing that would separate them, so this narrows the gap rather than
+    # closing it; a PAT-driven labeler would need its own review of this gate.
+    #
+    # (c) also requires the PR to still be OPEN. `labeled` fires on closed and
+    # merged PRs too, and reviewing one spends the budget this whole gate exists
+    # to protect on a diff nobody can act on. Branch (a) needs no such check —
+    # `synchronize`/`reopened` imply an open PR.
+    #
+    # Draft PRs are deliberately NOT excluded. The repo has no draft gate at all
+    # (a draft PR fires `opened`, so branch (a) already reviews drafts), and
+    # asking for a review ON a draft is a normal thing to want — that is the
+    # point of an explicit opt-in.
+    #
+    # Branch (c) needs no `opened` + `contains(labels.*)` fallback for a PR that
+    # arrives already labelled. The create-PR API takes no `labels` field, so
+    # labelling is always a separate act that fires its own `labeled` event — and
+    # it requires triage or write access, which means the actor is
+    # OWNER/MEMBER/COLLABORATOR and already covered by branch (a) anyway. The
+    # case this gate exists for, a first-time contributor, cannot self-attach the
+    # label at all. The gap is unreachable from either direction, and adding the
+    # fallback would widen the trigger surface for no gain.
+    #
+    # Branch (a) must exclude `labeled`, or adding any label to a known
+    # contributor's PR would re-review it under the automatic path and sidestep
+    # the name check in (c).
     #
     # sender.type gates out bot-initiated events (e.g. a pre-commit.ci autofix
     # push firing `synchronize`): claude-code-action hard-fails on non-human
@@ -76,6 +136,7 @@ jobs:
     # skipped instead of failed; a maintainer can still `/claude-review`.
     if: >
       (github.event_name == 'pull_request_target' &&
+        github.event.action != 'labeled' &&
         github.event.sender.type != 'Bot' &&
         (github.event.pull_request.author_association == 'OWNER' ||
          github.event.pull_request.author_association == 'MEMBER' ||
@@ -87,7 +148,12 @@ jobs:
          startsWith(github.event.comment.body, '/claude-review ')) &&
         (github.event.comment.author_association == 'OWNER' ||
          github.event.comment.author_association == 'MEMBER' ||
-         github.event.comment.author_association == 'COLLABORATOR'))
+         github.event.comment.author_association == 'COLLABORATOR')) ||
+      (github.event_name == 'pull_request_target' &&
+        github.event.action == 'labeled' &&
+        github.event.sender.type != 'Bot' &&
+        github.event.pull_request.state == 'open' &&
+        github.event.label.name == 'claude-review')
 
     runs-on: ubuntu-latest
     permissions:
@@ -128,6 +194,29 @@ jobs:
           ref: ${{ steps.pr.outputs.sha }}
           persist-credentials: false
           fetch-depth: 1
+          # actions/checkout hard-refuses a fork PR head under
+          # pull_request_target unless this opt-in is set — it is guarding
+          # against "pwn request", where a workflow checks out fork code and
+          # then *executes* it (npm ci, build, test, a lifecycle script) with the
+          # base repo's write-scoped token and secrets. That guard landed in a
+          # v7 patch release, so every fork PR — including known contributors,
+          # who are the ones the `if:` above lets through — started failing this
+          # step with no change on our side.
+          #
+          # This job does none of the things the guard protects against: it never
+          # installs dependencies, never runs a build or test, and never executes
+          # anything from the checkout. The head is only ever *read* — by Claude's
+          # Read/Grep/Glob, which is the entire point of checking it out. The
+          # token is kept out of .git/config by persist-credentials above, out of
+          # the agent's subprocesses by the action's env scrub (see the header),
+          # and the agent has no Bash tool with which to run checked-out code
+          # even if it wanted to. So we opt in deliberately.
+          #
+          # This stays true only as long as no step in this job executes the
+          # checkout. Do not add a build, install, or test step here — put it in
+          # ubuntu.yml / macos.yml / windows.yml, which run under `pull_request`
+          # and get no secrets.
+          allow-unsafe-pr-checkout: true
 
       # Claude cannot fetch the diff itself (no token in its subprocesses — see
       # the header). Stage it on disk instead. This runs AFTER the checkout and
@@ -174,14 +263,15 @@ jobs:
         id: claude-review
         # Pinned to a full commit SHA, not the mutable `v1` tag. This workflow's
         # behaviour depends on action internals that `v1` has silently changed
-        # under us before — the env scrub that broke review for nine days
-        # arrived that way, with no commit here to point at. A SHA turns the
+        # before: the subprocess env scrub this whole design is built around
+        # arrived that way, and silently broke review in opengeos/GeoLibre for
+        # nine days with no commit in that repo to point at. A SHA turns the
         # next such change into a reviewable Dependabot PR. Dependabot covers
         # the github-actions ecosystem weekly and bumps pinned SHAs, so this
         # does not strand us on an old version. When it bumps, re-read the
         # action's release notes for changes to the scrub, MCP wiring, or the
         # `execution_file` contract that the summary step below parses.
-        uses: anthropics/claude-code-action@56cf60fde42f7b19c3abfd5c9c48b69a1288461f # v1 (Claude Code 2.1.220)
+        uses: anthropics/claude-code-action@9cdae7f0d995e3ba7c33f226087fdf82a59cd520 # v1 (Claude Code 2.1.220)
         with:
           # Use the workflow's GITHUB_TOKEN for GitHub API calls instead of the
           # default OIDC -> Claude GitHub App token exchange. That exchange
