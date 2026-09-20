@@ -8,6 +8,58 @@ from typing import Optional
 from .common import read_vector
 
 
+def ai_map(
+    description: str,
+    output: Optional[str] = None,
+    api_key: Optional[str] = None,
+    base_url: Optional[str] = None,
+    model: Optional[str] = None,
+    no_execute: bool = False,
+) -> None:
+    """
+    Generate an interactive map from a natural language description using LLM.
+
+    Args:
+        description (str): Map description, e.g. '南京市河流分布图'.
+        output (str, optional): Output HTML file path. Defaults to None (auto temp file).
+        api_key (str, optional): LLM API key. Defaults to None (env LEAFMAP_LLM_API_KEY).
+        base_url (str, optional): LLM base URL. Defaults to None (env LEAFMAP_LLM_BASE_URL).
+        model (str, optional): LLM model name. Defaults to None (env LEAFMAP_LLM_MODEL).
+        no_execute (bool, optional): Only generate code, do not execute. Defaults to False.
+
+    Raises:
+        ImportError: If leafmap.ai is not available.
+        ValueError: If no API key is configured.
+    """
+    try:
+        from .ai import natural_map
+    except ImportError as e:
+        raise ImportError("leafmap.ai 模块不可用，请确认已安装依赖。") from e
+
+    natural_map(
+        description,
+        output=output,
+        api_key=api_key,
+        base_url=base_url,
+        model=model,
+        execute=not no_execute,
+    )
+
+
+def ai_demo() -> None:
+    """
+    Launch the Gradio web demo for natural language map generation.
+
+    Runs ``leafmap.ai.demo()`` which starts a local web UI (default
+    http://127.0.0.1:7860). Requires the ``gradio`` package.
+    """
+    try:
+        from .ai import demo
+    except ImportError as e:
+        raise ImportError("leafmap.ai 模块不可用，请确认已安装依赖。") from e
+    demo()
+
+
 def view_raster(
     file_path: str,
     port: Optional[int] = None,
@@ -603,6 +655,35 @@ def main():
         help="Don't open browser automatically",
     )
 
+    # ai-map command
+    ai_parser = subparsers.add_parser(
+        "ai-map", help="Generate a map from natural language using LLM"
+    )
+    ai_parser.add_argument(
+        "description", help="Map description, e.g. '南京市河流分布图'"
+    )
+    ai_parser.add_argument(
+        "--output",
+        help="Output HTML file path (default: auto temp file)",
+    )
+    ai_parser.add_argument(
+        "--api-key",
+        help="LLM API key (default: env LEAFMAP_LLM_API_KEY)",
+    )
+    ai_parser.add_argument(
+        "--base-url",
+        help="LLM base URL (default: env LEAFMAP_LLM_BASE_URL)",
+    )
+    ai_parser.add_argument(
+        "--model",
+        help="LLM model name (default: env LEAFMAP_LLM_MODEL)",
+    )
+    ai_parser.add_argument(
+        "--no-execute",
+        action="store_true",
+        help="Only generate code, do not execute",
+    )
+
     args = parser.parse_args()
 
     if args.command == "view-raster":
@@ -629,6 +710,15 @@ def main():
             file_path=args.file_path,
             style=args.style,
             open_browser=not args.no_browser,
+        )
+    elif args.command == "ai-map":
+        ai_map(
+            description=args.description,
+            output=args.output,
+            api_key=args.api_key,
+            base_url=args.base_url,
+            model=args.model,
+            no_execute=args.no_execute,
         )
     else:
         parser.print_help()
