@@ -4,14 +4,22 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pytest
 import rasterio
 import rioxarray
 import xarray as xr
-from rasterio.transform import from_origin
+from rasterio.transform import Affine, from_origin
 
 from leafmap.common import plot_raster
 
 NODATA = -9999.0
+
+
+@pytest.fixture(autouse=True)
+def _enable_plot_raster(monkeypatch):
+    # CI sets USE_MKDOCS, which makes plot_raster return without plotting.
+    monkeypatch.delenv("USE_MKDOCS", raising=False)
+
 
 # British National Grid (EPSG:27700) origin and pixel size used by the tests.
 ORIGIN_X = 530000
@@ -155,5 +163,38 @@ def test_plot_raster_does_not_mutate_open_kwargs(tmp_path):
         plot_raster(str(path), band=0, open_kwargs=open_kwargs)
 
         assert open_kwargs == {}
+    finally:
+        plt.close("all")
+
+
+def test_plot_raster_rotated_raster_uses_map_coordinates(tmp_path):
+    """A rotated raster should be plotted in map coordinates, not pixel indices."""
+    path = tmp_path / "rotated.tif"
+    height, width = 20, 30
+    data = np.arange(height * width, dtype="float32").reshape(height, width)
+
+    with rasterio.open(
+        path,
+        "w",
+        driver="GTiff",
+        height=height,
+        width=width,
+        count=1,
+        dtype="float32",
+        crs="EPSG:27700",
+        transform=Affine(RES, 3, ORIGIN_X, 3, -RES, ORIGIN_Y),
+    ) as dst:
+        dst.write(data, 1)
+
+    try:
+        plot_raster(str(path), band=0)
+        axes = plt.gcf().axes[0]
+        xmin, xmax = axes.get_xlim()
+        ymin, ymax = sorted(axes.get_ylim())
+
+        # Pixel indices would give limits of roughly 0-30; map coordinates
+        # stay close to the raster origin.
+        assert ORIGIN_X - 100 < xmin < xmax < ORIGIN_X + 1000
+        assert ORIGIN_Y - 1000 < ymin < ymax < ORIGIN_Y + 1000
     finally:
         plt.close("all")

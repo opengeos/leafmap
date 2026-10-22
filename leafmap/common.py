@@ -6107,6 +6107,10 @@ def plot_raster(
     kwargs["figsize"] = figsize
     # Use a 2-98 percentile stretch unless vmin/vmax are given explicitly.
     kwargs.setdefault("robust", True)
+    if "xc" in da.coords and "yc" in da.coords:
+        # Rotated or sheared rasters: plot against real map coordinates.
+        kwargs.setdefault("x", "xc")
+        kwargs.setdefault("y", "yc")
     result = da.plot(**kwargs)
 
     # Keep real-world proportions (a projected CRS is in meters).
