@@ -3,6 +3,7 @@
 """Tests for `leafmap` package."""
 
 import os
+import tempfile
 import unittest
 from unittest.mock import MagicMock, patch
 
@@ -35,6 +36,17 @@ class TestCommon(unittest.TestCase):
 
     def test_csv_to_gdf(self):
         self.assertIsInstance(csv_to_gdf(self.in_csv), geopandas.GeoDataFrame)
+
+    def test_csv_to_gdf_crs(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            in_csv = os.path.join(tmp_dir, "points.csv")
+            with open(in_csv, "w", encoding="utf-8") as f:
+                f.write("name,northing,easting\na,4500000,500000\n")
+            gdf = csv_to_gdf(
+                in_csv, latitude="northing", longitude="easting", crs="EPSG:3857"
+            )
+        self.assertEqual(gdf.crs.to_epsg(), 3857)
+        self.assertEqual((gdf.geometry.x[0], gdf.geometry.y[0]), (500000, 4500000))
 
     def test_csv_to_geojson(self):
         self.assertIsInstance(csv_to_geojson(self.in_csv), dict)
