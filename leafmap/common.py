@@ -1058,6 +1058,10 @@ def csv_to_gdf(
 
         gdf = gpd.read_file(out_geojson)
         os.remove(out_geojson)
+        # GeoJSON is always read back as EPSG:4326, but the coordinates are the
+        # raw column values, so label them with the requested CRS.
+        if crs is not None:
+            gdf.set_crs(crs, allow_override=True, inplace=True)
     else:
         df = pd.read_csv(in_csv, encoding=encoding)
         df["geometry"] = df[geometry].apply(wkt.loads)
