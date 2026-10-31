@@ -7990,7 +7990,7 @@ def add_text_to_gif(
         out_gif (str): The file path to the output GIF image.
         xy (tuple, optional): Top left corner of the text. It can be formatted like this: (10, 10) or ('15%', '25%'). Defaults to None.
         text_sequence (int, str, list, optional): Text to be drawn. It can be an integer number, a string, or a list of strings. Defaults to None.
-        font_type (str, optional): Font type. It can be the bundled "LiberationSans-Regular.ttf" or any system font. "arial.ttf" is accepted as an alias for the bundled font. Defaults to "LiberationSans-Regular.ttf".
+        font_type (str, optional): Font type. It can be the bundled "LiberationSans-Regular.ttf" or any system font. "arial.ttf" is accepted as an alias for the bundled font. The bundled font has no Arabic or Persian glyphs, so use a system font that covers them for such text. Defaults to "LiberationSans-Regular.ttf".
         font_size (int, optional): Font size. Defaults to 20.
         font_color (str, optional): Font color. It can be a string (e.g., 'red'), rgb tuple (e.g., (255, 127, 0)), or hex code (e.g., '#ff00ff').  Defaults to '#000000'.
         add_progress_bar (bool, optional): Whether to add a progress bar at the bottom of the GIF. Defaults to True.
@@ -8488,7 +8488,7 @@ def create_timelapse(
         text_xy (tuple, optional): The x, y coordinates of the text. For example, ('10%', '10%').
             Defaults to None, using the bottom left corner.
         text_sequence (list, optional): The sequence of text to add to the gif. For example, ['year 1', 'year 2', ...].
-        font_type (str, optional): The font type of the text, can be the bundled 'LiberationSans-Regular.ttf' or any system font. 'arial.ttf' is accepted as an alias for the bundled font. Defaults to 'LiberationSans-Regular.ttf'.
+        font_type (str, optional): The font type of the text, can be the bundled 'LiberationSans-Regular.ttf' or any system font. 'arial.ttf' is accepted as an alias for the bundled font. The bundled font has no Arabic or Persian glyphs, so use a system font that covers them for such text. Defaults to 'LiberationSans-Regular.ttf'.
         font_size (int, optional): The font size of the text. Defaults to 20.
         font_color (str, optional): The color of the text, can be color name or hex code. Defaults to 'black'.
         mp4 (bool, optional): Whether to convert the gif to mp4. Defaults to False.
