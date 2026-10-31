@@ -138,6 +138,23 @@ class TestCommon(unittest.TestCase):
     #         )
     #         assert cm.exception.message != "Input file must be a .pmtiles file."
 
+    def test_add_text_to_gif_fonts(self):
+        """Tests that add_text_to_gif works with the bundled font and its fallbacks."""
+        import tempfile
+
+        from PIL import Image
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            in_gif = os.path.join(tmp_dir, "in.gif")
+            frames = [Image.new("RGB", (50, 50), color) for color in ("red", "blue")]
+            frames[0].save(in_gif, save_all=True, append_images=frames[1:])
+
+            fonts = [{}, {"font_type": "arial.ttf"}, {"font_type": "alibaba.otf"}]
+            for index, kwargs in enumerate(fonts):
+                out_gif = os.path.join(tmp_dir, f"out_{index}.gif")
+                add_text_to_gif(in_gif, out_gif, **kwargs)
+                self.assertTrue(os.path.exists(out_gif))
+
 
 if __name__ == "__main__":
     unittest.main()
