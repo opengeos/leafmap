@@ -6058,7 +6058,7 @@ def plot_raster(
     image,
     band=None,
     cmap="terrain",
-    proj="EPSG:3857",
+    proj=None,
     figsize=None,
     open_kwargs={},
     **kwargs: Any,
@@ -6069,10 +6069,14 @@ def plot_raster(
         image (str | xarray.DataArray ): The input raster image, can be a file path, HTTP URL, or xarray.DataArray.
         band (int, optional): The band index, starting from zero. Defaults to None.
         cmap (str, optional): The matplotlib colormap to use. Defaults to "terrain".
-        proj (str, optional): The EPSG projection code. Defaults to "EPSG:3857".
+        proj (str, optional): The target CRS for reprojection. Defaults to None, which preserves the input raster's CRS.
         figsize (tuple, optional): The figure size as a tuple, such as (10, 8). Defaults to None.
         open_kwargs (dict, optional): The keyword arguments to pass to rioxarray.open_rasterio. Defaults to {}.
+            When image is a file path, masked=True is used by default so that nodata
+            values are excluded from the color stretch.
         **kwargs: Additional keyword arguments to pass to xarray.DataArray.plot().
+            robust=True is used by default (2-98 percentile color stretch);
+            pass vmin and vmax to set the color limits explicitly.
 
     """
     if os.environ.get("USE_MKDOCS") is not None:
@@ -6089,6 +6093,9 @@ def plot_raster(
         return
 
     if isinstance(image, str):
+        # Mask nodata so it does not distort the color stretch. Build a new dict
+        # instead of mutating the shared default argument.
+        open_kwargs = {"masked": True, **open_kwargs}
         da = rioxarray.open_rasterio(image, **open_kwargs)
     elif isinstance(image, xarray.DataArray):
         da = image
@@ -6098,10 +6105,22 @@ def plot_raster(
     if band is not None:
         da = da[dict(band=band)]
 
-    da = da.rio.reproject(proj)
+    if proj is not None:
+        da = da.rio.reproject(proj)
     kwargs["cmap"] = cmap
     kwargs["figsize"] = figsize
-    da.plot(**kwargs)
+    # Use a 2-98 percentile stretch unless vmin/vmax are given explicitly.
+    kwargs.setdefault("robust", True)
+    if "xc" in da.coords and "yc" in da.coords:
+        # Rotated or sheared rasters: plot against real map coordinates.
+        kwargs.setdefault("x", "xc")
+        kwargs.setdefault("y", "yc")
+    result = da.plot(**kwargs)
+
+    # Keep real-world proportions (a projected CRS is in meters).
+    ax = getattr(result, "axes", None)
+    if ax is not None and hasattr(ax, "set_aspect") and "aspect" not in kwargs:
+        ax.set_aspect("equal")
 
 
 def plot_raster_3d(
