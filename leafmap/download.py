@@ -16,6 +16,7 @@ import xarray as xr
 from pystac_client import Client
 from shapely.geometry import box
 from tqdm import tqdm
+import json
 
 # Configure logging
 logging.basicConfig(
