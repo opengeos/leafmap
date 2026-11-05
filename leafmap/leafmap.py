@@ -17,6 +17,76 @@ from .plot import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
+# Colab's dark theme sets light text colors for ipywidgets, but widgets in map
+# controls sit on a light background, so their labels become unreadable. Pin
+# the widgets inside map controls to a light theme so they stay legible in both
+# Colab themes.
+_COLAB_WIDGET_CONTROL_CSS = """
+<style>
+.leaflet-widgetcontrol {
+  color-scheme: light;
+  color: #000000;
+  --colab-primary-text-color: #000000;
+  --colab-secondary-text-color: #424242;
+  --colab-primary-surface-color: #ffffff;
+  --jp-layout-color0: #ffffff;
+  --jp-layout-color1: #ffffff;
+  --jp-layout-color2: #eeeeee;
+  --jp-layout-color3: #bdbdbd;
+  --jp-border-color0: #bdbdbd;
+  --jp-border-color1: #bdbdbd;
+  --jp-border-color2: #e0e0e0;
+  --jp-ui-font-color0: rgba(0, 0, 0, 1);
+  --jp-ui-font-color1: rgba(0, 0, 0, 0.87);
+  --jp-ui-font-color2: rgba(0, 0, 0, 0.54);
+  --jp-ui-font-color3: rgba(0, 0, 0, 0.38);
+  --jp-content-font-color0: rgba(0, 0, 0, 1);
+  --jp-content-font-color1: rgba(0, 0, 0, 0.87);
+  --jp-content-font-color2: rgba(0, 0, 0, 0.54);
+  --jp-content-font-color3: rgba(0, 0, 0, 0.38);
+  --jp-widgets-color: #000000;
+  --jp-widgets-label-color: #000000;
+  --jp-widgets-readout-color: #000000;
+  --jp-widgets-input-color: #000000;
+  --jp-widgets-input-background-color: #ffffff;
+  --jp-widgets-input-border-color: #9e9e9e;
+  --jp-widgets-slider-active-handle-color: #424242;
+  --jp-widgets-slider-handle-border-color: #9e9e9e;
+  --jp-widgets-slider-handle-background-color: #ffffff;
+}
+.leaflet-widgetcontrol .widget-label,
+.leaflet-widgetcontrol .widget-label-basic,
+.leaflet-widgetcontrol .widget-checkbox label,
+.leaflet-widgetcontrol .widget-readout,
+.leaflet-widgetcontrol .widget-html-content,
+.leaflet-widgetcontrol .output_subarea {
+  color: #000000;
+}
+.leaflet-widgetcontrol .jupyter-widgets-output-area,
+.leaflet-widgetcontrol .widget-output,
+.leaflet-widgetcontrol .output_area {
+  background-color: transparent;
+}
+</style>
+"""
+
+
+def _inject_colab_widget_css() -> None:
+    """Displays a stylesheet that keeps map control widgets legible in Colab.
+
+    Colab renders each cell's output in its own frame, so the stylesheet is
+    displayed alongside every map. It does nothing outside Colab, where the
+    widget theme already matches the control background.
+    """
+    if not common._in_colab_shell():
+        return
+    try:
+        from IPython.display import HTML
+
+        display(HTML(_COLAB_WIDGET_CONTROL_CSS))
+    except Exception:
+        pass
+
 
 class Map(ipyleaflet.Map):
     """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map
@@ -30,6 +100,30 @@ class Map(ipyleaflet.Map):
     @property
     def _layer_editor(self) -> Optional[map_widgets.LayerEditor]:
         return self._find_widget_of_type(map_widgets.LayerEditor)
+
+    def _repr_mimebundle_(self, **kwargs):
+        """Returns the widget mimebundle, styling map controls first in Colab.
+
+        Args:
+            **kwargs: Keyword arguments passed to the ipywidgets implementation.
+
+        Returns:
+            dict: The mimebundle used to display the map widget.
+        """
+        _inject_colab_widget_css()
+        return super()._repr_mimebundle_(**kwargs)
+
+    if hasattr(ipyleaflet.Map, "_ipython_display_"):
+        # ipywidgets 7 displays widgets through _ipython_display_ instead.
+
+        def _ipython_display_(self, **kwargs):
+            """Displays the map, styling map controls first in Colab.
+
+            Args:
+                **kwargs: Keyword arguments passed to the ipywidgets implementation.
+            """
+            _inject_colab_widget_css()
+            return super()._ipython_display_(**kwargs)
 
     def __init__(self, **kwargs):
         if "center" not in kwargs:
