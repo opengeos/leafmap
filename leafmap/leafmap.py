@@ -295,9 +295,9 @@ class Map(ipyleaflet.Map):
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
 
-        colab_theme_control = _colab_theme_control()
-        if colab_theme_control is not None:
-            super().add(colab_theme_control)
+        self._colab_theme_control = _colab_theme_control()
+        if self._colab_theme_control is not None:
+            super().add(self._colab_theme_control)
 
     def add(self, obj, index=None, **kwargs) -> None:
         """Adds a layer to the map.
@@ -2217,6 +2217,10 @@ class Map(ipyleaflet.Map):
             controls = self.controls
             layers = self.layers
             self.clear()
+
+            colab_theme_control = getattr(self, "_colab_theme_control", None)
+            if colab_theme_control is not None:
+                ipyleaflet.Map.add(self, colab_theme_control)
 
             if zoom_control:
                 self.add(ipyleaflet.ZoomControl())

@@ -42,6 +42,13 @@ class TestColabTheme(unittest.TestCase):
             m = leafmap.Map()
         self.assertEqual(_theme_controls(m), [])
 
+    def test_control_kept_by_split_map(self):
+        """split_map keeps the theme control after clearing the map."""
+        with mock.patch.object(leafmap.common, "_in_colab_shell", return_value=True):
+            m = leafmap.Map()
+            m.split_map(left_layer="OpenTopoMap", right_layer="Esri.WorldImagery")
+        self.assertEqual(len(_theme_controls(m)), 1)
+
 
 if __name__ == "__main__":
     unittest.main()
