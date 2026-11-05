@@ -1,0 +1,3 @@
+# mapbox module
+
+::: leafmap.mapbox

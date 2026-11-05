@@ -2,49 +2,76 @@
 
 ## How do I report an issue or make a feature request
 
-Please go to <https://github.com/opengeos/leafmap/issues>.
+Please go to <https://github.com/opengeos/leafmap/issues>. When reporting a bug, include a minimal code example and the output of the following code so that the versions of leafmap and its dependencies are known:
+
+```python
+import leafmap
+leafmap.Report()
+```
 
 ## What's the difference between folium and ipyleaflet
 
-A key difference between [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) and [folium](https://github.com/python-visualization/folium) is that ipyleaflet is built upon ipywidgets and allows bidirectional communication between the front-end and the backend enabling the use of the map to capture user input, while folium is meant for displaying static data only ([source](https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a)). Note that [Google Colab](https://colab.research.google.com/) currently does not support ipyleaflet ([source](https://github.com/googlecolab/colabtools/issues/498#issuecomment-695335421)). Therefore, if you are using leafmap
-with Google Colab, `import leafmap` will automatically use the `folium` plotting backend. If you are using leafmap with Jupyter installed locally, `import leafmap` will automatically use the `ipyleaflet', which provides more functionalities for capturing user input (e.g., mouse-clicking and moving).
+A key difference between [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) and [folium](https://github.com/python-visualization/folium) is that ipyleaflet is built upon ipywidgets and allows bidirectional communication between the front-end and the Python kernel, so the map can capture user input (e.g., mouse clicks and drawn shapes). Folium produces static HTML maps and is meant for displaying data only ([source](https://blog.jupyter.org/interactive-gis-in-jupyter-with-ipyleaflet-52f9657fa7a)). As a result, the leafmap toolbar and interactive tools are only available with the ipyleaflet backend, while folium maps are easy to save as standalone HTML files and embed in web apps.
 
 ## How to use a specific plotting backend
 
-`leafmap` has multiple plotting backends, including [folium](https://github.com/python-visualization/folium) and [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet). If you are using `leafmap` with Jupyter installed locally, `import leafmap` will use the `ipyleaflet` plotting backend by default. If you are using `leafmap` with [Google Colab](https://colab.research.google.com/github/opengeos/leafmap/blob/master/docs/notebooks/01_leafmap_intro.ipynb), `import leafmap` will use the `folium` plotting backend by default. Note that Google Colab does not yet support `ipyleaflet` ([source](https://github.com/googlecolab/colabtools/issues/498#issuecomment-695335421)). Therefore, you won't be able to access the `leafmap` toolbar in Colab. Note that the backends do not offer equal functionality. Some interactive functionality in `ipyleaflet` might not be available in `folium`. To use a specific plotting backend, use one of the following:
+`import leafmap` uses the `ipyleaflet` plotting backend by default, in Jupyter Notebook, JupyterLab, Google Colab and VS Code. In [marimo](https://github.com/marimo-team/marimo) notebooks, it uses the `folium` backend. To use a specific plotting backend, import its module explicitly:
 
--   `import leafmap.leafmap as leafmap`
--   `import leafmap.foliumap as leafmap`
+-   `import leafmap.leafmap as leafmap` (ipyleaflet)
+-   `import leafmap.foliumap as leafmap` (folium)
+-   `import leafmap.maplibregl as leafmap` (MapLibre GL JS)
+-   `import leafmap.deckgl as leafmap` (lonboard)
+-   `import leafmap.deck as leafmap` (pydeck)
+-   `import leafmap.kepler as leafmap` (kepler.gl)
+-   `import leafmap.plotlymap as leafmap` (plotly)
+-   `import leafmap.bokehmap as leafmap` (bokeh)
+
+Note that the backends do not offer equal functionality. See [Get Started](get-started.md#plotting-backends) for a comparison.
 
 ## Why the interactive map does not show up
 
-If the interactive map does not show up on Jupyter Notebook and JupyterLab, it is probably because the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) extension is not installed properly.
-For example, you might receive an error message saying `Error displaying widget: model not found`. This a well-known issue related to ipyleaflet. See some relevant issues below.
+If the interactive map does not show up in Jupyter Notebook or JupyterLab, or you see an error such as `Error displaying widget: model not found`, the Jupyter widget front-end is usually out of sync with the Python packages. Modern versions of JupyterLab (4.x) and Notebook (7.x) install widget extensions automatically, so the old `jupyter nbextension` and `jupyter labextension install` commands are no longer needed.
 
--   [How to display map object using ipyleaflet in jupyter notebook or jupyter Lab](https://github.com/jupyter-widgets/ipyleaflet/issues/739)
--   [ipyleaflet does not work in jupyter lab - "Error displaying widget: model not found"](https://github.com/jupyter-widgets/ipyleaflet/issues/418)
--   [Error displaying widget: model not found](https://github.com/jupyter-widgets/ipyleaflet/issues/504)
+Try the following steps:
 
-Try some of the options below to resolve the issue. If the issue persists after trying these steps, you can open an issue on the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet/issues) repository.
+1. Make sure `ipywidgets`, `ipyleaflet` and Jupyter are installed in the same environment as the kernel you are using, and upgrade them together:
 
-For Jupyter notebook, try running the following two commands within your leafmap conda environment:
+    ```bash
+    pip install -U ipywidgets ipyleaflet jupyterlab notebook
+    ```
 
+2. Restart the Jupyter server (not just the kernel) and hard-refresh the browser page.
+3. Run `jupyter labextension list` and check that `jupyter-leaflet` and `@jupyter-widgets/jupyterlab-manager` are enabled.
+
+If the issue persists, you can open an issue on the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet/issues) repository, or try another backend such as `import leafmap.foliumap as leafmap`.
+
+Alternatively, you can run leafmap directly in the cloud using [Google Colab](https://colab.research.google.com/github/opengeos/leafmap/blob/master) or [Binder](https://mybinder.org/v2/gh/opengeos/leafmap/HEAD).
+
+## Why is the map center different between backends
+
+The ipyleaflet, folium, plotly, kepler.gl and lonboard (`deckgl`) backends use `(latitude, longitude)` order for `center`, following the Leaflet convention. The MapLibre (`maplibregl`) backend uses `(longitude, latitude)`, following the MapLibre GL JS and GeoJSON convention. For example, the same view of the contiguous United States is `leafmap.Map(center=(40, -100))` with ipyleaflet and `leafmap.Map(center=(-100, 40))` with MapLibre.
+
+## How do I save a map as an HTML file
+
+Most backends provide a `to_html()` method:
+
+```python
+m = leafmap.Map()
+m.to_html("map.html")
 ```
-jupyter nbextension install --py --symlink --sys-prefix ipyleaflet
-jupyter nbextension enable --py --sys-prefix ipyleaflet
+
+## How do I set API keys
+
+Some basemaps and data sources require API keys, such as `MAPTILER_KEY` for MapTiler styles in the MapLibre backend or `GOOGLE_MAPS_API_KEY` for Google basemaps. Set them as environment variables before importing leafmap, since some keys (e.g., `GOOGLE_MAPS_API_KEY`) are read when the package is imported:
+
+```python
+import os
+os.environ["MAPTILER_KEY"] = "your-api-key"
+
+import leafmap.maplibregl as leafmap
 ```
 
-For JupyterLab, try running the following command within your leafmap conda environment:
-
-```
-jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
-
-```
-
-Alternatively, you can run leafmap directly using binder:
-
--   <https://mybinder.org/v2/gh/opengeos/leafmap/HEAD>
--   <https://mybinder.org/v2/gh/opengeos/leafmap/HEAD>
+In Google Colab, you can also store keys in the Colab Secrets panel; leafmap looks up keys there when they are not set as environment variables.
 
 ## How to use leafmap in countries where Google Services are blocked
 
