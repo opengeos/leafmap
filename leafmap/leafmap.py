@@ -17,13 +17,14 @@ from .plot import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
-# Colab's dark theme sets light text colors for ipywidgets, but map controls
-# sit on a light background, so their labels become unreadable. Pin
-# the widgets inside map controls to a light theme so they stay legible in both
-# Colab themes.
+# Colab's dark theme sets light text colors for ipywidgets and the JupyterLab
+# theme variables, but the map and its controls keep a light background, so
+# widget labels, zoom buttons and the attribution become unreadable. Pin the
+# whole map, including the ipyleaflet built-in controls that read these
+# variables, to a light theme so it stays legible in both Colab themes.
 _COLAB_WIDGET_CONTROL_CSS = """
 <style>
-.leaflet-widgetcontrol {
+.leaflet-container {
   color-scheme: light;
   color: #000000;
   --colab-primary-text-color: #000000;
@@ -62,7 +63,6 @@ _COLAB_WIDGET_CONTROL_CSS = """
 .leaflet-widgetcontrol .output_subarea {
   color: #000000;
 }
-.leaflet-container .leaflet-control-attribution,
 .leaflet-container .leaflet-control-scale-line {
   color: #333333;
 }
@@ -76,7 +76,7 @@ _COLAB_WIDGET_CONTROL_CSS = """
 
 
 def _inject_colab_widget_css() -> None:
-    """Displays a stylesheet that keeps map control widgets legible in Colab.
+    """Displays a stylesheet that keeps map controls legible in Colab.
 
     Colab renders each cell's output in its own frame, so the stylesheet is
     displayed alongside every map. It does nothing outside Colab, where the
