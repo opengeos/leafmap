@@ -17,8 +17,8 @@ from .plot import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
-# Colab's dark theme sets light text colors for ipywidgets, but widgets in map
-# controls sit on a light background, so their labels become unreadable. Pin
+# Colab's dark theme sets light text colors for ipywidgets, but map controls
+# sit on a light background, so their labels become unreadable. Pin
 # the widgets inside map controls to a light theme so they stay legible in both
 # Colab themes.
 _COLAB_WIDGET_CONTROL_CSS = """
@@ -61,6 +61,10 @@ _COLAB_WIDGET_CONTROL_CSS = """
 .leaflet-widgetcontrol .widget-html-content,
 .leaflet-widgetcontrol .output_subarea {
   color: #000000;
+}
+.leaflet-container .leaflet-control-attribution,
+.leaflet-container .leaflet-control-scale-line {
+  color: #333333;
 }
 .leaflet-widgetcontrol .jupyter-widgets-output-area,
 .leaflet-widgetcontrol .widget-output,
