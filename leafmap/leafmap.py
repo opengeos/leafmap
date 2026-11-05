@@ -23,7 +23,11 @@ basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 # whole map, including the ipyleaflet built-in controls that read these
 # variables, to a light theme so it stays legible in both Colab themes.
 _COLAB_WIDGET_CONTROL_CSS = """
+<div class="leafmap-colab-theme"></div>
 <style>
+.leaflet-widgetcontrol:has(.leafmap-colab-theme) {
+  display: none !important;
+}
 .leaflet-container {
   color-scheme: light;
   color: #000000;
@@ -75,21 +79,23 @@ _COLAB_WIDGET_CONTROL_CSS = """
 """
 
 
-def _inject_colab_widget_css() -> None:
-    """Displays a stylesheet that keeps map controls legible in Colab.
+def _colab_theme_control() -> Optional[ipyleaflet.WidgetControl]:
+    """Creates a hidden control that keeps map controls legible in Colab.
 
-    Colab renders each cell's output in its own frame, so the stylesheet is
-    displayed alongside every map. It does nothing outside Colab, where the
-    widget theme already matches the control background.
+    The stylesheet lives inside the map, so it is rendered wherever the map
+    is, including inside containers such as linked maps, and it is never
+    duplicated. Outside Colab, the widget theme already matches the control
+    background, so no control is created.
+
+    Returns:
+        Optional[ipyleaflet.WidgetControl]: The hidden control in Colab,
+        otherwise None.
     """
     if not common._in_colab_shell():
-        return
-    try:
-        from IPython.display import HTML
-
-        display(HTML(_COLAB_WIDGET_CONTROL_CSS))
-    except Exception:
-        pass
+        return None
+    return ipyleaflet.WidgetControl(
+        widget=widgets.HTML(_COLAB_WIDGET_CONTROL_CSS), position="bottomleft"
+    )
 
 
 class Map(ipyleaflet.Map):
@@ -104,30 +110,6 @@ class Map(ipyleaflet.Map):
     @property
     def _layer_editor(self) -> Optional[map_widgets.LayerEditor]:
         return self._find_widget_of_type(map_widgets.LayerEditor)
-
-    def _repr_mimebundle_(self, **kwargs):
-        """Returns the widget mimebundle, styling map controls first in Colab.
-
-        Args:
-            **kwargs: Keyword arguments passed to the ipywidgets implementation.
-
-        Returns:
-            dict: The mimebundle used to display the map widget.
-        """
-        _inject_colab_widget_css()
-        return super()._repr_mimebundle_(**kwargs)
-
-    if hasattr(ipyleaflet.Map, "_ipython_display_"):
-        # ipywidgets 7 displays widgets through _ipython_display_ instead.
-
-        def _ipython_display_(self, **kwargs):
-            """Displays the map, styling map controls first in Colab.
-
-            Args:
-                **kwargs: Keyword arguments passed to the ipywidgets implementation.
-            """
-            _inject_colab_widget_css()
-            return super()._ipython_display_(**kwargs)
 
     def __init__(self, **kwargs):
         if "center" not in kwargs:
@@ -312,6 +294,10 @@ class Map(ipyleaflet.Map):
 
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
+
+        colab_theme_control = _colab_theme_control()
+        if colab_theme_control is not None:
+            super().add(colab_theme_control)
 
     def add(self, obj, index=None, **kwargs) -> None:
         """Adds a layer to the map.
