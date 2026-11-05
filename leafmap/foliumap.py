@@ -768,6 +768,7 @@ class Map(folium.Map):
                 palette_colors = [common.check_color(color) for color in palette]
         else:
             palette_colors = []
+        clamp_palette = True
 
         if vmin is not None and vmax is not None:
             value_range = [float(vmin), float(vmax)]
@@ -784,6 +785,9 @@ class Map(folium.Map):
                     palette_colors = common.get_palette_colors(cmap, 256, hashtag=True)
                 elif isinstance(cmap, dict):
                     palette_colors, keyed_range = _keyed_colormap_to_palette(cmap)
+                    # Keyed (categorical) palettes need exact lookup: values
+                    # outside the keys must stay transparent, not be clamped.
+                    clamp_palette = keyed_range is None
                     if keyed_range is not None and value_range is None:
                         value_range = keyed_range
                 elif cmap is not None:
@@ -821,6 +825,7 @@ class Map(folium.Map):
             nodata_color=nodata_color,
             indexes=indexes,
             sequence=sequence,
+            clamp_palette=clamp_palette,
         )
         layer.add_to(self)
 
@@ -5074,12 +5079,16 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                         const span = vmax - vmin || palette.length || 1;
                         const lastIndex = palette.length - 1;
                         const nullColor = nodataColor || null;
+                        const clampPalette = {{ this.clamp_palette|tojson }};
                         layerOptions.pixelValuesToColorFn = function(values) {
                             const val = Array.isArray(values) ? values[0] : values;
                             if (val === null || val === undefined || Number.isNaN(val)) {
                                 return nullColor;
                             }
                             const ratio = (val - vmin) / span;
+                            if (!clampPalette && (ratio < 0 || ratio > 1)) {
+                                return nullColor;
+                            }
                             const idx = Math.max(0, Math.min(lastIndex, Math.round(ratio * lastIndex)));
                             return palette[idx];
                         };
@@ -5139,9 +5148,18 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         nodata_color: Optional[str] = None,
         indexes: Optional[Sequence[int]] = None,
         sequence: int = 0,
+        clamp_palette: bool = True,
         **kwargs,
     ) -> None:
-        """Initialize the layer."""
+        """Initialize the layer.
+
+        Args:
+            clamp_palette (bool, optional): Whether values outside ``value_range``
+                take the first/last palette color. If False, they are rendered
+                with ``nodata_color`` (transparent by default), which suits
+                categorical palettes. Defaults to True. See the class for the
+                other arguments.
+        """
         layer_name = name if name else "GeoTIFF"
         super().__init__(
             name=layer_name,
@@ -5158,6 +5176,7 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         self.fit_bounds = fit_bounds
         self.show = show
         self.palette = list(palette or [])
+        self.clamp_palette = clamp_palette
         self.value_range = list(value_range) if value_range else None
         self.nodata_color = nodata_color
         self.indexes = list(indexes) if indexes is not None else None

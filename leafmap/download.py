@@ -153,17 +153,18 @@ def download_with_progress(url: str, output_path: str) -> None:
     with requests.get(url, stream=True, timeout=60) as response:
         response.raise_for_status()
         total_size = int(response.headers.get("content-length", 0))
-        progress = tqdm(
-            desc=os.path.basename(output_path),
-            total=total_size,
-            unit="iB",
-            unit_scale=True,
-            unit_divisor=1024,
-        )
-        with open(output_path, "wb") as file, progress as bar:
-            for data in response.iter_content(block_size):
-                size = file.write(data)
-                bar.update(size)
+        # Open the file first so a failed open never leaves a progress bar behind.
+        with open(output_path, "wb") as file:
+            with tqdm(
+                desc=os.path.basename(output_path),
+                total=total_size,
+                unit="iB",
+                unit_scale=True,
+                unit_divisor=1024,
+            ) as bar:
+                for data in response.iter_content(block_size):
+                    size = file.write(data)
+                    bar.update(size)
 
 
 def preview_raster(data: Any, title: str = None) -> None:

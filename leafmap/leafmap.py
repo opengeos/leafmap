@@ -2878,6 +2878,8 @@ class Map(ipyleaflet.Map):
                         "tif": "PNG",
                         "tiff": "PNG",
                     }.get(ext.lower(), ext.upper())
+                    if fmt == "PNG":
+                        image = _to_png_compatible(image)
                     image.save(f, fmt)
                     ext = fmt.lower()
 
@@ -7520,6 +7522,8 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
                         "tif": "PNG",
                         "tiff": "PNG",
                     }.get(ext.lower(), ext.upper())
+                    if fmt == "PNG":
+                        image = _to_png_compatible(image)
                     image.save(f, fmt)
                     ext = fmt.lower()
 
@@ -8106,6 +8110,36 @@ def geojson_layer(
         )
 
     return geojson
+
+
+def _to_png_compatible(image):
+    """Converts a PIL image to a mode that can be saved as PNG.
+
+    Floating-point images (mode "F", e.g., from a float GeoTIFF) are linearly
+    stretched to 8-bit grayscale; other unsupported modes are converted to RGBA.
+
+    Args:
+        image (PIL.Image.Image): The image to convert.
+
+    Returns:
+        PIL.Image.Image: An image whose mode PNG supports.
+    """
+    import numpy as np
+    from PIL import Image
+
+    if image.mode == "F":
+        array = np.asarray(image, dtype="float64")
+        finite = np.isfinite(array)
+        if finite.any():
+            vmin, vmax = array[finite].min(), array[finite].max()
+            scale = 255.0 / (vmax - vmin) if vmax > vmin else 0.0
+            array = np.where(finite, (array - vmin) * scale, 0)
+        else:
+            array = np.zeros_like(array)
+        return Image.fromarray(array.astype("uint8"))
+    if image.mode not in ("1", "L", "LA", "I", "I;16", "P", "RGB", "RGBA"):
+        return image.convert("RGBA")
+    return image
 
 
 def _resolve_basemap_name(name):

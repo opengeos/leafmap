@@ -60,6 +60,17 @@ class TestCommonFixes(unittest.TestCase):
         self.assertEqual(len(result), 3)
         self.assertEqual(set(legend), {"forest", "water"})
 
+    def test_classify_string_column_with_missing(self):
+        """Missing values in a string column are left unclassified."""
+        gdf = gpd.GeoDataFrame(
+            {"lc": pd.Series(["a", None, "b"], dtype="string")},
+            geometry=[Point(0, 0), Point(1, 1), Point(2, 2)],
+            crs="EPSG:4326",
+        )
+        result, legend = common.classify(gdf, "lc")
+        self.assertEqual(set(legend), {"a", "b"})
+        self.assertTrue(pd.isna(result["category"].iloc[1]))
+
     def test_construct_bbox_returns_gdf(self):
         """construct_bbox must import geopandas itself."""
         gdf = common.construct_bbox(0, 0, 1, 1, return_gdf=True)
@@ -189,9 +200,39 @@ class TestFoliumFixes(unittest.TestCase):
         self.assertIsNone(palette[1])
         self.assertTrue(palette[2].startswith("rgba(255, 0, 0, 0.5"))
 
+    def test_keyed_colormap_layer_does_not_clamp(self):
+        """Keyed colormaps render out-of-range values as nodata."""
+        import leafmap.foliumap as foliumap
+
+        layer = foliumap.GeoTIFFLayer(
+            url="https://example.com/a.tif",
+            palette=["#000000", "#ffffff"],
+            value_range=[11, 12],
+            clamp_palette=False,
+        )
+        self.assertFalse(layer.clamp_palette)
+
 
 # A minimal inline style so the MapLibre tests never fetch a remote style.
 EMPTY_STYLE = {"version": 8, "sources": {}, "layers": []}
+
+
+class TestOverlayFixes(unittest.TestCase):
+    """Tests for image overlay helpers."""
+
+    def test_float_image_to_png(self):
+        """Float (mode F) images are converted to a PNG-compatible mode."""
+        from io import BytesIO
+
+        from PIL import Image
+
+        from leafmap.leafmap import _to_png_compatible
+
+        image = Image.fromarray(np.linspace(0, 1, 16, dtype=np.float32).reshape(4, 4))
+        self.assertEqual(image.mode, "F")
+        converted = _to_png_compatible(image)
+        self.assertEqual(converted.mode, "L")
+        converted.save(BytesIO(), "PNG")
 
 
 class TestMapLibreFixes(unittest.TestCase):

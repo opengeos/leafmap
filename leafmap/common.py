@@ -5955,7 +5955,8 @@ def classify(
     init_column = None
     value_list = None
     if not pd.api.types.is_numeric_dtype(df[column]):
-        value_list = df[column].unique().tolist()
+        # Missing values cannot be sorted; they stay unclassified (NaN).
+        value_list = df[column].dropna().unique().tolist()
         value_list.sort()
         # Map to codes explicitly; replace() on a string extension array would
         # try to store integers in a string column.
