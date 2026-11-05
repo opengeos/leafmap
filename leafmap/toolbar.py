@@ -1814,8 +1814,8 @@ def split_basemaps(
         right_name (str, optional): The default value of the right dropdown list. Defaults to None.
         width (str, optional): The width of the dropdown list. Defaults to "120px".
     """
-    from .basemaps import wms_tiles
-    from .leafmap import basemaps, get_basemap
+    from .basemaps import WMS_TILES as wms_tiles
+    from .leafmap import _resolve_basemap_name, basemaps, get_basemap
 
     controls = m.controls
     layers = m.layers
@@ -1834,10 +1834,8 @@ def split_basemaps(
         keys = list(layers_dict.keys())
 
     if layers_dict is None:
-        if left_name is None:
-            left_name = "ROADMAP"
-        if right_name is None:
-            right_name = "HYBRID"
+        left_name = _resolve_basemap_name(left_name or "ROADMAP")
+        right_name = _resolve_basemap_name(right_name or "HYBRID")
     else:
         if left_name is None:
             left_name = keys[0]
@@ -2040,6 +2038,17 @@ def time_slider(
     pause_btn.on_click(pause_click)
 
     keys = list(layers.keys())
+    # Snapshot each frame's URL and name before the displayed layer (which may
+    # be the first entry of ``layers`` itself) gets mutated by the slider.
+    frame_urls = {}
+    frame_names = {}
+    for key, value in layers.items():
+        if isinstance(value, str):
+            frame_urls[key] = value
+            frame_names[key] = None
+        else:
+            frame_urls[key] = value.url
+            frame_names[key] = value.name
     layer = layers[keys[0]]
     if isinstance(layer, str) and layer.startswith("http"):
         layer = ipyleaflet.TileLayer(url=layer, **tile_args)
@@ -2052,12 +2061,8 @@ def time_slider(
         # Use keys[index] instead of label.value to avoid potential mismatch
         # between label widget value and dictionary keys
         layer_key = keys[index]
-        if isinstance(layers[layer_key], str) and layers[layer_key].startswith("http"):
-            layer.url = layers[layer_key]
-            layer.name = labels[index]
-        else:
-            layer.url = layers[layer_key].url
-            layer.name = layers[layer_key].name
+        layer.url = frame_urls[layer_key]
+        layer.name = frame_names[layer_key] or labels[index]
         m.default_style = {"cursor": "default"}
 
     slider.observe(slider_changed, "value")
@@ -6436,8 +6441,8 @@ def layer_manager_gui(
 
                 layer_settings.on_click(layer_settings_click)
 
-                def layer_opacity_changed(change):
-                    if change["new"]:
+                def layer_opacity_changed(change, layer=layer):
+                    if change["new"] is not None:
                         layer.style = {
                             "opacity": change["new"],
                             "fillOpacity": change["new"],
