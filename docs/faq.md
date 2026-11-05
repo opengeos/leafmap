@@ -71,7 +71,16 @@ os.environ["MAPTILER_KEY"] = "your-api-key"
 import leafmap.maplibregl as leafmap
 ```
 
-In Google Colab, you can also store keys in the Colab Secrets panel; leafmap looks up keys there when they are not set as environment variables.
+In Google Colab, you can also store keys in the Colab Secrets panel. For keys looked up when a function is called (such as `MAPTILER_KEY`), leafmap checks Colab Secrets first and falls back to the environment variable. Google basemaps are the exception: `GOOGLE_MAPS_API_KEY` is only read from the environment when leafmap is imported, so copy it from Secrets into the environment first:
+
+```python
+import os
+from google.colab import userdata
+
+os.environ["GOOGLE_MAPS_API_KEY"] = userdata.get("GOOGLE_MAPS_API_KEY")
+
+import leafmap
+```
 
 ## How to use leafmap in countries where Google Services are blocked
 

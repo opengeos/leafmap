@@ -99,7 +99,7 @@ Note that MapLibre uses `(longitude, latitude)` order for `center`, while the ip
 
 ## Add your own data
 
-All backends support adding common vector and raster data with a few lines of code:
+With the default ipyleaflet backend, adding vector and raster data takes a few lines of code. Most other backends offer similar methods, but not all of them support every data type (for example, `leafmap.deck` and `leafmap.kepler` have no `add_cog_layer()`), so check the API Reference for the backend you use.
 
 ```python
 import leafmap
