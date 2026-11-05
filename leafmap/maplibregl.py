@@ -11155,6 +11155,12 @@ class DateFilterWidget(widgets.VBox):
         gdf = gdfs[file_index]
         # Parse separately so string date columns compare correctly while the
         # GeoJSON sent to the map keeps its original (serializable) values.
+        missing = [c for c in (start_date_col, end_date_col) if c not in gdf.columns]
+        if missing:
+            raise ValueError(
+                f"Date column(s) {missing} not found. Set start_date_col and "
+                f"end_date_col to columns in the data: {list(gdf.columns)}"
+            )
         start_dates = pd.to_datetime(gdf[start_date_col])
         end_dates = pd.to_datetime(gdf[end_date_col])
 

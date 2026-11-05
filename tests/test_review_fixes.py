@@ -272,12 +272,14 @@ class TestMapLibreFixes(unittest.TestCase):
 
     def test_message_queue_env_false(self):
         """USE_MESSAGE_QUEUE=False must not enable the message queue."""
-        os.environ["USE_MESSAGE_QUEUE"] = "False"
-        try:
+        from unittest import mock
+
+        with mock.patch.dict(os.environ, {"USE_MESSAGE_QUEUE": "False"}):
             m = self.maplibregl.Map(style=EMPTY_STYLE)
-            self.assertFalse(getattr(m, "_use_message_queue", False))
-        finally:
-            del os.environ["USE_MESSAGE_QUEUE"]
+            self.assertFalse(m._use_message_queue)
+        with mock.patch.dict(os.environ, {"USE_MESSAGE_QUEUE": "true"}):
+            m = self.maplibregl.Map(style=EMPTY_STYLE)
+            self.assertTrue(m._use_message_queue)
 
 
 if __name__ == "__main__":
