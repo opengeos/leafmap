@@ -10,7 +10,7 @@ from box import Box
 from IPython.display import display
 
 from . import common, examples, map_widgets, osm, pc
-from .basemaps import xyz_to_leaflet
+from .basemaps import TileLayer, get_osm_layer, xyz_to_leaflet
 from .common import *
 from .legends import builtin_legends
 from .plot import *
@@ -47,6 +47,8 @@ class Map(ipyleaflet.Map):
         if "basemap" in kwargs:
             if isinstance(kwargs["basemap"], str):
                 kwargs["basemap"] = get_basemap(kwargs["basemap"])
+        else:
+            kwargs["basemap"] = get_osm_layer()
 
         super().__init__(**kwargs)
         self.baseclass = "ipyleaflet"
@@ -380,7 +382,7 @@ class Map(ipyleaflet.Map):
                     max_zoom = basemap["max_zoom"]
                 else:
                     max_zoom = 22
-                layer = ipyleaflet.TileLayer(
+                layer = TileLayer(
                     url=url,
                     name=name,
                     max_zoom=max_zoom,
@@ -618,7 +620,7 @@ class Map(ipyleaflet.Map):
         if "max_native_zoom" not in kwargs:
             kwargs["max_native_zoom"] = 30
         try:
-            tile_layer = ipyleaflet.TileLayer(
+            tile_layer = TileLayer(
                 url=url,
                 name=name,
                 attribution=attribution,
@@ -7870,7 +7872,7 @@ def get_basemap(name: str):
         if name in basemaps.keys():
             basemap = basemaps[name]
             if basemap["type"] == "xyz":
-                layer = ipyleaflet.TileLayer(
+                layer = TileLayer(
                     url=basemap["url"],
                     name=basemap["name"],
                     max_zoom=24,

@@ -26,10 +26,50 @@ import folium
 import ipyleaflet
 import requests
 import xyzservices
+from traitlets import Unicode
 
 from .common import GoogleMapsTileProvider, check_package, planet_tiles
 
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", None)
+
+
+class TileLayer(ipyleaflet.TileLayer):
+    """An ipyleaflet TileLayer that exposes Leaflet's ``referrerPolicy`` option.
+
+    The OpenStreetMap tile servers reject requests without a ``Referer``
+    header and return an "Access blocked" tile instead. Some notebook
+    environments, such as Google Colab, render widget output in an iframe
+    whose referrer policy strips the header. Setting ``referrerPolicy`` on
+    the tile ``<img>`` elements overrides the page policy so the origin is
+    sent again. See https://wiki.openstreetmap.org/wiki/Blocked_tiles.
+    """
+
+    referrer_policy = Unicode("strict-origin-when-cross-origin", allow_none=True).tag(
+        sync=True, o=True
+    )
+
+
+def get_osm_layer(**kwargs) -> TileLayer:
+    """Create an OpenStreetMap tile layer that sends a Referer header.
+
+    Args:
+        **kwargs: Additional keyword arguments passed to TileLayer.
+
+    Returns:
+        TileLayer: The OpenStreetMap tile layer.
+    """
+    provider = xyzservices.providers.OpenStreetMap.Mapnik
+    params = {
+        "url": provider.build_url(),
+        "name": "OpenStreetMap",
+        "max_zoom": 24,
+        "max_native_zoom": provider.get("max_zoom", 19),
+        "attribution": provider.html_attribution,
+        "base": True,
+    }
+    params.update(kwargs)
+    return TileLayer(**params)
+
 
 XYZ_TILES = {
     "OpenStreetMap": {
