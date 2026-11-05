@@ -304,7 +304,10 @@ class Map(ipyleaflet.Map):
         # the loop that owns it.
         task = getattr(self, "_fit_bounds_task", None)
         if task is not None and not task.done():
-            task.get_loop().call_soon_threadsafe(task.cancel)
+            try:
+                task.get_loop().call_soon_threadsafe(task.cancel)
+            except RuntimeError:
+                pass  # The old task's loop is closed, so it can never run.
         self._fit_bounds_task = asyncio.ensure_future(self._fit_bounds(bounds))
         self._fit_bounds_task.add_done_callback(self._log_fit_bounds_error)
 
@@ -404,7 +407,7 @@ class Map(ipyleaflet.Map):
 
         min_zoom = max(1, self.min_zoom or 1)
         zoomed_out = False
-        while self.zoom > min_zoom and not within_bounds():
+        while self.zoom - 1 >= min_zoom and not within_bounds():
             zoomed_out = True
             if not await self._set_view_and_wait(zoom=self.zoom - 1):
                 return
@@ -415,7 +418,7 @@ class Map(ipyleaflet.Map):
                     return
                 if not await self._set_view_and_wait(zoom=self.zoom + 1):
                     return
-            if self.zoom > min_zoom:
+            if self.zoom - 1 >= min_zoom:
                 await self._set_view_and_wait(zoom=self.zoom - 1)
 
     def zoom_to_bounds(self, bounds) -> None:
