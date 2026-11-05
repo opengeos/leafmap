@@ -371,8 +371,8 @@ class Map(ipyleaflet.Map):
 
         Same approach as ipyleaflet's ``_fit_bounds`` (move the center, then
         step the zoom level while checking the bounds the frontend reports),
-        but it waits with ``_set_view_and_wait``, stops at ``max_zoom``, and
-        stops if the frontend stops responding.
+        but it waits with ``_set_view_and_wait``, stays within ``min_zoom`` and
+        ``max_zoom``, and stops if the frontend stops responding.
 
         Args:
             bounds (list): Bounds in the form [[south, west], [north, east]].
@@ -400,8 +400,9 @@ class Map(ipyleaflet.Map):
                 south > b_south or north < b_north or west > b_west or east < b_east
             )
 
+        min_zoom = max(1, self.min_zoom or 1)
         zoomed_out = False
-        while self.zoom > 1 and not within_bounds():
+        while self.zoom > min_zoom and not within_bounds():
             zoomed_out = True
             if not await self._set_view_and_wait(zoom=self.zoom - 1):
                 return

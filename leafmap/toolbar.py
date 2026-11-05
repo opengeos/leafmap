@@ -54,6 +54,10 @@ class _ToolbarHoverEvent(ipyevents.Event):
     pointer inside are ignored.
     """
 
+    # Overrides the private ipyevents message handler (ipyevents 2.x), which
+    # receives every DOM event before the registered callbacks. If a future
+    # ipyevents renames it, this override is simply never called and hover
+    # handling falls back to the plain debounced behaviour.
     def _handle_mouse_msg(self, _, content, buffers):
         if content.get("type") == "mouseleave" and _pointer_inside(content):
             return
