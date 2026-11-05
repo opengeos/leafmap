@@ -299,10 +299,12 @@ class Map(ipyleaflet.Map):
             asyncio.set_event_loop(asyncio.new_event_loop())
 
         # Cancel a fit that is still in progress so that two fits do not
-        # fight over the zoom level.
+        # fight over the zoom level. A widget callback may run on a kernel
+        # subshell thread with its own event loop, so cancel the old task on
+        # the loop that owns it.
         task = getattr(self, "_fit_bounds_task", None)
         if task is not None and not task.done():
-            task.cancel()
+            task.get_loop().call_soon_threadsafe(task.cancel)
         self._fit_bounds_task = asyncio.ensure_future(self._fit_bounds(bounds))
         self._fit_bounds_task.add_done_callback(self._log_fit_bounds_error)
 
@@ -413,7 +415,8 @@ class Map(ipyleaflet.Map):
                     return
                 if not await self._set_view_and_wait(zoom=self.zoom + 1):
                     return
-            await self._set_view_and_wait(zoom=self.zoom - 1)
+            if self.zoom > min_zoom:
+                await self._set_view_and_wait(zoom=self.zoom - 1)
 
     def zoom_to_bounds(self, bounds) -> None:
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].

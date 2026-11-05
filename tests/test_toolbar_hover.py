@@ -40,8 +40,10 @@ def test_pointer_inside():
     assert _pointer_inside(_event("mouseleave", 150, 100))
     assert not _pointer_inside(_event("mouseleave", 250, 100))
     assert not _pointer_inside(_event("mouseleave", 150, 40))
-    # A pointer resting on the edge counts as outside.
-    assert not _pointer_inside(_event("mouseleave", 100, 100))
+    # Left/top edges are inside, right/bottom edges are outside.
+    assert _pointer_inside(_event("mouseleave", 100, 50))
+    assert not _pointer_inside(_event("mouseleave", 200, 100))
+    assert not _pointer_inside(_event("mouseleave", 150, 150))
     # Events without position data are never treated as inside.
     assert not _pointer_inside({"type": "mouseleave"})
 

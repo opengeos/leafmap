@@ -18,14 +18,14 @@ TOOLBAR_HOVER_DEBOUNCE_MS = 250
 TOOLBAR_HOVER_MODE = "debounce"
 
 
-def _pointer_inside(event: Dict[str, Any], margin: float = 1.0) -> bool:
+def _pointer_inside(event: Dict[str, Any]) -> bool:
     """Checks whether a mouse event's pointer lies inside the source element.
+
+    The rect is treated as half-open (left and top edges inside, right and
+    bottom edges outside), which matches how browsers hit-test elements.
 
     Args:
         event (dict): The DOM event content sent by ipyevents.
-        margin (float, optional): Inset in pixels applied to the element's
-            bounding rect, so that a pointer resting on the edge counts as
-            outside. Defaults to 1.0.
 
     Returns:
         bool: True if the pointer is inside the element's bounding rect,
@@ -40,7 +40,7 @@ def _pointer_inside(event: Dict[str, Any], margin: float = 1.0) -> bool:
         bottom = float(event["boundingRectBottom"])
     except (KeyError, TypeError, ValueError):
         return False
-    return (left + margin < x < right - margin) and (top + margin < y < bottom - margin)
+    return (left <= x < right) and (top <= y < bottom)
 
 
 class _ToolbarHoverEvent(ipyevents.Event):
