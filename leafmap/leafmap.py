@@ -17,6 +17,86 @@ from .plot import *
 
 basemaps = Box(xyz_to_leaflet(), frozen_box=True)
 
+# Colab's dark theme sets light text colors for ipywidgets and the JupyterLab
+# theme variables, but the map and its controls keep a light background, so
+# widget labels, zoom buttons and the attribution become unreadable. Pin the
+# whole map, including the ipyleaflet built-in controls that read these
+# variables, to a light theme so it stays legible in both Colab themes.
+_COLAB_WIDGET_CONTROL_CSS = """
+<div class="leafmap-colab-theme"></div>
+<style>
+.leaflet-widgetcontrol:has(.leafmap-colab-theme) {
+  display: none !important;
+}
+.leaflet-container {
+  color-scheme: light;
+  color: #000000;
+  --colab-primary-text-color: #000000;
+  --colab-secondary-text-color: #424242;
+  --colab-primary-surface-color: #ffffff;
+  --jp-layout-color0: #ffffff;
+  --jp-layout-color1: #ffffff;
+  --jp-layout-color2: #eeeeee;
+  --jp-layout-color3: #bdbdbd;
+  --jp-border-color0: #bdbdbd;
+  --jp-border-color1: #bdbdbd;
+  --jp-border-color2: #e0e0e0;
+  --jp-ui-font-color0: rgba(0, 0, 0, 1);
+  --jp-ui-font-color1: rgba(0, 0, 0, 0.87);
+  --jp-ui-font-color2: rgba(0, 0, 0, 0.54);
+  --jp-ui-font-color3: rgba(0, 0, 0, 0.38);
+  --jp-content-font-color0: rgba(0, 0, 0, 1);
+  --jp-content-font-color1: rgba(0, 0, 0, 0.87);
+  --jp-content-font-color2: rgba(0, 0, 0, 0.54);
+  --jp-content-font-color3: rgba(0, 0, 0, 0.38);
+  --jp-widgets-color: #000000;
+  --jp-widgets-label-color: #000000;
+  --jp-widgets-readout-color: #000000;
+  --jp-widgets-input-color: #000000;
+  --jp-widgets-input-background-color: #ffffff;
+  --jp-widgets-input-border-color: #9e9e9e;
+  --jp-widgets-slider-active-handle-color: #424242;
+  --jp-widgets-slider-handle-border-color: #9e9e9e;
+  --jp-widgets-slider-handle-background-color: #ffffff;
+}
+.leaflet-widgetcontrol .widget-label,
+.leaflet-widgetcontrol .widget-label-basic,
+.leaflet-widgetcontrol .widget-checkbox label,
+.leaflet-widgetcontrol .widget-readout,
+.leaflet-widgetcontrol .widget-html-content,
+.leaflet-widgetcontrol .output_subarea {
+  color: #000000;
+}
+.leaflet-container .leaflet-control-scale-line {
+  color: #333333;
+}
+.leaflet-widgetcontrol .jupyter-widgets-output-area,
+.leaflet-widgetcontrol .widget-output,
+.leaflet-widgetcontrol .output_area {
+  background-color: transparent;
+}
+</style>
+"""
+
+
+def _colab_theme_control() -> Optional[ipyleaflet.WidgetControl]:
+    """Creates a hidden control that keeps map controls legible in Colab.
+
+    The stylesheet lives inside the map, so it is rendered wherever the map
+    is, including inside containers such as linked maps, and it is never
+    duplicated. Outside Colab, the widget theme already matches the control
+    background, so no control is created.
+
+    Returns:
+        Optional[ipyleaflet.WidgetControl]: The hidden control in Colab,
+        otherwise None.
+    """
+    if not common._in_colab_shell():
+        return None
+    return ipyleaflet.WidgetControl(
+        widget=widgets.HTML(_COLAB_WIDGET_CONTROL_CSS), position="bottomleft"
+    )
+
 
 class Map(ipyleaflet.Map):
     """The Map class inherits ipyleaflet.Map. The arguments you can pass to the Map
@@ -214,6 +294,10 @@ class Map(ipyleaflet.Map):
 
         if "catalog_source" in kwargs:
             self.set_catalog_source(kwargs["catalog_source"])
+
+        self._colab_theme_control = _colab_theme_control()
+        if self._colab_theme_control is not None:
+            super().add(self._colab_theme_control)
 
     def add(self, obj, index=None, **kwargs) -> None:
         """Adds a layer to the map.
@@ -2133,6 +2217,10 @@ class Map(ipyleaflet.Map):
             controls = self.controls
             layers = self.layers
             self.clear()
+
+            colab_theme_control = getattr(self, "_colab_theme_control", None)
+            if colab_theme_control is not None:
+                ipyleaflet.Map.add(self, colab_theme_control)
 
             if zoom_control:
                 self.add(ipyleaflet.ZoomControl())
