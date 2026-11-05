@@ -1,6 +1,7 @@
 """This module contains some common functions for both folium and ipyleaflet."""
 
 import csv
+import inspect
 import json
 import os
 import shutil
@@ -1822,7 +1823,7 @@ def gdf_to_geojson(
                 raise TypeError(
                     "The output file extension must be either .json or .geojson"
                 )
-            out_dir = os.path.dirname(out_geojson)
+            out_dir = os.path.dirname(os.path.abspath(out_geojson))
             if not os.path.exists(out_dir):
                 os.makedirs(out_dir)
 
@@ -3825,7 +3826,12 @@ def points_from_xy(data, x=None, y=None, z=None, crs=None, **kwargs: Any):
         else:
             raise ValueError("The y column could not be found.")
 
-    gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df[x], df[y], z=z, crs=crs))
+    gdf = gpd.GeoDataFrame(
+        df,
+        geometry=gpd.points_from_xy(
+            df[x], df[y], z=df[z] if z is not None else None, crs=crs
+        ),
+    )
 
     return gdf
 
@@ -4196,7 +4202,7 @@ def gdf_geom_type(gdf, first_only=True):
     import geopandas as gpd
 
     if first_only:
-        return gdf.geometry.type[0]
+        return gdf.geometry.geom_type.iloc[0]
     else:
         return gdf.geometry.type
 
@@ -4220,9 +4226,13 @@ def vector_geom_type(data, first_only=True, **kwargs: Any):
 
     if isinstance(data, str) or isinstance(data, dict):
         gdf = gpd.read_file(data, **kwargs)
+    elif isinstance(data, gpd.GeoDataFrame):
+        gdf = data
+    else:
+        raise TypeError("data must be a file path, GeoJSON dict or GeoDataFrame.")
 
     if first_only:
-        return gdf.geometry.type[0]
+        return gdf.geometry.geom_type.iloc[0]
     else:
         return gdf.geometry.type
 
@@ -4497,7 +4507,9 @@ def numpy_to_image(
     if np_array.dtype == np.float64 or np_array.dtype == np.float32:
         # Convert the array to uint8
         # np_array = (np_array * 255).astype(np.uint8)
-        np.interp(np_array, (np_array.min(), np_array.max()), (0, 255)).astype(np.uint8)
+        np_array = np.interp(
+            np_array, (np_array.min(), np_array.max()), (0, 255)
+        ).astype(np.uint8)
     else:
         # The array is already uint8
         np_array = np_array
@@ -5210,12 +5222,24 @@ def download_file(
         else:
             url = github_raw_url(url)
 
-    if "https://drive.google.com/file/d/" in url:
+    if isinstance(url, str) and "https://drive.google.com/file/d/" in url:
         fuzzy = True
 
-    output = gdown.download(
-        url, output, quiet, proxy, speed, use_cookies, verify, id, fuzzy, resume
+    download_kwargs = dict(
+        url=url,
+        output=output,
+        quiet=quiet,
+        proxy=proxy,
+        speed=speed,
+        use_cookies=use_cookies,
+        verify=verify,
+        id=id,
+        resume=resume,
     )
+    # gdown >= 6 removed ``fuzzy`` (file URLs are always parsed fuzzily).
+    if "fuzzy" in inspect.signature(gdown.download).parameters:
+        download_kwargs["fuzzy"] = fuzzy
+    output = gdown.download(**download_kwargs)
 
     if unzip:
         if output.endswith(".zip"):
@@ -5371,9 +5395,20 @@ def download_folder(
         )
         return
 
-    files = gdown.download_folder(
-        url, id, output, quiet, proxy, speed, use_cookies, remaining_ok
+    folder_kwargs = dict(
+        url=url,
+        id=id,
+        output=output,
+        quiet=quiet,
+        proxy=proxy,
+        speed=speed,
+        use_cookies=use_cookies,
     )
+    # Passing these positionally put ``remaining_ok`` into gdown's ``verify``
+    # slot, which disabled TLS certificate verification.
+    if "remaining_ok" in inspect.signature(gdown.download_folder).parameters:
+        folder_kwargs["remaining_ok"] = remaining_ok
+    files = gdown.download_folder(**folder_kwargs)
     return files
 
 
@@ -5411,7 +5446,9 @@ def clip_image(image, mask, output, to_cog=True):
 
     if isinstance(mask, str):
         if mask.startswith("http"):
-            mask = download_file(mask, output)
+            mask = download_file(
+                mask, temp_file_path(os.path.splitext(mask)[1] or ".geojson")
+            )
         if not os.path.exists(mask):
             raise FileNotFoundError(f"{mask} does not exist.")
     elif isinstance(mask, list) or isinstance(mask, dict):
@@ -5533,7 +5570,10 @@ def clip_raster(
         )
 
     if geom_crs is not None:
-        gdf.set_crs(geom_crs, inplace=True)
+        gdf = gdf.set_crs(geom_crs)
+    elif gdf.crs is None:
+        # GeoJSON dicts carry no CRS; GeoJSON coordinates are WGS84 by spec.
+        gdf = gdf.set_crs("EPSG:4326")
 
     if isinstance(resolution, (int, float)):
         resolution = (resolution, resolution)
@@ -5898,7 +5938,7 @@ def classify(
     # Convert categorical data to numeric
     init_column = None
     value_list = None
-    if np.issubdtype(df[column].dtype, np.object_):
+    if not pd.api.types.is_numeric_dtype(df[column]):
         value_list = df[column].unique().tolist()
         value_list.sort()
         df["category"] = df[column].replace(value_list, range(0, len(value_list)))
@@ -7110,7 +7150,7 @@ def zoom_level_resolution(zoom, latitude=0):
     """
     import math
 
-    resolution = 156543.04 * math.cos(latitude) / math.pow(2, zoom)
+    resolution = 156543.04 * math.cos(math.radians(latitude)) / math.pow(2, zoom)
     return abs(resolution)
 
 
@@ -7265,7 +7305,10 @@ def get_geometry_coords(row, geom, coord_type, shape_type, mercator=False):
 
     # Parse the exterior of the coordinate
     if shape_type.lower() in ["polygon", "multipolygon"]:
-        exterior = row[geom].geoms[0].exterior
+        polygon = row[geom]
+        if polygon.geom_type == "MultiPolygon":
+            polygon = polygon.geoms[0]
+        exterior = polygon.exterior
         if coord_type == "x":
             # Get the x coordinates of the exterior
             coords = list(exterior.coords.xy[0])
@@ -7281,13 +7324,16 @@ def get_geometry_coords(row, geom, coord_type, shape_type, mercator=False):
             return coords
 
     elif shape_type.lower() in ["linestring", "multilinestring"]:
+        line = row[geom]
+        if line.geom_type == "MultiLineString":
+            line = line.geoms[0]
         if coord_type == "x":
-            coords = list(row[geom].coords.xy[0])
+            coords = list(line.coords.xy[0])
             if mercator:
                 coords = [lnglat_to_meters(x, 0)[0] for x in coords]
             return coords
         elif coord_type == "y":
-            coords = list(row[geom].coords.xy[1])
+            coords = list(line.coords.xy[1])
             if mercator:
                 coords = [lnglat_to_meters(0, y)[1] for y in coords]
             return coords
@@ -11816,6 +11862,10 @@ def array_to_memory_file(
 
         kwargs["transform"] = transform
 
+    if dtype is None and np.issubdtype(array.dtype, np.floating):
+        # Keep floating-point data floating; narrowing it to an integer type
+        # based on its range would truncate values (e.g., NDVI to all zeros).
+        dtype = np.float32 if array.dtype.itemsize < 4 else array.dtype
     if dtype is None:
         # Determine the minimum and maximum values in the array
         min_value = np.min(array)
@@ -12029,6 +12079,10 @@ def array_to_image(
 
         kwargs["transform"] = transform
 
+    if dtype is None and np.issubdtype(array.dtype, np.floating):
+        # Keep floating-point data floating; narrowing it to an integer type
+        # based on its range would truncate values (e.g., NDVI to all zeros).
+        dtype = np.float32 if array.dtype.itemsize < 4 else array.dtype
     if dtype is None:
         # Determine the minimum and maximum values in the array
         min_value = np.min(array)
@@ -15784,7 +15838,6 @@ def gedi_subset(
         # CMR API base url
         doisearch = f"https://cmr.earthdata.nasa.gov/search/collections.json?doi={doi}"
         concept_id = re.get(doisearch).json()["feed"]["entry"][0]["id"]
-        concept_id
         collection = Collection(id=concept_id)
 
     if username is None:
@@ -16384,7 +16437,7 @@ def nasa_datasets(keyword=None, df=None, return_short_name=False):
     if keyword is not None:
         # Convert keyword and DataFrame values to lowercase
         keyword_lower = keyword.lower()
-        df_lower = df.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+        df_lower = df.map(lambda x: x.lower() if isinstance(x, str) else x)
 
         # Use boolean indexing to filter the DataFrame
         filtered_df = df[
@@ -17381,6 +17434,8 @@ def construct_bbox(
     Returns:
         The constructed bounding box (Polygon).
     """
+
+    import geopandas as gpd
     from shapely.geometry import box
 
     if len(args) == 2:
@@ -18728,6 +18783,8 @@ def color_code_dataframe(
         >>> df = pd.DataFrame({"Risk": ["low", "medium", "high", None]})
         >>> color_df = color_code_dataframe(df, cat_legend)
     """
+
+    import geopandas as gpd
     import re
 
     # Handle different input types
@@ -18868,9 +18925,11 @@ def color_code_dataframe(
         # For categorical legend, look for object or category columns
         columns_to_process: List[str] = []
         for col in df.columns:
-            if pd.api.types.is_object_dtype(
-                df[col]
-            ) or pd.api.types.is_categorical_dtype(df[col]):
+            if (
+                pd.api.types.is_object_dtype(df[col])
+                or pd.api.types.is_string_dtype(df[col])
+                or isinstance(df[col].dtype, pd.CategoricalDtype)
+            ):
                 columns_to_process.append(col)
             # Also check if numeric columns might contain discrete categories
             elif pd.api.types.is_numeric_dtype(df[col]) and df[col].nunique() < 10:
@@ -19171,6 +19230,8 @@ def filter_geom_type(
     Returns:
         The filtered GeoDataFrame.
     """
+
+    import geopandas as gpd
 
     if isinstance(data, str):
         data = read_vector(data)

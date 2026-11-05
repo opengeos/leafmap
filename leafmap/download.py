@@ -1,5 +1,7 @@
 """This module provides functions to download data, including NAIP imagery and building data from Overture Maps."""
 
+import datetime
+import json
 import logging
 import os
 from typing import Any, Dict, List, Optional, Tuple
@@ -145,7 +147,8 @@ def download_with_progress(url: str, output_path: str) -> None:
         url: URL of the file to download.
         output_path: Path where the file will be saved.
     """
-    response = requests.get(url, stream=True)
+    response = requests.get(url, stream=True, timeout=60)
+    response.raise_for_status()
     total_size = int(response.headers.get("content-length", 0))
     block_size = 1024  # 1 Kibibyte
 
