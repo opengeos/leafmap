@@ -774,6 +774,8 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
         ):
             run_titiler(show_logs=False)
         titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
+        if titiler_endpoint is None:
+            raise RuntimeError("Failed to start a local TiTiler server.")
     elif titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
             titiler_endpoint = os.environ.get("TITILER_ENDPOINT")

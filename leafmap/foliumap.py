@@ -783,9 +783,11 @@ class Map(folium.Map):
                 if isinstance(cmap, str):
                     palette_colors = common.get_palette_colors(cmap, 256, hashtag=True)
                 elif isinstance(cmap, dict):
-                    palette_colors = [common.check_color(c) for c in cmap.values()]
+                    palette_colors, keyed_range = _keyed_colormap_to_palette(cmap)
+                    if keyed_range is not None and value_range is None:
+                        value_range = keyed_range
                 elif cmap is not None:
-                    palette_colors = [common.check_color(c) for c in cmap]
+                    palette_colors = [_css_color(c) for c in cmap]
         if "rescale" in kwargs:
             if isinstance(kwargs["rescale"], str):
                 value_range = kwargs["rescale"].split(",")
@@ -4859,6 +4861,59 @@ def geojson_layer(
         data=data, name=layer_name, tooltip=tooltip, popup=popup, **kwargs
     )
     return geojson
+
+
+def _css_color(color: Any) -> str:
+    """Converts a color to a CSS color string, keeping any alpha channel.
+
+    Args:
+        color (Any): A color name, hex string, or an RGB/RGBA sequence with
+            0-255 channels.
+
+    Returns:
+        str: A CSS color string, such as "#ff0000" or "rgba(255, 0, 0, 0.5)".
+    """
+    if isinstance(color, (list, tuple)) and len(color) == 4:
+        r, g, b, a = color
+        alpha = a / 255 if a > 1 else a
+        return f"rgba({int(r)}, {int(g)}, {int(b)}, {alpha})"
+    return common.check_color(color)
+
+
+def _keyed_colormap_to_palette(
+    colormap: Dict[Any, Any], max_size: int = 65536
+) -> Tuple[List[Optional[str]], Optional[List[float]]]:
+    """Converts a {pixel value: color} colormap to a dense palette.
+
+    GeoTIFFLayer maps pixel values linearly onto the palette, so the palette
+    has one entry per integer value between the smallest and largest key, and
+    values not in the colormap are left transparent (None).
+
+    Args:
+        colormap (Dict[Any, Any]): A mapping of integer pixel values (int or
+            numeric strings) to colors.
+        max_size (int, optional): The largest palette to build. Defaults to 65536.
+
+    Returns:
+        Tuple[List[Optional[str]], Optional[List[float]]]: The palette and the
+            value range [min_key, max_key]. If the keys are not integers or span
+            too many values, the colors are returned in key order with no range.
+    """
+    try:
+        keyed = {int(float(k)): v for k, v in colormap.items()}
+    except (TypeError, ValueError):
+        keyed = None
+    if keyed:
+        kmin, kmax = min(keyed), max(keyed)
+        if kmax - kmin + 1 <= max_size:
+            palette = [None] * (kmax - kmin + 1)
+            for value, color in keyed.items():
+                palette[value - kmin] = _css_color(color)
+            if kmin == kmax:
+                # A one-entry palette needs a non-zero range to render.
+                return palette, [float(kmin), float(kmin) + 1]
+            return palette, [float(kmin), float(kmax)]
+    return [_css_color(c) for c in colormap.values()], None
 
 
 class GeoTIFFLayer(JSCSSMixin, Layer):

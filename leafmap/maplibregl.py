@@ -716,7 +716,7 @@ class Map(MapWidget):
         opacity: float = 1.0,
         visible: bool = True,
         overwrite: bool = False,
-    ) -> None:
+    ) -> str:
         """
         Adds a layer to the map.
 
@@ -737,7 +737,9 @@ class Map(MapWidget):
                 original name even if it exists in the list. Defaults to False.
 
         Returns:
-            None
+            str: The name (and MapLibre layer id) the layer was added under. It
+                differs from ``name`` when that name was already taken and
+                ``overwrite`` is False.
         """
         if isinstance(layer, dict):
             if "minzoom" in layer:
@@ -782,6 +784,8 @@ class Map(MapWidget):
 
         if self.layer_manager is not None:
             self.layer_manager.refresh()
+
+        return name
 
     def remove_layer(self, name: str, **kwargs: Any) -> None:
         """
@@ -1496,7 +1500,7 @@ class Map(MapWidget):
         source_name = common.get_unique_name("source", self.source_names)
         self.add_source(source_name, raster_source)
         layer = Layer(id=layer_name, source=source_name, type=LayerType.RASTER)
-        self.add_layer(layer, before_id=before_id)
+        layer_name = self.add_layer(layer, before_id=before_id)
         self.set_opacity(layer_name, opacity)
         self.set_visibility(layer_name, visible)
 
@@ -1824,7 +1828,9 @@ class Map(MapWidget):
         source_name = common.get_unique_name("source", self.source_names)
         self.add_source(source_name, raster_source)
         layer = Layer(id=name, source=source_name, type=LayerType.RASTER, **kwargs)
-        self.add_layer(layer, before_id=before_id, name=name, overwrite=overwrite)
+        name = self.add_layer(
+            layer, before_id=before_id, name=name, overwrite=overwrite
+        )
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
@@ -2136,7 +2142,7 @@ class Map(MapWidget):
 
         # Add any additional kwargs
         layer_config.update(kwargs)
-        self.add_layer(
+        name = self.add_layer(
             layer_config,
             before_id=before_id,
             name=name,
@@ -3506,18 +3512,18 @@ class Map(MapWidget):
                     continue
 
                 layer = Layer(**params)
-                self.add_layer(layer)
-                self.set_visibility(params["id"], visible)
+                layer_id = self.add_layer(layer)
+                self.set_visibility(layer_id, visible)
                 if "paint" in params:
                     for key in params["paint"]:
                         if "opacity" in key:
-                            self.set_opacity(params["id"], params["paint"][key])
+                            self.set_opacity(layer_id, params["paint"][key])
                             break
                     else:
-                        self.set_opacity(params["id"], opacity)
+                        self.set_opacity(layer_id, opacity)
 
                 if tooltip:
-                    self.add_tooltip(params["id"], properties, template)
+                    self.add_tooltip(layer_id, properties, template)
 
             if fit_bounds:
                 metadata = common.pmtiles_metadata(url)

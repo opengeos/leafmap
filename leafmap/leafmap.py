@@ -2870,10 +2870,14 @@ class Map(ipyleaflet.Map):
                         loop=0,
                     )
                 else:
-                    # PIL expects format names such as "JPEG"/"TIFF", not "jpg"/"tif".
-                    fmt = {"jpg": "JPEG", "jpeg": "JPEG", "tif": "TIFF"}.get(
-                        ext.lower(), ext.upper()
-                    )
+                    # PIL expects format names such as "JPEG", not "jpg". Browsers cannot
+                    # display TIFF in a data URL, so TIFF images are re-encoded as PNG.
+                    fmt = {
+                        "jpg": "JPEG",
+                        "jpeg": "JPEG",
+                        "tif": "PNG",
+                        "tiff": "PNG",
+                    }.get(ext.lower(), ext.upper())
                     image.save(f, fmt)
                     ext = fmt.lower()
 
@@ -7506,10 +7510,14 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
                         loop=0,
                     )
                 else:
-                    # PIL expects format names such as "JPEG"/"TIFF", not "jpg"/"tif".
-                    fmt = {"jpg": "JPEG", "jpeg": "JPEG", "tif": "TIFF"}.get(
-                        ext.lower(), ext.upper()
-                    )
+                    # PIL expects format names such as "JPEG", not "jpg". Browsers cannot
+                    # display TIFF in a data URL, so TIFF images are re-encoded as PNG.
+                    fmt = {
+                        "jpg": "JPEG",
+                        "jpeg": "JPEG",
+                        "tif": "PNG",
+                        "tiff": "PNG",
+                    }.get(ext.lower(), ext.upper())
                     image.save(f, fmt)
                     ext = fmt.lower()
 

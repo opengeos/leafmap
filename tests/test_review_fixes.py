@@ -52,7 +52,7 @@ class TestCommonFixes(unittest.TestCase):
     def test_classify_string_column(self):
         """Classifying a non-numeric column must not crash."""
         gdf = gpd.GeoDataFrame(
-            {"landcover": ["forest", "water", "forest"]},
+            {"landcover": pd.Series(["forest", "water", "forest"], dtype="string")},
             geometry=[Point(0, 0), Point(1, 1), Point(2, 2)],
             crs="EPSG:4326",
         )
@@ -73,6 +73,33 @@ class TestCommonFixes(unittest.TestCase):
         row = pd.Series({"geometry": MultiLineString([[(0, 0), (1, 1)]])})
         ys = common.get_geometry_coords(row, "geometry", "y", "MultiLineString")
         self.assertEqual(ys, [0.0, 1.0])
+
+    def test_get_geometry_coords_keeps_all_line_parts(self):
+        """All MultiLineString parts are kept, separated by NaN."""
+        row = pd.Series(
+            {"geometry": MultiLineString([[(0, 0), (1, 1)], [(5, 5), (6, 6)]])}
+        )
+        xs = common.get_geometry_coords(row, "geometry", "x", "MultiLineString")
+        self.assertEqual(len(xs), 5)
+        self.assertTrue(math.isnan(xs[2]))
+        self.assertEqual(xs[3:], [5.0, 6.0])
+
+    def test_array_to_image_png_keeps_integer_inference(self):
+        """PNG output cannot store floats, so float input is still narrowed."""
+        import rasterio
+
+        arr = np.linspace(10, 20, 16, dtype=np.float32).reshape(4, 4)
+        with tempfile.TemporaryDirectory() as tmp:
+            out = os.path.join(tmp, "img.png")
+            common.array_to_image(
+                arr,
+                output=out,
+                cellsize=1,
+                crs="EPSG:4326",
+                transform=(1, 0, 0, 0, -1, 0),
+            )
+            with rasterio.open(out) as src:
+                self.assertEqual(src.dtypes[0], "uint8")
 
     def test_array_to_image_keeps_float(self):
         """Float data in [-1, 1] must not be truncated to integers."""
@@ -131,6 +158,26 @@ class TestLeafletFixes(unittest.TestCase):
         self.assertIsInstance(layer.data["features"][0]["properties"]["t"], str)
 
 
+class TestFoliumFixes(unittest.TestCase):
+    """Tests for fixes in the folium backend."""
+
+    def test_keyed_colormap_palette(self):
+        """Keyed colormaps map each pixel value to its own color."""
+        from leafmap.foliumap import _keyed_colormap_to_palette
+
+        palette, value_range = _keyed_colormap_to_palette(
+            {"11": "#466b9f", "13": (255, 0, 0, 128)}
+        )
+        self.assertEqual(value_range, [11.0, 13.0])
+        self.assertEqual(palette[0], "#466b9f")
+        self.assertIsNone(palette[1])
+        self.assertTrue(palette[2].startswith("rgba(255, 0, 0, 0.5"))
+
+
+# A minimal inline style so the MapLibre tests never fetch a remote style.
+EMPTY_STYLE = {"version": 8, "sources": {}, "layers": []}
+
+
 class TestMapLibreFixes(unittest.TestCase):
     """Tests for fixes in the MapLibre backend."""
 
@@ -144,16 +191,21 @@ class TestMapLibreFixes(unittest.TestCase):
 
     def test_duplicate_layer_names_get_unique_ids(self):
         """A de-duplicated layer name is also used as the MapLibre layer id."""
-        m = self.maplibregl.Map(style="positron")
-        m.add_tile_layer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", name="T")
-        m.add_tile_layer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", name="T")
+        m = self.maplibregl.Map(style=EMPTY_STYLE)
+        url = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        m.add_tile_layer(url, name="T")
+        m.add_tile_layer(url, name="T", visible=False, opacity=0.25)
         for name, info in m.layer_dict.items():
             if name.startswith("T"):
                 self.assertEqual(info["layer"].id, name)
+        # Settings apply to the new layer, not the original one.
+        self.assertTrue(m.layer_dict["T"]["visible"])
+        self.assertFalse(m.layer_dict["T_1"]["visible"])
+        self.assertEqual(m.layer_dict["T_1"]["opacity"], 0.25)
 
     def test_vector_tile_layer_references_source_name(self):
         """add_vector_tile must keep source_names hashable."""
-        m = self.maplibregl.Map(style="positron")
+        m = self.maplibregl.Map(style=EMPTY_STYLE)
         m.add_vector_tile(
             "https://example.com/{z}/{x}/{y}.pbf",
             layer_id="vt",
@@ -165,7 +217,7 @@ class TestMapLibreFixes(unittest.TestCase):
         """USE_MESSAGE_QUEUE=False must not enable the message queue."""
         os.environ["USE_MESSAGE_QUEUE"] = "False"
         try:
-            m = self.maplibregl.Map(style="positron")
+            m = self.maplibregl.Map(style=EMPTY_STYLE)
             self.assertFalse(getattr(m, "_use_message_queue", False))
         finally:
             del os.environ["USE_MESSAGE_QUEUE"]

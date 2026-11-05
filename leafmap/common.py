@@ -5516,7 +5516,10 @@ def clip_raster(
         geometry (str | geopandas.GeoDataFrame | dict | list): The geometry to clip the raster by.
             It can be a path to vector datasets (e.g., GeoJSON, Shapefile), a geopandas.GeoDataFrame,
             a dictionary, or a list of 4 numbers (minx, miny, maxx, maxy) representing a bounding box.
-        geom_crs (str, optional): The coordinate reference system of the geometry. Defaults to None.
+        geom_crs (str, optional): The coordinate reference system of the geometry. If
+            given, it is assigned to the geometry (overriding any existing CRS).
+            Defaults to None, which keeps the existing CRS or assumes EPSG:4326
+            for GeoJSON dicts.
         dst_crs (str, optional): The coordinate reference system of the output raster. Defaults to None.
         resolution (int, optional): The resolution of the output raster. Defaults to None.
             If a single value is provided, the resolution will be the same in both x and y directions.
@@ -5570,7 +5573,7 @@ def clip_raster(
         )
 
     if geom_crs is not None:
-        gdf = gdf.set_crs(geom_crs)
+        gdf = gdf.set_crs(geom_crs, allow_override=True)
     elif gdf.crs is None:
         # GeoJSON dicts carry no CRS; GeoJSON coordinates are WGS84 by spec.
         gdf = gdf.set_crs("EPSG:4326")
@@ -5941,7 +5944,10 @@ def classify(
     if not pd.api.types.is_numeric_dtype(df[column]):
         value_list = df[column].unique().tolist()
         value_list.sort()
-        df["category"] = df[column].replace(value_list, range(0, len(value_list)))
+        # Map to codes explicitly; replace() on a string extension array would
+        # try to store integers in a string column.
+        codes = {value: index for index, value in enumerate(value_list)}
+        df["category"] = df[column].map(codes).astype(float)
         init_column = column
         column = "category"
         k = len(value_list)
@@ -7325,18 +7331,24 @@ def get_geometry_coords(row, geom, coord_type, shape_type, mercator=False):
 
     elif shape_type.lower() in ["linestring", "multilinestring"]:
         line = row[geom]
-        if line.geom_type == "MultiLineString":
-            line = line.geoms[0]
-        if coord_type == "x":
-            coords = list(line.coords.xy[0])
-            if mercator:
-                coords = [lnglat_to_meters(x, 0)[0] for x in coords]
-            return coords
-        elif coord_type == "y":
-            coords = list(line.coords.xy[1])
-            if mercator:
-                coords = [lnglat_to_meters(0, y)[1] for y in coords]
-            return coords
+        parts = line.geoms if line.geom_type == "MultiLineString" else [line]
+        coords = []
+        for part in parts:
+            if coord_type == "x":
+                part_coords = list(part.coords.xy[0])
+                if mercator:
+                    part_coords = [lnglat_to_meters(x, 0)[0] for x in part_coords]
+            elif coord_type == "y":
+                part_coords = list(part.coords.xy[1])
+                if mercator:
+                    part_coords = [lnglat_to_meters(0, y)[1] for y in part_coords]
+            else:
+                return None
+            if coords:
+                # NaN breaks the line in bokeh so disjoint parts are not joined.
+                coords.append(float("nan"))
+            coords.extend(part_coords)
+        return coords
 
     elif shape_type.lower() in ["point", "multipoint"]:
         exterior = row[geom]
@@ -11862,9 +11874,15 @@ def array_to_memory_file(
 
         kwargs["transform"] = transform
 
-    if dtype is None and np.issubdtype(array.dtype, np.floating):
+    if (
+        dtype is None
+        and np.issubdtype(array.dtype, np.floating)
+        and str(driver).upper() in ("COG", "GTIFF")
+    ):
         # Keep floating-point data floating; narrowing it to an integer type
         # based on its range would truncate values (e.g., NDVI to all zeros).
+        # Image formats such as PNG/JPEG cannot store floats, so they keep the
+        # range-based inference below.
         dtype = np.float32 if array.dtype.itemsize < 4 else array.dtype
     if dtype is None:
         # Determine the minimum and maximum values in the array
@@ -12079,9 +12097,15 @@ def array_to_image(
 
         kwargs["transform"] = transform
 
-    if dtype is None and np.issubdtype(array.dtype, np.floating):
+    if (
+        dtype is None
+        and np.issubdtype(array.dtype, np.floating)
+        and str(driver).upper() in ("COG", "GTIFF")
+    ):
         # Keep floating-point data floating; narrowing it to an integer type
         # based on its range would truncate values (e.g., NDVI to all zeros).
+        # Image formats such as PNG/JPEG cannot store floats, so they keep the
+        # range-based inference below.
         dtype = np.float32 if array.dtype.itemsize < 4 else array.dtype
     if dtype is None:
         # Determine the minimum and maximum values in the array
