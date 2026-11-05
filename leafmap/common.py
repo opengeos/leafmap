@@ -11807,7 +11807,8 @@ def _float_output_dtype(array, driver, colormap=None):
         array (np.ndarray): The input array.
         driver (str): The GDAL driver used to write the output.
         colormap (dict, optional): The colormap to write. GeoTIFF color tables
-            require integer data, so float data is not preserved when one is given.
+            require integer data, so float data is not preserved when a
+            non-empty colormap is given.
 
     Returns:
         The float dtype to use, or None to fall back to range-based inference
@@ -11815,7 +11816,7 @@ def _float_output_dtype(array, driver, colormap=None):
             store floats, or when a colormap is given).
     """
     if (
-        colormap is None
+        not colormap
         and np.issubdtype(array.dtype, np.floating)
         and str(driver).upper() in ("COG", "GTIFF")
     ):

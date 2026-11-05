@@ -137,6 +137,7 @@ class TestCommonFixes(unittest.TestCase):
         self.assertEqual(common._float_output_dtype(arr, "COG"), np.float32)
         self.assertIsNone(common._float_output_dtype(arr, "PNG"))
         self.assertIsNone(common._float_output_dtype(arr, "GTiff", {1: (0, 0, 0)}))
+        self.assertEqual(common._float_output_dtype(arr, "GTiff", {}), np.float32)
 
     def test_buffer_gdf_near_pole(self):
         """Buffering works beyond UTM coverage."""
@@ -200,6 +201,14 @@ class TestFoliumFixes(unittest.TestCase):
         self.assertIsNone(palette[1])
         self.assertTrue(palette[2].startswith("rgba(255, 0, 0, 0.5"))
 
+    def test_single_key_colormap_palette(self):
+        """A single-key colormap leaves the next value unmapped."""
+        from leafmap.foliumap import _keyed_colormap_to_palette
+
+        palette, value_range = _keyed_colormap_to_palette({11: "#ff0000"})
+        self.assertEqual(value_range, [11.0, 12.0])
+        self.assertEqual(palette, ["#ff0000", None])
+
     def test_keyed_colormap_layer_does_not_clamp(self):
         """Keyed colormaps render out-of-range values as nodata."""
         import leafmap.foliumap as foliumap
@@ -259,6 +268,16 @@ class TestMapLibreFixes(unittest.TestCase):
         self.assertTrue(m.layer_dict["T"]["visible"])
         self.assertFalse(m.layer_dict["T_1"]["visible"])
         self.assertEqual(m.layer_dict["T_1"]["opacity"], 0.25)
+
+    def test_layer_id_kept_when_name_differs(self):
+        """A layer id that intentionally differs from its name is kept."""
+        from maplibre.layer import Layer
+
+        m = self.maplibregl.Map(style=EMPTY_STYLE)
+        layer = Layer(id="my-id", type="raster", source="src")
+        name = m.add_layer(layer, name="Display name")
+        self.assertEqual(name, "Display name")
+        self.assertEqual(m.layer_dict["Display name"]["layer"].id, "my-id")
 
     def test_vector_tile_layer_references_source_name(self):
         """add_vector_tile must keep source_names hashable."""

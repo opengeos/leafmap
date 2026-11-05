@@ -759,15 +759,18 @@ class Map(MapWidget):
 
         if name is None:
             name = layer.id
+        requested_name = name
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
 
         if name in self.get_layer_names():
             self.remove_layer(name)
 
-        # Layers are addressed by name everywhere (visibility, opacity, removal),
-        # so the MapLibre layer id must match the (possibly de-duplicated) name.
-        if layer.id != name:
+        # Layers are addressed by name (visibility, opacity, removal), so when
+        # de-duplication renames a layer whose id equals the requested name, the
+        # MapLibre layer id must be renamed too. Ids that intentionally differ
+        # from the name are left untouched.
+        if name != requested_name and layer.id == requested_name:
             layer = layer.model_copy(update={"id": name})
 
         if (
@@ -11072,6 +11075,25 @@ class LayerStyleWidget(widgets.VBox):
         self.map.remove_from_sidebar(name=f"Style {self.layer_id}")
 
 
+def _check_date_columns(gdf, start_date_col: str, end_date_col: str) -> None:
+    """Raises a ValueError if the start or end date column is missing.
+
+    Args:
+        gdf (gpd.GeoDataFrame): The data to check.
+        start_date_col (str): The name of the start date column.
+        end_date_col (str): The name of the end date column.
+
+    Raises:
+        ValueError: If either column is not in the data.
+    """
+    missing = [c for c in (start_date_col, end_date_col) if c not in gdf.columns]
+    if missing:
+        raise ValueError(
+            f"Date column(s) {missing} not found. Set start_date_col and "
+            f"end_date_col to columns in the data: {list(gdf.columns)}"
+        )
+
+
 class DateFilterWidget(widgets.VBox):
     """
     A widget for filtering data based on time range.
@@ -11133,6 +11155,10 @@ class DateFilterWidget(widgets.VBox):
                     gdfs.append(None)
                     continue
                 gdf = geojson_to_gdf(source)
+                if index == file_index:
+                    # Validate before any layer is added so a bad column name
+                    # leaves the map unchanged.
+                    _check_date_columns(gdf, start_date_col, end_date_col)
                 gdfs.append(gdf)
 
                 style = styles[names[index]]
@@ -11155,12 +11181,7 @@ class DateFilterWidget(widgets.VBox):
         gdf = gdfs[file_index]
         # Parse separately so string date columns compare correctly while the
         # GeoJSON sent to the map keeps its original (serializable) values.
-        missing = [c for c in (start_date_col, end_date_col) if c not in gdf.columns]
-        if missing:
-            raise ValueError(
-                f"Date column(s) {missing} not found. Set start_date_col and "
-                f"end_date_col to columns in the data: {list(gdf.columns)}"
-            )
+        _check_date_columns(gdf, start_date_col, end_date_col)
         start_dates = pd.to_datetime(gdf[start_date_col])
         end_dates = pd.to_datetime(gdf[end_date_col])
 

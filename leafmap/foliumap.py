@@ -4915,8 +4915,9 @@ def _keyed_colormap_to_palette(
             for value, color in keyed.items():
                 palette[value - kmin] = _css_color(color)
             if kmin == kmax:
-                # A one-entry palette needs a non-zero range to render.
-                return palette, [float(kmin), float(kmin) + 1]
+                # A one-entry palette needs a non-zero range to render; the
+                # extra endpoint is unmapped so value kmin + 1 stays transparent.
+                return palette + [None], [float(kmin), float(kmin) + 1]
             return palette, [float(kmin), float(kmax)]
     return [_css_color(c) for c in colormap.values()], None
 
