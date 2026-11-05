@@ -30,7 +30,6 @@ from maplibre.controls import (
 )
 from maplibre.ipywidget import MapWidget
 from maplibre.sources import GeoJSONSource, RasterTileSource
-from maplibre.utils import get_bounds
 
 from . import common
 from .basemaps import xyz_to_leaflet
@@ -229,7 +228,9 @@ class Map(MapWidget):
 
         super().__init__(map_options, height=height)
         if use_message_queue is None:
-            use_message_queue = os.environ.get("USE_MESSAGE_QUEUE", False)
+            use_message_queue = os.environ.get(
+                "USE_MESSAGE_QUEUE", ""
+            ).strip().lower() in ("1", "true", "yes")
         self.use_message_queue(use_message_queue)
 
         self.controls = {}
@@ -613,15 +614,16 @@ class Map(MapWidget):
         # Check if floating sidebar is being used
         if hasattr(self, "floating_sidebar_content_box"):
             # Handle floating sidebar case
-            key = None
+            found = None
             for key, value in self._floating_sidebar_widgets.items():
                 if value == widget or key == name:
                     if widget is None:
-                        widget = self._floating_sidebar_widgets[key]
+                        widget = value
+                    found = key
                     break
 
-            if key is not None and key in self._floating_sidebar_widgets:
-                self._floating_sidebar_widgets.pop(key)
+            if found is not None:
+                self._floating_sidebar_widgets.pop(found)
             self.floating_sidebar_content_box.children = tuple(
                 child
                 for child in self.floating_sidebar_content_box.children
@@ -642,8 +644,10 @@ class Map(MapWidget):
         if self.container is None:
             self.create_container()
         self.container.set_sidebar_width(min_width, max_width)
-        self.sidebar_args["min_width"] = min_width
-        self.sidebar_args["max_width"] = max_width
+        if min_width is not None:
+            self.sidebar_args["min_width"] = int(str(min_width).replace("px", ""))
+        if max_width is not None:
+            self.sidebar_args["max_width"] = int(str(max_width).replace("px", ""))
 
     def add_to_map_container(
         self, *items: Union[widgets.Widget, Iterable[widgets.Widget], None]
@@ -750,6 +754,11 @@ class Map(MapWidget):
 
         if name in self.get_layer_names():
             self.remove_layer(name)
+
+        # Layers are addressed by name everywhere (visibility, opacity, removal),
+        # so the MapLibre layer id must match the (possibly de-duplicated) name.
+        if layer.id != name:
+            layer = layer.model_copy(update={"id": name})
 
         if (
             "paint" in layer.to_dict()
@@ -934,13 +943,13 @@ class Map(MapWidget):
         ]
 
         # Generate tooltip template dynamically based on the columns
-        if tooltip is None:
-            columns = df.columns
-        elif isinstance(tooltip, list):
-            columns = tooltip
-        tooltip_content = "<br>".join(
-            [f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns]
-        )
+        if isinstance(tooltip, str):
+            tooltip_content = tooltip
+        else:
+            columns = df.columns if tooltip is None else tooltip
+            tooltip_content = "<br>".join(
+                [f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns]
+            )
 
         deck_arc_layer = {
             "@@type": "ArcLayer",
@@ -2110,7 +2119,7 @@ class Map(MapWidget):
         layer_config = {
             "id": name,
             "type": layer_type,
-            "source": vector_source,
+            "source": source_name,
             "source-layer": source_layer,
         }
 
@@ -4097,7 +4106,8 @@ class Map(MapWidget):
                         image, common.temp_file_path(image.split(".")[-1]), quiet=True
                     )
                 if os.path.exists(image):
-                    img = Image.open(image)
+                    # MapLibre's addImage expects width * height * 4 RGBA bytes.
+                    img = Image.open(image).convert("RGBA")
                 else:
                     raise ValueError("The image file does not exist.")
 
@@ -6327,8 +6337,9 @@ class Map(MapWidget):
                 "95": "#6c9fb8",
             }
 
-        if "zoom_to_layer" not in kwargs:
-            kwargs["zoom_to_layer"] = False
+        # add_cog_layer uses fit_bounds; zoom_to_layer is accepted for consistency
+        # with the other backends but must not leak into the tile request.
+        kwargs.setdefault("fit_bounds", kwargs.pop("zoom_to_layer", False))
 
         for year in years:
             if year not in allowed_years:
@@ -6919,7 +6930,7 @@ class Map(MapWidget):
         if image_id is None:
             if lon is None or lat is None:
                 if "center" in self.view_state:
-                    center = self.view_state
+                    center = self.view_state["center"]
                     if len(center) > 0:
                         lon = center["lng"]
                         lat = center["lat"]
@@ -7255,8 +7266,8 @@ class Map(MapWidget):
         sources: List[Dict[str, Any]],
         names: List[str] = None,
         styles: Dict[str, Any] = None,
-        start_date_col: str = "startDate",
-        end_date_col: str = "endDate",
+        start_date_col: str = "startDatetime",
+        end_date_col: str = "endDatetime",
         date_col: str = None,
         date_format: str = "%Y-%m-%d",
         min_date: str = None,
@@ -7281,8 +7292,8 @@ class Map(MapWidget):
             sources (List[Dict[str, Any]]): List of data sources.
             names (List[str], optional): List of names for the data sources. Defaults to None.
             styles (Dict[str, Any], optional): Dictionary of styles for the data sources. Defaults to None.
-            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDate".
-            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDate".
+            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDatetime".
+            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDatetime".
             date_col (str, optional): Name of the column containing the date. Defaults to None.
             date_format (str, optional): Format of the date. Defaults to "%Y-%m-%d".
             min_date (str, optional): Minimum date. Defaults to None.
@@ -10580,7 +10591,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         """
         if self._building:
             return
-        group_name = change["owner"].description.split(" ")[0]
+        group_name = change["owner"].description.removesuffix(" group layers on/off")
         group_layers = self.groups[group_name]
         for layer_name in group_layers:
             self.set_layer_visibility(layer_name, change["new"])
@@ -11130,7 +11141,7 @@ class DateFilterWidget(widgets.VBox):
         gdf = gdfs[file_index]
 
         if min_date is None:
-            min_date = gdf["startDatetime"].min().normalize()
+            min_date = gdf[start_date_col].min().normalize()
         elif isinstance(min_date, str):
             min_date = datetime.strptime(min_date, date_format)
         elif isinstance(min_date, pd.Timestamp):
@@ -11139,7 +11150,7 @@ class DateFilterWidget(widgets.VBox):
             raise ValueError("min_date must be a string, pd.Timestamp, or None")
 
         if max_date is None:
-            max_date = gdf["endDatetime"].max().normalize()
+            max_date = gdf[end_date_col].max().normalize()
         elif isinstance(max_date, str):
             max_date = datetime.strptime(max_date, date_format)
         elif isinstance(max_date, pd.Timestamp):
@@ -11266,7 +11277,7 @@ class DateFilterWidget(widgets.VBox):
                 start, end = slider.value
                 range_label.value = f"Selected range: {start.strftime(date_format)} to {end.strftime(date_format)}"
                 filtered_gdf = gdf[
-                    (gdf["startDatetime"] >= start) & (gdf["endDatetime"] <= end)
+                    (gdf[start_date_col] >= start) & (gdf[end_date_col] <= end)
                 ]
                 if group_dropdown.value is not None:
                     filtered_gdf = filtered_gdf[
