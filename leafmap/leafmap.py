@@ -284,7 +284,105 @@ class Map(ipyleaflet.Map):
             asyncio.get_event_loop()
         except RuntimeError:
             asyncio.set_event_loop(asyncio.new_event_loop())
-        super().fit_bounds(bounds)
+
+        # Cancel a fit that is still in progress so that two fits do not
+        # fight over the zoom level.
+        task = getattr(self, "_fit_bounds_task", None)
+        if task is not None and not task.done():
+            task.cancel()
+        self._fit_bounds_task = asyncio.ensure_future(self._fit_bounds(bounds))
+
+    async def _wait_for_bounds_change(self, timeout: Optional[float] = 10) -> bool:
+        """Waits until the frontend reports new map bounds.
+
+        ipyleaflet's own helper resolves an asyncio future directly from the
+        trait observer. Recent JupyterLab versions send widget messages to a
+        kernel subshell, so the observer runs on another thread and the
+        future never wakes the event loop, which makes ``fit_bounds`` hang.
+        This version hands the result back to the loop in a thread-safe way.
+
+        Args:
+            timeout (float, optional): Seconds to wait before giving up. Use
+                None to wait indefinitely. Defaults to 10.
+
+        Returns:
+            bool: True if the bounds changed, False if the wait timed out.
+        """
+        import asyncio
+
+        loop = asyncio.get_running_loop()
+        future = loop.create_future()
+
+        def resolve():
+            if not future.done():
+                future.set_result(True)
+
+        def handler(change):
+            self.unobserve(handler, "bounds")
+            loop.call_soon_threadsafe(resolve)
+
+        self.observe(handler, "bounds")
+        try:
+            return await asyncio.wait_for(future, timeout)
+        except asyncio.TimeoutError:
+            return False
+        finally:
+            try:
+                self.unobserve(handler, "bounds")
+            except ValueError:
+                pass
+
+    async def _fit_bounds(self, bounds) -> None:
+        """Adjusts the center and zoom so the map view contains the bounds.
+
+        Same approach as ipyleaflet's ``_fit_bounds`` (move the center, then
+        step the zoom level while checking the bounds the frontend reports),
+        but it waits with ``_wait_for_bounds_change`` and stops if the
+        frontend stops responding.
+
+        Args:
+            bounds (list): Bounds in the form [[south, west], [north, east]].
+        """
+        (b_south, b_west), (b_north, b_east) = bounds
+        center = [b_south + (b_north - b_south) / 2, b_west + (b_east - b_west) / 2]
+
+        if not self.bounds:
+            # The map has not been rendered yet; wait for it to be displayed.
+            self.center = center
+            if not await self._wait_for_bounds_change(timeout=None):
+                return
+        elif list(center) != list(self.center):
+            self.center = center
+            if not await self._wait_for_bounds_change():
+                return
+
+        zoomed_out = False
+        while self.zoom > 1:
+            (south, west), (north, east) = self.bounds
+            if south > b_south or north < b_north or west > b_west or east < b_east:
+                self.zoom -= 1
+                zoomed_out = True
+                if not await self._wait_for_bounds_change():
+                    return
+            else:
+                break
+
+        if not zoomed_out:
+            while True:
+                (south, west), (north, east) = self.bounds
+                if (
+                    south < b_south
+                    and north > b_north
+                    and west < b_west
+                    and east > b_east
+                ):
+                    self.zoom += 1
+                    if not await self._wait_for_bounds_change():
+                        return
+                else:
+                    self.zoom -= 1
+                    await self._wait_for_bounds_change()
+                    break
 
     def zoom_to_bounds(self, bounds) -> None:
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
@@ -3547,7 +3645,7 @@ class Map(ipyleaflet.Map):
             try:
                 bounds = gdf.total_bounds
                 west, south, east, north = bounds
-                self.fit_bounds([[south, east], [north, west]])
+                self.fit_bounds([[south, west], [north, east]])
             except Exception as e:
                 print(e)
 
@@ -5970,7 +6068,7 @@ class Map(ipyleaflet.Map):
 
         if bounds is not None and zoom_to_layer:
             west, south, east, north = bounds
-            self.fit_bounds([[south, east], [north, west]])
+            self.fit_bounds([[south, west], [north, east]])
 
     def edit_lines(
         self,
@@ -6543,7 +6641,7 @@ class Map(ipyleaflet.Map):
 
         if bounds is not None and zoom_to_layer:
             west, south, east, north = bounds
-            self.fit_bounds([[south, east], [north, west]])
+            self.fit_bounds([[south, west], [north, east]])
 
     def batch_edit_lines(
         self,
