@@ -30,7 +30,6 @@ from maplibre.controls import (
 )
 from maplibre.ipywidget import MapWidget
 from maplibre.sources import GeoJSONSource, RasterTileSource
-from maplibre.utils import get_bounds
 
 from . import common
 from .basemaps import xyz_to_leaflet
@@ -141,8 +140,9 @@ class Map(MapWidget):
                 "mercator" or "globe". Defaults to "mercator".
             use_message_queue (bool, optional): Whether to use the message queue.
                 Defaults to None. If None, it will check the environment variable
-                "USE_MESSAGE_QUEUE". If it is set to "True", it will use the message queue, which
-                is needed to export the map to HTML. If it is set to "False", it will not use the message
+                "USE_MESSAGE_QUEUE". If it is set to "1", "true", "yes", "y" or "on"
+                (case-insensitive), it will use the message queue, which is needed to export
+                the map to HTML. Any other value (or no value) will not use the message
                 queue, which is needed to display the map multiple times in the same notebook.
             add_sidebar (bool, optional): Whether to add a sidebar to the map.
                 Defaults to False. If True, the map will be displayed in a sidebar.
@@ -229,7 +229,9 @@ class Map(MapWidget):
 
         super().__init__(map_options, height=height)
         if use_message_queue is None:
-            use_message_queue = os.environ.get("USE_MESSAGE_QUEUE", False)
+            use_message_queue = os.environ.get(
+                "USE_MESSAGE_QUEUE", ""
+            ).strip().lower() in ("1", "true", "yes", "y", "on")
         self.use_message_queue(use_message_queue)
 
         self.controls = {}
@@ -613,15 +615,16 @@ class Map(MapWidget):
         # Check if floating sidebar is being used
         if hasattr(self, "floating_sidebar_content_box"):
             # Handle floating sidebar case
-            key = None
+            found = None
             for key, value in self._floating_sidebar_widgets.items():
                 if value == widget or key == name:
                     if widget is None:
-                        widget = self._floating_sidebar_widgets[key]
+                        widget = value
+                    found = key
                     break
 
-            if key is not None and key in self._floating_sidebar_widgets:
-                self._floating_sidebar_widgets.pop(key)
+            if found is not None:
+                self._floating_sidebar_widgets.pop(found)
             self.floating_sidebar_content_box.children = tuple(
                 child
                 for child in self.floating_sidebar_content_box.children
@@ -642,8 +645,17 @@ class Map(MapWidget):
         if self.container is None:
             self.create_container()
         self.container.set_sidebar_width(min_width, max_width)
-        self.sidebar_args["min_width"] = min_width
-        self.sidebar_args["max_width"] = max_width
+        for key, width in (("min_width", min_width), ("max_width", max_width)):
+            if width is None:
+                continue
+            # Other code does arithmetic on these, so store pixel values as
+            # numbers; keep other CSS units (e.g. "20%") as given.
+            try:
+                width = float(str(width).strip().removesuffix("px"))
+                width = int(width) if width.is_integer() else width
+            except ValueError:
+                pass
+            self.sidebar_args[key] = width
 
     def add_to_map_container(
         self, *items: Union[widgets.Widget, Iterable[widgets.Widget], None]
@@ -712,7 +724,7 @@ class Map(MapWidget):
         opacity: float = 1.0,
         visible: bool = True,
         overwrite: bool = False,
-    ) -> None:
+    ) -> str:
         """
         Adds a layer to the map.
 
@@ -733,7 +745,9 @@ class Map(MapWidget):
                 original name even if it exists in the list. Defaults to False.
 
         Returns:
-            None
+            str: The name (and MapLibre layer id) the layer was added under. It
+                differs from ``name`` when that name was already taken and
+                ``overwrite`` is False.
         """
         if isinstance(layer, dict):
             if "minzoom" in layer:
@@ -745,11 +759,19 @@ class Map(MapWidget):
 
         if name is None:
             name = layer.id
+        requested_name = name
 
         name = common.get_unique_name(name, self.get_layer_names(), overwrite=overwrite)
 
         if name in self.get_layer_names():
             self.remove_layer(name)
+
+        # Layers are addressed by name (visibility, opacity, removal), so when
+        # de-duplication renames a layer whose id equals the requested name, the
+        # MapLibre layer id must be renamed too. Ids that intentionally differ
+        # from the name are left untouched.
+        if name != requested_name and layer.id == requested_name:
+            layer = layer.model_copy(update={"id": name})
 
         if (
             "paint" in layer.to_dict()
@@ -773,6 +795,8 @@ class Map(MapWidget):
 
         if self.layer_manager is not None:
             self.layer_manager.refresh()
+
+        return name
 
     def remove_layer(self, name: str, **kwargs: Any) -> None:
         """
@@ -934,13 +958,13 @@ class Map(MapWidget):
         ]
 
         # Generate tooltip template dynamically based on the columns
-        if tooltip is None:
-            columns = df.columns
-        elif isinstance(tooltip, list):
-            columns = tooltip
-        tooltip_content = "<br>".join(
-            [f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns]
-        )
+        if isinstance(tooltip, str):
+            tooltip_content = tooltip
+        else:
+            columns = df.columns if tooltip is None else tooltip
+            tooltip_content = "<br>".join(
+                [f"<b>{col}:</b> {{{{ {col} }}}}" for col in columns]
+            )
 
         deck_arc_layer = {
             "@@type": "ArcLayer",
@@ -1487,7 +1511,7 @@ class Map(MapWidget):
         source_name = common.get_unique_name("source", self.source_names)
         self.add_source(source_name, raster_source)
         layer = Layer(id=layer_name, source=source_name, type=LayerType.RASTER)
-        self.add_layer(layer, before_id=before_id)
+        layer_name = self.add_layer(layer, before_id=before_id)
         self.set_opacity(layer_name, opacity)
         self.set_visibility(layer_name, visible)
 
@@ -1815,7 +1839,9 @@ class Map(MapWidget):
         source_name = common.get_unique_name("source", self.source_names)
         self.add_source(source_name, raster_source)
         layer = Layer(id=name, source=source_name, type=LayerType.RASTER, **kwargs)
-        self.add_layer(layer, before_id=before_id, name=name, overwrite=overwrite)
+        name = self.add_layer(
+            layer, before_id=before_id, name=name, overwrite=overwrite
+        )
         self.set_visibility(name, visible)
         self.set_opacity(name, opacity)
 
@@ -2110,7 +2136,7 @@ class Map(MapWidget):
         layer_config = {
             "id": name,
             "type": layer_type,
-            "source": vector_source,
+            "source": source_name,
             "source-layer": source_layer,
         }
 
@@ -2127,7 +2153,7 @@ class Map(MapWidget):
 
         # Add any additional kwargs
         layer_config.update(kwargs)
-        self.add_layer(
+        name = self.add_layer(
             layer_config,
             before_id=before_id,
             name=name,
@@ -3497,18 +3523,18 @@ class Map(MapWidget):
                     continue
 
                 layer = Layer(**params)
-                self.add_layer(layer)
-                self.set_visibility(params["id"], visible)
+                layer_id = self.add_layer(layer)
+                self.set_visibility(layer_id, visible)
                 if "paint" in params:
                     for key in params["paint"]:
                         if "opacity" in key:
-                            self.set_opacity(params["id"], params["paint"][key])
+                            self.set_opacity(layer_id, params["paint"][key])
                             break
                     else:
-                        self.set_opacity(params["id"], opacity)
+                        self.set_opacity(layer_id, opacity)
 
                 if tooltip:
-                    self.add_tooltip(params["id"], properties, template)
+                    self.add_tooltip(layer_id, properties, template)
 
             if fit_bounds:
                 metadata = common.pmtiles_metadata(url)
@@ -4097,7 +4123,8 @@ class Map(MapWidget):
                         image, common.temp_file_path(image.split(".")[-1]), quiet=True
                     )
                 if os.path.exists(image):
-                    img = Image.open(image)
+                    # MapLibre's addImage expects width * height * 4 RGBA bytes.
+                    img = Image.open(image).convert("RGBA")
                 else:
                     raise ValueError("The image file does not exist.")
 
@@ -6327,8 +6354,9 @@ class Map(MapWidget):
                 "95": "#6c9fb8",
             }
 
-        if "zoom_to_layer" not in kwargs:
-            kwargs["zoom_to_layer"] = False
+        # add_cog_layer uses fit_bounds; zoom_to_layer is accepted for consistency
+        # with the other backends but must not leak into the tile request.
+        kwargs.setdefault("fit_bounds", kwargs.pop("zoom_to_layer", False))
 
         for year in years:
             if year not in allowed_years:
@@ -6919,7 +6947,7 @@ class Map(MapWidget):
         if image_id is None:
             if lon is None or lat is None:
                 if "center" in self.view_state:
-                    center = self.view_state
+                    center = self.view_state["center"]
                     if len(center) > 0:
                         lon = center["lng"]
                         lat = center["lat"]
@@ -7255,8 +7283,8 @@ class Map(MapWidget):
         sources: List[Dict[str, Any]],
         names: List[str] = None,
         styles: Dict[str, Any] = None,
-        start_date_col: str = "startDate",
-        end_date_col: str = "endDate",
+        start_date_col: str = "startDatetime",
+        end_date_col: str = "endDatetime",
         date_col: str = None,
         date_format: str = "%Y-%m-%d",
         min_date: str = None,
@@ -7281,8 +7309,8 @@ class Map(MapWidget):
             sources (List[Dict[str, Any]]): List of data sources.
             names (List[str], optional): List of names for the data sources. Defaults to None.
             styles (Dict[str, Any], optional): Dictionary of styles for the data sources. Defaults to None.
-            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDate".
-            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDate".
+            start_date_col (str, optional): Name of the column containing the start date. Defaults to "startDatetime".
+            end_date_col (str, optional): Name of the column containing the end date. Defaults to "endDatetime".
             date_col (str, optional): Name of the column containing the date. Defaults to None.
             date_format (str, optional): Format of the date. Defaults to "%Y-%m-%d".
             min_date (str, optional): Minimum date. Defaults to None.
@@ -10580,7 +10608,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         """
         if self._building:
             return
-        group_name = change["owner"].description.split(" ")[0]
+        group_name = change["owner"].description.removesuffix(" group layers on/off")
         group_layers = self.groups[group_name]
         for layer_name in group_layers:
             self.set_layer_visibility(layer_name, change["new"])
@@ -11047,6 +11075,25 @@ class LayerStyleWidget(widgets.VBox):
         self.map.remove_from_sidebar(name=f"Style {self.layer_id}")
 
 
+def _check_date_columns(gdf, start_date_col: str, end_date_col: str) -> None:
+    """Raises a ValueError if the start or end date column is missing.
+
+    Args:
+        gdf (gpd.GeoDataFrame): The data to check.
+        start_date_col (str): The name of the start date column.
+        end_date_col (str): The name of the end date column.
+
+    Raises:
+        ValueError: If either column is not in the data.
+    """
+    missing = [c for c in (start_date_col, end_date_col) if c not in gdf.columns]
+    if missing:
+        raise ValueError(
+            f"Date column(s) {missing} not found. Set start_date_col and "
+            f"end_date_col to columns in the data: {list(gdf.columns)}"
+        )
+
+
 class DateFilterWidget(widgets.VBox):
     """
     A widget for filtering data based on time range.
@@ -11108,6 +11155,10 @@ class DateFilterWidget(widgets.VBox):
                     gdfs.append(None)
                     continue
                 gdf = geojson_to_gdf(source)
+                if index == file_index:
+                    # Validate before any layer is added so a bad column name
+                    # leaves the map unchanged.
+                    _check_date_columns(gdf, start_date_col, end_date_col)
                 gdfs.append(gdf)
 
                 style = styles[names[index]]
@@ -11128,9 +11179,14 @@ class DateFilterWidget(widgets.VBox):
             )
 
         gdf = gdfs[file_index]
+        # Parse separately so string date columns compare correctly while the
+        # GeoJSON sent to the map keeps its original (serializable) values.
+        _check_date_columns(gdf, start_date_col, end_date_col)
+        start_dates = pd.to_datetime(gdf[start_date_col])
+        end_dates = pd.to_datetime(gdf[end_date_col])
 
         if min_date is None:
-            min_date = gdf["startDatetime"].min().normalize()
+            min_date = start_dates.min().normalize()
         elif isinstance(min_date, str):
             min_date = datetime.strptime(min_date, date_format)
         elif isinstance(min_date, pd.Timestamp):
@@ -11139,7 +11195,7 @@ class DateFilterWidget(widgets.VBox):
             raise ValueError("min_date must be a string, pd.Timestamp, or None")
 
         if max_date is None:
-            max_date = gdf["endDatetime"].max().normalize()
+            max_date = end_dates.max().normalize()
         elif isinstance(max_date, str):
             max_date = datetime.strptime(max_date, date_format)
         elif isinstance(max_date, pd.Timestamp):
@@ -11265,9 +11321,7 @@ class DateFilterWidget(widgets.VBox):
             if slider.value:
                 start, end = slider.value
                 range_label.value = f"Selected range: {start.strftime(date_format)} to {end.strftime(date_format)}"
-                filtered_gdf = gdf[
-                    (gdf["startDatetime"] >= start) & (gdf["endDatetime"] <= end)
-                ]
+                filtered_gdf = gdf[(start_dates >= start) & (end_dates <= end)]
                 if group_dropdown.value is not None:
                     filtered_gdf = filtered_gdf[
                         filtered_gdf[group_col] == group_dropdown.value

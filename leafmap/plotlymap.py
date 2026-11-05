@@ -809,7 +809,7 @@ class Map(go.FigureWidget):
 
         if geometry_type.lower() in ["polygon", "multipolygon"]:
             type = "fill"
-        elif geometry_type.lower() in ["linstring", "multilinestring"]:
+        elif geometry_type.lower() in ["linestring", "multilinestring"]:
             type = "line"
         elif geometry_type.lower() in ["point", "multipoint"]:
             type = "circle"

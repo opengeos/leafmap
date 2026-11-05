@@ -421,15 +421,15 @@ class Map(lonboard.Map):
                     max_zoom = basemap["max_zoom"]
                 else:
                     max_zoom = 22
-                    layer = lonboard.BitmapTileLayer(
-                        data=url,
-                        min_zoom=tile.min_zoom,
-                        max_zoom=max_zoom,
-                        visible=visible,
-                        **kwargs,
-                    )
+                layer = lonboard.BitmapTileLayer(
+                    data=url,
+                    min_zoom=basemap.get("min_zoom", 0),
+                    max_zoom=max_zoom,
+                    visible=visible,
+                    **kwargs,
+                )
 
-                    self.add_layer(layer)
+                self.add_layer(layer)
             elif basemap in basemaps and basemaps[basemap].name:
                 tile = basemaps[basemap]
                 layer = lonboard.BitmapTileLayer(

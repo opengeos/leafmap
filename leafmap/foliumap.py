@@ -768,6 +768,7 @@ class Map(folium.Map):
                 palette_colors = [common.check_color(color) for color in palette]
         else:
             palette_colors = []
+        clamp_palette = True
 
         if vmin is not None and vmax is not None:
             value_range = [float(vmin), float(vmax)]
@@ -776,10 +777,21 @@ class Map(folium.Map):
 
         if "bidx" in kwargs:
             indexes = kwargs.pop("bidx")
-        if "colormap_name" in kwargs:
-            palette_colors = kwargs.pop("colormap_name")
-        if "colormap" in kwargs:
-            palette_colors = kwargs.pop("colormap")
+        for cmap_key in ("colormap_name", "colormap"):
+            if cmap_key in kwargs:
+                cmap = kwargs.pop(cmap_key)
+                # GeoTIFFLayer expects a list of colors, not a colormap name.
+                if isinstance(cmap, str):
+                    palette_colors = common.get_palette_colors(cmap, 256, hashtag=True)
+                elif isinstance(cmap, dict):
+                    palette_colors, keyed_range = _keyed_colormap_to_palette(cmap)
+                    # Keyed (categorical) palettes need exact lookup: values
+                    # outside the keys must stay transparent, not be clamped.
+                    clamp_palette = keyed_range is None
+                    if keyed_range is not None and value_range is None:
+                        value_range = keyed_range
+                elif cmap is not None:
+                    palette_colors = [_css_color(c) for c in cmap]
         if "rescale" in kwargs:
             if isinstance(kwargs["rescale"], str):
                 value_range = kwargs["rescale"].split(",")
@@ -813,6 +825,7 @@ class Map(folium.Map):
             nodata_color=nodata_color,
             indexes=indexes,
             sequence=sequence,
+            clamp_palette=clamp_palette,
         )
         layer.add_to(self)
 
@@ -2161,8 +2174,11 @@ class Map(folium.Map):
 
         """
 
+        gdf = gdf.copy()
         for col in gdf.columns:
-            if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+            if col != gdf.geometry.name and pd.api.types.is_datetime64_any_dtype(
+                gdf[col]
+            ):
                 gdf[col] = gdf[col].astype(str)
 
         self.add_geojson(
@@ -3397,7 +3413,7 @@ class Map(folium.Map):
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
-                    right_tile_url = common.stac_tile(right_layer, **left_args)
+                    right_tile_url = common.stac_tile(right_layer, **right_args)
                     bbox = common.stac_bounds(right_layer)
                     if bbox is not None:
                         bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
@@ -3427,7 +3443,7 @@ class Map(folium.Map):
                         **right_args,
                     )
             elif isinstance(right_layer, folium.raster_layers.TileLayer) or isinstance(
-                left_layer, folium.WmsTileLayer
+                right_layer, folium.WmsTileLayer
             ):
                 pass
             elif common.is_array(right_layer):
@@ -4852,6 +4868,60 @@ def geojson_layer(
     return geojson
 
 
+def _css_color(color: Any) -> str:
+    """Converts a color to a CSS color string, keeping any alpha channel.
+
+    Args:
+        color (Any): A color name, hex string, or an RGB/RGBA sequence with
+            0-255 channels.
+
+    Returns:
+        str: A CSS color string, such as "#ff0000" or "rgba(255, 0, 0, 0.5)".
+    """
+    if isinstance(color, (list, tuple)) and len(color) == 4:
+        r, g, b, a = color
+        alpha = a / 255 if a > 1 else a
+        return f"rgba({int(r)}, {int(g)}, {int(b)}, {alpha})"
+    return common.check_color(color)
+
+
+def _keyed_colormap_to_palette(
+    colormap: Dict[Any, Any], max_size: int = 65536
+) -> Tuple[List[Optional[str]], Optional[List[float]]]:
+    """Converts a {pixel value: color} colormap to a dense palette.
+
+    GeoTIFFLayer maps pixel values linearly onto the palette, so the palette
+    has one entry per integer value between the smallest and largest key, and
+    values not in the colormap are left transparent (None).
+
+    Args:
+        colormap (Dict[Any, Any]): A mapping of integer pixel values (int or
+            numeric strings) to colors.
+        max_size (int, optional): The largest palette to build. Defaults to 65536.
+
+    Returns:
+        Tuple[List[Optional[str]], Optional[List[float]]]: The palette and the
+            value range [min_key, max_key]. If the keys are not integers or span
+            too many values, the colors are returned in key order with no range.
+    """
+    try:
+        keyed = {int(float(k)): v for k, v in colormap.items()}
+    except (TypeError, ValueError):
+        keyed = None
+    if keyed:
+        kmin, kmax = min(keyed), max(keyed)
+        if kmax - kmin + 1 <= max_size:
+            palette = [None] * (kmax - kmin + 1)
+            for value, color in keyed.items():
+                palette[value - kmin] = _css_color(color)
+            if kmin == kmax:
+                # A one-entry palette needs a non-zero range to render; the
+                # extra endpoint is unmapped so value kmin + 1 stays transparent.
+                return palette + [None], [float(kmin), float(kmin) + 1]
+            return palette, [float(kmin), float(kmax)]
+    return [_css_color(c) for c in colormap.values()], None
+
+
 class GeoTIFFLayer(JSCSSMixin, Layer):
     """Leaflet layer that renders Cloud Optimized GeoTIFFs client-side."""
 
@@ -5010,12 +5080,16 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
                         const span = vmax - vmin || palette.length || 1;
                         const lastIndex = palette.length - 1;
                         const nullColor = nodataColor || null;
+                        const clampPalette = {{ this.clamp_palette|tojson }};
                         layerOptions.pixelValuesToColorFn = function(values) {
                             const val = Array.isArray(values) ? values[0] : values;
                             if (val === null || val === undefined || Number.isNaN(val)) {
                                 return nullColor;
                             }
                             const ratio = (val - vmin) / span;
+                            if (!clampPalette && (ratio < 0 || ratio > 1)) {
+                                return nullColor;
+                            }
                             const idx = Math.max(0, Math.min(lastIndex, Math.round(ratio * lastIndex)));
                             return palette[idx];
                         };
@@ -5075,9 +5149,18 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         nodata_color: Optional[str] = None,
         indexes: Optional[Sequence[int]] = None,
         sequence: int = 0,
+        clamp_palette: bool = True,
         **kwargs,
     ) -> None:
-        """Initialize the layer."""
+        """Initialize the layer.
+
+        Args:
+            clamp_palette (bool, optional): Whether values outside ``value_range``
+                take the first/last palette color. If False, they are rendered
+                with ``nodata_color`` (transparent by default), which suits
+                categorical palettes. Defaults to True. See the class for the
+                other arguments.
+        """
         layer_name = name if name else "GeoTIFF"
         super().__init__(
             name=layer_name,
@@ -5094,6 +5177,7 @@ class GeoTIFFLayer(JSCSSMixin, Layer):
         self.fit_bounds = fit_bounds
         self.show = show
         self.palette = list(palette or [])
+        self.clamp_palette = clamp_palette
         self.value_range = list(value_range) if value_range else None
         self.nodata_color = nodata_color
         self.indexes = list(indexes) if indexes is not None else None

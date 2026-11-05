@@ -353,8 +353,7 @@ class Legend(widgets.VBox):
 
         width = Legend.__create_layout_property("width", None, **kwargs)
 
-        if "min_width" not in kwargs:
-            min_width = None
+        min_width = Legend.__create_layout_property("min_width", None, **kwargs)
 
         if width is None:
             max_width = Legend.DEFAULT_MAX_WIDTH

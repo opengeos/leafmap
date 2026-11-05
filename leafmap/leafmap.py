@@ -672,9 +672,11 @@ class Map(ipyleaflet.Map):
         Args:
             layer (ipyleaflet layer): The layer to be added.
         """
-        existing_layer = self.find_layer(layer.name)
-        if existing_layer is not None:
-            self.remove_layer(existing_layer)
+        # Unnamed layers (e.g., Popup, Marker) must not replace other unnamed layers.
+        if getattr(layer, "name", None):
+            existing_layer = self.find_layer(layer.name)
+            if existing_layer is not None:
+                self.remove_layer(existing_layer)
         super().add(layer)
 
     def add_ee_layer(
@@ -2238,6 +2240,7 @@ class Map(ipyleaflet.Map):
                 right_name = "Right Layer"
 
             if isinstance(left_layer, str):
+                left_layer = _resolve_basemap_name(left_layer)
                 if left_layer in basemaps.keys():
                     left_layer = get_basemap(left_layer)
                 elif left_layer.startswith("http") and left_layer.endswith(".tif"):
@@ -2314,6 +2317,7 @@ class Map(ipyleaflet.Map):
                 )
 
             if isinstance(right_layer, str):
+                right_layer = _resolve_basemap_name(right_layer)
                 if right_layer in basemaps.keys():
                     right_layer = get_basemap(right_layer)
                 elif right_layer.startswith("http") and right_layer.endswith(".tif"):
@@ -2332,7 +2336,7 @@ class Map(ipyleaflet.Map):
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
-                    right_tile_url = common.stac_tile(right_layer, **left_args)
+                    right_tile_url = common.stac_tile(right_layer, **right_args)
                     bbox = common.stac_bounds(right_layer)
                     if bbox is not None:
                         bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
@@ -2866,7 +2870,18 @@ class Map(ipyleaflet.Map):
                         loop=0,
                     )
                 else:
-                    image.save(f, ext)
+                    # PIL expects format names such as "JPEG", not "jpg". Browsers cannot
+                    # display TIFF in a data URL, so TIFF images are re-encoded as PNG.
+                    fmt = {
+                        "jpg": "JPEG",
+                        "jpeg": "JPEG",
+                        "tif": "PNG",
+                        "tiff": "PNG",
+                    }.get(ext.lower(), ext.upper())
+                    if fmt == "PNG":
+                        image = _to_png_compatible(image)
+                    image.save(f, fmt)
+                    ext = fmt.lower()
 
                 data = b64encode(f.getvalue())
                 data = data.decode("ascii")
@@ -2989,7 +3004,7 @@ class Map(ipyleaflet.Map):
             print("The output file must be a PNG or JPG image.")
             return
 
-        work_dir = os.path.dirname(outfile)
+        work_dir = os.path.dirname(os.path.abspath(outfile))
         if not os.path.exists(work_dir):
             os.makedirs(work_dir)
 
@@ -3152,10 +3167,12 @@ class Map(ipyleaflet.Map):
             self.cog_layer_dict = {}
 
         if indexes is None:
-            if len(tile_client.band_names) == 1:
+            if len(tile_client.band_names) < 3:
                 indexes = [1]
             else:
                 indexes = [1, 2, 3]
+        elif isinstance(indexes, int):
+            indexes = [indexes]
 
         vis_bands = [tile_client.band_names[i - 1] for i in indexes]
 
@@ -3837,9 +3854,11 @@ class Map(ipyleaflet.Map):
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
+        # Work on a copy so the caller's datetime columns keep their dtype.
+        gdf = gdf.copy()
         for col in gdf.columns:
             try:
-                if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+                if pd.api.types.is_datetime64_any_dtype(gdf[col]):
                     gdf[col] = gdf[col].astype(str)
             except:
                 pass
@@ -3956,7 +3975,7 @@ class Map(ipyleaflet.Map):
         # Handle datetime columns (same as add_gdf)
         for col in pdf.columns:
             try:
-                if pdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+                if pd.api.types.is_datetime64_any_dtype(pdf[col]):
                     pdf[col] = pdf[col].astype(str)
             except Exception:
                 pass
@@ -6097,7 +6116,7 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, dict):
             geojson_data = data
-            if zoom_to_layer and (bounds is not None):
+            if zoom_to_layer and (bounds is None):
                 bounds = gpd.GeoDataFrame.from_features(data).total_bounds
         else:
             raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
@@ -6259,10 +6278,9 @@ class Map(ipyleaflet.Map):
             print("No GeoJSON data to save.")
             return
 
-        gdf = gpd.GeoDataFrame.from_features(self._geojson_data)
+        gdf = gpd.GeoDataFrame.from_features(self._geojson_data, crs="EPSG:4326")
         if drop_style and "style" in gdf.columns:
             gdf = gdf.drop(columns=["style"])
-            gdf.crs = "EPSG:4326"
 
         if crs != "EPSG:4326":
             gdf = gdf.to_crs(crs)
@@ -6323,7 +6341,7 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, dict):
             geojson_data = data
-            if zoom_to_layer and (bounds is not None):
+            if zoom_to_layer and (bounds is None):
                 bounds = gpd.GeoDataFrame.from_features(data).total_bounds
         else:
             raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
@@ -6585,7 +6603,7 @@ class Map(ipyleaflet.Map):
 
         if isinstance(data, dict):
             data = data
-            if zoom_to_layer and (bounds is not None):
+            if zoom_to_layer and (bounds is None):
                 bounds = gpd.GeoDataFrame.from_features(data).total_bounds
         else:
             raise ValueError("The data must be a GeoDataFrame or a GeoJSON dictionary.")
@@ -7496,7 +7514,18 @@ class ImageOverlay(ipyleaflet.ImageOverlay):
                         loop=0,
                     )
                 else:
-                    image.save(f, ext)
+                    # PIL expects format names such as "JPEG", not "jpg". Browsers cannot
+                    # display TIFF in a data URL, so TIFF images are re-encoded as PNG.
+                    fmt = {
+                        "jpg": "JPEG",
+                        "jpeg": "JPEG",
+                        "tif": "PNG",
+                        "tiff": "PNG",
+                    }.get(ext.lower(), ext.upper())
+                    if fmt == "PNG":
+                        image = _to_png_compatible(image)
+                    image.save(f, fmt)
+                    ext = fmt.lower()
 
                 data = b64encode(f.getvalue())
                 data = data.decode("ascii")
@@ -7689,6 +7718,7 @@ def split_map(
     bounds = None
 
     try:
+        left_layer = _resolve_basemap_name(left_layer)
         if left_layer in basemaps.keys():
             left_layer = get_basemap(left_layer)
         elif isinstance(left_layer, str):
@@ -7739,6 +7769,7 @@ def split_map(
                 f"left_layer must be one of the following: {', '.join(basemaps.keys())} or a string url to a tif file."
             )
 
+        right_layer = _resolve_basemap_name(right_layer)
         if right_layer in basemaps.keys():
             right_layer = get_basemap(right_layer)
         elif isinstance(right_layer, str):
@@ -8081,6 +8112,55 @@ def geojson_layer(
     return geojson
 
 
+def _to_png_compatible(image):
+    """Converts a PIL image to a mode that can be saved as PNG.
+
+    Floating-point images (mode "F", e.g., from a float GeoTIFF) are linearly
+    stretched to 8-bit grayscale; other unsupported modes are converted to RGBA.
+
+    Args:
+        image (PIL.Image.Image): The image to convert.
+
+    Returns:
+        PIL.Image.Image: An image whose mode PNG supports.
+    """
+    import numpy as np
+    from PIL import Image
+
+    if image.mode == "F":
+        array = np.asarray(image, dtype="float64")
+        finite = np.isfinite(array)
+        if finite.any():
+            vmin, vmax = array[finite].min(), array[finite].max()
+            scale = 255.0 / (vmax - vmin) if vmax > vmin else 0.0
+            array = np.where(finite, (array - vmin) * scale, 0)
+        else:
+            array = np.zeros_like(array)
+        return Image.fromarray(array.astype("uint8"))
+    if image.mode not in ("1", "L", "LA", "I", "I;16", "P", "RGB", "RGBA"):
+        return image.convert("RGBA")
+    return image
+
+
+def _resolve_basemap_name(name):
+    """Resolves a basemap alias (e.g., "ROADMAP", "TERRAIN") to a basemap key.
+
+    The ``basemaps`` dictionary is keyed by provider name (e.g.,
+    "Esri.WorldTopoMap"), while the Google-style aliases live in ``XYZ_TILES``.
+
+    Args:
+        name (Any): The basemap name or alias. Non-string values are returned as is.
+
+    Returns:
+        Any: The key in ``basemaps`` if ``name`` is a known alias, otherwise ``name``.
+    """
+    from .basemaps import XYZ_TILES
+
+    if isinstance(name, str) and name not in basemaps and name in XYZ_TILES:
+        return XYZ_TILES[name]["name"]
+    return name
+
+
 def get_basemap(name: str):
     """Gets a basemap tile layer by name.
 
@@ -8091,6 +8171,7 @@ def get_basemap(name: str):
         ipylealfet.TileLayer | ipyleaflet.WMSLayer: The basemap layer.
     """
 
+    name = _resolve_basemap_name(name)
     if isinstance(name, str):
         if name in basemaps.keys():
             basemap = basemaps[name]
