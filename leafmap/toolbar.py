@@ -18,12 +18,59 @@ TOOLBAR_HOVER_DEBOUNCE_MS = 250
 TOOLBAR_HOVER_MODE = "debounce"
 
 
+def _pointer_inside(event: Dict[str, Any]) -> bool:
+    """Checks whether a mouse event's pointer lies inside the source element.
+
+    The rect is treated as half-open (left and top edges inside, right and
+    bottom edges outside), which matches how browsers hit-test elements.
+
+    Args:
+        event (dict): The DOM event content sent by ipyevents.
+
+    Returns:
+        bool: True if the pointer is inside the element's bounding rect,
+            False if it is outside or the event lacks position information.
+    """
+    try:
+        x = float(event["clientX"])
+        y = float(event["clientY"])
+        left = float(event["boundingRectLeft"])
+        right = float(event["boundingRectRight"])
+        top = float(event["boundingRectTop"])
+        bottom = float(event["boundingRectBottom"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    return (left <= x < right) and (top <= y < bottom)
+
+
+class _ToolbarHoverEvent(ipyevents.Event):
+    """An ipyevents Event that drops spurious ``mouseleave`` events.
+
+    Expanding or collapsing a toolbar replaces its children, which re-renders
+    the widget. Webview-based frontends such as VS Code and Cursor then fire a
+    ``mouseleave`` even though the pointer has not moved, the toolbar
+    collapses, and the cycle repeats as flickering. A real ``mouseleave``
+    has the pointer outside the element, so events that still report the
+    pointer inside are ignored.
+    """
+
+    # Overrides the private ipyevents message handler (ipyevents 2.x), which
+    # receives every DOM event before the registered callbacks. If a future
+    # ipyevents renames it, this override is simply never called and hover
+    # handling falls back to the plain debounced behaviour.
+    def _handle_mouse_msg(self, _, content, buffers):
+        if content.get("type") == "mouseleave" and _pointer_inside(content):
+            return
+        super()._handle_mouse_msg(_, content, buffers)
+
+
 def _toolbar_hover_event(source: widgets.Widget) -> "ipyevents.Event":
     """Create a debounced ipyevents Event for a toolbar hover container.
 
-    Debouncing the ``mouseenter``/``mouseleave`` events avoids the rapid
-    expand/collapse feedback loop that makes the toolbar flicker in
-    webview-based frontends such as VS Code (see #1330).
+    Debouncing the ``mouseenter``/``mouseleave`` events and ignoring
+    ``mouseleave`` events whose pointer is still inside the toolbar avoids
+    the expand/collapse feedback loop that makes the toolbar flicker in
+    webview-based frontends such as VS Code and Cursor (see #1330).
 
     Args:
         source (widgets.Widget): The widget to watch for hover events.
@@ -31,7 +78,7 @@ def _toolbar_hover_event(source: widgets.Widget) -> "ipyevents.Event":
     Returns:
         ipyevents.Event: The configured hover event.
     """
-    return ipyevents.Event(
+    return _ToolbarHoverEvent(
         source=source,
         watched_events=["mouseenter", "mouseleave"],
         wait=TOOLBAR_HOVER_DEBOUNCE_MS,
