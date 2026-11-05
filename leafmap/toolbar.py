@@ -1817,10 +1817,6 @@ def split_basemaps(
     from .basemaps import WMS_TILES as wms_tiles
     from .leafmap import _resolve_basemap_name, basemaps, get_basemap
 
-    controls = m.controls
-    layers = m.layers
-    m.clear()
-
     add_zoom = True
     add_fullscreen = True
 
@@ -1841,6 +1837,17 @@ def split_basemaps(
             left_name = keys[0]
         if right_name is None:
             right_name = keys[-1]
+
+    # Validate before clearing the map so a bad selection leaves it untouched.
+    for selected in (left_name, right_name):
+        if selected not in keys:
+            raise ValueError(
+                f"{selected} is not supported. It must be one of the dropdown options."
+            )
+
+    controls = m.controls
+    layers = m.layers
+    m.clear()
 
     if layers_dict is None:
         if isinstance(left_name, str):
@@ -6443,7 +6450,9 @@ def layer_manager_gui(
 
                 def layer_opacity_changed(change, layer=layer):
                     if change["new"] is not None:
+                        # Merge so other style properties (e.g. weight) are kept.
                         layer.style = {
+                            **(layer.style or {}),
                             "opacity": change["new"],
                             "fillOpacity": change["new"],
                         }

@@ -16,7 +16,8 @@ def _buffer_gdf(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     """Buffers the geometries of a GeoDataFrame by a distance in meters.
 
     osmnx 2.x removed the ``buffer_dist`` argument, so the buffer is applied
-    here in a local UTM projection and projected back to the original CRS.
+    here in a local UTM projection (polar stereographic beyond UTM coverage)
+    and projected back to the original CRS.
 
     Args:
         gdf (gpd.GeoDataFrame): The GeoDataFrame to buffer.
@@ -25,7 +26,13 @@ def _buffer_gdf(gdf: gpd.GeoDataFrame, distance: float) -> gpd.GeoDataFrame:
     Returns:
         gpd.GeoDataFrame: A copy of the GeoDataFrame with buffered geometries.
     """
-    projected = gdf.to_crs(gdf.estimate_utm_crs())
+    try:
+        metric_crs = gdf.estimate_utm_crs()
+    except RuntimeError:
+        # UTM does not cover the poles; use a polar stereographic projection.
+        north = gdf.to_crs("EPSG:4326").geometry.centroid.y.mean() >= 0
+        metric_crs = "EPSG:3413" if north else "EPSG:3031"
+    projected = gdf.to_crs(metric_crs)
     projected = projected.set_geometry(projected.buffer(distance))
     return projected.to_crs(gdf.crs)
 
@@ -129,7 +136,14 @@ def osm_gdf_from_place(
     else:
         boundary = ox.geocode_to_gdf(query, which_result=which_result)
         boundary = _buffer_gdf(boundary, buffer_dist)
-        gdf = ox.features_from_polygon(boundary.geometry.union_all(), tags)
+        geometry = boundary.geometry
+        # union_all() was added in geopandas 1.0; older versions use unary_union.
+        polygon = (
+            geometry.union_all()
+            if hasattr(geometry, "union_all")
+            else geometry.unary_union
+        )
+        gdf = ox.features_from_polygon(polygon, tags)
     return gdf
 
 
@@ -324,8 +338,13 @@ def osm_gdf_from_bbox(
             "osmnx package is required. Please install it using 'pip install osmnx'"
         )
 
-    # osmnx 2.x takes bbox as (left, bottom, right, top).
-    gdf = ox.features_from_bbox(bbox=(west, south, east, north), tags=tags)
+    if int(ox.__version__.split(".")[0]) >= 2:
+        # osmnx 2.x takes bbox as (left, bottom, right, top).
+        bbox = (west, south, east, north)
+    else:
+        # osmnx 1.x takes bbox as (north, south, east, west).
+        bbox = (north, south, east, west)
+    gdf = ox.features_from_bbox(bbox=bbox, tags=tags)
     return gdf
 
 

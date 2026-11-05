@@ -140,8 +140,9 @@ class Map(MapWidget):
                 "mercator" or "globe". Defaults to "mercator".
             use_message_queue (bool, optional): Whether to use the message queue.
                 Defaults to None. If None, it will check the environment variable
-                "USE_MESSAGE_QUEUE". If it is set to "True", it will use the message queue, which
-                is needed to export the map to HTML. If it is set to "False", it will not use the message
+                "USE_MESSAGE_QUEUE". If it is set to "1", "true", "yes", "y" or "on"
+                (case-insensitive), it will use the message queue, which is needed to export
+                the map to HTML. Any other value (or no value) will not use the message
                 queue, which is needed to display the map multiple times in the same notebook.
             add_sidebar (bool, optional): Whether to add a sidebar to the map.
                 Defaults to False. If True, the map will be displayed in a sidebar.
@@ -230,7 +231,7 @@ class Map(MapWidget):
         if use_message_queue is None:
             use_message_queue = os.environ.get(
                 "USE_MESSAGE_QUEUE", ""
-            ).strip().lower() in ("1", "true", "yes")
+            ).strip().lower() in ("1", "true", "yes", "y", "on")
         self.use_message_queue(use_message_queue)
 
         self.controls = {}
@@ -644,10 +645,17 @@ class Map(MapWidget):
         if self.container is None:
             self.create_container()
         self.container.set_sidebar_width(min_width, max_width)
-        if min_width is not None:
-            self.sidebar_args["min_width"] = int(str(min_width).replace("px", ""))
-        if max_width is not None:
-            self.sidebar_args["max_width"] = int(str(max_width).replace("px", ""))
+        for key, width in (("min_width", min_width), ("max_width", max_width)):
+            if width is None:
+                continue
+            # Other code does arithmetic on these, so store pixel values as
+            # numbers; keep other CSS units (e.g. "20%") as given.
+            try:
+                width = float(str(width).strip().removesuffix("px"))
+                width = int(width) if width.is_integer() else width
+            except ValueError:
+                pass
+            self.sidebar_args[key] = width
 
     def add_to_map_container(
         self, *items: Union[widgets.Widget, Iterable[widgets.Widget], None]
@@ -11145,9 +11153,13 @@ class DateFilterWidget(widgets.VBox):
             )
 
         gdf = gdfs[file_index]
+        # Parse separately so string date columns compare correctly while the
+        # GeoJSON sent to the map keeps its original (serializable) values.
+        start_dates = pd.to_datetime(gdf[start_date_col])
+        end_dates = pd.to_datetime(gdf[end_date_col])
 
         if min_date is None:
-            min_date = gdf[start_date_col].min().normalize()
+            min_date = start_dates.min().normalize()
         elif isinstance(min_date, str):
             min_date = datetime.strptime(min_date, date_format)
         elif isinstance(min_date, pd.Timestamp):
@@ -11156,7 +11168,7 @@ class DateFilterWidget(widgets.VBox):
             raise ValueError("min_date must be a string, pd.Timestamp, or None")
 
         if max_date is None:
-            max_date = gdf[end_date_col].max().normalize()
+            max_date = end_dates.max().normalize()
         elif isinstance(max_date, str):
             max_date = datetime.strptime(max_date, date_format)
         elif isinstance(max_date, pd.Timestamp):
@@ -11282,9 +11294,7 @@ class DateFilterWidget(widgets.VBox):
             if slider.value:
                 start, end = slider.value
                 range_label.value = f"Selected range: {start.strftime(date_format)} to {end.strftime(date_format)}"
-                filtered_gdf = gdf[
-                    (gdf[start_date_col] >= start) & (gdf[end_date_col] <= end)
-                ]
+                filtered_gdf = gdf[(start_dates >= start) & (end_dates <= end)]
                 if group_dropdown.value is not None:
                     filtered_gdf = filtered_gdf[
                         filtered_gdf[group_col] == group_dropdown.value

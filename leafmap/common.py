@@ -5444,11 +5444,13 @@ def clip_image(image, mask, output, to_cog=True):
 
     output = check_file_path(output)
 
+    temp_mask = None
     if isinstance(mask, str):
         if mask.startswith("http"):
             mask = download_file(
                 mask, temp_file_path(os.path.splitext(mask)[1] or ".geojson")
             )
+            temp_mask = mask
         if not os.path.exists(mask):
             raise FileNotFoundError(f"{mask} does not exist.")
     elif isinstance(mask, list) or isinstance(mask, dict):
@@ -5469,11 +5471,17 @@ def clip_image(image, mask, output, to_cog=True):
                 "features": [mask],
             }
         mask = temp_file_path(".geojson")
+        temp_mask = mask
         with open(mask, "w") as f:
             json.dump(geojson, f)
 
-    with fiona.open(mask, "r") as shapefile:
-        shapes = [feature["geometry"] for feature in shapefile]
+    try:
+        with fiona.open(mask, "r") as shapefile:
+            shapes = [feature["geometry"] for feature in shapefile]
+    finally:
+        # Remove masks this function created; never delete a caller's file.
+        if temp_mask is not None and os.path.exists(temp_mask):
+            os.remove(temp_mask)
 
     with rasterio.open(image) as src:
         out_image, out_transform = rasterio.mask.mask(src, shapes, crop=True)
@@ -5519,7 +5527,7 @@ def clip_raster(
         geom_crs (str, optional): The coordinate reference system of the geometry. If
             given, it is assigned to the geometry (overriding any existing CRS).
             Defaults to None, which keeps the existing CRS or assumes EPSG:4326
-            for GeoJSON dicts.
+            for GeoJSON dicts. Other inputs without a CRS require geom_crs.
         dst_crs (str, optional): The coordinate reference system of the output raster. Defaults to None.
         resolution (int, optional): The resolution of the output raster. Defaults to None.
             If a single value is provided, the resolution will be the same in both x and y directions.
@@ -5575,8 +5583,13 @@ def clip_raster(
     if geom_crs is not None:
         gdf = gdf.set_crs(geom_crs, allow_override=True)
     elif gdf.crs is None:
-        # GeoJSON dicts carry no CRS; GeoJSON coordinates are WGS84 by spec.
-        gdf = gdf.set_crs("EPSG:4326")
+        if isinstance(geometry, dict):
+            # GeoJSON dicts carry no CRS; GeoJSON coordinates are WGS84 by spec.
+            gdf = gdf.set_crs("EPSG:4326")
+        else:
+            raise ValueError(
+                "The geometry has no CRS. Set it on the input or pass geom_crs."
+            )
 
     if isinstance(resolution, (int, float)):
         resolution = (resolution, resolution)
@@ -11782,6 +11795,33 @@ def is_array(x):
     return False
 
 
+def _float_output_dtype(array, driver, colormap=None):
+    """Returns the output dtype for floating-point arrays that should stay float.
+
+    Narrowing float data to an integer type based on its value range truncates
+    values (e.g., NDVI in [-1, 1] becomes all zeros), so float input is kept
+    float when the output format can store it.
+
+    Args:
+        array (np.ndarray): The input array.
+        driver (str): The GDAL driver used to write the output.
+        colormap (dict, optional): The colormap to write. GeoTIFF color tables
+            require integer data, so float data is not preserved when one is given.
+
+    Returns:
+        The float dtype to use, or None to fall back to range-based inference
+            (for non-float input, image formats such as PNG/JPEG that cannot
+            store floats, or when a colormap is given).
+    """
+    if (
+        colormap is None
+        and np.issubdtype(array.dtype, np.floating)
+        and str(driver).upper() in ("COG", "GTIFF")
+    ):
+        return np.float32 if array.dtype.itemsize < 4 else array.dtype
+    return None
+
+
 def array_to_memory_file(
     array,
     source: str = None,
@@ -11874,16 +11914,8 @@ def array_to_memory_file(
 
         kwargs["transform"] = transform
 
-    if (
-        dtype is None
-        and np.issubdtype(array.dtype, np.floating)
-        and str(driver).upper() in ("COG", "GTIFF")
-    ):
-        # Keep floating-point data floating; narrowing it to an integer type
-        # based on its range would truncate values (e.g., NDVI to all zeros).
-        # Image formats such as PNG/JPEG cannot store floats, so they keep the
-        # range-based inference below.
-        dtype = np.float32 if array.dtype.itemsize < 4 else array.dtype
+    if dtype is None:
+        dtype = _float_output_dtype(array, driver, colormap)
     if dtype is None:
         # Determine the minimum and maximum values in the array
         min_value = np.min(array)
@@ -12097,16 +12129,8 @@ def array_to_image(
 
         kwargs["transform"] = transform
 
-    if (
-        dtype is None
-        and np.issubdtype(array.dtype, np.floating)
-        and str(driver).upper() in ("COG", "GTIFF")
-    ):
-        # Keep floating-point data floating; narrowing it to an integer type
-        # based on its range would truncate values (e.g., NDVI to all zeros).
-        # Image formats such as PNG/JPEG cannot store floats, so they keep the
-        # range-based inference below.
-        dtype = np.float32 if array.dtype.itemsize < 4 else array.dtype
+    if dtype is None:
+        dtype = _float_output_dtype(array, driver, colormap)
     if dtype is None:
         # Determine the minimum and maximum values in the array
         min_value = np.min(array)
@@ -16461,7 +16485,9 @@ def nasa_datasets(keyword=None, df=None, return_short_name=False):
     if keyword is not None:
         # Convert keyword and DataFrame values to lowercase
         keyword_lower = keyword.lower()
-        df_lower = df.map(lambda x: x.lower() if isinstance(x, str) else x)
+        # DataFrame.map replaced applymap in pandas 2.1; applymap is gone in 3.0.
+        elementwise = df.map if hasattr(df, "map") else df.applymap
+        df_lower = elementwise(lambda x: x.lower() if isinstance(x, str) else x)
 
         # Use boolean indexing to filter the DataFrame
         filtered_df = df[

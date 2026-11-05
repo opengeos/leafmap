@@ -3852,6 +3852,8 @@ class Map(ipyleaflet.Map):
             zoom_to_layer (bool, optional): Whether to zoom to the layer. Defaults to False.
             encoding (str, optional): The encoding of the GeoDataFrame. Defaults to "utf-8".
         """
+        # Work on a copy so the caller's datetime columns keep their dtype.
+        gdf = gdf.copy()
         for col in gdf.columns:
             try:
                 if pd.api.types.is_datetime64_any_dtype(gdf[col]):

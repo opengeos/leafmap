@@ -120,6 +120,20 @@ class TestCommonFixes(unittest.TestCase):
         self.assertTrue(np.issubdtype(data.dtype, np.floating))
         self.assertAlmostEqual(float(data.min()), -0.9, places=5)
 
+    def test_float_output_dtype(self):
+        """Float data stays float for GeoTIFF only, and not with a colormap."""
+        arr = np.zeros((2, 2), dtype=np.float32)
+        self.assertEqual(common._float_output_dtype(arr, "COG"), np.float32)
+        self.assertIsNone(common._float_output_dtype(arr, "PNG"))
+        self.assertIsNone(common._float_output_dtype(arr, "GTiff", {1: (0, 0, 0)}))
+
+    def test_buffer_gdf_near_pole(self):
+        """Buffering works beyond UTM coverage."""
+        from leafmap.osm import _buffer_gdf
+
+        gdf = gpd.GeoDataFrame(geometry=[Point(0, 89.5)], crs="EPSG:4326")
+        self.assertEqual(_buffer_gdf(gdf, 1000).geometry.iloc[0].geom_type, "Polygon")
+
 
 class TestLeafletFixes(unittest.TestCase):
     """Tests for fixes in the ipyleaflet backend."""
@@ -156,6 +170,8 @@ class TestLeafletFixes(unittest.TestCase):
         m.add_gdf(gdf, layer_name="pts", zoom_to_layer=False)
         layer = m.find_layer("pts")
         self.assertIsInstance(layer.data["features"][0]["properties"]["t"], str)
+        # The caller's GeoDataFrame keeps its datetime dtype.
+        self.assertTrue(pd.api.types.is_datetime64_any_dtype(gdf["t"]))
 
 
 class TestFoliumFixes(unittest.TestCase):

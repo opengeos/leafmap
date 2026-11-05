@@ -276,7 +276,11 @@ def bar_chart(
     if isinstance(legend_title, str):
         # Copy so the shared default (and the caller's dict) is not mutated.
         layout_args = dict(layout_args or {})
-        layout_args["legend"] = {**layout_args.get("legend", {}), "title": legend_title}
+        legend = layout_args.get("legend") or {}
+        if hasattr(legend, "to_plotly_json"):
+            # A plotly Legend object; convert it so it can be merged.
+            legend = legend.to_plotly_json()
+        layout_args["legend"] = {**legend, "title": legend_title}
 
     try:
         fig = px.bar(
@@ -557,7 +561,11 @@ def line_chart(
     if isinstance(legend_title, str):
         # Copy so the shared default (and the caller's dict) is not mutated.
         layout_args = dict(layout_args or {})
-        layout_args["legend"] = {**layout_args.get("legend", {}), "title": legend_title}
+        legend = layout_args.get("legend") or {}
+        if hasattr(legend, "to_plotly_json"):
+            # A plotly Legend object; convert it so it can be merged.
+            legend = legend.to_plotly_json()
+        layout_args["legend"] = {**legend, "title": legend_title}
 
     try:
         fig = px.line(
@@ -823,7 +831,8 @@ def histogram(
         data = data.head(max_rows)
 
     # Pop labels so it is not passed twice to px.histogram below.
-    labels = kwargs.pop("labels", None) or {}
+    # Copy so x_label/y_label do not modify the caller's dict.
+    labels = dict(kwargs.pop("labels", None) or {})
 
     if x_label is not None:
         labels[x] = x_label
@@ -983,7 +992,11 @@ def pie_chart(
     if isinstance(legend_title, str):
         # Copy so the shared default (and the caller's dict) is not mutated.
         layout_args = dict(layout_args or {})
-        layout_args["legend"] = {**layout_args.get("legend", {}), "title": legend_title}
+        legend = layout_args.get("legend") or {}
+        if hasattr(legend, "to_plotly_json"):
+            # A plotly Legend object; convert it so it can be merged.
+            legend = legend.to_plotly_json()
+        layout_args["legend"] = {**legend, "title": legend_title}
 
     try:
         fig = px.pie(
