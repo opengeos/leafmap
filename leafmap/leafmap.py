@@ -271,14 +271,27 @@ class Map(ipyleaflet.Map):
     def fit_bounds(self, bounds) -> None:
         """Fits the map view to the given bounds.
 
-        Wraps ipyleaflet's ``fit_bounds``, which schedules an asyncio task via
-        ``asyncio.ensure_future``. On Python 3.14+ there is no implicit current
-        event loop outside a running loop, so ensure one exists first.
+        Like ipyleaflet's ``fit_bounds``, this schedules an asyncio task that
+        adjusts the view once the frontend reports the map bounds, so it has
+        no effect without a running event loop (e.g. in a plain script). On
+        Python 3.14+ there is no implicit current event loop outside a running
+        loop, so ensure one exists first.
 
         Args:
             bounds (list): Bounds in the form [[south, west], [north, east]].
+
+        Raises:
+            ValueError: If ``bounds`` is not in the expected form.
         """
         import asyncio
+
+        try:
+            (south, west), (north, east) = bounds
+            bounds = [[float(south), float(west)], [float(north), float(east)]]
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                "bounds must be in the form [[south, west], [north, east]]"
+            ) from e
 
         try:
             asyncio.get_event_loop()
@@ -291,19 +304,42 @@ class Map(ipyleaflet.Map):
         if task is not None and not task.done():
             task.cancel()
         self._fit_bounds_task = asyncio.ensure_future(self._fit_bounds(bounds))
+        self._fit_bounds_task.add_done_callback(self._log_fit_bounds_error)
 
-    async def _wait_for_bounds_change(self, timeout: Optional[float] = 10) -> bool:
-        """Waits until the frontend reports new map bounds.
+    @staticmethod
+    def _log_fit_bounds_error(task) -> None:
+        """Logs an exception raised inside a background ``fit_bounds`` task.
 
-        ipyleaflet's own helper resolves an asyncio future directly from the
-        trait observer. Recent JupyterLab versions send widget messages to a
-        kernel subshell, so the observer runs on another thread and the
-        future never wakes the event loop, which makes ``fit_bounds`` hang.
-        This version hands the result back to the loop in a thread-safe way.
+        Args:
+            task (asyncio.Task): The finished ``_fit_bounds`` task.
+        """
+        import logging
+
+        if task.cancelled():
+            return
+        error = task.exception()
+        if error is not None:
+            logging.getLogger(__name__).warning(
+                "fit_bounds failed: %s", error, exc_info=error
+            )
+
+    async def _set_view_and_wait(
+        self, timeout: Optional[float] = 10, **changes
+    ) -> bool:
+        """Changes map view traits and waits for the frontend's new bounds.
+
+        The ``bounds`` observer is registered before the traits change, so a
+        reply that arrives right away is not missed. ipyleaflet's own helper
+        resolves an asyncio future directly from the trait observer. Recent
+        JupyterLab versions send widget messages to a kernel subshell, so the
+        observer runs on another thread and that future never wakes the event
+        loop. This version hands the result back to the loop in a thread-safe
+        way.
 
         Args:
             timeout (float, optional): Seconds to wait before giving up. Use
                 None to wait indefinitely. Defaults to 10.
+            **changes: Map traits to set, such as ``center`` or ``zoom``.
 
         Returns:
             bool: True if the bounds changed, False if the wait timed out.
@@ -318,27 +354,25 @@ class Map(ipyleaflet.Map):
                 future.set_result(True)
 
         def handler(change):
-            self.unobserve(handler, "bounds")
             loop.call_soon_threadsafe(resolve)
 
         self.observe(handler, "bounds")
         try:
+            for name, value in changes.items():
+                setattr(self, name, value)
             return await asyncio.wait_for(future, timeout)
         except asyncio.TimeoutError:
             return False
         finally:
-            try:
-                self.unobserve(handler, "bounds")
-            except ValueError:
-                pass
+            self.unobserve(handler, "bounds")
 
     async def _fit_bounds(self, bounds) -> None:
         """Adjusts the center and zoom so the map view contains the bounds.
 
         Same approach as ipyleaflet's ``_fit_bounds`` (move the center, then
         step the zoom level while checking the bounds the frontend reports),
-        but it waits with ``_wait_for_bounds_change`` and stops if the
-        frontend stops responding.
+        but it waits with ``_set_view_and_wait``, stops at ``max_zoom``, and
+        stops if the frontend stops responding.
 
         Args:
             bounds (list): Bounds in the form [[south, west], [north, east]].
@@ -348,41 +382,37 @@ class Map(ipyleaflet.Map):
 
         if not self.bounds:
             # The map has not been rendered yet; wait for it to be displayed.
-            self.center = center
-            if not await self._wait_for_bounds_change(timeout=None):
+            if not await self._set_view_and_wait(timeout=None, center=center):
                 return
         elif list(center) != list(self.center):
-            self.center = center
-            if not await self._wait_for_bounds_change():
+            if not await self._set_view_and_wait(center=center):
                 return
 
-        zoomed_out = False
-        while self.zoom > 1:
+        def contains_bounds():
             (south, west), (north, east) = self.bounds
-            if south > b_south or north < b_north or west > b_west or east < b_east:
-                self.zoom -= 1
-                zoomed_out = True
-                if not await self._wait_for_bounds_change():
-                    return
-            else:
-                break
+            return (
+                south < b_south and north > b_north and west < b_west and east > b_east
+            )
+
+        def within_bounds():
+            (south, west), (north, east) = self.bounds
+            return not (
+                south > b_south or north < b_north or west > b_west or east < b_east
+            )
+
+        zoomed_out = False
+        while self.zoom > 1 and not within_bounds():
+            zoomed_out = True
+            if not await self._set_view_and_wait(zoom=self.zoom - 1):
+                return
 
         if not zoomed_out:
-            while True:
-                (south, west), (north, east) = self.bounds
-                if (
-                    south < b_south
-                    and north > b_north
-                    and west < b_west
-                    and east > b_east
-                ):
-                    self.zoom += 1
-                    if not await self._wait_for_bounds_change():
-                        return
-                else:
-                    self.zoom -= 1
-                    await self._wait_for_bounds_change()
-                    break
+            while contains_bounds():
+                if self.max_zoom is not None and self.zoom >= self.max_zoom:
+                    return
+                if not await self._set_view_and_wait(zoom=self.zoom + 1):
+                    return
+            await self._set_view_and_wait(zoom=self.zoom - 1)
 
     def zoom_to_bounds(self, bounds) -> None:
         """Zooms to a bounding box in the form of [minx, miny, maxx, maxy].
