@@ -776,10 +776,16 @@ class Map(folium.Map):
 
         if "bidx" in kwargs:
             indexes = kwargs.pop("bidx")
-        if "colormap_name" in kwargs:
-            palette_colors = kwargs.pop("colormap_name")
-        if "colormap" in kwargs:
-            palette_colors = kwargs.pop("colormap")
+        for cmap_key in ("colormap_name", "colormap"):
+            if cmap_key in kwargs:
+                cmap = kwargs.pop(cmap_key)
+                # GeoTIFFLayer expects a list of colors, not a colormap name.
+                if isinstance(cmap, str):
+                    palette_colors = common.get_palette_colors(cmap, 256, hashtag=True)
+                elif isinstance(cmap, dict):
+                    palette_colors = [common.check_color(c) for c in cmap.values()]
+                elif cmap is not None:
+                    palette_colors = [common.check_color(c) for c in cmap]
         if "rescale" in kwargs:
             if isinstance(kwargs["rescale"], str):
                 value_range = kwargs["rescale"].split(",")
@@ -2161,8 +2167,11 @@ class Map(folium.Map):
 
         """
 
+        gdf = gdf.copy()
         for col in gdf.columns:
-            if gdf[col].dtype in ["datetime64[ns]", "datetime64[ns, UTC]"]:
+            if col != gdf.geometry.name and pd.api.types.is_datetime64_any_dtype(
+                gdf[col]
+            ):
                 gdf[col] = gdf[col].astype(str)
 
         self.add_geojson(
@@ -3397,7 +3406,7 @@ class Map(folium.Map):
                     )
 
                 elif right_layer.startswith("http") and right_layer.endswith(".json"):
-                    right_tile_url = common.stac_tile(right_layer, **left_args)
+                    right_tile_url = common.stac_tile(right_layer, **right_args)
                     bbox = common.stac_bounds(right_layer)
                     if bbox is not None:
                         bounds = [(bbox[1], bbox[0]), (bbox[3], bbox[2])]
@@ -3427,7 +3436,7 @@ class Map(folium.Map):
                         **right_args,
                     )
             elif isinstance(right_layer, folium.raster_layers.TileLayer) or isinstance(
-                left_layer, folium.WmsTileLayer
+                right_layer, folium.WmsTileLayer
             ):
                 pass
             elif common.is_array(right_layer):

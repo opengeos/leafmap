@@ -767,7 +767,13 @@ def check_titiler_endpoint(titiler_endpoint: Optional[str] = None) -> Any:
         and isinstance(titiler_endpoint, str)
         and titiler_endpoint.lower() == "local"
     ):
-        titiler_endpoint = run_titiler(show_logs=False)
+        # run_titiler sets TITILER_ENDPOINT; reuse a running local server.
+        local_endpoint = os.environ.get("TITILER_ENDPOINT", "")
+        if not local_endpoint.startswith("http://127.0.0.1") and not (
+            local_endpoint.startswith("http://localhost")
+        ):
+            run_titiler(show_logs=False)
+        titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
     elif titiler_endpoint is None:
         if os.environ.get("TITILER_ENDPOINT") is not None:
             titiler_endpoint = os.environ.get("TITILER_ENDPOINT")
@@ -832,8 +838,6 @@ def cog_tile(
                 bands = bands[0]
             kwargs["bidx"] = bands
         elif all(isinstance(x, str) for x in bands):
-            if len(set(bands)) == 1:
-                bands = bands[0]
             kwargs["bidx"] = [band_names.index(x) + 1 for x in bands]
         else:
             raise ValueError("Bands must be a list of integers or strings.")
@@ -861,12 +865,14 @@ def cog_tile(
 
         if stats is not None and "message" not in stats:
             try:
+                # One rescale range per selected band, in bidx order.
                 rescale = []
-                for i in band_names:
+                for i in kwargs["bidx"]:
+                    band_name = band_names[i - 1]
                     rescale.append(
                         "{},{}".format(
-                            stats[i]["percentile_2"],
-                            stats[i]["percentile_98"],
+                            stats[band_name]["percentile_2"],
+                            stats[band_name]["percentile_98"],
                         )
                     )
                 kwargs["rescale"] = rescale
@@ -2209,7 +2215,8 @@ def stac_client(
 
     except Exception as e:
         print(e)
-        return None
+        # Callers unpack two values, so keep the shape consistent on failure.
+        return None, None
 
 
 def stac_collections(

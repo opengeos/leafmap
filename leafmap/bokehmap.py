@@ -357,7 +357,9 @@ class Map:
             self.figure.add_tools(hover)
 
         if fit_bounds:
-            self.fit_bounds(gdf.total_bounds.tolist())
+            # bounds_to_xy_range expects lon/lat bounds.
+            bounds_gdf = gdf if gdf.crs is None else gdf.to_crs("EPSG:4326")
+            self.fit_bounds(bounds_gdf.total_bounds.tolist())
 
     def add_geojson(
         self,
@@ -468,7 +470,7 @@ class Map:
         """
         import geopandas as gpd
 
-        if filename.startswith("http"):
+        if isinstance(filename, str) and filename.startswith("http"):
             filename = common.github_raw_url(filename)
 
         if isinstance(filename, gpd.GeoDataFrame):
