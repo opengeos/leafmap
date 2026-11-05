@@ -55,11 +55,13 @@ Leafmap offers a wide range of features and capabilities that empower geospatial
 
 -   **Creating an interactive map with just one line of code:** Leafmap makes it easy to create an interactive map by providing a simple API that allows you to load and visualize geospatial datasets with minimal coding.
 
--   **Switching between different mapping backends:** Leafmap supports multiple mapping backends, including ipyleaflet, folium, kepler.gl, pydeck, and bokeh. You can switch between these backends to create maps with different visualization styles and capabilities.
+-   **Switching between different mapping backends:** Leafmap supports multiple mapping backends, including ipyleaflet, folium, MapLibre GL JS, lonboard, pydeck, kepler.gl, plotly, and bokeh. You can switch between these backends to create maps with different visualization styles and capabilities.
 
--   **Changing basemaps interactively:** Leafmap allows you to change basemaps interactively, providing a variety of options such as OpenStreetMap, Stamen Terrain, CartoDB Positron, and many more.
+-   **Changing basemaps interactively:** Leafmap allows you to change basemaps interactively, providing a variety of options such as OpenStreetMap, Esri World Imagery, CartoDB Positron, and many more.
 
 -   **Adding XYZ, WMS, and vector tile services:** You can easily add XYZ, WMS, and vector tile services to your map, allowing you to overlay additional geospatial data from various sources.
+
+-   **Creating 3D maps with vector tiles:** The MapLibre backend supports vector tiles, PMTiles, 3D terrain, 3D buildings, and custom map styles.
 
 -   **Displaying vector data:** Leafmap supports various vector data formats, including Shapefile, GeoJSON, GeoPackage, and any vector format supported by GeoPandas. You can load and display vector data on the map, enabling you to visualize and analyze spatial features.
 
@@ -86,6 +88,8 @@ Leafmap offers a wide range of features and capabilities that empower geospatial
 -   **Analyzing geospatial data with whitebox:** Leafmap integrates with WhiteboxTools and whiteboxgui, providing a suite of geospatial analyses, such as hydrological analysis, terrain analysis, and LiDAR processing.
 
 -   **Segmenting and classifying remote sensing imagery:** Leafmap integrates the segment-geospatial package, which provides tools for segmenting and classifying remote sensing imagery using deep learning algorithms.
+
+-   **Viewing data from the command line:** The `view-raster` and `view-vector` commands open a raster or vector file in the browser without writing any code.
 
 -   **Building interactive web apps:** Leafmap supports the development of interactive web applications using frameworks like Voila, Streamlit, and Solara. This allows you to share your geospatial analyses and visualizations with others in a user-friendly web interface.
 

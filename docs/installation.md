@@ -1,5 +1,9 @@
 # Installation
 
+**leafmap** supports Python 3.9 and later. The core package is lightweight; heavier
+features (raster tiling, vector analysis, extra mapping backends) are available
+through [optional dependencies](#optional-dependencies).
+
 ## Install from PyPI
 
 **leafmap** is available on [PyPI](https://pypi.org/project/leafmap/). To install **leafmap**, run this command in your terminal:
@@ -11,51 +15,42 @@ pip install leafmap
 ## Install from conda-forge
 
 **leafmap** is also available on [conda-forge](https://anaconda.org/conda-forge/leafmap). If you have
-[Anaconda](https://www.anaconda.com/distribution/#download-section) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) installed on your computer, you can install leafmap using the following command:
+[Miniforge](https://github.com/conda-forge/miniforge) (recommended), [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/download) installed on your computer, you can install leafmap using the following command:
 
 ```bash
-conda install leafmap -c conda-forge
+conda install -c conda-forge leafmap
 ```
 
-The leafmap package has some optional dependencies (e.g., [geopandas](https://geopandas.org/) and [localtileserver](https://github.com/banesullivan/localtileserver)), which can be challenging to install on some computers, especially Windows. It is highly recommended that you create a fresh conda environment to install geopandas and leafmap. Follow the commands below to set up a conda env and install [geopandas](https://geopandas.org), [localtileserver](https://github.com/banesullivan/localtileserver), [keplergl](https://docs.kepler.gl/docs/keplergl-jupyter), [pydeck](https://deckgl.readthedocs.io/), and leafmap.
+Some optional dependencies (e.g., [geopandas](https://geopandas.org/) and [localtileserver](https://github.com/banesullivan/localtileserver)) depend on compiled libraries such as GDAL, which can be challenging to install with pip on some computers, especially Windows. It is highly recommended that you create a fresh conda environment for them:
 
 ```bash
-conda install -n base mamba -c conda-forge
-mamba create -n geo leafmap geopandas localtileserver python -c conda-forge
+conda create -n geo -c conda-forge python=3.12 leafmap geopandas localtileserver jupyterlab
+conda activate geo
 ```
 
-Optionally, you can install some [Jupyter notebook extensions](https://github.com/ipython-contrib/jupyter_contrib_nbextensions), which can improve your productivity in the notebook environment. Some useful extensions include Table of Contents, Gist-it, Autopep8, Variable Inspector, etc. See this [post](https://towardsdatascience.com/jupyter-notebook-extensions-517fa69d2231) for more information.
+[Miniforge](https://github.com/conda-forge/miniforge) ships with `mamba`, a faster drop-in replacement for `conda`. If you have it, you can replace `conda` with `mamba` in the commands above.
 
-```bash
-conda install jupyter_contrib_nbextensions -c conda-forge
-```
-
-## Optional Dependencies
+## Optional dependencies
 
 Leafmap has various optional dependencies to enable additional features. You can install them as needed:
 
-### Polars Support
+| Extra      | Command                            | Enables                                                                          |
+| ---------- | ---------------------------------- | -------------------------------------------------------------------------------- |
+| `raster`   | `pip install "leafmap[raster]"`    | Local raster/COG visualization (localtileserver, rioxarray, TiTiler, NetCDF)     |
+| `vector`   | `pip install "leafmap[vector]"`    | Vector analysis, OpenStreetMap (osmnx), PMTiles, lonboard, classification        |
+| `maplibre` | `pip install "leafmap[maplibre]"`  | The MapLibre GL backend (`leafmap.maplibregl`)                                   |
+| `backends` | `pip install "leafmap[backends]"`  | The bokeh, kepler.gl, MapLibre, pydeck and plotly backends                       |
+| `polars`   | `pip install "leafmap[polars]"`    | `add_polars()` for Polars DataFrames with geometry columns                       |
+| `duckdb`   | `pip install "leafmap[duckdb]"`    | DuckDB and SQL integration                                                       |
+| `sql`      | `pip install "leafmap[sql]"`       | Reading vector data from PostGIS                                                 |
+| `pmtiles`  | `pip install "leafmap[pmtiles]"`   | Creating and serving PMTiles                                                     |
+| `titiler`  | `pip install "leafmap[titiler]"`   | Running a local TiTiler server                                                   |
+| `usgs`     | `pip install "leafmap[usgs]"`      | USGS hydrography and 3DEP elevation data                                         |
+| `lidar`    | `pip install "leafmap[lidar]"`     | LiDAR point cloud visualization                                                  |
+| `apps`     | `pip install "leafmap[apps]"`      | Building web apps with Streamlit, Voilà and Solara                               |
+| `ai`       | `pip install "leafmap[ai]"`        | AI/ML features (torchgeo, raster-vision)                                         |
 
-To enable Polars DataFrame support for modern, high-performance geospatial workflows:
-
-```bash
-pip install "leafmap[polars]"
-```
-
-This enables the `add_polars()` method for visualizing Polars DataFrames with geometry columns (e.g., from Polars-ST or polars-h3).
-
-### Other Optional Dependencies
-
-Install other optional features:
-
-```bash
-pip install "leafmap[vector]"     # Vector analysis tools
-pip install "leafmap[raster]"     # Raster data support
-pip install "leafmap[lidar]"      # LiDAR data analysis
-pip install "leafmap[backends]"   # All mapping backends
-pip install "leafmap[maplibre]"   # MapLibre GL backend
-pip install "leafmap[ai]"         # AI/ML features
-```
+Multiple extras can be combined, for example `pip install "leafmap[raster,vector,maplibre]"`.
 
 ## Install from GitHub
 
@@ -94,31 +89,33 @@ import leafmap
 leafmap.update_package()
 ```
 
+## Check your installation
+
+To print the versions of leafmap and its key dependencies (useful when reporting an issue), run:
+
+```python
+import leafmap
+leafmap.Report()
+```
+
 ## Troubleshooting
 
-If the interactive map does not show up on Jupyter Notebook and JupyterLab, it is probably because the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet) extension is not installed properly.
-For example, you might receive an error message saying `Error displaying widget: model not found`. This a well-known issue related to ipyleaflet. See some relevant issues below.
+If the interactive map does not show up in Jupyter Notebook or JupyterLab, or you see an error such as `Error displaying widget: model not found`, the Jupyter widget front-end is usually out of sync with the Python packages. Modern versions of JupyterLab (4.x) and Notebook (7.x) install widget extensions automatically together with the Python package, so no `jupyter nbextension` or `jupyter labextension install` commands are needed.
 
--   [How to display map object using ipyleaflet in jupyter notebook or jupyter Lab](https://github.com/jupyter-widgets/ipyleaflet/issues/739)
--   [ipyleaflet does not work in jupyter lab - "Error displaying widget: model not found"](https://github.com/jupyter-widgets/ipyleaflet/issues/418)
--   [Error displaying widget: model not found](https://github.com/jupyter-widgets/ipyleaflet/issues/504)
+Try the following steps:
 
-Try some of the options below to resolve the issue. If the issue persists after trying these steps, you can open an issue on the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet/issues) repository.
+1. Make sure `ipywidgets`, `ipyleaflet` and Jupyter are installed **in the same environment** as the kernel you are using, and upgrade them together:
 
-For Jupyter notebook, try running the following two commands within your leafmap conda environment:
+    ```bash
+    pip install -U ipywidgets ipyleaflet jupyterlab notebook
+    ```
 
-```
-jupyter nbextension install --py --symlink --sys-prefix ipyleaflet
-jupyter nbextension enable --py --sys-prefix ipyleaflet
-```
+2. Restart the Jupyter server (not just the kernel) and hard-refresh the browser page.
+3. Run `jupyter labextension list` and check that `jupyter-leaflet` and `@jupyter-widgets/jupyterlab-manager` are listed as enabled.
 
-For JupyterLab, try running the following command within your leafmap conda environment:
+If the issue persists, you can open an issue on the [ipyleaflet](https://github.com/jupyter-widgets/ipyleaflet/issues) repository, or try a different backend such as `import leafmap.foliumap as leafmap` or `import leafmap.maplibregl as leafmap`.
 
-```
-jupyter labextension install @jupyter-widgets/jupyterlab-manager jupyter-leaflet
+Alternatively, you can run leafmap directly in the cloud without installing anything:
 
-```
-
-Alternatively, you can run leafmap directly using binder:
-
--   <https://mybinder.org/v2/gh/opengeos/leafmap/HEAD>
+-   [Google Colab](https://colab.research.google.com/github/opengeos/leafmap/blob/master)
+-   [Binder](https://mybinder.org/v2/gh/opengeos/leafmap/HEAD)

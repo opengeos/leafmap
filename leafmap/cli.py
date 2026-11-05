@@ -4,14 +4,14 @@ import argparse
 import os
 import sys
 import webbrowser
-from typing import Optional
+from typing import List, Optional, Union
 from .common import read_vector
 
 
 def view_raster(
     file_path: str,
     port: Optional[int] = None,
-    indexes: Optional[int | list[int]] = None,
+    indexes: Optional[Union[int, List[int]]] = None,
     colormap: Optional[str] = None,
     vmin: Optional[float] = None,
     vmax: Optional[float] = None,
