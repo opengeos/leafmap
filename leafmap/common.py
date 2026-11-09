@@ -1293,7 +1293,10 @@ def get_bounds(
     Args:
         geometry (dict): A GeoJSON dict.
         north_up (bool, optional): . Defaults to True.
-        transform ([type], optional): . Defaults to None.
+        transform (optional): Coordinate transform applied to geometries, including
+            collection members. Transformed bounds keep the existing
+            (left, maximum-y, right, minimum-y) ordering. Defaults to None.
+            An explicit GeoJSON bbox is returned unchanged.
 
     Returns:
         A list of coordinates representing [left, bottom, right, top].
@@ -1320,15 +1323,16 @@ def get_bounds(
         xmaxs = []
         ymaxs = []
         for feature in geometry["features"]:
-            xmin, ymin, xmax, ymax = get_bounds(feature["geometry"])
+            xmin, ymin, xmax, ymax = get_bounds(
+                feature["geometry"], transform=transform
+            )
             xmins.append(xmin)
-            ymins.append(ymin)
+            ymins.append(min(ymin, ymax))
             xmaxs.append(xmax)
-            ymaxs.append(ymax)
-        if north_up:
+            ymaxs.append(max(ymin, ymax))
+        if north_up and transform is None:
             return min(xmins), min(ymins), max(xmaxs), max(ymaxs)
-        else:
-            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
+        else:            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
 
     elif "geometries" in geometry:
         # Input is a geometry collection
@@ -1337,15 +1341,14 @@ def get_bounds(
         xmaxs = []
         ymaxs = []
         for geometry in geometry["geometries"]:
-            xmin, ymin, xmax, ymax = get_bounds(geometry)
+            xmin, ymin, xmax, ymax = get_bounds(geometry, transform=transform)
             xmins.append(xmin)
-            ymins.append(ymin)
+            ymins.append(min(ymin, ymax))
             xmaxs.append(xmax)
-            ymaxs.append(ymax)
-        if north_up:
+            ymaxs.append(max(ymin, ymax))
+        if north_up and transform is None:
             return min(xmins), min(ymins), max(xmaxs), max(ymaxs)
-        else:
-            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
+        else:            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
 
     elif "coordinates" in geometry:
         # Input is a singular geometry object
