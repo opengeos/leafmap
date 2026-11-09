@@ -1332,7 +1332,8 @@ def get_bounds(
             ymaxs.append(max(ymin, ymax))
         if north_up and transform is None:
             return min(xmins), min(ymins), max(xmaxs), max(ymaxs)
-        else:            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
+        else:
+            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
 
     elif "geometries" in geometry:
         # Input is a geometry collection
@@ -1348,7 +1349,8 @@ def get_bounds(
             ymaxs.append(max(ymin, ymax))
         if north_up and transform is None:
             return min(xmins), min(ymins), max(xmaxs), max(ymaxs)
-        else:            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
+        else:
+            return min(xmins), max(ymaxs), max(xmaxs), min(ymins)
 
     elif "coordinates" in geometry:
         # Input is a singular geometry object
