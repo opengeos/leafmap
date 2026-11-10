@@ -2078,9 +2078,7 @@ def normalize_carto_provider(provider: Any) -> Any:
     if not is_carto_provider(provider):
         return provider
     tile = xyzservices.TileProvider(dict(provider))
-    tile["url"] = (
-        tile["url"].replace("?key={apikey}", "").replace("&key={apikey}", "")
-    )
+    tile["url"] = tile["url"].replace("?key={apikey}", "").replace("&key={apikey}", "")
     tile.pop("apikey", None)
     return tile
 
