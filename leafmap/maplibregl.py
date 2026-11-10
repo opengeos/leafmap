@@ -5418,6 +5418,7 @@ class Map(MapWidget):
             floating (bool): If True, no separate layer switcher is added to the map,
                 since layers are managed in the sidebar layer manager. Set to False
                 to add a floating layer switcher control on the map. Defaults to True.
+
         Returns:
             None
         """
