@@ -5415,7 +5415,9 @@ class Map(MapWidget):
             position (str): The position of the layer control on the map. Can be "top-left", "top-right", "bottom-left",
                 or "bottom-right". Defaults to "top-left".
             bg_layers (bool): If True, background layers will be included in the control. Defaults to False.
-            floating (bool): If True, the layer control will be floating. Defaults to True.
+            floating (bool): If True, no separate layer switcher is added to the map,
+                since layers are managed in the sidebar layer manager. Set to False
+                to add a floating layer switcher control on the map. Defaults to True.
         Returns:
             None
         """
