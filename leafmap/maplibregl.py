@@ -10371,7 +10371,11 @@ class LayerManagerWidget(v.ExpansionPanels):
         # Master toggle
         style = {"description_width": "initial"}
         self.master_toggle = widgets.Checkbox(
-            value=True, description="All layers on/off", style=style
+            value=True,
+            description="All layers on/off",
+            style=style,
+            indent=False,
+            layout=widgets.Layout(width="100%"),
         )
         self.master_toggle.observe(self.toggle_all_layers, names="value")
 
@@ -10382,6 +10386,8 @@ class LayerManagerWidget(v.ExpansionPanels):
                     value=True,
                     description=f"{group_name} group layers on/off",
                     style=style,
+                    indent=False,
+                    layout=widgets.Layout(width="100%"),
                 )
                 group_toggle.observe(self.toggle_group_layers, names="value")
                 self.group_toggles.children += (group_toggle,)
@@ -10411,6 +10417,18 @@ class LayerManagerWidget(v.ExpansionPanels):
                 f"background-color: {background_color}; "
                 f"color: {text_color};"
             ),
+            # Color the expand/collapse chevron explicitly; the default icon
+            # follows the Vuetify theme and is nearly invisible on the light
+            # header in dark mode.
+            v_slots=[
+                {
+                    "name": "actions",
+                    "children": v.Icon(
+                        children=["mdi-chevron-down"],
+                        style_=f"color: {text_color};",
+                    ),
+                }
+            ],
             children=[
                 v.Row(
                     align="center",
@@ -10431,7 +10449,21 @@ class LayerManagerWidget(v.ExpansionPanels):
             ],
         )
 
+        # Reduce Vuetify's default 24px side padding around the layer rows and
+        # keep widget labels readable on the light panel when the notebook
+        # uses a dark theme.
+        panel_style = widgets.HTML(
+            "<style>"
+            ".leafmap-layer-manager .v-expansion-panel-content__wrap"
+            " { padding: 4px 8px 8px; }"
+            f".leafmap-layer-manager {{ --jp-widgets-label-color: {text_color};"
+            f" --jp-widgets-color: {text_color}; }}"
+            "</style>",
+            layout=widgets.Layout(display="none"),
+        )
+
         panel = v.ExpansionPanel(
+            class_="leafmap-layer-manager",
             style_=(
                 f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
                 f"color: {text_color}; "
@@ -10447,7 +10479,12 @@ class LayerManagerWidget(v.ExpansionPanels):
                     ),
                     children=[
                         widgets.VBox(
-                            [self.master_toggle, self.group_toggles, self.layers_box]
+                            [
+                                panel_style,
+                                self.master_toggle,
+                                self.group_toggles,
+                                self.layers_box,
+                            ]
                         )
                     ],
                 ),
@@ -10491,7 +10528,9 @@ class LayerManagerWidget(v.ExpansionPanels):
             if isinstance(opacity, list) and "match" in opacity and len(opacity) >= 5:
                 opacity = opacity[3]
 
-            checkbox = widgets.Checkbox(value=visible, description=name, style=style)
+            checkbox = widgets.Checkbox(
+                value=visible, description=name, style=style, indent=False
+            )
             checkbox.layout.flex = "1 1 auto"
             checkbox.layout.min_width = "0"
             checkbox.layout.overflow = "hidden"
@@ -10504,9 +10543,9 @@ class LayerManagerWidget(v.ExpansionPanels):
                 readout=False,
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
-                    flex="0 0 150px",
-                    width="150px",
-                    min_width="100px",
+                    flex="0 0 90px",
+                    width="90px",
+                    min_width="60px",
                     padding=padding,
                 ),
             )
@@ -10726,6 +10765,18 @@ class CustomWidget(v.ExpansionPanels):
                 f"background-color: {background_color}; "
                 f"color: {text_color};"
             ),
+            # Color the expand/collapse chevron explicitly; the default icon
+            # follows the Vuetify theme and is nearly invisible on the light
+            # header in dark mode.
+            v_slots=[
+                {
+                    "name": "actions",
+                    "children": v.Icon(
+                        children=["mdi-chevron-down"],
+                        style_=f"color: {text_color};",
+                    ),
+                }
+            ],
             children=[
                 v.Row(
                     align="center",
