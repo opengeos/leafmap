@@ -177,7 +177,7 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
             if style.startswith("http"):
-                response = requests.get(style)
+                response = requests.get(common.add_carto_api_key(style, warn=False))
                 if response.status_code != 200:
                     print(
                         "The provided style URL is invalid. Falling back to 'dark-matter'."
@@ -216,6 +216,9 @@ class Map(MapWidget):
 
             if style in carto_basemaps:
                 style = construct_carto_basemap_url(style)
+
+        if isinstance(style, str):
+            style = common.add_carto_api_key(style, warn=False)
 
         if style is not None:
             kwargs["style"] = style
@@ -1459,7 +1462,7 @@ class Map(MapWidget):
 
         elif isinstance(basemap, xyzservices.TileProvider):
             name = basemap.name
-            url = basemap.build_url()
+            url = common.xyz_provider_url(basemap)
             if attribution is None:
                 attribution = basemap.attribution
             if "max_zoom" in basemap.keys():
@@ -1493,6 +1496,7 @@ class Map(MapWidget):
             )
             return
 
+        url = common.add_carto_api_key(url)
         raster_source = RasterTileSource(
             tiles=[url],
             attribution=attribution,
@@ -5823,10 +5827,7 @@ class Map(MapWidget):
             ValueError: If the length of values and colors lists are not the same.
         """
 
-        if release is None:
-            release = common.get_overture_latest_release()
-
-        url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
+        url = common.get_overture_pmtiles_url("buildings", release)
 
         if template == "simple":
             template = "Name: {{@name}}<br>Subtype: {{subtype}}<br>Class: {{class}}<br>Height: {{height}}"
@@ -5916,8 +5917,10 @@ class Map(MapWidget):
         """Add Overture Maps data to the map.
 
         Args:
-            release (str, optional): The release date of the data. Defaults to
-                "2024-12-28". For more info, see https://github.com/OvertureMaps/overture-tiles
+            release (str, optional): The release version of the data, e.g.,
+                "2026-10-21.0". Defaults to None, which uses the latest release.
+                Only recent releases are available. For more info, see
+                https://stac.overturemaps.org/catalog.json
             theme (str, optional): The theme of the data. It can be one of the following:
                 "addresses", "base", "buildings", "divisions", "places", "transportation".
                 Defaults to "buildings".
@@ -5934,8 +5937,6 @@ class Map(MapWidget):
         Raises:
             ValueError: If the theme is not one of the allowed themes.
         """
-        if release is None:
-            release = common.get_overture_latest_release()
 
         allowed_themes = [
             "addresses",
@@ -6137,7 +6138,7 @@ class Map(MapWidget):
             },
         }
 
-        url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/{theme}.pmtiles"
+        url = common.get_overture_pmtiles_url(theme, release)
         if style is None:
             style = styles.get(theme, None)
         self.add_pmtiles(
@@ -6164,8 +6165,10 @@ class Map(MapWidget):
         """Add Overture Maps data to the map.
 
         Args:
-            release (str, optional): The release date of the data. Defaults to
-                "2024-12-18". For more info, see https://github.com/OvertureMaps/overture-tiles
+            release (str, optional): The release version of the data, e.g.,
+                "2026-10-21.0". Defaults to None, which uses the latest release.
+                Only recent releases are available. For more info, see
+                https://stac.overturemaps.org/catalog.json
             style (Optional[Dict[str, Any]], optional): The style dictionary for
                 the data. Defaults to None.
             type (str, optional): The type of the data. It can be "line" or "fill".
@@ -6177,10 +6180,7 @@ class Map(MapWidget):
                 data layer. Defaults to False.
             **kwargs (Any): Additional keyword arguments for the paint properties.
         """
-        if release is None:
-            release = common.get_overture_latest_release()
-
-        url = f"https://overturemaps-tiles-us-west-2-beta.s3.amazonaws.com/{release}/buildings.pmtiles"
+        url = common.get_overture_pmtiles_url("buildings", release)
 
         kwargs = common.replace_underscores_in_keys(kwargs)
 

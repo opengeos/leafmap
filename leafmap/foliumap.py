@@ -425,7 +425,7 @@ class Map(folium.Map):
 
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
-                url = basemap.build_url()
+                url = common.xyz_provider_url(basemap)
                 attribution = basemap.attribution
                 if "max_zoom" in basemap.keys():
                     max_zoom = basemap["max_zoom"]
@@ -448,12 +448,26 @@ class Map(folium.Map):
 
             elif basemap in basemaps:
                 bmap = basemaps[basemap]
+                if isinstance(bmap, folium.TileLayer):
+                    keyed_url = common.add_carto_api_key(bmap.tiles)
+                    if keyed_url != bmap.tiles:
+                        # Build a new layer so the key is not stored on the
+                        # shared basemap object, and copy all of its options.
+                        keyed_layer = folium.TileLayer(
+                            tiles=keyed_url,
+                            attr=bmap.options.get("attribution"),
+                            name=bmap.layer_name,
+                            overlay=bmap.overlay,
+                            control=bmap.control,
+                        )
+                        keyed_layer.options = dict(bmap.options)
+                        bmap = keyed_layer
                 bmap.show = show
                 bmap.add_to(self)
-                if isinstance(basemaps[basemap], folium.TileLayer):
-                    url = basemaps[basemap].tiles
-                elif isinstance(basemaps[basemap], folium.WmsTileLayer):
-                    url = basemaps[basemap].url
+                if isinstance(bmap, folium.TileLayer):
+                    url = bmap.tiles
+                elif isinstance(bmap, folium.WmsTileLayer):
+                    url = bmap.url
                 common.arc_add_layer(url, basemap)
             else:
                 print(
@@ -2800,7 +2814,7 @@ class Map(folium.Map):
         if provider.startswith("xyz"):
             name = provider[4:]
             xyz_provider = xyz.flatten()[name]
-            url = xyz_provider.build_url()
+            url = common.xyz_provider_url(xyz_provider)
             attribution = xyz_provider.attribution
             if attribution.strip() == "":
                 attribution = " "

@@ -1989,6 +1989,135 @@ def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Option
     return None
 
 
+_CARTO_KEY_WARNED = False
+
+
+def _is_carto_url(url: Any) -> bool:
+    """Checks whether a URL is hosted on basemaps.cartocdn.com.
+
+    Args:
+        url (Any): The URL to check. Non-string values return False.
+
+    Returns:
+        True if the URL's hostname is basemaps.cartocdn.com or a subdomain of it.
+    """
+    from urllib.parse import urlsplit
+
+    if not isinstance(url, str):
+        return False
+    try:
+        host = (urlsplit(url).hostname or "").lower()
+    except ValueError:
+        return False
+    return host == "basemaps.cartocdn.com" or host.endswith(".basemaps.cartocdn.com")
+
+
+def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) -> Any:
+    """Appends a CARTO Basemaps API key to a basemaps.cartocdn.com URL.
+
+    CARTO requires an API key on every basemaps.cartocdn.com URL (raster tiles
+    and vector styles). Without a key, raster tiles show an "API key required"
+    watermark. Request a free key at https://carto.com/basemaps/apikey and set
+    it as the ``CARTO_API_KEY`` environment variable (or Colab secret).
+
+    Note that the key becomes part of the layer URL, so it is included in
+    anything that serializes the map, such as HTML exports, saved notebook
+    outputs, and widget state. Restrict the key to your domains in the CARTO
+    dashboard before publishing such maps.
+
+    Args:
+        url (Any): The tile or style URL. Non-string values and URLs that are
+            not hosted on basemaps.cartocdn.com are returned unchanged.
+        key (str, optional): The CARTO API key. Defaults to None, which reads
+            the ``CARTO_API_KEY`` environment variable or Colab secret.
+        warn (bool, optional): Whether to print a one-time notice when no key
+            is found. Defaults to True.
+
+    Returns:
+        The URL with the ``key`` query parameter appended when a key is available.
+    """
+    global _CARTO_KEY_WARNED
+    from urllib.parse import parse_qs, quote, urlsplit
+
+    if not _is_carto_url(url):
+        return url
+    if "key" in parse_qs(urlsplit(url).query, keep_blank_values=True):
+        return url
+
+    key = get_api_key("CARTO_API_KEY", key)
+    if not key:
+        if warn and not _CARTO_KEY_WARNED:
+            print(
+                "CARTO basemaps now require an API key. Request a free key at "
+                "https://carto.com/basemaps/apikey and set it with "
+                "leafmap.set_api_key(key, 'CARTO_API_KEY') or the CARTO_API_KEY "
+                "environment variable. Without it, tiles show an "
+                "'API key required' watermark."
+            )
+            _CARTO_KEY_WARNED = True
+        return url
+
+    sep = "&" if "?" in url else "?"
+    return f"{url}{sep}key={quote(str(key), safe='')}"
+
+
+def is_carto_provider(provider: Any) -> bool:
+    """Checks whether an xyzservices TileProvider serves CARTO basemaps.
+
+    Args:
+        provider (Any): The xyzservices TileProvider (or dict) to check.
+
+    Returns:
+        True if the provider's URL is hosted on basemaps.cartocdn.com.
+    """
+    try:
+        return _is_carto_url(provider.get("url"))
+    except AttributeError:
+        return False
+
+
+def normalize_carto_provider(provider: Any) -> Any:
+    """Removes the API key placeholder from a CARTO xyzservices TileProvider.
+
+    xyzservices >= 2026.9.0 defines CARTO providers with a ``?key={apikey}``
+    URL template and a placeholder key, so they count as requiring a token.
+    Leafmap adds the real key when a layer is created (see
+    :func:`add_carto_api_key`), so the placeholder is stripped here.
+
+    Args:
+        provider (Any): The xyzservices TileProvider.
+
+    Returns:
+        A copy of the provider without the key template, or the provider
+        unchanged if it is not a CARTO provider.
+    """
+    import re
+
+    if not is_carto_provider(provider):
+        return provider
+    tile = xyzservices.TileProvider(dict(provider))
+    # Remove the key={apikey} pair and tidy the remaining query separators.
+    url = re.sub(r"([?&])key=\{apikey\}(&|$)", r"\1", tile["url"])
+    tile["url"] = re.sub(r"[?&]$", "", url)
+    tile.pop("apikey", None)
+    return tile
+
+
+def xyz_provider_url(provider: Any) -> str:
+    """Builds the tile URL of an xyzservices TileProvider.
+
+    CARTO providers get the ``CARTO_API_KEY`` key instead of the xyzservices
+    placeholder.
+
+    Args:
+        provider (Any): The xyzservices TileProvider.
+
+    Returns:
+        The tile URL.
+    """
+    return add_carto_api_key(normalize_carto_provider(provider).build_url())
+
+
 def set_api_key(key: str, name: str = "GOOGLE_MAPS_API_KEY"):
     """Sets the Google Maps API key. You can generate one from https://bit.ly/3sw0THG.
 
@@ -9620,7 +9749,7 @@ def filter_date(
 
     mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
     result = data.loc[mask]
-    return result.drop(columns=[new_field], axis=1)
+    return result.drop(columns=[new_field])
 
 
 def skip_mkdocs_build():
@@ -9664,7 +9793,7 @@ def disjoint(input_features, selecting_features, output=None, **kwargs: Any) -> 
     input_features["savedindex"] = input_features.index
     intersecting = selecting_features.sjoin(input_features, how="inner")["savedindex"]
     results = input_features[~input_features.savedindex.isin(intersecting)].drop(
-        columns=["savedindex"], axis=1
+        columns=["savedindex"]
     )
 
     if output is not None:
@@ -15454,6 +15583,38 @@ def check_url(url: str) -> bool:
         return False
 
 
+def _geoparquet_crs(source: str, geometry: str = "geometry") -> Optional[Any]:
+    """Reads the CRS of a geometry column from GeoParquet file metadata.
+
+    Args:
+        source (str): The path or URL to a single GeoParquet file.
+        geometry (str, optional): The geometry column name. Defaults to "geometry".
+
+    Returns:
+        The CRS (a PROJJSON dict or "OGC:CRS84"), or None if the file has no
+        GeoParquet metadata or the CRS cannot be determined.
+    """
+    try:
+        import pyarrow.parquet as pq
+
+        if isinstance(source, str) and source.startswith(("http://", "https://")):
+            import fsspec
+
+            with fsspec.open(source, "rb") as f:
+                metadata = pq.read_schema(f).metadata
+        else:
+            metadata = pq.read_schema(source).metadata
+
+        geo = json.loads((metadata or {}).get(b"geo", b"{}"))
+        column = geo.get("columns", {}).get(geometry)
+        if column is None:
+            return None
+        # Per the GeoParquet spec, a missing "crs" key means OGC:CRS84.
+        return column.get("crs", "OGC:CRS84")
+    except Exception:
+        return None
+
+
 def read_parquet(
     source: str,
     geometry: Optional[str] = None,
@@ -15480,7 +15641,10 @@ def read_parquet(
         table_name (str, optional): The name of the table in the DuckDB database. Defaults to None.
         sql (str, optional): The SQL query to execute. Defaults to None.
         limit (int, optional): The maximum number of rows to return. Defaults to None (return all rows).
-        src_crs (str, optional): The source CRS (Coordinate Reference System) of the geometries. Defaults to None.
+        src_crs (str, optional): The source CRS (Coordinate Reference System) of the geometries.
+            Defaults to None, which reads the CRS from the GeoParquet metadata of a single
+            file when no custom ``sql`` is given. Globs, directories, and custom ``sql``
+            queries get no CRS unless ``src_crs`` is set.
         dst_crs (str, optional): The target CRS to reproject the geometries. Defaults to None.
         return_type (str, optional): The type of object to return:
             - 'gdf': GeoDataFrame (default)
@@ -15527,6 +15691,7 @@ def read_parquet(
         columns = f"{columns} EXCLUDE {exclude}"
 
     result = None
+    custom_sql = sql is not None
     if return_type in ["df", "numpy", "arrow", "polars"]:
         if sql is None:
             sql = f"SELECT {columns} FROM '{source}'"
@@ -15560,6 +15725,8 @@ def read_parquet(
         df = con.sql(sql, **kwargs).df()
         if table_name is not None:
             con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM df", **kwargs)
+        if src_crs is None and not custom_sql:
+            src_crs = _geoparquet_crs(source, geometry)
         result = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs)
 
     con.close()
@@ -19058,35 +19225,32 @@ def color_code_dataframe(
 
 def get_overture_latest_release(patch=False) -> str:
     """
-    Retrieves the value of the 'latest' key from the Overture Maps release JSON file.
+    Retrieves the latest Overture Maps release from the Overture STAC catalog.
 
     Args:
         patch (bool): If True, returns the full version string (e.g., "2025-02-19.0").
+            Otherwise, returns the release date only (e.g., "2025-02-19").
 
     Returns:
-        The value of the 'latest' key from the releases.json file.
+        The latest release version.
 
     Raises:
         requests.RequestException: If there's an issue with the HTTP request.
         KeyError: If the 'latest' key is not found in the JSON data.
         json.JSONDecodeError: If the response cannot be parsed as JSON.
     """
-    url = "https://labs.overturemaps.org/data/releases.json"
+    url = "https://stac.overturemaps.org/catalog.json"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()  # Raise an exception for HTTP errors
 
-        data = response.json()
-        if patch:
-            latest_release = data.get("latest")
-        else:
-            latest_release = data.get("latest").split(".")[
-                0
-            ]  # Extract the version number
-
+        latest_release = response.json().get("latest")
         if latest_release is None:
-            raise KeyError("The 'latest' key was not found in the releases.json file")
+            raise KeyError("The 'latest' key was not found in the STAC catalog")
+
+        if not patch:
+            latest_release = latest_release.split(".")[0]
 
         return latest_release
 
@@ -19099,6 +19263,28 @@ def get_overture_latest_release(patch=False) -> str:
     except KeyError as e:
         print(f"Key error: {e}")
         raise
+
+
+def get_overture_pmtiles_url(
+    theme: str = "buildings", release: Optional[str] = None
+) -> str:
+    """Get the URL of an Overture Maps PMTiles file for a theme.
+
+    Args:
+        theme (str): The Overture theme, e.g., "buildings", "places", "base",
+            "transportation", "divisions", or "addresses". Defaults to "buildings".
+        release (str, optional): The release version, e.g., "2025-02-19.0". A
+            release without a patch number (e.g., "2025-02-19") gets ".0"
+            appended. Defaults to None, which uses the latest release.
+
+    Returns:
+        The URL of the PMTiles file.
+    """
+    if release is None:
+        release = get_overture_latest_release(patch=True)
+    elif "." not in release:
+        release = f"{release}.0"
+    return f"https://tiles.overturemaps.org/{release}/{theme}.pmtiles"
 
 
 def set_proj_lib_path(verbose=False):
@@ -19222,7 +19408,6 @@ def read_vector(source, layer=None, **kwargs: Any):
 
     import urllib.parse
 
-    import fiona
     import geopandas as gpd
 
     # Determine if source is a URL or local file
@@ -19250,11 +19435,16 @@ def read_vector(source, layer=None, **kwargs: Any):
             return gpd.read_file(source, layer=layer, **kwargs)
         return gpd.read_file(source, **kwargs)
 
-    # Try to use fiona to identify valid layers for formats that might have them
-    # Only attempt this for local files as fiona.listlayers might not work with URLs
+    # Identify valid layers for formats that might have them
+    # Only attempt this for local files as listing layers might not work with URLs
     if layer is None and ext in [".gpkg", ".gml"] and not is_url:
         try:
-            layers = fiona.listlayers(source)
+            if hasattr(gpd, "list_layers"):  # geopandas >= 1.0
+                layers = list(gpd.list_layers(source)["name"])
+            else:
+                from pyogrio import list_layers
+
+                layers = [name for name, _ in list_layers(source)]
             if layers:
                 return gpd.read_file(source, layer=layers[0], **kwargs)
         except Exception:
