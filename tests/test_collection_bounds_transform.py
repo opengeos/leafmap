@@ -118,5 +118,34 @@ def test_member_explicit_bbox_keeps_existing_shortcut():
     geom["bbox"] = [-1, -2, 3, 4]
     data = collection([geom], "GeometryCollection")
     assert get_bounds(geom, transform=Transform()) == (-1, -2, 3, 4)
-    # The collection normalizes extrema but does not transform explicit bbox.
-    assert get_bounds(data, transform=Transform()) == (-1, 4, 3, -2)
+    # Members are bounded in transformed space, so their raw bbox is ignored.
+    assert get_bounds(data, transform=Transform()) == (100, 200, 120, 170)
+
+
+@pytest.mark.parametrize("kind", ["FeatureCollection", "GeometryCollection"])
+def test_mixed_member_bbox_stays_in_transformed_space(kind):
+    with_bbox = polygon()
+    with_bbox["bbox"] = [0, 0, 2, 3]
+    data = collection([with_bbox, polygon(4, 5)], kind)
+    expected = get_bounds(
+        collection([polygon(), polygon(4, 5)], kind), transform=Transform()
+    )
+    assert get_bounds(data, transform=Transform()) == expected
+    assert get_center(data, transform=Transform()) == (130, 160)
+
+
+@pytest.mark.parametrize("transform", [None, Transform()])
+def test_null_geometry_features_are_skipped(transform):
+    data = collection([polygon(), polygon(4, 5)], "FeatureCollection")
+    data["features"].insert(1, feature(None))
+    expected = get_bounds(
+        collection([polygon(), polygon(4, 5)], "FeatureCollection"),
+        transform=transform,
+    )
+    assert get_bounds(data, transform=transform) == expected
+
+
+def test_collection_without_located_geometries_raises():
+    data = collection([None], "FeatureCollection")
+    with pytest.raises(ValueError, match="located geometries"):
+        get_bounds(data)

@@ -1281,6 +1281,26 @@ def explode(coords) -> Iterator[Any]:
                 yield f
 
 
+def _bounds_member(geometry: Optional[dict], transform=None) -> Optional[dict]:
+    """Prepare a collection member for bounds aggregation.
+
+    Args:
+        geometry (dict, optional): A member geometry of a GeoJSON collection.
+            Unlocated members (null geometry) are skipped.
+        transform (optional): The coordinate transform passed to get_bounds. When
+            set, a member's own bbox is ignored so that its bounds are computed
+            from transformed coordinates, like the other members.
+
+    Returns:
+        The member to pass to get_bounds, or None if it has no geometry.
+    """
+    if geometry is None:
+        return None
+    if transform is not None and "bbox" in geometry:
+        return {key: value for key, value in geometry.items() if key != "bbox"}
+    return geometry
+
+
 def get_bounds(
     geometry, north_up=True, transform=None
 ) -> Tuple[float, float, float, float]:
@@ -1323,13 +1343,16 @@ def get_bounds(
         xmaxs = []
         ymaxs = []
         for feature in geometry["features"]:
-            xmin, ymin, xmax, ymax = get_bounds(
-                feature["geometry"], transform=transform
-            )
+            member = _bounds_member(feature.get("geometry"), transform)
+            if member is None:
+                continue
+            xmin, ymin, xmax, ymax = get_bounds(member, transform=transform)
             xmins.append(xmin)
             ymins.append(min(ymin, ymax))
             xmaxs.append(xmax)
             ymaxs.append(max(ymin, ymax))
+        if not xmins:
+            raise ValueError("The collection does not contain any located geometries.")
         if north_up and transform is None:
             return min(xmins), min(ymins), max(xmaxs), max(ymaxs)
         else:
@@ -1342,11 +1365,16 @@ def get_bounds(
         xmaxs = []
         ymaxs = []
         for geometry in geometry["geometries"]:
-            xmin, ymin, xmax, ymax = get_bounds(geometry, transform=transform)
+            member = _bounds_member(geometry, transform)
+            if member is None:
+                continue
+            xmin, ymin, xmax, ymax = get_bounds(member, transform=transform)
             xmins.append(xmin)
             ymins.append(min(ymin, ymax))
             xmaxs.append(xmax)
             ymaxs.append(max(ymin, ymax))
+        if not xmins:
+            raise ValueError("The collection does not contain any located geometries.")
         if north_up and transform is None:
             return min(xmins), min(ymins), max(xmaxs), max(ymaxs)
         else:
