@@ -1992,6 +1992,26 @@ def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Option
 _CARTO_KEY_WARNED = False
 
 
+def _is_carto_url(url: Any) -> bool:
+    """Checks whether a URL is hosted on basemaps.cartocdn.com.
+
+    Args:
+        url (Any): The URL to check. Non-string values return False.
+
+    Returns:
+        True if the URL's hostname is basemaps.cartocdn.com or a subdomain of it.
+    """
+    from urllib.parse import urlsplit
+
+    if not isinstance(url, str):
+        return False
+    try:
+        host = (urlsplit(url).hostname or "").lower()
+    except ValueError:
+        return False
+    return host == "basemaps.cartocdn.com" or host.endswith(".basemaps.cartocdn.com")
+
+
 def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) -> Any:
     """Appends a CARTO Basemaps API key to a basemaps.cartocdn.com URL.
 
@@ -2019,13 +2039,9 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
     global _CARTO_KEY_WARNED
     from urllib.parse import parse_qs, urlsplit
 
-    if not isinstance(url, str):
+    if not _is_carto_url(url):
         return url
-    parts = urlsplit(url)
-    host = (parts.hostname or "").lower()
-    if host != "basemaps.cartocdn.com" and not host.endswith(".basemaps.cartocdn.com"):
-        return url
-    if "key" in parse_qs(parts.query):
+    if "key" in parse_qs(urlsplit(url).query):
         return url
 
     key = get_api_key("CARTO_API_KEY", key)
@@ -2055,7 +2071,7 @@ def is_carto_provider(provider: Any) -> bool:
         True if the provider's URL is hosted on basemaps.cartocdn.com.
     """
     try:
-        return "basemaps.cartocdn.com" in provider.get("url", "")
+        return _is_carto_url(provider.get("url"))
     except AttributeError:
         return False
 

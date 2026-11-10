@@ -1,8 +1,5 @@
-import copy
 import json
 import os
-import uuid
-from collections import OrderedDict
 
 import folium
 import folium.plugins as plugins
@@ -454,14 +451,17 @@ class Map(folium.Map):
                 if isinstance(bmap, folium.TileLayer):
                     keyed_url = common.add_carto_api_key(bmap.tiles)
                     if keyed_url != bmap.tiles:
-                        # Copy the layer so the key is not stored on the shared
-                        # basemap object, keeping all of its other options.
-                        bmap = copy.copy(bmap)
-                        bmap.options = dict(bmap.options)
-                        bmap._children = OrderedDict()
-                        bmap._parent = None
-                        bmap._id = uuid.uuid4().hex
-                        bmap.tiles = keyed_url
+                        # Build a new layer so the key is not stored on the
+                        # shared basemap object, and copy all of its options.
+                        keyed_layer = folium.TileLayer(
+                            tiles=keyed_url,
+                            attr=bmap.options.get("attribution"),
+                            name=bmap.layer_name,
+                            overlay=bmap.overlay,
+                            control=bmap.control,
+                        )
+                        keyed_layer.options = dict(bmap.options)
+                        bmap = keyed_layer
                 bmap.show = show
                 bmap.add_to(self)
                 if isinstance(bmap, folium.TileLayer):

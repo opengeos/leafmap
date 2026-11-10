@@ -199,3 +199,12 @@ def test_get_xyz_dict_keeps_carto_providers():
     xyz_dict = get_xyz_dict()
     assert "CartoDB.Positron" in xyz_dict
     assert "{apikey}" not in xyz_dict["CartoDB.Positron"]["url"]
+
+
+def test_is_carto_provider_matches_host_only():
+    """Only providers hosted on basemaps.cartocdn.com count as CARTO."""
+    assert common.is_carto_provider(_new_style_carto_provider())
+    assert not common.is_carto_provider(
+        {"url": "https://example.com/?u=basemaps.cartocdn.com"}
+    )
+    assert not common.is_carto_provider({"url": None})

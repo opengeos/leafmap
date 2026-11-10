@@ -177,8 +177,7 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
             if style.startswith("http"):
-                style = common.add_carto_api_key(style, warn=False)
-                response = requests.get(style)
+                response = requests.get(common.add_carto_api_key(style, warn=False))
                 if response.status_code != 200:
                     print(
                         "The provided style URL is invalid. Falling back to 'dark-matter'."
