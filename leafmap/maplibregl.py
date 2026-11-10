@@ -10522,7 +10522,9 @@ class LayerManagerWidget(v.ExpansionPanels):
         style = {"description_width": "initial"}
         padding = "0px 5px 0px 5px"
 
-        for name, info in list(self.m.layer_dict.items()):
+        # List the top-most layer first and the background last, like a GIS
+        # layer panel.
+        for name, info in reversed(list(self.m.layer_dict.items())):
             # if name == "background":
             #     continue
 
