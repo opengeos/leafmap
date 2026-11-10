@@ -9620,7 +9620,7 @@ def filter_date(
 
     mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
     result = data.loc[mask]
-    return result.drop(columns=[new_field], axis=1)
+    return result.drop(columns=[new_field])
 
 
 def skip_mkdocs_build():
@@ -9664,7 +9664,7 @@ def disjoint(input_features, selecting_features, output=None, **kwargs: Any) -> 
     input_features["savedindex"] = input_features.index
     intersecting = selecting_features.sjoin(input_features, how="inner")["savedindex"]
     results = input_features[~input_features.savedindex.isin(intersecting)].drop(
-        columns=["savedindex"], axis=1
+        columns=["savedindex"]
     )
 
     if output is not None:
@@ -19058,35 +19058,32 @@ def color_code_dataframe(
 
 def get_overture_latest_release(patch=False) -> str:
     """
-    Retrieves the value of the 'latest' key from the Overture Maps release JSON file.
+    Retrieves the latest Overture Maps release from the Overture STAC catalog.
 
     Args:
         patch (bool): If True, returns the full version string (e.g., "2025-02-19.0").
+            Otherwise, returns the release date only (e.g., "2025-02-19").
 
     Returns:
-        The value of the 'latest' key from the releases.json file.
+        The latest release version.
 
     Raises:
         requests.RequestException: If there's an issue with the HTTP request.
         KeyError: If the 'latest' key is not found in the JSON data.
         json.JSONDecodeError: If the response cannot be parsed as JSON.
     """
-    url = "https://labs.overturemaps.org/data/releases.json"
+    url = "https://stac.overturemaps.org/catalog.json"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()  # Raise an exception for HTTP errors
 
-        data = response.json()
-        if patch:
-            latest_release = data.get("latest")
-        else:
-            latest_release = data.get("latest").split(".")[
-                0
-            ]  # Extract the version number
-
+        latest_release = response.json().get("latest")
         if latest_release is None:
-            raise KeyError("The 'latest' key was not found in the releases.json file")
+            raise KeyError("The 'latest' key was not found in the STAC catalog")
+
+        if not patch:
+            latest_release = latest_release.split(".")[0]
 
         return latest_release
 
@@ -19099,6 +19096,26 @@ def get_overture_latest_release(patch=False) -> str:
     except KeyError as e:
         print(f"Key error: {e}")
         raise
+
+
+def get_overture_pmtiles_url(theme: str = "buildings", release: str = None) -> str:
+    """Get the URL of an Overture Maps PMTiles file for a theme.
+
+    Args:
+        theme (str): The Overture theme, e.g., "buildings", "places", "base",
+            "transportation", "divisions", or "addresses". Defaults to "buildings".
+        release (str, optional): The release version, e.g., "2025-02-19.0". A
+            release without a patch number (e.g., "2025-02-19") gets ".0"
+            appended. Defaults to None, which uses the latest release.
+
+    Returns:
+        The URL of the PMTiles file.
+    """
+    if release is None:
+        release = get_overture_latest_release(patch=True)
+    elif "." not in release:
+        release = f"{release}.0"
+    return f"https://tiles.overturemaps.org/{release}/{theme}.pmtiles"
 
 
 def set_proj_lib_path(verbose=False):
@@ -19222,7 +19239,6 @@ def read_vector(source, layer=None, **kwargs: Any):
 
     import urllib.parse
 
-    import fiona
     import geopandas as gpd
 
     # Determine if source is a URL or local file
@@ -19250,11 +19266,11 @@ def read_vector(source, layer=None, **kwargs: Any):
             return gpd.read_file(source, layer=layer, **kwargs)
         return gpd.read_file(source, **kwargs)
 
-    # Try to use fiona to identify valid layers for formats that might have them
-    # Only attempt this for local files as fiona.listlayers might not work with URLs
+    # Identify valid layers for formats that might have them
+    # Only attempt this for local files as listing layers might not work with URLs
     if layer is None and ext in [".gpkg", ".gml"] and not is_url:
         try:
-            layers = fiona.listlayers(source)
+            layers = list(gpd.list_layers(source)["name"])
             if layers:
                 return gpd.read_file(source, layer=layers[0], **kwargs)
         except Exception:

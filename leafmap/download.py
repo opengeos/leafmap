@@ -211,35 +211,32 @@ def json_serializable(obj: Any) -> Any:
 
 def get_overture_latest_release(patch=True) -> str:
     """
-    Retrieves the value of the 'latest' key from the Overture Maps release JSON file.
+    Retrieves the latest Overture Maps release from the Overture STAC catalog.
 
     Args:
         patch (bool): If True, returns the full version string (e.g., "2025-02-19.0").
+            Otherwise, returns the release date only (e.g., "2025-02-19").
 
     Returns:
-        str: The value of the 'latest' key from the releases.json file.
+        The latest release version.
 
     Raises:
         requests.RequestException: If there's an issue with the HTTP request.
         KeyError: If the 'latest' key is not found in the JSON data.
         json.JSONDecodeError: If the response cannot be parsed as JSON.
     """
-    url = "https://labs.overturemaps.org/data/releases.json"
+    url = "https://stac.overturemaps.org/catalog.json"
 
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         response.raise_for_status()  # Raise an exception for HTTP errors
 
-        data = response.json()
-        if patch:
-            latest_release = data.get("latest")
-        else:
-            latest_release = data.get("latest").split(".")[
-                0
-            ]  # Extract the version number
-
+        latest_release = response.json().get("latest")
         if latest_release is None:
-            raise KeyError("The 'latest' key was not found in the releases.json file")
+            raise KeyError("The 'latest' key was not found in the STAC catalog")
+
+        if not patch:
+            latest_release = latest_release.split(".")[0]
 
         return latest_release
 

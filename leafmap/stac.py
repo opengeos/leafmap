@@ -2874,7 +2874,7 @@ def maxar_search(
 
     mask = (data[new_field] >= start_date) & (data[new_field] <= end_date)
     result = data.loc[mask]
-    return result.drop(columns=[new_field], axis=1)
+    return result.drop(columns=[new_field])
 
 
 def maxar_collection_url(collection, dtype="geojson", raw=True) -> str:
