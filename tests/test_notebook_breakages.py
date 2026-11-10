@@ -76,3 +76,21 @@ def test_read_parquet_keeps_geoparquet_crs(tmp_path):
     gdf.to_parquet(path)
     result = common.read_parquet(str(path))
     assert result.crs.to_epsg() == 5070
+
+
+def test_read_parquet_custom_sql_has_no_file_crs(tmp_path):
+    """A custom SQL query does not get the file's CRS assigned."""
+    path = tmp_path / "projected.parquet"
+    gdf = gpd.GeoDataFrame(
+        {"id": [1]}, geometry=[Point(1620000, 1920000)], crs="EPSG:5070"
+    )
+    gdf.to_parquet(path)
+    sql = f"SELECT id, ST_AsText(geometry) AS geometry FROM '{path}'"
+    result = common.read_parquet(str(path), sql=sql)
+    assert result.crs is None
+
+
+def test_add_carto_api_key_ignores_similar_params():
+    """Parameters such as apikey are not mistaken for an existing key."""
+    url = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json?apikey=1"
+    assert common.add_carto_api_key(url, key="abc") == url + "&key=abc"

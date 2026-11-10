@@ -2000,6 +2000,11 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
     watermark. Request a free key at https://carto.com/basemaps/apikey and set
     it as the ``CARTO_API_KEY`` environment variable (or Colab secret).
 
+    Note that the key becomes part of the layer URL, so it is included in
+    anything that serializes the map, such as HTML exports, saved notebook
+    outputs, and widget state. Restrict the key to your domains in the CARTO
+    dashboard before publishing such maps.
+
     Args:
         url (Any): The tile or style URL. Non-string values and URLs that are
             not hosted on basemaps.cartocdn.com are returned unchanged.
@@ -2015,7 +2020,9 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
 
     if not isinstance(url, str) or "basemaps.cartocdn.com" not in url:
         return url
-    if "?key=" in url or "&key=" in url:
+    from urllib.parse import parse_qs, urlsplit
+
+    if "key" in parse_qs(urlsplit(url).query):
         return url
 
     key = get_api_key("CARTO_API_KEY", key)
@@ -15558,7 +15565,10 @@ def read_parquet(
         table_name (str, optional): The name of the table in the DuckDB database. Defaults to None.
         sql (str, optional): The SQL query to execute. Defaults to None.
         limit (int, optional): The maximum number of rows to return. Defaults to None (return all rows).
-        src_crs (str, optional): The source CRS (Coordinate Reference System) of the geometries. Defaults to None.
+        src_crs (str, optional): The source CRS (Coordinate Reference System) of the geometries.
+            Defaults to None, which reads the CRS from the GeoParquet metadata of a single
+            file when no custom ``sql`` is given. Globs, directories, and custom ``sql``
+            queries get no CRS unless ``src_crs`` is set.
         dst_crs (str, optional): The target CRS to reproject the geometries. Defaults to None.
         return_type (str, optional): The type of object to return:
             - 'gdf': GeoDataFrame (default)
@@ -15605,6 +15615,7 @@ def read_parquet(
         columns = f"{columns} EXCLUDE {exclude}"
 
     result = None
+    custom_sql = sql is not None
     if return_type in ["df", "numpy", "arrow", "polars"]:
         if sql is None:
             sql = f"SELECT {columns} FROM '{source}'"
@@ -15638,7 +15649,7 @@ def read_parquet(
         df = con.sql(sql, **kwargs).df()
         if table_name is not None:
             con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM df", **kwargs)
-        if src_crs is None:
+        if src_crs is None and not custom_sql:
             src_crs = _geoparquet_crs(source, geometry)
         result = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs)
 
