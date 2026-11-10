@@ -87,6 +87,29 @@ SIDEBAR_PANEL_TEXT_COLOR = "#212121"
 SIDEBAR_SCROLLBAR_STYLE = "scrollbar-color: #bdbdbd #f5f5f5; scrollbar-width: thin;"
 
 
+def _panel_header_chevron(color: str) -> List[Dict[str, Any]]:
+    """Builds an expansion panel header "actions" slot with a colored chevron.
+
+    The default expand/collapse icon follows the Vuetify theme and is nearly
+    invisible on the light sidebar headers in dark mode, so it is colored
+    explicitly.
+
+    Args:
+        color (str): The CSS color of the chevron.
+
+    Returns:
+        The ``v_slots`` list for ``v.ExpansionPanelHeader``.
+    """
+    return [
+        {
+            "name": "actions",
+            "children": v.Icon(
+                children=["mdi-chevron-down"], style_=f"color: {color};"
+            ),
+        }
+    ]
+
+
 class Map(MapWidget):
     """The Map class inherits from the MapWidget class of the maplibre.ipywidget module."""
 
@@ -5374,6 +5397,7 @@ class Map(MapWidget):
         css_text: Optional[str] = None,
         position: str = "top-left",
         bg_layers: Optional[Union[bool, List[str]]] = False,
+        floating: bool = True,
     ) -> None:
         """
         Adds a layer control to the map.
@@ -5391,10 +5415,16 @@ class Map(MapWidget):
             position (str): The position of the layer control on the map. Can be "top-left", "top-right", "bottom-left",
                 or "bottom-right". Defaults to "top-left".
             bg_layers (bool): If True, background layers will be included in the control. Defaults to False.
+            floating (bool): If True, no separate layer switcher is added to the map,
+                since layers are managed in the sidebar layer manager. Set to False
+                to add a floating layer switcher control on the map. Defaults to True.
 
         Returns:
             None
         """
+        if floating:
+            return
+
         from maplibre.controls import LayerSwitcherControl
 
         if layer_ids is None:
@@ -10371,7 +10401,11 @@ class LayerManagerWidget(v.ExpansionPanels):
         # Master toggle
         style = {"description_width": "initial"}
         self.master_toggle = widgets.Checkbox(
-            value=True, description="All layers on/off", style=style
+            value=True,
+            description="All layers on/off",
+            style=style,
+            indent=False,
+            layout=widgets.Layout(width="100%"),
         )
         self.master_toggle.observe(self.toggle_all_layers, names="value")
 
@@ -10382,6 +10416,8 @@ class LayerManagerWidget(v.ExpansionPanels):
                     value=True,
                     description=f"{group_name} group layers on/off",
                     style=style,
+                    indent=False,
+                    layout=widgets.Layout(width="100%"),
                 )
                 group_toggle.observe(self.toggle_group_layers, names="value")
                 self.group_toggles.children += (group_toggle,)
@@ -10411,6 +10447,7 @@ class LayerManagerWidget(v.ExpansionPanels):
                 f"background-color: {background_color}; "
                 f"color: {text_color};"
             ),
+            v_slots=_panel_header_chevron(text_color),
             children=[
                 v.Row(
                     align="center",
@@ -10431,7 +10468,22 @@ class LayerManagerWidget(v.ExpansionPanels):
             ],
         )
 
+        # Reduce Vuetify's default 24px side padding around the layer rows and
+        # keep widget labels readable on the light panel when the notebook
+        # uses a dark theme.
+        panel_style = widgets.HTML(
+            "<style>"
+            ".leafmap-layer-manager .v-expansion-panel-content__wrap"
+            " { padding: 4px 8px 8px; }"
+            ".leafmap-layer-manager {"
+            f" --jp-widgets-label-color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            f" --jp-widgets-color: {SIDEBAR_PANEL_TEXT_COLOR}; }}"
+            "</style>",
+            layout=widgets.Layout(display="none"),
+        )
+
         panel = v.ExpansionPanel(
+            class_="leafmap-layer-manager",
             style_=(
                 f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
                 f"color: {text_color}; "
@@ -10447,7 +10499,12 @@ class LayerManagerWidget(v.ExpansionPanels):
                     ),
                     children=[
                         widgets.VBox(
-                            [self.master_toggle, self.group_toggles, self.layers_box]
+                            [
+                                panel_style,
+                                self.master_toggle,
+                                self.group_toggles,
+                                self.layers_box,
+                            ]
                         )
                     ],
                 ),
@@ -10481,7 +10538,9 @@ class LayerManagerWidget(v.ExpansionPanels):
         style = {"description_width": "initial"}
         padding = "0px 5px 0px 5px"
 
-        for name, info in list(self.m.layer_dict.items()):
+        # List the top-most layer first and the background last, like a GIS
+        # layer panel.
+        for name, info in reversed(list(self.m.layer_dict.items())):
             # if name == "background":
             #     continue
 
@@ -10491,7 +10550,9 @@ class LayerManagerWidget(v.ExpansionPanels):
             if isinstance(opacity, list) and "match" in opacity and len(opacity) >= 5:
                 opacity = opacity[3]
 
-            checkbox = widgets.Checkbox(value=visible, description=name, style=style)
+            checkbox = widgets.Checkbox(
+                value=visible, description=name, style=style, indent=False
+            )
             checkbox.layout.flex = "1 1 auto"
             checkbox.layout.min_width = "0"
             checkbox.layout.overflow = "hidden"
@@ -10504,23 +10565,32 @@ class LayerManagerWidget(v.ExpansionPanels):
                 readout=False,
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
-                    flex="0 0 150px",
-                    width="150px",
-                    min_width="100px",
+                    flex="0 1 90px",
+                    width="90px",
+                    min_width="40px",
                     padding=padding,
                 ),
             )
 
+            # Keep the icon buttons from shrinking in the flex row; otherwise
+            # the icon overflows and is truncated to "..".
+            button_layout = {
+                "width": "32px",
+                "min_width": "32px",
+                "flex": "0 0 auto",
+                "height": "25px",
+                "padding": "0",
+            }
             settings = widgets.Button(
                 icon="gear",
                 tooltip="Change layer style",
-                layout=widgets.Layout(width="38px", height="25px", padding=padding),
+                layout=widgets.Layout(**button_layout),
             )
 
             remove = widgets.Button(
                 icon="times",
                 tooltip="Remove layer",
-                layout=widgets.Layout(width="38px", height="25px", padding=padding),
+                layout=widgets.Layout(**button_layout),
             )
 
             def on_visibility_change(change, layer_name=name):
@@ -10717,6 +10787,7 @@ class CustomWidget(v.ExpansionPanels):
                 f"background-color: {background_color}; "
                 f"color: {text_color};"
             ),
+            v_slots=_panel_header_chevron(text_color),
             children=[
                 v.Row(
                     align="center",
