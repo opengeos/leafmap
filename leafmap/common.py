@@ -13967,6 +13967,41 @@ def geojson_to_pmtiles(
     return "Tippecanoe process completed successfully."
 
 
+def _fetch_pmtiles_bytes(url: str, length: int) -> bytes:
+    """Fetch the first ``length`` bytes of a remote PMTiles archive.
+
+    The request disables content encoding because some static hosts (e.g.,
+    GitHub Pages) apply byte ranges to a gzip-compressed copy of the file,
+    which returns corrupted PMTiles bytes.
+
+    Args:
+        url: The URL of the remote .pmtiles file.
+        length: The number of bytes to fetch from the start of the file.
+
+    Returns:
+        bytes: The first ``length`` bytes of the file.
+
+    Raises:
+        ValueError: If the server does not return the expected bytes.
+    """
+    import requests
+
+    headers = {"Range": f"bytes=0-{length - 1}", "Accept-Encoding": "identity"}
+    response = requests.get(url, headers=headers, timeout=60)
+    response.raise_for_status()
+    content = response.content[:length]
+    if len(content) < length or not content.startswith(b"PMTiles"):
+        raise ValueError(
+            f"Could not read a valid PMTiles header from {url}. The server must "
+            "support HTTP range requests on the uncompressed file. Some hosts, "
+            "such as GitHub Pages, compress the file before applying the byte "
+            "range, which corrupts the result. Host the file on a service that "
+            "serves ranges correctly, such as raw.githubusercontent.com, "
+            "Hugging Face, S3, or Cloudflare R2."
+        )
+    return content
+
+
 def pmtiles_header(input_file: str):
     """
     Fetch the header information from a local or remote .pmtiles file.
@@ -13997,8 +14032,6 @@ def pmtiles_header(input_file: str):
 
     from urllib.parse import urlparse
 
-    import requests
-
     try:
         from pmtiles.reader import MmapSource, Reader
         from pmtiles.tile import deserialize_header
@@ -14011,10 +14044,8 @@ def pmtiles_header(input_file: str):
         raise ValueError("Input file must be a .pmtiles file.")
 
     if input_file.startswith("http"):
-        # Fetch only the first 127 bytes
-        headers = {"Range": "bytes=0-127"}
-        response = requests.get(input_file, headers=headers)
-        header = deserialize_header(response.content)
+        # Fetch only the 127-byte header
+        header = deserialize_header(_fetch_pmtiles_bytes(input_file, 127))
 
     else:
         if not os.path.exists(input_file):
@@ -14066,8 +14097,6 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
     import json
     from urllib.parse import urlparse
 
-    import requests
-
     try:
         from pmtiles.reader import MemorySource, MmapSource, Reader
     except ImportError:
@@ -14085,9 +14114,9 @@ def pmtiles_metadata(input_file: str) -> Dict[str, Union[str, int, List[str]]]:
     metadata_length = header["metadata_length"]
 
     if input_file.startswith("http"):
-        headers = {"Range": f"bytes=0-{metadata_offset + metadata_length}"}
-        response = requests.get(input_file, headers=headers)
-        content = MemorySource(response.content)
+        content = MemorySource(
+            _fetch_pmtiles_bytes(input_file, metadata_offset + metadata_length)
+        )
         metadata = Reader(content).metadata()
     else:
         with open(input_file, "rb") as f:
