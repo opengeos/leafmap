@@ -108,10 +108,10 @@ def test_ipyleaflet_add_basemap_adds_carto_key(monkeypatch):
     """ipyleaflet basemaps get the key, but other TileLayers are untouched."""
     import ipyleaflet
 
-    import leafmap
+    from leafmap import leafmap as ipyl
 
     monkeypatch.setenv("CARTO_API_KEY", "abc")
-    m = leafmap.Map()
+    m = ipyl.Map()
     m.add_basemap("CartoDB.Positron")
     assert m.layers[-1].url.endswith("?key=abc")
 
@@ -131,6 +131,71 @@ def test_folium_add_basemap_does_not_mutate_shared_layer(monkeypatch):
     m = fm.Map()
     m.add_basemap("CartoDB.Positron")
     assert shared.tiles == original
+    added = [
+        child
+        for child in m._children.values()
+        if getattr(child, "tiles", "").endswith("?key=abc")
+    ]
+    assert len(added) == 1
+    assert added[0] is not shared
+    assert added[0].get_name() != shared.get_name()
+    assert added[0].options == shared.options
     assert "basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=abc" in (
         m.get_root().render()
     )
+
+
+def test_maplibre_style_url_gets_carto_key_before_fetch(monkeypatch):
+    """A user-supplied CARTO style URL is keyed before it is fetched."""
+    import leafmap.maplibregl as ml
+
+    monkeypatch.setenv("CARTO_API_KEY", "abc")
+    requested = []
+
+    class Response:
+        status_code = 200
+        text = '{"version": 8, "sources": {}, "layers": []}'
+
+    def fake_get(url, *args, **kwargs):
+        requested.append(url)
+        return Response()
+
+    monkeypatch.setattr(ml.requests, "get", fake_get)
+    ml.Map(style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json")
+    assert requested[0].endswith("style.json?key=abc")
+
+
+def _new_style_carto_provider():
+    """Builds a CARTO provider the way xyzservices >= 2026.9.0 defines it."""
+    import xyzservices
+
+    return xyzservices.TileProvider(
+        name="CartoDB.Positron",
+        url="https://{s}.basemaps.cartocdn.com/{variant}/{z}/{x}/{y}{r}.png?key={apikey}",
+        attribution="(C) OpenStreetMap contributors (C) CARTO",
+        subdomains="abcd",
+        max_zoom=20,
+        variant="light_all",
+        apikey="<insert your API key here>",
+    )
+
+
+def test_xyz_provider_url_replaces_carto_placeholder(monkeypatch):
+    """A CARTO provider with the xyzservices key placeholder gets the real key."""
+    monkeypatch.setenv("CARTO_API_KEY", "abc")
+    provider = _new_style_carto_provider()
+    assert provider.requires_token()
+    normalized = common.normalize_carto_provider(provider)
+    assert not normalized.requires_token()
+    assert "apikey" in provider  # the original provider is not modified
+    url = common.xyz_provider_url(provider)
+    assert url == "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=abc"
+
+
+def test_get_xyz_dict_keeps_carto_providers():
+    """CARTO basemaps stay available even when xyzservices marks them as keyed."""
+    from leafmap.basemaps import get_xyz_dict
+
+    xyz_dict = get_xyz_dict()
+    assert "CartoDB.Positron" in xyz_dict
+    assert "{apikey}" not in xyz_dict["CartoDB.Positron"]["url"]

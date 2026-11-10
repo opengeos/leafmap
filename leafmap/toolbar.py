@@ -2316,7 +2316,7 @@ def search_basemaps(m):
                 elif provider.startswith("xyz"):
                     name = provider[4:]
                     xyz_provider = xyz.flatten()[name]
-                    url = xyz_provider.build_url()
+                    url = xyz_provider_url(xyz_provider)
                     attribution = xyz_provider.attribution
                     m.layers = layers
                     if xyz_provider.requires_token():
@@ -3532,7 +3532,7 @@ def plotly_search_basemaps(canvas):
                 elif provider.startswith("xyz"):
                     name = provider[4:]
                     xyz_provider = xyz.flatten()[name]
-                    url = xyz_provider.build_url()
+                    url = xyz_provider_url(xyz_provider)
                     attribution = xyz_provider.attribution
                     if xyz_provider.requires_token():
                         with output:

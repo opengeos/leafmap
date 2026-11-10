@@ -2045,6 +2045,61 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
     return f"{url}{sep}key={key}"
 
 
+def is_carto_provider(provider: Any) -> bool:
+    """Checks whether an xyzservices TileProvider serves CARTO basemaps.
+
+    Args:
+        provider (Any): The xyzservices TileProvider (or dict) to check.
+
+    Returns:
+        True if the provider's URL is hosted on basemaps.cartocdn.com.
+    """
+    try:
+        return "basemaps.cartocdn.com" in provider.get("url", "")
+    except AttributeError:
+        return False
+
+
+def normalize_carto_provider(provider: Any) -> Any:
+    """Removes the API key placeholder from a CARTO xyzservices TileProvider.
+
+    xyzservices >= 2026.9.0 defines CARTO providers with a ``?key={apikey}``
+    URL template and a placeholder key, so they count as requiring a token.
+    Leafmap adds the real key when a layer is created (see
+    :func:`add_carto_api_key`), so the placeholder is stripped here.
+
+    Args:
+        provider (Any): The xyzservices TileProvider.
+
+    Returns:
+        A copy of the provider without the key template, or the provider
+        unchanged if it is not a CARTO provider.
+    """
+    if not is_carto_provider(provider):
+        return provider
+    tile = xyzservices.TileProvider(dict(provider))
+    tile["url"] = (
+        tile["url"].replace("?key={apikey}", "").replace("&key={apikey}", "")
+    )
+    tile.pop("apikey", None)
+    return tile
+
+
+def xyz_provider_url(provider: Any) -> str:
+    """Builds the tile URL of an xyzservices TileProvider.
+
+    CARTO providers get the ``CARTO_API_KEY`` key instead of the xyzservices
+    placeholder.
+
+    Args:
+        provider (Any): The xyzservices TileProvider.
+
+    Returns:
+        The tile URL.
+    """
+    return add_carto_api_key(normalize_carto_provider(provider).build_url())
+
+
 def set_api_key(key: str, name: str = "GOOGLE_MAPS_API_KEY"):
     """Sets the Google Maps API key. You can generate one from https://bit.ly/3sw0THG.
 
@@ -19366,7 +19421,12 @@ def read_vector(source, layer=None, **kwargs: Any):
     # Only attempt this for local files as listing layers might not work with URLs
     if layer is None and ext in [".gpkg", ".gml"] and not is_url:
         try:
-            layers = list(gpd.list_layers(source)["name"])
+            if hasattr(gpd, "list_layers"):  # geopandas >= 1.0
+                layers = list(gpd.list_layers(source)["name"])
+            else:
+                from pyogrio import list_layers
+
+                layers = [name for name, _ in list_layers(source)]
             if layers:
                 return gpd.read_file(source, layer=layers[0], **kwargs)
         except Exception:

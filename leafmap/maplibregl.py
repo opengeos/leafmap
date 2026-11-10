@@ -177,6 +177,7 @@ class Map(MapWidget):
         ]
         if isinstance(style, str):
             if style.startswith("http"):
+                style = common.add_carto_api_key(style, warn=False)
                 response = requests.get(style)
                 if response.status_code != 200:
                     print(
@@ -1462,7 +1463,7 @@ class Map(MapWidget):
 
         elif isinstance(basemap, xyzservices.TileProvider):
             name = basemap.name
-            url = basemap.build_url()
+            url = common.xyz_provider_url(basemap)
             if attribution is None:
                 attribution = basemap.attribution
             if "max_zoom" in basemap.keys():

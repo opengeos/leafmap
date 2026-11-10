@@ -595,7 +595,7 @@ class Map(ipyleaflet.Map):
 
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
-                url = common.add_carto_api_key(basemap.build_url())
+                url = common.xyz_provider_url(basemap)
                 attribution = basemap.attribution
                 if "max_zoom" in basemap.keys():
                     max_zoom = basemap["max_zoom"]
@@ -4978,7 +4978,7 @@ class Map(ipyleaflet.Map):
         if provider.startswith("xyz"):
             name = provider[4:]
             xyz_provider = xyz.flatten()[name]
-            url = xyz_provider.build_url()
+            url = common.xyz_provider_url(xyz_provider)
             attribution = xyz_provider.attribution
             if attribution.strip() == "":
                 attribution = " "

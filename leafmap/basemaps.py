@@ -28,7 +28,13 @@ import requests
 import xyzservices
 from traitlets import Unicode
 
-from .common import GoogleMapsTileProvider, check_package, planet_tiles
+from .common import (
+    GoogleMapsTileProvider,
+    check_package,
+    is_carto_provider,
+    normalize_carto_provider,
+    planet_tiles,
+)
 
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY", None)
 
@@ -331,7 +337,11 @@ def get_xyz_dict(free_only: bool = True, france: bool = False) -> dict:
     xyz_bunch = xyzservices.providers
 
     if free_only:
-        xyz_bunch = xyz_bunch.filter(requires_token=False)
+        # CARTO providers require a key since xyzservices 2026.9.0. Keep them,
+        # since leafmap adds the CARTO_API_KEY key when a layer is created.
+        xyz_bunch = xyz_bunch.filter(
+            function=lambda tile: not tile.requires_token() or is_carto_provider(tile)
+        )
     if not france:
         xyz_bunch = xyz_bunch.filter(
             function=lambda tile: "france" not in dict(tile)["name"].lower()
@@ -340,7 +350,7 @@ def get_xyz_dict(free_only: bool = True, france: bool = False) -> dict:
     xyz_dict = xyz_bunch.flatten()
 
     for key, value in xyz_dict.items():
-        tile = xyzservices.TileProvider(value)
+        tile = normalize_carto_provider(xyzservices.TileProvider(value))
         if "type" not in tile:
             tile["type"] = "xyz"
         xyz_dict[key] = tile
