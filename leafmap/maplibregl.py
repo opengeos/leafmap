@@ -5374,6 +5374,7 @@ class Map(MapWidget):
         css_text: Optional[str] = None,
         position: str = "top-left",
         bg_layers: Optional[Union[bool, List[str]]] = False,
+        floating: bool = True,
     ) -> None:
         """
         Adds a layer control to the map.
@@ -5391,10 +5392,13 @@ class Map(MapWidget):
             position (str): The position of the layer control on the map. Can be "top-left", "top-right", "bottom-left",
                 or "bottom-right". Defaults to "top-left".
             bg_layers (bool): If True, background layers will be included in the control. Defaults to False.
-
+            floating (bool): If True, the layer control will be floating. Defaults to True.
         Returns:
             None
         """
+        if floating:
+            return
+
         from maplibre.controls import LayerSwitcherControl
 
         if layer_ids is None:
