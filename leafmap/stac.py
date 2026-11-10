@@ -896,7 +896,7 @@ def cog_tile(
         r = requests.get(
             f"{titiler_endpoint}/cog/{TileMatrixSetId}/tilejson.json",
             params=kwargs,
-            timeout=10,
+            timeout=60,
         ).json()
     except Exception as e:
         print(e)

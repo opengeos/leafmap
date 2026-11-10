@@ -34,3 +34,45 @@ def test_read_vector_gpkg_without_layer(tmp_path):
     gdf.to_file(path, layer="pts", driver="GPKG")
     result = common.read_vector(str(path))
     assert len(result) == 2
+
+
+def test_add_carto_api_key_appends_key():
+    """CARTO URLs get the key appended with the right separator."""
+    tile = "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+    assert common.add_carto_api_key(tile, key="abc") == tile + "?key=abc"
+    style = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json?foo=1"
+    assert common.add_carto_api_key(style, key="abc") == style + "&key=abc"
+
+
+def test_add_carto_api_key_leaves_other_urls(monkeypatch):
+    """Non-CARTO URLs and URLs that already have a key are unchanged."""
+    monkeypatch.setenv("CARTO_API_KEY", "abc")
+    osm = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+    assert common.add_carto_api_key(osm) == osm
+    keyed = "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=xyz"
+    assert common.add_carto_api_key(keyed) == keyed
+
+
+def test_add_carto_api_key_reads_env(monkeypatch):
+    """The key is read from the CARTO_API_KEY environment variable."""
+    monkeypatch.setenv("CARTO_API_KEY", "envkey")
+    url = "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+    assert common.add_carto_api_key(url).endswith("?key=envkey")
+
+
+def test_add_carto_api_key_without_key(monkeypatch):
+    """Without a key the URL is returned unchanged."""
+    monkeypatch.delenv("CARTO_API_KEY", raising=False)
+    url = "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+    assert common.add_carto_api_key(url, warn=False) == url
+
+
+def test_read_parquet_keeps_geoparquet_crs(tmp_path):
+    """read_parquet keeps the CRS stored in GeoParquet metadata."""
+    path = tmp_path / "projected.parquet"
+    gdf = gpd.GeoDataFrame(
+        {"id": [1]}, geometry=[Point(1620000, 1920000)], crs="EPSG:5070"
+    )
+    gdf.to_parquet(path)
+    result = common.read_parquet(str(path))
+    assert result.crs.to_epsg() == 5070

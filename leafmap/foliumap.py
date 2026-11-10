@@ -425,7 +425,7 @@ class Map(folium.Map):
 
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
-                url = basemap.build_url()
+                url = common.add_carto_api_key(basemap.build_url())
                 attribution = basemap.attribution
                 if "max_zoom" in basemap.keys():
                     max_zoom = basemap["max_zoom"]
@@ -448,6 +448,8 @@ class Map(folium.Map):
 
             elif basemap in basemaps:
                 bmap = basemaps[basemap]
+                if isinstance(bmap, folium.TileLayer):
+                    bmap.tiles = common.add_carto_api_key(bmap.tiles)
                 bmap.show = show
                 bmap.add_to(self)
                 if isinstance(basemaps[basemap], folium.TileLayer):

@@ -217,6 +217,9 @@ class Map(MapWidget):
             if style in carto_basemaps:
                 style = construct_carto_basemap_url(style)
 
+        if isinstance(style, str):
+            style = common.add_carto_api_key(style, warn=False)
+
         if style is not None:
             kwargs["style"] = style
 
@@ -1493,6 +1496,7 @@ class Map(MapWidget):
             )
             return
 
+        url = common.add_carto_api_key(url)
         raster_source = RasterTileSource(
             tiles=[url],
             attribution=attribution,

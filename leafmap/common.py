@@ -1989,6 +1989,52 @@ def get_api_key(name: Optional[str] = None, key: Optional[str] = None) -> Option
     return None
 
 
+_CARTO_KEY_WARNED = False
+
+
+def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) -> Any:
+    """Appends a CARTO Basemaps API key to a basemaps.cartocdn.com URL.
+
+    CARTO requires an API key on every basemaps.cartocdn.com URL (raster tiles
+    and vector styles). Without a key, raster tiles show an "API key required"
+    watermark. Request a free key at https://carto.com/basemaps/apikey and set
+    it as the ``CARTO_API_KEY`` environment variable (or Colab secret).
+
+    Args:
+        url (Any): The tile or style URL. Non-string values and URLs that are
+            not hosted on basemaps.cartocdn.com are returned unchanged.
+        key (str, optional): The CARTO API key. Defaults to None, which reads
+            the ``CARTO_API_KEY`` environment variable or Colab secret.
+        warn (bool, optional): Whether to print a one-time notice when no key
+            is found. Defaults to True.
+
+    Returns:
+        The URL with the ``key`` query parameter appended when a key is available.
+    """
+    global _CARTO_KEY_WARNED
+
+    if not isinstance(url, str) or "basemaps.cartocdn.com" not in url:
+        return url
+    if "?key=" in url or "&key=" in url:
+        return url
+
+    key = get_api_key("CARTO_API_KEY", key)
+    if not key:
+        if warn and not _CARTO_KEY_WARNED:
+            print(
+                "CARTO basemaps now require an API key. Request a free key at "
+                "https://carto.com/basemaps/apikey and set it with "
+                "leafmap.set_api_key(key, 'CARTO_API_KEY') or the CARTO_API_KEY "
+                "environment variable. Without it, tiles show an "
+                "'API key required' watermark."
+            )
+            _CARTO_KEY_WARNED = True
+        return url
+
+    sep = "&" if "?" in url else "?"
+    return f"{url}{sep}key={key}"
+
+
 def set_api_key(key: str, name: str = "GOOGLE_MAPS_API_KEY"):
     """Sets the Google Maps API key. You can generate one from https://bit.ly/3sw0THG.
 
@@ -15454,6 +15500,38 @@ def check_url(url: str) -> bool:
         return False
 
 
+def _geoparquet_crs(source: str, geometry: str = "geometry") -> Optional[Any]:
+    """Reads the CRS of a geometry column from GeoParquet file metadata.
+
+    Args:
+        source (str): The path or URL to a single GeoParquet file.
+        geometry (str, optional): The geometry column name. Defaults to "geometry".
+
+    Returns:
+        The CRS (a PROJJSON dict or "OGC:CRS84"), or None if the file has no
+        GeoParquet metadata or the CRS cannot be determined.
+    """
+    try:
+        import pyarrow.parquet as pq
+
+        if isinstance(source, str) and source.startswith(("http://", "https://")):
+            import fsspec
+
+            with fsspec.open(source, "rb") as f:
+                metadata = pq.read_schema(f).metadata
+        else:
+            metadata = pq.read_schema(source).metadata
+
+        geo = json.loads((metadata or {}).get(b"geo", b"{}"))
+        column = geo.get("columns", {}).get(geometry)
+        if column is None:
+            return None
+        # Per the GeoParquet spec, a missing "crs" key means OGC:CRS84.
+        return column.get("crs", "OGC:CRS84")
+    except Exception:
+        return None
+
+
 def read_parquet(
     source: str,
     geometry: Optional[str] = None,
@@ -15560,6 +15638,8 @@ def read_parquet(
         df = con.sql(sql, **kwargs).df()
         if table_name is not None:
             con.sql(f"CREATE OR REPLACE TABLE {table_name} AS FROM df", **kwargs)
+        if src_crs is None:
+            src_crs = _geoparquet_crs(source, geometry)
         result = df_to_gdf(df, geometry=geometry, src_crs=src_crs, dst_crs=dst_crs)
 
     con.close()

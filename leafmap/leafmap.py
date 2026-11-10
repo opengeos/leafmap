@@ -335,6 +335,11 @@ class Map(ipyleaflet.Map):
                     self.add_oam_gui(**kwargs)
                 return
 
+        if isinstance(obj, ipyleaflet.TileLayer) and not isinstance(
+            obj, ipyleaflet.LocalTileLayer
+        ):
+            obj.url = common.add_carto_api_key(obj.url)
+
         super().add(obj, index=index)
 
         if hasattr(self, "_layer_manager_widget"):
@@ -8177,7 +8182,7 @@ def get_basemap(name: str):
             basemap = basemaps[name]
             if basemap["type"] == "xyz":
                 layer = TileLayer(
-                    url=basemap["url"],
+                    url=common.add_carto_api_key(basemap["url"]),
                     name=basemap["name"],
                     max_zoom=24,
                     attribution=basemap["attribution"],
