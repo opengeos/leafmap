@@ -335,11 +335,6 @@ class Map(ipyleaflet.Map):
                     self.add_oam_gui(**kwargs)
                 return
 
-        if isinstance(obj, ipyleaflet.TileLayer) and not isinstance(
-            obj, ipyleaflet.LocalTileLayer
-        ):
-            obj.url = common.add_carto_api_key(obj.url)
-
         super().add(obj, index=index)
 
         if hasattr(self, "_layer_manager_widget"):
@@ -600,7 +595,7 @@ class Map(ipyleaflet.Map):
 
             if isinstance(basemap, xyzservices.TileProvider):
                 name = basemap.name
-                url = basemap.build_url()
+                url = common.add_carto_api_key(basemap.build_url())
                 attribution = basemap.attribution
                 if "max_zoom" in basemap.keys():
                     max_zoom = basemap["max_zoom"]

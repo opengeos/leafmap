@@ -94,3 +94,43 @@ def test_add_carto_api_key_ignores_similar_params():
     """Parameters such as apikey are not mistaken for an existing key."""
     url = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json?apikey=1"
     assert common.add_carto_api_key(url, key="abc") == url + "&key=abc"
+
+
+def test_add_carto_api_key_matches_host_only():
+    """The key is only added for CARTO hosts, not URLs that mention them."""
+    url = "https://example.com/tiles?u=basemaps.cartocdn.com"
+    assert common.add_carto_api_key(url, key="abc") == url
+    url = "https://basemaps.cartocdn.com.example.com/{z}/{x}/{y}.png"
+    assert common.add_carto_api_key(url, key="abc") == url
+
+
+def test_ipyleaflet_add_basemap_adds_carto_key(monkeypatch):
+    """ipyleaflet basemaps get the key, but other TileLayers are untouched."""
+    import ipyleaflet
+
+    import leafmap
+
+    monkeypatch.setenv("CARTO_API_KEY", "abc")
+    m = leafmap.Map()
+    m.add_basemap("CartoDB.Positron")
+    assert m.layers[-1].url.endswith("?key=abc")
+
+    url = "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"
+    layer = ipyleaflet.TileLayer(url=url, name="custom")
+    m.add(layer)
+    assert layer.url == url
+
+
+def test_folium_add_basemap_does_not_mutate_shared_layer(monkeypatch):
+    """folium basemaps get the key without changing the shared basemap object."""
+    import leafmap.foliumap as fm
+
+    monkeypatch.setenv("CARTO_API_KEY", "abc")
+    shared = fm.basemaps["CartoDB.Positron"]
+    original = shared.tiles
+    m = fm.Map()
+    m.add_basemap("CartoDB.Positron")
+    assert shared.tiles == original
+    assert "basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key=abc" in (
+        m.get_root().render()
+    )

@@ -2017,12 +2017,15 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
         The URL with the ``key`` query parameter appended when a key is available.
     """
     global _CARTO_KEY_WARNED
-
-    if not isinstance(url, str) or "basemaps.cartocdn.com" not in url:
-        return url
     from urllib.parse import parse_qs, urlsplit
 
-    if "key" in parse_qs(urlsplit(url).query):
+    if not isinstance(url, str):
+        return url
+    parts = urlsplit(url)
+    host = (parts.hostname or "").lower()
+    if host != "basemaps.cartocdn.com" and not host.endswith(".basemaps.cartocdn.com"):
+        return url
+    if "key" in parse_qs(parts.query):
         return url
 
     key = get_api_key("CARTO_API_KEY", key)
@@ -19189,7 +19192,9 @@ def get_overture_latest_release(patch=False) -> str:
         raise
 
 
-def get_overture_pmtiles_url(theme: str = "buildings", release: str = None) -> str:
+def get_overture_pmtiles_url(
+    theme: str = "buildings", release: Optional[str] = None
+) -> str:
     """Get the URL of an Overture Maps PMTiles file for a theme.
 
     Args:

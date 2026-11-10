@@ -449,7 +449,18 @@ class Map(folium.Map):
             elif basemap in basemaps:
                 bmap = basemaps[basemap]
                 if isinstance(bmap, folium.TileLayer):
-                    bmap.tiles = common.add_carto_api_key(bmap.tiles)
+                    keyed_url = common.add_carto_api_key(bmap.tiles)
+                    if keyed_url != bmap.tiles:
+                        # Build a new layer so the key is not stored on the
+                        # shared basemap object.
+                        bmap = folium.TileLayer(
+                            tiles=keyed_url,
+                            attr=bmap.options.get("attribution"),
+                            name=bmap.layer_name,
+                            max_zoom=bmap.options.get("max_zoom", 22),
+                            overlay=bmap.overlay,
+                            control=bmap.control,
+                        )
                 bmap.show = show
                 bmap.add_to(self)
                 if isinstance(basemaps[basemap], folium.TileLayer):
