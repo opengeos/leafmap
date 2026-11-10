@@ -208,3 +208,9 @@ def test_is_carto_provider_matches_host_only():
         {"url": "https://example.com/?u=basemaps.cartocdn.com"}
     )
     assert not common.is_carto_provider({"url": None})
+
+
+def test_add_carto_api_key_encodes_key():
+    """Special characters in the key are URL-encoded."""
+    url = "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
+    assert common.add_carto_api_key(url, key="a&b c") == url + "?key=a%26b%20c"

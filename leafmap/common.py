@@ -2037,7 +2037,7 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
         The URL with the ``key`` query parameter appended when a key is available.
     """
     global _CARTO_KEY_WARNED
-    from urllib.parse import parse_qs, urlsplit
+    from urllib.parse import parse_qs, quote, urlsplit
 
     if not _is_carto_url(url):
         return url
@@ -2058,7 +2058,7 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
         return url
 
     sep = "&" if "?" in url else "?"
-    return f"{url}{sep}key={key}"
+    return f"{url}{sep}key={quote(str(key), safe='')}"
 
 
 def is_carto_provider(provider: Any) -> bool:
