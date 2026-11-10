@@ -87,6 +87,29 @@ SIDEBAR_PANEL_TEXT_COLOR = "#212121"
 SIDEBAR_SCROLLBAR_STYLE = "scrollbar-color: #bdbdbd #f5f5f5; scrollbar-width: thin;"
 
 
+def _panel_header_chevron(color: str) -> List[Dict[str, Any]]:
+    """Builds an expansion panel header "actions" slot with a colored chevron.
+
+    The default expand/collapse icon follows the Vuetify theme and is nearly
+    invisible on the light sidebar headers in dark mode, so it is colored
+    explicitly.
+
+    Args:
+        color (str): The CSS color of the chevron.
+
+    Returns:
+        The ``v_slots`` list for ``v.ExpansionPanelHeader``.
+    """
+    return [
+        {
+            "name": "actions",
+            "children": v.Icon(
+                children=["mdi-chevron-down"], style_=f"color: {color};"
+            ),
+        }
+    ]
+
+
 class Map(MapWidget):
     """The Map class inherits from the MapWidget class of the maplibre.ipywidget module."""
 
@@ -10421,18 +10444,7 @@ class LayerManagerWidget(v.ExpansionPanels):
                 f"background-color: {background_color}; "
                 f"color: {text_color};"
             ),
-            # Color the expand/collapse chevron explicitly; the default icon
-            # follows the Vuetify theme and is nearly invisible on the light
-            # header in dark mode.
-            v_slots=[
-                {
-                    "name": "actions",
-                    "children": v.Icon(
-                        children=["mdi-chevron-down"],
-                        style_=f"color: {text_color};",
-                    ),
-                }
-            ],
+            v_slots=_panel_header_chevron(text_color),
             children=[
                 v.Row(
                     align="center",
@@ -10460,8 +10472,9 @@ class LayerManagerWidget(v.ExpansionPanels):
             "<style>"
             ".leafmap-layer-manager .v-expansion-panel-content__wrap"
             " { padding: 4px 8px 8px; }"
-            f".leafmap-layer-manager {{ --jp-widgets-label-color: {text_color};"
-            f" --jp-widgets-color: {text_color}; }}"
+            ".leafmap-layer-manager {"
+            f" --jp-widgets-label-color: {SIDEBAR_PANEL_TEXT_COLOR};"
+            f" --jp-widgets-color: {SIDEBAR_PANEL_TEXT_COLOR}; }}"
             "</style>",
             layout=widgets.Layout(display="none"),
         )
@@ -10549,9 +10562,9 @@ class LayerManagerWidget(v.ExpansionPanels):
                 readout=False,
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
-                    flex="0 0 90px",
+                    flex="0 1 90px",
                     width="90px",
-                    min_width="60px",
+                    min_width="40px",
                     padding=padding,
                 ),
             )
@@ -10771,18 +10784,7 @@ class CustomWidget(v.ExpansionPanels):
                 f"background-color: {background_color}; "
                 f"color: {text_color};"
             ),
-            # Color the expand/collapse chevron explicitly; the default icon
-            # follows the Vuetify theme and is nearly invisible on the light
-            # header in dark mode.
-            v_slots=[
-                {
-                    "name": "actions",
-                    "children": v.Icon(
-                        children=["mdi-chevron-down"],
-                        style_=f"color: {text_color};",
-                    ),
-                }
-            ],
+            v_slots=_panel_header_chevron(text_color),
             children=[
                 v.Row(
                     align="center",
