@@ -214,3 +214,30 @@ def test_add_carto_api_key_encodes_key():
     """Special characters in the key are URL-encoded."""
     url = "https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png"
     assert common.add_carto_api_key(url, key="a&b c") == url + "?key=a%26b%20c"
+
+
+def test_normalize_carto_provider_keeps_other_params():
+    """Removing the key placeholder keeps other query parameters valid."""
+    import xyzservices
+
+    base = {
+        "name": "C",
+        "attribution": "a",
+        "variant": "v",
+        "apikey": "<insert your API key here>",
+    }
+    prefix = "https://basemaps.cartocdn.com/{variant}/{z}/{x}/{y}.png"
+    cases = {
+        "?key={apikey}&other=1": "?other=1",
+        "?other=1&key={apikey}": "?other=1",
+        "?a=1&key={apikey}&b=2": "?a=1&b=2",
+    }
+    for query, expected in cases.items():
+        provider = xyzservices.TileProvider(url=prefix + query, **base)
+        assert common.normalize_carto_provider(provider)["url"] == prefix + expected
+
+
+def test_add_carto_api_key_respects_blank_key():
+    """An existing blank key parameter is not duplicated."""
+    url = "https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png?key="
+    assert common.add_carto_api_key(url, key="abc") == url

@@ -2041,7 +2041,7 @@ def add_carto_api_key(url: Any, key: Optional[str] = None, warn: bool = True) ->
 
     if not _is_carto_url(url):
         return url
-    if "key" in parse_qs(urlsplit(url).query):
+    if "key" in parse_qs(urlsplit(url).query, keep_blank_values=True):
         return url
 
     key = get_api_key("CARTO_API_KEY", key)
@@ -2091,10 +2091,14 @@ def normalize_carto_provider(provider: Any) -> Any:
         A copy of the provider without the key template, or the provider
         unchanged if it is not a CARTO provider.
     """
+    import re
+
     if not is_carto_provider(provider):
         return provider
     tile = xyzservices.TileProvider(dict(provider))
-    tile["url"] = tile["url"].replace("?key={apikey}", "").replace("&key={apikey}", "")
+    # Remove the key={apikey} pair and tidy the remaining query separators.
+    url = re.sub(r"([?&])key=\{apikey\}(&|$)", r"\1", tile["url"])
+    tile["url"] = re.sub(r"[?&]$", "", url)
     tile.pop("apikey", None)
     return tile
 
