@@ -10511,16 +10511,25 @@ class LayerManagerWidget(v.ExpansionPanels):
                 ),
             )
 
+            # Keep the icon buttons from shrinking in the flex row; otherwise
+            # the icon overflows and is truncated to "..".
+            button_layout = {
+                "width": "32px",
+                "min_width": "32px",
+                "flex": "0 0 auto",
+                "height": "25px",
+                "padding": "0",
+            }
             settings = widgets.Button(
                 icon="gear",
                 tooltip="Change layer style",
-                layout=widgets.Layout(width="38px", height="25px", padding=padding),
+                layout=widgets.Layout(**button_layout),
             )
 
             remove = widgets.Button(
                 icon="times",
                 tooltip="Remove layer",
-                layout=widgets.Layout(width="38px", height="25px", padding=padding),
+                layout=widgets.Layout(**button_layout),
             )
 
             def on_visibility_change(change, layer_name=name):
