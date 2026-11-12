@@ -11022,7 +11022,8 @@ class LayerStyleWidget(widgets.VBox):
             layout=widgets.Layout(width="auto"),
         )
 
-        self.output_widget = widgets.Output()
+        # No margin so the empty output area adds no space below the buttons.
+        self.output_widget = widgets.Output(layout=widgets.Layout(margin="0"))
 
         # Button container
         self.button_box = widgets.HBox([self.apply_btn, self.reset_btn, self.close_btn])
@@ -11032,8 +11033,10 @@ class LayerStyleWidget(widgets.VBox):
         self.reset_btn.on_click(self._reset_style)
         self.close_btn.on_click(self._close_widget)
 
-        # Layout
-        self.layout = widgets.Layout(width="300px", padding="10px")
+        # Layout. No padding: the sidebar panel already pads its content, and
+        # extra padding leaves a gap below the buttons and misaligns the
+        # content with the other panels.
+        self.layout = widgets.Layout(width="300px", padding="0")
 
         # Combine all widgets
         self.children = [*self.style_widgets, self.button_box, self.output_widget]
