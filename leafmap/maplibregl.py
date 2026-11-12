@@ -10630,7 +10630,10 @@ class LayerManagerWidget(v.ExpansionPanels):
             checkbox = widgets.Checkbox(
                 value=visible, description=name, style=style, indent=False
             )
-            checkbox.layout.flex = "1 1 auto"
+            # Use a zero flex basis so the checkbox only takes the space left
+            # over by the slider and buttons. With an "auto" basis, its default
+            # 300px width squeezes the opacity slider down to its minimum.
+            checkbox.layout.flex = "1 1 0"
             checkbox.layout.min_width = "0"
             checkbox.layout.overflow = "hidden"
 
@@ -10642,9 +10645,9 @@ class LayerManagerWidget(v.ExpansionPanels):
                 readout=False,
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
-                    flex="0 1 90px",
+                    flex="0 0 auto",
                     width="90px",
-                    min_width="40px",
+                    min_width="90px",
                     padding=padding,
                 ),
             )
@@ -11019,7 +11022,8 @@ class LayerStyleWidget(widgets.VBox):
             layout=widgets.Layout(width="auto"),
         )
 
-        self.output_widget = widgets.Output()
+        # No margin so the empty output area adds no space below the buttons.
+        self.output_widget = widgets.Output(layout=widgets.Layout(margin="0"))
 
         # Button container
         self.button_box = widgets.HBox([self.apply_btn, self.reset_btn, self.close_btn])
@@ -11029,8 +11033,10 @@ class LayerStyleWidget(widgets.VBox):
         self.reset_btn.on_click(self._reset_style)
         self.close_btn.on_click(self._close_widget)
 
-        # Layout
-        self.layout = widgets.Layout(width="300px", padding="10px")
+        # Layout. No padding: the sidebar panel already pads its content, and
+        # extra padding leaves a gap below the buttons and misaligns the
+        # content with the other panels.
+        self.layout = widgets.Layout(width="300px", padding="0")
 
         # Combine all widgets
         self.children = [*self.style_widgets, self.button_box, self.output_widget]
