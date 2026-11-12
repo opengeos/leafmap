@@ -110,34 +110,41 @@ def _panel_header_chevron(color: str) -> List[Dict[str, Any]]:
     ]
 
 
-def _map_widget_css() -> str:
+MAP_CSS_CLASS = "leafmap-maplibre"
+
+
+def _map_widget_css() -> Any:
     """Builds the map widget CSS with a readable popup text color.
 
     MapLibre popups have a white background but no text color, so in a dark
     notebook theme the popup text inherits the light theme color and is
     unreadable. The upstream widget CSS is kept and a dark text color is
-    appended for popups.
+    appended for popups. The rule is scoped to leafmap maps because anywidget
+    loads the CSS for the whole page.
 
     Returns:
-        The CSS for the map widget.
+        The CSS for the map widget, or the upstream CSS unchanged if it cannot
+        be read.
     """
     # anywidget may wrap the upstream CSS file in a FileContents object, whose
     # str() is the file contents.
-    css = getattr(MapWidget, "_css", None) or MapWidget.__dict__.get("_css")
+    original = getattr(MapWidget, "_css", None)
     try:
-        if isinstance(css, os.PathLike) or (
-            isinstance(css, str) and os.path.isfile(css)
+        if isinstance(original, os.PathLike) or (
+            isinstance(original, str) and os.path.isfile(original)
         ):
-            with open(css, encoding="utf-8") as f:
+            with open(original, encoding="utf-8") as f:
                 css = f.read()
         else:
-            css = str(css) if css is not None else ""
-    except OSError:
+            css = str(original) if original is not None else ""
+    except Exception:
         css = ""
+    if not css.strip():
+        # Never replace the upstream map CSS with only the popup rule.
+        return original
     return (
-        css + "\n.maplibregl-popup-content {"
-        f" color: {SIDEBAR_PANEL_TEXT_COLOR};"
-        f" background-color: {SIDEBAR_PANEL_BACKGROUND}; }}\n"
+        css + f"\n.{MAP_CSS_CLASS} .maplibregl-popup-content {{"
+        f" color: {SIDEBAR_PANEL_TEXT_COLOR}; }}\n"
     )
 
 
@@ -287,6 +294,7 @@ class Map(MapWidget):
         )
 
         super().__init__(map_options, height=height)
+        self.add_class(MAP_CSS_CLASS)
         if use_message_queue is None:
             use_message_queue = os.environ.get(
                 "USE_MESSAGE_QUEUE", ""
