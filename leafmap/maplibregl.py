@@ -110,8 +110,41 @@ def _panel_header_chevron(color: str) -> List[Dict[str, Any]]:
     ]
 
 
+def _map_widget_css() -> str:
+    """Builds the map widget CSS with a readable popup text color.
+
+    MapLibre popups have a white background but no text color, so in a dark
+    notebook theme the popup text inherits the light theme color and is
+    unreadable. The upstream widget CSS is kept and a dark text color is
+    appended for popups.
+
+    Returns:
+        The CSS for the map widget.
+    """
+    # anywidget may wrap the upstream CSS file in a FileContents object, whose
+    # str() is the file contents.
+    css = getattr(MapWidget, "_css", None) or MapWidget.__dict__.get("_css")
+    try:
+        if isinstance(css, os.PathLike) or (
+            isinstance(css, str) and os.path.isfile(css)
+        ):
+            with open(css, encoding="utf-8") as f:
+                css = f.read()
+        else:
+            css = str(css) if css is not None else ""
+    except OSError:
+        css = ""
+    return (
+        css + "\n.maplibregl-popup-content {"
+        f" color: {SIDEBAR_PANEL_TEXT_COLOR};"
+        f" background-color: {SIDEBAR_PANEL_BACKGROUND}; }}\n"
+    )
+
+
 class Map(MapWidget):
     """The Map class inherits from the MapWidget class of the maplibre.ipywidget module."""
+
+    _css = _map_widget_css()
 
     def __init__(
         self,
