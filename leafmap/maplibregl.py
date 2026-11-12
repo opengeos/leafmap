@@ -10630,7 +10630,10 @@ class LayerManagerWidget(v.ExpansionPanels):
             checkbox = widgets.Checkbox(
                 value=visible, description=name, style=style, indent=False
             )
-            checkbox.layout.flex = "1 1 auto"
+            # Use a zero flex basis so the checkbox only takes the space left
+            # over by the slider and buttons. With an "auto" basis, its default
+            # 300px width squeezes the opacity slider down to its minimum.
+            checkbox.layout.flex = "1 1 0"
             checkbox.layout.min_width = "0"
             checkbox.layout.overflow = "hidden"
 
@@ -10642,9 +10645,9 @@ class LayerManagerWidget(v.ExpansionPanels):
                 readout=False,
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
-                    flex="0 1 90px",
-                    width="90px",
-                    min_width="40px",
+                    flex="0 0 auto",
+                    width="120px",
+                    min_width="120px",
                     padding=padding,
                 ),
             )
