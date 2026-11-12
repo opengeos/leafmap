@@ -4,6 +4,7 @@ import ipyvuetify as v
 import ipywidgets as widgets
 
 from . import common
+from . import vuetify_compat as vc
 
 
 class Colorbar(widgets.Output):
@@ -1050,35 +1051,41 @@ class TabWidget:
         # Toolbar
         self._title = v.ToolbarTitle(children=[title])
         self._refresh_btn = v.Btn(
-            icon=True, children=[v.Icon(children=["mdi-refresh"])], tooltip="Refresh"
+            **vc.icon_button(),
+            children=[v.Icon(children=["mdi-refresh"])],
+            tooltip="Refresh",
         )
         self._help_btn = v.Btn(
-            icon=True,
+            **vc.icon_button(),
             children=[v.Icon(children=["mdi-help-circle-outline"])],
             tooltip="Help",
         )
         self._toolbar = v.Toolbar(
-            dense=True,
+            **vc.dense(),
             flat=True,
             color="primary" if dark_topbar else "white",
-            dark=dark_topbar,
+            **vc.dark_theme(dark_topbar),
             children=[self._title, v.Spacer(), self._refresh_btn, self._help_btn],
         )
 
         # Tabs header & items (linked by jslink)
         self._tabs_header = v.Tabs(
             v_model=0,
-            background_color="transparent",
+            **vc.tabs_background("transparent"),
             slider_color="primary",
             class_="px-4" if show_tab_header else "px-4 d-none",
             children=[],
         )
-        self._tabs_items = v.TabsItems(v_model=0, children=[])
+        self._tabs_items = vc.TabsWindow(v_model=0, children=[])
         widgets.jslink((self._tabs_header, "v_model"), (self._tabs_items, "v_model"))
 
         # Snackbar for quick feedback
         self._snackbar = v.Snackbar(
-            v_model=False, timeout=1400, color="primary", bottom=True, children=[""]
+            v_model=False,
+            timeout=1400,
+            color="primary",
+            **vc.location_bottom(),
+            children=[""],
         )
 
         # Help dialog (default content)
@@ -1090,7 +1097,9 @@ class TabWidget:
             """)
         self._help_title = v.CardTitle(class_="text-h6", children=["Help"])
         self._help_cardtext = v.CardText(class_="py-4", children=[default_help])
-        self._help_close_btn = v.Btn(text=True, color="primary", children=["Close"])
+        self._help_close_btn = v.Btn(
+            **vc.text_button(), color="primary", children=["Close"]
+        )
         self._help_card = v.Card(
             class_="rounded-xl",
             children=[
@@ -1271,7 +1280,10 @@ class TabWidget:
         tab = self._tabs_header.children[index]
         label = self._labels[index]
         if icon:
-            tab.children = [v.Icon(left=True, small=True, children=[icon]), label]
+            tab.children = [
+                v.Icon(**vc.icon_start(), **vc.small(), children=[icon]),
+                label,
+            ]
         else:
             tab.children = [label]
         if index < len(self._icons):
@@ -1448,13 +1460,18 @@ class TabWidget:
         hdr_children = list(self._tabs_header.children)
         items_children = list(self._tabs_items.children)
         tab_hdr = (
-            v.Tab(children=[v.Icon(left=True, small=True, children=[icon]), label])
+            v.Tab(
+                children=[
+                    v.Icon(**vc.icon_start(), **vc.small(), children=[icon]),
+                    label,
+                ]
+            )
             if icon
             else v.Tab(children=[label])
         )
         hdr_children.append(tab_hdr)
         content = self._card(label, body) if self._wrap_in_card else body
-        items_children.append(v.TabItem(children=[content]))
+        items_children.append(vc.TabsWindowItem(children=[content]))
         self._tabs_header.children = tuple(hdr_children)
         self._tabs_items.children = tuple(items_children)
 
@@ -1478,13 +1495,18 @@ class TabWidget:
         if not (0 <= index <= n):
             raise IndexError(f"index {index} out of range (0..{n})")
         tab_hdr = (
-            v.Tab(children=[v.Icon(left=True, small=True, children=[icon]), label])
+            v.Tab(
+                children=[
+                    v.Icon(**vc.icon_start(), **vc.small(), children=[icon]),
+                    label,
+                ]
+            )
             if icon
             else v.Tab(children=[label])
         )
         hdr_children.insert(index, tab_hdr)
         content = self._card(label, body) if self._wrap_in_card else body
-        items_children.insert(index, v.TabItem(children=[content]))
+        items_children.insert(index, vc.TabsWindowItem(children=[content]))
         self._tabs_header.children = tuple(hdr_children)
         self._tabs_items.children = tuple(items_children)
         self._labels.insert(index, label)

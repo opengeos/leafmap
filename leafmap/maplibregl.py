@@ -32,6 +32,7 @@ from maplibre.ipywidget import MapWidget
 from maplibre.sources import GeoJSONSource, RasterTileSource
 
 from . import common
+from . import vuetify_compat as vc
 from .basemaps import xyz_to_leaflet
 from .common import (
     _in_colab_shell,
@@ -92,14 +93,18 @@ def _panel_header_chevron(color: str) -> List[Dict[str, Any]]:
 
     The default expand/collapse icon follows the Vuetify theme and is nearly
     invisible on the light sidebar headers in dark mode, so it is colored
-    explicitly.
+    explicitly. Vuetify 3 swaps between expand and collapse icons instead of
+    rotating a custom one, and its icon takes the header text color, so no slot
+    is needed there.
 
     Args:
         color (str): The CSS color of the chevron.
 
     Returns:
-        The ``v_slots`` list for ``v.ExpansionPanelHeader``.
+        The ``v_slots`` list for ``vc.ExpansionPanelTitle``.
     """
+    if vc.VUETIFY3:
+        return []
     return [
         {
             "name": "actions",
@@ -5567,11 +5572,11 @@ class Map(MapWidget):
         # Create toggle button
         toggle_icon = v.Icon(
             children=["mdi-chevron-left"] if sidebar_visible else ["mdi-chevron-right"],
-            small=True,
+            **vc.small(),
             style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         toggle_btn = v.Btn(
-            icon=True,
+            **vc.icon_button(),
             children=[toggle_icon],
             style_=(
                 f"width: 22px; height: 22px; min-width: 22px; padding: 0; "
@@ -5582,11 +5587,11 @@ class Map(MapWidget):
         # Create settings/wrench button
         settings_icon = v.Icon(
             children=["mdi-wrench"],
-            small=True,
+            **vc.small(),
             style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         settings_btn = v.Btn(
-            icon=True,
+            **vc.icon_button(),
             children=[settings_icon],
             style_=(
                 f"width: 22px; height: 22px; min-width: 22px; padding: 0; "
@@ -8250,6 +8255,37 @@ class Container(v.Container):
         row (v.Row): The main layout row containing the map and sidebar.
     """
 
+    # ipyvuetify 3 adds synced ``min_width`` and ``max_width`` traits to
+    # ``v.Container``. These properties shadow them so the sidebar widths are
+    # kept in Python only and do not constrain the whole container.
+    @property
+    def min_width(self) -> int:
+        """int: Minimum width of the sidebar in pixels."""
+        return self._sidebar_min_width
+
+    @min_width.setter
+    def min_width(self, value: int) -> None:
+        """Sets the minimum width of the sidebar.
+
+        Args:
+            value (int): The minimum width in pixels.
+        """
+        self._sidebar_min_width = value
+
+    @property
+    def max_width(self) -> int:
+        """int: Maximum width of the sidebar in pixels."""
+        return self._sidebar_max_width
+
+    @max_width.setter
+    def max_width(self, value: int) -> None:
+        """Sets the maximum width of the sidebar.
+
+        Args:
+            value (int): The maximum width in pixels.
+        """
+        self._sidebar_max_width = value
+
     def __init__(
         self,
         host_map: Optional[Any] = None,
@@ -8312,7 +8348,7 @@ class Container(v.Container):
             style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         self.toggle_btn = v.Btn(
-            icon=True,
+            **vc.icon_button(),
             children=[self.toggle_icon],
             style_=(
                 f"width: 48px; height: 48px; min-width: 48px; "
@@ -8327,7 +8363,7 @@ class Container(v.Container):
             style_=f"color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
         self.settings_btn = v.Btn(
-            icon=True,
+            **vc.icon_button(),
             children=[self.settings_icon],
             style_=f"width: 36px; height: 36px; color: {SIDEBAR_PANEL_TEXT_COLOR};",
         )
@@ -10469,8 +10505,8 @@ class LayerManagerWidget(v.ExpansionPanels):
 
         # Close icon button
         close_btn = v.Btn(
-            icon=True,
-            small=True,
+            **vc.icon_button(),
+            **vc.small(),
             class_="ma-0",
             style_=f"min-width: 24px; width: 24px; color: {text_color};",
             children=[
@@ -10482,7 +10518,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         )
         close_btn.on_event("click", self._handle_close)
 
-        header = v.ExpansionPanelHeader(
+        header = vc.ExpansionPanelTitle(
             style_=(
                 f"height: {height}; min-height: {height}; "
                 f"background-color: {background_color}; "
@@ -10514,7 +10550,7 @@ class LayerManagerWidget(v.ExpansionPanels):
         # uses a dark theme.
         panel_style = widgets.HTML(
             "<style>"
-            ".leafmap-layer-manager .v-expansion-panel-content__wrap"
+            f".leafmap-layer-manager .{vc.EXPANSION_PANEL_WRAPPER_CLASS}"
             " { padding: 4px 8px 8px; }"
             ".leafmap-layer-manager {"
             f" --jp-widgets-label-color: {SIDEBAR_PANEL_TEXT_COLOR};"
@@ -10532,7 +10568,7 @@ class LayerManagerWidget(v.ExpansionPanels):
             ),
             children=[
                 header,
-                v.ExpansionPanelContent(
+                vc.ExpansionPanelText(
                     style_=(
                         f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
                         f"color: {text_color}; "
@@ -10809,8 +10845,8 @@ class CustomWidget(v.ExpansionPanels):
 
         # Close icon button
         close_btn = v.Btn(
-            icon=True,
-            small=True,
+            **vc.icon_button(),
+            **vc.small(),
             class_="ma-0",
             style_=f"min-width: 24px; width: 24px; color: {text_color};",
             children=[
@@ -10822,7 +10858,7 @@ class CustomWidget(v.ExpansionPanels):
         )
         close_btn.on_event("click", self._handle_close)
 
-        header = v.ExpansionPanelHeader(
+        header = vc.ExpansionPanelTitle(
             style_=(
                 f"height: {height}; min-height: {height}; "
                 f"background-color: {background_color}; "
@@ -10857,7 +10893,7 @@ class CustomWidget(v.ExpansionPanels):
             ),
             children=[
                 header,
-                v.ExpansionPanelContent(
+                vc.ExpansionPanelText(
                     style_=(
                         f"background-color: {SIDEBAR_PANEL_BACKGROUND}; "
                         f"color: {text_color}; "
