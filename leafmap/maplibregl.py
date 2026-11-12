@@ -10482,7 +10482,9 @@ class LayerManagerWidget(v.ExpansionPanels):
             description="All layers on/off",
             style=style,
             indent=False,
-            layout=widgets.Layout(width="100%"),
+            # "auto" rather than "100%": the checkbox has a 2px margin, so a
+            # 100% width overflows the panel and shows a horizontal scrollbar.
+            layout=widgets.Layout(width="auto"),
         )
         self.master_toggle.observe(self.toggle_all_layers, names="value")
 
@@ -10494,7 +10496,7 @@ class LayerManagerWidget(v.ExpansionPanels):
                     description=f"{group_name} group layers on/off",
                     style=style,
                     indent=False,
-                    layout=widgets.Layout(width="100%"),
+                    layout=widgets.Layout(width="auto"),
                 )
                 group_toggle.observe(self.toggle_group_layers, names="value")
                 self.group_toggles.children += (group_toggle,)
