@@ -10646,8 +10646,8 @@ class LayerManagerWidget(v.ExpansionPanels):
                 tooltip="Change layer opacity",
                 layout=widgets.Layout(
                     flex="0 0 auto",
-                    width="120px",
-                    min_width="120px",
+                    width="90px",
+                    min_width="90px",
                     padding=padding,
                 ),
             )
