@@ -303,7 +303,7 @@ class Map(ipyleaflet.Map):
         """Adds a layer to the map.
 
         Args:
-            layer (object): The layer to add to the map.
+            obj (object): The layer to add to the map.
             index (int, optional): The index at which to add the layer. Defaults to None.
         """
         if isinstance(obj, str):
@@ -571,7 +571,7 @@ class Map(ipyleaflet.Map):
 
         Args:
             basemap (str, optional): Can be one of string from basemaps. Defaults to 'HYBRID'.
-            visible (bool, optional): Whether the basemap is visible or not. Defaults to True.
+            show (bool, optional): Whether the basemap is visible or not. Defaults to True.
             **kwargs: Keyword arguments for the TileLayer.
         """
         import xyzservices
@@ -3023,7 +3023,6 @@ class Map(ipyleaflet.Map):
         Args:
             width (int, optional): Width of the map. Defaults to None.
             height (int, optional): Height of the map. Defaults to 600.
-            responsive (bool, optional): Whether to make the map responsive. Defaults to True.
             scrolling (bool, optional): If True, show a scrollbar when the content is larger than the iframe. Otherwise, do not show a scrollbar. Defaults to False.
 
         Returns:
@@ -5720,7 +5719,8 @@ class Map(ipyleaflet.Map):
         """Set the catalog source.
 
         Args:
-            catalog_source (str, optional): The catalog source. Defaults to "landsat".
+            source (dict): The STAC catalogs to use, in the format {label: url},
+                such as {'Element84': 'https://earth-search.aws.element84.com/v1'}.
         """
         if not isinstance(source, dict):
             raise TypeError(

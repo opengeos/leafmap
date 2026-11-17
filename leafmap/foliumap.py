@@ -764,8 +764,6 @@ class Map(folium.Map):
             georaster_options (Dict[str, Any], optional): Extra options forwarded to GeoRasterLayer.
             palette (str | Sequence[str], optional): Name of a built-in palette or a
                 sequence of color hex strings to visualize single-band rasters.
-            value_range (Sequence[float], optional): Two values defining the data range
-                mapped to the palette. Defaults to the GeoTIFF min/max.
             nodata_color (str, optional): Color used when encountering nodata or NaN
                 values. Defaults to transparent.
             indexes (Sequence[int], optional): List of band indexes to visualize
@@ -3570,7 +3568,7 @@ class Map(folium.Map):
                     "dashArray": "9"
                     "clickable": True,
                 }
-            hightlight_function (function, optional): Highlighting function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
+            highlight_function (function, optional): Highlighting function that is called for each feature, and should return the feature style. This styling function takes the feature as argument. Defaults to None.
                 highlight_function is a function that takes the feature as argument and should return a dictionary of the following form:
                 highlight_function = lambda feat: {"fillColor": feat["properties"]["color"]}
             info_mode (str, optional): Displays the attributes by either on_hover or on_click. Any value other than "on_hover" or "on_click" will be treated as None. Defaults to "on_hover".
