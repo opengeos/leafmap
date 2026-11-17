@@ -1636,11 +1636,8 @@ def change_basemap(m, position: Optional[str] = "topright"):
     """Widget for changing basemaps.
 
     Args:
-        canvas: The plotly map canvas that holds the Map object.
-        map_min_width (str, optional): Width of the map while the widget is open.
-            Defaults to "78%".
-        map_max_width (str, optional): Width of the map after the widget is closed.
-            Defaults to "98%".
+        m (object): leafmap.Map.
+        position (str, optional): The position of the widget. Defaults to "topright".
     """
     from .basemaps import get_xyz_dict
     from .leafmap import basemaps, get_basemap

@@ -6692,8 +6692,8 @@ class Map(MapWidget):
             layer_type (str, optional): The type of layer to add. Can be 'circle', 'line', or 'fill'. Defaults to None.
             extrude (bool, optional): Whether to extrude the layer based on the
                 column values. Defaults to False.
-            scale_factor (float, optional): Scale factor applied to extrusion
-                heights. Defaults to 1.0.
+            scale_factor (float, optional): Extrusion heights are divided by this
+                factor, so 2 gives half the column values. Defaults to 1.0.
             filter (dict, optional): The filter to apply to the layer. If None,
                 no filter is applied.
             paint (dict, optional): The paint properties to apply to the layer.
