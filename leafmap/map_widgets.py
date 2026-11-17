@@ -27,9 +27,8 @@ class Colorbar(widgets.Output):
         """Add a matplotlib colorbar to the map.
 
         Args:
-            vis_params (dict): Visualization parameters as a dictionary. See
-                https://developers.google.com/earth-engine/guides/image_visualization # noqa
-                for options.
+            vmin (float, optional): Minimum data value of the colorbar. Defaults to 0.
+            vmax (float, optional): Maximum data value of the colorbar. Defaults to 1.
             cmap (str, optional): Matplotlib colormap. Defaults to "gray". See
                 https://matplotlib.org/3.3.4/tutorials/colors/colormaps.html#sphx-glr-tutorials-colors-colormaps-py # noqa
                 for options.
@@ -48,7 +47,7 @@ class Colorbar(widgets.Output):
                 Defaults to None.
 
         Raises:
-            TypeError: If the vis_params is not a dictionary.
+            TypeError: If the constructed visualization parameters are not a dictionary.
             ValueError: If the orientation is not either horizontal or vertical.
             ValueError: If the provided min value is not convertible to float.
             ValueError: If the provided max value is not convertible to float.

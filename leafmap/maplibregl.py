@@ -4350,16 +4350,16 @@ class Map(MapWidget):
         """Add an image to the map.
 
         Args:
-            id (str): The layer ID of the image.
             image (Union[str, Dict, np.ndarray]): The URL or local file path to
                 the image, or a dictionary containing image data, or a numpy
                 array representing the image.
             width (int, optional): The width of the image. Defaults to None.
             height (int, optional): The height of the image. Defaults to None.
+            add_header (bool): If True, adds a header to the sidebar panel. Defaults to True.
             widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
             close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
+            label (str): Text label for the header. Defaults to "Image".
             background_color (str): Background color of the header. Defaults to "#f5f5f5".
-            label (str): Text label for the header. Defaults to "My Tools".
             header_height (str): Height of the header. Defaults to "40px".
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             **kwargs (Any): Additional keyword arguments for the parent class.
@@ -5389,9 +5389,9 @@ class Map(MapWidget):
             add_header (bool): If True, adds a header to the colorbar. Defaults to True.
             widget_icon (str): Icon for the header. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
             close_icon (str): Icon for the close button. See https://pictogrammers.github.io/@mdi/font/2.0.46/ for available icons.
-            background_color (str): Background color of the header. Defaults to "#f5f5f5".
-            label (str): Text label for the header. Defaults to "My Tools".
-            height (str): Height of the header. Defaults to "40px".
+            header_label (str): Text label for the header. Defaults to "Colorbar".
+            header_color (str): Background color of the header. Defaults to "#f5f5f5".
+            header_height (str): Height of the header. Defaults to "40px".
             expanded (bool): Whether the panel is expanded by default. Defaults to True.
             **kwargs (Any): Additional keyword arguments for the parent class.
 
@@ -6690,6 +6690,10 @@ class Map(MapWidget):
                 Defaults to None.
             legend_args (dict, optional): Additional keyword arguments for the add_legend method. Defaults to None.
             layer_type (str, optional): The type of layer to add. Can be 'circle', 'line', or 'fill'. Defaults to None.
+            extrude (bool, optional): Whether to extrude the layer based on the
+                column values. Defaults to False.
+            scale_factor (float, optional): Scale factor applied to extrusion
+                heights. Defaults to 1.0.
             filter (dict, optional): The filter to apply to the layer. If None,
                 no filter is applied.
             paint (dict, optional): The paint properties to apply to the layer.
@@ -6701,6 +6705,7 @@ class Map(MapWidget):
                 map to fit the bounds of the GeoJSON data. Defaults to True.
             visible (bool, optional): Whether the layer is visible or not.
                 Defaults to True.
+            opacity (float, optional): The opacity of the layer. Defaults to 1.0.
             before_id (str, optional): The ID of an existing layer before which
                 the new layer should be inserted.
             source_args (dict, optional): Additional keyword arguments that are
@@ -7394,7 +7399,6 @@ class Map(MapWidget):
             file_index (int, optional): Index of the main file. Defaults to 0.
             group_col (str, optional): Name of the column containing the group. Defaults to None.
             freq (str, optional): Frequency of the date range. Defaults to "D".
-            unit (str, optional): Unit of the date. Defaults to "ms".
             interval (int, optional): Interval of the date range. Defaults to 1.
             add_header (bool, optional): Whether to add a header to the widget. Defaults to True.
             widget_icon (str, optional): Icon of the widget. Defaults to "mdi-filter".
@@ -7886,8 +7890,6 @@ class Map(MapWidget):
         buttons for saving, exporting, and resetting the data.
 
         Args:
-            m (Map, optional): An existing Map object. If not provided, a default map with
-                basemaps and drawing controls will be created. Defaults to None.
             filename (str or gpd.GeoDataFrame): The path to a GeoJSON file or a GeoDataFrame
                 containing the vector data to be edited. Defaults to None.
             properties (Dict[str, List[Any]], optional): A dictionary where keys are property names
@@ -7895,9 +7897,6 @@ class Map(MapWidget):
                 assigned to the drawn features. Defaults to None.
             time_format (str, optional): The format string for the timestamp used in the exported
                 filename. Defaults to "%Y%m%dT%H%M%S".
-            column_widths (Optional[List[int]], optional): A list of two integers specifying the
-                relative widths of the map and sidebar columns. Defaults to (9, 3).
-            map_height (str, optional): The height of the map widget. Defaults to "600px".
             out_dir (str, optional): The directory where the exported GeoJSON files will be saved.
                 If not provided, the current working directory is used. Defaults to None.
             filename_prefix (str, optional): A prefix to be added to the exported filename.
@@ -7916,6 +7915,8 @@ class Map(MapWidget):
             controls (Optional[List[str]], optional): The drawing controls to be added to the map.
                 Defaults to ["point", "polygon", "line_string", "trash"].
             position (str, optional): The position of the drawing controls on the map. Defaults to "top-right".
+            fit_bounds_options (Optional[Dict], optional): Extra options passed to fit_bounds
+                after the edited data is added. Defaults to None.
             **kwargs (Any): Additional keyword arguments that may be passed to the function.
 
         Returns:
