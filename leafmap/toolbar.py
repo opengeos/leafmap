@@ -1637,6 +1637,7 @@ def change_basemap(m, position: Optional[str] = "topright"):
 
     Args:
         m (object): leafmap.Map.
+        position (str, optional): The position of the widget. Defaults to "topright".
     """
     from .basemaps import get_xyz_dict
     from .leafmap import basemaps, get_basemap
@@ -3041,7 +3042,7 @@ def plotly_toolbar(
     """Creates the main toolbar and adds it to the map.
 
     Args:
-        m (plotlymap.Map): The plotly Map object.
+        canvas: The plotly map canvas that holds the Map object.
     """
     m = canvas.map
     map_min_width = canvas.map_min_width
@@ -3386,7 +3387,11 @@ def plotly_basemap_gui(canvas, map_min_width="78%", map_max_width="98%"):
     """Widget for changing basemaps.
 
     Args:
-        m (object): leafmap.Map.
+        canvas: The plotly map canvas that holds the Map object.
+        map_min_width (str, optional): Width of the map while the widget is open.
+            Defaults to "78%".
+        map_max_width (str, optional): Width of the map after the widget is closed.
+            Defaults to "98%".
     """
     from .plotlymap import basemaps
 
@@ -3437,7 +3442,7 @@ def plotly_search_basemaps(canvas):
     """The widget for search XYZ tile services.
 
     Args:
-        m (plotlymap.Map, optional): The Plotly Map object. Defaults to None.
+        canvas: The plotly map canvas that holds the Map object.
 
     Returns:
         ipywidgets: The tool GUI widget.
